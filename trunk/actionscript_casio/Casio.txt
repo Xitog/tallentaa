@@ -1,0 +1,30 @@
+
+
+% : représente le disp & pause.
+
+---------------------------------------------------------------------
+
+Efface l'écran, attend une touche.
+Si la touche égale 31, recommence.
+Sinon affiche la touche pressée.
+
+G (51)
+ClrText
+Lbl 0
+0->tau
+While tau=0
+	Getkey->tau
+WhileEnd
+tau=31=>Goto 0
+tau%
+
+---------------------------------------------------------------------
+
+C2I
+1->X
+1->Y
+Locate X,Y, "0
+While 1
+	Getkey->tau
+	tau=26=>tau+1->tau
+	
