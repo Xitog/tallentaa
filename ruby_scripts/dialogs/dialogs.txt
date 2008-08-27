@@ -1,0 +1,10 @@
+1	Bonjour ami et bienvenue à Redwyne, je suis Sam, pour vous servir.
+2	Où puis-je acheter des armes ?
+3	Où puis-je dormir ?
+4	Au revoir.
+5	L'auberge du daim noir est une bonne auberge. Le tenancier est ami, dite lui que vous venez de ma par...
+6	Où puis-je dormir déjà ?
+7	Où puis-je acheter des armes déjà ?
+8	Notre forgeron est un des meilleurs de la région. Suivez la chaleur, vous ne vous tromperez pas !
+9	N'hésitez pas à revenir me voir. Sam, toujours à votre service Monsieur !
+10	Rebonjour ami ! Que voulez-vous savoir ?
