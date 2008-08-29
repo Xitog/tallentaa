@@ -1,30 +1,398 @@
 
+Symboles
+---
 
-% : représente le disp & pause.
+%  : représente le disp & pause.
+!= : différence
+/  : division
+*  : multiplication
+tau: variable écureuil
+_r : "petit" r
+
+Sommaire
+---
+
+COMBAT (1226)
+MAKER.P (466)
+STAT (224)
+CHARGEZ (94)
+G (51)
+C2I
+DEMINEUR
+ROD.MAIN
+ROD.OBJS
+ROD.EDIT
+ROD.LEC
+SVG
+LOAD
 
 ---------------------------------------------------------------------
+
+COMBAT (1226)
+
+Système de combats utilisé par LABYRINTHE. Deux ennemis différents.
+
+Int 2Ran#+1->C
+ClrText
+" "
+" "
+" "
+" "
+If C = 1
+Then 10->R
+	10->S
+	10->T
+	10->U
+IfEnd
+If C = 2
+Then 15->R
+	15->S
+	5->T
+	15->P										// Bug Original !!!!!!!
+IfEnd
+Lbl 0
+Locate 1,1,"ENNEMI:"
+C=1=>Locate 1,2, "SQUELETTE"
+C=2=>Locate 1,2, "ZOMBIE"
+C=1=>Locate 1,3, "0000000000"
+C=2=>Locate 1,3, "000000000000000"
+Locate 1,6, "VOUS:"
+Locate 1,7, "F:   E:   R:   PV:   "
+Locate 3,7,F
+Locate 8,7,E
+Locate 13,7,R
+Locate 19,7,P
+While Getkey!=31
+WhileEnd
+ClrText
+" "
+" "
+" "
+" "
+Locate 1,1,"ATTAQUES:"
+A>=1 => Locate 1,2,"1.COUP D'ESTOC"
+A>=2 => Locate 1,3,"2.COUP DE PART EN PART"
+A>=3 => Locate 1,4,"3.TRANCHE TETE"
+?->B
+B=1 => F+10-(R/3)->M
+B=2 => F*2-R->M
+B=3 => F+20-(R/2)->M
+Int 3Ran#+1->B
+B=1 => R+10-(R/3)->N
+B=2 => R*2-10-R->N					// Factorisation.... où es tu ????
+B=3 => R+15-(R/2)->N
+N<5 => 5->N
+Locate 1,6,"VOUS INFLIGEZ:"
+Locate 20,6,M
+Locate 1,7,"IL VOUS INFLIGE:"
+Locate 20,7,N
+P-N->P
+U-M->U
+U<=0 => Goto 2
+P<=0 => Goto 1
+While Getkey != 31
+WhileEnd
+ClrText
+Goto 0
+Lbl 1
+While Getkey != 31
+WhileEnd
+ClrText
+Locate 1,1, "VOUS AVEZ ETE VAINCU."
+Locate 1,2, "VOUS PERDEZ LA TOTALI"
+Locate 1,3, "TE DE VOTRE EQUIPEMENT"
+Locate 1,4, "ET RENNAISSAIT AU DE-"
+Locate 1,5, "PART DU LABYRINTHE..."
+While Getkey != 31
+WhileEnd
+Prog "MAKER.P"
+Lbl 2
+While Getkey != 31
+WhileEnd
+ClrText
+Locate 1,1, "VOUS AVEZ GAGNE"
+Locate 1,2, "ARGENT GAGNE:"
+Int 200Ran#+10->tau
+Locate 15,2,tau
+_r+tau->_r
+Locate 1,3, "ARGENT TOTAL:"
+Locate 15,3,_r
+Locate 1,4,"EXPERIENCE GAGNE:"
+Int 100Ran#+10->Q
+Locate 19,4,Q
+Locate 1,5,"EXPERIENCE TOTAL:"					// Ortho
+Q+Z->Z
+Locate 19,5,Z
+15->P
+While Getkey != 31
+WhileEnd
+ClrText
+" "
+" "
+" "
+Locate 1,1, "SAUVEGARDEZ ?"						// Ortho
+Locate 1,2,"1.OUI"
+Locate 1,3,"2.NON"
+?->K
+K=2 => Goto 9
+F->Mat A[1,1]
+E->Mat A[2,1]
+R->Mat A[3,1]
+P->Mat A[1,2]
+_r->Mat A[2,2]
+Z->Mat A[3,2]
+Lbl 9
+Prog "DECOR1"
+Return
+
+---------------------------------------------------------------------
+
+MAKER.P (466)
+
+---------------------------------------------------------------------
+
+STAT (224)
+
+---------------------------------------------------------------------
+
+CHARGEZ (94)
+
+---------------------------------------------------------------------
+
+G (51)
 
 Efface l'écran, attend une touche.
 Si la touche égale 31, recommence.
 Sinon affiche la touche pressée.
 
-G (51)
 ClrText
 Lbl 0
 0->tau
 While tau=0
 	Getkey->tau
 WhileEnd
-tau=31=>Goto 0
+tau=31 => Goto 0
 tau%
 
 ---------------------------------------------------------------------
 
-C2I
+C2I (201)
+
+Un simple "mouveur"
+Concu pour être minimal, hélas il répète beaucoup de code !
+(celui de suppression et celui d'affichage)
+
 1->X
 1->Y
 Locate X,Y, "0
 While 1
 	Getkey->tau
-	tau=26=>tau+1->tau
-	
+	tau=26 => tau+1->tau
+	If tau = 38
+	Then Locate X,Y,"
+		X-1->X										// Factorisation proche de 0
+		Locate X,Y,"0
+	IfEnd
+	If tau = 27
+	Then Locate X,Y," 
+		X+1->X
+		Locate X,Y,"0
+	IfEnd
+	If tau = 28
+	Then Locate X,Y,"
+		Y-1->Y
+		Locate X,Y,"0
+	IfEnd
+	If tau = 37
+	Then Locate X,Y,"
+		Y+1->Y
+		Locate X,Y,"0
+	IfEnd
+WhileEnd
+
+---------------------------------------------------------------------
+
+DEMINEUR (1036)
+
+---------------------------------------------------------------------
+
+ROD.MAIN (396)
+
+Lol ! On peut mettre des mots clés là où on peut mettre des instructions : ex le 'G = 0 => WhileEnd'... Vachement dangereux... Principal interface pour le jeu.
+
+{21,7}->Dim Mat A
+5->A
+5->B
+1->O
+Prog "ROD.OBJS"
+ClrText
+For 1->A To 21
+	For 1->B To 7
+		Mat A[A,B]=1 => Locate A,B,"0"
+	Next
+Next
+1->X
+1->Y
+Locate X,Y,"0"
+While 1
+	Getkey->G
+	G=0 => WhileEnd						// Goto 0 me semble plus propre (et encore)
+	G=27 => Goto A
+	G=28 => Goto B
+	G=37 => Goto C
+	G=28 => Goto D
+Lbl 0
+WhileEnd
+Lbl A
+X=21 => Goto 0
+Mat A[X+1,Y]=1=> Goto 0
+Locate X,Y," "							// Factorisation proche de 0
+X+1->X
+Locate X,Y,"0"
+Goto 0
+Lbl B
+Y=1 => Goto 0
+Mat A[X,Y-1]=1 => Goto 0
+Locate X,Y," "
+Y-1->Y
+Locate X,Y,"0"
+Goto 0
+Lbl C
+Y=7 => Goto 0
+Mat A[X,Y+1]=1 => Goto 0
+Locate X,Y," "
+Y+1->Y
+Locate X,Y,"0"
+Goto 0
+Lbl D
+X=1 => Goto 0
+Mat A[X-1,Y]=1 => Goto 0
+Locate X,Y," "
+X-1->X
+Locate X,Y,"0"
+Goto 0
+
+---------------------------------------------------------------------
+
+ROD.OBJS (188)
+
+Ce programme est une "base" d'objet. Par objet, je veux dire une construction
+dans la matrice. Ici un mur horizontal et un mur vertical.
+ 
+O=1 => Goto A
+O=2 => Goto B
+Return
+Lbl A
+1->Mat A[A,B]
+1->Mat A[A+1,B]
+1->Mat A[A+2,B]
+Locate A,B,"1"
+Locate A+1,B,"1"
+Locate A+2,B,"1"
+Return
+Lbl B
+1->Mat A[A,B]
+1->Mat A[A,B+1]
+A->Mat A[A,B+2]
+Locate A,B,"1"
+Locate A,B+1,"1"
+Locate A,B+2,"1"
+Return
+
+---------------------------------------------------------------------
+
+ROD.EDIT (205)
+
+Utilisation de sous-programme - les variables sont communes !
+Il s'agit d'un éditeur de niveau qui utilise le lecteur (ROD.LEC)
+et une base d'objet préfabriqué (ROD.OBJS).
+
+Prog "ROD.LEC"
+1->X
+1->Y
+While 1
+	Getkey->tau
+	Locate X,Y,Mat A[X,Y]
+	tau=37 => Y+1->Y
+	tau=38 => X-1->X
+	tau=27 => X+1->X
+	tau=28 => Y-1->Y
+	tau=71 => 0->Mat A[X,Y]
+	If tau=72
+	Then X->A
+		Y->B
+		1->O
+		Prog "ROD.OBJS"
+	IfEnd
+	If tau=62
+	Then X->A
+		Y->B
+		2->O
+		Prog "ROD.OBJS"
+	IfEnd
+	Locate X,Y,"+"
+WhileEnd
+
+---------------------------------------------------------------------
+
+ROD.LEC (93)
+
+Un lecteur de matrice/carte.
+
+For 1->A To 21
+	For 1->B To 7
+		Mat A[A,B]->C
+		C!=0 => Locate A,B,C
+		C=0 => Locate A,B,"#"
+		C=1 => Locate A,B,"0"
+	Next
+Next
+
+---------------------------------------------------------------------
+
+SVG (201)
+
+Effectue une sauvegarde compressée de la matrice dans une liste.
+En effet, on ne stocke QUE les valeurs non nulles en aditionant le X, le Y, et la valeur.
+On travail dans la liste 1 avant de tout mettre dans la liste 2.
+Ex [10,3] = 7
+
+Fill(0,List 1)
+150->Dim List 1
+0->tau
+For 1->A To 21
+	For 1->B To 7
+		Mat A[A,B]->C
+		C!=0 => tau+1->tau
+		C!=0 => C*100->C					// 700
+		C!=0 => B/10->E						// 0.3
+		C!=0 => C+A+E->List 1[tau]			// 710.3
+	Next
+Next
+tau -> Dim List 2							// Pourquoi ne pas tout mettre dans la liste 2 directement ??? +Rapide !
+For 1->A To tau
+	List 1[A]->List 2[A]
+Next
+1->Dim List 1
+{1,1}->Dim Mat A
+"MATRICE COMPRESSEE"
+
+---------------------------------------------------------------------
+
+LOAD (117)
+
+Fait l'opération inverse : charge la matrice à partir du format compressé défini dans SVG.
+Le calcul me semble vraiment chiadé...
+Ex: 710.3
+
+Dim List 2->Z
+{21,7}->Dim Mat A
+For 1->D To Z
+	List2[D]->C
+	(Frac C)*10->B					// 3
+	C-(Frac C)->C					// 710
+	C/100->C						// 7.10
+	(Frac C)x100->A					// 10
+	C-(Frac C)->C					// 7
+	C->Mat A[A,B]
+Next
