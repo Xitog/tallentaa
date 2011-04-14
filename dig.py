@@ -9,105 +9,89 @@ from pygame.locals import *
 pygame.init()
 pygame.display.set_caption('Dig Edit')
 
-resolution = (800,600)
+MAXX = 800
+MAXY = 600
+resolution = (MAXX,MAXY)
 flags = pygame.DOUBLEBUF
 screen = pygame.display.set_mode(resolution,flags,32)
 
 escape = False
 clock = pygame.time.Clock()
 
-v = 0
+v = 1
 n = 32
 s = 32
 lvl = [[v]*n for x in xrange(n)]
+alt = [[0]*n for x in xrange(n)]
 
 act = False
 
 item = 'Water'
 mode = 'Texture'
 
-#
-
-obj = {}
-
-def init(source, **key):
-    o = source.copy()
-    o.update(key)
-    if o.has_key('init'):
-        o['init'](o)
-    return o
-
-def inherit(cls, xfrom):
-    cls['super'] = xfrom
-    #cls.update(xfrom)
-
-#
-
-def ini_texture(tex):
-    tex['surf'] = pygame.image.load(tex['file']).convert()
-    tex['surf'].set_colorkey((255,0,255))
-
-Texture = {
-    'name' : None,
-    'file' : None,
-    'id'   : None,
-    'surf' : None,
-    'init' : ini_texture
-}
-inherit(Texture, obj)
-
-#
-
-grass = init(Texture, name='Grass', file='basic.png', id='1')
-water = init(Texture, name='Water', file='basic2.png', id='2')
-selector = init(Texture, name='Selector', file='Selector.png', id='0')
-
-#
-
 textures = {
-    'Grass' : 'basic.png',
-    'Water' : 'basic2.png'
+    'Grass' : '1_Basic.png',
+    'Water' : '2_Basic2.png'
 }
 
 doodads = {
-    'Desert Tree 1' : 'DesertTree1.png',
-    'Desert Tree 2' : 'DesertTree2.png',
-    'Desert Tree 3' : 'DesertTree3.png'
+    'Desert Tree 1' : '101_DesertTree1.png',
+    'Desert Tree 2' : '102_DesertTree2.png',
+    'Desert Tree 3' : '103_DesertTree3.png'
 }
 
-modes = {'Texture':textures, 'Doodad':doodads, 'Object': {}}
+specials = {
+    'HG' : '111_HG.png',
+    'HM' : '112_HM.png',
+    'HD' : '113_HD.png',
+    'MD' : '114_MD.png',
+    'BD' : '115_BD.png',
+    'BM' : '116_BM.png',
+    'BG' : '117_BG.png',
+    'MG' : '118_MG.png'
+}
 
-def make(myDic):
-    for k in myDic:
+modes = {'Texture':textures, 'Doodad':doodads, 'Object': {}, 'Specials' : specials}
+
+class Texture:
+    def __init__(self, filename, alpha=255):
         try:
-            s = pygame.image.load(myDic[k]).convert()
-            s.set_colorkey((255,0,255))
-            i = hash(myDic[k])
-            print 'Loaded ressource %s @%s' % (myDic[k],i)
-            myDic[k] = (i, s)
+            elements = filename.rstrip('.png').split('_')
+            self.id = int(elements[0])
+            elements = elements[1:]
+            self.name = ' '.join(elements)
+            self.surf = pygame.image.load(filename).convert()
+            self.surf.set_colorkey((255,0,255))
+            self.surf.set_alpha(alpha)
+            self.x = self.surf.get_size()[0]
+            self.y = self.surf.get_size()[1]
+            print 'Loaded ressource %s @%s as %s %dx%d' % (filename,self.id, self.name, self.x, self.y)
         except pygame.error as e:
-            print e
+            print 'Load error %s : %s' % (filename, str(e))
+
+selector = Texture('0_Selector.png', 192)
+
+quick = {}
 
 for k in modes:
     print '----> Loading %s' % (k,)
-    make(modes[k])
-
-def fromHash(myHash):
-    global modes
-    for k in modes:
-        for i in modes[k]:
-            if modes[k][i][0] == myHash:
-                return modes[k][i][1]
-    return modes['Texture']['Grass'][1]
+    for i in modes[k]:
+        t = Texture(modes[k][i])
+        modes[k][i] = t
+        quick[t.id] = t.surf
 
 print mode
 print item
 
 import sys
 
-selector['surf'].set_alpha(192)
+pygame.mouse.set_pos([400,300])
 
-pygame.mouse.set_pos([100,100])
+cam_x = 0
+cam_y = 0
+pres = 10
+
+activated = False
 
 # Main loop
 while not escape:
@@ -115,17 +99,33 @@ while not escape:
     m = pygame.mouse.get_pos()
     mx = m[0]
     my = m[1]
-    mxg = m[0]/s
-    myg = m[1]/s
+    mxg = (m[0]-cam_x)/s
+    myg = (m[1]-cam_y)/s
+    if mxg < 0: mxg = 0
+    elif mxg > 31: mxg = 31
+    if myg < 0: myg = 0
+    elif myg > 31 : myg = 31
 
+    if activated:    
+        if mx < pres:
+            cam_x += 1
+        elif mx > MAXX-pres:
+            cam_x -= 1
+        if my < pres:
+            cam_y += 1
+        elif my > MAXY-pres:
+            cam_y -= 1
+    
+    #print 'MX:',m[0],'MY:',m[1],'GridX:',mxg,'GridY:',myg, 'CamX:',cam_x, 'CamY:',cam_y
+    
     # Handle events
     for event in pygame.event.get():
         if event.type == QUIT:
             escape = True
         if event.type == MOUSEMOTION:
-            print m[0], m[1], m[0]/s, m[1]/s
+            activated = True
         if event.type == MOUSEBUTTONDOWN:
-            print event.button
+            #print event.button
             if event.button == 1:
                 act = True
             elif event.button == 2:
@@ -145,26 +145,36 @@ while not escape:
                 print item
 
         if act:
-            #p = event.pos
-            #xp = p[0] / s
-            #yp = p[1] / s
-            #lvl[xp][yp] = modes[mode][item][0]
-            lvl[mxg][myg] = modes[mode][item][0]
+            if lvl[myg-1][mxg-1] == 1: lvl[myg-1][mxg-1] = 111
+            else: lvl[myg-1][mxg-1] = 2
+            if lvl[myg-1][mxg] == 1: lvl[myg-1][mxg] = 112
+            else: lvl[myg-1][mxg] = 2
+            if lvl[myg-1][mxg+1] == 1: lvl[myg-1][mxg+1] = 113
+            else: lvl[myg-1][mxg+1] = 2
+            if lvl[myg][mxg+1] == 1: lvl[myg][mxg+1] = 114
+            else: lvl[myg][mxg+1] = 2
+            if lvl[myg+1][mxg+1] == 1: lvl[myg+1][mxg+1] = 115
+            else: lvl[myg+1][mxg+1] = 2
+            if lvl[myg+1][mxg] == 1: lvl[myg+1][mxg] = 116
+            else: lvl[myg+1][mxg] = 2
+            if lvl[myg+1][mxg-1] == 1: lvl[myg+1][mxg-1] = 117
+            else: lvl[myg+1][mxg-1] = 2
+            if lvl[myg][mxg-1] == 1: lvl[myg][mxg-1]   = 118
+            else: lvl[myg][mxg-1] = 2
+            lvl[myg][mxg] = modes[mode][item].id
 
     # Update
     # Draw
     screen.fill((0,0,0))
     
-    xm = m[0] / s
-    ym = m[1] / s
-    screen.blit(selector['surf'], (xm*s, ym*s))
+    screen.blit(selector.surf, (mxg*s+cam_x, myg*s+cam_y))
      
     for i in range(0, n):
         for j in range(0, n):
-            screen.blit(fromHash(lvl[i][j]), (i*s,j*s))
-            #if lvl[i][j] == 0: screen.blit(b, (i*s,j*s)) #screen.pygame.draw.rect(screen, (255,0,0), (i*s, j*s, s, s), 1)
-            #else: screen.blit(b2, (i*s,j*s))
-
+            if j*s+cam_y > MAXY: break
+            screen.blit(quick[lvl[j][i]], (i*s+cam_x,j*s+cam_y))
+        if i*s+cam_x > MAXX: break
+    
     pygame.display.flip()
     
     # Limit to 60 fps maximum
