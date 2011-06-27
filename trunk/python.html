@@ -1,4 +1,4 @@
-<html>
+<html charset="utf8">
 <head>
     <title>Python</title>
     <style type="text/css">
@@ -14,7 +14,7 @@
         a.ghost:hover   { color: White; text-decoration: underline; background: DarkSlateGray; }
         a.intext:hover  { color: White; text-decoration: underline; background: DarkSlateGray; }
         h1              { font-family: arial;     font-size: 16px; color: SeaGreen; }
-		    h2              { font-family: arial;     font-size: 14px; color: SeaGreen; }
+		h2              { font-family: arial;     font-size: 14px; color: SeaGreen; }
         h3              { font-family: arial;     font-size: 14px; color: DarkSlateGray; }
         h4              { font-family: arial;     font-size: 14px; color: DarkGray; }
         body            { font-family: arial;     font-size: 14px; color: DarkSlateGray; }
@@ -24,7 +24,7 @@
 </head>
 <body>
 
-<p>Ceci est un brouillon d'une éventuelle feuille de notes pour Python.</p>
+<p>Ceci est un brouillon d’une éventuelle feuille de notes pour Python.</p>
 
 <!-- ------------------------------------------------------------------------------------------ -->
 
@@ -50,7 +50,7 @@
 
 <p>Il existe trois structures de contrôle fondamentales : séquence, sélection et itération.</p>
 
-<p>En Python, une instruction nulle est obligatoire si on veut avoir un bloc action vide. Cette instruction nulle est « pass ». </p>
+<p>En Python, l’instruction ‘nulle’ est « pass » et est obligatoire !</p>
 
 <h2>Conditions</h2>
 
@@ -82,11 +82,11 @@ while condition :
 
 <h3>A) Entiers</h3>
 
-<p>Ils peuvent être définis selon trois formats : hexadécimal (en base 16) en précédant le nombre avec 0x ou 0X, octal (en base 8 ) en précédant le nombre d'un 0 et en base 10. Il faut donc faire bien attention à repérer si le littéral commence par un 0 ou pas pour ne pas confondre base octale et décimale. Les chiffres supplémentaires en base 16 sont représentés par les lettres A à F (indifféremment de la casse).</p>
+<p>Ils peuvent être définis selon trois formats : hexadécimal (en base 16) en précédant le nombre avec 0x ou 0X, octal (en base 8 ) en précédant le nombre d’un 0 et en base 10. Il faut donc faire bien attention à repérer si le littéral commence par un 0 ou pas pour ne pas confondre base octale et décimale. Les chiffres supplémentaires en base 16 sont représentés par les lettres A à F (indifféremment de la casse).</p>
 
 <p>Exemple : 8 (base 10), 010 (8 en base octale), 0xA (10 en base hexadécimale).</p>
 
-<p>Un entier sera convertit en long si besoin est de façon automatique. Le long permet de ne pas avoir de limite relative à la grandeur du nombre représenté - celle-ci est en effet illimité. Le suffixe « L » ou « l » permet de déclarer doffice un long, même si Python se charge complètement et d'une manière transparente de la conversion.</p>
+<p>Un entier sera convertit en long si besoin est de façon automatique. Le long permet de ne pas avoir de limite relative à la grandeur du nombre représenté – celle-ci est en effet illimité. Le suffixe « L » ou « l » permet de déclarer d’office un long, même si Python se charge complètement et d’une manière transparente de la conversion.</p>
 
 <p>Exemple : 8L</p>
 
@@ -123,7 +123,7 @@ hexdigit ::=
 
 <h3>B) Nombres réels</h3>
 
-<p>Les nombres réels n'utilisent que la base décimale, est le « . » pour séparer la partie entière de la décimale. Le « . » est nécessaire, même sans partie décimale, pour différencier un entier ou un flottant. De même la partie entière, si elle est égale à 0, peut être omise. Un exposant peu être spécifié avec la lettre E (indifféremment de la casse).</p>
+<p>Les nombres réels n’utilisent que la base décimale, est le « . » pour séparer la partie entière de la décimale. Le « . » est nécessaire, même sans partie décimale, pour différencier un entier ou un flottant. De même la partie entière, si elle est égale à 0, peut être omise. Un exposant peu être spécifié avec la lettre E (indifféremment de la casse).</p>
 
 <p>Exemple : 3.4, 3., .3, 3.e20</p>
 
@@ -151,7 +151,7 @@ exponent ::=
 </pre>
 <h3>C) Nombres complexes</h3>
 
-<p>Il suffit d'utiliser le suffixe J (casse indifférente) pour indiquer une partie imaginaire. L'addition d'une partie réelle et imaginaire permet d'exprimer un nombre complexe.</p>
+<p>Il suffit d’utiliser le suffixe J (casse indifférente) pour indiquer une partie imaginaire. L’addition d’une partie réelle et imaginaire permet d’exprimer un nombre complexe.</p>
 
 <p>Exemples : 3+2j, 3-2j</p>
 
@@ -163,7 +163,7 @@ imagnumber ::= (floatnumber | intpart) ("j" | "J")
 
 <h3>D) Booléens</h3>
 
-<p>Il ny a que deux valeurs.</p>
+<p>Il n’y a que deux valeurs.</p>
 
 <p>Exemples : True, False</p>
 
@@ -180,16 +180,16 @@ literal ::=
 
 <h2>Séquences Immutables</h2>
 <ul>
-<li>str   'Hello' | « Hello »    immutable séquence de caractère</li>
-<li>unicode  u'Hello' | u »Hello »    immutable séquence de caractère</li>
-<li>tuple  (4.0, 'a', "b") | (3,)   immutable, on peut mixé les types</li>
+<li>str   ’Hello’ | « Hello »    immutable séquence de caractère</li>
+<li>unicode  u’Hello’ | u »Hello »    immutable séquence de caractère</li>
+<li>tuple  (4.0, ‘a’, ‘b’) | (3,)   immutable, on peut mixé les types</li>
 <li>frozenset frozenset([4.0, 'a', True])  immutable, sans ordre, sans doublon</li>
 </ul>
 
 <h2>Séquences Mutables</h2>
 <ul>
 <li>list  [1, 'a', True]     mutable, on peut mixer les types</li>
-<li>dict  {'key1' : 1.0, 'key2' : False} paire clé / valeur</li>
+<li>dict  {‘key1' : 1.0, ‘key2' : False} paire clé / valeur</li>
 <li>set   set([4.0, 'a', True])   mutable, sans ordre, sans doublon</li>
 </ul>
 
@@ -205,8 +205,8 @@ def Nom ( arg1, arg2, ... ) :
 return var1, var2, ...
 </pre>
 
-<p>Si il n'y a pas de return, None est renvoyé. (!= Ruby)</p>
-<p>Même si il n'y pas d'arguments, les parenthères sont obligatoires, dans la définition et l'appel. (!= Ruby)</p>
+<p>Si il n’y a pas de return, None est renvoyé. (!= Ruby)</p>
+<p>Même si il n’y pas d’arguments, les parenthères sont obligatoires, dans la définition et l’appel. (!= Ruby)</p>
 
 <!-- ------------------------------------------------------------------------------------------ -->
 
@@ -226,6 +226,39 @@ class Nom(ClasseMère) :
 <li>Héritage multiple</li>
 </ul>
 
+<p>Propriétés</p>
+<p>http://adam.gomaa.us/blog/2008/aug/11/the-python-property-builtin/</p>
+
+<p>On peut faire des properties en Python, à la manière de Ruby :</p>
+<pre>
+class Pipo(object):
+	...
+    myProp = property(getter, setter, deleter, doc)
+</pre>
+
+<p>où chacun des éléments est une fonction. ActiveState a pondu un truc infâme pour éviter d’encombrer l’espace de nom de la classe des fonctions de getter/setter/etc. :</p>
+<pre>
+    def Property(func)
+      return property(**func())
+    class Person(object):
+      @Property
+      def name():
+          doc = "The person's name"
+          def fget(self):
+              return "%s %s" % (self.first_name, self.last_name)
+          def fset(self, name):
+              self.first_name, self.last_name = name.split()
+          def fdel(self):
+              del self.first_name
+              del self.last_name
+          return locals()
+
+</pre>
+
+<p>Abstract</p>
+
+<p>http://docs.python.org/dev/library/abc.html#module-abc</p>
+
 <!-- ------------------------------------------------------------------------------------------ -->
 
 <h1>VI. Les Modules</h1>
@@ -233,7 +266,7 @@ class Nom(ClasseMère) :
 <p>Principes</p>
 <ul>
 <li>Module re : expressions régulières</li>
-<li>Module os,sys : services du systèmes dexploitation</li>
+<li>Module os,sys : services du systèmes d’exploitation</li>
 <li>Module csv : traitement de fichiers structurés par séparateurs</li>
 </ul>
 
