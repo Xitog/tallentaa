@@ -14,7 +14,7 @@
         a.ghost:hover   { color: White; text-decoration: underline; background: DarkSlateGray; }
         a.intext:hover  { color: White; text-decoration: underline; background: DarkSlateGray; }
         h1              { font-family: arial;     font-size: 16px; color: SeaGreen; }
-		h2              { font-family: arial;     font-size: 14px; color: SeaGreen; }
+		    h2              { font-family: arial;     font-size: 14px; color: SeaGreen; }
         h3              { font-family: arial;     font-size: 14px; color: DarkSlateGray; }
         h4              { font-family: arial;     font-size: 14px; color: DarkGray; }
         body            { font-family: arial;     font-size: 14px; color: DarkSlateGray; }
@@ -24,21 +24,21 @@
 </head>
 <body>
 
-<p>Ceci est un brouillon d’une éventuelle feuille de notes pour Python.</p>
+<p>Ceci est un brouillon dÂ’une Ã©ventuelle feuille de notes pour Python.</p>
 
 <!-- ------------------------------------------------------------------------------------------ -->
 
-<h1>I. Introduction à Python</h1>
+<h1>I. Introduction Ã  Python</h1>
 
 <p>Python (Guido Van Rossum, 1991)</p>
 <ul>
     <li>Typage Fort + Dynamique (duck/latent typing)</li>
-    <li>Interprété, Cross-platform</li>
-    <li>Implémentations : CPython (C), Jython (JVM), IronPython (.Net), PyPy (Python)</li>
+    <li>InterprÃ©tÃ©, Cross-platform</li>
+    <li>ImplÃ©mentations : CPython (C), Jython (JVM), IronPython (.Net), PyPy (Python)</li>
     <li>Sous-langages   :
     <ul>
 		<li>Stackless Python (sans pile C)</li>
-		<li>RPython (sous ensemble de Python compilé pour PyPy)</li>
+		<li>RPython (sous ensemble de Python compilÃ© pour PyPy)</li>
 		<li>Pyrex[->Cython] (type C + Python)</li>
 		<li>Extensions : .py, .pyc (bytecode), .pyx (Pyrex)</li>
 	</ul></li>
@@ -46,11 +46,11 @@
 
 <!-- ------------------------------------------------------------------------------------------ -->
 
-<h1>II. Structures de contrôle en Python</h1>
+<h1>II. Structures de contrÃ´le en Python</h1>
 
-<p>Il existe trois structures de contrôle fondamentales : séquence, sélection et itération.</p>
+<p>Il existe trois structures de contrÃ´le fondamentales : sÃ©quence, sÃ©lection et itÃ©ration.</p>
 
-<p>En Python, l’instruction ‘nulle’ est « pass » et est obligatoire !</p>
+<p>En Python, une instruction nulle est obligatoire si on veut avoir un bloc action vide. Cette instruction nulle est Â« pass Â». </p>
 
 <h2>Conditions</h2>
 
@@ -72,25 +72,25 @@ while condition :
   action
 </pre>
 
-<p>Et voilà !</p>
+<p>Et voilÃ  !</p>
 
 <!-- ------------------------------------------------------------------------------------------ -->
 
-<h1>III. Les littéraux en Python</h1>
+<h1>III. Les littÃ©raux en Python</h1>
 
 <h2>1. Scalaires</h2>
 
 <h3>A) Entiers</h3>
 
-<p>Ils peuvent être définis selon trois formats : hexadécimal (en base 16) en précédant le nombre avec 0x ou 0X, octal (en base 8 ) en précédant le nombre d’un 0 et en base 10. Il faut donc faire bien attention à repérer si le littéral commence par un 0 ou pas pour ne pas confondre base octale et décimale. Les chiffres supplémentaires en base 16 sont représentés par les lettres A à F (indifféremment de la casse).</p>
+<p>Ils peuvent Ãªtre dÃ©finis selon trois formats : hexadÃ©cimal (en base 16) en prÃ©cÃ©dant le nombre avec 0x ou 0X, octal (en base 8 ) en prÃ©cÃ©dant le nombre d'un 0 et en base 10. Il faut donc faire bien attention Ã  repÃ©rer si le littÃ©ral commence par un 0 ou pas pour ne pas confondre base octale et dÃ©cimale. Les chiffres supplÃ©mentaires en base 16 sont reprÃ©sentÃ©s par les lettres A Ã  F (indiffÃ©remment de la casse).</p>
 
-<p>Exemple : 8 (base 10), 010 (8 en base octale), 0xA (10 en base hexadécimale).</p>
+<p>Exemple : 8 (base 10), 010 (8 en base octale), 0xA (10 en base hexadÃ©cimale).</p>
 
-<p>Un entier sera convertit en long si besoin est de façon automatique. Le long permet de ne pas avoir de limite relative à la grandeur du nombre représenté – celle-ci est en effet illimité. Le suffixe « L » ou « l » permet de déclarer d’office un long, même si Python se charge complètement et d’une manière transparente de la conversion.</p>
+<p>Un entier sera convertit en long si besoin est de faÃ§on automatique. Le long permet de ne pas avoir de limite relative Ã  la grandeur du nombre reprÃ©sentÃ© - celle-ci est en effet illimitÃ©. Le suffixe Â« L Â» ou Â« l Â» permet de dÃ©clarer dÂ’office un long, mÃªme si Python se charge complÃ¨tement et d'une maniÃ¨re transparente de la conversion.</p>
 
 <p>Exemple : 8L</p>
 
-<p>Règles de grammaire associées :</p>
+<p>RÃ¨gles de grammaire associÃ©es :</p>
 <pre>
 digit ::=
              "0"..."9"
@@ -121,13 +121,13 @@ hexdigit ::=
 
 </pre>
 
-<h3>B) Nombres réels</h3>
+<h3>B) Nombres rÃ©els</h3>
 
-<p>Les nombres réels n’utilisent que la base décimale, est le « . » pour séparer la partie entière de la décimale. Le « . » est nécessaire, même sans partie décimale, pour différencier un entier ou un flottant. De même la partie entière, si elle est égale à 0, peut être omise. Un exposant peu être spécifié avec la lettre E (indifféremment de la casse).</p>
+<p>Les nombres rÃ©els n'utilisent que la base dÃ©cimale, est le Â« . Â» pour sÃ©parer la partie entiÃ¨re de la dÃ©cimale. Le Â« . Â» est nÃ©cessaire, mÃªme sans partie dÃ©cimale, pour diffÃ©rencier un entier ou un flottant. De mÃªme la partie entiÃ¨re, si elle est Ã©gale Ã  0, peut Ãªtre omise. Un exposant peu Ãªtre spÃ©cifiÃ© avec la lettre E (indiffÃ©remment de la casse).</p>
 
 <p>Exemple : 3.4, 3., .3, 3.e20</p>
 
-<p>Règles de grammaire associées :</p>
+<p>RÃ¨gles de grammaire associÃ©es :</p>
 <pre>
 floatnumber ::=
              pointfloat | exponentfloat
@@ -151,23 +151,23 @@ exponent ::=
 </pre>
 <h3>C) Nombres complexes</h3>
 
-<p>Il suffit d’utiliser le suffixe J (casse indifférente) pour indiquer une partie imaginaire. L’addition d’une partie réelle et imaginaire permet d’exprimer un nombre complexe.</p>
+<p>Il suffit d'utiliser le suffixe J (casse indiffÃ©rente) pour indiquer une partie imaginaire. L'addition d'une partie rÃ©elle et imaginaire permet d'exprimer un nombre complexe.</p>
 
 <p>Exemples : 3+2j, 3-2j</p>
 
-<p>Règles de grammaire associée :</p>
+<p>RÃ¨gles de grammaire associÃ©e :</p>
 <pre>
 imagnumber ::= (floatnumber | intpart) ("j" | "J")
 
 </pre>
 
-<h3>D) Booléens</h3>
+<h3>D) BoolÃ©ens</h3>
 
-<p>Il n’y a que deux valeurs.</p>
+<p>Il nÂ’y a que deux valeurs.</p>
 
 <p>Exemples : True, False</p>
 
-<h3>E) Règles de grammaire associées aux littéraux</h3>
+<h3>E) RÃ¨gles de grammaire associÃ©es aux littÃ©raux</h3>
 <pre>
 atom ::=
              identifier | literal | enclosure
@@ -178,18 +178,18 @@ literal ::=
 
 </pre>
 
-<h2>Séquences Immutables</h2>
+<h2>SÃ©quences Immutables</h2>
 <ul>
-<li>str   ’Hello’ | « Hello »    immutable séquence de caractère</li>
-<li>unicode  u’Hello’ | u »Hello »    immutable séquence de caractère</li>
-<li>tuple  (4.0, ‘a’, ‘b’) | (3,)   immutable, on peut mixé les types</li>
+<li>str   'Hello' | Â« Hello Â»    immutable sÃ©quence de caractÃ¨re</li>
+<li>unicode  u'Hello' | u Â»Hello Â»    immutable sÃ©quence de caractÃ¨re</li>
+<li>tuple  (4.0, 'a', "b") | (3,)   immutable, on peut mixÃ© les types</li>
 <li>frozenset frozenset([4.0, 'a', True])  immutable, sans ordre, sans doublon</li>
 </ul>
 
-<h2>Séquences Mutables</h2>
+<h2>SÃ©quences Mutables</h2>
 <ul>
 <li>list  [1, 'a', True]     mutable, on peut mixer les types</li>
-<li>dict  {‘key1' : 1.0, ‘key2' : False} paire clé / valeur</li>
+<li>dict  {'key1' : 1.0, 'key2' : False} paire clÃ© / valeur</li>
 <li>set   set([4.0, 'a', True])   mutable, sans ordre, sans doublon</li>
 </ul>
 
@@ -205,8 +205,8 @@ def Nom ( arg1, arg2, ... ) :
 return var1, var2, ...
 </pre>
 
-<p>Si il n’y a pas de return, None est renvoyé. (!= Ruby)</p>
-<p>Même si il n’y pas d’arguments, les parenthères sont obligatoires, dans la définition et l’appel. (!= Ruby)</p>
+<p>Si il n'y a pas de return, None est renvoyÃ©. (!= Ruby)</p>
+<p>MÃªme si il n'y pas d'arguments, les parenthÃ¨res sont obligatoires, dans la dÃ©finition et l'appel. (!= Ruby)</p>
 
 <!-- ------------------------------------------------------------------------------------------ -->
 
@@ -214,16 +214,16 @@ return var1, var2, ...
 
 <p>Classe & objets</p>
 <pre>
-class Nom(ClasseMère) :
+class Nom(ClasseMÃ¨re) :
  action
 </pre>
 
-<p>Méthodes & instances</p>
+<p>MÃ©thodes & instances</p>
 <ul>
 <li>Encapsulation</li>
 <li>Polymorphisme</li>
-<li>Héritage simple</li>
-<li>Héritage multiple</li>
+<li>HÃ©ritage simple</li>
+<li>HÃ©ritage multiple</li>
 </ul>
 
 <!-- ------------------------------------------------------------------------------------------ -->
@@ -232,21 +232,21 @@ class Nom(ClasseMère) :
 
 <p>Principes</p>
 <ul>
-<li>Module re : expressions régulières</li>
-<li>Module os,sys : services du systèmes d’exploitation</li>
-<li>Module csv : traitement de fichiers structurés par séparateurs</li>
+<li>Module re : expressions rÃ©guliÃ¨res</li>
+<li>Module os,sys : services du systÃ¨mes dÂ’exploitation</li>
+<li>Module csv : traitement de fichiers structurÃ©s par sÃ©parateurs</li>
 </ul>
 
 <!-- ------------------------------------------------------------------------------------------ -->
 
-<h1>VII. Python et le Web : Introduction à Zope</h1>
+<h1>VII. Python et le Web : Introduction Ã  Zope</h1>
 <ul>
-<li>Architecture générale : mécanisme de publication</li>
+<li>Architecture gÃ©nÃ©rale : mÃ©canisme de publication</li>
 <li>Interaction DHTML-Python : Exemples</li>
 <li>Notes diverses</li>
 </ul>
 
-<p>Un bon « duck programmer » utilisera hasattr() plutôt que type() ou isinstance()
+<p>Un bon Â« duck programmer Â» utilisera hasattr() plutÃ´t que type() ou isinstance()
 http://en.wikipedia.org/wiki/Category:Type_theory</p>
 
 <!-- ------------------------------------------------------------------------------------------ -->
