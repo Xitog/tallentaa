@@ -1,0 +1,288 @@
+<html charset="utf8">
+<head>
+    <title>Python</title>
+    <style type="text/css">
+        #container .on  { display: block; }
+        #container .off { display: none; }
+        table.main      { border-width: 0px; border-color: #000000; border-style: solid; margin: auto; }
+        div.main        { font-family: arial;     font-size: 12px; color: gray; }
+        pre             { font-family: monospace; font-size: 12px; color: white; background: #00a0a0; }
+        a.current       { font-family: arial;     font-size: 14px; color: DarkSlateGray; text-decoration: none; font-weight: normal; }
+        a.current:hover { cursor: default; }
+        a.ghost         { font-family: arial;     font-size: 14px; color: DarkSlateGray; text-decoration: none; font-weight: normal; }
+        a.intext        { font-family: arial;     font-size: 12px; color: DarkSlateGray; text-decoration: none; font-weight: normal; }
+        a.ghost:hover   { color: White; text-decoration: underline; background: DarkSlateGray; }
+        a.intext:hover  { color: White; text-decoration: underline; background: DarkSlateGray; }
+        h1              { font-family: arial;     font-size: 16px; color: SeaGreen; }
+		h2              { font-family: arial;     font-size: 14px; color: SeaGreen; }
+        h3              { font-family: arial;     font-size: 14px; color: DarkSlateGray; }
+        h4              { font-family: arial;     font-size: 14px; color: DarkGray; }
+        body            { font-family: arial;     font-size: 14px; color: DarkSlateGray; }
+        table           { border: 1px solid DarkSlateGray;}
+        td, th          { border: 1px solid DarkSlateGray; text-align: center;}
+    </style>
+</head>
+<body>
+
+<p>Ceci est un brouillon d’une éventuelle feuille de notes pour Python.</p>
+
+<!-- ------------------------------------------------------------------------------------------ -->
+
+<h1>I. Introduction à Python</h1>
+
+<p>Python (Guido Van Rossum, 1991)</p>
+<ul>
+    <li>Typage Fort + Dynamique (duck/latent typing)</li>
+    <li>Interprété, Cross-platform</li>
+    <li>Implémentations : CPython (C), Jython (JVM), IronPython (.Net), PyPy (Python)</li>
+    <li>Sous-langages   :
+    <ul>
+		<li>Stackless Python (sans pile C)</li>
+		<li>RPython (sous ensemble de Python compilé pour PyPy)</li>
+		<li>Pyrex[->Cython] (type C + Python)</li>
+		<li>Extensions : .py, .pyc (bytecode), .pyx (Pyrex)</li>
+	</ul></li>
+</ul>
+
+<!-- ------------------------------------------------------------------------------------------ -->
+
+<h1>II. Structures de contrôle en Python</h1>
+
+<p>Il existe trois structures de contrôle fondamentales : séquence, sélection et itération.</p>
+
+<p>En Python, l’instruction ‘nulle’ est « pass » et est obligatoire !</p>
+
+<h2>Conditions</h2>
+
+<pre>
+if condition :
+  action
+elif condition :
+  action
+else :
+  action
+</pre>
+
+<h2>Boucles</h2>
+
+<pre>
+for var in list :
+  action
+while condition :
+  action
+</pre>
+
+<p>Et voilà !</p>
+
+<!-- ------------------------------------------------------------------------------------------ -->
+
+<h1>III. Les littéraux en Python</h1>
+
+<h2>1. Scalaires</h2>
+
+<h3>A) Entiers</h3>
+
+<p>Ils peuvent être définis selon trois formats : hexadécimal (en base 16) en précédant le nombre avec 0x ou 0X, octal (en base 8 ) en précédant le nombre d’un 0 et en base 10. Il faut donc faire bien attention à repérer si le littéral commence par un 0 ou pas pour ne pas confondre base octale et décimale. Les chiffres supplémentaires en base 16 sont représentés par les lettres A à F (indifféremment de la casse).</p>
+
+<p>Exemple : 8 (base 10), 010 (8 en base octale), 0xA (10 en base hexadécimale).</p>
+
+<p>Un entier sera convertit en long si besoin est de façon automatique. Le long permet de ne pas avoir de limite relative à la grandeur du nombre représenté – celle-ci est en effet illimité. Le suffixe « L » ou « l » permet de déclarer d’office un long, même si Python se charge complètement et d’une manière transparente de la conversion.</p>
+
+<p>Exemple : 8L</p>
+
+<p>Règles de grammaire associées :</p>
+<pre>
+digit ::=
+             "0"..."9"
+
+longinteger ::=
+             integer ("l" | "L")
+
+integer ::=
+             decimalinteger | octinteger | hexinteger
+
+decimalinteger ::=
+             nonzerodigit digit* | "0"
+
+octinteger ::=
+             "0" octdigit+
+
+hexinteger ::=
+             "0" ("x" | "X") hexdigit+
+
+nonzerodigit ::=
+             "1"..."9"
+
+octdigit ::=
+             "0"..."7"
+
+hexdigit ::=
+             digit | "a"..."f" | "A"..."F"
+
+</pre>
+
+<h3>B) Nombres réels</h3>
+
+<p>Les nombres réels n’utilisent que la base décimale, est le « . » pour séparer la partie entière de la décimale. Le « . » est nécessaire, même sans partie décimale, pour différencier un entier ou un flottant. De même la partie entière, si elle est égale à 0, peut être omise. Un exposant peu être spécifié avec la lettre E (indifféremment de la casse).</p>
+
+<p>Exemple : 3.4, 3., .3, 3.e20</p>
+
+<p>Règles de grammaire associées :</p>
+<pre>
+floatnumber ::=
+             pointfloat | exponentfloat
+
+pointfloat ::=
+             [intpart] fraction | intpart "."
+
+exponentfloat ::=
+             (intpart | pointfloat)
+              exponent
+
+intpart ::=
+             digit+
+
+fraction ::=
+             "." digit+
+
+exponent ::=
+             ("e" | "E") ["+" | "-"] digit+
+
+</pre>
+<h3>C) Nombres complexes</h3>
+
+<p>Il suffit d’utiliser le suffixe J (casse indifférente) pour indiquer une partie imaginaire. L’addition d’une partie réelle et imaginaire permet d’exprimer un nombre complexe.</p>
+
+<p>Exemples : 3+2j, 3-2j</p>
+
+<p>Règles de grammaire associée :</p>
+<pre>
+imagnumber ::= (floatnumber | intpart) ("j" | "J")
+
+</pre>
+
+<h3>D) Booléens</h3>
+
+<p>Il n’y a que deux valeurs.</p>
+
+<p>Exemples : True, False</p>
+
+<h3>E) Règles de grammaire associées aux littéraux</h3>
+<pre>
+atom ::=
+             identifier | literal | enclosure
+
+literal ::=
+             stringliteral | integer | longinteger
+                | floatnumber | imagnumber
+
+</pre>
+
+<h2>Séquences Immutables</h2>
+<ul>
+<li>str   ’Hello’ | « Hello »    immutable séquence de caractère</li>
+<li>unicode  u’Hello’ | u »Hello »    immutable séquence de caractère</li>
+<li>tuple  (4.0, ‘a’, ‘b’) | (3,)   immutable, on peut mixé les types</li>
+<li>frozenset frozenset([4.0, 'a', True])  immutable, sans ordre, sans doublon</li>
+</ul>
+
+<h2>Séquences Mutables</h2>
+<ul>
+<li>list  [1, 'a', True]     mutable, on peut mixer les types</li>
+<li>dict  {‘key1' : 1.0, ‘key2' : False} paire clé / valeur</li>
+<li>set   set([4.0, 'a', True])   mutable, sans ordre, sans doublon</li>
+</ul>
+
+<h2>Autres</h2>
+<ul><li>NoneType  None</li></ul>
+
+<!-- ------------------------------------------------------------------------------------------ -->
+
+<h1>IV. Fonctions</h1>
+<pre>
+def Nom ( arg1, arg2, ... ) :
+   action
+return var1, var2, ...
+</pre>
+
+<p>Si il n’y a pas de return, None est renvoyé. (!= Ruby)</p>
+<p>Même si il n’y pas d’arguments, les parenthères sont obligatoires, dans la définition et l’appel. (!= Ruby)</p>
+
+<!-- ------------------------------------------------------------------------------------------ -->
+
+<h1>V. Programmation Objet</h1>
+
+<p>Classe & objets</p>
+<pre>
+class Nom(ClasseMère) :
+ action
+</pre>
+
+<p>Méthodes & instances</p>
+<ul>
+<li>Encapsulation</li>
+<li>Polymorphisme</li>
+<li>Héritage simple</li>
+<li>Héritage multiple</li>
+</ul>
+
+<p>Propriétés</p>
+<p>http://adam.gomaa.us/blog/2008/aug/11/the-python-property-builtin/</p>
+
+<p>On peut faire des properties en Python, à la manière de Ruby :</p>
+<pre>
+class Pipo(object):
+	...
+    myProp = property(getter, setter, deleter, doc)
+</pre>
+
+<p>où chacun des éléments est une fonction. ActiveState a pondu un truc infâme pour éviter d’encombrer l’espace de nom de la classe des fonctions de getter/setter/etc. :</p>
+<pre>
+    def Property(func)
+      return property(**func())
+    class Person(object):
+      @Property
+      def name():
+          doc = "The person's name"
+          def fget(self):
+              return "%s %s" % (self.first_name, self.last_name)
+          def fset(self, name):
+              self.first_name, self.last_name = name.split()
+          def fdel(self):
+              del self.first_name
+              del self.last_name
+          return locals()
+
+</pre>
+
+<p>Abstract</p>
+
+<p>http://docs.python.org/dev/library/abc.html#module-abc</p>
+
+<!-- ------------------------------------------------------------------------------------------ -->
+
+<h1>VI. Les Modules</h1>
+
+<p>Principes</p>
+<ul>
+<li>Module re : expressions régulières</li>
+<li>Module os,sys : services du systèmes d’exploitation</li>
+<li>Module csv : traitement de fichiers structurés par séparateurs</li>
+</ul>
+
+<!-- ------------------------------------------------------------------------------------------ -->
+
+<h1>VII. Python et le Web : Introduction à Zope</h1>
+<ul>
+<li>Architecture générale : mécanisme de publication</li>
+<li>Interaction DHTML-Python : Exemples</li>
+<li>Notes diverses</li>
+</ul>
+
+<p>Un bon « duck programmer » utilisera hasattr() plutôt que type() ou isinstance()
+http://en.wikipedia.org/wiki/Category:Type_theory</p>
+
+<!-- ------------------------------------------------------------------------------------------ -->
+
+</body>
+</html>
