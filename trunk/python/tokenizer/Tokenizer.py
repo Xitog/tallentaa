@@ -13,8 +13,8 @@ class Enum:
         for t in tab:
             setattr(self, t, t)
 
-LexerState = Enum('start', 'float', 'integer', 'operator', 'id')
-TokenType = Enum('integer', 'float', 'id', 'operator', 'separator','keyword', 'eof', 'boolean')
+LexerState = Enum('start', 'float', 'integer', 'operator', 'id', 'hexa', 'bin', 'octal', 'string')
+TokenType = Enum('integer', 'float', 'id', 'operator', 'separator','keyword', 'eof', 'boolean', 'string')
 
 #-------------------------------------------------------------------------------
 
@@ -34,6 +34,12 @@ def is_digit(c):
 
 def is_hexadigit(c):
     return (is_digit(c) or (c in ['A', 'B', 'C', 'D', 'E', 'F']))
+
+def is_octaldigit(c):
+    return (c in ['0', '1', '2', '3', '4', '5', '6', '7'])
+
+def is_bindigit(c):
+    return (c in ['0', '1'])
 
 def is_ops_char(c):
     return (c in ['+', '-', '/', '*', '%', '>', '<', '=', '!', '&', '^', '|'])
@@ -107,8 +113,10 @@ def token(t):
     curr = []
     state = LexerState.start
 
+debug = False
+
 def tokenize():
-    global s, curr, tokens, c, i, state, escape
+    global s, curr, tokens, c, i, state, escape, debug
     while not escape:
         #print curr
         if c == '\0': # last turn
@@ -123,6 +131,11 @@ def tokenize():
                 state = LexerState.integer
                 #
                 curr.append(c)
+                next()
+            elif c == '"':
+                state = LexerState.string
+                #
+                #curr.append(c)
                 next()
             elif c == '.': # '.' can be for a float or an operator
                 state = LexerState.float
@@ -168,6 +181,18 @@ def tokenize():
             if is_digit(c):
                 curr.append(c)
                 next()
+            elif curr == ['0'] and (c == 'x' or c == 'X'):
+                state = LexerState.hexa
+                curr.append(c)
+                next()
+            elif curr == ['0'] and (c == 'c' or c == 'C'):
+                state = LexerState.octal
+                curr.append(c)
+                next()
+            elif curr == ['0'] and (c == 'b' or c == 'B'):
+                state = LexerState.bin
+                curr.append(c)
+                next()
             elif c == '.':
                 state = LexerState.float
                 curr.append(c)
@@ -182,23 +207,56 @@ def tokenize():
                 token(TokenType.operator)        
             else:
                 token(TokenType.float)
+        elif state == LexerState.octal:
+            if is_octaldigit(c):
+                curr.append(c)
+                next()
+            elif is_hexadigit(c):
+                raise Exception("Mismatched integer")
+            else:
+                token(TokenType.integer)
+        elif state == LexerState.bin:
+            if is_bindigit(c):
+                curr.append(c)
+                next()
+            elif is_hexadigit(c):
+                raise Exception("Mismatched integer")
+            else:
+                token(TokenType.integer)
+        elif state == LexerState.hexa:
+            if is_hexadigit(c):
+                curr.append(c)
+                next()
+            elif is_char(c):
+                raise Exception("Mismatched integer")
+            else:
+                token(TokenType.integer)
         elif state == LexerState.operator:
             if is_ops_char(c) and is_operator((''.join(curr))+c):
                 curr.append(c)
                 next()
             else:
                 token(TokenType.operator)
+        elif state == LexerState.string:
+            if c != '"' and (len(curr) < 2 or curr[len(curr)-1] != '\\'):
+                curr.append(c)
+                next()
+            else:
+                next()
+                token(TokenType.string)
+
     curr = ['eof']
     token(TokenType.eof)
 
-#print('\nTokens\n')
-
-#i=0
-#for t in tokens:
-#    print i, '.', t
-#    i+=1
-#
-#print('\nNb: '+str(len(tokens)))
+    if debug:
+        print('\nTokens\n')
+    
+        i=0
+        for t in tokens:
+            print i, '.', t
+            i+=1
+    
+        print('\nNb: '+str(len(tokens)))
 
 #-------------------------------------------------------------------------------
 
@@ -264,7 +322,7 @@ def sub(subjects):
     return subjects[1: i-1]
 
 def make_ast(tokens):
-    d = {TokenType.id : 'id', TokenType.integer : 'integer', TokenType.float : 'float', TokenType.boolean : 'boolean'}
+    d = {TokenType.id : 'id', TokenType.integer : 'integer', TokenType.float : 'float', TokenType.boolean : 'boolean', TokenType.string : 'string' }
                     
     while len(tokens) > 1:    
         max_val = 0
@@ -274,7 +332,7 @@ def make_ast(tokens):
         while i < len(tokens):
             t = tokens[i]
             if isinstance(t, Token):
-                if t.kind in [TokenType.id, TokenType.integer, TokenType.float, TokenType.boolean]:
+                if t.kind in [TokenType.id, TokenType.integer, TokenType.float, TokenType.boolean, TokenType.string]:
                     tokens[i] = Node(kind=d[t.kind], val=t.val)
                     miniproc = True
                 elif t.val in Priority:
@@ -377,6 +435,8 @@ class Interpreter:
                 start.append('KEY ' + e)
                 start.append('VAL ' + n.val[e])
             start.append('HASH ' + str(len(n.val)))
+        elif n.kind == 'string':
+            start.append('STRING ' + n.val)
         else:
             raise Exception('Node type not handled %s' % (n.kind,))
         pass
@@ -451,7 +511,18 @@ class Interpreter:
             else:
                 raise Exception('error')
         elif n.kind == 'integer':
-            return int(n.val)
+            if len(n.val) >= 3:
+                if n.val[0:2] == '0x' or n.val[0:2] == '0X':
+                    r = int(n.val, 16)
+                elif n.val[0:2] == '0b' or n.val[0:2] == '0B':
+                    r = int(n.val, 2)
+                elif n.val[0:2] == '0c' or n.val[0:2] == '0C':
+                    r = int(n.val[2:], 8)
+                else:
+                    r = int(n.val)
+            else:
+                r = int(n.val)
+            return r
         elif n.kind == 'float':
             return float(n.val)
         elif n.kind == 'boolean':
@@ -461,6 +532,8 @@ class Interpreter:
             for e in n.val:
                 h[e] = self.do_node(n.val[e])
             return h
+        elif n.kind == 'string':
+            return n.val
         else:
             raise Exception('Node type not handled %s' % (n.kind,))
 
@@ -533,6 +606,13 @@ suite.append(Test("true", True))
 suite.append(Test("5", 5))
 #suite.append(Test("true + 1" # ERROR
 suite.append(Test("{}", {}))
+suite.append(Test("0xA == 10", True))
+suite.append(Test("0b10 == 2", True))
+suite.append(Test("0c10 == 8", True))
+suite.append(Test("0XA == 10", True))
+suite.append(Test("0B10 == 2", True))
+suite.append(Test("0C10 == 8", True))
+suite.append(Test('"savior"', "savior"))
 
 Test.setup(Interpreter())
 
