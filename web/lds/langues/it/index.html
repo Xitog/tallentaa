@@ -22,15 +22,29 @@
         h4              { font-family: arial;     font-size: 14px; color: DarkGray; }
         body            { font-family: arial;     font-size: 14px; color: DarkSlateGray; }
         table           { border: 1px solid DarkSlateGray;}
-        td, th          { border: 1px solid DarkSlateGray; }
+        td, th          { border: 1px solid DarkSlateGray; text-align: center;}
 
     </style>
+    <script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-23318909-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+    </script>
 </head>
 <body>
 
 <h1>Mini Grammaire Italienne</h1>
 
-<p>Damien Gouteux, 2011. Version Alpha</p>
+<p>Damien Gouteux, 2011. Version Alpha 2</p>
+<p>T&eacute;l&eacute;charger <a href="italien.pdf">la version PDF</a> ou <a href="italien.xps">la version XPS</a>.</p>
 
 <h2>Pr&eacute;sentation<h2>
 
@@ -74,6 +88,7 @@ $ note, anecdote<br/>
 </ol></li>
 <li><a href="#vocabulaire">Vocabulaire</a>
 <ol>
+    <li>Les animaux</li>
     <li>Les jours et les mois</li>
     <li>La maison</li>
     <li>Exprimer la fr&eacute;quence</li>
@@ -82,6 +97,7 @@ $ note, anecdote<br/>
     <li>L'heure</li>
     <li>Des adverbes</li>
     <li>Des conjonctions</li>
+    <li>Se d&eacute;placer</li>
     <li>Les pays</li>
     <li>Les nombres</li>
     <li>Des verbes</li>
@@ -100,7 +116,7 @@ $ note, anecdote<br/>
 <tr><td>b</td><td>"bi"</td></tr>
 <tr><td>c</td><td>"tchi"</td></tr>
 <tr><td>d</td><td>"di"</td></tr>
-<tr><td>e</td><td>"&eagrave;"</td></tr>
+<tr><td>e</td><td>"&egrave;"</td></tr>
 <tr><td>f</td><td>"&eacute;ff&eacute;"</td></tr>
 <tr><td>g</td><td>"dji"</td></tr>
 <tr><td>h</td><td>"akka"</td></tr>
@@ -200,6 +216,7 @@ $ note, anecdote<br/>
 <li>! Certains adjectifs ou noms termin&eacute;s par co, go, ca, ga prennent un h au pluriel en i et e pour conserver le son "k" ou "gu".</li>
 <li>! Les adjectifs ou noms en cia et gia perdent le i au pluriel lorsque la terminaison est pr&eacute;c&eacute;d&eacute;e par une consonne.</li>
 <li>! Certains adjectifs termin&eacute;s par a au masculin et au f&eacute;minin feront leur pluriel en i (si les qualifi&eacute;s sont masculins) ou en e (si f&eacute;minins).</li>
+<li>! Les noms termin&eacute;s par un caract&egrave;re accentu&eacute; sont invariables, ceux au féminin termi&eacute; par ie, les noms monosyllabiques, les noms d'origine &eacute;trang&egrave;re ainsi que les abbr&eacute;viations aussi.</li>
 </ul>
 
 </ul>
@@ -224,8 +241,8 @@ $ note, anecdote<br/>
 </table>
 
 <ul>
-<li>! bien voir la diff&eacute;rence entre un' indiquant toujours un f&eacute;minin et un indiquant toujours un masculin.</li>
-<li>! si un mot est accentu&eacute; sur sa derni&egrave;re syllabe, il est invariable : la citt&agrave;, le citt&agrave; = la ville, les villes</li>
+<li>! Bien voir la diff&eacute;rence entre un' indiquant toujours un f&eacute;minin et un indiquant toujours un masculin.</li>
+<li>! Si un mot est accentu&eacute; sur sa derni&egrave;re syllabe, il est invariable : la citt&agrave;, le citt&agrave; = la ville, les villes.</li>
 </ul>
 
 <h2 id="pronoms">Pronoms</h2> <a href="#sommaire"><i>(retour sommaire)</i></a>
@@ -301,15 +318,16 @@ Dans ce document :
 <li>finire  -ire +terminaison</li>
 </ul>
 
-Terminaisons :
+<p>Terminaisons</p>
 
 <table>
-<tr><td>o</td></tr>
-<tr><td>i</td></tr>
-<tr><td>a (1er groupe) / e (2&egrave;me et 3&egrave;me)</td></tr>
-<tr><td>iamo</td></tr>
-<tr><td>ate (1er) / ete (2&egrave;me) / ite (3&egrave;me)</td></tr>
-<tr><td>ano (1er) / ono (2&egrave;me et 3&egrave;me)</td></tr>
+<tr><td>1er</td><td>2&egrave;me</td><td>3&egrave;me</td></tr>
+<tr><td colspan="3">o</td></tr>
+<tr><td colspan="3">i</td></tr>
+<tr><td>a</td><td colspan="2">e</td></tr>
+<tr><td colspan="3">iamo</td></tr>
+<tr><td>ate</td><td>ete</td><td>ite</td></tr>
+<tr><td>ano</td><td colspan="2">ono</td></tr>
 </table>
 
 <p>Notons que certains verbes du 2&egrave;me groupe pr&eacute;c&egrave;de par la particule "sc" la terminaison aux 1&egrave;re, 2&egrave;me, 3&egrave;me personnes du singulier et &agrave; la 3&egrave;me personne du pluriel. </p>
@@ -385,7 +403,11 @@ Dans les temps compos&eacute;s, il s'accorde selon les m&ecirc;mes r&egrave;gles
 
 auxilaire + participe pass&eacute;
 
-! Choix de l'auxiliaire : le verbe &ecirc;tre, les verbes d'&eacute;tat et de mouvement se conjuguent avec l'auxiliaire &ecirc;tre.
+<ul>
+<li>! Choix de l'auxiliaire : le verbe &ecirc;tre, les verbes d'&eacute;tat et de mouvement se conjuguent avec l'auxiliaire &ecirc;tre.</li>
+<li>! Les verbes r&eacute;fl&eacute;chis sont toujours avec l'auxilaire &ecirc;tre.</li>
+<li>! Dovere, volere, potere suivit d'un verbe au pass&eacute; compos&eacute; prennent l'auxiliaire du verbe qui les suit.</li>
+</ul>
 
 <h3>Irr&eacute;guliers</h3>
 
@@ -407,8 +429,8 @@ L'italien comporte de nombreux verbes irr&eacute;guliers.
 <h2 id="prepositions">Pr&eacute;positions</h2> <a href="#sommaire"><i>(retour sommaire)</i></a>
 
 <ul>
-<li>di    : provenance (de), pr&eacute;cision</li>
-<li>da    : chez</li>
+<li>di    : de (pr&eacute;cision)</li>
+<li>da    : chez, depuis, de (provenance)</li>
 <li>in    : dans, en</li>
 <li>per   : pour</li>
 <li>su    : sur</li>
@@ -479,6 +501,8 @@ Les saisons et le temps (climat)
 <table>
 <tr><td>Sempre</td><td>Toujours</td></tr>
 <tr><td>Quasi Sempre</td><td>Presque tout le temps</td></tr>
+<tr><td>Spesso</td><td>Souvent</td></tr>
+<tr><td>Molte volte</td><td>Beaucoup de fois</td></tr>
 <tr><td>A volte</td><td>Parfois</td></tr>
 <tr><td>Raramente</td><td>Rarement</td></tr>
 <tr><td>Quasi mai</td><td>Presque jamais</td></tr>
@@ -504,8 +528,8 @@ Les saisons et le temps (climat)
 <tr><td>buongiorno</td><td>bonjour</td></tr>
 <tr><td>arrivederci</td><td>au revoir</td></tr>
 <tr><td>ciao</td><td>salut</td></tr>
-<tr><td>per favore</td><td>s'il vous plaît</td></tr>
-<tr><td>per cortesia</td><td>s'il vous plaît</td></tr>
+<tr><td>per favore</td><td>s'il vous pla&icirc;t</td></tr>
+<tr><td>per cortesia</td><td>s'il vous pla&icirc;t</td></tr>
 <tr><td>Pronto ?</td><td>Allo ?</td></tr>
 <tr><td>Pronto !</td><td>Allo !</td></tr>
 <tr><td>a domani !</td><td>&agrave; demain !</td></tr>
@@ -545,7 +569,16 @@ Les saisons et le temps (climat)
 <table>
 <tr><td>ma</td><td>mais</td></tr>
 <tr><td>o</td><td>ou</td></tr>
-<tr><td>e (ed</td><td>et</td></tr>
+<tr><td>e (ed)</td><td>et</td></tr>
+</table>
+
+<h3>Se d&eacute;placer</h3>
+
+<table>
+    <tr><td>a piedi</td><td>&agrave; pieds</td></tr>
+    <tr><td>in +nom</td><td>tous les autres</td></tr>
+    <tr><td>andere a+ville, in+&eacute;tat</td><td>aller &agrave;, au, en</td></tr>
+    <tr><td>venire da+lieu de provenance, a,in+lieu o&ugrave; l'on va</td><td>venir de ou venir &agrave;</td></tr>
 </table>
 
 <h3>Les pays</h3>
@@ -600,26 +633,31 @@ Les saisons et le temps (climat)
 <h3>Des verbes</h3>
 
 <table>
-<tr><td>andare</td><td>aller</td></tr>
-<tr><td>amare</td><td>envoyer</td></tr>
-<tr><td>aspettare</td><td>attendre</td></tr>
-<tr><td>cambiare</td><td>changer</td></tr>
-<tr><td>chiedere</td><td>demander</td></tr>
-<tr><td>chiudere</td><td>fermer</td></tr>
-<tr><td>cominciare</td><td>commencer</td></tr>
-<tr><td>comprare</td><td>acheter</td></tr>
-<tr><td>invitare</td><td>inviter</td></tr>
-<tr><td>lavorare</td><td>travailler</td></tr>
-<tr><td>leggere</td><td>lire</td></tr>
-<tr><td>mancare</td><td>manquer</td></tr>
-<tr><td>mangiare</td><td>manger</td></tr>
-<tr><td>pensare</td><td>penser</td></tr>
-<tr><td>prendre</td><td>prendre</td></tr>
-<tr><td>salire</td><td>monter</td></tr>
-<tr><td>sentire</td><td>sentir</td></tr>
-<tr><td>spedire</td><td>envoyer</td></tr>
-<tr><td>studiare</td><td>&eacute;tudier</td></tr>
-<tr><td>vivere</td><td>vivre</td></tr>
+<tr><td>Infinitif</td><td>Radical du futur</td><td>Participe pass&eacute;</td><td>Fran&ccedil;ais</td></tr>
+<tr><td>andare</td><td>andr_</td><td>andato</td><td>aller</td></tr>
+<tr><td>amare</td><td>amer_</td><td>amato</td><td>envoyer</td></tr>
+<tr><td>aspettare</td><td>aspetter_</td><td>aspettato</td><td>attendre</td></tr>
+<tr><td>cambiare</td><td>cambier_</td><td>cambiato</td><td>changer</td></tr>
+<tr><td>chiedere</td><td>chieder_</td><td>chiesto</td><td>demander</td></tr>
+<tr><td>chiudere</td><td>chiuder_</td><td>chiuso</td><td>fermer</td></tr>
+<tr><td>cominciare</td><td>comincier_</td><td>cominciato</td><td>commencer</td></tr>
+<tr><td>comprare</td><td>comprer_</td><td>comprato</td><td>acheter</td></tr>
+<tr><td>dare</td><td>dar_</td><td>dato</td><td>donner</td></tr>
+<tr><td>dire</td><td>dir_</td><td>detto</td><td>dire</td></tr>
+<tr><td>fare</td><td>far_</td><td>fatto</td><td>faire</td></tr>
+<tr><td>invitare</td><td>inviter_</td><td>invitato</td><td>inviter</td></tr>
+<tr><td>lavorare</td><td>laver_</td><td>lavorato</td><td>travailler</td></tr>
+<tr><td>leggere</td><td>legger_</td><td>letto</td><td>lire</td></tr>
+<tr><td>mancare</td><td>mancher_</td><td>mancato</td><td>manquer</td></tr>
+<tr><td>mangiare</td><td>manger_</td><td>mangiato</td><td>manger</td></tr>
+<tr><td>pensare</td><td>penser_</td><td>pensato</td><td>penser</td></tr>
+<tr><td>prendre</td><td>prender_</td><td>preso</td><td>prendre</td></tr>
+<tr><td>salire</td><td>salir_</td><td>salito</td><td>monter</td></tr>
+<tr><td>sentire</td><td>sentir_</td><td>sentito</td><td>sentir</td></tr>
+<tr><td>spedire</td><td>spedir_</td><td>spedito</td><td>envoyer</td></tr>
+<tr><td>studiare</td><td>studier_</td><td>studiato</td><td>&eacute;tudier</td></tr>
+<tr><td>vivere</td><td>vivr_</td><td>vissuto</td><td>vivre</td></tr>
+<tr><td>volere</td><td>vorr_</td><td>voluto</td><td>vouloir</td></tr>
 </table>
 
 <h2 id="ressources">Ressources</h2> <a href="#sommaire"><i>(retour sommaire)</i></a>
@@ -642,6 +680,18 @@ Les saisons et le temps (climat)
 
 <ul>
 <li>12 mai 2011 : Version Alpha</li>
+<li>13 mai 2011 : Version Alpha 2
+    <ul>
+        <li>Ajout pour les verbes r&eacute;fl&eacute;chis avec le verbe essere.</li>
+        <li>Ajout de Molte Volte (fr&eacute;quence).</li>
+        <li>Ajout de dovere, potere, volere avec un verbe apr&egrave;s.</li>
+        <li>Ajout de la r&egrave;gle pour les noms invariables.</li>
+        <li>Ajout de "Se D&eacute;placer".</li>
+        <li>Rajout des formes de verbes (voc) et de verbes.</li>
+        <li>Correction des pr&eacute;positions.</li>
+        <li>Nouvelle pr&eacute;sentation du pr&eacute;sent.</li>
+    </ul>
+</li>
 </ul>
 
 </body>
