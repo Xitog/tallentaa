@@ -405,13 +405,13 @@ class Interpreter:
     def __init__(self, scope=[]):
         self.scope = scope
 
-    def do_string(self, s2, stack=[]):
+    def do_string(self, s2, stack=[], scope={}):
         global s
         s = s2
         restart()
         tokenize()
         n = make_ast(tokens)
-        r = self.do_node(n)
+        r = self.do_node(n, scope, True)
         #self.process_python(n)
         self.process_vm(n, stack)
         return r
@@ -420,7 +420,7 @@ class Interpreter:
         if not isinstance(n, Node):
             raise Exception('Not a node but %s' % (str(n.__class__),))
         if n.kind == 'binop':
-            dop = {'+' : 'ADD', '*' : 'MUL', '-' : 'SUB', '/' : 'DIV', '//' : 'INTDIV', '**' : 'POW', '%' : 'MOD', '<' : 'LT', '>' : 'GT', '>=' : 'GE', '<=' : 'LE', '!=' : 'NE', '==' : 'EQ' }
+            dop = {'+' : 'ADD', '*' : 'MUL', '-' : 'SUB', '/' : 'DIV', '//' : 'INTDIV', '**' : 'POW', '%' : 'MOD', '<' : 'LT', '>' : 'GT', '>=' : 'GE', '<=' : 'LE', '!=' : 'NE', '==' : 'EQ', '=' : 'AFF' }
             self.process_vm(n.arg1, start)
             self.process_vm(n.arg2, start)
             start.append(dop[n.op])
@@ -437,6 +437,8 @@ class Interpreter:
             start.append('HASH ' + str(len(n.val)))
         elif n.kind == 'string':
             start.append('STRING ' + n.val)
+        elif n.kind == 'id':
+            start.append('ID ' + n.val)
         else:
             raise Exception('Node type not handled %s' % (n.kind,))
         pass
@@ -469,13 +471,17 @@ class Interpreter:
         else:
             raise Exception('Node type not handled %s' % (n.kind,))
         
-    def do_node(self, n):
+    def do_node(self, n, scope={}, lonely=False):
         if not isinstance(n, Node):
             raise Exception('Not a node but %s' % (str(n.__class__),))
         if n.kind == 'binop':
             if is_arithmetic_operator(n.op):
-                a = self.do_node(n.arg1)
-                b = self.do_node(n.arg2)
+                a = self.do_node(n.arg1, scope)
+                b = self.do_node(n.arg2, scope)
+                if isinstance(a, str) and n.arg1.kind == 'id':
+                    a = scope[a]
+                if isinstance(b, str) and n.arg2.kind == 'id':
+                    b = scope[b]
                 if not (a.__class__ in [int, float] and b.__class__ in [int, float]):
                     raise Exception('Incorrect operand %s and %s for operator %s' % (a.__class__, b.__class__, n.op))
                 elif n.op == '+':
@@ -497,19 +503,24 @@ class Interpreter:
                 elif n.op == '%':
                     return a % b
             elif n.op == '<':
-                return self.do_node(n.arg1) < self.do_node(n.arg2)
+                return self.do_node(n.arg1, scope) < self.do_node(n.arg2, scope)
             elif n.op == '<=':
-                return self.do_node(n.arg1) <= self.do_node(n.arg2)
+                return self.do_node(n.arg1, scope) <= self.do_node(n.arg2, scope)
             elif n.op == '>':
-                return self.do_node(n.arg1) > self.do_node(n.arg2)
+                return self.do_node(n.arg1, scope) > self.do_node(n.arg2, scope)
             elif n.op == '>=':
-                return self.do_node(n.arg1) >= self.do_node(n.arg2)
+                return self.do_node(n.arg1, scope) >= self.do_node(n.arg2, scope)
             elif n.op == '==':
-                return self.do_node(n.arg1) == self.do_node(n.arg2)
+                return self.do_node(n.arg1, scope) == self.do_node(n.arg2, scope)
             elif n.op == '!=':
-                return self.do_node(n.arg1) != self.do_node(n.arg2)
+                return self.do_node(n.arg1, scope) != self.do_node(n.arg2, scope)
+            elif n.op == '=':
+                left = self.do_node(n.arg1, scope)
+                right = self.do_node(n.arg2, scope)
+                scope[left] = right
+                return right
             else:
-                raise Exception('error')
+                raise Exception('error unknown op : %s' % (n.op,))
         elif n.kind == 'integer':
             if len(n.val) >= 3:
                 if n.val[0:2] == '0x' or n.val[0:2] == '0X':
@@ -534,6 +545,14 @@ class Interpreter:
             return h
         elif n.kind == 'string':
             return n.val
+        elif n.kind == 'id':
+            if not lonely:
+                return n.val
+            else:
+                if n.val in scope:
+                    return scope[n.val]
+                else:
+                    raise Exception('Var %s not defined' % (n.val,))
         else:
             raise Exception('Node type not handled %s' % (n.kind,))
 
@@ -576,12 +595,12 @@ class Test:
     def setup(cls, intpr):
         Test.intpr = intpr
     
-    def test(self, stack=[]):
-        i = Test.intpr.do_string(self.s, stack)
-        if i == self.r:
-            return (True, self.s, i)
+    def test(self, stack=[], scope={}):
+        computed = Test.intpr.do_string(self.s, stack, scope)
+        if computed == self.r: # compare result awaited (r) and result given (computed)
+            return (True, self.s, computed)
         else:
-            return (False, self.s, i, self.r)
+            return (False, self.s, computed, self.r)
 
 #s = "a = 5; b = 2; c = a * -b+1; writeln(c) #pipo; 11+1 .4 2.3.alpha 5..alpha"
 suite = []
@@ -613,6 +632,12 @@ suite.append(Test("0XA == 10", True))
 suite.append(Test("0B10 == 2", True))
 suite.append(Test("0C10 == 8", True))
 suite.append(Test('"savior"', "savior"))
+suite.append(Test("a = 5", 5))
+suite.append(Test("a", 5))
+suite.append(Test("a + 5", 10))
+suite.append(Test("a", 5))
+suite.append(Test("b = a + 5", 10))
+suite.append(Test("b", 10))
 
 Test.setup(Interpreter())
 
@@ -621,10 +646,11 @@ Test.setup(Interpreter())
 #print r
 #exit()
 
+scope = {}
 stack = []
 good = 0
 for s in suite:
-    r = s.test(stack)
+    r = s.test(stack, scope)
     if r[0]:
         print 'ok: s=', r[1], 'r=', r[2]
         good += 1
