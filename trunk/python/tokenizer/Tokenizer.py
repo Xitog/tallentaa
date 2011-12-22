@@ -266,10 +266,14 @@ def tokenize():
 print('\nParser\n')
 
 Priority = {
-    ';' :   1,
-    '/n':   1,
-    '{' :   2,  # '}'
-    '}' :   0,  # neutral
+    ';' :   3,
+    '/n':   3,
+    'if':   2,
+    'unless' : 2,
+    'then': 0, # neutral ( if )
+    'end': 0,  # neutral ( if )
+    '{' :   8, 
+    '}' :   0, # neutral ( } )
     '=' :  10,
     '==': 80,
     '!=': 81,
@@ -304,6 +308,9 @@ def sub(subjects):
     i = 0
     while i < len(subjects):
         t = subjects[i]
+        if isinstance(t, Node):
+            i+=1
+            continue
         if start.val == '(':
             if t.val == '(':
                 mod += 1
@@ -315,6 +322,13 @@ def sub(subjects):
             if t.val == '{':
                 mod += 1
             elif t.val == '}':
+                mod -= 1
+                if mod == 0:
+                    break
+        elif start.val == 'if':
+            if t.val in ['while', 'for', 'class', 'fun', 'module']:
+                mod += 1
+            elif t.val == 'end':
                 mod -= 1
                 if mod == 0:
                     break
@@ -367,8 +381,21 @@ def make_ast(tokens):
                 n = Node(kind='hash',val={})
                 tokens[max_tok] = n
                 del tokens[max_tok+1+len(l)]
+            elif t.val in ['if', 'unless']:
+                lx = sub(tokens[max_tok:]) # cond then action
+                n = Node(kind='if', cond=lx[0], action=lx[2], invert=(t.val == 'unless'))
+                tokens[max_tok] = n
+                del tokens[max_tok+4] # cond
+                del tokens[max_tok+3] # then
+                del tokens[max_tok+2] # action
+                del tokens[max_tok+1] # end
+            elif t.val == ';':
+                n = Node(kind='seq', subkind='sta', left=tokens[max_tok-1], right=tokens[max_tok+1])
+                tokens[max_tok] = n
+                del tokens[max_tok+1]
+                del tokens[max_tok-1]
             else:
-                raise Exception('error')
+                raise Exception('token not handled in ast making! %s' % (t.val,))
                 
         #print 'debug list (', len(tokens) , ') -->'
         #for t in tokens:
@@ -439,6 +466,24 @@ class Interpreter:
             start.append('STRING ' + n.val)
         elif n.kind == 'id':
             start.append('ID ' + n.val)
+        elif n.kind == 'if':
+            self.process_vm(n.cond, start)
+            minis = []
+            minis.append('JUMP XXX')
+            self.process_vm(n.action, minis)
+            if n.invert:
+                minis[0] = 'JUMP_ON_TRUE ' + str(len(minis))
+            else:
+                minis[0] = 'JUMP_ON_FALSE ' + str(len(minis))
+            minis.append('REM ENDIF')
+            for elem in minis:
+                start.append(elem)
+        elif n.kind == 'seq':
+            if n.subkind == 'sta':
+                self.process_vm(n.left, start)
+                self.process_vm(n.right, start)
+            else:
+                raise Exception("ZEMBLA !") #TODO
         else:
             raise Exception('Node type not handled %s' % (n.kind,))
         pass
@@ -470,55 +515,88 @@ class Interpreter:
             return s
         else:
             raise Exception('Node type not handled %s' % (n.kind,))
-        
+    
+    def binop_num(self, a, b, op):
+        if isinstance(b, int) or isinstance(b, float):
+            if op == '+':
+                return a + b
+            elif op == '*':
+                return a * b
+            elif op == '/':
+                f = float(a) / float(b)
+                if a.__class__ == int and b.__class__ == int and f == int(f):
+                    return int(f)
+                else:
+                    return f
+            elif op == '//':
+                return int(a / b)
+            elif op == '**':
+                return a ** b
+            elif op == '-':
+                return a - b
+            elif op == '%':
+                return a % b
+            else:
+                raise Exception('Unknown operator %s for %s with par %s' % (op, a.__class__, b.__class__))
+        else:
+            raise Exception('Incorrect operand %s for %s with operator %s' % (a.__class__, b.__class__, op))
+    
+    def binop_str(self, a, b, op):
+        if isinstance(b, basestring):
+            if op == '+':
+                return a + b
+            elif op == '-':
+                return a.replace(b, '')
+            else:
+                raise Exception('Unknown operator %s for %s with par %s' % (op, a.__class__, b.__class__))
+        elif isinstance(b, int):
+            if op == '*':
+                return a * b
+            else:
+                raise Exception('Unknown operator %s for %s with par %s' % (op, a.__class__, b.__class__))        
+        else:
+            raise Exception('Incorrect operand %s for %s with operator %s' % (a.__class__, b.__class__, op))
+
     def do_node(self, n, scope={}, lonely=False):
         if not isinstance(n, Node):
             raise Exception('Not a node but %s' % (str(n.__class__),))
         if n.kind == 'binop':
-            if is_arithmetic_operator(n.op):
-                a = self.do_node(n.arg1, scope)
-                b = self.do_node(n.arg2, scope)
-                if isinstance(a, str) and n.arg1.kind == 'id':
+            a = self.do_node(n.arg1, scope)
+            b = self.do_node(n.arg2, scope)
+            if isinstance(a, str) and n.arg1.kind == 'id':
+                ida = a
+                if a in scope:
                     a = scope[a]
-                if isinstance(b, str) and n.arg2.kind == 'id':
+                else:
+                    a = None
+            if isinstance(b, str) and n.arg2.kind == 'id':
+                idb = b
+                if b in scope:
                     b = scope[b]
-                if not (a.__class__ in [int, float] and b.__class__ in [int, float]):
-                    raise Exception('Incorrect operand %s and %s for operator %s' % (a.__class__, b.__class__, n.op))
-                elif n.op == '+':
-                    return a + b
-                elif n.op == '*':
-                    return a * b
-                elif n.op == '/':
-                    f = float(a) / float(b)
-                    if a.__class__ == int and b.__class__ == int and f == int(f):
-                        return int(f)
-                    else:
-                        return f
-                elif n.op == '//':
-                    return int(a / b)
-                elif n.op == '**':
-                    return a ** b
-                elif n.op == '-':
-                    return a - b
-                elif n.op == '%':
-                    return a % b
+                else:
+                    b = None
+            if is_arithmetic_operator(n.op):
+                if (a.__class__ in [int, float]):
+                    return self.binop_num(a, b, n.op)
+                elif isinstance(a, basestring):
+                    return self.binop_str(a, b, n.op)
+                else:
+                    raise Exception('Incorrect class %s for operator %s' % (a.__class__, n.op))
             elif n.op == '<':
-                return self.do_node(n.arg1, scope) < self.do_node(n.arg2, scope)
+                return a < b
             elif n.op == '<=':
-                return self.do_node(n.arg1, scope) <= self.do_node(n.arg2, scope)
+                return a <= b
             elif n.op == '>':
-                return self.do_node(n.arg1, scope) > self.do_node(n.arg2, scope)
+                return a > b
             elif n.op == '>=':
-                return self.do_node(n.arg1, scope) >= self.do_node(n.arg2, scope)
+                return a >= b
             elif n.op == '==':
-                return self.do_node(n.arg1, scope) == self.do_node(n.arg2, scope)
+                return a == b
             elif n.op == '!=':
-                return self.do_node(n.arg1, scope) != self.do_node(n.arg2, scope)
+                return a != b
             elif n.op == '=':
-                left = self.do_node(n.arg1, scope)
-                right = self.do_node(n.arg2, scope)
-                scope[left] = right
-                return right
+                scope[ida] = b
+                return scope[ida]
             else:
                 raise Exception('error unknown op : %s' % (n.op,))
         elif n.kind == 'integer':
@@ -553,6 +631,21 @@ class Interpreter:
                     return scope[n.val]
                 else:
                     raise Exception('Var %s not defined' % (n.val,))
+        elif n.kind == 'if':
+            cond = self.do_node(n.cond, scope, True)
+            r = None
+            #print 'b', scope['b']
+            #print 'cond', cond
+            #print 'n.invert', n.invert
+            if (cond and (not n.invert)) or ((not cond) and n.invert):
+                r = self.do_node(n.action, scope, True)
+            return r
+        elif n.kind == 'seq':
+            if n.subkind == 'sta':
+                self.do_node(n.left)
+                return self.do_node(n.right)
+            else:
+                exit(1) # TODO
         else:
             raise Exception('Node type not handled %s' % (n.kind,))
 
@@ -586,23 +679,47 @@ class Interpreter:
 
 #-------------------------------------------------------------------------------
 
+import sys
+import traceback
+
 class Test:
-    def __init__(self, s, r):
-        self.s = s
-        self.r = r
+    def __init__(self, test, waited):
+        self.test_str = test
+        self.waited = waited
+        self.computed = None
     
     @classmethod
     def setup(cls, intpr):
         Test.intpr = intpr
+        Test.ERROR = (None, 99)
     
     def test(self, stack=[], scope={}):
-        computed = Test.intpr.do_string(self.s, stack, scope)
-        if computed == self.r: # compare result awaited (r) and result given (computed)
-            return (True, self.s, computed)
+        try:
+            self.computed = Test.intpr.do_string(self.test_str, stack, scope)
+        except Exception as e:
+            if self.waited == Test.ERROR:
+                self.computed = Test.ERROR
+            else:
+                traceback.print_exc(file=sys.stdout)
+                raise e
+                
+    
+    def is_ok(self):
+        return self.computed == self.waited
+    
+    def __str__(self):
+        if self.computed == self.waited:
+            if self.waited != Test.ERROR:
+                return "[ok] for '%s' we got %s" % (self.test_str, self.computed)
+            else:
+                return "[ok] for '%s' as failed as intended" % (self.test_str,)
         else:
-            return (False, self.s, computed, self.r)
+            return "[!!] for '%s' we got %s instead of %s" % (self.test_str, self.computed, self.waited)
 
 #s = "a = 5; b = 2; c = a * -b+1; writeln(c) #pipo; 11+1 .4 2.3.alpha 5..alpha"
+
+Test.setup(Interpreter())
+
 suite = []
 suite.append(Test("4 + 5", 9))
 suite.append(Test("4 + 5 + 1", 10))
@@ -623,7 +740,9 @@ suite.append(Test("2 + 1 == 3", True))
 suite.append(Test("2 < 3 == 3 < 5", True))
 suite.append(Test("true", True))
 suite.append(Test("5", 5))
-#suite.append(Test("true + 1" # ERROR
+suite.append(Test("true + 1", Test.ERROR))
+suite.append(Test("1 / 0", Test.ERROR))
+suite.append(Test('"savior" / 5', Test.ERROR))
 suite.append(Test("{}", {}))
 suite.append(Test("0xA == 10", True))
 suite.append(Test("0b10 == 2", True))
@@ -638,8 +757,17 @@ suite.append(Test("a + 5", 10))
 suite.append(Test("a", 5))
 suite.append(Test("b = a + 5", 10))
 suite.append(Test("b", 10))
-
-Test.setup(Interpreter())
+suite.append(Test('"hel"+"lo"', "hello"))
+suite.append(Test('"hello" - "ll"', "heo"))
+suite.append(Test('"helloll" - "ll"', "heo"))
+suite.append(Test('"a" * 3', "aaa"))
+suite.append(Test('"a" / 3', Test.ERROR))
+suite.append(Test("if b == 10 then 42 end", 42))
+suite.append(Test("if b != 10 then 42 end", None))
+suite.append(Test("unless b == 10 then 42 end", None))
+suite.append(Test("unless b != 10 then 42 end", 42))
+suite.append(Test("42 ; 23", 23))
+suite.append(Test("if b == 10 then 42 ; 23 end", 23))
 
 #sx = Test("{}", {}) #Test("5", 5)
 #r = sx.test()
@@ -649,13 +777,18 @@ Test.setup(Interpreter())
 scope = {}
 stack = []
 good = 0
-for s in suite:
-    r = s.test(stack, scope)
-    if r[0]:
-        print 'ok: s=', r[1], 'r=', r[2]
-        good += 1
-    else:
-        print '!!: s=', r[1], 'r=', r[2], 'instead of=', r[3]
+for elem in suite:
+    #print elem.__class__
+    elem.test(stack, scope)
+    #print elem.__class__
+    print elem
+    #print elem.__class__
+    if elem.is_ok():
+        good+=1
+
+print
+print '-- Stack'
+print
 
 for s in stack:
     print s
