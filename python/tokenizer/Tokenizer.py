@@ -268,13 +268,18 @@ print('\nParser\n')
 Priority = {
     ';' :   3,
     '/n':   3,
+    'while': 2,
+    'until': 2,
     'if':   2,
     'unless' : 2,
     'then': 0, # neutral ( if )
     'end': 0,  # neutral ( if )
+    'do': 0,   # neutral ( while )
     '{' :   8, 
     '}' :   0, # neutral ( } )
     '=' :  10,
+    '+=':  10,
+    '-=':  10,
     '==': 80,
     '!=': 81,
     '<' : 82,
@@ -325,15 +330,20 @@ def sub(subjects):
                 mod -= 1
                 if mod == 0:
                     break
-        elif start.val == 'if':
-            if t.val in ['while', 'for', 'class', 'fun', 'module']:
+        elif start.val in ['while', 'for', 'class', 'fun', 'module', 'until', 'if']:
+            #print '>>', t.val
+            #print '>>', mod
+            if t.val in ['while', 'for', 'class', 'fun', 'module', 'until', 'if']:
                 mod += 1
             elif t.val == 'end':
                 mod -= 1
                 if mod == 0:
                     break
         i+=1
-    return subjects[1: i-1]
+    r = subjects[1: i]
+    #for e in r:
+    #    print e
+    return r
 
 def make_ast(tokens):
     d = {TokenType.id : 'id', TokenType.integer : 'integer', TokenType.float : 'float', TokenType.boolean : 'boolean', TokenType.string : 'string' }
@@ -389,6 +399,14 @@ def make_ast(tokens):
                 del tokens[max_tok+3] # then
                 del tokens[max_tok+2] # action
                 del tokens[max_tok+1] # end
+            elif t.val in ['while', 'until']:
+                lx = sub(tokens[max_tok:])
+                n = Node(kind='while', cond=lx[0], action=lx[2], invert=(t.val == 'until'))
+                tokens[max_tok] = n
+                del tokens[max_tok+4] # cond
+                del tokens[max_tok+3] # do
+                del tokens[max_tok+2] # action
+                del tokens[max_tok+1] # end
             elif t.val == ';':
                 n = Node(kind='seq', subkind='sta', left=tokens[max_tok-1], right=tokens[max_tok+1])
                 tokens[max_tok] = n
@@ -396,7 +414,7 @@ def make_ast(tokens):
                 del tokens[max_tok-1]
             else:
                 raise Exception('token not handled in ast making! %s' % (t.val,))
-                
+        
         #print 'debug list (', len(tokens) , ') -->'
         #for t in tokens:
         #    print t
@@ -447,7 +465,7 @@ class Interpreter:
         if not isinstance(n, Node):
             raise Exception('Not a node but %s' % (str(n.__class__),))
         if n.kind == 'binop':
-            dop = {'+' : 'ADD', '*' : 'MUL', '-' : 'SUB', '/' : 'DIV', '//' : 'INTDIV', '**' : 'POW', '%' : 'MOD', '<' : 'LT', '>' : 'GT', '>=' : 'GE', '<=' : 'LE', '!=' : 'NE', '==' : 'EQ', '=' : 'AFF' }
+            dop = {'+' : 'ADD', '*' : 'MUL', '-' : 'SUB', '/' : 'DIV', '//' : 'INTDIV', '**' : 'POW', '%' : 'MOD', '<' : 'LT', '>' : 'GT', '>=' : 'GE', '<=' : 'LE', '!=' : 'NE', '==' : 'EQ', '=' : 'AFF', '+=' : 'AFF_ADD', '-=' : 'AFF_SUB' }
             self.process_vm(n.arg1, start)
             self.process_vm(n.arg2, start)
             start.append(dop[n.op])
@@ -476,6 +494,20 @@ class Interpreter:
             else:
                 minis[0] = 'JUMP_ON_FALSE ' + str(len(minis))
             minis.append('REM ENDIF')
+            for elem in minis:
+                start.append(elem)
+        elif n.kind == 'while':
+            lbl = len(start)
+            self.process_vm(n.cond, start)
+            minis = []
+            minis.append('JUMP XXX')
+            self.process_vm(n.action, minis)
+            minis.append('JUMP ' + str(lbl))
+            if n.invert:
+                minis[0] = 'JUMP_ON_TRUE ' + str(len(minis))
+            else:
+                minis[0] = 'JUMP_ON_FALSE ' + str(len(minis))
+            minis.append('REM ENDWHILE')
             for elem in minis:
                 start.append(elem)
         elif n.kind == 'seq':
@@ -597,6 +629,12 @@ class Interpreter:
             elif n.op == '=':
                 scope[ida] = b
                 return scope[ida]
+            elif n.op == '+=':
+                scope[ida] = scope[ida] + b
+                return scope[ida]
+            elif n.op == '-=':
+                scope[ida] = scope[ida] - b
+                return scope[ida]
             else:
                 raise Exception('error unknown op : %s' % (n.op,))
         elif n.kind == 'integer':
@@ -639,6 +677,13 @@ class Interpreter:
             #print 'n.invert', n.invert
             if (cond and (not n.invert)) or ((not cond) and n.invert):
                 r = self.do_node(n.action, scope, True)
+            return r
+        elif n.kind == 'while':
+            cond = self.do_node(n.cond, scope, True)
+            r = None
+            while (cond and (not n.invert)) or ((not cond) and n.invert):
+                r = self.do_node(n.action, scope, True)
+                cond = self.do_node(n.cond, scope, True)
             return r
         elif n.kind == 'seq':
             if n.subkind == 'sta':
@@ -768,6 +813,10 @@ suite.append(Test("unless b == 10 then 42 end", None))
 suite.append(Test("unless b != 10 then 42 end", 42))
 suite.append(Test("42 ; 23", 23))
 suite.append(Test("if b == 10 then 42 ; 23 end", 23))
+suite.append(Test("until b > 12 do b = b + 1 end", 13))
+suite.append(Test("while b > 10 do b = b - 1 end", 10))
+suite.append(Test("until b > 12 do b += 1 end", 13))
+suite.append(Test("while b > 10 do b -= 1 end", 10))
 
 #sx = Test("{}", {}) #Test("5", 5)
 #r = sx.test()
@@ -790,8 +839,10 @@ print
 print '-- Stack'
 print
 
+i = 0
 for s in stack:
-    print s
+    print i, '.', s
+    i += 1
 
 print
 print "%s / %s" % (str(good), str(len(suite)))
