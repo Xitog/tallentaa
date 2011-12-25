@@ -51,7 +51,7 @@ def is_silent(c):
     return (c in [' ', '\t'])
 
 def is_aff_operator(s): # for parsing, could be merge with the next one
-    return (s in ['=', '+=', '-=', '/=', '//=', '*=', '**=', '%='])
+    return (s in ['=', '+=', '-=', '/=', '//=', '*=', '**=', '%=', '->'])
 
 def is_arithmetic_operator(s):
     return (s in ['+', '-', '/', '*', '//', '**', '%'])
@@ -94,7 +94,10 @@ def restart():
     escape = False
     state = 'start'
     i = 0
-    c = s[i]
+    if len(s) > 0:
+        c = s[i]
+    else:
+        c = '\0'
     curr = []
     tokens = []
 
@@ -117,6 +120,7 @@ debug = False
 
 def tokenize():
     global s, curr, tokens, c, i, state, escape, debug
+    
     while not escape:
         #print curr
         if c == '\0': # last turn
@@ -267,7 +271,7 @@ print('\nParser\n')
 
 Priority = {
     ';' :   3,
-    '/n':   3,
+    '\n':   3,
     'while': 2,
     'until': 2,
     'if':   2,
@@ -277,6 +281,7 @@ Priority = {
     'do': 0,   # neutral ( while )
     '{' :   8, 
     '}' :   0, # neutral ( } )
+    '->':  10,
     '=' :  10,
     '+=':  10,
     '-=':  10,
@@ -305,6 +310,41 @@ class Node:
             print '\t', k, '=>', self.rem[k]
     def __str__(self):
         return 'node(%s)' % (self.kind,)
+
+def clear():
+    global tokens
+    i = 0
+    while i < len(tokens)-1:
+        actual = tokens[i].val
+        next = tokens[i+1].val
+        
+        if actual == 'then' and next == '\n':
+            del tokens[i+1]
+        elif actual == '\n' and next == '\n':
+            del tokens[i+1]
+        elif actual == ';' and next == ';':
+            del tokens[i+1]
+        elif actual == ';' and next == '\n':
+            del tokens[i+1]
+        elif actual == '\n' and next == ';':
+            del tokens[i+1]
+        elif actual == 'end' and next == '\n':
+            del tokens[i+1]
+        elif actual == 'end' and next == ';':
+            del tokens[i+1]
+        elif actual == '\n' and next == 'end':
+            del tokens[i]
+        elif actual == ';' and next == 'end':
+            del tokens[i]
+        else:
+            i += 1
+    
+    if  len(tokens) == 2: # eof + whatever
+        if tokens[0].val in ['\n', ';']:
+            del tokens[0]
+    
+    #for t in tokens:
+    #    print 'cleared: ', t
 
 # 2 + ( 2 * 3) => 2 * 3
 def sub(subjects):
@@ -347,7 +387,10 @@ def sub(subjects):
 
 def make_ast(tokens):
     d = {TokenType.id : 'id', TokenType.integer : 'integer', TokenType.float : 'float', TokenType.boolean : 'boolean', TokenType.string : 'string' }
-                    
+
+    if len(tokens) == 1: # only eof inside
+        tokens[0] = Node(kind='empty')
+    
     while len(tokens) > 1:    
         max_val = 0
         max_tok = -1
@@ -371,7 +414,11 @@ def make_ast(tokens):
                     del tokens[i]
                     miniproc = True
                 else:
-                    print 'Token not found', tokens[i]
+                    if tokens[i].val == '\n':
+                        msg = 'NEWLINE'
+                    else:
+                        msg = str(tokens[i])
+                    print 'Token not found', msg
                     exit(1)
             i+=1
         if max_tok == -1 and not miniproc:
@@ -407,7 +454,7 @@ def make_ast(tokens):
                 del tokens[max_tok+3] # do
                 del tokens[max_tok+2] # action
                 del tokens[max_tok+1] # end
-            elif t.val == ';':
+            elif t.val == ';' or t.val == '\n':
                 n = Node(kind='seq', subkind='sta', left=tokens[max_tok-1], right=tokens[max_tok+1])
                 tokens[max_tok] = n
                 del tokens[max_tok+1]
@@ -445,6 +492,14 @@ def make_ast(tokens):
 
 # Interpreter
 
+class XINT(int):
+    def __init__(self, val):
+        int.__init__(self, val)
+
+class ZINT(int):
+    def __new__(cls, *args, **kwargs):
+        return  super(ZINT, cls).__new__(cls, args[0])
+
 class Interpreter:
 
     def __init__(self, scope=[]):
@@ -455,6 +510,7 @@ class Interpreter:
         s = s2
         restart()
         tokenize()
+        clear()
         n = make_ast(tokens)
         r = self.do_node(n, scope, True)
         #self.process_python(n)
@@ -465,7 +521,7 @@ class Interpreter:
         if not isinstance(n, Node):
             raise Exception('Not a node but %s' % (str(n.__class__),))
         if n.kind == 'binop':
-            dop = {'+' : 'ADD', '*' : 'MUL', '-' : 'SUB', '/' : 'DIV', '//' : 'INTDIV', '**' : 'POW', '%' : 'MOD', '<' : 'LT', '>' : 'GT', '>=' : 'GE', '<=' : 'LE', '!=' : 'NE', '==' : 'EQ', '=' : 'AFF', '+=' : 'AFF_ADD', '-=' : 'AFF_SUB' }
+            dop = {'+' : 'ADD', '*' : 'MUL', '-' : 'SUB', '/' : 'DIV', '//' : 'INTDIV', '**' : 'POW', '%' : 'MOD', '<' : 'LT', '>' : 'GT', '>=' : 'GE', '<=' : 'LE', '!=' : 'NE', '==' : 'EQ', '=' : 'AFF', '+=' : 'AFF_ADD', '-=' : 'AFF_SUB', '->' : 'CONST' }
             self.process_vm(n.arg1, start)
             self.process_vm(n.arg2, start)
             start.append(dop[n.op])
@@ -516,6 +572,8 @@ class Interpreter:
                 self.process_vm(n.right, start)
             else:
                 raise Exception("ZEMBLA !") #TODO
+        elif n.kind == 'empty':
+            pass
         else:
             raise Exception('Node type not handled %s' % (n.kind,))
         pass
@@ -627,13 +685,24 @@ class Interpreter:
             elif n.op == '!=':
                 return a != b
             elif n.op == '=':
-                scope[ida] = b
+                if ida in scope:
+                    if hasattr(scope[ida], 'frozen') and scope[ida].frozen:
+                        raise Exception("Can't assign constants %s" % (ida,))
+                    elif scope[ida].__class__ != b.__class__:
+                        raise Exception("Can't change type for %s (%s -> %s)" % (ida, scope[ida].__class__, b.__class__))
+                #if isinstance(b, int):
+                scope[ida] = b #XINT(b)
                 return scope[ida]
             elif n.op == '+=':
                 scope[ida] = scope[ida] + b
                 return scope[ida]
             elif n.op == '-=':
                 scope[ida] = scope[ida] - b
+                return scope[ida]
+            elif n.op == '->':
+                if isinstance(b, int):
+                    scope[ida] = ZINT(b)
+                scope[ida].frozen = True
                 return scope[ida]
             else:
                 raise Exception('error unknown op : %s' % (n.op,))
@@ -691,6 +760,8 @@ class Interpreter:
                 return self.do_node(n.right)
             else:
                 exit(1) # TODO
+        elif n.kind == 'empty':
+            return None
         else:
             raise Exception('Node type not handled %s' % (n.kind,))
 
@@ -755,11 +826,11 @@ class Test:
     def __str__(self):
         if self.computed == self.waited:
             if self.waited != Test.ERROR:
-                return "[ok] for '%s' we got %s" % (self.test_str, self.computed)
+                return "[ok] for '%s' we got %s" % (self.test_str.replace('\n', 'NL'), self.computed)
             else:
-                return "[ok] for '%s' as failed as intended" % (self.test_str,)
+                return "[ok] for '%s' as failed as intended" % (self.test_str.replace('\n', 'NL'),)
         else:
-            return "[!!] for '%s' we got %s instead of %s" % (self.test_str, self.computed, self.waited)
+            return "[!!] for '%s' we got %s instead of %s" % (self.test_str.replace('\n', 'NL'), self.computed, self.waited)
 
 #s = "a = 5; b = 2; c = a * -b+1; writeln(c) #pipo; 11+1 .4 2.3.alpha 5..alpha"
 
@@ -817,6 +888,15 @@ suite.append(Test("until b > 12 do b = b + 1 end", 13))
 suite.append(Test("while b > 10 do b = b - 1 end", 10))
 suite.append(Test("until b > 12 do b += 1 end", 13))
 suite.append(Test("while b > 10 do b -= 1 end", 10))
+suite.append(Test("const -> 0", 0))
+suite.append(Test("const = 22", Test.ERROR))
+suite.append(Test("a = 2.2", Test.ERROR))
+suite.append(Test("", None))
+suite.append(Test(" ", None))
+suite.append(Test("          \t", None))
+suite.append(Test("\n", None))
+suite.append(Test("\n;;\t\n", None))
+suite.append(Test("if b == 10 then\n 42\n 23\n end\n", 23))
 
 #sx = Test("{}", {}) #Test("5", 5)
 #r = sx.test()
