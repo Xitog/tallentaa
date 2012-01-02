@@ -968,6 +968,16 @@ suite.append(Test("if b == 10 then\n 42\n 23\n end\n", 23))
 suite.append(Test("if b == 10 then if a == 5 then 5 end end", 5)) #13h05 : marche !
 suite.append(Test("while b < 100 do b += 1 ; if b == 20 then break end end", None))
 suite.append(Test("b", 20))
+st = """
+    while b < 100
+        b += 1
+        if b == 30
+            break
+        end
+    end
+"""
+suite.append(Test(st, None)) # 14h53
+suite.append(Test("b", 30))
 
 scope = {}
 stack = []
