@@ -269,6 +269,38 @@ def tokenize():
 
 print('\nParser\n')
 
+def xxparse(tokens):
+    blocks = xparse(tokens)
+    #
+    if len(blocks) == 0:
+        print '********* ERROR *********'
+        for t in tokens:
+            print t
+        print 'Nothing found'
+    #
+    n = None
+    master = None
+    for b in blocks:
+        if b['type'] in ['if', 'unless']:
+            cond = make_ast(tokens[b['start']+1:b['middle']-b['start']])
+            action = xxparse(tokens[b['middle']+1:b['end']-b['start']])
+            if action is None:
+                raise Exception('ALARMA')
+            n = Node(kind='if', cond=cond, action=action, invert=(b['type'] == 'unless'))
+        elif b['type'] in ['while', 'until']:
+            cond = make_ast(tokens[b['start']+1:b['middle']-b['start']])
+            action = xxparse(tokens[b['middle']+1:b['end']-b['start']])
+            n = Node(kind='while', cond=cond, action=action, invert=(b['type'] == 'until'))
+        elif b['type'] == 'expression':
+            n = make_ast(tokens[b['start']:b['end']+1])
+        elif b['type'] == 'empty':
+            n = Node(kind='empty')
+        if master is None:
+            master = Node(kind='suite', subkind='statement', left=n, right=None)
+        elif n.kind != 'empty':
+            master = Node(kind='suite', subkind='statement', left=master, right=n)
+    return master
+
 def xparse(tokens):
     block_mode = 'start'
     level = 0
@@ -290,6 +322,9 @@ def xparse(tokens):
                 block_mode = 'hash'
                 level = 1
                 start = i
+            elif t.kind == TokenType.eof:
+                blocks.append({'type' : 'empty', 'start' : i, 'end' : i})
+                break
         elif block_mode in ['if', 'while', 'until', 'unless']:
             if t.val in ['if', 'while', 'until', 'unless']:
                 level += 1
@@ -303,65 +338,31 @@ def xparse(tokens):
                 blocks.append({'type' : block_mode, 'start' : start, 'end' : i, 'middle' : middle})
                 block_mode = 'start'
                 middle = -1
-        elif block_mode == 'expression':
-            if t.kind == TokenType.eof or t.val == ';' or t.val == '\n':
-                blocks.append({'type' : block_mode, 'start' : start, 'end' : i-1})
-                #print 'block! from %s to %s' % (start, i-1)
-                block_mode = 'start'
         elif block_mode == 'hash':
             if t.val == '{':
                 level += 1
             elif t.val == '}':
                 level -= 1
             if level == 0:
-                blocks.append({'type' : 'expression', 'start' : start, 'end' : i-1})
+                blocks.append({'type' : 'expression', 'start' : start, 'end' : i})
                 block_mode = 'start'
+        
+        if block_mode == 'expression':
+            if t.kind == TokenType.eof or t.val == ';' or t.val == '\n' or i == len(tokens)-1:
+                if i == len(tokens)-1: # and len(tokens) == 1:
+                    blocks.append({'type' : block_mode, 'start' : start, 'end' : i})
+                else:
+                    blocks.append({'type' : block_mode, 'start' : start, 'end' : i-1})
+                block_mode = 'start'
+        
         i+=1
     i=0
-    #for t in tokens:
-    #    if t.val != '\n':
-    #        print '(', i, ')', t.val,
-    #    else:
-    #        print '(', i, ')', 'NL', 
-    #    i+=1
-    #print
     for b in blocks:
         if 'middle' in b:
             print b['type'], b['start'], b['middle'], b['end']
         else:
             print b['type'], b['start'], b['end']
     return blocks
-
-Priority = {
-    ';' :   3,
-    '\n':   3,
-    'while': 2,
-    'until': 2,
-    'if':   2,
-    'unless' : 2,
-    'then': 0, # neutral ( if )
-    'end': 0,  # neutral ( if )
-    'do': 0,   # neutral ( while )
-    '{' :   8, 
-    '}' :   0, # neutral ( } )
-    '->':  10,
-    '=' :  10,
-    '+=':  10,
-    '-=':  10,
-    '==': 80,
-    '!=': 81,
-    '<' : 82,
-    '<=': 81,
-    '>' : 83,
-    '>=': 84,
-    '-' : 101,
-    '+' : 101,
-    '*' : 102,
-    '/' : 102,
-    '//': 102,
-    '**': 102,
-    '%' : 102,
-}
 
 class Node:
     def __init__(self, **kw):
@@ -373,6 +374,8 @@ class Node:
             print '\t', k, '=>', self.rem[k]
     def __str__(self):
         return 'node(%s)' % (self.kind,)
+
+#
 
 def clear():
     global tokens
@@ -409,7 +412,8 @@ def clear():
     #for t in tokens:
     #    print 'cleared: ', t
 
-# 2 + ( 2 * 3) => 2 * 3
+#
+
 def sub(subjects):
     mod = 0
     start = subjects[0]
@@ -444,100 +448,14 @@ def sub(subjects):
                     break
         i+=1
     r = subjects[1: i]
-    #for e in r:
-    #    print e
     return r
+#
 
 def make_ast(tokens):
-    d = {TokenType.id : 'id', TokenType.integer : 'integer', TokenType.float : 'float', TokenType.boolean : 'boolean', TokenType.string : 'string' }
-
-    if len(tokens) == 1: # only eof inside
-        tokens[0] = Node(kind='empty')
-    
-    while len(tokens) > 1:   
-        max_val = 0
-        max_tok = -1
-        i = 0
-        miniproc = False # si on a fait qq chose se tour ci sans max
-        while i < len(tokens):
-            t = tokens[i]
-            if isinstance(t, Token):
-                if t.kind in [TokenType.id, TokenType.integer, TokenType.float, TokenType.boolean, TokenType.string]:
-                    tokens[i] = Node(kind=d[t.kind], val=t.val)
-                    miniproc = True
-                elif t.val in Priority:
-                    if Priority[t.val] > max_val:
-                        max_val = Priority[t.val]
-                        max_tok = i
-                elif t.val == '(':
-                    l = sub(tokens, i)
-                    n = make_ast(l)
-                    tokens = tokens[0:i-1] + [n] + tokens[i:len(l)]
-                elif t.kind == TokenType.eof:
-                    del tokens[i]
-                    miniproc = True
-                else:
-                    if tokens[i].val == '\n':
-                        msg = 'NEWLINE'
-                    else:
-                        msg = str(tokens[i])
-                    print 'Token not found', msg
-                    exit(1)
-            i+=1
-        if max_tok == -1 and not miniproc:
-            print('No token to process')
-            exit(1)
-        elif max_tok != -1:
-            t = tokens[max_tok]
-            if is_operator(t.val):
-                n = Node(kind='binop',op=t.val,arg1=tokens[max_tok-1],arg2=tokens[max_tok+1])
-                tokens[max_tok] = n
-                del tokens[max_tok+1]
-                del tokens[max_tok-1]
-            elif t.val == '{':
-                l = sub(tokens[max_tok:])
-                #for e in l:
-                #    print e
-                n = Node(kind='hash',val={})
-                tokens[max_tok] = n
-                del tokens[max_tok+1+len(l)]
-            elif t.val in ['if', 'unless']:
-                lx = sub(tokens[max_tok:]) # cond then action
-                n = Node(kind='if', cond=lx[0], action=lx[2], invert=(t.val == 'unless'))
-                tokens[max_tok] = n
-                del tokens[max_tok+4] # cond
-                del tokens[max_tok+3] # then
-                del tokens[max_tok+2] # action
-                del tokens[max_tok+1] # end
-            elif t.val in ['while', 'until']:
-                lx = sub(tokens[max_tok:])
-                n = Node(kind='while', cond=lx[0], action=lx[2], invert=(t.val == 'until'))
-                tokens[max_tok] = n
-                del tokens[max_tok+4] # cond
-                del tokens[max_tok+3] # do
-                del tokens[max_tok+2] # action
-                del tokens[max_tok+1] # end
-            elif t.val == ';' or t.val == '\n':
-                n = Node(kind='seq', subkind='sta', left=tokens[max_tok-1], right=tokens[max_tok+1])
-                tokens[max_tok] = n
-                del tokens[max_tok+1]
-                del tokens[max_tok-1]
-            else:
-                raise Exception('token not handled in ast making! %s' % (t.val,))
-        
-        #print 'debug list (', len(tokens) , ') -->'
-        #for t in tokens:
-        #    print t
-        #print '<--'
-        #print
-    
-    return tokens[0]
-
-#n = make_ast(tokens)
-
-def xast(tokens):
     if len(tokens) < 1:
         raise Exception("Empty token list")
+    #elif len(tokens) == 1 and tokens.kind == TokenType.eof: # only eof inside
+    #    tokens[0] = Node(kind='empty')
     
     prio = {
         '->':  10, '=' :  10, '+=':  10, '-=':  10,
@@ -561,8 +479,10 @@ def xast(tokens):
             del tokens[i]
         i+=1
     # Operators GROS BUG J AI { { !!!
-    #for t in tokens:
-    #    print t
+    i = 0
+    for t in tokens:
+        print i, t
+        i+=1
     while len(tokens) > 1:
         i = 0
         max = None
@@ -582,7 +502,7 @@ def xast(tokens):
             del tokens[max+1]
             del tokens[max-1]
         elif not max is None and tokens[max].val == '{': # laid. a revoir.
-            l = sub(tokens[max_tok:])
+            l = sub(tokens[max:])
             n = Node(kind='hash',val={})
             tokens[max] = n
             del tokens[max+1+len(l)]
@@ -592,22 +512,6 @@ def xast(tokens):
             raise Exception('Prio not found')
     return tokens[0]
 #
-
-# 2050
-# 2137 YEAH! (interpreteur)
-# Python
-# 2204 VM OK!
-
-# http://stackoverflow.com/questions/952914/making-a-flat-list-out-of-list-of-lists-in-python
-# gg: flatten in Python
-
-# Hash dans la pile
-# INTEGER 5
-# CHAR A
-# CHAR B
-# STRING 2
-# HASH 1
-# pour : { 5 = 'ab' }
 
 #-------------------------------------------------------------------------------
 
@@ -633,35 +537,20 @@ class Interpreter:
         tokenize()
         clear()
         # Test
-        blocks = xparse(tokens)
-        n = None
-        for b in blocks:
-            if b['type'] in ['if', 'unless']:
-                cond = xast(tokens[b['start']+1:b['middle']-b['start']])
-                action = xast(tokens[b['middle']+1:b['end']-b['start']])
-                n = Node(kind='if', cond=cond, action=action, invert=(b['type'] == 'unless'))
-            elif b['type'] in ['while', 'until']:
-                cond = xast(tokens[b['start']+1:b['middle']-b['start']])
-                action = xast(tokens[b['middle']+1:b['end']-b['start']])
-                n = Node(kind='while', cond=cond, action=action, invert=(b['type'] == 'until'))
-            elif b['type'] == 'expression':
-                #sub_tokens = tokens[b['start']+1:b['middle']-b['start']]
-                #sub_tokens = tokens[b['middle']+1:b['end']-b['start']]
-                #sub_tokens = tokens[b['start']:b['end']-b['start']+1]
-                #print '****'
-                #for st in sub_tokens:
-                #    print '**', st
-                n = xast(tokens[b['start']:b['end']+1])
-        #n = make_ast(tokens)
-        r = self.do_node(n, scope, True)
+        master = xxparse(tokens)
+        r = self.do_node(master, scope, True)
         #self.process_python(n)
-        self.process_vm(n, stack)
+        self.process_vm(master, stack)
         return r
     
     def process_vm(self, n, start):
         if not isinstance(n, Node):
             raise Exception('Not a node but %s' % (str(n.__class__),))
-        if n.kind == 'binop':
+        if n.kind == 'suite' and n.subkind == 'statement':
+            self.process_vm(n.left, start)
+            if not n.right is None:
+                self.process_vm(n.right, start)
+        elif n.kind == 'binop':
             dop = {'+' : 'ADD', '*' : 'MUL', '-' : 'SUB', '/' : 'DIV', '//' : 'INTDIV', '**' : 'POW', '%' : 'MOD', '<' : 'LT', '>' : 'GT', '>=' : 'GE', '<=' : 'LE', '!=' : 'NE', '==' : 'EQ', '=' : 'AFF', '+=' : 'AFF_ADD', '-=' : 'AFF_SUB', '->' : 'CONST' }
             self.process_vm(n.arg1, start)
             self.process_vm(n.arg2, start)
@@ -726,7 +615,9 @@ class Interpreter:
     def process_python(self, n):
         if not isinstance(n, Node):
             raise Exception('Not a node but %s' % (str(n.__class__),))
-        if n.kind == 'binop':
+        if n.kind == 'suite' and n.subkind == 'statement':
+            pass
+        elif n.kind == 'binop':
             return self.process_python(n.arg1) + ' ' + n.op + ' '+self.process_python(n.arg2)
         elif n.kind == 'integer':
             return n.val
@@ -787,11 +678,16 @@ class Interpreter:
                 raise Exception('Unknown operator %s for %s with par %s' % (op, a.__class__, b.__class__))        
         else:
             raise Exception('Incorrect operand %s for %s with operator %s' % (a.__class__, b.__class__, op))
-
+    
     def do_node(self, n, scope={}, lonely=False):
         if not isinstance(n, Node):
             raise Exception('Not a node but %s' % (str(n.__class__),))
-        if n.kind == 'binop':
+        if n.kind == 'suite' and n.subkind == 'statement':
+            r = self.do_node(n.left, scope, True)
+            if not n.right is None:
+                r = self.do_node(n.right, scope, True)
+            return r
+        elif n.kind == 'binop':
             a = self.do_node(n.arg1, scope)
             b = self.do_node(n.arg2, scope)
             if isinstance(a, str) and n.arg1.kind == 'id':
@@ -929,17 +825,6 @@ class Interpreter:
     #pass #print 'f'
     #    pass BROKEN PYTHON ???? 2.3.5 sur ce mac !!! 2.5 pour unifier
 
-# http://coding.derkeiler.com/Archive/Python/comp.lang.python/2007-06/msg03531.html
-# http://www.python.org/dev/peps/pep-0341/
-
-#print 'result = ', r
-#print 'python = ', intr.process_python(n)
-#print 'pyresult=', eval(intr.process_python(n))
-#print 'vm = '
-#stack = []
-#intr.process_vm(n, stack)
-#for s in stack:
-#    print s
 
 #-------------------------------------------------------------------------------
 
@@ -1007,7 +892,7 @@ suite.append(Test("5", 5))
 suite.append(Test("true + 1", Test.ERROR))
 suite.append(Test("1 / 0", Test.ERROR))
 suite.append(Test('"savior" / 5', Test.ERROR))
-#suite.append(Test("{}", {}))
+suite.append(Test("{}", {}))
 suite.append(Test("0xA == 10", True))
 suite.append(Test("0b10 == 2", True))
 suite.append(Test("0c10 == 8", True))
@@ -1031,7 +916,7 @@ suite.append(Test("if b != 10 then 42 end", None))
 suite.append(Test("unless b == 10 then 42 end", None))
 suite.append(Test("unless b != 10 then 42 end", 42))
 suite.append(Test("42 ; 23", 23))
-#suite.append(Test("if b == 10 then 42 ; 23 end", 23))
+suite.append(Test("if b == 10 then 42 ; 23 end", 23))
 suite.append(Test("until b > 12 do b = b + 1 end", 13))
 suite.append(Test("while b > 10 do b = b - 1 end", 10))
 suite.append(Test("until b > 12 do b += 1 end", 13))
@@ -1039,17 +924,12 @@ suite.append(Test("while b > 10 do b -= 1 end", 10))
 suite.append(Test("const -> 0", 0))
 suite.append(Test("const = 22", Test.ERROR))
 suite.append(Test("a = 2.2", Test.ERROR))
-#suite.append(Test("", None))
-#suite.append(Test(" ", None))
-#suite.append(Test("          \t", None))
-#suite.append(Test("\n", None))
-#suite.append(Test("\n;;\t\n", None))
-#suite.append(Test("if b == 10 then\n 42\n 23\n end\n", 23))
-
-#sx = Test("{}", {}) #Test("5", 5)
-#r = sx.test()
-#print r
-#exit()
+suite.append(Test("", None))
+suite.append(Test(" ", None))
+suite.append(Test("          \t", None))
+suite.append(Test("\n", None))
+suite.append(Test("\n;;\t\n", None))
+suite.append(Test("if b == 10 then\n 42\n 23\n end\n", 23))
 
 scope = {}
 stack = []
