@@ -270,6 +270,8 @@ def tokenize():
 print('\nParser\n')
 
 def xxparse(tokens):
+    print '--- big xxparse---'
+    
     blocks = xparse(tokens)
     #
     if len(blocks) == 0:
@@ -282,19 +284,33 @@ def xxparse(tokens):
     master = None
     for b in blocks:
         if b['type'] in ['if', 'unless']:
-            cond = make_ast(tokens[b['start']+1:b['middle']-b['start']])
-            action = xxparse(tokens[b['middle']+1:b['end']-b['start']])
-            if action is None:
-                raise Exception('ALARMA')
-            n = Node(kind='if', cond=cond, action=action, invert=(b['type'] == 'unless'))
+
+            #print '>>>', b['start'], b['middle'], b['end']
+            #lst = tokens[b['start']+1:b['middle']]
+            #i = 0
+            #for elx in lst:
+            #    print i, elx
+            #    i+=1
+            #print '<<<>>>'
+            #i = 0
+            #for elxt in tokens:
+            #    print i, elxt
+            #    i+=1
+            #print '<<<'
+
+            sel_cond = make_ast(tokens[b['start']+1:b['middle']])
+            sel_action = xxparse(tokens[b['middle']+1:b['end']])
+            n = Node(kind='if', cond=sel_cond, action=sel_action, invert=(b['type'] == 'unless'))
         elif b['type'] in ['while', 'until']:
-            cond = make_ast(tokens[b['start']+1:b['middle']-b['start']])
-            action = xxparse(tokens[b['middle']+1:b['end']-b['start']])
-            n = Node(kind='while', cond=cond, action=action, invert=(b['type'] == 'until'))
+            iter_cond = make_ast(tokens[b['start']+1:b['middle']])
+            iter_action = xxparse(tokens[b['middle']+1:b['end']])
+            n = Node(kind='while', cond=iter_cond, action=iter_action, invert=(b['type'] == 'until'))
         elif b['type'] == 'expression':
             n = make_ast(tokens[b['start']:b['end']+1])
         elif b['type'] == 'empty':
             n = Node(kind='empty')
+        elif b['type'] == 'break':
+            n = Node(kind='break')
         if master is None:
             master = Node(kind='suite', subkind='statement', left=n, right=None)
         elif n.kind != 'empty':
@@ -302,6 +318,7 @@ def xxparse(tokens):
     return master
 
 def xparse(tokens):
+    print '---xparse---'
     block_mode = 'start'
     level = 0
     start = 0
@@ -314,6 +331,9 @@ def xparse(tokens):
             if t.val in ['if', 'while', 'until', 'unless']:
                 block_mode = t.val
                 level = 1
+                start = i
+            elif t.val in ['break']:
+                block_mode = t.val
                 start = i
             elif t.kind in [TokenType.id, TokenType.float, TokenType.integer, TokenType.string, TokenType.boolean]:
                 block_mode = 'expression'
@@ -354,10 +374,18 @@ def xparse(tokens):
                 else:
                     blocks.append({'type' : block_mode, 'start' : start, 'end' : i-1})
                 block_mode = 'start'
+        elif block_mode == 'break':
+            if t.val in [';', '\n'] or i == len(tokens)-1:
+                blocks.append({'type' : block_mode, 'start' : start, 'end' : i})
+                block_mode = 'start'
         
         i+=1
     i=0
     for b in blocks:
+        i = 0
+        for t in tokens:
+            print '\t', i, t
+            i += 1
         if 'middle' in b:
             print b['type'], b['start'], b['middle'], b['end']
         else:
@@ -366,12 +394,12 @@ def xparse(tokens):
 
 class Node:
     def __init__(self, **kw):
-        self.rem = kw
+        self.rem = kw # on ne devrait prendre que les cles !
         for k in kw:
             setattr(self, k, kw[k])
     def info(self):
         for k in self.rem:
-            print '\t', k, '=>', self.rem[k]
+            print '\t', k, '=>', getattr(self, k) #self.rem[k]
     def __str__(self):
         return 'node(%s)' % (self.kind,)
 
@@ -479,10 +507,10 @@ def make_ast(tokens):
             del tokens[i]
         i+=1
     # Operators GROS BUG J AI { { !!!
-    i = 0
-    for t in tokens:
-        print i, t
-        i+=1
+    #i = 0
+    #for t in tokens:
+    #    print i, t
+    #    i+=1
     while len(tokens) > 1:
         i = 0
         max = None
@@ -529,6 +557,7 @@ class Interpreter:
 
     def __init__(self, scope=[]):
         self.scope = scope
+        self.MASTER_LOOP_EXIT = False
 
     def do_string(self, s2, stack=[], scope={}):
         global s
@@ -596,12 +625,14 @@ class Interpreter:
             minis.append('REM ENDWHILE')
             for elem in minis:
                 start.append(elem)
-        elif n.kind == 'seq':
-            if n.subkind == 'sta':
-                self.process_vm(n.left, start)
-                self.process_vm(n.right, start)
-            else:
-                raise Exception("ZEMBLA !") #TODO
+        #elif n.kind == 'seq': # => suite
+        #    if n.subkind == 'sta':
+        #        self.process_vm(n.left, start)
+        #        self.process_vm(n.right, start)
+        #    else:
+        #        raise Exception("ZEMBLA !") #TODO
+        elif n.kind == 'break':
+            start.append('JUMP_BRK') #TODO
         elif n.kind == 'empty':
             pass
         else:
@@ -789,7 +820,7 @@ class Interpreter:
             iteration = 0
             cond = self.do_node(n.cond, scope, True)
             r = None
-            while (cond and (not n.invert)) or ((not cond) and n.invert):
+            while ((cond and (not n.invert)) or ((not cond) and n.invert)) and not self.MASTER_LOOP_EXIT:
                 if iteration >= max_repeat:
                     r = '<<max iteration>>'
                     break
@@ -797,13 +828,17 @@ class Interpreter:
                     iteration+=1
                 r = self.do_node(n.action, scope, True)
                 cond = self.do_node(n.cond, scope, True)
+            if self.MASTER_LOOP_EXIT:
+                self.MASTER_LOOP_EXIT = False
             return r
-        elif n.kind == 'seq':
-            if n.subkind == 'sta':
-                self.do_node(n.left)
-                return self.do_node(n.right)
-            else:
-                exit(1) # TODO
+        #elif n.kind == 'seq':
+        #    if n.subkind == 'sta':
+        #        self.do_node(n.left)
+        #        return self.do_node(n.right)
+        #    else:
+        #        exit(1) # TODO
+        elif n.kind == 'break':
+            self.MASTER_LOOP_EXIT = True
         elif n.kind == 'empty':
             return None
         else:
@@ -930,6 +965,9 @@ suite.append(Test("          \t", None))
 suite.append(Test("\n", None))
 suite.append(Test("\n;;\t\n", None))
 suite.append(Test("if b == 10 then\n 42\n 23\n end\n", 23))
+suite.append(Test("if b == 10 then if a == 5 then 5 end end", 5)) #13h05 : marche !
+suite.append(Test("while b < 100 do b += 1 ; if b == 20 then break end end", None))
+suite.append(Test("b", 20))
 
 scope = {}
 stack = []
