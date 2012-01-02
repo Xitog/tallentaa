@@ -1,0 +1,212 @@
+;; Le problème, c'est que c'est toujours une liste de mot, pas d'idées.
+;; Collège, Lycée sont indissociables de ma vision (française).
+;; De même copain recouvre deux idées : ami + petit copain
+
+;; n2 = deux formes séparées par /, masculine en 1er
+;; n& = féminin et masculin
+;; nm = nom masculin
+;; nf = nom féminin
+;; +s = pluriel
+;; +i = invariable
+;; +ex = nom (expression figée)
+
+;; adjq2 = deux formes séparées par /, masculine en 1er
+;; adjq& = une forme pour masc et fém
+
+;; v
+;; +ex = nom (expression figée)
+
+;; expr
+
+#* langue
+    expr il y a
+    expr c'est
+
+#* vie et mort
+    nf vie
+    nf mort
+    adjq2 vivant / vivante
+    adjq2 mort / morte
+    v naître
+    v être
+    v avoir
+    v mourir
+    vm anniversaire
+    expr bon anniversaire
+    adj& malade
+    vex être malade
+    nf maladie
+    nf santé
+    vex être en bonne santé
+    vex aller bien
+    expr comment vas tu ?
+    expr ça va ?
+#- études
+    n2 écolier / écolière
+    n2 étudiant / étudiante
+    nf université
+    nm collège
+    nm lycée
+    nm école primaire
+    nm école maternelle
+    v étudier
+    v apprendre
+    nm examen (général)
+    nf évaluation (école primaire)
+    nm contrôle (collège - lycée)
+    nm partiel (faculté)
+    nf note
+    vex réussir un examen
+    vex passer un examen
+#- travail
+    nm métier
+    nm travail
+    n2 ouvrier / ouvrière
+    n2 chômeur / chômeuse
+    n2 retraité / retraitée
+    nm médecin
+    nf entreprise
+    nm laboratoire
+    v travailler
+    nm emploi
+    nm salarié
+    nmex chef d'entreprise
+    nfex femme au foyer
+    n& collègue
+    vex perdre son emploi/travail
+    vex trouver un emploi/travail
+
+#* maison
+    nf chambre
+    nm lit
+    nf pièce
+    nf cuisine
+    nf table
+    nm salon
+    nm escalier
+    nm appartement
+    nf maison
+
+#* manger et boire
+    nm repas
+    nm dîner
+    nm petit-déjeuner
+    nm goûter
+    vex aller manger
+    nm restaurant
+    nm bar
+    nm verre
+    nf fourchette
+    nm couteau
+    nm cuillère
+    nm plat
+    nf casserole
+    nm four
+    v cuire
+    nf bouteille
+    nm micro-onde
+    v manger
+    vex mettre la table
+#- aliments
+    nm vin
+    nf eau
+    nf viande
+    nm légume
+    nm déssert
+    nf entrée
+
+#* relations
+#- famille
+    n2 père / mère
+    n& enfant
+    n2 oncle / tante
+    n2 frère / sœur
+    n2 grand-père / grand-mère
+    n2 garçon / fille
+    nm mariage
+    nm divorce
+    adjq2 divorcé / divorcée
+    adjq2 marié / mariée
+#- sentiments
+    n2 ami / amie
+    n2 copain / copine
+    n2ex petit copain / petite copine
+    v aimer
+    v détester
+    vex tomber amoureux
+    v tromper
+    nm amour
+    vex faire l'amour
+    expr je t'aime
+
+#* nature
+    nm arbre
+    nf fleur
+    nf eau
+    nf terre
+    nm feu
+    nm air
+    nf herbe
+#- animaux
+    n2 taureau / vache 
+    n2 cochon / truie
+    n2 mouton / brebis
+    n2 bouc / chèvre
+    n2 cheval / jument
+    n2 chat / chatte
+    n2 chien / chienne
+    nm oiseau
+    nf souris
+    nm poisson
+    nm serpent
+#- géographie
+    nf montagne
+    nf rivière
+    nf mer
+    nm océan
+    nf plaine
+#- ciel
+    nf nuit
+    nf étoile
+    nm ciel
+    nm soleil
+    nf lune
+    nm nuage
+    expr il pleut
+    nf pluie
+
+#* dates et heures
+#- mois
+    nm janvier
+    nm février
+    nm mars
+    nm avril
+    nm mai
+    nm juin
+    nm juillet
+    nm août
+    nm septembre
+    nm octobre
+    nm novembre
+    nm décembre
+#- jours
+    nm lundi
+    nm mardi
+    nm mercredi
+    nm jeudi
+    nm vendredi
+    nm samedi
+    nm dimanche
+#- temps
+    nf année
+    nm jour
+    nf heure
+    nf minute
+    nf seconde
+    nm midi
+    nm minuit
+    adjq2 férié / fériée
+    adjq2 ouvré / ouvrée
+    expr quelle heure est-il ?
+    expr il est...
+    expr bonne année
