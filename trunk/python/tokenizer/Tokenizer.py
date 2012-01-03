@@ -294,22 +294,34 @@ def xxparse(tokens):
         elif b['type'] == 'expression':
             n = make_ast(tokens[b['start']:b['end']+1])
         elif b['type'] in ['{', '(', '[']:
-            if b['start'] == b['end']:
-                n = Node(kind='suite', subkind='sequence', left=None, right=None)
+            print 'start-end : ', b['start'], '-', b['end']
+            if b['start'] > b['end']:
+                n = Node(kind='suite', subkind='sequence', subsubkind=b['type'], left=None, right=None)
             else:
                 r = None
                 i = b['start']
                 end_i = i
+                print 'end:', b['end'], 'start:', b['start'], i, end_i
                 while i <= b['end']:
+                    print 'i:', i , 'endi:', end_i, tokens[end_i].val
                     while tokens[end_i].val != ',' and end_i <= b['end']:
+                        print end_i
                         end_i += 1
-                    n = make_ast(tokens[i:end_i]) # ERROR HUMANUM EST
-                    i+=1
+                    kk = i
+                    for ex in tokens[i:end_i+1]:
+                        print '>>', kk, '->', ex
+                        kk += 1
+                    print end_i+1
+                    if tokens[end_i].val in [',',']',')','}']:
+                        n = make_ast(tokens[i:end_i])
+                    else:
+                        n = make_ast(tokens[i:end_i+1])
+                    i = end_i + 1
                     end_i = i
                     if r is None:
-                        r = Node(kind='suite', subkind='sequence', left=n, right=None)
+                        r = Node(kind='suite', subkind='sequence', subsubkind=b['type'], left=n, right=None)
                     else:
-                        r = Node(kind='suite', subkind='sequence', left=r, right=n)
+                        r = Node(kind='suite', subkind='sequence', subsubkind=b['type'], left=n, right=r)
                 n = r
         elif b['type'] == 'empty':
             n = Node(kind='empty')
@@ -384,9 +396,8 @@ def xparse(tokens):
             elif (block_mode == '{' and t.val == '}') or (block_mode == '(' and t.val == ')') or (block_mode == '[' and t.val == ']'):
                 level -= 1
             if level == 0:
-                blocks.append({'type' : block_mode, 'start' : start+1, 'end' : i})
+                blocks.append({'type' : block_mode, 'start' : start+1, 'end' : i-1})
                 block_mode = 'start'
-        
         if block_mode == 'expression':
             if t.kind == TokenType.eof or t.val == ';' or t.val == '\n' or i == len(tokens)-1:
                 if i == len(tokens)-1: # and len(tokens) == 1:
@@ -770,13 +781,17 @@ class Interpreter:
                 r = self.do_node(n.right, scope, True)
             return r
         if n.kind == 'suite' and n.subkind == 'sequence':
-            if not n.left is None:
-                r = [self.do_node(n.left, scope, True)]
-                if not n.right is None:
-                    r.append(self.do_node(n.right, scope, True))
-            else:
+            if n.subsubkind in ['[','(']:
                 r = []
-            return r
+                while n is not None:
+                    if n.left is not None: # empty list
+                        r.append(self.do_node(n.left, scope, True))
+                    n = n.right
+                r.reverse()
+                return r
+            elif n.subsubkind in ['{']:
+                r = {}
+                return r # 23h33 yeah en qwerty 69/69
         elif n.kind == 'binop':
             a = self.do_node(n.arg1, scope)
             b = self.do_node(n.arg2, scope)
@@ -1046,6 +1061,8 @@ st = """
 """
 suite.append(Test(st, None))
 suite.append(Test("[1,2,3]", [1,2,3]))
+suite.append(Test("(1, 2, 3)", [1,2,3]))
+suite.append(Test("(1)", [1]))
 
 scope = {}
 stack = []
