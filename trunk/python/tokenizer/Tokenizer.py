@@ -45,7 +45,7 @@ def is_ops_char(c):
     return (c in ['+', '-', '/', '*', '%', '>', '<', '=', '!', '&', '^', '|'])
 
 def is_sep_char(c):
-    return (c in [';', '(', ')', '[', ']', '{', '}', '\n'])
+    return (c in [',', ';', '(', ')', '[', ']', '{', '}', '\n'])
 
 def is_silent(c):
     return (c in [' ', '\t'])
@@ -72,7 +72,7 @@ def is_boolean(s):
     return (s in ['true', 'false'])
 
 def is_keyword(s):
-    return (s in ['if', 'then', 'else', 'elsif', 'end', 'while', 'do', 'end', 'until', 'unless', 'break', 'next', 'return'])
+    return (s in ['if', 'then', 'else', 'elsif', 'end', 'while', 'do', 'end', 'until', 'unless', 'break', 'next', 'return', 'fun'])
 
 class Token:
     def __init__(self, kind, val):
@@ -270,7 +270,7 @@ def tokenize():
 print('\nParser\n')
 
 def xxparse(tokens):
-    print '--- big xxparse---'
+    #print '--- big xxparse---'
     
     blocks = xparse(tokens)
     #
@@ -284,20 +284,6 @@ def xxparse(tokens):
     master = None
     for b in blocks:
         if b['type'] in ['if', 'unless']:
-
-            #print '>>>', b['start'], b['middle'], b['end']
-            #lst = tokens[b['start']+1:b['middle']]
-            #i = 0
-            #for elx in lst:
-            #    print i, elx
-            #    i+=1
-            #print '<<<>>>'
-            #i = 0
-            #for elxt in tokens:
-            #    print i, elxt
-            #    i+=1
-            #print '<<<'
-
             sel_cond = make_ast(tokens[b['start']+1:b['middle']])
             sel_action = xxparse(tokens[b['middle']+1:b['end']])
             n = Node(kind='if', cond=sel_cond, action=sel_action, invert=(b['type'] == 'unless'))
@@ -307,10 +293,33 @@ def xxparse(tokens):
             n = Node(kind='while', cond=iter_cond, action=iter_action, invert=(b['type'] == 'until'))
         elif b['type'] == 'expression':
             n = make_ast(tokens[b['start']:b['end']+1])
+        elif b['type'] in ['{', '(', '[']:
+            if b['start'] == b['end']:
+                n = Node(kind='suite', subkind='sequence', left=None, right=None)
+            else:
+                r = None
+                i = b['start']
+                end_i = i
+                while i <= b['end']:
+                    while tokens[end_i].val != ',' and end_i <= b['end']:
+                        end_i += 1
+                    n = make_ast(tokens[i:end_i]) # ERROR HUMANUM EST
+                    i+=1
+                    end_i = i
+                    if r is None:
+                        r = Node(kind='suite', subkind='sequence', left=n, right=None)
+                    else:
+                        r = Node(kind='suite', subkind='sequence', left=r, right=n)
+                n = r
         elif b['type'] == 'empty':
             n = Node(kind='empty')
         elif b['type'] == 'break':
             n = Node(kind='break')
+        elif b['type'] == 'fun':
+            fun_param = [] #TODO
+            fun_ret = None
+            fun_action = xxparse(tokens[b['middle']+1:b['end']])
+            n = Node(kind='fun', name=tokens[b['start']+1].val, param=fun_param, ret=fun_ret, action=fun_action)
         if master is None:
             master = Node(kind='suite', subkind='statement', left=n, right=None)
         elif n.kind != 'empty':
@@ -318,7 +327,7 @@ def xxparse(tokens):
     return master
 
 def xparse(tokens):
-    print '---xparse---'
+    #print '---xparse---'
     block_mode = 'start'
     level = 0
     start = 0
@@ -328,7 +337,7 @@ def xparse(tokens):
     while i < len(tokens):
         t = tokens[i]
         if block_mode == 'start':
-            if t.val in ['if', 'while', 'until', 'unless']:
+            if t.val in ['if', 'while', 'until', 'unless', 'fun']:
                 block_mode = t.val
                 level = 1
                 start = i
@@ -338,8 +347,8 @@ def xparse(tokens):
             elif t.kind in [TokenType.id, TokenType.float, TokenType.integer, TokenType.string, TokenType.boolean]:
                 block_mode = 'expression'
                 start = i
-            elif t.val == '{':
-                block_mode = 'hash'
+            elif t.val in ['{', '(', '[']:
+                block_mode = t.val
                 level = 1
                 start = i
             elif t.kind == TokenType.eof:
@@ -358,13 +367,24 @@ def xparse(tokens):
                 blocks.append({'type' : block_mode, 'start' : start, 'end' : i, 'middle' : middle})
                 block_mode = 'start'
                 middle = -1
-        elif block_mode == 'hash':
-            if t.val == '{':
+        elif block_mode == 'fun':
+            if t.val in ['if', 'while', 'until', 'unless']:
                 level += 1
-            elif t.val == '}':
+            elif middle == -1 and (t.val == 'do' or t.val == '\n'):
+                middle = i
+            elif t.val == 'end':
                 level -= 1
             if level == 0:
-                blocks.append({'type' : 'expression', 'start' : start, 'end' : i})
+                blocks.append({'type' : block_mode, 'start' : start, 'end' : i, 'middle' : middle})
+                block_mode = 'start'
+                middle = -1
+        elif block_mode in ['{', '(', '[']:
+            if t.val == block_mode:
+                level += 1
+            elif (block_mode == '{' and t.val == '}') or (block_mode == '(' and t.val == ')') or (block_mode == '[' and t.val == ']'):
+                level -= 1
+            if level == 0:
+                blocks.append({'type' : block_mode, 'start' : start+1, 'end' : i})
                 block_mode = 'start'
         
         if block_mode == 'expression':
@@ -380,16 +400,16 @@ def xparse(tokens):
                 block_mode = 'start'
         
         i+=1
-    i=0
-    for b in blocks:
-        i = 0
-        for t in tokens:
-            print '\t', i, t
-            i += 1
-        if 'middle' in b:
-            print b['type'], b['start'], b['middle'], b['end']
-        else:
-            print b['type'], b['start'], b['end']
+    #i=0
+    #for b in blocks:
+    #    i = 0
+    #    for t in tokens:
+    #        print '\t', i, t
+    #        i += 1
+    #    if 'middle' in b:
+    #        print b['type'], b['start'], b['middle'], b['end']
+    #    else:
+    #        print b['type'], b['start'], b['end']
     return blocks
 
 class Node:
@@ -465,6 +485,13 @@ def sub(subjects):
                 mod -= 1
                 if mod == 0:
                     break
+        elif start.val == '[':
+            if t.val == '[':
+                mod += 1
+            elif t.val == ']':
+                mod -= 1
+                if mod == 0:
+                    break
         elif start.val in ['while', 'for', 'class', 'fun', 'module', 'until', 'if']:
             #print '>>', t.val
             #print '>>', mod
@@ -489,7 +516,6 @@ def make_ast(tokens):
         '->':  10, '=' :  10, '+=':  10, '-=':  10,
         '==': 80, '!=': 81, '<' : 82, '<=': 81, '>' : 83, '>=': 84,
         '-':101, '+':101, '*':102, '/':102, '//':102, '%':103, '**':103,
-        '{':201,
         }
     ts = {
         TokenType.id : 'id', 
@@ -529,11 +555,11 @@ def make_ast(tokens):
                 raise Exception('Incorrect expr left')
             del tokens[max+1]
             del tokens[max-1]
-        elif not max is None and tokens[max].val == '{': # laid. a revoir.
-            l = sub(tokens[max:])
-            n = Node(kind='hash',val={})
-            tokens[max] = n
-            del tokens[max+1+len(l)]
+        #elif not max is None and tokens[max].val == '{': # laid. a revoir.
+        #    l = sub(tokens[max:])
+        #    n = Node(kind='hash',val={}) #TODO
+        #    tokens[max] = n
+        #    del tokens[max+1+len(l)]
         else:
             for t in tokens:
                 print '%%%', t
@@ -552,6 +578,17 @@ class XINT(int):
 class ZINT(int):
     def __new__(cls, *args, **kwargs):
         return  super(ZINT, cls).__new__(cls, args[0])
+
+class XFUN(object):
+    def __init__(self, name, par, ret, ast):
+        self.name = name
+        self.par = par
+        self.ret = ret
+        self.ast = ast
+    def xcall(self, interpreter, scope, *par_lst, **par_dic):
+        xscope = scope.copy()
+        # la faire le mix des param dans xscope
+        interpreter.do_node(self.ast, xscope, True)
 
 class Interpreter:
 
@@ -579,6 +616,16 @@ class Interpreter:
             self.process_vm(n.left, start)
             if not n.right is None:
                 self.process_vm(n.right, start)
+        elif n.kind == 'suite' and n.subkind == 'sequence':
+            start.append('SEQ START')
+            if not n.left is None:
+                self.process_vm(n.left, start)
+                if not n.right is None:
+                    self.process_vm(n.right, start)
+            start.append('SEQ END')
+        elif n.kind == 'suite':
+            print n.subkind
+            exit(1)
         elif n.kind == 'binop':
             dop = {'+' : 'ADD', '*' : 'MUL', '-' : 'SUB', '/' : 'DIV', '//' : 'INTDIV', '**' : 'POW', '%' : 'MOD', '<' : 'LT', '>' : 'GT', '>=' : 'GE', '<=' : 'LE', '!=' : 'NE', '==' : 'EQ', '=' : 'AFF', '+=' : 'AFF_ADD', '-=' : 'AFF_SUB', '->' : 'CONST' }
             self.process_vm(n.arg1, start)
@@ -633,6 +680,10 @@ class Interpreter:
         #        raise Exception("ZEMBLA !") #TODO
         elif n.kind == 'break':
             start.append('JUMP_BRK') #TODO
+        elif n.kind == 'fun':
+            start.append('FUN %s' % (n.name,)) # on inclut le JMP dans le FUN.
+            self.process_vm(n.action, start)
+            start.append('REM END FUN %s' % (n.name,))
         elif n.kind == 'empty':
             pass
         else:
@@ -659,13 +710,13 @@ class Interpreter:
                 return 'True'
             else:
                 return 'False'
-        elif n.kind == 'hash':
-            s = '{'
-            for e in n.val:
-                s += self.process_python(n.val[e])
-                s += ','
-            s += '}'
-            return s
+        #elif n.kind == 'hash':
+        #    s = '{'
+        #    for e in n.val:
+        #        s += self.process_python(n.val[e])
+        #        s += ','
+        #    s += '}'
+        #    return s
         else:
             raise Exception('Node type not handled %s' % (n.kind,))
     
@@ -717,6 +768,14 @@ class Interpreter:
             r = self.do_node(n.left, scope, True)
             if not n.right is None:
                 r = self.do_node(n.right, scope, True)
+            return r
+        if n.kind == 'suite' and n.subkind == 'sequence':
+            if not n.left is None:
+                r = [self.do_node(n.left, scope, True)]
+                if not n.right is None:
+                    r.append(self.do_node(n.right, scope, True))
+            else:
+                r = []
             return r
         elif n.kind == 'binop':
             a = self.do_node(n.arg1, scope)
@@ -839,6 +898,8 @@ class Interpreter:
         #        exit(1) # TODO
         elif n.kind == 'break':
             self.MASTER_LOOP_EXIT = True
+        elif n.kind == 'fun':
+            scope[n.name] = XFUN(n.name, n.param, n.ret, n.action)
         elif n.kind == 'empty':
             return None
         else:
@@ -978,6 +1039,13 @@ st = """
 """
 suite.append(Test(st, None)) # 14h53
 suite.append(Test("b", 30))
+st = """
+    fun hello
+        "hello"
+    end
+"""
+suite.append(Test(st, None))
+suite.append(Test("[1,2,3]", [1,2,3]))
 
 scope = {}
 stack = []
