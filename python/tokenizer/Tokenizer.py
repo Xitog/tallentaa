@@ -666,10 +666,10 @@ class XFUN(object):
         self.par = par
         self.ret = ret
         self.ast = ast
-    def xcall(self, interpreter, scope, *par_lst, **par_dic):
+    def xcall(self, interpreter, scope, par): #*par_lst, **par_dic):
         xscope = scope.copy()
-        # la faire le mix des param dans xscope
-        interpreter.do_node(self.ast, xscope, True)
+        # la faire le mix des param (par) dans xscope
+        return interpreter.do_node(self.ast, xscope, True)
 
 class Interpreter:
 
@@ -919,6 +919,11 @@ class Interpreter:
             elif n.op == 'call':
                 if n.arg1.kind == 'id' and n.arg1.val == 'println':
                     print self.do_node(n.arg2)
+                elif n.arg1.kind == 'id' and n.arg1.val in scope:
+                    if isinstance(scope[n.arg1.val], XFUN):
+                        return scope[n.arg1.val].xcall(self, scope, n.arg2)
+                    else:
+                        raise Exception('no callable')
                 else:
                     raise Exception('function call not handled')
             else:
@@ -1146,6 +1151,11 @@ suite.append(Test("5 + 4 * 2", 13))
 suite.append(Test("2 * (4 + 5)", 18))
 suite.append(Test("(5 + 4) * 2", 18)) #0108 PUREE level_max et test pour savoir avant max-1>=0
 suite.append(Test("(5 * (5 + 2))", 35)) #0112 PREMIERE FAUTE D ENTREE SUR OUBLI DE PAR !!!
+suite.append(Test("(2+3)*(1+1)", 10))
+suite.append(Test('println("hello")', None))
+suite.append(Test('hello(23)', "hello")) # appel d'une fonction !!!
+
+# tests : hello(x)->erreur, hello(), 1 + add(2,3)
 
 scope = {}
 stack = []
