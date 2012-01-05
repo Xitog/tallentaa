@@ -272,7 +272,7 @@ print('\nParser\n')
 def xxparse(tokens):
     #print '--- big xxparse---'
     
-    blocks = xparse(tokens)
+    blocks = identify_block(tokens)
     #
     if len(blocks) == 0:
         print '********* ERROR *********'
@@ -293,8 +293,8 @@ def xxparse(tokens):
             n = Node(kind='while', cond=iter_cond, action=iter_action, invert=(b['type'] == 'until'))
         elif b['type'] == 'expression':
             n = make_ast(tokens[b['start']:b['end']+1])
-        elif b['type'] in ['{', '(', '[']:
-            print 'start-end : ', b['start'], '-', b['end']
+        elif b['type'] in ['{', '[']: # '(', 
+            print 'xxparse', 'start-end : ', b['start'], '-', b['end']
             if b['start'] > b['end']:
                 n = Node(kind='suite', subkind='sequence', subsubkind=b['type'], left=None, right=None)
             else:
@@ -312,7 +312,7 @@ def xxparse(tokens):
                         print '>>', kk, '->', ex
                         kk += 1
                     print end_i+1
-                    if tokens[end_i].val in [',',']',')','}']:
+                    if tokens[end_i].val in [',',']','}']: # ')',
                         n = make_ast(tokens[i:end_i])
                     else:
                         n = make_ast(tokens[i:end_i+1])
@@ -338,8 +338,8 @@ def xxparse(tokens):
             master = Node(kind='suite', subkind='statement', left=master, right=n)
     return master
 
-def xparse(tokens):
-    #print '---xparse---'
+def identify_block(tokens):
+    #print '--- identify_block ---'
     block_mode = 'start'
     level = 0
     start = 0
@@ -356,10 +356,11 @@ def xparse(tokens):
             elif t.val in ['break']:
                 block_mode = t.val
                 start = i
-            elif t.kind in [TokenType.id, TokenType.float, TokenType.integer, TokenType.string, TokenType.boolean]:
+            elif t.kind in [TokenType.id, TokenType.float, TokenType.integer, TokenType.string, TokenType.boolean] or t.val == '(':
                 block_mode = 'expression'
                 start = i
-            elif t.val in ['{', '(', '[']:
+            elif t.val in ['{', '[']: #'(', 
+                #22h34 eeee OOOOAAAAAAAHAAAAHAAAH // OOOOOH ouii ouii
                 block_mode = t.val
                 level = 1
                 start = i
@@ -396,6 +397,8 @@ def xparse(tokens):
             elif (block_mode == '{' and t.val == '}') or (block_mode == '(' and t.val == ')') or (block_mode == '[' and t.val == ']'):
                 level -= 1
             if level == 0:
+                #if len(blocks) > 1 and blocks[len(blocks)-1]['type'] == 'expression':
+                #    blocks.append(
                 blocks.append({'type' : block_mode, 'start' : start+1, 'end' : i-1})
                 block_mode = 'start'
         if block_mode == 'expression':
@@ -518,15 +521,25 @@ def sub(subjects):
 #
 
 def make_ast(tokens):
+    print '---'
+    print 'make ast'
+    print '---'
+    
+    i=0
+    for t in tokens:
+        print 'make_ast', i, t
+        i+=1
+    
     if len(tokens) < 1:
         raise Exception("Empty token list")
     #elif len(tokens) == 1 and tokens.kind == TokenType.eof: # only eof inside
     #    tokens[0] = Node(kind='empty')
     
     prio = {
-        '->':  10, '=' :  10, '+=':  10, '-=':  10,
-        '==': 80, '!=': 81, '<' : 82, '<=': 81, '>' : 83, '>=': 84,
-        '-':101, '+':101, '*':102, '/':102, '//':102, '%':103, '**':103,
+        '->':  1, '=' :  1, '+=':  1, '-=':  1,
+        '(': 2,
+        '==': 5, '!=': 5, '<' : 5, '<=': 5, '>' : 5, '>=': 5,
+        '-':6, '+':6, '*':7, '/':7, '//':7, '%':7, '**':7,
         }
     ts = {
         TokenType.id : 'id', 
@@ -543,21 +556,33 @@ def make_ast(tokens):
         if t.kind == TokenType.eof:
             del tokens[i]
         i+=1
-    # Operators GROS BUG J AI { { !!!
-    #i = 0
-    #for t in tokens:
-    #    print i, t
-    #    i+=1
     while len(tokens) > 1:
+        print 'master loop. len=', len(tokens)
         i = 0
         max = None
+        level_max = 1
+        level = 1
         while i < len(tokens):
             t = tokens[i]
-            if isinstance(t, Token) and t.val in prio:
-                if max is None or prio[tokens[max].val] < prio[t.val]:
-                    max = i
+            print '    while', t
+            if isinstance(t, Token):
+                
+                if t.val == '(':
+                    level *= 10
+                    print 'level up!', level
+                elif t.val == ')':
+                    level /= 10
+                    print 'level down!', level
+                if t.val in prio:
+                    if max is None or prio[tokens[max].val]*level_max < prio[t.val]*level:
+                        print 'changed target'
+                        if max is None: print 'from None to ', prio[t.val]*level
+                        else: print 'from', prio[tokens[max].val]*level_max, 'to', prio[t.val]*level
+                        max = i
+                        level_max = level
             i+=1
-        if not max is None and tokens[max].val != '{':
+        if not max is None and tokens[max].val != '(':
+            print 'I choose : ', tokens[max].val, '(', max, ')'
             n = Node(kind='binop',op=tokens[max].val,arg1=tokens[max-1],arg2=tokens[max+1])
             tokens[max] = n
             if len(tokens) <= max+1:
@@ -566,11 +591,56 @@ def make_ast(tokens):
                 raise Exception('Incorrect expr left')
             del tokens[max+1]
             del tokens[max-1]
-        #elif not max is None and tokens[max].val == '{': # laid. a revoir.
-        #    l = sub(tokens[max:])
-        #    n = Node(kind='hash',val={}) #TODO
-        #    tokens[max] = n
-        #    del tokens[max+1+len(l)]
+        elif not max is None and tokens[max].val == '(':
+            print 'I choose : ', tokens[max].val, '(', max, ')'
+            print 'par mode'
+            print 'go!'
+            i = 0
+            for t in tokens:
+                print '>> ', i, t
+                i += 1
+            print max, tokens[max].val
+            deb = max+1
+            print 'deb=', deb
+            end = deb
+            level = 1
+            while end < len(tokens) and level > 0:
+                print 'iter', end, tokens[end]
+                if isinstance(tokens[end], Token) and tokens[end].val == ')':
+                    level -= 1
+                elif isinstance(tokens[end], Token) and tokens[end].val == '(':
+                    level += 1
+                    end += 1
+                else:
+                    end += 1
+            if tokens[end].val != ')':
+                raise Exception('Incorrect ()')
+            else:
+                end -= 1
+            print 'end=', end
+            if deb == end:
+                print [tokens[deb]]
+                n = make_ast([tokens[deb]])
+            else:
+                n = make_ast(tokens[deb:end])
+            for t in tokens:
+                print ':', t
+            del tokens[end+1]
+            del tokens[deb-1]
+            # 'operator' 'separator' 'keyword' 'eof'
+            # Call 0028 unknown op
+            i=0
+            for t in tokens:
+                print '+++', i, t
+                i+=1
+            print max-1 #### PUTAIN DE PYTHON -1 MARCHE SUR UNE LISTE REC !!! !!! FUCK. ET for i,v in list !!!!
+            if max-1>=0:
+                if isinstance(tokens[max-1], Node) and tokens[max-1].kind in ['integer', 'float', 'id', 'boolean', 'string']:
+                    n = Node(kind='binop', op='call', arg1=tokens[max-1],arg2=tokens[max])
+                    tokens[max-1] = n
+                    del tokens[max]
+                for t in tokens:
+                    print '/', t
         else:
             for t in tokens:
                 print '%%%', t
@@ -638,7 +708,7 @@ class Interpreter:
             print n.subkind
             exit(1)
         elif n.kind == 'binop':
-            dop = {'+' : 'ADD', '*' : 'MUL', '-' : 'SUB', '/' : 'DIV', '//' : 'INTDIV', '**' : 'POW', '%' : 'MOD', '<' : 'LT', '>' : 'GT', '>=' : 'GE', '<=' : 'LE', '!=' : 'NE', '==' : 'EQ', '=' : 'AFF', '+=' : 'AFF_ADD', '-=' : 'AFF_SUB', '->' : 'CONST' }
+            dop = {'+' : 'ADD', '*' : 'MUL', '-' : 'SUB', '/' : 'DIV', '//' : 'INTDIV', '**' : 'POW', '%' : 'MOD', '<' : 'LT', '>' : 'GT', '>=' : 'GE', '<=' : 'LE', '!=' : 'NE', '==' : 'EQ', '=' : 'AFF', '+=' : 'AFF_ADD', '-=' : 'AFF_SUB', '->' : 'CONST', 'call' : 'CALL' }
             self.process_vm(n.arg1, start)
             self.process_vm(n.arg2, start)
             start.append(dop[n.op])
@@ -846,6 +916,11 @@ class Interpreter:
                     scope[ida] = ZINT(b)
                 scope[ida].frozen = True
                 return scope[ida]
+            elif n.op == 'call':
+                if n.arg1.kind == 'id' and n.arg1.val == 'println':
+                    print self.do_node(n.arg2)
+                else:
+                    raise Exception('function call not handled')
             else:
                 raise Exception('error unknown op : %s' % (n.op,))
         elif n.kind == 'integer':
@@ -1061,8 +1136,16 @@ st = """
 """
 suite.append(Test(st, None))
 suite.append(Test("[1,2,3]", [1,2,3]))
-suite.append(Test("(1, 2, 3)", [1,2,3]))
-suite.append(Test("(1)", [1]))
+#suite.append(Test("(1, 2, 3)", [1,2,3]))
+suite.append(Test("(1)", 1)) #0054
+suite.append(Test("(1+2)", 3))
+suite.append(Test("println(23)", None)) #0031
+suite.append(Test("1 + (3)", 4)) #0036
+suite.append(Test("2 * 4 + 5", 13))
+suite.append(Test("5 + 4 * 2", 13))
+suite.append(Test("2 * (4 + 5)", 18))
+suite.append(Test("(5 + 4) * 2", 18)) #0108 PUREE level_max et test pour savoir avant max-1>=0
+suite.append(Test("(5 * (5 + 2))", 35)) #0112 PREMIERE FAUTE D ENTREE SUR OUBLI DE PAR !!!
 
 scope = {}
 stack = []
@@ -1082,7 +1165,7 @@ print
 
 i = 0
 for s in stack:
-    print i, '.', s
+    #print i, '.', s
     i += 1
 
 print
@@ -1091,35 +1174,4 @@ print "%s / %s" % (str(good), str(len(suite)))
 print
 print 'Goodbye'
 
-#LineType = Enum('Unknown', 'Empty', 'Expression', 'Affectation')
-
-#def execute(sta):
-#    tol = type_of_line(sta)
-#    print '[', tol, ']',
-#    for t in sta:
-#        print t.val,
-#    print
-#    if tol == LineType.Affectation:
-#        n = Node(kind='Expr', val=sta[2:])
-#        return Node(kind='Aff', target=sta[0].val, expr=n)
-#
-#def type_of_line(statement):
-#    if len(statement) == 0:
-#        return LineType.Empty
-#    elif statement[0].kind == 'id':
-#        if len(statement) == 1:
-#            return LineType.Expression
-#        elif is_aff_operator(statement[1].val):
-#            return LineType.Affectation
-#    return LineType.Unknown
-#
-#i = 0
-#todo = []
-#while tokens[i].kind != 'EOF' and i < len(tokens):
-#    if not tokens[i].val in [';', '\n']:
-#        todo.append(tokens[i])
-#    else:
-#        r = execute(todo)
-#        if r is not None: r.info()
-#        todo = []
-#    i+=1
+# PUTAIN POURQUOI J AI PAS COMMENCER PAR UN TRUC AVEC PARENTHESE HEIN ???????????????????
