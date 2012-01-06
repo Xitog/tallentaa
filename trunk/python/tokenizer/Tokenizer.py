@@ -42,10 +42,10 @@ def is_bindigit(c):
     return (c in ['0', '1'])
 
 def is_ops_char(c):
-    return (c in ['+', '-', '/', '*', '%', '>', '<', '=', '!', '&', '^', '|'])
+    return (c in [',', '+', '-', '/', '*', '%', '>', '<', '=', '!', '&', '^', '|'])
 
 def is_sep_char(c):
-    return (c in [',', ';', '(', ')', '[', ']', '{', '}', '\n'])
+    return (c in [';', '(', ')', '[', ']', '{', '}', '\n'])
 
 def is_silent(c):
     return (c in [' ', '\t'])
@@ -292,26 +292,29 @@ def xxparse(tokens):
             iter_action = xxparse(tokens[b['middle']+1:b['end']])
             n = Node(kind='while', cond=iter_cond, action=iter_action, invert=(b['type'] == 'until'))
         elif b['type'] == 'expression':
-            n = make_ast(tokens[b['start']:b['end']+1])
+            if b['start'] > b['end']: # puree un bug ici. >= au lieu de >
+                n = Node(kind='empty')
+            else:
+                ###
+                print 'tokens'
+                i = 0
+                for tt in tokens:
+                    print i, tt, tt in tokens[b['start']:b['end']+1]
+                    i+=1
+                print b['start'], b['end']
+                
+                n = make_ast(tokens[b['start']:b['end']+1])
         elif b['type'] in ['{', '[']: # '(', 
-            print 'xxparse', 'start-end : ', b['start'], '-', b['end']
             if b['start'] > b['end']:
                 n = Node(kind='suite', subkind='sequence', subsubkind=b['type'], left=None, right=None)
             else:
                 r = None
                 i = b['start']
                 end_i = i
-                print 'end:', b['end'], 'start:', b['start'], i, end_i
                 while i <= b['end']:
-                    print 'i:', i , 'endi:', end_i, tokens[end_i].val
                     while tokens[end_i].val != ',' and end_i <= b['end']:
                         print end_i
                         end_i += 1
-                    kk = i
-                    for ex in tokens[i:end_i+1]:
-                        print '>>', kk, '->', ex
-                        kk += 1
-                    print end_i+1
                     if tokens[end_i].val in [',',']','}']: # ')',
                         n = make_ast(tokens[i:end_i])
                     else:
@@ -328,7 +331,28 @@ def xxparse(tokens):
         elif b['type'] == 'break':
             n = Node(kind='break')
         elif b['type'] == 'fun':
-            fun_param = [] #TODO
+            
+            x = b['start']
+            deb_par = 0
+            end_par = 0
+            while x < b['middle']:
+                if tokens[x].val == '(':
+                    deb_par = x
+                elif tokens[x].val == ')':
+                    end_par = x
+                x += 1
+            
+            i=0
+            for tt in tokens[deb_par:end_par+1]:
+                print 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', i, tt
+                i+=1
+            
+            #print 'ZEEEEEEMBLA', deb_par, end_par
+            
+            if end_par > deb_par:
+                fun_param = make_ast(tokens[deb_par:end_par+1])
+            else:
+                fun_param = Node(kind='empty')
             fun_ret = None
             fun_action = xxparse(tokens[b['middle']+1:b['end']])
             n = Node(kind='fun', name=tokens[b['start']+1].val, param=fun_param, ret=fun_ret, action=fun_action)
@@ -360,7 +384,6 @@ def identify_block(tokens):
                 block_mode = 'expression'
                 start = i
             elif t.val in ['{', '[']: #'(', 
-                #22h34 eeee OOOOAAAAAAAHAAAAHAAAH // OOOOOH ouii ouii
                 block_mode = t.val
                 level = 1
                 start = i
@@ -391,14 +414,12 @@ def identify_block(tokens):
                 blocks.append({'type' : block_mode, 'start' : start, 'end' : i, 'middle' : middle})
                 block_mode = 'start'
                 middle = -1
-        elif block_mode in ['{', '(', '[']:
+        elif block_mode in ['{', '[']: # '(', (block_mode == '(' and t.val == ')')
             if t.val == block_mode:
                 level += 1
-            elif (block_mode == '{' and t.val == '}') or (block_mode == '(' and t.val == ')') or (block_mode == '[' and t.val == ']'):
+            elif (block_mode == '{' and t.val == '}') or (block_mode == '[' and t.val == ']'):
                 level -= 1
             if level == 0:
-                #if len(blocks) > 1 and blocks[len(blocks)-1]['type'] == 'expression':
-                #    blocks.append(
                 blocks.append({'type' : block_mode, 'start' : start+1, 'end' : i-1})
                 block_mode = 'start'
         if block_mode == 'expression':
@@ -414,6 +435,8 @@ def identify_block(tokens):
                 block_mode = 'start'
         
         i+=1
+    
+    #print 'blocks'
     #i=0
     #for b in blocks:
     #    i = 0
@@ -424,6 +447,7 @@ def identify_block(tokens):
     #        print b['type'], b['start'], b['middle'], b['end']
     #    else:
     #        print b['type'], b['start'], b['end']
+    
     return blocks
 
 class Node:
@@ -521,10 +545,8 @@ def sub(subjects):
 #
 
 def make_ast(tokens):
-    print '---'
-    print 'make ast'
-    print '---'
-    
+    ###
+    print 'make_ast'
     i=0
     for t in tokens:
         print 'make_ast', i, t
@@ -537,7 +559,7 @@ def make_ast(tokens):
     
     prio = {
         '->':  1, '=' :  1, '+=':  1, '-=':  1,
-        '(': 2,
+        ',' : 1.5, '(': 2,
         '==': 5, '!=': 5, '<' : 5, '<=': 5, '>' : 5, '>=': 5,
         '-':6, '+':6, '*':7, '/':7, '//':7, '%':7, '**':7,
         }
@@ -557,32 +579,24 @@ def make_ast(tokens):
             del tokens[i]
         i+=1
     while len(tokens) > 1:
-        print 'master loop. len=', len(tokens)
         i = 0
         max = None
         level_max = 1
         level = 1
         while i < len(tokens):
             t = tokens[i]
-            print '    while', t
             if isinstance(t, Token):
                 
                 if t.val == '(':
                     level *= 10
-                    print 'level up!', level
                 elif t.val == ')':
                     level /= 10
-                    print 'level down!', level
                 if t.val in prio:
                     if max is None or prio[tokens[max].val]*level_max < prio[t.val]*level:
-                        print 'changed target'
-                        if max is None: print 'from None to ', prio[t.val]*level
-                        else: print 'from', prio[tokens[max].val]*level_max, 'to', prio[t.val]*level
                         max = i
                         level_max = level
             i+=1
         if not max is None and tokens[max].val != '(':
-            print 'I choose : ', tokens[max].val, '(', max, ')'
             n = Node(kind='binop',op=tokens[max].val,arg1=tokens[max-1],arg2=tokens[max+1])
             tokens[max] = n
             if len(tokens) <= max+1:
@@ -592,20 +606,10 @@ def make_ast(tokens):
             del tokens[max+1]
             del tokens[max-1]
         elif not max is None and tokens[max].val == '(':
-            print 'I choose : ', tokens[max].val, '(', max, ')'
-            print 'par mode'
-            print 'go!'
-            i = 0
-            for t in tokens:
-                print '>> ', i, t
-                i += 1
-            print max, tokens[max].val
             deb = max+1
-            print 'deb=', deb
             end = deb
             level = 1
             while end < len(tokens) and level > 0:
-                print 'iter', end, tokens[end]
                 if isinstance(tokens[end], Token) and tokens[end].val == ')':
                     level -= 1
                 elif isinstance(tokens[end], Token) and tokens[end].val == '(':
@@ -617,33 +621,61 @@ def make_ast(tokens):
                 raise Exception('Incorrect ()')
             else:
                 end -= 1
-            print 'end=', end
             if deb == end:
-                print [tokens[deb]]
                 n = make_ast([tokens[deb]])
+                del tokens[end+1]
+                del tokens[deb-1]
+            elif deb == end+1:
+                n = Node(kind='empty')
+                tokens[deb] = n
+                del tokens[deb-1]
             else:
-                n = make_ast(tokens[deb:end])
-            for t in tokens:
-                print ':', t
-            del tokens[end+1]
-            del tokens[deb-1]
+                print '%%%%%%%', end
+                i = deb
+                sub = deb # sub start
+                n = None
+                while i <= end+1:
+                    print 'www', tokens[i], tokens[i] in tokens[sub:i]
+                    if isinstance(tokens[i], Token) and tokens[i].val in [',',')']:
+                        n = Node(kind='suite', subkind='sequence', subsubkind='(', left=make_ast(tokens[sub:i]), right=n)
+                        sub = i+1 # DERNIER BUG. PASSER DE VIRG EN VIRG
+                    i+=1
+                
+                ii = end+1
+                while ii > deb:
+                    print 'i delete', ii
+                    del tokens[ii]
+                    ii -= 1
+                tokens[deb] = n
+                del tokens[deb-1]
+            
             # 'operator' 'separator' 'keyword' 'eof'
             # Call 0028 unknown op
-            i=0
-            for t in tokens:
-                print '+++', i, t
-                i+=1
-            print max-1 #### PUTAIN DE PYTHON -1 MARCHE SUR UNE LISTE REC !!! !!! FUCK. ET for i,v in list !!!!
             if max-1>=0:
                 if isinstance(tokens[max-1], Node) and tokens[max-1].kind in ['integer', 'float', 'id', 'boolean', 'string']:
                     n = Node(kind='binop', op='call', arg1=tokens[max-1],arg2=tokens[max])
                     tokens[max-1] = n
                     del tokens[max]
-                for t in tokens:
-                    print '/', t
+            
+            print '------------'
+            i=0
+            for tt in tokens:
+                print i, tt
+                i+=1
+            print '------------'
+            
+            if len(tokens) == 1 and tokens[0].kind == 'binop':
+                print 'op=', tokens[0].op
+                if tokens[0].op == 'call':
+                    print tokens[0].arg1
+                    print tokens[0].arg2
+                    if tokens[0].arg2.kind == 'suite':
+                        print tokens[0].arg2.left
+                        print tokens[0].arg2.right
         else:
-            for t in tokens:
-                print '%%%', t
+            print 'ALARMA'
+            for tt in tokens:
+                print tt
             raise Exception('Prio not found')
     return tokens[0]
 #
@@ -652,24 +684,79 @@ def make_ast(tokens):
 
 # Interpreter
 
-class XINT(int):
-    def __init__(self, val):
-        int.__init__(self, val)
+#class XINT(int):
+#    def __init__(self, val):
+#        int.__init__(self, val)
 
 class ZINT(int):
     def __new__(cls, *args, **kwargs):
         return  super(ZINT, cls).__new__(cls, args[0])
 
 class XFUN(object):
-    def __init__(self, name, par, ret, ast):
+    def __init__(self, name, par=None, ret=None, ast=None):
         self.name = name
-        self.par = par
+        self.par = []
+        print 'print ya des params ?'
+        parcours = par
+        if parcours is not None and parcours.kind == 'empty':
+            print 'no'
+        elif parcours is not None and parcours.kind == 'suite':
+            while parcours is not None:
+                #print parcours.left.val
+                self.par.append(parcours.left.val)
+                parcours = parcours.right
+        for p in self.par:
+            print 'param', p
+        
+        ### BON C LA MERDE C TRUC. J ARRIVE PAS. PUTAIN DE (). JE COMPRENDS PLUS MON CODE C UN BORDEL SANS NOM.
+        ### LA IL ME CHIE QUE J'AI DEUX FOIS LE MEME ID !!!
+        
         self.ret = ret
         self.ast = ast
     def xcall(self, interpreter, scope, par): #*par_lst, **par_dic):
         xscope = scope.copy()
         # la faire le mix des param (par) dans xscope
+        
+        #print 'par :::::'
+        #print par
+        #if par.kind != 'empty':
+        #    if par.kind == 'suite':
+        #        print 'left = ', par.left
+        #        if par.right.kind == 'suite':
+        #            print '    left = ', par.right.left
+        #            print '    right = ', par.right.right
+        #        print 'right = ', par.right
+        #        #exit(1)
+        
+        parcours = par
+        if parcours is not None and parcours.kind == 'empty':
+            print 'no'
+        elif parcours is not None and parcours.kind == 'suite':
+            i = 0
+            while parcours is not None:
+                #print parcours.left.val
+                xscope[self.par[i]] = interpreter.do_node(parcours.left, xscope, True)
+                parcours = parcours.right
+                i+=1
+        
+        ### HERE IS THE END. C LA MERDE. LA GROSSE. LA GROGROSSE. PUTAIN DE MERDOUILLE. MAIS STRUCTURE
+        ### SONT BUGGEES. LA IL ME DIT NONE !!!! AH MAIS JE SAIS : IL ENREGISTRE LES PARAMS COMME I I et pas I J
+        
         return interpreter.do_node(self.ast, xscope, True)
+    def __eq__(self, other):
+        if self.__class__ != XFUN:
+            raise Exception("WTF???")
+        elif other.__class__ != XFUN:
+            return False
+        else:
+            return self.name == other.name
+    def __ne__(self, other):
+        if self.__class__ != XFUN:
+            raise Exception("WTF???")
+        elif  other.__class__ != XFUN:
+            return True
+        else:
+            return self.name != other.name    
 
 class Interpreter:
 
@@ -753,12 +840,6 @@ class Interpreter:
             minis.append('REM ENDWHILE')
             for elem in minis:
                 start.append(elem)
-        #elif n.kind == 'seq': # => suite
-        #    if n.subkind == 'sta':
-        #        self.process_vm(n.left, start)
-        #        self.process_vm(n.right, start)
-        #    else:
-        #        raise Exception("ZEMBLA !") #TODO
         elif n.kind == 'break':
             start.append('JUMP_BRK') #TODO
         elif n.kind == 'fun':
@@ -769,12 +850,7 @@ class Interpreter:
             pass
         else:
             raise Exception('Node type not handled %s' % (n.kind,))
-        pass
-        # LOAD_STACK X
-        # LOAD_STACK Y
-        # ADD
-        # STORE A
-        
+
     def process_python(self, n):
         if not isinstance(n, Node):
             raise Exception('Not a node but %s' % (str(n.__class__),))
@@ -791,13 +867,6 @@ class Interpreter:
                 return 'True'
             else:
                 return 'False'
-        #elif n.kind == 'hash':
-        #    s = '{'
-        #    for e in n.val:
-        #        s += self.process_python(n.val[e])
-        #        s += ','
-        #    s += '}'
-        #    return s
         else:
             raise Exception('Node type not handled %s' % (n.kind,))
     
@@ -925,6 +994,8 @@ class Interpreter:
                     else:
                         raise Exception('no callable')
                 else:
+                    print 'ERROR', n.arg1.kind, n.arg1.kind == 'id'
+                    print 'ERROR', n.arg1.val, n.arg1.val in scope
                     raise Exception('function call not handled')
             else:
                 raise Exception('error unknown op : %s' % (n.op,))
@@ -963,9 +1034,6 @@ class Interpreter:
         elif n.kind == 'if':
             cond = self.do_node(n.cond, scope, True)
             r = None
-            #print 'b', scope['b']
-            #print 'cond', cond
-            #print 'n.invert', n.invert
             if (cond and (not n.invert)) or ((not cond) and n.invert):
                 r = self.do_node(n.action, scope, True)
             return r
@@ -985,37 +1053,16 @@ class Interpreter:
             if self.MASTER_LOOP_EXIT:
                 self.MASTER_LOOP_EXIT = False
             return r
-        #elif n.kind == 'seq':
-        #    if n.subkind == 'sta':
-        #        self.do_node(n.left)
-        #        return self.do_node(n.right)
-        #    else:
-        #        exit(1) # TODO
         elif n.kind == 'break':
             self.MASTER_LOOP_EXIT = True
         elif n.kind == 'fun':
-            scope[n.name] = XFUN(n.name, n.param, n.ret, n.action)
+            new_fun = XFUN(n.name, n.param, n.ret, n.action)
+            scope[n.name] = new_fun
+            return new_fun
         elif n.kind == 'empty':
             return None
         else:
             raise Exception('Node type not handled %s' % (n.kind,))
-
-#intr = Interpreter()
-
-#try:
-    #try:
-        #r = None
-        #r = intr.do_node(n)
-    #except Exception: #as e: # ne marche pas !!!!!!!
-        #print "ALARMA"
-    #else: # si pas d'exception leve
-        #pass
-        #r = None
-        #print 'done'
-#finally: #NE MARCHE PAS ???? !!!!!! http://docs.python.org/tutorial/errors.html
-    #pass #print 'f'
-    #    pass BROKEN PYTHON ???? 2.3.5 sur ce mac !!! 2.5 pour unifier
-
 
 #-------------------------------------------------------------------------------
 
@@ -1139,7 +1186,7 @@ st = """
         "hello"
     end
 """
-suite.append(Test(st, None))
+suite.append(Test(st, XFUN('hello')))
 suite.append(Test("[1,2,3]", [1,2,3]))
 #suite.append(Test("(1, 2, 3)", [1,2,3]))
 suite.append(Test("(1)", 1)) #0054
@@ -1153,19 +1200,41 @@ suite.append(Test("(5 + 4) * 2", 18)) #0108 PUREE level_max et test pour savoir 
 suite.append(Test("(5 * (5 + 2))", 35)) #0112 PREMIERE FAUTE D ENTREE SUR OUBLI DE PAR !!!
 suite.append(Test("(2+3)*(1+1)", 10))
 suite.append(Test('println("hello")', None))
-suite.append(Test('hello(23)', "hello")) # appel d'une fonction !!!
+suite.append(Test('hello()', "hello")) # appel d'une fonction !!!
+st = """
+    fun add(i, j)
+        i + j
+    end
+"""
+suite.append(Test(st, XFUN('add')))
+suite.append(Test('add(2,3)', 5)) #2h32. Vendredi (matin) 6 Janvier 2012. Enfin. Oui... Oui... Oui... Depuis 00h00...
+suite.append(Test('2 * add(2,3)', 10)) # 2h32 aussi.
+suite.append(Test('add(2,3)+add(3,2)', 10)) # 2h36 (sans rien faire)
+suite.append(Test('add(1+1, 2+1)', 5)) # 2h37 (un petit bug)
 
-# tests : hello(x)->erreur, hello(), 1 + add(2,3)
+# ATTENTION : QUAND ON TEST tokens(x).val : verif tokens(x) est un Token !!!
+
+# Il m'a fallu implemanter : les listes multiples (avec ,)
+# les parametres
+# debugger les listes
+
+# Il ne manque plus que '-'.
+# Et un gros clean up du code...
+# 84 tests !!!
+
+# tests : hello(x)->erreur,
+# http://en.wikipedia.org/wiki/Recursive_descent_parser
+
+# LL et LR lisent de droite a gauche mais ne derive pas de la meme maniere !
+
+# Une alternative a ply. http://pyparsing.wikispaces.com/Examples
 
 scope = {}
 stack = []
 good = 0
 for elem in suite:
-    #print elem.__class__
     elem.test(stack, scope)
-    #print elem.__class__
     print elem
-    #print elem.__class__
     if elem.is_ok():
         good+=1
 
@@ -1183,5 +1252,3 @@ print "%s / %s" % (str(good), str(len(suite)))
 
 print
 print 'Goodbye'
-
-# PUTAIN POURQUOI J AI PAS COMMENCER PAR UN TRUC AVEC PARENTHESE HEIN ???????????????????
