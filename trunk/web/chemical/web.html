@@ -1,0 +1,203 @@
+﻿<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+        page = "main";
+        
+        function go(code)
+        {
+            if (code == 'ariane')
+            {
+                window.location= "http://looking.dwarf.free.fr/#plan" ;
+            }
+            else if (code == 'beatrice')
+            {
+                window.location= "http://looking.dwarf.free.fr/langues/it/" ;
+            }
+            else if (code == 'scriptal')
+            {
+                window.location= "http://looking.dwarf.free.fr/langages/" ;
+            }
+            else
+            {
+                alert(code);
+            }
+        }
+        
+        function erase()
+        {
+            var b = document.getElementById('info');
+            b.innerText = " ";
+        }
+        
+        function info(code)
+        {
+            if (code == 'ariane')
+            {
+                var b = document.getElementById('info');
+                b.innerText = "Guidebooks about various subjects";
+            }
+            else if (code == 'beatrice')
+            {
+                var b = document.getElementById('info');
+                b.innerText = "About the italian language";
+            }
+            else if (code == 'scriptal')
+            {
+                var b = document.getElementById('info');
+                b.innerText = "A small scripting language";
+            }
+            else
+            {
+                alert(code);
+            }
+        }
+        
+        function changeAll(code)
+        {
+            page = code;
+            // alert(page);
+            if (page == 'projects')
+            {        
+                var b = document.getElementById('main');
+                b.innerHTML =             
+    '<table width="100%" height="100%"><tr id="top" height="15px"><td class="tdmain" colspan="7"><table width="100%"><tr><td align="left"><span onclick="changeAll(\'home\');">Home</span><span class="dead"> > </span><span class="dead">Projects</span></span></td><td align="right"><span onclick="translate(\'en\');">en</span><span>&nbsp;</span><span onclick="translate(\'fr\');">fr</span><span>&nbsp;</span><span onclick="translate(\'it\');">it</span><span>&nbsp;</span></td></tr></table></td></tr><tr></tr><tr height="100px"><td>&nbsp;</td><td id="proj" class="elem" onclick="go(\'beatrice\')" onMouseOut="erase()" onmouseover="info(\'beatrice\')" background="./fond2.png">BEATRICE</td><td width="20px"></td><td id="news" class="dead" background="./atom_ag.png">Ag</td><td width="20px"></td><td id="about" class="elem" onclick="go(\'ariane\')" onMouseOut="erase()" onmouseover="info(\'ariane\')" background="./fond.png">ARIANE</td><td>&nbsp;</td></tr><tr height="20px"></tr><tr height="100px"><td>&nbsp;</td><td id="proj" class="dead"  background="./atom_ni.png">Ni</td><td width="20px"></td><td id="news" class="elem" onclick="go(\'scriptal\')" onMouseOut="erase()" onmouseover="info(\'scriptal\')" background="./fond3.png">SCRIPTAL</td><td width="20px"></td><td id="about" class="dead" background="./atom_pb.png">Pb</td><td>&nbsp;</td></tr><tr></tr><tr id="bottom" height="15px"><td class="tdmain" colspan="7"><table width="100%"><tr><td width="33%" align="left"><span>Damien Gouteux</span></td><td width="34%" align="center"><span id="info">&nbsp;</span></td><td width="33%" align="right"><span>2012</span></td></tr></table></td></tr></table>';
+            }
+            else if (page == 'home')
+            {
+                var b = document.getElementById('main');
+                b.innerHTML = 
+    '<table width="100%" height="100%"><tr id="top" height="15px"><td class="tdmain" colspan="7"><table width="100%"><tr><td align="left"><span class="dead">Home</span></td><td align="right"><span onclick="translate(\'en\');">en</span><span>&nbsp;</span><span onclick="translate(\'fr\');">fr</span><span>&nbsp;</span><span onclick="translate(\'it\');">it</span><span>&nbsp;</span></td></tr></table></td></tr><tr></tr><tr height="100px"><td>&nbsp;</td><td id="proj" class="elem" onclick="changeAll(\'projects\');" background="./fond2.png">PROJECTS</td><td width="20px"></td><td id="news" class="elem" onclick="changeAll(\'news\');" background="./fond3.png">NEWS</td><td width="20px"></td><td id="about" class="elem"onclick="changeAll(\'about\');" background="./fond.png">ABOUT</td><td>&nbsp;</td></tr><tr></tr><tr id="bottom" height="15px"><td class="tdmain" colspan="7"><table width="100%"><tr><td align="left"><span>Damien Gouteux</span></td><td align="center"><span id="info">&nbsp;</span></td><td align="right"><span>2012</span></td></tr></table></td></tr></table>';
+            }
+            else
+            {
+                alert(page);
+            }
+        }
+        
+        function translate(mode)
+        {
+            if (mode == 'en')
+            {
+                var proj = document.getElementById('proj');
+                proj.innerHTML = 'PROJECTS';
+                var news = document.getElementById('news');
+                news.innerHTML = 'NEWS';
+                var about = document.getElementById('about');
+                about.innerHTML = 'ABOUT';
+            }
+            else if (mode == 'fr')
+            {
+                var proj = document.getElementById('proj');
+                proj.innerText = 'PROJETS';
+                var news = document.getElementById('news');
+                news.innerHTML = 'ACTUALITÉS';
+                var about = document.getElementById('about');
+                about.innerHTML = 'À PROPOS';
+            }
+            else if (mode == 'it')
+            {
+                var proj = document.getElementById('proj');
+                proj.innerHTML = 'PROGETTI';
+                var news = document.getElementById('news');
+                news.innerHTML = 'NEWS';
+                var about = document.getElementById('about');
+                about.innerHTML = 'CHI SIAMO';
+            }
+        }
+    </script>
+    <style type="text/css">
+        body {
+            margin: 0px;
+        }
+        td.elem {
+            border: 1px solid grey;
+            width: 100px;
+            height: 100px;
+            text-align: center;
+            font-family: "century gothic";
+            font-size: 16px;
+        }
+        td.dead {
+            border: 1px solid grey;
+            width: 100px;
+            height: 100px;
+            text-align: center;
+            font-family: "century gothic";
+            font-size: 16px;
+            color: grey;
+        }
+        
+        td.elem:hover {
+            border: 1px solid black;
+            cursor:default;
+        }
+        td.dead:hover {
+            border: 1px solid grey;
+            cursor:default;
+        }
+        
+        #top td.tdmain {
+            border-bottom: 1px solid grey;
+            text-align: right;
+            padding: 0;
+        }
+        #top span {
+            font-family: "century gothic";
+            font-size: small;
+            color: grey;
+        }
+        #top span:hover {
+            font-family: "century gothic";
+            font-size: small;
+            color: black;
+            cursor:default;
+        }
+        #top span.dead:hover {
+            font-family: "century gothic";
+            font-size: small;
+            color: grey;
+            cursor:default;
+        }
+        
+        #bottom td.tdmain {
+            border-top: 1px solid grey;
+            text-align: left;
+            padding: 0;
+        }
+        
+        #bottom span {
+            font-family: "century gothic";
+            font-size: small;
+            color: grey;
+            cursor:default;
+        }
+    </style>
+  </head>
+  <body id="main">
+    <table width="100%" height="100%">
+        <tr id="top" height="15px">
+            <td class="tdmain" colspan="7"><table width="100%"><tr><td align="left"><span class="dead">Home</span></td><td align="right"><span onclick="translate('en');">en</span><span>&nbsp;</span><span onclick="translate('fr');">fr</span><span>&nbsp;</span><span onclick="translate('it');">it</span><span>&nbsp;</span></td></tr></table></td>
+            
+            <!--<td colspan="7"><span onclick="translate('en');">en</span><span>&nbsp;</span><span onclick="translate('fr');">fr</span><span>&nbsp;</span><span onclick="translate('it');">it</span><span>&nbsp;</span></td>-->
+        </tr>
+        <tr>
+        </tr>
+        <tr height="100px">
+            <td>&nbsp;</td>
+            <td id="proj" class="elem" onclick="changeAll('projects');" background="./fond2.png">PROJECTS</td>
+            <td width="20px"></td>
+            <td id="news" class="elem" onclick="changeAll('news');" background="./fond3.png">NEWS</td>
+            <td width="20px"></td>
+            <td id="about" class="elem"onclick="changeAll('about');" background="./fond.png">ABOUT</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+        </tr>
+        <tr id="bottom" height="15px">
+            <td class="tdmain" colspan="7"><table width="100%"><tr><td align="left"><span>Damien Gouteux</span></td><td align="center"><span id="info">&nbsp;</span></td><td align="right"><span>2012</span></td></tr></table></td>
+            <!--<td colspan="7"><span onclick="changeAll('home');">Damien Gouteux 2012</span></td>-->
+        </tr>
+    </table>
+  </body>
+</html>
