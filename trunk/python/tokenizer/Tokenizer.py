@@ -380,7 +380,7 @@ def identify_block(tokens):
             elif t.val in ['break']:
                 block_mode = t.val
                 start = i
-            elif t.kind in [TokenType.id, TokenType.float, TokenType.integer, TokenType.string, TokenType.boolean] or t.val == '(':
+            elif t.kind in [TokenType.id, TokenType.float, TokenType.integer, TokenType.string, TokenType.boolean] or t.val == '(' or t.val == '-':
                 block_mode = 'expression'
                 start = i
             elif t.val in ['{', '[']: #'(', 
@@ -562,6 +562,7 @@ def make_ast(tokens):
         ',' : 1.5, '(': 2,
         '==': 5, '!=': 5, '<' : 5, '<=': 5, '>' : 5, '>=': 5,
         '-':6, '+':6, '*':7, '/':7, '//':7, '%':7, '**':7,
+        'unary_minus' : 8,
         }
     ts = {
         TokenType.id : 'id', 
@@ -571,12 +572,20 @@ def make_ast(tokens):
         TokenType.string : 'string' }
     # Litterals and removing the last (if any)
     i = 0
+    for t in tokens:
+        print '#-#', t
     while i < len(tokens):
         t = tokens[i]
         if t.kind in ts:
             tokens[i] = Node(kind=ts[t.kind], val=t.val)
         if t.kind == TokenType.eof:
             del tokens[i]
+        #if isinstance(t, Token):
+        #    print '###', isinstance(t, Token), t.val, t.val == '-'
+        if isinstance(t, Token) and t.val == '-':
+            if i == 0 or tokens[i-1].kind in [TokenType.operator]:
+                #print 'found one'
+                t.val = 'unary_minus'
         i+=1
     while len(tokens) > 1:
         i = 0
@@ -596,7 +605,11 @@ def make_ast(tokens):
                         max = i
                         level_max = level
             i+=1
-        if not max is None and tokens[max].val != '(':
+        if not max is None and tokens[max].val == 'unary_minus':
+            n = Node(kind='unaop',op=tokens[max].val, arg=tokens[max+1])
+            tokens[max] = n
+            del tokens[max+1]
+        elif not max is None and tokens[max].val != '(':
             n = Node(kind='binop',op=tokens[max].val,arg1=tokens[max-1],arg2=tokens[max+1])
             tokens[max] = n
             if len(tokens) <= max+1:
@@ -794,6 +807,9 @@ class Interpreter:
         elif n.kind == 'suite':
             print n.subkind
             exit(1)
+        elif n.kind == 'unaop':
+            self.process_vm(n.arg, start)
+            start.append('INVERT')
         elif n.kind == 'binop':
             dop = {'+' : 'ADD', '*' : 'MUL', '-' : 'SUB', '/' : 'DIV', '//' : 'INTDIV', '**' : 'POW', '%' : 'MOD', '<' : 'LT', '>' : 'GT', '>=' : 'GE', '<=' : 'LE', '!=' : 'NE', '==' : 'EQ', '=' : 'AFF', '+=' : 'AFF_ADD', '-=' : 'AFF_SUB', '->' : 'CONST', 'call' : 'CALL' }
             self.process_vm(n.arg1, start)
@@ -931,6 +947,15 @@ class Interpreter:
             elif n.subsubkind in ['{']:
                 r = {}
                 return r # 23h33 yeah en qwerty 69/69
+        elif n.kind == 'unaop':
+            a = self.do_node(n.arg, scope)
+            if isinstance(a, str) and n.arg.kind == 'id':
+                ida = a #unused
+                a = scope[a]
+            if isinstance(a, int) or isinstance(a, float):
+                return -a
+            else:
+                raise Exception('Invalid type for unary minus : %s' % (a.__class__,))
         elif n.kind == 'binop':
             a = self.do_node(n.arg1, scope)
             b = self.do_node(n.arg2, scope)
@@ -1105,7 +1130,8 @@ class Test:
 
 #s = "a = 5; b = 2; c = a * -b+1; writeln(c) #pipo; 11+1 .4 2.3.alpha 5..alpha"
 
-Test.setup(Interpreter())
+interpreter = Interpreter()
+Test.setup(interpreter)
 
 suite = []
 suite.append(Test("4 + 5", 9))
@@ -1211,6 +1237,9 @@ suite.append(Test('add(2,3)', 5)) #2h32. Vendredi (matin) 6 Janvier 2012. Enfin.
 suite.append(Test('2 * add(2,3)', 10)) # 2h32 aussi.
 suite.append(Test('add(2,3)+add(3,2)', 10)) # 2h36 (sans rien faire)
 suite.append(Test('add(1+1, 2+1)', 5)) # 2h37 (un petit bug)
+suite.append(Test('-3', -3))
+suite.append(Test('-(3+2)', -5))
+suite.append(Test('-(3+2)*4', -20))
 
 # ATTENTION : QUAND ON TEST tokens(x).val : verif tokens(x) est un Token !!!
 
@@ -1249,6 +1278,16 @@ for s in stack:
 
 print
 print "%s / %s" % (str(good), str(len(suite)))
+
+console = True
+
+if console:
+    command = ''
+    while command != 'exit':
+        command = raw_input('>>> ')
+        if command != 'exit':
+            r = interpreter.do_string(command, stack, scope)
+            print r
 
 print
 print 'Goodbye'
