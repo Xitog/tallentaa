@@ -74,30 +74,37 @@ import math
 def distance(x1, y1, x2, y2):
     x = x1 - x2
     y = y1 - y2
-    #print "x = ", x
-    #print "y = ", y
     return math.sqrt(x**2+y**2)
 
-# 18h47 new collision mecanisme, pixel perfect, with id auto.
+def vec(x1, y1, x2, y2):
+    x = x2 - x1
+    y = y2 - y1
+    d = distance(x1, y1, x2, y2)
+    return (x/d, y/d)
 
 class Thing:
     
     def __init__(self, player, x, y, size, vie=100):
         self.player = player
-        self.index = -1
         self.x = x
         self.y = y
+        self.mx = x
+        self.my = y
         self.s = size
         self.waypoints = []
+        self.targets = []
         self.vie = vie
     
-    def link(self, index):
-        self.index = index
-    
-    def do(self): # 9h37 : it's moving!
+    def do(self):
         global background
-        old = (self.x, self.y)
+        old = (self.mx, self.my)
         if len(self.waypoints) != 0:
+            v = vec(self.mx, self.my, self.waypoints[0][0], self.waypoints[0][1])
+            print v
+            self.mx = self.mx+v[0]
+            self.my = self.my+v[1]
+            
+            """
             if self.x < self.waypoints[0][0]:
                 self.x += 1
             elif self.x > self.waypoints[0][0]:
@@ -106,46 +113,21 @@ class Thing:
                 self.y += 1
             elif self.y > self.waypoints[0][1]:
                 self.y -= 1
+            """
             
+            collide = None
             for t in things.all():
                 if t == self:
                     continue
-                if distance(t.x, t.y, self.x, self.y) <= t.s+self.s:
-                    #print distance(t.x, t.y, self.x, self.y)
-                    #print t.s+self.s
-                    #raw_input()
-                    self.x = old[0]
-                    self.y = old[1]
+                if distance(t.mx, t.my, self.mx, self.my) <= t.s+self.s:
+                    self.mx = old[0]
+                    self.my = old[1]
+                    collide = t
                     break
             
-            if background.get(self.x, self.y-self.s-2) != Black or background.get(self.x, self.y+self.s+2) != Black or background.get(self.x+self.s+2, self.y) != Black or background.get(self.x-self.s-2, self.y) != Black:
-                #print "en haut", background.get(self.x, self.y-self.s)
-                #print "en bas", background.get(self.x, self.y+self.s)
-                #print "a droite", background.get(self.x+self.s, self.y)
-                #print "a gauche", background.get(self.x-self.s, self.y)
-                #ask()
-                #exit()
-                if background.get(self.x, self.y-self.s-2) != Black:
-                    c = background.get(self.x, self.y-self.s-2)
-                    t = col2id(c)
-                    print t
-                elif background.get(self.x, self.y+self.s+2) != Black:
-                    c = background.get(self.x, self.y+self.s+2)
-                    t = col2id(c)
-                    print t
-                elif background.get(self.x+self.s+2, self.y) != Black:
-                    c = background.get(self.x+self.s+2, self.y)
-                    t = col2id(c)
-                    print t
-                elif background.get(self.x-self.s-2, self.y) != Black:
-                    c = background.get(self.x-self.s-2, self.y)
-                    t = col2id(c)
-                    print t
-                else:
-                    print "why?" ### PUTAIN DE PAS POSSIBLE !!!!!!!!! Ah mais si... self.x = old avant !!!
-                self.x = old[0]
-                self.y = old[1]
-                
+            self.x = int(self.mx)
+            self.y = int(self.my)
+            
             if self.x == self.waypoints[0][0] and self.y == self.waypoints[0][1]:
                 self.waypoints = self.waypoints[1:]
 
@@ -159,19 +141,19 @@ class Group:
             raise Exception("Wrong Class")
         elif o in self.core:
             raise Exception("Already inside this group")
-        elif not hasattr(o, 'link'):
-            raise Exception("No link function")
-        
-        i = len(self.core)
-        o.link(i)
+        #elif not hasattr(o, 'link'):
+        #    raise Exception("No link function")
         self.core.append(o)
     
     def all(self):
         return self.core
 
+PLAYER = 1
+
 things = Group(Thing)
-things.add(Thing(1, 10, 10, 10))
-things.add(Thing(1, 30, 30, 15))
+things.add(Thing(PLAYER, 10, 10, 10))
+things.add(Thing(PLAYER, 30, 30, 15))
+things.add(Thing(2, 100, 100, 20))
 
 select = []
 
@@ -212,9 +194,7 @@ class Surf:
         global Black
         sx, sy = self.surface.get_size()
         if x < 0 or y < 0 or x >= sx or y >= sy:
-            #print "Omega"
             return Black
-        #print "Alpha"
         return self.surface.get_at((x,y))
     
     def circle(self, x, y, r, c=(255, 255, 255), w=0):
@@ -235,7 +215,6 @@ class Surf:
         pygame.draw.line(self.surface, c, (x1, y1), (x2, y2), pencil)
 
 screen = Surf(mother=screen)
-background = Surf(2000, 2000)
 
 def cx(x):
     global CAM_X
@@ -253,25 +232,16 @@ def uncy(y):
     global CAM_Y
     return y+CAM_Y
 
-def id2col(index):
-    return ((index+1)*20+100, 0, 0)
-
-def col2id(color):
-    return (color[0]-100)/20-1
-
 # Main loop
 while not escape:
     # Handle events
     for event in pygame.event.get():
         # Detect mod
-        if event.type == KEYDOWN: ## 9h31 : ok!
+        if event.type == KEYDOWN:
             if (event.mod & (KMOD_SHIFT | KMOD_LSHIFT)) or event.key == K_LSHIFT:
                 MOD_LSHIFT = True
             elif event.key == K_TAB:
                 MOD_BACK = True
-        #    else:
-        #        MOD_LSHIFT = False
-        #    print MOD_LSHIFT
         if event.type == KEYUP:
             if event.key == K_LSHIFT:
                 MOD_LSHIFT = False
@@ -311,7 +281,6 @@ while not escape:
                 max_y = max(y, START_Y)
                 for t in things.all():
                     if t.x >= min_x and t.x <= max_x and t.y >= min_y and t.y <= max_y or t.x + t.s >= min_x and t.x - t.s <= max_x and t.y + t.s >= min_y and t.y - t.s <= max_y:
-                #if t.x - t.s < x and x < t.x + t.s and t.y - t.s < y and y < t.y + t.s:
                         select.append(t)
         if event.type == MOUSEBUTTONDOWN:
             print "event button = ", event.button
@@ -332,11 +301,25 @@ while not escape:
                 print "True"
             elif event.button == MOUSE_RIGHT:
                 p = (uncx(event.pos[0]), uncy(event.pos[1]))
-                for s in select:
-                    if MOD_LSHIFT:
-                        s.waypoints.append(p)
-                    else:
-                        s.waypoints = [p]
+                target = None
+                for t in things.all():
+                    if t.x - t.s <= p[0] and t.x + t.s >= p[0] and t.y - t.s <= p[1] and t.y + t.s >= p[1]:
+                        target = t
+                        break
+                print target
+                if target == None:
+                    for s in select:
+                        if MOD_LSHIFT:
+                            s.waypoints.append(p)
+                        else:
+                            s.waypoints = [p]
+                elif target.player != PLAYER:
+                    # ATTACK
+                    for s in select:
+                        if MOD_LSHIFT:
+                            s.targets.append(target)
+                        else:
+                            s.targets = [target]
             print "camx, camy, z, zoom[x]", camx, camy, z, zoom[z]
     camx -= modx
     camy -= mody
@@ -353,7 +336,6 @@ while not escape:
     #  Draw Units (selected ones != not selected) and waypoints
     
     screen.clear()
-    background.clear()
     
     mx, my = pygame.mouse.get_pos()
     
@@ -385,7 +367,6 @@ while not escape:
         x = cx(t.x)
         y = cy(t.y)
         s = t.s
-        background.circle(x, y, s, id2col(t.index))
         if t in select:
             screen.circle(x, y, s, Blue, Surf.Fill)
             if len(t.waypoints) != 0:
@@ -396,15 +377,21 @@ while not escape:
                     screen.circle(px, py, 5, Blue, Surf.Fill)
                     screen.line(last[0], last[1], px, py, Blue, 1)
                     last = (px, py)
+            if len(t.targets) != 0:
+                last = (x, y)
+                for t in t.targets:
+                    px = cx(t.x)
+                    py = cy(t.y)
+                    screen.line(last[0], last[1], px, py, Red, 1)
         else:
             screen.circle(x, y, s, Green, Surf.Fill)
-        screen.text(x-5, y-5, str(t.index))
+        screen.text(x-5, y-5, str(t.player))
     
     # View Filter (Background collision view)
-    if MOD_BACK:
-        c = background.get(mx, my)
-        background.send(0, 0, screen)
-        screen.text(mx, my, str(c[0])+','+str(c[1])+','+str(c[2]))
+    #if MOD_BACK:
+    #    c = background.get(mx, my)
+    #    background.send(0, 0, screen)
+    #    screen.text(mx, my, str(c[0])+','+str(c[1])+','+str(c[2]))
     
     screen.text(10,10, str(CAM_X)+','+str(CAM_Y))
     
