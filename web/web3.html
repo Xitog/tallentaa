@@ -1,0 +1,126 @@
+﻿<html>
+<head>
+    <style type="text/css">
+        body
+        {
+            margin: 0;
+            background-color: white; /*#EEEEEE;*/
+        }
+        /* a:hover MUST come after a:link and a:visited in the CSS definition in order to be effective!! */
+        #menu table tr td a:link 
+        {
+            text-decoration: underline;
+            font-family: "Century Gothic", verdana;
+            font-size: 16;
+            color: grey;
+            background-color: white;
+        }
+        #menu table tr td a:visited
+        {
+            text-decoration: underline;
+            font-family: "Century Gothic", verdana;
+            font-size: 16;
+            color: grey;
+            background-color: white;
+        }
+        #menu table tr td a:hover
+        {
+            background-color: grey;
+            color: white;
+        }
+        #menu
+        {
+            border-right: 1px grey solid;
+        }
+        #banner
+        {
+            font-size: 32;
+            font-family: "Century Gothic", verdana;
+            color: black;
+            text-align: left;
+            padding: 0;
+            border-bottom: 1px grey solid;
+            background-color: white;
+        }
+        div.title
+        {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 32;
+            font-family: "Palatino Linotype";
+        }
+        div.title2
+        {
+            text-align: left;
+            margin-bottom: 15px;
+            font-size: 24;
+            font-family: "Palatino Linotype";
+        }
+        div.text
+        {
+            text-align: left;
+            font-size: 16;
+            font-family: "Palatino Linotype";
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+        #footer
+        {
+            font-family: "Century Gothic", verdana;
+            font-size: 12px;
+            color: grey;
+        }
+        td.menu_and_main
+        {
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+<table background="red" width="100%" height="100%">
+    <tbody>
+        <tr height="10%" align="center">
+            <td colspan="4">
+                <table width="100%" height="100%" style="border-collapse:collapse;"> <!-- remove height100% in order to put it in center -->
+                    <tr>
+                        <td width="20%"></td>
+                        <td width="60%" id="banner">hello</td>
+                        <td width="20%"></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr height="90%" align="center" >
+            <td width="20%"></td>
+            <td class="menu_and_main" id="menu" width="5%">
+                <table width="100%" height="100%" style="border-collapse:collapse;">
+                    <tr><td align="center"><a href="">Menu1</a></td></tr>
+                    <tr><td align="center"><a href="">Menu1</a></td></tr>
+                    <tr><td align="center"><a href="">Menu1</a></td></tr>
+                    <tr><td>&nbsp;</td></tr>
+                    <tr><td>&nbsp;</td></tr>
+                    <tr><td>&nbsp;</td></tr>
+                </table>
+            </td>
+            <td class="menu_and_main" id="main" width="55%">
+                <table width="100%" height="100%">
+                    <tr>
+                        <td valign="top">
+                            <div class="title">Title</div>
+                            <div class="text">
+                            <p><i>blah blah?</i></p>
+                            <p>BlahblahblahBlahblahblahBlah blahblahBlahbla hblahBlahblahbla hBlahblahblahBla hblahblahBlahblahbl ahBlahblahblahBlahblahblahBlahbla hblahBlahblahblahBlahb lahblahBlahblahbla hBlahblahblahBlahblahblahB lahb lahblahBlahbl ahb lahBlahblah blahBlah blahblah Blahblah blahBlahbla hblah BlahblahblahBl ahblahbla hBlahblahblahBlahbl ahblahBlahblahblahBlah b lahblahBlahbla hblahBla hblahblahBlah blahblahBlahb lahb lahBlahb lahblah. Blahbl ahblahBlahblahb lahBlahblahb l ahBlahblahblahBla hblahblahBlahblahblahBlahblahb lahBlahb lahblahBlahbl ahblahBl ahblahblahBl ahblahblah Blahblahblah Blahblahbl ahBlahbl ahblahBlahblahblahBlahblahblahBlahblahblahBlahblahblahBlahblahbl  ahBlahbl ahb lahBlahbla hblahBla hb lahblahBlahb lahblahBlahbl ahblahBlahblahblahBlahbl ahb lahBlah blahbl ahBlahblahbla hBlahbla hblahBlahblahbla hBlahblahblahBlahblahb lahBlahbla hblah.</p>
+                            <pre>let a = 2 + 4</pre>
+                            <div class="title2">Title</div>
+                            <p>blahblah blah</p>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td width="20%"></td></tr>
+        <tr height="10%" id="footer" align="center"><td colspan="4">Damien Gouteux 2012</td></tr>
+    </tbody>
+</table>
+</body>
+</html>
