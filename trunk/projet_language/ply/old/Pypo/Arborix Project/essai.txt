@@ -1,0 +1,13 @@
+a = 4
+b = 2.0
+c = a + b
+
+if c == 6 then
+    a = 5
+else
+    22
+end
+
+print(a == 5)
+print(b == 2.0)
+print(c == 6)
