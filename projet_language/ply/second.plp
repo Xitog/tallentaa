@@ -1,0 +1,126 @@
+#
+# FLOAT AND INT
+#
+
+a = 54
+
+b = a + 2
+b = b - 6
+b = b / 2
+b = b * 4
+#100
+#b = b // 3
+# 33
+
+c = 2.0 / 3.0
+println(c)
+println(-c)
+
+f = 3.14
+println(f.sin)
+
+#
+# LIST
+#
+l1 = []
+l2 = [2, 3, 4, 5]
+l2 << 6
+println(l1.len) # 0
+println(l2.len) # 5
+println(l2.contains?(2)) # True
+println(l2.contains?("2")) # False
+println(l2(0)) # 2
+
+#
+# DICT
+#
+f1 = {}
+f2 = { a => 5 }
+println(f2.a) # 5
+println(f2("a")) # 5
+println(f2.contains?("a")) # True
+println(f2.contains?("b")) # False
+println(f2.len)
+
+#
+# STRING
+#
+s = "23"
+g = s.to_i
+println(g + 2) # 25
+g = "23".to_i + 2
+println(g) # 25
+
+#
+# IF
+#
+
+if a == 54 then
+  println(22)
+  println(b)
+end
+
+a = 6
+if a == 5 then
+  println("a == 5 donc")
+else
+  println("a != 5 donc")
+end
+
+b = Range(2, 3)
+println(b)
+println(b.random)
+
+#
+# WHILE & FOR
+#
+
+d = 5
+while d > 0 do
+  println(d)
+  d -= 1
+end
+
+l = [1, 2, 3]
+i = 0
+while i < l.len do
+  println(l(i))
+  i += 1
+end
+
+for i in [4,5,6] do
+  println(i)
+end
+
+#
+# DATE & TIME
+#
+
+d = Date()
+println(">>>" + d.to_s)
+println("year = " + d.year.to_s)
+
+println("bob " * 3)
+println("bonjour " + "bob")
+println("bonjour " + 24..to_s)
+
+require 'first.py'
+include first
+
+hello("bob" * 3)
+
+#
+# FUNCTION
+#
+def f_add(a,b)
+  return a+b
+end
+
+println(f_add(2,3))
+println(f_add.arity)
+
+def f2_add(a int, b int)
+  return a+b
+end
+
+println(f2_add(5,7))

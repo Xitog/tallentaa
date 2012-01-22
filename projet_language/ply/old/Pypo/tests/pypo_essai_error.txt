@@ -1,0 +1,5 @@
+if True then print(1) end
+
+b = a
+
+if 2 then print(2) end

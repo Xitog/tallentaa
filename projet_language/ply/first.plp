@@ -1,0 +1,92 @@
+require "first.py"
+include first
+
+hello("bob"*3)
+
+a = 54
+
+if a == 54 then
+  println(22)
+end
+
+#start("hello", 300, 300)
+
+b = Range(2, 3)
+println(b)
+println(b.random)
+
+# c = ask()
+# println(c)
+
+println(b.random.sin)
+
+d = 5
+while d > 0 do
+  println(d)
+  d -= 1
+end
+
+println("bonjour " + "bob")
+println("bonjour " + 24..to_s)
+
+#g = int("23")
+g = "23".to_i
+println(g + 2)
+
+l = [1, 2, 3]
+i = 0
+while i < l.len do
+  println(l(i))
+  i += 1
+end
+
+a = 6
+if a == 5 then
+  println("a == 5 donc")
+else
+  println("a != 5 donc")
+end
+
+for i in [4,5,6] do
+  println(i)
+end
+
+def hello()
+  println("hello")
+end
+
+d = Date()
+println(">>>" + d.to_s)
+println("year = " + d.year.to_s)
+
+n = 5 #Integer(5)
+i = 5
+println(i.sin)
+println(n.sin)
+
+#println(n.add(5))
+println(n+5)
+println(n.to_s)
+
+m = n.add(5)
+println(m.to_s)
+
+exit()
+
+# Jeu
+espace = Range(1, 100)
+bon = espace.random
+guess = -1
+essai = 0
+while bon != guess do
+  println(essai + 1)
+  guess = int(ask())
+  essai += 1
+  if guess > bon then
+    println("plus bas")
+  end
+  if guess < bon then
+    println("plus haut")
+  end
+end
+println("Vous avez trouve en " + essai + " essais.")
