@@ -16,6 +16,7 @@
                     <ul>
                         <li><a href="index.php">News</a></li>
                         <li><a href="beatrice.php">Beatrice</a></li>
+                        <li><a href="ariane.php">Ariane</a></li>
                         <li><a href="scriptal.php">Scriptal</a></li>
                         <li><a href="about.php">A propos</a></li>
                 </td>
