@@ -1,0 +1,149 @@
+﻿<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" type="text/css" href="http://looking.dwarf.free.fr/style2.css"/>
+    <title>Guide Python</title>
+</head>
+<body class="valentina" width="90%">
+<br/>
+<div id="content">
+<h1>Guide du langage Python</h1>
+<i>Draft version</i>
+
+<h2>1. Introduction</h2>
+
+<b>Python (Guido Van Rossum, 1991)</b>
+<ul>
+	<li>Typage Fort + Dynamique (duck/latent typing)
+	<li>Interprété, Cross-platform
+	<li>Implémentations : CPython (C), Jython (JVM), IronPython (.Net), PyPy (Python)
+	<li>Sous-langages   :<ul>
+		<li>Stackless Python (sans pile C)
+		<li>RPython (sous ensemble de Python compilé pour PyPy)
+		<li>Pyrex[->Cython] (type C + Python)
+    </ul></li>
+	<li>Extensions : .py, .pyc (bytecode), .pyx (Pyrex)
+</ul>
+
+<h2>2. Types élémentaires</h2>
+
+<ul>
+<li>Scalaires<ul>
+	<li>int				1 | 34L							automatiquement converti en long si besoin</li>
+	<li>long		    23L								longueur illimité</li>
+	<li>float			3.4 | 3.</li>
+	<li>bool			True | False</li>
+	<li>complex			3+2j							parti réelle et imaginaire</li>
+</ul></li>
+<li>Séquences<ul>
+	<li>Immutables<ul>
+		<li>str			'Hello' | "Hello"				immutable séquence de caractère</li>
+		<li>unicode		u'Hello' | u"Hello"				immutable séquence de caractère</li>
+		<li>tuple		(4.0, 'a', 'b') | (3,)			immutable, on peut mixé les types</li>
+		<li>frozenset	frozenset([4.0, 'a', True])		immutable, sans ordre, sans doublon</li>
+    </ul></li>
+	<li>Mutables<ul>
+		<li>list		[1, 'a', True]					mutable, on peut mixé les types</li>
+		<li>dict		{'key1' : 1.0, 'key2' : False}	paire clé / valeur</li>
+		<li>set			set([4.0, 'a', True])			mutable, sans ordre, sans doublon</li>
+    </ul></li>
+</ul></li>
+<li>Autres<ul>
+	<li>NoneType		None</li>
+</ul></li>
+</ul>
+
+<h2>3. Structures de contrôles</h2>
+
+<p>En Python, l'instruction 'nulle' est "pass" et est obligatoire !</p>
+
+<h3>Conditions</h3>
+<pre class="xcode">
+	<span class="keyword">if</span> condition :
+		action
+	<span class="keyword">elif</span> condition :
+		action
+	<span class="keyword">else</span> :
+		action
+</pre>
+<h3>Boucles</h3>
+<pre class="xcode">
+	<span class="keyword">for</span> var <span class="keyword">in</span> list :
+		action
+	<span class="keyword">while</span> condition :
+		action
+</pre>
+
+<h2>4. Fonctions</h2>
+
+<pre class="xcode">
+<span class="keyword">def</span> Nom ( arg1, arg2, ... ) :
+	action
+	<span class="keyword">return</span> var1, var2, ...
+</pre>
+
+<ul>
+<li>Si il n'y a pas de return, None est renvoyé. (!= Ruby)</li>
+<li>Même si il n'y pas d'arguments, les parenthères sont obligatoires, dans la définition et l'appel. (!= Ruby)</li>
+</ul>
+
+<h2>5. Programmation Objet</h2>
+<h3>Classe & objets</h3>
+<pre class="xcode">
+<span class="keyword">class</span> Nom(ClasseMère) :
+	action
+</pre>
+<h3>Méthodes & instances
+<h3>Encapsulation</h3>
+<h3>Polymorphisme</h3>
+<h3>Héritage simple</h3>
+<h3>Héritage multiple</h3>
+
+<h2>6. Les Modules</h2>
+<h3>Principes</h3>
+<h3>Module re : expressions régulières</h3>
+<h3>Module os,sys : services du systèmes d'exploitation</h3>
+<h3>Module csv : traitement de fichiers structurés par séparateurs</h3>
+
+<h2>7. Python et le Web : Introduction à Zope</h2>
+<h3>Architecture générale : mécanisme de publication</h3>
+<h3>Interaction DHTML-Python : Exemples</h3>
+
+<h2>Notes diverses :</h2>
+<h3>Un bon "duck programmer" utilisera hasattr() plutôt que type() ou isinstance()</h3>
+<h3>http://en.wikipedia.org/wiki/Category:Type_theory</h3>
+
+<h2>Ressources</h2>
+<ul>
+  <li>Free ebooks:
+    <ul>
+      <li><a href="http://www.swaroopch.com/notes/Python">A byte of Python</a></li>
+      <li><a href="http://www.diveintopython.net/">Dive into Python</a></li>
+      <li><a href="http://learnpythonthehardway.org/">Learn Python the hard way</a></li>
+      <li><a href="http://mindview.net/Books/Python/ThinkingInPython.html">Thinking in Python (Bruce Eckel)</a></li>
+      <li><a href="http://greenteapress.com/thinkpython/thinkpython.html">Think Python: How to Think Like a Computer Scientist</a></li>
+      <li><a href="http://rgruet.free.fr/">Python Quick Reference (PQR)</a></li>
+    </ul>
+  </li>
+  <li>Websites:
+    <ul>
+      <li><a href="http://www.python.org/">Python official website</a></li>
+      <li><a href="http://www.jython.org/">Jython official website</a></li>
+      <li><a href="http://homepages.cwi.nl/~jack/macpython/download.html">Python for Mac</a></li>
+      <li><a href="http://www.freenetpages.co.uk/hp/alan.gauld/">Learn to program using Python</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2>Historique</h2>
+<ul>
+  <li>Version du 24 Juillet 2008
+    <ul>
+      <li>Un premier jet d'une ébauche de guide, mise en ligne courant 2010.</li>
+    </ul>
+  </li>
+</ul>
+</div>
+</body>
+</html>
+

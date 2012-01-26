@@ -1,0 +1,598 @@
+<html>
+<body>
+<pre>
+
+[RUBY]
+
+parse.y => Ruby utilise Lex et Yacc !!!
+Donc oui, on peut se baser dessus sans passer pour un noob en fait...
+
+http://www.ruby-doc.org/
+http://web.njit.edu/all_topics/Prog_Lang_Docs/html/ruby/ il a une grammaire en yacc de Ruby
+http://www.ruby-doc.org/docs/ruby-doc-bundle/Manual/man-1.4/syntax.html
+http://phrogz.net/programmingruby/language.html
+
+https://developer.mozilla.org/fr/Guide_JavaScript_1.5/Constantes_litt%C3%A9rales
+
+11h36 : Ruby est trop puissant !!!
+irb(main):176:0> for i,k in {'a'=>1,'b'=>2} do
+irb(main):177:1* puts i,k
+irb(main):178:1> end
+a
+1
+b
+2
+=> {"a"=>1, "b"=>2}
+
+for is the syntax sugar for:
+    (expr).each `{' `|' lhs..`|' expr.. `}'
+
+
+
+    high   ::
+           []
+           **
+           -(unary)  +(unary)  !  ~
+           *  /  %
+           +  -
+           <<  >>
+           &
+           |  ^
+           >  >=  <  <=
+           <=> ==  === !=  =~  !~
+           &&
+           ||
+           .. ...
+           =(+=, -=...)
+           not
+    low    and or
+
+1. Constantes Littérales
+
+- Réel / Nombres à virgule flottante    Float                   Valeur      1.2 1e10
+- Entier                                Fixnum, Bignum          Valeur      1 010 (8 en octal) 0x10 (16 en hexa) 0b10 (2 en binaire) 124_345 (ignoré)
+- Chaîne de caractère                   String                  Référence   "youpi\n" 'youpi'
+- Valeurs booléennes                    TrueClass, FalseClass   Valeur      true false
+- Tableau / Liste                       Array                   Référence   [value, value]
+- Table de hachage / Dictionnaire       Hash                    Référence   { key => value }
+- Intervalle                            Range                   Référence   1..2 1...3 (inclusif et exclusif)
+- Symbole                               Symbol                  Référence   :sym
+
+- true, false, nil, __LINE__, __FILE__ sont appelés "Pseudo variable" et sont inassignables.
+- %w(expr expr expr) permet de créer un tableau sans []
+- %s(...) permet de créer une chaîne sans "" ou ''
+- une chaîne en guillement simple n'interprète pas les caractères spéciaux \n (elle les échappe d'office)
+
+Pb:
+- Différence de sémantique du '=' qui sera soit un clonage d'objet CLONE OBJ, soit une copie de la référence COPIE REF qui pointera sur le même objet !
+ (ou encore une création d'objet et une assignation de référence NEW OBJ ASSIGN REF)
+- Ruby a des petits problèmes avec ... et .. par rapport aux entiers !!! (1..2) == (1...3) il faut les parenthèses
+
+2. Références Constantes
+
+- Concept de référence vers un objet
+- Première lettre en majuscule
+- Emet un warning si on change sa valeur
+
+Pb:
+A = "abc"
+b = A
+b[1] = 'e'
+b => aec
+A => aec Sans production de warning !
+
+3. Références (Variables / Identifiants)
+
+- De n'importe quel type.
+- Portée : au delà des blocs. (pas pareil en 1.4)
+- Pour savoir si une variable est définie : defined?
+
+4. Opérateurs
+
+Arithmétique
+
++, -, /, *, %, **
+
+Binaire
+
+&, |, ^, <<, >>
+
+Assignement
+
+id = expr
+id1, id2 = expr, expr
+
+Cast
+
+to_s : méthode pour obtenir une chaîne
+to_i : méthode pour obtenir un entier d'un flottant ou d'une chaîne
+to_f : méthode pour obtenir un flottant d'un entier ou d'une chaîne
+
+Booléen
+
+and ou &&
+or ou ||
+not ou !
+
+- ZeroDivisionError si on fait .../0
+- si le nb d'identifiant est inférieur à gauche, ils recevront nil
+- à gaiche on peut avoir : référence, référence indexée (appel de la méthode []=),
+
+5. Structure de contrôle
+
+Séquence
+- Nouvelle ligne
+- ;
+- bloc d'actions begin ACTIONS end
+- bloc paramètre do ACTIONS end ou { ACTIONS }
+
+Sélection
+- if COND then ACTIONS elsif COND then ACTIONS else ACTIONS end
+- ACTION if COND
+- unless COND then ACTIONS else ACTIONS end
+- ACTION unless COND
+- case EXPR when EXPR then ACTIONS when EXPR then ACTIONS else ACTIONS end
+
+Itération
+- while COND do ACTIONS end
+- for REF in EXPR do ACTIONS end
+- until COND do ACTIONS end
+- ACTION while COND
+- ACTION until COND
+- avec une méthode et un bloc en paramètre. Appel method params bloc
+
+Notes
+- si la condtion de if est une expression irrégulière seule, alors $_ sera évaluée contre.
+
+6. Fonctions
+
+Définition
+
+def nom (liste de paramètres formels)
+   corps
+end
+
+
+Appel
+
+nom(liste de paramètres réels, effectifs)
+
+- Si pas de paramètre ou pas d'ambiguité : on peut supprimer les parenthèses.
+- Bien mettre le nombre de paramètre sinon ArgumentError
+- Tout se fait par passage de message : le nom de la fonction est un message et l'objet le receveur (désigné par self dans le corps de la fonction)
+- Si le receveur n'est pas spécifié, "main" est utilisé (main est une instance de Object)
+
+
+yield
+raise
+paramètres spéciaux (listes, hash, bloc)
+    begin
+      do_something
+    rescue
+      recover
+    ensure
+      must_to_do
+    end
+retry
+return
+break
+next (et pas continue !!!!)
+for et le sugar syntaxique, on peut faire for i,k !!!!
+redo Restarts this iteration of the most internal loop, without checking loop condition.
+BEGIN {... } END { ...}
+class
+singleton
+module
+méthode dispo avant sa def ?
+alias
+singleton method
+undef
+!!!! ON PEUT FAIRE DES METHODES ENCHASSEES
+Regex littéral
+
+
+- next (et pas continue)
+- for k,v in hash
+- else (et pas when other)
+- méthodes enchassées
+
+
+
+
+
+
+Version du 24 Juillet 2008
+
+BEGIN {
+	puts "Hello Ruby !"
+}
+
+END {
+	puts "Goodbye Ruby !"
+}
+
+puts 'Hello World!'					#=> nil
+a = 'Hello World!'					#=> "Hello World!"
+puts a								#=> nil
+
+b = 3.times { puts 'hello' }		#=> 3
+puts b								#=> nil
+"hello world".length				#=> 11
+"hello world".index("h")			#=> 0
+-4.abs								#=> 4
+
+# Comment. No semicolons, no braces
+def sayHello(name)
+	result = "Hello, " + name
+	return result
+end									#=> nil
+puts sayHello("Elyane")				#=> nil
+puts(sayHello("Marianne"))			#=> nil
+puts(sayHello "Josianne")			#=> nil		(warning: parenthesize argument(s) for future version)
+puts sayHello "Ariane"				#=> nil		(warning: parenthesize argument(s) for future version)
+
+# "string" : substitutions \x + expression interpolation "#{var}"
+name = "Hélène"
+puts "Bonjour #{name}"
+
+def hello
+	"hello"
+end
+puts hello
+
+# Array
+a = [1, 'a', 3.4]
+puts a[0]
+a[2] = nil
+puts 'array a = '
+puts a
+empty = []
+empty2 = Array.new
+empty3 = %w{ ant bee cat dog elk } # bien mettre accolé %w{
+
+# Hashes
+dict = {
+	'bob' => 'robert',
+	'jo' => 'john',
+	'mike' => 'michael',
+	'ed' => 'edouard'
+}
+puts dict['ed']
+
+# nil is fasle in boolean expression
+# ['keyx'] : nil
+h = Hash.new(0) # 0 = default value si clé n'existe pas (nil par défaut)
+
+count = 0
+if count == 0
+	puts "count == 0 !"
+elsif
+	puts "count != 0 !"
+else
+	puts "never"
+end
+
+pipo = 0
+while count < 10 and pipo == 0
+	count += 1
+end
+
+puts "hello" if count == 10
+puts (pipo=pipo+=1) while pipo < 5
+
+text = "La lune est une dure maîtresse - Pour qui sonne le glas - Heart of Darkness"
+
+# /pattern/
+# | : ou
+# ( ) : priorité
+# + : 1 ou +
+# * : 0 ou +
+# ? : 0 ou 1
+# \s : space, tab, newline, etc.
+# \d : digit
+# \w :  any character that may appear in a typical word
+# . : any
+if /lune|glas/ =~ text then puts "glaslune !" end
+text.sub!(/lune/, 'moon of mars') # 1ère occurence
+text.gsub!(/of/, 'de') # toutes les occurences
+puts text
+
+#------------------------------------------------
+# Convention de nommage
+#------------------------------------------------
+
+# fonction_1
+# fonction? retournant un booléen
+# fonction! modifiant l'instance elle-même
+# to_x fonction de conversion (s: string i : integer)
+# Classe
+# Module
+# $var_globale
+# @var_d_instance
+# @@var_de_classe
+# variable, paramètre
+
+#? contre quoi match un pattern dans un if si on précise pas =~ bidule ?
+#? différence entre { ...} et do ... end
+
+#------------------------------------------------
+# Object Oriented Programming
+#------------------------------------------------
+
+class A
+	attr_reader :p1, :p2
+	attr_writer :p3
+	
+	@@count = 0
+	
+	def A.count
+		puts "A count"
+		@@count
+	end
+	
+	def initialize(p1, p2, p3)
+		@p1 = p1
+		@p2 = p2
+		@p3 = p3
+		@@count += 1
+	end
+	
+	def to_s
+		"A (#{@p1} ; #{@p2} ; #{@p3})"
+	end
+end
+a = A.new(1, 'a', 0.0)
+puts a.to_s
+
+class B < A
+	
+	@@count = 0 # must be initialized
+	
+	public
+	
+	def B.count
+		puts "B count"
+		@@count
+	end
+	
+	def p4=(value)
+		@p4 = value
+	end
+	
+	def initialize(p1, p2, p3, p4)
+		super(p1, p2, p3)
+		@p4 = p4
+		@@count += 1
+	end
+	# decoupling
+	def to_s
+		super + " [ #{@p4} ]"
+	end
+end
+b = B.new(2, 'b', '2.0', "Alpha")
+puts b
+
+print 'A : ', A.count, "\n"
+print 'B : ', B.count
+
+# This is more than a curiosity. In his landmark book Object-Oriented Software Construction , Bertrand Meyer calls this the Uniform Access Principle. By hiding the 
+# difference between instance variables and calculated values, you are shielding the rest of the world from the implementation of your class. You're free to change 
+# how things work in the future without impacting the millions of lines of code that use your class. This is a big win. 
+
+# Because constants are references to objects, changing what a constant refers to generates a warning, but 
+# modifying the object itself does not. For example, Greeting << " world!" if Greeting == "Hello" does not 
+# generate an error or warning. This is similar to final variables in Java, but Ruby does also have the 
+# functionality to "freeze" an object, unlike Java. 
+
+# To denote floating point numbers, one must follow with a zero digit (99.0) or an explicit conversion (
+# 99.to_f). It is insufficient to append a dot (99.), because numbers are susceptible to method syntax. 
+
+# Mixin partial class definition
+
+#------------------------------------------------
+# Variable & reference
+#------------------------------------------------
+
+# Variable = reference to an object
+# Assignment aliases objects
+a = "hello"
+puts
+puts a.object_id # a.id warning deprecated
+puts a.class # a.type warning deprecated
+puts a
+b = a.dup # une sorte de clone()
+b[0] = "H"
+puts a
+puts b
+
+a.freeze
+begin
+	a[1] = "E"
+rescue TypeError
+	puts "Everything allright"
+end
+
+#------------------------------------------------
+# Class Singleton
+#------------------------------------------------
+
+# notation, which basically says ``build me a new class just for object obj."
+# a singleton class is created and inserted as a's direct class. a's original class, String, is made this singleton's superclass.
+# in both cases
+# If an object's klass reference already points to a singleton class, a new one will not be created. This means that the first of the two method definitions in the 
+# previous example will create a singleton class, but the second will simply add a method to it. 
+aa = "hello"
+class << aa
+	def to_s
+		"The value is '#{self}'"
+	end
+end
+puts aa.to_s
+
+def aa.twotimes
+	self + self
+end
+puts aa.twotimes
+
+#------------------------------------------------
+# Mixins et modules
+#------------------------------------------------
+
+# When you include a module, Ruby creates an anonymous proxy class that references that module, and inserts that proxy as the direct superclass of the class that 
+# did the including. The proxy class contains references to the instance variables and methods of the module. This is important: the same module may be included in 
+# many different classes, and will appear in many different inheritance chains. However, thanks to the proxy class, there is still only one underlying module: change 
+# a method definition in that module, and it will change in all classes that include that module, both past and future. 
+
+puts
+puts "Mixin and modules"
+
+module HelloMod
+	def hello
+		"Hello!"
+	end
+end
+
+class C
+	include HelloMod
+end
+c = C.new
+puts c.hello
+
+module HelloMod
+	def hello
+		"zorbix"
+	end
+end
+puts c.hello
+
+#------------------------------------------------
+# Extending objects
+#------------------------------------------------
+
+module Laetitia
+	def hello
+		"hey !"
+	end
+end
+cc = "Grouchy"
+cc.extend Laetitia
+puts cc.hello
+
+class Lae
+	include Laetitia	# ajoute comme méthode d'instance
+	extend Laetitia		# appel à object#extend, donc self.extend avec self = Lae (la classe) donc méthode de classe
+end
+lae = Lae.new
+puts lae.hello
+puts Lae.hello
+
+#------------------------------------------------
+# Dynamique des classes
+#------------------------------------------------
+
+# Module is an ancestor of Class, its instance methods can be called without an explicit receiver within a class definition. 
+# In fact, many of the directives that you use when defining a class or module, things such as alias_method, attr, and public, are simply methods in class Module. 
+# This opens up some interesting possibilities---you can extend the functionality of class and module definitions by writing Ruby code.
+
+$value = 25
+class Pipo
+	puts "Type of self = #{self.type}"
+	puts "Name of self = #{self.name}"
+	
+	def Pipo.helloTest
+		puts "Hello Test !"
+	end
+	
+	helloTest
+	
+	if $value == 25 then
+		def hello
+			"hello 25"
+		end
+	elsif
+		def hello
+			"hello"
+		end
+	end
+end
+
+#------------------------------------------------
+# Extending classes
+#------------------------------------------------
+
+puts
+puts "Extending Classes"
+
+class Module
+	@@docs = Hash.new(nil)				# Les variables de classes n'ont pas l'air d'être accessible dans les sous classes par @@ !!!
+	def doc(str)
+		@@docs[self.name] = str
+	end
+	
+	def gdoc
+		@@docs[self.name]
+	end
+end
+
+class Alpharius
+	doc "What a simple way to extend Ruby!"
+
+	def initialize
+		puts Alpharius.gdoc				# ici @@docs, connait pas !
+	end
+end
+
+class Zemblix
+	doc <<-FIN
+		Ceci est une documentation
+		couplée avec une heredoc.
+		Youpi!
+	FIN
+end
+
+alpha = Alpharius.new
+puts Alpharius.gdoc
+puts Zemblix.gdoc
+
+#------------------------------------------------
+# Class attributes and methods
+#------------------------------------------------
+
+#------------------------------------------------
+# Top-level environment
+#------------------------------------------------ 
+
+puts self.class
+puts self.object_id
+
+#------------------------------------------------
+# Object
+#------------------------------------------------ 
+
+o1 = Object.new	# make a new object
+o2 = Object.new
+unless o1 == o2 then puts "not equal" end
+unless o1 === o2 then puts "not equal" end
+unless o1 =~ o2 then puts "not pattern equal" end
+puts o1.__id__
+o1.__send__(:puts, "hello")
+puts o1.class
+o3 = o1.clone		# clone fait une copie shallow au niveau d'object
+o1.display
+puts
+o4 = o1.dup			# dup est destiné à être surchargé
+ta = ['cat']
+tb = ['cat']
+puts ta == tb
+puts ta === tb
+puts ta.eql? tb
+puts ta.equal? tb
+
+
+#------------------------------------------------
+#
+#------------------------------------------------ 
+
+</pre>
+</body>
+</html>
