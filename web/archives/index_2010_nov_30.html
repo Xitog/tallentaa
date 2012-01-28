@@ -1,0 +1,71 @@
+<html>
+<head>
+    <title>Looking Dwarf Software on the web</title>
+    <style type="text/css">
+        #container .on  { display: block; }
+        #container .off { display: none; }
+        table.main      { border-width: 0px; border-color: #000000; border-style: solid; margin: auto; }
+        div.main        { font-family: arial;     font-size: 12px; color: gray; }
+        pre             { font-family: monospace; font-size: 12px; color: white; background: #00a0a0; }
+        a.current       { font-family: arial;     font-size: 14px; color: DarkSlateGray; text-decoration: none; font-weight: normal; }
+        a.current:hover { cursor: default; }
+        a.ghost         { font-family: arial;     font-size: 14px; color: DarkSlateGray; text-decoration: none; font-weight: normal; }
+        a.intext        { font-family: arial;     font-size: 12px; color: DarkSlateGray; text-decoration: none; font-weight: normal; }
+        a.ghost:hover   { color: White; text-decoration: underline; background: DarkSlateGray; }
+        a.intext:hover  { color: White; text-decoration: underline; background: DarkSlateGray; }
+        h1              { font-family: arial;     font-size: 16px; color: SeaGreen; }
+    </style>
+    <script type="text/javascript">
+<!--
+function multiClass(eltId) {
+	arrLinkId = new Array('_1','_2','_3','_4');
+	intNbLinkElt = new Number(arrLinkId.length);
+	arrClassLink = new Array('current','ghost');
+	strContent = new String()
+	for (i=0; i<intNbLinkElt; i++) {
+		strContent = "menu"+arrLinkId[i];
+		if ( arrLinkId[i] == eltId ) {
+			document.getElementById(arrLinkId[i]).className = arrClassLink[0];
+			document.getElementById(strContent).className = 'on content';
+		} else {
+			document.getElementById(arrLinkId[i]).className = arrClassLink[1];
+			document.getElementById(strContent).className = 'off content';
+		}
+	}	
+}
+-->
+    </script>
+</head>
+<body>
+<table class="main" width="700">
+<tr><td>
+    <div id="container">
+		<a href="#" id="_1" class="current" onclick="multiClass(this.id)" alt="menu1">Accueil</a> |
+        <a href="#" id="_2" class="ghost" onclick="multiClass(this.id)" alt="menu2">Sous-sites</a> |
+		<a href="#" id="_3" class="ghost" onclick="multiClass(this.id)" alt="menu3">A propos</a>
+	<hr />
+    <div id="menu_1" class="on content">
+		<h1>Accueil</h1>
+		<p>Bonjour monde !</p>
+	</div>
+    <div id="menu_2" class="off content">
+		<h1>Sous-sites</h1>
+        <div class="main">
+		    <p>Plusieurs sites web :</p>
+            <ul>
+                <li><a href="./lds/" class="intext">LDS Main Site (in english)</a></li>
+                <li><a href="./silverlight/" class="intext">Essai avec Silverlight</a></li>
+            </ul>
+        </div>
+	</div>
+    <div id="menu_3" class="off content">
+		<h1>A propos</h1>
+        <div class="main">
+		    <p>Au revoir monde !</p>
+        </div>
+	</div>
+</div>
+<td></tr>
+</table>
+</body>
+</html>
