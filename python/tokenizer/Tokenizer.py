@@ -1,10 +1,23 @@
-# 15h39-42. OK
-
-# Token
-
-#-------------------------------------------------------------------------------
-
+#-----------------------------------------------------------------------
+# Tokenizer
+# Damien Gouteux
+#-----------------------------------------------------------------------
+#
+# Parts :
+#
 # Tools
+# Lexer
+# Parser
+# Interpreter
+# Tests
+# Interactive Console
+
+debug = False
+tests = False
+
+#-----------------------------------------------------------------------
+# Tools
+#-----------------------------------------------------------------------
 
 class Enum:
     def __init__(self, *tab):
@@ -16,9 +29,11 @@ class Enum:
 LexerState = Enum('start', 'float', 'integer', 'operator', 'id', 'hexa', 'bin', 'octal', 'string')
 TokenType = Enum('integer', 'float', 'id', 'operator', 'separator','keyword', 'eof', 'boolean', 'string')
 
-#-------------------------------------------------------------------------------
-
+#-----------------------------------------------------------------------
 # Lexer
+#-----------------------------------------------------------------------
+
+# Tokens
 
 def is_lower_char(c):
     return (c in ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'])
@@ -72,7 +87,9 @@ def is_boolean(s):
     return (s in ['true', 'false'])
 
 def is_keyword(s):
-    return (s in ['if', 'then', 'else', 'elsif', 'end', 'while', 'do', 'end', 'until', 'unless', 'break', 'next', 'return', 'fun'])
+    return (s in ['if', 'then', 'else', 'elsif', 'end', 'while', 'do', 'until', 'unless', 'break', 'next', 'return', 'fun'])
+
+all_keywords = ['if', 'then', 'else', 'elsif', 'end', 'while', 'do', 'until', 'unless', 'break', 'next', 'return', 'fun'] + ['true', 'false']
 
 class Token:
     def __init__(self, kind, val):
@@ -115,8 +132,6 @@ def token(t):
     tokens.append(Token(t, ''.join(curr)))
     curr = []
     state = LexerState.start
-
-debug = False
 
 def tokenize():
     global s, curr, tokens, c, i, state, escape, debug
@@ -262,12 +277,14 @@ def tokenize():
     
         print('\nNb: '+str(len(tokens)))
 
-#-------------------------------------------------------------------------------
-
+#-----------------------------------------------------------------------
 # Parser
+#-----------------------------------------------------------------------
+
 # tokens -> AST
 
-print('\nParser\n')
+if debug:
+    print('\nParser\n')
 
 def xxparse(tokens):
     #print '--- big xxparse---'
@@ -296,13 +313,13 @@ def xxparse(tokens):
                 n = Node(kind='empty')
             else:
                 ###
-                print 'tokens'
-                i = 0
-                for tt in tokens:
-                    print i, tt, tt in tokens[b['start']:b['end']+1]
-                    i+=1
-                print b['start'], b['end']
-                
+                if debug:
+                    print 'tokens'
+                    i = 0
+                    for tt in tokens:
+                        print i, tt, tt in tokens[b['start']:b['end']+1]
+                        i+=1
+                    print b['start'], b['end']
                 n = make_ast(tokens[b['start']:b['end']+1])
         elif b['type'] in ['{', '[']: # '(', 
             if b['start'] > b['end']:
@@ -313,7 +330,8 @@ def xxparse(tokens):
                 end_i = i
                 while i <= b['end']:
                     while tokens[end_i].val != ',' and end_i <= b['end']:
-                        print end_i
+                        if debug:
+                            print end_i
                         end_i += 1
                     if tokens[end_i].val in [',',']','}']: # ')',
                         n = make_ast(tokens[i:end_i])
@@ -344,7 +362,8 @@ def xxparse(tokens):
             
             i=0
             for tt in tokens[deb_par:end_par+1]:
-                print 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', i, tt
+                if debug:
+                    print 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', i, tt
                 i+=1
             
             #print 'ZEEEEEEMBLA', deb_par, end_par
@@ -546,11 +565,12 @@ def sub(subjects):
 
 def make_ast(tokens):
     ###
-    print 'make_ast'
-    i=0
-    for t in tokens:
-        print 'make_ast', i, t
-        i+=1
+    if debug:
+        print 'make_ast'
+        i=0
+        for t in tokens:
+            print 'make_ast', i, t
+            i+=1
     
     if len(tokens) < 1:
         raise Exception("Empty token list")
@@ -572,8 +592,9 @@ def make_ast(tokens):
         TokenType.string : 'string' }
     # Litterals and removing the last (if any)
     i = 0
-    for t in tokens:
-        print '#-#', t
+    if debug:
+        for t in tokens:
+            print '#-#', t
     while i < len(tokens):
         t = tokens[i]
         if t.kind in ts:
@@ -643,12 +664,14 @@ def make_ast(tokens):
                 tokens[deb] = n
                 del tokens[deb-1]
             else:
-                print '%%%%%%%', end
+                if debug:
+                    print '%%%%%%%', end
                 i = deb
                 sub = deb # sub start
                 n = None
                 while i <= end+1:
-                    print 'www', tokens[i], tokens[i] in tokens[sub:i]
+                    if debug:
+                        print 'www', tokens[i], tokens[i] in tokens[sub:i]
                     if isinstance(tokens[i], Token) and tokens[i].val in [',',')']:
                         n = Node(kind='suite', subkind='sequence', subsubkind='(', left=make_ast(tokens[sub:i]), right=n)
                         sub = i+1 # DERNIER BUG. PASSER DE VIRG EN VIRG
@@ -656,7 +679,8 @@ def make_ast(tokens):
                 
                 ii = end+1
                 while ii > deb:
-                    print 'i delete', ii
+                    if debug:
+                        print 'i delete', ii
                     del tokens[ii]
                     ii -= 1
                 tokens[deb] = n
@@ -670,21 +694,22 @@ def make_ast(tokens):
                     tokens[max-1] = n
                     del tokens[max]
             
-            print '------------'
-            i=0
-            for tt in tokens:
-                print i, tt
-                i+=1
-            print '------------'
+            if debug:
+                print '------------'
+                i=0
+                for tt in tokens:
+                    print i, tt
+                    i+=1
+                print '------------'
             
-            if len(tokens) == 1 and tokens[0].kind == 'binop':
-                print 'op=', tokens[0].op
-                if tokens[0].op == 'call':
-                    print tokens[0].arg1
-                    print tokens[0].arg2
-                    if tokens[0].arg2.kind == 'suite':
-                        print tokens[0].arg2.left
-                        print tokens[0].arg2.right
+                if len(tokens) == 1 and tokens[0].kind == 'binop':
+                    print 'op=', tokens[0].op
+                    if tokens[0].op == 'call':
+                        print tokens[0].arg1
+                        print tokens[0].arg2
+                        if tokens[0].arg2.kind == 'suite':
+                            print tokens[0].arg2.left
+                            print tokens[0].arg2.right
         else:
             print 'ALARMA'
             for tt in tokens:
@@ -693,9 +718,9 @@ def make_ast(tokens):
     return tokens[0]
 #
 
-#-------------------------------------------------------------------------------
-
+#-----------------------------------------------------------------------
 # Interpreter
+#-----------------------------------------------------------------------
 
 #class XINT(int):
 #    def __init__(self, val):
@@ -709,7 +734,8 @@ class XFUN(object):
     def __init__(self, name, par=None, ret=None, ast=None):
         self.name = name
         self.par = []
-        print 'print ya des params ?'
+        if debug:
+            print 'print ya des params ?'
         parcours = par
         if parcours is not None and parcours.kind == 'empty':
             print 'no'
@@ -718,8 +744,9 @@ class XFUN(object):
                 #print parcours.left.val
                 self.par.append(parcours.left.val)
                 parcours = parcours.right
-        for p in self.par:
-            print 'param', p
+        if debug:
+            for p in self.par:
+                print 'param', p
         
         ### BON C LA MERDE C TRUC. J ARRIVE PAS. PUTAIN DE (). JE COMPRENDS PLUS MON CODE C UN BORDEL SANS NOM.
         ### LA IL ME CHIE QUE J'AI DEUX FOIS LE MEME ID !!!
@@ -1089,7 +1116,9 @@ class Interpreter:
         else:
             raise Exception('Node type not handled %s' % (n.kind,))
 
-#-------------------------------------------------------------------------------
+#-----------------------------------------------------------------------
+# Tests
+#-----------------------------------------------------------------------
 
 import sys
 import traceback
@@ -1260,34 +1289,79 @@ suite.append(Test('-(3+2)*4', -20))
 
 scope = {}
 stack = []
-good = 0
-for elem in suite:
-    elem.test(stack, scope)
-    print elem
-    if elem.is_ok():
-        good+=1
 
-print
-print '-- Stack'
-print
+def all_tests():
+    global suite, scope, stack
+    good = 0
+    for elem in suite:
+        elem.test(stack, scope)
+        print elem
+        if elem.is_ok():
+            good+=1
+    
+    print
+    print '-- Stack'
+    print
+    
+    i = 0
+    for s in stack:
+        #print i, '.', s
+        i += 1
+    
+    print
+    print "%s / %s" % (str(good), str(len(suite)))
+    print
 
-i = 0
-for s in stack:
-    #print i, '.', s
-    i += 1
+if tests:
+    all_tests()
 
-print
-print "%s / %s" % (str(good), str(len(suite)))
+#-----------------------------------------------------------------------
+# Interactive Console
+#-----------------------------------------------------------------------
 
+# Console On
 console = True
+
+# Commands
+def com_keywords():
+    global all_keywords
+    print len(all_keywords), 'keywords:'
+    all_keywords.sort()
+    for k in all_keywords:
+        print '\t', k
+
+def com_help():
+    global commands
+    print len(commands), 'commands:'
+    keys = commands.keys()
+    keys.sort()
+    for k in keys:
+        print '\t', k
+
+def com_tests():
+    all_tests()
+
+def com_clear():
+    import os
+    os.system('cls')
+
+def com_exit():
+    pass
+
+commands = { 'keywords' : com_keywords, 'help' : com_help, 'exit' : com_exit, 'tests' : com_tests, 'clear' : com_clear}
 
 if console:
     command = ''
+    print '+- Welcom to Pypo 0.1'
+    print '+- Enter code or type help for more information.'
     while command != 'exit':
-        command = raw_input('>>> ')
-        if command != 'exit':
+        command = raw_input('>>> ') # +->
+        if not(command in commands):
             r = interpreter.do_string(command, stack, scope)
             print r
+            scope['_'] = r
+        elif command in commands:
+            commands[command]()
 
+print '+- Goodbye!'
 print
-print 'Goodbye'
