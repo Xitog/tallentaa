@@ -1,0 +1,102 @@
+﻿Grammaire
+    Phrase (simple : GN + GV ou complexe : X propositions, 1 principale, X-1 subordonnées)
+        Propositions
+            Groupes de mots
+                Mots (sens, classe grammaticale, forme, fonction syntaxique)
+    Classes grammaticales / nature / catégorie (10)
+        Variables
+            noms/substantifs 
+                abstrait (concept) ou concret (animé ou non animé : objet) / simple ou compoé / commun ou propre(maj)
+                genre (m ou f) nombre (sg ou pl) certains suffixes permettent de connaître le genre. certaines catégories : arbre = masc.
+                !!! le mannequin, un laideron, un cordon-bleu : masc, mais femme. une estafette, une ordonnance : fem mais homme.
+                nom collectif : sg mais désigne X. nom seulemet au sg : ténèbres
+                formation du féminin : +e. Mais nombreuses exceptions : +esse, eur->euse, ou femme+nom, ou irrégulier jars/oie
+                certains noms d'animaux seulement à un genre :  pour précier : +mâle ou +femelle
+                certains noms changent de genre au pluriel : un amour. des folles amours (mouais)
+                certains noms changent de sens selon le genre : un aigle, une aigle (drapeau).
+                certains noms hésitent sur le genre : un ou une après-midi
+                certains noms f sont masc lorsqu'ils sont employés en tant que pronom indéf. (quelque chose s'est dit au village)
+            adjectifs qual.  indique une qualité
+                épithète : à côté, sans séparation ou prép après certains pron indéf : quelque chose de grave
+                apposition : séparé, à côté
+                attribut : relié par un verbe (+prép parfois)
+                    du CO (je le crois sincère) ou du sujet (il est beau)
+                peut devenir adv ou un nom.
+                peut avoir un complément de détermination : plein de lait (comp. et sup. relatif en ont souvent : le plus X des Y)
+            adjectifs !qual  précise le nom
+            articles         détermine nom en précisant genre et nombre
+            pronoms          remplace un nom
+            verbes           action ou état
+            Notes : adjectifs !qual + articles = déterminant chez certaines grammaires
+        Invariables
+            adverbes         modifie le sens d'un adjectif, verbe ou autre adverbe
+            prépositions     établit un rapport entre mots ou groupes
+            conjonctions
+            interjections    traduit une exclamation
+        Il y a une possibilité de "transhumance".
+        
+    signes de ponctuation 
+        . (fin) , (apposition) ; (coupure) : (citation) ? interrogation ! exclamation ... (incomplétude) - chgt d'interlocuteur ou mise en valeur " citation 
+        () réflexion accessoire [] précision
+    
+    Fonctions
+        Compléments circonstanciels (CC) 9 : indique circonstance, conditions de l'action exprimée par le verbe, auquel il se rattache.
+        où ? quand ? comment ? combien ? ... avec prép ou sans 
+            Il part mardi (!COD) quand ?
+            Il habite Paris (!COD) où ?
+            Il resta un mois (!COD) combien de temps ?
+            Elle marchait la tête haute (!COD) comment ?
+            Elle sortit malgré/en dépit de la pluie (!COD) comment ? (d'opposition)
+        9 : LIEU, TEMPS, MANIERE, MOYEN, CAUSE, D'OPPOSITION, BUT, DE PRIX ET MESURES, D'ACCOMPAGNEMENT ET DE PRIVATION
+        En gén, après le verbe et le COD, le + long en dernier s'il y en a plusieurs.
+        
+    Verbes
+        -er : 1ère conjugaison
+        -ir : 2ème
+        divers : 3ème
+        négatif : verbe entre les 2 parties de la négation. Si auxiliaire : c'est lui qui s'intercale. infinitif : négation avat sauf au choix pour avoir et être.
+        interrogatif : est-ce que + S + V ... : directe : V S (inversion) avec possible de -t- si voyelle. 
+        Les 2 (? + neg) : les 2 parties de la neg encadrent le V S.
+        1               2               3
+        je parle        je finis        je prends
+        tu parles       tu finis        tu prends
+        il parle        il finit        il prend
+        nous parlons    nous finissons  nous prenons
+        vous parlez     vous finissez   vous prenez
+        ils parlent     ils finissent   ils prennent
+        
+        Modes (7)
+            indicatif       pers    action / état réels certains généraux
+            subjonctif      pers    principale -> intention (désirée, envisagée, douteuse). subordonnée -> concordance par rapport à la principale
+            impératif       pers    ordre / défense, conseil, souhait, opposition, prière
+                présent : ordre, demande, défense portant sur le présent ou l'avenir / condition (accepte et je me rends)
+                passé : ordre ou défense qui devra être suivi dans l'avenir : soyez prêts demain.
+            conditionnel    pers    action / état dépendant de conditions éventuelles
+            infinitif       impers  peut avoir fct de nom. Action sans indication de nombre ni de personne.
+            participe       impers  verbe ou adjectif
+            gérondif        impers  indique une circonstance, fct d'averbe (en marchant)
+        
+    2 Questions
+        La pluie tombre dru (adv) vs Nous vivions tranquille (adj attr S)
+        Pierre agit en ingrat (adj attr S) vs Pierre joue avec malice (CC de manière)
+        
+        Il est très sensible à vos compliments et il en est fier.
+        en = vos compliments
+        
+    Défauts
+        Pas d'Index
+        Pas de gérondif dans les modes
+        Pas de Lexique explicatif
+        
+    Liens
+        http://fr.wikipedia.org/wiki/Syntaxe_du_nom_en_fran%C3%A7ais
+            Certains CC ont cependant un caractère obligatoire :
+                Je vais à Paris.
+                Le CC de lieu « à Paris » ne peut être supprimé sous peine d'obtenir une phrase asémantique (« Je vais »).
+        http://www.scribd.com/doc/36920999/Langue-Francaise-Grammaire-Francaise-Complete
+            Le livre complet de 1961 !!
+        gg: comment faire la différence entre un complément circonstanciel ou attribut ?
+        http://forums-enseignants-du-primaire.com/topic/183010-cm-complement-dobjet-et-attribut-du-sujet/ : FAUX ! à Paris = CC.
+        Sites supers :
+        http://www.aidenet.eu/homo_leur.htm
+        
