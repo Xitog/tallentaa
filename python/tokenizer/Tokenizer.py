@@ -181,9 +181,10 @@ def tokenize():
             elif c == '\0':
                 pass # ????
             else:
-                print 'Forbidden character: [%s]' % (str(c),)
-                print c == '\0'
-                print curr
+                #print 'Forbidden character: [%s]' % (str(c),)
+                #print c == '\0'
+                #print curr
+                raise Exception('Forbidden character: [%s]' % (str(c),))
         elif state == LexerState.id:
             if (is_char(c) or is_digit(c) or c == '_') or (c == '@' and len(curr) == 1):
                 curr.append(c)
@@ -380,6 +381,52 @@ def xxparse(tokens):
         elif n.kind != 'empty':
             master = Node(kind='suite', subkind='statement', left=master, right=n)
     return master
+
+#----------------------------
+# Another way to see blocks.
+#----------------------------
+
+class Block:
+    def __init__(self, _mother, _father, _type, _start, _end=None, _subtype = None):
+        self._start = _start
+        self._end = _end
+        self._type = _type
+        self._subtype = None
+        self._mother = _mother
+        self._father = _father
+        if _end is None:
+            init()
+        
+    def init(self):
+        get_end()
+    
+    def get_end(self):
+        pass
+    
+class SelectBlock(Block):
+    def __init__(self, _mother, _father, _subtype, _start, _end=None, _then=None, _else=None):
+        Block.__init__(self, _mother, _father, 'selection', _start, _end, _subtype)
+        self._then = _then
+        self._else = _else
+    
+    def init(self):
+        pass
+    
+    def get_end(self):
+        pass
+
+class IterBlock(Block):
+    def __init__(self, _mother, _father, _subtype, _start, _end=None, _do=None):
+        Block.__init__(self, _mother, _father, 'iteration', _start, _end, _subtype)
+        self._do = _do
+
+def make_block(tokens):
+    if tokens[0] in ['if', 'unless']:
+        b = SelectBlock(tokens, None, tokens[0], 0)
+
+#---------------------------
+# Old way
+#---------------------------
 
 def identify_block(tokens):
     #print '--- identify_block ---'
@@ -1330,13 +1377,25 @@ def com_keywords():
     for k in all_keywords:
         print '\t', k
 
-def com_help():
+def com_help(*args):
     global commands
-    print len(commands), 'commands:'
-    keys = commands.keys()
-    keys.sort()
-    for k in keys:
-        print '\t', k
+    if len(args)<=1:
+        print len(commands), 'commands:'
+        keys = commands.keys()
+        keys.sort()
+        for k in keys:
+            print '\t', k
+    elif args[1] == 'if':
+        print 'Syntax: if <condition> then <actions> end'
+        print 'Execute <actions> if <condition> is true.'
+        print 'See also: unless'
+    elif args[1] == 'unless':
+        print 'Syntax: unless <condition> then <actions> end'
+        print 'Execute <actions> if <conditions> is false.'
+        print 'unless = if not'
+        print 'See also: if'
+    else:
+        print 'no help for', args[1]
 
 def com_tests():
     all_tests()
@@ -1356,12 +1415,17 @@ if console:
     print '+- Enter code or type help for more information.'
     while command != 'exit':
         command = raw_input('>>> ') # +->
-        if not(command in commands):
-            r = interpreter.do_string(command, stack, scope)
-            print r
-            scope['_'] = r
+        if not(command in commands) and not(command.split(' ')[0] in commands):
+            try:
+                r = interpreter.do_string(command, stack, scope)
+                print r
+                scope['_'] = r
+            except Exception as e:
+                print e
         elif command in commands:
             commands[command]()
+        elif command.split(' ')[0] in commands:
+            commands[command.split(' ')[0]](*command.split(' '))
 
 print '+- Goodbye!'
 print
