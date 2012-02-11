@@ -560,7 +560,7 @@ class Parser:
                 else:
                     end -= 1
                 if deb == end:
-                    n = make_ast([tokens[deb]])
+                    n = self.make_ast([tokens[deb]])
                     del tokens[end+1]
                     del tokens[deb-1]
                 elif deb == end+1:
@@ -577,7 +577,7 @@ class Parser:
                         if debug:
                             print 'www', tokens[i], tokens[i] in tokens[sub:i]
                         if isinstance(tokens[i], Token) and tokens[i].val in [',',')']:
-                            n = Node(kind='suite', subkind='sequence', subsubkind='(', left=make_ast(tokens[sub:i]), right=n)
+                            n = Node(kind='suite', subkind='sequence', subsubkind='(', left=self.make_ast(tokens[sub:i]), right=n)
                             sub = i+1 # DERNIER BUG. PASSER DE VIRG EN VIRG
                         i+=1
                     
@@ -660,6 +660,10 @@ class XFUN(object):
                 print 'param', p
         self.ret = ret
         self.ast = ast
+    
+    def __str__(self):
+        return '%s/%d' % (self.name, len(self.par))
+    
     def xcall(self, interpreter, scope, par): #*par_lst, **par_dic):
         xscope = scope.copy()
         # la faire le mix des param (par) dans xscope
@@ -1203,6 +1207,9 @@ if tests:
 # Interactive Console
 #-----------------------------------------------------------------------
 
+import sys
+import os
+
 # Console On
 console = True
 
@@ -1226,11 +1233,17 @@ def com_help(*args):
         print 'Syntax: if <condition> then <actions> end'
         print 'Execute <actions> if <condition> is true.'
         print 'See also: unless'
+        print 'Alternative: do can be replaced by a new line.'
     elif args[1] == 'unless':
         print 'Syntax: unless <condition> then <actions> end'
         print 'Execute <actions> if <conditions> is false.'
         print 'unless = if not'
         print 'See also: if'
+        print 'Alternative: do can be replaced by a new line.'
+    elif args[1] == 'fun':
+        print 'Syntax: fun <name> (<parameter list>) do <actions> end'
+        print 'Store <actions> in order be called later under the name <name>.'
+        print 'Alternative: do can be replaced by a new line.'
     else:
         print 'no help for', args[1]
 
@@ -1238,7 +1251,6 @@ def com_tests():
     all_tests()
 
 def com_clear():
-    import os
     os.system('cls')
 
 def com_exit():
@@ -1265,11 +1277,27 @@ command = ''
 previous = ''
 commands = { 'keywords' : com_keywords, 'help' : com_help, 'exit' : com_exit, 'tests' : com_tests, 'clear' : com_clear, 'tokens' : com_tokens, 'blocks' : com_blocks}
 
+def clos(command):
+    t = Tokenizer()
+    tokens = t.parse(command)
+    if tokens[0].val == 'help': return True
+    cdeb = 0
+    cend = 0
+    for t in tokens:
+        if t.val in ['if','unless','while','until','fun']:
+            cdeb+=1
+        elif t.val == 'end':
+            cend+=1
+    return cdeb == cend
+    
 if console:
-    print '+- Welcom to Pypo 0.1'
+    ver = sys.version_info
+    print '+- Welcome to Pypo 0.1 on Python %i.%i' % (ver[0], ver[1])
     print '+- Enter code or type help for more information.'
     while command != 'exit':
         command = raw_input('>>> ') # +->
+        while not clos(command):
+            command += '\n' + raw_input('... ')
         if not(command in commands) and not(command.split(' ')[0] in commands):
             try:
                 r = interpreter.do_string(command, stack, scope)
