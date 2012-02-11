@@ -98,423 +98,528 @@ class Token:
     def __str__(self):
         return 'Token: %s : %s' % (self.val, self.kind)
 
-s = ' '
-escape = False
-state = 'start'
-i = 0
-c = s[i]
-curr = []
-tokens = []
-
-def restart():
-    global s, curr, tokens, c, i, state, escape
-    escape = False
-    state = 'start'
-    i = 0
-    if len(s) > 0:
-        c = s[i]
-    else:
-        c = '\0'
-    curr = []
-    tokens = []
-
-def next():
-    global s, i, c, escape
-    i+=1
-    if i < len(s):
-        c = s[i]
-    else:
-        c = '\0'
-
-def token(t):
-    global curr, state
-    #print 'Token!', ''.join(curr), 'of type', t
-    tokens.append(Token(t, ''.join(curr)))
-    curr = []
-    state = LexerState.start
-
-def tokenize():
-    global s, curr, tokens, c, i, state, escape, debug
+class Tokenizer:
+    def __init__(self):
+        self.restart()
     
-    while not escape:
-        #print curr
-        if c == '\0': # last turn
-            escape = True
-        if state == LexerState.start:
-            if is_char(c) or c == '$' or c == '@' or c == '_':
-                state = LexerState.id
-                #
-                curr.append(c)
-                next()
-            elif is_digit(c):
-                state = LexerState.integer
-                #
-                curr.append(c)
-                next()
-            elif c == '"':
-                state = LexerState.string
-                #
-                #curr.append(c)
-                next()
-            elif c == '.': # '.' can be for a float or an operator
-                state = LexerState.float
-                #
-                curr.append(c)
-                next()
-            elif is_ops_char(c):
-                state = LexerState.operator
-                #
-                curr.append(c)
-                next()
-            elif is_sep_char(c):
-                curr.append(c)
-                next()
-                token(TokenType.separator)
-            elif c == '#':
-                end = False
-                while (not escape) and (not end):
-                    next()
-                    if c == ';' or c == '\n':
-                        end = True
-            elif is_silent(c):
-                next()
-            elif c == '\0':
-                pass # ????
-            else:
-                #print 'Forbidden character: [%s]' % (str(c),)
-                #print c == '\0'
-                #print curr
-                raise Exception('Forbidden character: [%s]' % (str(c),))
-        elif state == LexerState.id:
-            if (is_char(c) or is_digit(c) or c == '_') or (c == '@' and len(curr) == 1):
-                curr.append(c)
-                next()
-            else:
-                #print '>>> [', ''.join(curr), ']', is_boolean(''.join(curr))
-                if is_keyword(''.join(curr)):
-                    token(TokenType.keyword)
-                elif is_boolean(''.join(curr)):
-                    token(TokenType.boolean)
-                else:
-                    token(TokenType.id)
-        elif state == LexerState.integer:
-            if is_digit(c):
-                curr.append(c)
-                next()
-            elif curr == ['0'] and (c == 'x' or c == 'X'):
-                state = LexerState.hexa
-                curr.append(c)
-                next()
-            elif curr == ['0'] and (c == 'c' or c == 'C'):
-                state = LexerState.octal
-                curr.append(c)
-                next()
-            elif curr == ['0'] and (c == 'b' or c == 'B'):
-                state = LexerState.bin
-                curr.append(c)
-                next()
-            elif c == '.':
-                state = LexerState.float
-                curr.append(c)
-                next()
-            else:
-                token(TokenType.integer)
-        elif state == LexerState.float:
-            if is_digit(c):
-                curr.append(c)
-                next()
-            elif len(curr) == 1: # We have a lonely '.'
-                token(TokenType.operator)        
-            else:
-                token(TokenType.float)
-        elif state == LexerState.octal:
-            if is_octaldigit(c):
-                curr.append(c)
-                next()
-            elif is_hexadigit(c):
-                raise Exception("Mismatched integer")
-            else:
-                token(TokenType.integer)
-        elif state == LexerState.bin:
-            if is_bindigit(c):
-                curr.append(c)
-                next()
-            elif is_hexadigit(c):
-                raise Exception("Mismatched integer")
-            else:
-                token(TokenType.integer)
-        elif state == LexerState.hexa:
-            if is_hexadigit(c):
-                curr.append(c)
-                next()
-            elif is_char(c):
-                raise Exception("Mismatched integer")
-            else:
-                token(TokenType.integer)
-        elif state == LexerState.operator:
-            if is_ops_char(c) and is_operator((''.join(curr))+c):
-                curr.append(c)
-                next()
-            else:
-                token(TokenType.operator)
-        elif state == LexerState.string:
-            if c != '"' and (len(curr) < 2 or curr[len(curr)-1] != '\\'):
-                curr.append(c)
-                next()
-            else:
-                next()
-                token(TokenType.string)
-
-    curr = ['eof']
-    token(TokenType.eof)
-
-    if debug:
-        print('\nTokens\n')
-    
-        i=0
-        for t in tokens:
-            print i, '.', t
-            i+=1
-    
-        print('\nNb: '+str(len(tokens)))
-
-#-----------------------------------------------------------------------
-# Parser
-#-----------------------------------------------------------------------
-
-# tokens -> AST
-
-if debug:
-    print('\nParser\n')
-
-def xxparse(tokens):
-    #print '--- big xxparse---'
-    
-    blocks = identify_block(tokens)
-    #
-    if len(blocks) == 0:
-        print '********* ERROR *********'
-        for t in tokens:
-            print t
-        print 'Nothing found'
-    #
-    n = None
-    master = None
-    for b in blocks:
-        if b['type'] in ['if', 'unless']:
-            sel_cond = make_ast(tokens[b['start']+1:b['middle']])
-            sel_action = xxparse(tokens[b['middle']+1:b['end']])
-            n = Node(kind='if', cond=sel_cond, action=sel_action, invert=(b['type'] == 'unless'))
-        elif b['type'] in ['while', 'until']:
-            iter_cond = make_ast(tokens[b['start']+1:b['middle']])
-            iter_action = xxparse(tokens[b['middle']+1:b['end']])
-            n = Node(kind='while', cond=iter_cond, action=iter_action, invert=(b['type'] == 'until'))
-        elif b['type'] == 'expression':
-            if b['start'] > b['end']: # puree un bug ici. >= au lieu de >
-                n = Node(kind='empty')
-            else:
-                ###
-                if debug:
-                    print 'tokens'
-                    i = 0
-                    for tt in tokens:
-                        print i, tt, tt in tokens[b['start']:b['end']+1]
-                        i+=1
-                    print b['start'], b['end']
-                n = make_ast(tokens[b['start']:b['end']+1])
-        elif b['type'] in ['{', '[']: # '(', 
-            if b['start'] > b['end']:
-                n = Node(kind='suite', subkind='sequence', subsubkind=b['type'], left=None, right=None)
-            else:
-                r = None
-                i = b['start']
-                end_i = i
-                while i <= b['end']:
-                    while tokens[end_i].val != ',' and end_i <= b['end']:
-                        if debug:
-                            print end_i
-                        end_i += 1
-                    if tokens[end_i].val in [',',']','}']: # ')',
-                        n = make_ast(tokens[i:end_i])
-                    else:
-                        n = make_ast(tokens[i:end_i+1])
-                    i = end_i + 1
-                    end_i = i
-                    if r is None:
-                        r = Node(kind='suite', subkind='sequence', subsubkind=b['type'], left=n, right=None)
-                    else:
-                        r = Node(kind='suite', subkind='sequence', subsubkind=b['type'], left=n, right=r)
-                n = r
-        elif b['type'] == 'empty':
-            n = Node(kind='empty')
-        elif b['type'] == 'break':
-            n = Node(kind='break')
-        elif b['type'] == 'fun':
-            
-            x = b['start']
-            deb_par = 0
-            end_par = 0
-            while x < b['middle']:
-                if tokens[x].val == '(':
-                    deb_par = x
-                elif tokens[x].val == ')':
-                    end_par = x
-                x += 1
-            
-            i=0
-            for tt in tokens[deb_par:end_par+1]:
-                if debug:
-                    print 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', i, tt
-                i+=1
-            
-            #print 'ZEEEEEEMBLA', deb_par, end_par
-            
-            if end_par > deb_par:
-                fun_param = make_ast(tokens[deb_par:end_par+1])
-            else:
-                fun_param = Node(kind='empty')
-            fun_ret = None
-            fun_action = xxparse(tokens[b['middle']+1:b['end']])
-            n = Node(kind='fun', name=tokens[b['start']+1].val, param=fun_param, ret=fun_ret, action=fun_action)
-        if master is None:
-            master = Node(kind='suite', subkind='statement', left=n, right=None)
-        elif n.kind != 'empty':
-            master = Node(kind='suite', subkind='statement', left=master, right=n)
-    return master
-
-#----------------------------
-# Another way to see blocks.
-#----------------------------
-
-class Block:
-    def __init__(self, _mother, _father, _type, _start, _end=None, _subtype = None):
-        self._start = _start
-        self._end = _end
-        self._type = _type
-        self._subtype = None
-        self._mother = _mother
-        self._father = _father
-        if _end is None:
-            init()
+    def restart(self):
+        self.text = ''
+        self.tokens = []
+        self.curr = []
+        self.state = 'start'
         
-    def init(self):
-        get_end()
-    
-    def get_end(self):
-        pass
-    
-class SelectBlock(Block):
-    def __init__(self, _mother, _father, _subtype, _start, _end=None, _then=None, _else=None):
-        Block.__init__(self, _mother, _father, 'selection', _start, _end, _subtype)
-        self._then = _then
-        self._else = _else
-    
-    def init(self):
-        pass
-    
-    def get_end(self):
-        pass
-
-class IterBlock(Block):
-    def __init__(self, _mother, _father, _subtype, _start, _end=None, _do=None):
-        Block.__init__(self, _mother, _father, 'iteration', _start, _end, _subtype)
-        self._do = _do
-
-def make_block(tokens):
-    if tokens[0] in ['if', 'unless']:
-        b = SelectBlock(tokens, None, tokens[0], 0)
-
-#---------------------------
-# Old way
-#---------------------------
-
-def identify_block(tokens):
-    #print '--- identify_block ---'
-    block_mode = 'start'
-    level = 0
-    start = 0
-    middle = -1
-    blocks = []
-    i = 0
-    while i < len(tokens):
-        t = tokens[i]
-        if block_mode == 'start':
-            if t.val in ['if', 'while', 'until', 'unless', 'fun']:
-                block_mode = t.val
-                level = 1
-                start = i
-            elif t.val in ['break']:
-                block_mode = t.val
-                start = i
-            elif t.kind in [TokenType.id, TokenType.float, TokenType.integer, TokenType.string, TokenType.boolean] or t.val == '(' or t.val == '-':
-                block_mode = 'expression'
-                start = i
-            elif t.val in ['{', '[']: #'(', 
-                block_mode = t.val
-                level = 1
-                start = i
-            elif t.kind == TokenType.eof:
-                blocks.append({'type' : 'empty', 'start' : i, 'end' : i})
-                break
-        elif block_mode in ['if', 'while', 'until', 'unless']:
-            if t.val in ['if', 'while', 'until', 'unless']:
-                level += 1
-            elif middle == -1 and block_mode in ['if', 'unless'] and (t.val == 'then' or t.val == '\n'):
-                middle = i
-            elif middle == -1 and block_mode in ['while', 'until'] and (t.val == 'do' or t.val == '\n'):
-                middle = i
-            elif t.val == 'end':
-                level -= 1
-            if level == 0:
-                blocks.append({'type' : block_mode, 'start' : start, 'end' : i, 'middle' : middle})
-                block_mode = 'start'
-                middle = -1
-        elif block_mode == 'fun':
-            if t.val in ['if', 'while', 'until', 'unless']:
-                level += 1
-            elif middle == -1 and (t.val == 'do' or t.val == '\n'):
-                middle = i
-            elif t.val == 'end':
-                level -= 1
-            if level == 0:
-                blocks.append({'type' : block_mode, 'start' : start, 'end' : i, 'middle' : middle})
-                block_mode = 'start'
-                middle = -1
-        elif block_mode in ['{', '[']: # '(', (block_mode == '(' and t.val == ')')
-            if t.val == block_mode:
-                level += 1
-            elif (block_mode == '{' and t.val == '}') or (block_mode == '[' and t.val == ']'):
-                level -= 1
-            if level == 0:
-                blocks.append({'type' : block_mode, 'start' : start+1, 'end' : i-1})
-                block_mode = 'start'
-        if block_mode == 'expression':
-            if t.kind == TokenType.eof or t.val == ';' or t.val == '\n' or i == len(tokens)-1:
-                if i == len(tokens)-1: # and len(tokens) == 1:
-                    blocks.append({'type' : block_mode, 'start' : start, 'end' : i})
-                else:
-                    blocks.append({'type' : block_mode, 'start' : start, 'end' : i-1})
-                block_mode = 'start'
-        elif block_mode == 'break':
-            if t.val in [';', '\n'] or i == len(tokens)-1:
-                blocks.append({'type' : block_mode, 'start' : start, 'end' : i})
-                block_mode = 'start'
-        
+    def next(self, i):        
         i+=1
+        if i < len(self.text):
+            c = self.text[i]
+        else:
+            c = '\0'
+        return (i,c)
     
-    #print 'blocks'
-    #i=0
-    #for b in blocks:
-    #    i = 0
-    #    for t in tokens:
-    #        print '\t', i, t
-    #        i += 1
-    #    if 'middle' in b:
-    #        print b['type'], b['start'], b['middle'], b['end']
-    #    else:
-    #        print b['type'], b['start'], b['end']
+    def token(self, typ):
+        self.tokens.append(Token(typ, ''.join(self.curr)))
+        self.curr = []
+        self.state = LexerState.start
     
-    return blocks
+    def parse(self, s):
+        self.text = s
+        
+        escape = False
+        i = 0
+        if len(s) > 0:
+            c = s[i]
+        else:
+            c = '\0'
+        
+        while not escape:
+            if c == '\0': # last turn
+                escape = True
+            if self.state == LexerState.start:
+                if is_char(c) or c == '$' or c == '@' or c == '_':
+                    self.state = LexerState.id
+                    #
+                    self.curr.append(c)
+                    i, c = self.next(i)
+                elif is_digit(c):
+                    self.state = LexerState.integer
+                    #
+                    self.curr.append(c)
+                    i, c = self.next(i)
+                elif c == '"':
+                    self.state = LexerState.string
+                    i, c = self.next(i)
+                elif c == '.': # '.' can be for a float or an operator
+                    state = LexerState.float
+                    self.curr.append(c)
+                    i, c = self.next(i)
+                elif is_ops_char(c):
+                    self.state = LexerState.operator
+                    #
+                    self.curr.append(c)
+                    i, c = self.next(i)
+                elif is_sep_char(c):
+                    self.curr.append(c)
+                    i, c = self.next(i)
+                    self.token(TokenType.separator)
+                elif c == '#':
+                    end = False
+                    while (not escape) and (not end):
+                        i, c = self.next(i)
+                        if c == ';' or c == '\n':
+                            end = True
+                elif is_silent(c):
+                    i, c = self.next(i)
+                elif c == '\0':
+                    pass # ????
+                else:
+                    raise Exception('Forbidden character: [%s]' % (str(c),))
+            elif self.state == LexerState.id:
+                if (is_char(c) or is_digit(c) or c == '_') or (c == '@' and len(self.curr) == 1):
+                    self.curr.append(c)
+                    i, c = self.next(i)
+                else:
+                    #print '>>> [', ''.join(curr), ']', is_boolean(''.join(curr))
+                    if is_keyword(''.join(self.curr)):
+                        self.token(TokenType.keyword)
+                    elif is_boolean(''.join(self.curr)):
+                        self.token(TokenType.boolean)
+                    else:
+                        self.token(TokenType.id)
+            elif self.state == LexerState.integer:
+                if is_digit(c):
+                    self.curr.append(c)
+                    i, c = self.next(i)
+                elif self.curr == ['0'] and (c == 'x' or c == 'X'):
+                    self.state = LexerState.hexa
+                    self.curr.append(c)
+                    i, c = self.next(i)
+                elif self.curr == ['0'] and (c == 'c' or c == 'C'):
+                    self.state = LexerState.octal
+                    self.curr.append(c)
+                    i, c = self.next(i)
+                elif self.curr == ['0'] and (c == 'b' or c == 'B'):
+                    self.state = LexerState.bin
+                    self.curr.append(c)
+                    i, c = self.next(i)
+                elif c == '.':
+                    self.state = LexerState.float
+                    self.curr.append(c)
+                    i, c = self.next(i)
+                else:
+                    self.token(TokenType.integer)
+            elif self.state == LexerState.float:
+                if is_digit(c):
+                    self.curr.append(c)
+                    i, c = self.next(i)
+                elif len(self.curr) == 1: # We have a lonely '.'
+                    self.token(TokenType.operator)        
+                else:
+                    self.token(TokenType.float)
+            elif self.state == LexerState.octal:
+                if is_octaldigit(c):
+                    self.curr.append(c)
+                    i, c = self.next(i)
+                elif is_hexadigit(c):
+                    raise Exception("Mismatched integer")
+                else:
+                    self.token(TokenType.integer)
+            elif self.state == LexerState.bin:
+                if is_bindigit(c):
+                    self.curr.append(c)
+                    i, c = self.next(i)
+                elif is_hexadigit(c):
+                    raise Exception("Mismatched integer")
+                else:
+                    self.token(TokenType.integer)
+            elif self.state == LexerState.hexa:
+                if is_hexadigit(c):
+                    self.curr.append(c)
+                    i, c = self.next(i)
+                elif is_char(c):
+                    raise Exception("Mismatched integer")
+                else:
+                    self.token(TokenType.integer)
+            elif self.state == LexerState.operator:
+                if is_ops_char(c) and is_operator((''.join(self.curr))+c):
+                    self.curr.append(c)
+                    i, c = self.next(i)
+                else:
+                    self.token(TokenType.operator)
+            elif self.state == LexerState.string:
+                if c != '"' and (len(self.curr) < 2 or self.curr[len(self.curr)-1] != '\\'):
+                    self.curr.append(c)
+                    i, c = self.next(i)
+                else:
+                    i, c = self.next(i)
+                    self.token(TokenType.string)
+    
+        self.curr = ['eof']
+        self.token(TokenType.eof)
+        
+        return self.tokens
+        
+#-----------------------------------------------------------------------
+# Parser (from tokens[] to Ast)
+#-----------------------------------------------------------------------
+
+class Parser:
+    def __init__(self):
+        pass
+    
+    def parse(self, tokens, debug=False):
+        blocks = self.identify_block(tokens)
+        if debug:
+            for b in blocks:
+                print b
+        n = None
+        master = None
+        for b in blocks:
+            if b['type'] in ['if', 'unless']:
+                sel_cond = self.make_ast(tokens[b['start']+1:b['middle']])
+                sel_action = self.parse(tokens[b['middle']+1:b['end']])
+                n = Node(kind='if', cond=sel_cond, action=sel_action, invert=(b['type'] == 'unless'))
+            elif b['type'] in ['while', 'until']:
+                iter_cond = self.make_ast(tokens[b['start']+1:b['middle']])
+                iter_action = self.parse(tokens[b['middle']+1:b['end']])
+                n = Node(kind='while', cond=iter_cond, action=iter_action, invert=(b['type'] == 'until'))
+            elif b['type'] == 'expression':
+                if b['start'] > b['end']:
+                    n = Node(kind='empty')
+                else:
+                    if debug:
+                        print 'tokens'
+                        i = 0
+                        for tt in tokens:
+                            print i, tt, tt in tokens[b['start']:b['end']+1]
+                            i+=1
+                        print b['start'], b['end']
+                    n = self.make_ast(tokens[b['start']:b['end']+1])
+            elif b['type'] in ['{', '[']: # '(', 
+                if b['start'] > b['end']:
+                    n = Node(kind='suite', subkind='sequence', subsubkind=b['type'], left=None, right=None)
+                else:
+                    r = None
+                    i = b['start']
+                    end_i = i
+                    while i <= b['end']:
+                        while tokens[end_i].val != ',' and end_i <= b['end']:
+                            if debug:
+                                print end_i
+                            end_i += 1
+                        if tokens[end_i].val in [',',']','}']: # ')',
+                            n = self.make_ast(tokens[i:end_i])
+                        else:
+                            n = self.make_ast(tokens[i:end_i+1])
+                        i = end_i + 1
+                        end_i = i
+                        if r is None:
+                            r = Node(kind='suite', subkind='sequence', subsubkind=b['type'], left=n, right=None)
+                        else:
+                            r = Node(kind='suite', subkind='sequence', subsubkind=b['type'], left=n, right=r)
+                    n = r
+            elif b['type'] == 'empty':
+                n = Node(kind='empty')
+            elif b['type'] == 'break':
+                n = Node(kind='break')
+            elif b['type'] == 'fun':
+                x = b['start']
+                deb_par = 0
+                end_par = 0
+                while x < b['middle']:
+                    if tokens[x].val == '(':
+                        deb_par = x
+                    elif tokens[x].val == ')':
+                        end_par = x
+                    x += 1
+                i=0
+                for tt in tokens[deb_par:end_par+1]:
+                    if debug:
+                        print 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', i, tt
+                    i+=1
+                if end_par > deb_par:
+                    fun_param = self.make_ast(tokens[deb_par:end_par+1])
+                else:
+                    fun_param = Node(kind='empty')
+                fun_ret = None
+                fun_action = self.parse(tokens[b['middle']+1:b['end']])
+                n = Node(kind='fun', name=tokens[b['start']+1].val, param=fun_param, ret=fun_ret, action=fun_action)
+            if master is None:
+                master = Node(kind='suite', subkind='statement', left=n, right=None)
+            elif n.kind != 'empty':
+                master = Node(kind='suite', subkind='statement', left=master, right=n)
+        return master
+    
+    def identify_block(self, tokens):
+        block_mode = 'start'
+        level = 0
+        start = 0
+        middle = -1
+        blocks = []
+        i = 0
+        while i < len(tokens):
+            t = tokens[i]
+            if block_mode == 'start':
+                if t.val in ['if', 'while', 'until', 'unless', 'fun']:
+                    block_mode = t.val
+                    level = 1
+                    start = i
+                elif t.val in ['break']:
+                    block_mode = t.val
+                    start = i
+                elif t.kind in [TokenType.id, TokenType.float, TokenType.integer, TokenType.string, TokenType.boolean] or t.val == '(' or t.val == '-':
+                    block_mode = 'expression'
+                    start = i
+                elif t.val in ['{', '[']: #'(', 
+                    block_mode = t.val
+                    level = 1
+                    start = i
+                elif t.kind == TokenType.eof:
+                    blocks.append({'type' : 'empty', 'start' : i, 'end' : i})
+                    break
+            elif block_mode in ['if', 'while', 'until', 'unless']:
+                if t.val in ['if', 'while', 'until', 'unless']:
+                    level += 1
+                elif middle == -1 and block_mode in ['if', 'unless'] and (t.val == 'then' or t.val == '\n'):
+                    middle = i
+                elif middle == -1 and block_mode in ['while', 'until'] and (t.val == 'do' or t.val == '\n'):
+                    middle = i
+                elif t.val == 'end':
+                    level -= 1
+                if level == 0:
+                    blocks.append({'type' : block_mode, 'start' : start, 'end' : i, 'middle' : middle})
+                    block_mode = 'start'
+                    middle = -1
+            elif block_mode == 'fun':
+                if t.val in ['if', 'while', 'until', 'unless']:
+                    level += 1
+                elif middle == -1 and (t.val == 'do' or t.val == '\n'):
+                    middle = i
+                elif t.val == 'end':
+                    level -= 1
+                if level == 0:
+                    blocks.append({'type' : block_mode, 'start' : start, 'end' : i, 'middle' : middle})
+                    block_mode = 'start'
+                    middle = -1
+            elif block_mode in ['{', '[']: # '(', (block_mode == '(' and t.val == ')')
+                if t.val == block_mode:
+                    level += 1
+                elif (block_mode == '{' and t.val == '}') or (block_mode == '[' and t.val == ']'):
+                    level -= 1
+                if level == 0:
+                    blocks.append({'type' : block_mode, 'start' : start+1, 'end' : i-1})
+                    block_mode = 'start'
+            if block_mode == 'expression':
+                if t.kind == TokenType.eof or t.val == ';' or t.val == '\n' or i == len(tokens)-1:
+                    if i == len(tokens)-1: # and len(tokens) == 1:
+                        blocks.append({'type' : block_mode, 'start' : start, 'end' : i})
+                    else:
+                        blocks.append({'type' : block_mode, 'start' : start, 'end' : i-1})
+                    block_mode = 'start'
+            elif block_mode == 'break':
+                if t.val in [';', '\n'] or i == len(tokens)-1:
+                    blocks.append({'type' : block_mode, 'start' : start, 'end' : i})
+                    block_mode = 'start'
+            
+            i+=1
+        
+        #print 'blocks'
+        #i=0
+        #for b in blocks:
+        #    i = 0
+        #    for t in tokens:
+        #        print '\t', i, t
+        #        i += 1
+        #    if 'middle' in b:
+        #        print b['type'], b['start'], b['middle'], b['end']
+        #    else:
+        #        print b['type'], b['start'], b['end']
+        
+        return blocks
+    
+    def clear(self, tokens):
+        i = 0
+        while i < len(tokens)-1:
+            actual = tokens[i].val
+            next = tokens[i+1].val
+            
+            if actual == 'then' and next == '\n':
+                del tokens[i+1]
+            elif actual == '\n' and next == '\n':
+                del tokens[i+1]
+            elif actual == ';' and next == ';':
+                del tokens[i+1]
+            elif actual == ';' and next == '\n':
+                del tokens[i+1]
+            elif actual == '\n' and next == ';':
+                del tokens[i+1]
+            elif actual == 'end' and next == '\n':
+                del tokens[i+1]
+            elif actual == 'end' and next == ';':
+                del tokens[i+1]
+            elif actual == '\n' and next == 'end':
+                del tokens[i]
+            elif actual == ';' and next == 'end':
+                del tokens[i]
+            else:
+                i += 1
+        
+        if  len(tokens) == 2: # eof + whatever
+            if tokens[0].val in ['\n', ';']:
+                del tokens[0]
+
+    def make_ast(self, tokens):
+        ###
+        if debug:
+            print 'make_ast'
+            i=0
+            for t in tokens:
+                print 'make_ast', i, t
+                i+=1
+        
+        if len(tokens) < 1:
+            raise Exception("Empty token list")
+        #elif len(tokens) == 1 and tokens.kind == TokenType.eof: # only eof inside
+        #    tokens[0] = Node(kind='empty')
+        
+        prio = {
+            '->':  1, '=' :  1, '+=':  1, '-=':  1,
+            ',' : 1.5, '(': 2,
+            '==': 5, '!=': 5, '<' : 5, '<=': 5, '>' : 5, '>=': 5,
+            '-':6, '+':6, '*':7, '/':7, '//':7, '%':7, '**':7,
+            'unary_minus' : 8,
+            }
+        ts = {
+            TokenType.id : 'id', 
+            TokenType.integer : 'integer', 
+            TokenType.float : 'float', 
+            TokenType.boolean : 'boolean', 
+            TokenType.string : 'string' }
+        # Litterals and removing the last (if any)
+        i = 0
+        if debug:
+            for t in tokens:
+                print '#-#', t
+        while i < len(tokens):
+            t = tokens[i]
+            if t.kind in ts:
+                tokens[i] = Node(kind=ts[t.kind], val=t.val)
+            if t.kind == TokenType.eof:
+                del tokens[i]
+            #if isinstance(t, Token):
+            #    print '###', isinstance(t, Token), t.val, t.val == '-'
+            if isinstance(t, Token) and t.val == '-':
+                if i == 0 or tokens[i-1].kind in [TokenType.operator]:
+                    #print 'found one'
+                    t.val = 'unary_minus'
+            i+=1
+        while len(tokens) > 1:
+            i = 0
+            max = None
+            level_max = 1
+            level = 1
+            while i < len(tokens):
+                t = tokens[i]
+                if isinstance(t, Token):
+                    
+                    if t.val == '(':
+                        level *= 10
+                    elif t.val == ')':
+                        level /= 10
+                    if t.val in prio:
+                        if max is None or prio[tokens[max].val]*level_max < prio[t.val]*level:
+                            max = i
+                            level_max = level
+                i+=1
+            if not max is None and tokens[max].val == 'unary_minus':
+                n = Node(kind='unaop',op=tokens[max].val, arg=tokens[max+1])
+                tokens[max] = n
+                del tokens[max+1]
+            elif not max is None and tokens[max].val != '(':
+                n = Node(kind='binop',op=tokens[max].val,arg1=tokens[max-1],arg2=tokens[max+1])
+                tokens[max] = n
+                if len(tokens) <= max+1:
+                    raise Exception('Incorrect expr right')
+                if max == 0:
+                    raise Exception('Incorrect expr left')
+                del tokens[max+1]
+                del tokens[max-1]
+            elif not max is None and tokens[max].val == '(':
+                deb = max+1
+                end = deb
+                level = 1
+                while end < len(tokens) and level > 0:
+                    if isinstance(tokens[end], Token) and tokens[end].val == ')':
+                        level -= 1
+                    elif isinstance(tokens[end], Token) and tokens[end].val == '(':
+                        level += 1
+                        end += 1
+                    else:
+                        end += 1
+                if tokens[end].val != ')':
+                    raise Exception('Incorrect ()')
+                else:
+                    end -= 1
+                if deb == end:
+                    n = make_ast([tokens[deb]])
+                    del tokens[end+1]
+                    del tokens[deb-1]
+                elif deb == end+1:
+                    n = Node(kind='empty')
+                    tokens[deb] = n
+                    del tokens[deb-1]
+                else:
+                    if debug:
+                        print '%%%%%%%', end
+                    i = deb
+                    sub = deb # sub start
+                    n = None
+                    while i <= end+1:
+                        if debug:
+                            print 'www', tokens[i], tokens[i] in tokens[sub:i]
+                        if isinstance(tokens[i], Token) and tokens[i].val in [',',')']:
+                            n = Node(kind='suite', subkind='sequence', subsubkind='(', left=make_ast(tokens[sub:i]), right=n)
+                            sub = i+1 # DERNIER BUG. PASSER DE VIRG EN VIRG
+                        i+=1
+                    
+                    ii = end+1
+                    while ii > deb:
+                        if debug:
+                            print 'i delete', ii
+                        del tokens[ii]
+                        ii -= 1
+                    tokens[deb] = n
+                    del tokens[deb-1]
+                
+                # 'operator' 'separator' 'keyword' 'eof'
+                # Call 0028 unknown op
+                if max-1>=0:
+                    if isinstance(tokens[max-1], Node) and tokens[max-1].kind in ['integer', 'float', 'id', 'boolean', 'string']:
+                        n = Node(kind='binop', op='call', arg1=tokens[max-1],arg2=tokens[max])
+                        tokens[max-1] = n
+                        del tokens[max]
+                
+                if debug:
+                    print '------------'
+                    i=0
+                    for tt in tokens:
+                        print i, tt
+                        i+=1
+                    print '------------'
+                
+                    if len(tokens) == 1 and tokens[0].kind == 'binop':
+                        print 'op=', tokens[0].op
+                        if tokens[0].op == 'call':
+                            print tokens[0].arg1
+                            print tokens[0].arg2
+                            if tokens[0].arg2.kind == 'suite':
+                                print tokens[0].arg2.left
+                                print tokens[0].arg2.right
+            else:
+                print 'ALARMA'
+                for tt in tokens:
+                    print tt
+                raise Exception('Prio not found')
+        return tokens[0]
 
 class Node:
     def __init__(self, **kw):
@@ -527,251 +632,10 @@ class Node:
     def __str__(self):
         return 'node(%s)' % (self.kind,)
 
-#
-
-def clear():
-    global tokens
-    i = 0
-    while i < len(tokens)-1:
-        actual = tokens[i].val
-        next = tokens[i+1].val
-        
-        if actual == 'then' and next == '\n':
-            del tokens[i+1]
-        elif actual == '\n' and next == '\n':
-            del tokens[i+1]
-        elif actual == ';' and next == ';':
-            del tokens[i+1]
-        elif actual == ';' and next == '\n':
-            del tokens[i+1]
-        elif actual == '\n' and next == ';':
-            del tokens[i+1]
-        elif actual == 'end' and next == '\n':
-            del tokens[i+1]
-        elif actual == 'end' and next == ';':
-            del tokens[i+1]
-        elif actual == '\n' and next == 'end':
-            del tokens[i]
-        elif actual == ';' and next == 'end':
-            del tokens[i]
-        else:
-            i += 1
-    
-    if  len(tokens) == 2: # eof + whatever
-        if tokens[0].val in ['\n', ';']:
-            del tokens[0]
-    
-    #for t in tokens:
-    #    print 'cleared: ', t
-
-#
-
-def sub(subjects):
-    mod = 0
-    start = subjects[0]
-    i = 0
-    while i < len(subjects):
-        t = subjects[i]
-        if isinstance(t, Node):
-            i+=1
-            continue
-        if start.val == '(':
-            if t.val == '(':
-                mod += 1
-            elif t.val == ')':
-                mod -= 1
-                if mod == 0:
-                    break
-        elif start.val == '{':
-            if t.val == '{':
-                mod += 1
-            elif t.val == '}':
-                mod -= 1
-                if mod == 0:
-                    break
-        elif start.val == '[':
-            if t.val == '[':
-                mod += 1
-            elif t.val == ']':
-                mod -= 1
-                if mod == 0:
-                    break
-        elif start.val in ['while', 'for', 'class', 'fun', 'module', 'until', 'if']:
-            #print '>>', t.val
-            #print '>>', mod
-            if t.val in ['while', 'for', 'class', 'fun', 'module', 'until', 'if']:
-                mod += 1
-            elif t.val == 'end':
-                mod -= 1
-                if mod == 0:
-                    break
-        i+=1
-    r = subjects[1: i]
-    return r
-#
-
-def make_ast(tokens):
-    ###
-    if debug:
-        print 'make_ast'
-        i=0
-        for t in tokens:
-            print 'make_ast', i, t
-            i+=1
-    
-    if len(tokens) < 1:
-        raise Exception("Empty token list")
-    #elif len(tokens) == 1 and tokens.kind == TokenType.eof: # only eof inside
-    #    tokens[0] = Node(kind='empty')
-    
-    prio = {
-        '->':  1, '=' :  1, '+=':  1, '-=':  1,
-        ',' : 1.5, '(': 2,
-        '==': 5, '!=': 5, '<' : 5, '<=': 5, '>' : 5, '>=': 5,
-        '-':6, '+':6, '*':7, '/':7, '//':7, '%':7, '**':7,
-        'unary_minus' : 8,
-        }
-    ts = {
-        TokenType.id : 'id', 
-        TokenType.integer : 'integer', 
-        TokenType.float : 'float', 
-        TokenType.boolean : 'boolean', 
-        TokenType.string : 'string' }
-    # Litterals and removing the last (if any)
-    i = 0
-    if debug:
-        for t in tokens:
-            print '#-#', t
-    while i < len(tokens):
-        t = tokens[i]
-        if t.kind in ts:
-            tokens[i] = Node(kind=ts[t.kind], val=t.val)
-        if t.kind == TokenType.eof:
-            del tokens[i]
-        #if isinstance(t, Token):
-        #    print '###', isinstance(t, Token), t.val, t.val == '-'
-        if isinstance(t, Token) and t.val == '-':
-            if i == 0 or tokens[i-1].kind in [TokenType.operator]:
-                #print 'found one'
-                t.val = 'unary_minus'
-        i+=1
-    while len(tokens) > 1:
-        i = 0
-        max = None
-        level_max = 1
-        level = 1
-        while i < len(tokens):
-            t = tokens[i]
-            if isinstance(t, Token):
-                
-                if t.val == '(':
-                    level *= 10
-                elif t.val == ')':
-                    level /= 10
-                if t.val in prio:
-                    if max is None or prio[tokens[max].val]*level_max < prio[t.val]*level:
-                        max = i
-                        level_max = level
-            i+=1
-        if not max is None and tokens[max].val == 'unary_minus':
-            n = Node(kind='unaop',op=tokens[max].val, arg=tokens[max+1])
-            tokens[max] = n
-            del tokens[max+1]
-        elif not max is None and tokens[max].val != '(':
-            n = Node(kind='binop',op=tokens[max].val,arg1=tokens[max-1],arg2=tokens[max+1])
-            tokens[max] = n
-            if len(tokens) <= max+1:
-                raise Exception('Incorrect expr right')
-            if max == 0:
-                raise Exception('Incorrect expr left')
-            del tokens[max+1]
-            del tokens[max-1]
-        elif not max is None and tokens[max].val == '(':
-            deb = max+1
-            end = deb
-            level = 1
-            while end < len(tokens) and level > 0:
-                if isinstance(tokens[end], Token) and tokens[end].val == ')':
-                    level -= 1
-                elif isinstance(tokens[end], Token) and tokens[end].val == '(':
-                    level += 1
-                    end += 1
-                else:
-                    end += 1
-            if tokens[end].val != ')':
-                raise Exception('Incorrect ()')
-            else:
-                end -= 1
-            if deb == end:
-                n = make_ast([tokens[deb]])
-                del tokens[end+1]
-                del tokens[deb-1]
-            elif deb == end+1:
-                n = Node(kind='empty')
-                tokens[deb] = n
-                del tokens[deb-1]
-            else:
-                if debug:
-                    print '%%%%%%%', end
-                i = deb
-                sub = deb # sub start
-                n = None
-                while i <= end+1:
-                    if debug:
-                        print 'www', tokens[i], tokens[i] in tokens[sub:i]
-                    if isinstance(tokens[i], Token) and tokens[i].val in [',',')']:
-                        n = Node(kind='suite', subkind='sequence', subsubkind='(', left=make_ast(tokens[sub:i]), right=n)
-                        sub = i+1 # DERNIER BUG. PASSER DE VIRG EN VIRG
-                    i+=1
-                
-                ii = end+1
-                while ii > deb:
-                    if debug:
-                        print 'i delete', ii
-                    del tokens[ii]
-                    ii -= 1
-                tokens[deb] = n
-                del tokens[deb-1]
-            
-            # 'operator' 'separator' 'keyword' 'eof'
-            # Call 0028 unknown op
-            if max-1>=0:
-                if isinstance(tokens[max-1], Node) and tokens[max-1].kind in ['integer', 'float', 'id', 'boolean', 'string']:
-                    n = Node(kind='binop', op='call', arg1=tokens[max-1],arg2=tokens[max])
-                    tokens[max-1] = n
-                    del tokens[max]
-            
-            if debug:
-                print '------------'
-                i=0
-                for tt in tokens:
-                    print i, tt
-                    i+=1
-                print '------------'
-            
-                if len(tokens) == 1 and tokens[0].kind == 'binop':
-                    print 'op=', tokens[0].op
-                    if tokens[0].op == 'call':
-                        print tokens[0].arg1
-                        print tokens[0].arg2
-                        if tokens[0].arg2.kind == 'suite':
-                            print tokens[0].arg2.left
-                            print tokens[0].arg2.right
-        else:
-            print 'ALARMA'
-            for tt in tokens:
-                print tt
-            raise Exception('Prio not found')
-    return tokens[0]
-#
 
 #-----------------------------------------------------------------------
 # Interpreter
 #-----------------------------------------------------------------------
-
-#class XINT(int):
-#    def __init__(self, val):
-#        int.__init__(self, val)
 
 class ZINT(int):
     def __new__(cls, *args, **kwargs):
@@ -794,10 +658,6 @@ class XFUN(object):
         if debug:
             for p in self.par:
                 print 'param', p
-        
-        ### BON C LA MERDE C TRUC. J ARRIVE PAS. PUTAIN DE (). JE COMPRENDS PLUS MON CODE C UN BORDEL SANS NOM.
-        ### LA IL ME CHIE QUE J'AI DEUX FOIS LE MEME ID !!!
-        
         self.ret = ret
         self.ast = ast
     def xcall(self, interpreter, scope, par): #*par_lst, **par_dic):
@@ -825,10 +685,6 @@ class XFUN(object):
                 xscope[self.par[i]] = interpreter.do_node(parcours.left, xscope, True)
                 parcours = parcours.right
                 i+=1
-        
-        ### HERE IS THE END. C LA MERDE. LA GROSSE. LA GROGROSSE. PUTAIN DE MERDOUILLE. MAIS STRUCTURE
-        ### SONT BUGGEES. LA IL ME DIT NONE !!!! AH MAIS JE SAIS : IL ENREGISTRE LES PARAMS COMME I I et pas I J
-        
         return interpreter.do_node(self.ast, xscope, True)
     def __eq__(self, other):
         if self.__class__ != XFUN:
@@ -851,14 +707,12 @@ class Interpreter:
         self.scope = scope
         self.MASTER_LOOP_EXIT = False
 
-    def do_string(self, s2, stack=[], scope={}):
-        global s
-        s = s2
-        restart()
-        tokenize()
-        clear()
-        # Test
-        master = xxparse(tokens)
+    def do_string(self, s, stack=[], scope={}):
+        t = Tokenizer()
+        tokens = t.parse(s)
+        p = Parser()
+        p.clear(tokens)
+        master = p.parse(tokens)
         r = self.do_node(master, scope, True)
         #self.process_python(n)
         self.process_vm(master, stack)
@@ -1317,23 +1171,6 @@ suite.append(Test('-3', -3))
 suite.append(Test('-(3+2)', -5))
 suite.append(Test('-(3+2)*4', -20))
 
-# ATTENTION : QUAND ON TEST tokens(x).val : verif tokens(x) est un Token !!!
-
-# Il m'a fallu implemanter : les listes multiples (avec ,)
-# les parametres
-# debugger les listes
-
-# Il ne manque plus que '-'.
-# Et un gros clean up du code...
-# 84 tests !!!
-
-# tests : hello(x)->erreur,
-# http://en.wikipedia.org/wiki/Recursive_descent_parser
-
-# LL et LR lisent de droite a gauche mais ne derive pas de la meme maniere !
-
-# Une alternative a ply. http://pyparsing.wikispaces.com/Examples
-
 scope = {}
 stack = []
 
@@ -1407,10 +1244,28 @@ def com_clear():
 def com_exit():
     pass
 
-commands = { 'keywords' : com_keywords, 'help' : com_help, 'exit' : com_exit, 'tests' : com_tests, 'clear' : com_clear}
+def com_tokens():
+    global previous
+    t = Tokenizer()
+    tokens = t.parse(previous)
+    i = 0
+    for t in tokens:
+        print "%i. %s" % (i, str(t))
+        i+=1
+
+def com_blocks():
+    global previous
+    t = Tokenizer()
+    tokens = t.parse(previous)
+    p = Parser()
+    p.clear(tokens)
+    p.parse(tokens, True)
+    
+command = ''
+previous = ''
+commands = { 'keywords' : com_keywords, 'help' : com_help, 'exit' : com_exit, 'tests' : com_tests, 'clear' : com_clear, 'tokens' : com_tokens, 'blocks' : com_blocks}
 
 if console:
-    command = ''
     print '+- Welcom to Pypo 0.1'
     print '+- Enter code or type help for more information.'
     while command != 'exit':
@@ -1422,6 +1277,8 @@ if console:
                 scope['_'] = r
             except Exception as e:
                 print e
+            finally:
+                previous = command
         elif command in commands:
             commands[command]()
         elif command.split(' ')[0] in commands:
