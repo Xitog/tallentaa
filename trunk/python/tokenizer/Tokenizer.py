@@ -333,8 +333,6 @@ class Parser:
                     x += 1
                 i=0
                 for tt in tokens[deb_par:end_par+1]:
-                    if debug:
-                        print 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', i, tt
                     i+=1
                 if end_par > deb_par:
                     fun_param = self.make_ast(tokens[deb_par:end_par+1])
@@ -637,73 +635,108 @@ class Node:
 # Interpreter
 #-----------------------------------------------------------------------
 
-class ZINT(int):
-    def __new__(cls, *args, **kwargs):
-        return  super(ZINT, cls).__new__(cls, args[0])
+# Standard lib
 
-class XFUN(object):
-    def __init__(self, name, par=None, ret=None, ast=None):
-        self.name = name
-        self.par = []
-        if debug:
-            print 'print ya des params ?'
-        parcours = par
-        if parcours is not None and parcours.kind == 'empty':
-            print 'no'
-        elif parcours is not None and parcours.kind == 'suite':
+def node2list_formal(ast):
+    parcours = ast
+    if isinstance(parcours, Node):
+        r = []
+        if parcours.kind == 'empty':
+            pass
+        elif parcours.kind == 'suite':
             while parcours is not None:
-                #print parcours.left.val
-                self.par.append(parcours.left.val)
+                if parcours.left.kind == 'id':
+                    r.append(SParam(parcours.left.val)) #var,card,def
+                else:
+                    raise Exception('not id')
                 parcours = parcours.right
-        if debug:
-            for p in self.par:
-                print 'param', p
-        self.ret = ret
-        self.ast = ast
+        else:
+            if parcours.kind == 'id':
+                r.append(SParam(parcours.val))
+            else:
+                raise Exception('Not a suite, not empty, not id')
+    else:
+        raise Exception('Not a node')
+    return r
+
+def node2list(ast, scope):
+    if isinstance(ast, Node):
+        r = []
+        parcours = ast
+        if parcours.kind == 'empty':
+            pass
+        elif parcours.kind == 'suite':
+            while parcours is not None:
+                r.append(interpreter.do_node(parcours.left, scope, True))
+                parcours = parcours.right
+        elif parcours.kind in ['integer', 'float', 'boolean', 'string', 'id']:
+            r.append(interpreter.do_node(parcours, scope, True))
+        return r
+    else:
+        raise Exception ('node2list error: not a Node')
+
+class SInteger(int):
+    def __new__(cls, *args, **kwargs):
+        return  super(SInteger, cls).__new__(cls, args[0])
+
+class SParam:
+    
+    def __init__(self, name, typ='var', card='1', default=None):
+        self.name = name
+        self.typ = typ
+        self.card = card
+        self.default = None
+
+class SFunction:
+    
+    def __init__(self, name, formals, rettype, code):
+        self.name = name
+        self.formals = formals
+        self.rettype = rettype
+        self.code = code
     
     def __str__(self):
-        return '%s/%d' % (self.name, len(self.par))
-    
-    def xcall(self, interpreter, scope, par): #*par_lst, **par_dic):
-        xscope = scope.copy()
-        # la faire le mix des param (par) dans xscope
-        
-        #print 'par :::::'
-        #print par
-        #if par.kind != 'empty':
-        #    if par.kind == 'suite':
-        #        print 'left = ', par.left
-        #        if par.right.kind == 'suite':
-        #            print '    left = ', par.right.left
-        #            print '    right = ', par.right.right
-        #        print 'right = ', par.right
-        #        #exit(1)
-        
-        parcours = par
-        if parcours is not None and parcours.kind == 'empty':
-            print 'no'
-        elif parcours is not None and parcours.kind == 'suite':
-            i = 0
-            while parcours is not None:
-                #print parcours.left.val
-                xscope[self.par[i]] = interpreter.do_node(parcours.left, xscope, True)
-                parcours = parcours.right
-                i+=1
-        return interpreter.do_node(self.ast, xscope, True)
-    def __eq__(self, other):
-        if self.__class__ != XFUN:
-            raise Exception("WTF???")
-        elif other.__class__ != XFUN:
-            return False
+        return '%s/%d' % (self.name, len(self.formals))
+
+    def do(self, interpreter, scope, reals):
+        fun_scope = scope.copy()
+        if len(reals) != len(self.formals):
+            raise Exception('Wrong number of parameters: %i / %i' % (len(reals), len(self.formals)))
+        parameters = {}
+        i = 0
+        for p in self.formals:
+            parameters[p.name] = reals[i]
+            i+=1
+        if isinstance(self.code, Node):
+            fun_scope.update(parameters)
+            #for s in fun_scope:
+            #   print s
+            return interpreter.do_node(self.code, fun_scope, True)
         else:
-            return self.name == other.name
-    def __ne__(self, other):
-        if self.__class__ != XFUN:
-            raise Exception("WTF???")
-        elif  other.__class__ != XFUN:
-            return True
-        else:
-            return self.name != other.name    
+            return self.code(fun_scope, parameters)  
+
+global_scope = {}
+
+def base_println(scope, par):
+    global global_scope
+    i = 0
+    for e in par:
+        sys.stdout.write(str(par[e]))
+        i += len(str(par[e]))
+    sys.stdout.write("\n")
+    #i+=1
+    return i
+
+def base_print(scope, par):
+    global global_scope
+    i = 0
+    for e in par:
+        sys.stdout.write(str(par[e]))
+        i += len(str(par[e]))
+    return i
+
+global_scope['println'] = SFunction('println', [SParam('a',card='*')], 'int', base_println)
+global_scope['print'] = SFunction('print', [SParam('a',card='*')], 'int', base_print)
 
 class Interpreter:
 
@@ -939,17 +972,19 @@ class Interpreter:
                 return scope[ida]
             elif n.op == '->':
                 if isinstance(b, int):
-                    scope[ida] = ZINT(b)
+                    scope[ida] = SInteger(b)
                 scope[ida].frozen = True
                 return scope[ida]
             elif n.op == 'call':
-                if n.arg1.kind == 'id' and n.arg1.val == 'println':
-                    print self.do_node(n.arg2)
-                elif n.arg1.kind == 'id' and n.arg1.val in scope:
-                    if isinstance(scope[n.arg1.val], XFUN):
-                        return scope[n.arg1.val].xcall(self, scope, n.arg2)
+                #if n.arg1.kind == 'id' and n.arg1.val == 'println':
+                #    print self.do_node(n.arg2)
+                if n.arg1.kind == 'id' and n.arg1.val in scope:
+                    identifier = n.arg1.val
+                    if isinstance(scope[identifier], SFunction):
+                        par = node2list(n.arg2, scope)
+                        return scope[identifier].do(self, scope, par)
                     else:
-                        raise Exception('no callable')
+                        raise Exception('not callable')
                 else:
                     print 'ERROR', n.arg1.kind, n.arg1.kind == 'id'
                     print 'ERROR', n.arg1.val, n.arg1.val in scope
@@ -1013,7 +1048,8 @@ class Interpreter:
         elif n.kind == 'break':
             self.MASTER_LOOP_EXIT = True
         elif n.kind == 'fun':
-            new_fun = XFUN(n.name, n.param, n.ret, n.action)
+            l_parameters = node2list_formal(n.param)
+            new_fun = SFunction(n.name, l_parameters, n.ret, n.action)
             scope[n.name] = new_fun
             return new_fun
         elif n.kind == 'empty':
@@ -1145,13 +1181,14 @@ st = """
     fun hello
         "hello"
     end
+    hello()
 """
-suite.append(Test(st, XFUN('hello')))
+suite.append(Test(st, 'hello'))
 suite.append(Test("[1,2,3]", [1,2,3]))
 #suite.append(Test("(1, 2, 3)", [1,2,3]))
 suite.append(Test("(1)", 1)) #0054
 suite.append(Test("(1+2)", 3))
-suite.append(Test("println(23)", None)) #0031
+suite.append(Test("println(23)", 2)) #0031
 suite.append(Test("1 + (3)", 4)) #0036
 suite.append(Test("2 * 4 + 5", 13))
 suite.append(Test("5 + 4 * 2", 13))
@@ -1159,14 +1196,15 @@ suite.append(Test("2 * (4 + 5)", 18))
 suite.append(Test("(5 + 4) * 2", 18)) #0108 PUREE level_max et test pour savoir avant max-1>=0
 suite.append(Test("(5 * (5 + 2))", 35)) #0112 PREMIERE FAUTE D ENTREE SUR OUBLI DE PAR !!!
 suite.append(Test("(2+3)*(1+1)", 10))
-suite.append(Test('println("hello")', None))
+suite.append(Test('println("hello")', 5))
 suite.append(Test('hello()', "hello")) # appel d'une fonction !!!
 st = """
     fun add(i, j)
         i + j
     end
+    println(add)
 """
-suite.append(Test(st, XFUN('add')))
+suite.append(Test(st, 5))
 suite.append(Test('add(2,3)', 5)) #2h32. Vendredi (matin) 6 Janvier 2012. Enfin. Oui... Oui... Oui... Depuis 00h00...
 suite.append(Test('2 * add(2,3)', 10)) # 2h32 aussi.
 suite.append(Test('add(2,3)+add(3,2)', 10)) # 2h36 (sans rien faire)
@@ -1175,7 +1213,7 @@ suite.append(Test('-3', -3))
 suite.append(Test('-(3+2)', -5))
 suite.append(Test('-(3+2)*4', -20))
 
-scope = {}
+scope = global_scope.copy()
 stack = []
 
 def all_tests():
@@ -1299,13 +1337,13 @@ if console:
         while not clos(command):
             command += '\n' + raw_input('... ')
         if not(command in commands) and not(command.split(' ')[0] in commands):
-            try:
+            #try:
                 r = interpreter.do_string(command, stack, scope)
                 print r
                 scope['_'] = r
-            except Exception as e:
-                print e
-            finally:
+            #except Exception as e:
+            #    print e
+            #finally:
                 previous = command
         elif command in commands:
             commands[command]()
