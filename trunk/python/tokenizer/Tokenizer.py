@@ -12,6 +12,8 @@
 # Tests
 # Interactive Console
 
+import re
+
 debug = False
 tests = False
 
@@ -26,238 +28,150 @@ class Enum:
         for t in tab:
             setattr(self, t, t)
 
-LexerState = Enum('start', 'float', 'integer', 'operator', 'id', 'hexa', 'bin', 'octal', 'string')
-TokenType = Enum('integer', 'float', 'id', 'operator', 'separator','keyword', 'eof', 'boolean', 'string')
+TokenType = Enum('integer', 'float', 'id', 'operator', 'separator','keyword', 'eof', 'boolean', 'string', 'discard')
 
 #-----------------------------------------------------------------------
 # Lexer
 #-----------------------------------------------------------------------
 
-# Tokens
+tokens = [
+    
+    ('".*"', TokenType.string),
+    
+    ('0(b|B)[0-1]*' , TokenType.integer),
+    ('0(x|X)[0-9A-Fa-f]*' , TokenType.integer),
+    ('0(c|C)[0-7]*' , TokenType.integer),
+    ('[0-9]+', TokenType.integer),     #[0-9]+(?![a-zA-Z_])
+    
+    ('[0-9]*\.[0-9]+' , TokenType.float),
+    ('[0-9]+\.[0-9]*' , TokenType.float),
+    ('\.[0-9]+' , TokenType.float),
 
-def is_lower_char(c):
-    return (c in ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'])
+    (';' , TokenType.separator),
+    ('\(' , TokenType.separator),
+    ('\)' , TokenType.separator),
+    ('\[' , TokenType.separator),
+    ('\]' , TokenType.separator),
+    ('\{' , TokenType.separator),
+    ('\}' , TokenType.separator),
+    ('\n' , TokenType.separator),
+    (',' , TokenType.separator),
+    
+    ('=' , TokenType.operator),
+    ('\+=' , TokenType.operator),
+    ('-=' , TokenType.operator),
+    ('/=' , TokenType.operator),
+    ('//=' , TokenType.operator),
+    ('\*=' , TokenType.operator),
+    ('\*\*=' , TokenType.operator),
+    ('%=' , TokenType.operator),
+    ('->' , TokenType.operator),
+    
+    ('\+' , TokenType.operator),
+    ('-' , TokenType.operator),
+    ('/' , TokenType.operator),
+    ('\*' , TokenType.operator),
+    ('//' , TokenType.operator),
+    ('\*\*' , TokenType.operator),
+    ('%' , TokenType.operator),
+    
+    ('>' , TokenType.operator),
+    ('>=' , TokenType.operator),
+    ('==' , TokenType.operator),
+    ('!=' , TokenType.operator),
+    ('<=' , TokenType.operator),
+    ('<' , TokenType.operator),
+    
+    ('!' , TokenType.operator),
+    ('&' , TokenType.operator),
+    ('\^' , TokenType.operator), 
+    ('\|' , TokenType.operator),
+    
+    ('\.' , TokenType.operator),
+    
+    ('true' , TokenType.boolean),
+    ('false' , TokenType.boolean),
+    
+    ('if' , TokenType.keyword),
+    ('then' , TokenType.keyword),
+    ('else' , TokenType.keyword),
+    ('elsif' , TokenType.keyword),
+    ('end' , TokenType.keyword),
+    ('while' , TokenType.keyword),
+    ('do' , TokenType.keyword),
+    ('until' , TokenType.keyword),
+    ('unless' , TokenType.keyword),
+    ('break' , TokenType.keyword),
+    ('next' , TokenType.keyword),
+    ('return' , TokenType.keyword),
+    ('fun' , TokenType.keyword),
+    ('class' , TokenType.keyword),
 
-def is_upper_char(c):
-    return (c in ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'])   
-
-def is_char(c):
-    return (is_lower_char(c) or is_upper_char(c))
-
-def is_digit(c):
-    return (c in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
-
-def is_hexadigit(c):
-    return (is_digit(c) or (c in ['A', 'B', 'C', 'D', 'E', 'F']))
-
-def is_octaldigit(c):
-    return (c in ['0', '1', '2', '3', '4', '5', '6', '7'])
-
-def is_bindigit(c):
-    return (c in ['0', '1'])
-
-def is_ops_char(c):
-    return (c in [',', '+', '-', '/', '*', '%', '>', '<', '=', '!', '&', '^', '|'])
-
-def is_sep_char(c):
-    return (c in [';', '(', ')', '[', ']', '{', '}', '\n'])
-
-def is_silent(c):
-    return (c in [' ', '\t'])
-
-def is_aff_operator(s): # for parsing, could be merge with the next one
-    return (s in ['=', '+=', '-=', '/=', '//=', '*=', '**=', '%=', '->'])
-
-def is_arithmetic_operator(s):
-    return (s in ['+', '-', '/', '*', '//', '**', '%'])
-
-def is_comparaison_operator(s):
-    return (s in ['>', '>=', '==', '!=', '<=', '<'])
-
-def is_bitwise_operator(s):
-    return (s in ['!', '&', '^', '|'])
-
-def is_operator(s):
-    return (is_arithmetic_operator(s) or 
-            is_aff_operator(s) or
-            is_comparaison_operator(s) or
-            is_bitwise_operator(s))
-
-def is_boolean(s):
-    return (s in ['true', 'false'])
-
-def is_keyword(s):
-    return (s in ['if', 'then', 'else', 'elsif', 'end', 'while', 'do', 'until', 'unless', 'break', 'next', 'return', 'fun'])
-
-all_keywords = ['if', 'then', 'else', 'elsif', 'end', 'while', 'do', 'until', 'unless', 'break', 'next', 'return', 'fun'] + ['true', 'false']
+    (' ', TokenType.discard),
+    ('\t', TokenType.discard),
+    ('\n', TokenType.discard),
+    
+    ('[a-zA-Z_][a-zA-Z0-9_]*(\?|!)?', TokenType.id),
+]
 
 class Token:
     def __init__(self, kind, val):
         self.kind = kind
         self.val = val
+    
     def __str__(self):
-        return 'Token: %s : %s' % (self.val, self.kind)
+        return 'Token(%s, %s)' % (self.val, self.kind)
 
 class Tokenizer:
     def __init__(self):
-        self.restart()
+        global tokens
+        self.tokens = tokens
     
-    def restart(self):
-        self.text = ''
-        self.tokens = []
-        self.curr = []
-        self.state = 'start'
-        
-    def next(self, i):        
-        i+=1
-        if i < len(self.text):
-            c = self.text[i]
-        else:
-            c = '\0'
-        return (i,c)
-    
-    def token(self, typ):
-        self.tokens.append(Token(typ, ''.join(self.curr)))
-        self.curr = []
-        self.state = LexerState.start
-    
-    def parse(self, s):
-        self.text = s
-        
-        escape = False
+    def parse(self, input):
+        input += '\0'
+        output = []
+        current = ''
+        previous = None
         i = 0
-        if len(s) > 0:
-            c = s[i]
-        else:
-            c = '\0'
-        
-        while not escape:
-            if c == '\0': # last turn
-                escape = True
-            if self.state == LexerState.start:
-                if is_char(c) or c == '$' or c == '@' or c == '_':
-                    self.state = LexerState.id
-                    #
-                    self.curr.append(c)
-                    i, c = self.next(i)
-                elif is_digit(c):
-                    self.state = LexerState.integer
-                    #
-                    self.curr.append(c)
-                    i, c = self.next(i)
-                elif c == '"':
-                    self.state = LexerState.string
-                    i, c = self.next(i)
-                elif c == '.': # '.' can be for a float or an operator
-                    state = LexerState.float
-                    self.curr.append(c)
-                    i, c = self.next(i)
-                elif is_ops_char(c):
-                    self.state = LexerState.operator
-                    #
-                    self.curr.append(c)
-                    i, c = self.next(i)
-                elif is_sep_char(c):
-                    self.curr.append(c)
-                    i, c = self.next(i)
-                    self.token(TokenType.separator)
-                elif c == '#':
-                    end = False
-                    while (not escape) and (not end):
-                        i, c = self.next(i)
-                        if c == ';' or c == '\n':
-                            end = True
-                elif is_silent(c):
-                    i, c = self.next(i)
-                elif c == '\0':
-                    pass # ????
+        while i < len(input):
+            current += input[i]
+            found = False
+            #print '-------------------------------------[', current, '] (', len(current), ')' 
+            for tok in self.tokens:
+                #print tok[0]
+                r = re.match(tok[0], current)
+                if r is not None and r.end() == len(current):
+                    #print 'found!', tok[1]
+                    previous = tok[1]
+                    found = True
+                    break
+            if not found:
+                if previous is not None:
+                    if previous != TokenType.discard:
+                        output.append(Token(previous, current[:len(current)-1]))
+                    current = ''
+                    previous = None
+                    i-=1
                 else:
-                    raise Exception('Forbidden character: [%s]' % (str(c),))
-            elif self.state == LexerState.id:
-                if (is_char(c) or is_digit(c) or c == '_') or (c == '@' and len(self.curr) == 1):
-                    self.curr.append(c)
-                    i, c = self.next(i)
-                else:
-                    #print '>>> [', ''.join(curr), ']', is_boolean(''.join(curr))
-                    if is_keyword(''.join(self.curr)):
-                        self.token(TokenType.keyword)
-                    elif is_boolean(''.join(self.curr)):
-                        self.token(TokenType.boolean)
-                    else:
-                        self.token(TokenType.id)
-            elif self.state == LexerState.integer:
-                if is_digit(c):
-                    self.curr.append(c)
-                    i, c = self.next(i)
-                elif self.curr == ['0'] and (c == 'x' or c == 'X'):
-                    self.state = LexerState.hexa
-                    self.curr.append(c)
-                    i, c = self.next(i)
-                elif self.curr == ['0'] and (c == 'c' or c == 'C'):
-                    self.state = LexerState.octal
-                    self.curr.append(c)
-                    i, c = self.next(i)
-                elif self.curr == ['0'] and (c == 'b' or c == 'B'):
-                    self.state = LexerState.bin
-                    self.curr.append(c)
-                    i, c = self.next(i)
-                elif c == '.':
-                    self.state = LexerState.float
-                    self.curr.append(c)
-                    i, c = self.next(i)
-                else:
-                    self.token(TokenType.integer)
-            elif self.state == LexerState.float:
-                if is_digit(c):
-                    self.curr.append(c)
-                    i, c = self.next(i)
-                elif len(self.curr) == 1: # We have a lonely '.'
-                    self.token(TokenType.operator)        
-                else:
-                    self.token(TokenType.float)
-            elif self.state == LexerState.octal:
-                if is_octaldigit(c):
-                    self.curr.append(c)
-                    i, c = self.next(i)
-                elif is_hexadigit(c):
-                    raise Exception("Mismatched integer")
-                else:
-                    self.token(TokenType.integer)
-            elif self.state == LexerState.bin:
-                if is_bindigit(c):
-                    self.curr.append(c)
-                    i, c = self.next(i)
-                elif is_hexadigit(c):
-                    raise Exception("Mismatched integer")
-                else:
-                    self.token(TokenType.integer)
-            elif self.state == LexerState.hexa:
-                if is_hexadigit(c):
-                    self.curr.append(c)
-                    i, c = self.next(i)
-                elif is_char(c):
-                    raise Exception("Mismatched integer")
-                else:
-                    self.token(TokenType.integer)
-            elif self.state == LexerState.operator:
-                if is_ops_char(c) and is_operator((''.join(self.curr))+c):
-                    self.curr.append(c)
-                    i, c = self.next(i)
-                else:
-                    self.token(TokenType.operator)
-            elif self.state == LexerState.string:
-                if c != '"' and (len(self.curr) < 2 or self.curr[len(self.curr)-1] != '\\'):
-                    self.curr.append(c)
-                    i, c = self.next(i)
-                else:
-                    i, c = self.next(i)
-                    self.token(TokenType.string)
-    
-        self.curr = ['eof']
-        self.token(TokenType.eof)
-        
-        return self.tokens
-        
+                    pass # not enough caracter to decide
+            else:
+                pass # we found at least one matching tokens
+            i+=1
+        output.append(Token(TokenType.eof, 'eof'))
+        return output
+
+#a = "0XA"
+#a = """    fun hello
+#        "hello"
+#    end
+#    hello()
+#"""
+#a = "[1, 2, 3]"
+#t = Tokenizer()
+#for p in t.parse(a):
+#    print p
+#exit()
+
 #-----------------------------------------------------------------------
 # Parser (from tokens[] to Ast)
 #-----------------------------------------------------------------------
@@ -500,7 +414,10 @@ class Parser:
         while i < len(tokens):
             t = tokens[i]
             if t.kind in ts:
-                tokens[i] = Node(kind=ts[t.kind], val=t.val)
+                if t.kind != 'string': # only change required by new tokenizer
+                    tokens[i] = Node(kind=ts[t.kind], val=t.val)
+                else:
+                    tokens[i] = Node(kind=ts[t.kind], val=t.val[1:len(t.val)-1])
             if t.kind == TokenType.eof:
                 del tokens[i]
             #if isinstance(t, Token):
@@ -936,7 +853,7 @@ class Interpreter:
                     b = scope[b]
                 else:
                     b = None
-            if is_arithmetic_operator(n.op):
+            if n.op in ['+', '-', '/', '*', '**', '%', '//']:
                 if (a.__class__ in [int, float]):
                     return self.binop_num(a, b, n.op)
                 elif isinstance(a, basestring):
