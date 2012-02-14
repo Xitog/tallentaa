@@ -2,20 +2,13 @@
 # Tokenizer
 # Damien Gouteux
 #-----------------------------------------------------------------------
-#
-# Parts :
-#
-# Tools
-# Lexer
-# Parser
-# Interpreter
-# Tests
-# Interactive Console
 
-import re
+# Tools, Lexer, Parser, Interpreter, Tests, Interactive Console
 
-debug = False
-tests = False
+import re           # for Lexer
+import sys          # for Tests and Interactive Console
+import traceback    # for Tests
+import os           # for Interactive Console
 
 #-----------------------------------------------------------------------
 # Tools
@@ -37,6 +30,7 @@ TokenType = Enum('integer', 'float', 'id', 'operator', 'separator','keyword', 'e
 tokens = [
     
     ('".*"', TokenType.string),
+    ("'.*'", TokenType.string),
     
     ('0(b|B)[0-1]*' , TokenType.integer),
     ('0(x|X)[0-9A-Fa-f]*' , TokenType.integer),
@@ -160,38 +154,40 @@ class Tokenizer:
         output.append(Token(TokenType.eof, 'eof'))
         return output
 
-#a = "0XA"
-#a = """    fun hello
-#        "hello"
-#    end
-#    hello()
-#"""
-#a = "[1, 2, 3]"
-#t = Tokenizer()
-#for p in t.parse(a):
-#    print p
-#exit()
-
 #-----------------------------------------------------------------------
 # Parser (from tokens[] to Ast)
 #-----------------------------------------------------------------------
+
+blocks = [
+    ('if', 'then|\n', 'else?', 'end'),
+    ('unless', 'then|\n', 'else?', 'end'),
+    ('while', 'do|\n', 'end'),
+    ('until', 'do|\n', 'end'),
+    ('fun', 'do|\n', 'end'),
+    ('class', 'do|\n', 'end'),
+    ('{', '}'),
+    ('[', ']'),
+    ('break',),
+]
 
 class Parser:
     def __init__(self):
         pass
     
     def parse(self, tokens, debug=False):
-        blocks = self.identify_block(tokens)
-        if debug:
-            for b in blocks:
-                print b
+        blocks = self.block_split(tokens)
         n = None
         master = None
         for b in blocks:
             if b['type'] in ['if', 'unless']:
                 sel_cond = self.make_ast(tokens[b['start']+1:b['middle']])
-                sel_action = self.parse(tokens[b['middle']+1:b['end']])
-                n = Node(kind='if', cond=sel_cond, action=sel_action, invert=(b['type'] == 'unless'))
+                if b['other'] is not None:
+                    sel_other = self.parse(tokens[b['other']+1:b['end']])
+                    sel_action = self.parse(tokens[b['middle']+1:b['other']])
+                else:
+                    sel_other = None
+                    sel_action = self.parse(tokens[b['middle']+1:b['end']])
+                n = Node(kind='if', cond=sel_cond, action=sel_action, invert=(b['type'] == 'unless'), other=sel_other)
             elif b['type'] in ['while', 'until']:
                 iter_cond = self.make_ast(tokens[b['start']+1:b['middle']])
                 iter_action = self.parse(tokens[b['middle']+1:b['end']])
@@ -261,92 +257,98 @@ class Parser:
                 master = Node(kind='suite', subkind='statement', left=master, right=n)
         return master
     
-    def identify_block(self, tokens):
-        block_mode = 'start'
-        level = 0
-        start = 0
-        middle = -1
-        blocks = []
+    def block_split(self, tokens):
+        global blocks
+        
+        starters = {}                       # 'if' => 0 (le premier bloc)
+        enders = {}                         # 0 => 'end' (le premier bloc se termine par end)
         i = 0
-        while i < len(tokens):
-            t = tokens[i]
-            if block_mode == 'start':
-                if t.val in ['if', 'while', 'until', 'unless', 'fun']:
-                    block_mode = t.val
-                    level = 1
-                    start = i
-                elif t.val in ['break']:
-                    block_mode = t.val
-                    start = i
-                elif t.kind in [TokenType.id, TokenType.float, TokenType.integer, TokenType.string, TokenType.boolean] or t.val == '(' or t.val == '-':
-                    block_mode = 'expression'
-                    start = i
-                elif t.val in ['{', '[']: #'(', 
-                    block_mode = t.val
-                    level = 1
-                    start = i
-                elif t.kind == TokenType.eof:
-                    blocks.append({'type' : 'empty', 'start' : i, 'end' : i})
-                    break
-            elif block_mode in ['if', 'while', 'until', 'unless']:
-                if t.val in ['if', 'while', 'until', 'unless']:
-                    level += 1
-                elif middle == -1 and block_mode in ['if', 'unless'] and (t.val == 'then' or t.val == '\n'):
-                    middle = i
-                elif middle == -1 and block_mode in ['while', 'until'] and (t.val == 'do' or t.val == '\n'):
-                    middle = i
-                elif t.val == 'end':
-                    level -= 1
-                if level == 0:
-                    blocks.append({'type' : block_mode, 'start' : start, 'end' : i, 'middle' : middle})
-                    block_mode = 'start'
-                    middle = -1
-            elif block_mode == 'fun':
-                if t.val in ['if', 'while', 'until', 'unless']:
-                    level += 1
-                elif middle == -1 and (t.val == 'do' or t.val == '\n'):
-                    middle = i
-                elif t.val == 'end':
-                    level -= 1
-                if level == 0:
-                    blocks.append({'type' : block_mode, 'start' : start, 'end' : i, 'middle' : middle})
-                    block_mode = 'start'
-                    middle = -1
-            elif block_mode in ['{', '[']: # '(', (block_mode == '(' and t.val == ')')
-                if t.val == block_mode:
-                    level += 1
-                elif (block_mode == '{' and t.val == '}') or (block_mode == '[' and t.val == ']'):
-                    level -= 1
-                if level == 0:
-                    blocks.append({'type' : block_mode, 'start' : start+1, 'end' : i-1})
-                    block_mode = 'start'
-            if block_mode == 'expression':
-                if t.kind == TokenType.eof or t.val == ';' or t.val == '\n' or i == len(tokens)-1:
-                    if i == len(tokens)-1: # and len(tokens) == 1:
-                        blocks.append({'type' : block_mode, 'start' : start, 'end' : i})
-                    else:
-                        blocks.append({'type' : block_mode, 'start' : start, 'end' : i-1})
-                    block_mode = 'start'
-            elif block_mode == 'break':
-                if t.val in [';', '\n'] or i == len(tokens)-1:
-                    blocks.append({'type' : block_mode, 'start' : start, 'end' : i})
-                    block_mode = 'start'
-            
+        for b in blocks:                    # ('start|other_start', ...)
+            for e in b[0].split('|'):       # 'start'
+                starters[e] = i             # 'start' => 0
+            if len(b) > 1:
+                enders[i] = b[-1] 
             i+=1
         
-        #print 'blocks'
-        #i=0
-        #for b in blocks:
-        #    i = 0
-        #    for t in tokens:
-        #        print '\t', i, t
-        #        i += 1
-        #    if 'middle' in b:
-        #        print b['type'], b['start'], b['middle'], b['end']
-        #    else:
-        #        print b['type'], b['start'], b['end']
-        
-        return blocks
+        stack = []
+        output = []
+        i = 0
+        choosen = -1
+        while i < len(tokens):
+            tok = tokens[i].val
+            #print 'tok=', tok, 'choosen=', choosen
+            if tok in ['\n',';'] and choosen == -1:
+                pass
+            elif tok in starters:
+                choosen = starters[tok]
+                if len(blocks[choosen]) > 1:
+                    stack.append([choosen,i])
+                    #print 'starting', tok, 'lvl', len(stack), 'at', i
+                else: #block = break (only one element)
+                    #print 'break!'
+                    if len(stack) == 0:
+                        output.append({'type' : blocks[choosen][0], 'start' : i, 'end' : 1})
+                    else:
+                        choosen = stack[-1][0]
+            elif tok in enders.values():
+                if enders[stack[-1][0]] == tok: # cela finit le block en cours
+                    start = stack[-1][1]
+                    other = None
+                    middle = None
+                    if len(stack[-1]) > 2:
+                        middle = stack[-1][2]
+                        if len(stack[-1]) > 3:
+                            other = stack[-1][3]
+                    choosen = stack.pop()[0]
+                    if len(stack) == 0: # no inner parsing
+                        if blocks[choosen][0] in ['[', '{']: # [1,2,3] : [ and ] not included !!!
+                            output.append({'type' : blocks[choosen][0], 'start' : start+1, 'end' : i-1})
+                        else:
+                            output.append({'type' : blocks[choosen][0], 'start' : start, 'end' : i, 'middle' : middle, 'other' : other})
+                    if len(stack) > 0:
+                        choosen = stack[-1][0]
+                    else:
+                        choosen = -1
+                else:
+                    raise Exception('Terminator is not for current block')
+            # UGLY
+            elif len(stack) > 0 and blocks[stack[-1][0]][0] in ['if', 'unless'] and len(stack[-1]) == 2: # we are in if and no then has been detected
+                if tok == 'then' or tok == '\n':
+                    #print 'I got the then at', i
+                    stack[-1].append(i)
+            elif len(stack) > 0 and blocks[stack[-1][0]][0] in ['while', 'until', 'fun'] and len(stack[-1]) == 2:
+                if tok == 'do' or tok == '\n':
+                    #print 'I got the do at', i
+                    stack[-1].append(i)
+            elif len(stack) > 0 and blocks[stack[-1][0]][0] == 'if' and len(stack[-1]) == 3: # we have found the then/\n
+                if tok == 'else':
+                    stack[-1].append(i)
+            # end UGLY
+            elif len(stack) == 0:
+                start = i
+                if tokens[i].val == 'eof':
+                    break
+                elif tokens[i].val in ['\n', ';']:
+                    pass
+                else:
+                    while i < len(tokens) and tokens[i].val not in starters:
+                        #print 'tok=', tokens[i].val, 'choosen=', choosen
+                        if tokens[i].val in ['\n', ';', 'eof'] or i == len(tokens)-1:
+                            if i == len(tokens)-1: end = i
+                            else: end = i-1
+                            output.append({'type' : 'expression', 'start' : start, 'end' : end})
+                            start = i + 1
+                        i+=1
+                    if i < len(tokens) and tokens[i].val in starters: i-=1
+            i+=1
+        if len(stack) != 0:
+            raise Exception('Unfinished block')
+        if len(output) == 0:
+            output = [{'start': 0, 'end': 0, 'type' : 'empty'}]
+        output = sorted(output, key=lambda block: block['start'])
+        if output[-1]['start'] == output[-1]['end'] and tokens[output[-1]['start']].val == 'eof' and output[-1]['type'] == 'expression':
+            output[-1]['type'] = 'empty' # bug on first function test
+        return output
     
     def clear(self, tokens):
         i = 0
@@ -380,14 +382,6 @@ class Parser:
                 del tokens[0]
 
     def make_ast(self, tokens):
-        ###
-        if debug:
-            print 'make_ast'
-            i=0
-            for t in tokens:
-                print 'make_ast', i, t
-                i+=1
-        
         if len(tokens) < 1:
             raise Exception("Empty token list")
         #elif len(tokens) == 1 and tokens.kind == TokenType.eof: # only eof inside
@@ -408,9 +402,6 @@ class Parser:
             TokenType.string : 'string' }
         # Litterals and removing the last (if any)
         i = 0
-        if debug:
-            for t in tokens:
-                print '#-#', t
         while i < len(tokens):
             t = tokens[i]
             if t.kind in ts:
@@ -483,14 +474,12 @@ class Parser:
                     tokens[deb] = n
                     del tokens[deb-1]
                 else:
-                    if debug:
-                        print '%%%%%%%', end
                     i = deb
                     sub = deb # sub start
                     n = None
                     while i <= end+1:
-                        if debug:
-                            print 'www', tokens[i], tokens[i] in tokens[sub:i]
+                        #if debug:
+                            #print 'www', tokens[i], tokens[i] in tokens[sub:i]
                         if isinstance(tokens[i], Token) and tokens[i].val in [',',')']:
                             n = Node(kind='suite', subkind='sequence', subsubkind='(', left=self.make_ast(tokens[sub:i]), right=n)
                             sub = i+1 # DERNIER BUG. PASSER DE VIRG EN VIRG
@@ -498,8 +487,8 @@ class Parser:
                     
                     ii = end+1
                     while ii > deb:
-                        if debug:
-                            print 'i delete', ii
+                        #if debug:
+                        #    print 'i delete', ii
                         del tokens[ii]
                         ii -= 1
                     tokens[deb] = n
@@ -512,23 +501,14 @@ class Parser:
                         n = Node(kind='binop', op='call', arg1=tokens[max-1],arg2=tokens[max])
                         tokens[max-1] = n
                         del tokens[max]
-                
-                if debug:
-                    print '------------'
-                    i=0
-                    for tt in tokens:
-                        print i, tt
-                        i+=1
-                    print '------------'
-                
-                    if len(tokens) == 1 and tokens[0].kind == 'binop':
-                        print 'op=', tokens[0].op
-                        if tokens[0].op == 'call':
-                            print tokens[0].arg1
-                            print tokens[0].arg2
-                            if tokens[0].arg2.kind == 'suite':
-                                print tokens[0].arg2.left
-                                print tokens[0].arg2.right
+                    #if len(tokens) == 1 and tokens[0].kind == 'binop': CALL
+                        #print 'op=', tokens[0].op
+                        #if tokens[0].op == 'call':
+                            #print tokens[0].arg1
+                            #print tokens[0].arg2
+                            #if tokens[0].arg2.kind == 'suite':
+                                #print tokens[0].arg2.left
+                                #print tokens[0].arg2.right
             else:
                 print 'ALARMA'
                 for tt in tokens:
@@ -546,7 +526,6 @@ class Node:
             print '\t', k, '=>', getattr(self, k) #self.rem[k]
     def __str__(self):
         return 'node(%s)' % (self.kind,)
-
 
 #-----------------------------------------------------------------------
 # Interpreter
@@ -652,8 +631,14 @@ def base_print(scope, par):
         i += len(str(par[e]))
     return i
 
+def base_read(scope, par):
+    for e in par:
+        sys.stdout.write(str(par[e]))
+    return raw_input()
+
 global_scope['println'] = SFunction('println', [SParam('a',card='*')], 'int', base_println)
 global_scope['print'] = SFunction('print', [SParam('a',card='*')], 'int', base_print)
+global_scope['read'] = SFunction('read', [SParam('a', card='1', typ='str')], 'str', base_read)
 
 class Interpreter:
 
@@ -909,7 +894,9 @@ class Interpreter:
             else:
                 raise Exception('error unknown op : %s' % (n.op,))
         elif n.kind == 'integer':
-            if len(n.val) >= 3:
+            if len(n.val) >= 2:
+                if n.val[1] in ['x','X','b','B','c','C'] and len(n.val) == 2: # handle 0x and 0X
+                    n.val += '0'
                 if n.val[0:2] == '0x' or n.val[0:2] == '0X':
                     r = int(n.val, 16)
                 elif n.val[0:2] == '0b' or n.val[0:2] == '0B':
@@ -945,6 +932,8 @@ class Interpreter:
             r = None
             if (cond and (not n.invert)) or ((not cond) and n.invert):
                 r = self.do_node(n.action, scope, True)
+            elif n.other is not None:
+                r = self.do_node(n.other, scope, True)
             return r
         elif n.kind == 'while':
             max_repeat = 1000
@@ -977,9 +966,6 @@ class Interpreter:
 #-----------------------------------------------------------------------
 # Tests
 #-----------------------------------------------------------------------
-
-import sys
-import traceback
 
 class Test:
     def __init__(self, test, waited):
@@ -1050,6 +1036,7 @@ suite.append(Test("0c10 == 8", True))
 suite.append(Test("0XA == 10", True))
 suite.append(Test("0B10 == 2", True))
 suite.append(Test("0C10 == 8", True))
+suite.append(Test("0X == 0", True))
 suite.append(Test('"savior"', "savior"))
 suite.append(Test("a = 5", 5))
 suite.append(Test("a", 5))
@@ -1129,6 +1116,8 @@ suite.append(Test('add(1+1, 2+1)', 5)) # 2h37 (un petit bug)
 suite.append(Test('-3', -3))
 suite.append(Test('-(3+2)', -5))
 suite.append(Test('-(3+2)*4', -20))
+suite.append(Test('if false then 2 else 5 end', 5))
+suite.append(Test("'hello'", 'hello'))
 
 scope = global_scope.copy()
 stack = []
@@ -1155,15 +1144,9 @@ def all_tests():
     print "%s / %s" % (str(good), str(len(suite)))
     print
 
-if tests:
-    all_tests()
-
 #-----------------------------------------------------------------------
 # Interactive Console
 #-----------------------------------------------------------------------
-
-import sys
-import os
 
 # Console On
 console = True
@@ -1185,10 +1168,11 @@ def com_help(*args):
         for k in keys:
             print '\t', k
     elif args[1] == 'if':
-        print 'Syntax: if <condition> then <actions> end'
+        print 'Syntax: if <condition> then <actions> [else <actions2>] end'
         print 'Execute <actions> if <condition> is true.'
+        print 'Else, execute <actions2> if defined.'
         print 'See also: unless'
-        print 'Alternative: do can be replaced by a new line.'
+        print 'Alternative: then can be replaced by a new line.'
     elif args[1] == 'unless':
         print 'Syntax: unless <condition> then <actions> end'
         print 'Execute <actions> if <conditions> is false.'
