@@ -1,0 +1,270 @@
+﻿Sommaire
+
+le code
+    les instructions
+    les mots clés
+    flux
+    structure de contrôle
+séquence
+sélection
+    if
+    switch
+itération
+    while
+    for
+intérruption
+    break
+    continue (ou next)
+    return
+point d'entrée
+organisation (package)
+exceptions
+
+les expressions
+variables
+    nom
+    catégories
+    valeur / référence
+types de base
+    entiers
+    réels
+    booléens
+    chaînes et caractères
+    tableaux
+    listes
+    dictionnaires
+    autres
+opérateurs
+    arithmétiques
+    booléens
+    comparaison
+    affectation
+    bits à bits
+    autres
+    priorités et parenthèses
+conversion de type (transtypage)
+portée et visibilité des variables
+gestion de la mémoire
+constantes
+énumérations
+    
+les fonctions
+définition
+    en-tête et corps
+    paramètres formels
+    valeur par défaut
+    paramètres spéciaux
+    retour
+utilisation
+    paramètres réels
+    appel
+
+Les classes
+paradigme OO
+    encapsulation
+        private, protected, public, default
+    héritage
+    polymorphisme
+définition
+    spécialisation
+    abstraite
+    interface
+les attributs
+les méthodes
+    constructeurs
+    destructeurs
+utilisation
+généricité
+imbrication
+classe anonyme / singleton
+
+Avancés
+    réparti en X : Les annotations 
+    ex : Portée, Gestion Mémoire, Exception, Interface, Généricité, Imbrication, Classe anonyme / singleton
+    
+Index
+
+le code
+    les instructions
+    les mots clés
+    flux
+    structure de contrôle
+séquence
+sélection
+    if () { } else if { } else { }
+    switch (expr) { case val: break; default: ...;}
+        auto-enchaînement
+itération
+    while () {}
+    do {} while ();
+    for(init;cond;iter) {} for(type id : liste) {}
+intérruption
+    break
+    continue (ou next)
+    return ou return expr
+point d'entrée
+organisation (package)
+    conv = 1 classe de 1er niveau par fichier portant le même nom
+    class def dans le package par déf non accessible depuis un package nommé !
+    un package = 1 dossier
+    import ppp.*;
+    import ppp.xxx;
+exceptions
+    try {} catch (Type id) { } finally { }
+    throw new Type();
+    propagation
+
+les expressions
+variables
+    nom
+        ne commence jamais par un chiffre
+        convention : CamelCase other_conv otherConv
+        différence minuscule / majuscule
+        ne pas utiliser les mots clés
+    catégories
+        locale, d'instance, de classe
+    valeur / référence
+types de base (max, min, taille, val par défaut, littéraux)
+    entiers
+        byte, short, int, long (=0) 023 (octal) 0xA (hexa) (int de base)
+    réels
+        float, double (=0.0) (2.8f, 2.6e3f) (sans f, double de base)
+    booléens
+        true, false
+    chaînes et caractères
+        char (=\u0000), String (=null)
+        caractère d'échappement
+        caractère unicode \u
+        .charAt(index)
+        .equals(s) et pas ==
+        .trim()
+        .toUpperCase() toLowerCase()
+        .indexOf(s) -1 si pas trouvé
+        .replace(s,s)
+    tableaux
+        type[] x = new int[size] ou = {val, ... }
+        Accès : x[index]
+        type[][] x = new int[s][s2]
+        .length
+        java.util.Arrays : manip (sort, toString, copyOf)
+    listes
+    dictionnaires
+    autres
+        void et null
+opérateurs
+        unaire/binaire
+    arithmétiques
+        unaires ++ -- - 
+        binaires + - * / %
+    booléens
+        ! && & || | ^ 
+    comparaison
+        == != < <= >=
+    affectation
+    bits à bits
+        ~ complément à 1
+        & et | ou ^ xor >> décalage vers droite << vers gauche
+    autres
+        instanceof
+        + concaténation
+    priorités et parenthèses
+        -  *,/  /(int)   mod   +,-,+(concat)
+conversion de type (transtypage)
+    (type) expression
+    conversion autorisée
+    conversion implicite
+    parseXXX(String s) méthode statique de la classe associée
+    valueOf(XXX s) méthode statique de String pour obtenir une chaîne
+portée et visibilité des variables
+gestion de la mémoire
+    garbage collector, mark & sweep vs stop & copy
+    System.gc() force l'appel sinon se déclenche quand ressources utilisées > 85% des disponibles
+    Runtime.getRuntime().totalMemory()
+    Runtime.getRuntime().freeMemory()
+constantes
+gestion de la mémoire
+    static = immortelles
+constantes
+    final
+énumérations
+    enum Name { val, ... }
+    
+les fonctions
+définition
+    en-tête (signature) et corps
+    paramètres formels
+    valeur par défaut
+    paramètres spéciaux
+    retour
+utilisation
+    paramètres réels
+    appel
+
+Les classes
+    [modif] nom [extends super] [implements inter1, ...] {}
+    superclasse mère : Object
+paradigme OO
+    encapsulation
+    héritage
+    polymorphisme
+        A a = new B() ok si B->A
+définition
+    spécialisation
+        final pour empêcher
+    abstraite
+        abstract
+    interface
+        interface
+        only signatures et static var
+        convention fin en +able
+les attributs
+    à l'intérieur de la classe [mod] type id;
+    this
+    super
+les méthodes
+    [mod] typeret nom (par) {}
+    final : non redéf
+    synchronized : 1 seul thread
+    abstract : pas de code
+    static : de classe
+    surcharge OK mais pas only sur typeret
+    convention : getXXX setXXX ou isXXX pour get si rettype = boolean
+    constructeurs
+        nomclasse() ne renvoit rien !
+    destructeurs
+        protected finalize() throws Throwable
+utilisation
+    Xxx i = new Xxx(...);
+généricité
+    Nom<X [extends Y & Z]> Z and Y can be des classes ou des interfaces
+    Nom<X> s = new Nom<X>(...)
+    les génériques en Java sont une feature du compilo, pas de la jvm.
+    méthode marchant pour toutes les classes gén : Nom<?> mais alors on n'utilisera qu'une ref à Object.
+        <? extends Xxx>
+imbrication
+    ok ! classe dans classe
+classe anonyme / singleton
+    new interface/superclasse () { ... }
+
+Avancées
+    annotations
+        @Deprecated
+        @SuppressWarnings("xxx")
+        @Override pour indiquer une redéfinition
+    base
+        hashCode (=@mém)
+        clone
+        equals
+        getClass (réflexion)
+        toString
+Index
+
+Référence
+Java 6, Les bases du langage et de la programmation objet, Thierry Groussard, eni editions, collection TechNote, mai 2010
+extrait de : Java 6, Les fondamentaux du langage Java, Thierry Groussard, eni editions, collection Ressources Informatiques.
+Hugues Bersini
+Claude Delanoy
+Ruby in a nutshell
+Introduction à Python
+Jython Essentials
+http://www.cplusplus.com/doc/tutorial/variables/
