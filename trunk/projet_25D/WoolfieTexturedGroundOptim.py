@@ -22,6 +22,8 @@ screenHeight = 300 #480
 texWidth = 64
 texHeight = 64
 
+WHITE = (255, 255, 255)
+
 TEXTURED = True
 FPS = 60 #
 
@@ -112,11 +114,11 @@ def load_texture(filename, where):
             #print("%s for %s" % (z[xxx-1],xxx-1))
     tex[where] = z
 
-load_texture('eagle.png', 0)
-load_texture('wood.png', 1)
-load_texture('redbrick.png', 2)
-load_texture('bluestone.png', 3)
-load_texture('greystone.png', 4) # pb quand on applique le filtre "dark side"
+load_texture('textures/eagle.png', 0)
+load_texture('textures/wood.png', 1)
+load_texture('textures/redbrick.png', 2)
+load_texture('textures/bluestone.png', 3)
+load_texture('textures/greystone.png', 4) # pb quand on applique le filtre "dark side"
 
 # 14h52 : texture externe !!!!
 
@@ -208,6 +210,11 @@ def reboot():
     direction = [-1.0,0.0]
     camera = [0.0, 0.66]
 
+right = False
+left = False
+up = False
+down = False
+
 # Main loop
 while not escape:
 
@@ -221,61 +228,67 @@ while not escape:
             escape = True
         elif event.type == KEYDOWN and event.key == K_ESCAPE:
             escape = True
-        # rotate to the right
-        elif event.type == KEYDOWN and event.key == K_RIGHT:
-            # both camera direction and camera plane must be rotated
-            oldDirX = direction[0]
-            direction[0] = direction[0] * math.cos(-rotSpeed) - direction[1] * math.sin(-rotSpeed)
-            direction[1] = oldDirX * math.sin(-rotSpeed) + direction[1] * math.cos(-rotSpeed)
-            oldPlaneX = camera[0]
-            camera[0] = camera[0] * math.cos(-rotSpeed) - camera[1] * math.sin(-rotSpeed)
-            camera[1] = oldPlaneX * math.sin(-rotSpeed) + camera[1] * math.cos(-rotSpeed)
-        elif event.type == KEYDOWN and event.key == K_LEFT:
-            # both camera direction and camera plane must be rotated
-            oldDirX = direction[0]
-            direction[0] = direction[0] * math.cos(rotSpeed) - direction[1] * math.sin(rotSpeed)
-            direction[1] = oldDirX * math.sin(rotSpeed) + direction[1] * math.cos(rotSpeed)
-            oldPlaneX = camera[0]
-            camera[0] = camera[0] * math.cos(rotSpeed) - camera[1] * math.sin(rotSpeed)
-            camera[1] = oldPlaneX * math.sin(rotSpeed) + camera[1] * math.cos(rotSpeed)
-        elif event.type == KEYDOWN and event.key == K_UP:
-            try:        
-                if area[int(position[0] + direction[0] * moveSpeed)][int(position[1])] == False: position[0] += direction[0] * moveSpeed
-                if area[int(position[0])][int(position[1] + direction[1] * moveSpeed)] == False: position[1] += direction[1] * moveSpeed
-            except Exception as e:
-                print(int(position[0] + direction[0] * moveSpeed))
-                print(int(position[1] + direction[1] * moveSpeed))
-                print e
-        elif event.type == KEYDOWN and event.key == K_DOWN:
-            if area[int(position[0] - direction[0] * moveSpeed)][int(position[1])] == False: position[0] -= direction[0] * moveSpeed
-            if area[int(position[0])][int(position[1] - direction[1] * moveSpeed)] == False: position[1] -= direction[1] * moveSpeed
         elif event.type == KEYDOWN and event.key == K_SPACE:
             reboot()
-        #elif event.type == KEYDOWN and event.key == K_LEFT:
-        #    modx = -1
-        #elif event.type == KEYDOWN and event.key == K_RIGHT:
-        #    modx = 1
-        #elif event.type == KEYDOWN and event.key == K_UP:
-        #    mody = -1
-        #elif event.type == KEYDOWN and event.key == K_DOWN:
-        #    mody = 1
-        #elif event.type == KEYUP:
-        #    if event.key == K_LEFT or event.key == K_RIGHT:
-        #        modx = 0
-        #    elif event.key == K_DOWN or event.key == K_UP:
-        #        mody = 0
-    
-    # Update
-    #position[0] += modx
-    #position[1] += mody
-    
+        elif event.type == KEYUP and event.key == K_s:
+            TEXTURED = not TEXTURED
+        elif event.type == KEYDOWN:
+            if event.key == K_RIGHT:
+                right = True
+            if event.key == K_LEFT:
+                left = True
+            if event.key == K_UP:
+                up = True
+            if event.key == K_DOWN:
+                down = True
+        elif event.type == KEYUP:
+            if event.key == K_RIGHT:
+                right = False
+            if event.key == K_LEFT:
+                left = False
+            if event.key == K_UP:
+                up = False
+            if event.key == K_DOWN:
+                down = False
+                    
+    # rotate to the right
+    if right:
+        # both camera direction and camera plane must be rotated
+        oldDirX = direction[0]
+        direction[0] = direction[0] * math.cos(-rotSpeed) - direction[1] * math.sin(-rotSpeed)
+        direction[1] = oldDirX * math.sin(-rotSpeed) + direction[1] * math.cos(-rotSpeed)
+        oldPlaneX = camera[0]
+        camera[0] = camera[0] * math.cos(-rotSpeed) - camera[1] * math.sin(-rotSpeed)
+        camera[1] = oldPlaneX * math.sin(-rotSpeed) + camera[1] * math.cos(-rotSpeed)
+    if left:
+        # both camera direction and camera plane must be rotated
+        oldDirX = direction[0]
+        direction[0] = direction[0] * math.cos(rotSpeed) - direction[1] * math.sin(rotSpeed)
+        direction[1] = oldDirX * math.sin(rotSpeed) + direction[1] * math.cos(rotSpeed)
+        oldPlaneX = camera[0]
+        camera[0] = camera[0] * math.cos(rotSpeed) - camera[1] * math.sin(rotSpeed)
+        camera[1] = oldPlaneX * math.sin(rotSpeed) + camera[1] * math.cos(rotSpeed)
+    if up:
+        try:        
+            if area[int(position[0] + direction[0] * moveSpeed)][int(position[1])] == False: position[0] += direction[0] * moveSpeed
+            if area[int(position[0])][int(position[1] + direction[1] * moveSpeed)] == False: position[1] += direction[1] * moveSpeed
+        except Exception as e:
+            print(int(position[0] + direction[0] * moveSpeed))
+            print(int(position[1] + direction[1] * moveSpeed))
+            print e
+    if down:
+        if area[int(position[0] - direction[0] * moveSpeed)][int(position[1])] == False: position[0] -= direction[0] * moveSpeed
+        if area[int(position[0])][int(position[1] - direction[1] * moveSpeed)] == False: position[1] -= direction[1] * moveSpeed
+        
     # Draw
     screen.fill((0,0,0))
     
     screen.blit(default.render(" x = %f  y = %f" % (position[0], position[1]), True, (255,0,0)), (320, 260))
     screen.blit(default.render("dx = %f dy = %f" % (direction[0], direction[1]), True, (0,255,0)), (320, 260+16+2))
     screen.blit(default.render("cx = %f cy = %f" % (camera[0], camera[1]), True, (0,0,255)), (320, 260+18*2))
-    screen.blit(default.render("Press space to reboot simulation", True, (255,255,255)), (320, 260+18*3))
+    screen.blit(default.render("Press space to reboot simulation", True, WHITE), (320, 260+18*3))
+    screen.blit(default.render("Press escape to quit", True, WHITE), (320, 260+18*4))
+    screen.blit(default.render("Press S to switch sky drawing", True, WHITE), (320, 260+18*5))
     #screen.blit(sprite1, (100, 100))
     
     # Map and player
@@ -480,8 +493,9 @@ while not escape:
                 
         ## END TEXTURE
         
-        #UNTEX 
-        pygame.draw.line(screen, color, (s,drawStart), (s,drawEnd), 1)
+        #UNTEX
+        else:
+            pygame.draw.line(buffer, color, (s,drawStart), (s,drawEnd), 1)
     
     screen.blit(buffer, (0,0))
     buffer.fill((0,0,0))
