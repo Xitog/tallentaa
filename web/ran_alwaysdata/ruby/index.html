@@ -155,9 +155,9 @@
   </li>
   <li><b>Les bibliothèques</b>
     <ol>
-      <li><a href="#bibliotheques">Bibliothèque noyau</a></li>
-      <li><a href="#bibliotheques">Bibliothèque standard</a></li>
-      <li><a href="#bibliotheques">Divers bibliothèques</a></li>
+      <li><a href="#bib_noyau">Bibliothèque du noyau</a></li>
+      <li><a href="#bib_standard">Bibliothèque standard</a></li>
+      <li><a href="#bib_external">Bibliothèques externes</a></li>
     </ol>
   </li>
   <li><b>Annexes</b>
@@ -1031,16 +1031,18 @@
 
 <h4>Méthode singleton</h4>
 
-<p>définition de la méthode en dehors de la classe de l’objet en indiquant l’objet ainsi : def identificateur.nom_methode . Une méthode définie pour un objet particulier s’appelle une méthode singleton.</p>
+<p>Une méthode singleton est une méthode définie pour une seule instance.
+définition de la méthode en dehors de la classe de l’objet en indiquant l’objet ainsi : def identificateur.nom_methode . Une méthode définie pour un objet particulier s’appelle une méthode singleton.</p>
 <p>Exemple :</p>
 <p class="code">
-&nbsp;v<span class="i">1</span>&nbsp;=&nbsp;Voiture.new<br>
-&nbsp;<span class="k">def&nbsp;</span>v<span class="i">1</span>.rouler_vite()<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;puts</span>&nbsp;<span class="s">'je&nbsp;roule&nbsp;vite'</span><br>
-&nbsp;<span class="k">end</span><br>
-&nbsp;v<span class="i">1</span>.rouler_vite()&nbsp;&nbsp;<span class="c">#&nbsp;Affiche&nbsp;:&nbsp;je&nbsp;roule&nbsp;vite</span><br>
-&nbsp;v<span class="i">2</span>&nbsp;=&nbsp;Voiture.new<br>
-&nbsp;v<span class="i">2</span>.rouler_vite()&nbsp;&nbsp;<span class="c">#&nbsp;Erreur!&nbsp;:&nbsp;rouler_vite&nbsp;n'est&nbsp;pas&nbsp;définie&nbsp;pour&nbsp;v<span class="i">2</span>&nbsp;seulement&nbsp;pour&nbsp;v<span class="i">1</span>&nbsp;!</span><br>
+    v1 = Voiture.new('rouge', 'CNX')<br>
+    <span class="k">def</span> v1.rouler_vite()<br>
+    &nbsp;&nbsp;puts <span class="s">'je roule vite'</span><br>
+    <span class="k">end</span><br>
+    v1.rouler_vite() <span class="c">#&nbsp;Affiche&nbsp;:&nbsp;je&nbsp;roule&nbsp;vite</span><br>
+    <br>
+    v2 = Voiture.new('violette', 'Lyon')<br>
+    v2.rouler_vite() <span class="c"># Erreur! rouler_vite n'est pas définie pour v2 mais seulement pour v1 !</span><br>
 </p>
 <p class="code">
 &nbsp;aa&nbsp;=&nbsp;<span class="s">"hello"</span><br>
@@ -1210,6 +1212,12 @@
 <h2 class="horstexte" id="astuces">Astuces</h2>
 <a href="#sommaire"><i>(retour sommaire)</i></a>
 
+<p class="code">
+&nbsp;rand(max)&nbsp;de&nbsp;<span class="i">0</span>&nbsp;à&nbsp;max<br>
+&nbsp;puts</span>&nbsp;something<br>
+&nbsp;something&nbsp;=&nbsp;gets<br>
+</p>
+
 <h3>Appel de bibliothèque</h3>
 <p class="code">
 &nbsp;<span class="k">require&nbsp;</span><span class="s">'ma_bibliothèque'</span><br>
@@ -1260,43 +1268,167 @@
 <h2 class="horstexte" id="bibliotheques">Bibliothèques</h2>
 <a href="#sommaire"><i>(retour sommaire)</i></a>
 
-<p>Sites de bibliothèques : <a class="intext" href="http://raa.ruby-lang.org/""> RAA</a> (comme CPAN, Pear, Pecl pour Perl), [[href="http://rubyforge.org/", RubyForge]]</p>
+<p>Connaître le langage n'est que la moitié de l'affaire. En effet, il est important de connaître les bibliothèques offertes pour pouvoir utiliser dans sa pleine puissance Ruby, et surtout ne pas recoder quelque chose qui a déjà été codé, souvent en mieux ! Il y a trois niveaux de bibliothèque : la bibliothèque du noyau concerne les méthodes offertes par les types de base de Ruby. La bibliothèque standard est incluse dans chaque distribution de Ruby, mais nécessite d'employer des <span class="code">require</span> pour faire appel aux parties souhaitées. Enfin, les bibliothèques externes doivent être au préalable téléchargées et installées sur la machine avant de pouvoir être utilisées depuis Ruby.</p>
+
+<h3 id="bib_noyau">Bibliothèque du noyau</h3>
+
+<h4>Classe Object</h4>
+
+<p>Ces méthodes sont communes à tous les objets Ruby.</p>
+
+<h5>Méthodes</h5>
+
+<dl>
+    <dt>nil?</dt>
+    <dd>Renvoie vrai si l'objet est égal à la valeur nulle.</dd>
+</dl>
+
+<h4>Classes Fixnum et Bignum</h4>
+
+<p>Les deux classes héritent de <span class="code">Integer</span> qui hérite de <span class="code">Numeric</span>.</p>
+
+<h5>Méthodes</h5>
+
+<dl>
+    <dt><span class="code">abs</span></dt>
+    <dd>Renvoie la valeur absolue du nombre.</dd>
+    <dt><span class="code">between?(min, max)</span></dt>
+    <dd>Renvoie vrai si nombre est compris entre min et max inclus.</dd>
+    <dt><span class="code">chr</span></dt>
+    <dd>Renvoie la chaîne du caractère correspond au nombre.</dd>
+    <dt><span class="code">downto(min) bloc/1</span></dt>
+    <dd>Fait une itération du nombre à min en passant en argument la valeur courante au bloc en paramètre.</dd>
+    <dt><span class="code">to_f</span></dt>
+    <dd>Transforme l'entier en flottant. Si on essaye de convertir un Bignum en flottant, le flottant peut être trop petit pour le contenir, et prendra comme valeur l'infini.</dd>
+    <dt><span class="code">next</span></dt>
+    <dd>Renvoie nombre+1 (équivalent à <span class="code">succ</span>).</dd>
+    <dt><span class="code">size</span></dt>
+    <dd>Renvoie le nombre d'octets nécessaire pour stocker en mémoire ce nombre.</dd>
+    <dt><span class="code">step(limite, step) bloc/1</span></dt>
+    <dd>Fait une itération du nombre à limite en ajoutant step à chaque fois et en passant la valeur courante au bloc.</dd>
+    <dt><span class="code">succ</span></dt>
+    <dd>Renvoie nombre+1 (équivalent à <span class="code">next</span>).</dd>
+    <dt><span class="code">times bloc/0-1</span></dt>
+    <dd>Fait n itération de 0 à nombre-1 en appelant le bloc avec l'index.</dd>
+    <dt><span class="code">to_s(<i>base</i>)</span></dt>
+    <dd>Convertit le nombre en une chaîne dans la base donnée, 10 par défaut.</dd>
+    <dt><span class="code">upto(max) bloc/1</span></dt>
+    <dd>Fait une itération du nombre à max en passant en argument la valeur courante au bloc en paramètre.</dd>
+    <dt><span class="code">zero?</span></dt>
+    <dd>Renvoie vrai si nombre est égal à 0.</dd>
+</dl>
+
+<h5>Opérateurs</h5>
+
+<dl>
+    <dt><span class="code">[index]</span></dt>
+    <dd>Renvoie le bit à l'emplacement d'index.</dd>
+    <dt><span class="code">Arithmétiques : + - * / ** %</span></dt>
+    <dd>Opérateurs arithmétiques classiques. La division de deux entiers produit toujours un entier.</dd>
+    <dt><span class="code">Binaires : &amp; (et) | (ou) ^ (ou exclusif) ~ (inversion des bits)</span></dt>
+    <dd>Opérateurs binaires classiques.</dd>
+    <dt><span class="code">De décalage : &lt;&lt; (à gauche) &gt;&gt; (à droite)</span></dt>
+    <dd>Opérateurs de décalage (décale en ajoutant des 0).</dd>
+    <dd><span class="code">De comparaison : &lt; &lt;= &gt; &gt;= == != &lt;=&gt;</span></dd>
+    <dd>Renvoie vrai ou faux, sauf &lt;=&gt; qui renvoie 0 (égaux), -1 (gauche &lt; droite), +1 (gauche &gt; droite).</dd>
+</dl>
+
+<h4>Classe Float</h4>
+
+<p>Cette classe hérite de <span class="code">Numeric</span>.</p>
+
+<h5>Méthodes</h5>
+
+<dl>
+    <dt><span class="code">floor</span></dt>
+    <dd>Arrondit le nombre à l'inférieur.</dd>
+    <dt><span class="code">ceil</span></dt>
+    <dd>Arrondit le nombre au supérieur.</dd>
+    <dt><span class="code">round</span></dt>
+    <dd>Arrondit le nombre à l'inférieur si partie décimale &lt; 0.5, à l'inférieur si &gt;= 0.5.</dd>
+    <dt><span class="code">infinite?</span></dt>
+    <dd>Renvoie 1 si le nombre a pour valeur infini positive, -1 si infini négatif et nil si le nombre est fini.</dd>
+    <dt><span class="code">finite?</span></dt>
+    <dd>Renvoie vrai si le nombre a une valeur finie, faux sinon.</dd>
+    <dt><span class="code">nan?</span></dt>
+    <dd>Renvoie vrai si le nombre n'en est pas un (suite à une opération).</dd>
+    <dt><span class="code">floor</span></dt>
+    <dd>Arrondit le nombre à l'inférieur.</dd>
+    <dt><span class="code">to_s</span></dt>
+    <dd>Transforme le nombre en chaîne de caractère après avoir fait un arrondit à l'inférieur dessus.</dd>
+    <dt><span class="code">to_i</span></dt>
+    <dd>Transforme le nombre en entier en troncant sa partie décimale.</dd>
+</dl>
+
+<h5>Opérateurs</h5>
+
+<h4>Classe String</h4>
+
+<h5>Méthodes</h5>
+
+<dl>
+    <dt><span class="code">concat(str)</span></dt>
+    <dd>Retourne une nouvelle chaîne issue de la concaténation des deux.</dd>
+    <dt><span class="code">to_i</span></dt>
+    <dd>Essaye de convertir la chaîne en un entier. Renvoie 0 sinon.</dd>
+    <dt><span class="code">to_f</span></dt>
+    <dd>Essaye de convertir la chaîne en un flottant. Renvoie 0.0 sinon.</dd>
+</dl>
+
+<h5>Opérateurs</h5>
+
+<h4>Classe Range</h4>
+
+<h4>Classe Regex</h4>
+
+<h3 id="bib_standard">Bibliothèque standard</h3>
+
+<h3 id="bib_external">Bibliothèques externes</h3>
+
+<p>On peut trouver de nombreuses bibliothèques externes sur le site de la <a href="http://raa.ruby-lang.org/">Ruby Application Archive</a> ou RAA qui les liste. RAA est un peu comme CPAN, Pear et Pecl pour le langage Perl ou PyPI, the Python Package Index pour le langage Python. Il existe aussi Ruby Forge qui héberge de nombreux projets en Ruby dont des bibliothèques.</p>
+
+<h4>Watir</h4>
+
+<p><a href="http://wiki.openqa.org/display/WTR/Example+Test+Case">Watir</a> est une bibliothèque créée pour tester les applications web. Elle se charge de dialoguer avec un navigateur internet, pour permettre d'automatiser son comportement en vue de tester une application web (simulation de clic sur un bouton, de remplissage de formulaire).Il fonctionne avec les principaux navigateurs. Des versions pour .Net (Watin) et Java (Watij) existent aussi.</p>
+
 <p class="code">
-&nbsp;rand(max)&nbsp;de&nbsp;<span class="i">0</span>&nbsp;à&nbsp;max<br>
-&nbsp;puts</span>&nbsp;something<br>
-&nbsp;something&nbsp;=&nbsp;gets<br>
+    <span class="k">require</span> <span class="s">"watir"</span><br>
+    test_site = <span class="s">"http://www.google.com"</span><br>
+    ie = Watir::IE.new<br>
+    ie.goto test_site<br>
+    ie.text_field(:name, <span class="s">"q"</span>).set <span class="s">"pickaxe"</span><br>
+    ie.button(:name, <span class="s">"btnG"</span>).click<br>
+    ie.text.include? <span class="s">"Programming Ruby"</span><br>
 </p>
-<h3>Watir</h3>
-<p><a class="intext" href=""http://wiki.openqa.org/display/WTR/Example+Test+Case""> lien</a></p>
-<p>Watir est un module de test d'application web avec IE pour Ruby. Des versions .Net (Watin) et Java (Watij) existe aussi. Le but est d'automatiser le comportement du navigateur internet en vue de tester l'application.</p>
+
+<h4>Gosu</h4>
+
+<p><a href="http://www.libgosu.org/">Gosu</a> est une bibliothèque multimédia (sons, images, périphériques d'entrée tels que la souris et le clavier) qui permet notamment de faire des jeux en 2D avec Ruby. La classe principale de notre application devra hériter de la classe <span class="code">Window</span> de Gosu.</p>
+
 <p class="code">
-&nbsp;<span class="k">require&nbsp;</span><span class="s">"watir"</span><br>
-&nbsp;test_site&nbsp;=&nbsp;<span class="s">"http://www.google.com"</span><br>
-&nbsp;ie&nbsp;=&nbsp;Watir::IE.new<br>
-&nbsp;ie.goto&nbsp;test_site<br>
-&nbsp;ie.text_field(:name,&nbsp;<span class="s">"q"</span>).set&nbsp;<span class="s">"pickaxe"</span><br>
-&nbsp;ie.button(:name,&nbsp;<span class="s">"btnG"</span>).click<br>
-&nbsp;ie.text.include?&nbsp;<span class="s">"Programming&nbsp;Ruby"</span><br>
+    <span class="k">class</span> MaFenetre &lt; Gosu::Window<br>
+    <br>
+    &nbsp;&nbsp;<span class="k">def</span> initialize<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;super(largeur, hauteur, booléen)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;self.caption = <span class="s">"Titre"</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;initialisation<br>
+    &nbsp;&nbsp;<span class="k">end</span><br>
+    <br>
+    &nbsp;&nbsp;<span class="k">def&nbsp;</span>update<br>
+    &nbsp;&nbsp;<span class="k">end</span><br>
+    <br>
+    &nbsp;&nbsp;<span class="k">def&nbsp;</span>draw<br>
+    &nbsp;&nbsp;<span class="k">end</span><br>
+    <br>
+    &nbsp;&nbsp;<span class="k">def&nbsp;</span>button_down(id)<br>
+    &nbsp;&nbsp;<span class="k">end</span><br>
+    <br>
+    <span class="k">end</span><br>
+    <br>
+    f = MaFenetre.new<br>
+    f.show<br>
 </p>
-<h3>Gosu</h3>
-<p>La classe principale de notre application est une fenêtre.</p>
-<p class="code">
-&nbsp;<span class="k">class&nbsp;</span>Fenêtre&nbsp;&lt;&nbsp;Gosu::Window<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">def&nbsp;</span>initialize<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;super(largeur,&nbsp;hauteur,&nbsp;booléen)&nbsp;&lt;?&gt;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.caption&nbsp;=&nbsp;<span class="s">"Titre"</span><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;initialisation<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">end</span><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">def&nbsp;</span>update<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">end</span><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">def&nbsp;</span>draw<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">end</span><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">def&nbsp;</span>button_down(id)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">end</span><br>
-&nbsp;<span class="k">end</span><br>
-&nbsp;f&nbsp;=&nbsp;Fenêtre.new<br>
-&nbsp;f.show<br>
-</p>
+
 <p>Gosu::Button::xxx</p>
 <p>Enumération de tous les boutons possibles.</p>
 
