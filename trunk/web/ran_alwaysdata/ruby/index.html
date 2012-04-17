@@ -718,17 +718,21 @@
 
 <p>La sélection est l'acte d'exécuter une instruction si et seulement une condition est réunie. On distingue deux structures pour la sélection : le <span class="k">if</span> qui exécute l'instruction ou les instructions suivantes si la condition est vraie, et le <span class="k">unless</span>, que l'on peut traduire par <i>à moins que, sauf si</i>, qui exécutera le ou les instructions suivantes si la condition est fausse.</p>
 
+<p>Les éléments entre crochets et en italique sont optionnels. L'étoile indique que l'élément est répétable. Les éléments entre accolades et en italique séparés par | indique un choix obligatoire entre plusieurs possibilités.</p>
+
 <p class="code">
-    <span class="k">if</span> condition [<span class="k">then </span>]<br>
+    <span class="k">if</span> condition { <i><span class="k">then</span> | \n | ;</i> }<br>
     &nbsp;&nbsp;instructions<br>
-    [ <span class="k" >elsif</span> condition [<span class="k">then </span>]<br>
-    &nbsp;&nbsp;instructions ]*<br>
-    [ <span class="k">else</span><br>
-    &nbsp;&nbsp;instructions ]<br>
+    [ <i><span class="k" >elsif</span> condition { <span class="k">then</span> | \n | ; }<br>
+    &nbsp;&nbsp;instructions</i> ]*<br>
+    [ <i><span class="k">else</span><br>
+    &nbsp;&nbsp;instructions</i> ]<br>
     <span class="k">end</span><br>
     <br>
-    <span class="k">unless </span>condition<br>
+    <span class="k">unless </span>condition { <i><span class="k">then</span> | \n | ;</i> }<br>
     &nbsp;&nbsp;instructions<br>
+    [ <i><span class="k">else</span><br>
+    &nbsp;&nbsp;instructions</i> ]<br>
     <span class="k">end</span><br>
 </p>
 
@@ -762,12 +766,12 @@
 
 <p class="code">
     <span class="k">case</span> expression<br>
-    &nbsp;&nbsp;<span class="k">when</span> expression <span class="k">then</span><br>
+    &nbsp;&nbsp;<span class="k">when</span> expression [ <i>, expression</i> ]* { <span class="k">then</span> | \n | ; }<br>
     &nbsp;&nbsp;&nbsp;&nbsp;instructions<br>
-    &nbsp;&nbsp;<span class="k">when</span> expression <span class="k">then</span><br>
-    &nbsp;&nbsp;&nbsp;&nbsp;instructions<br>
-    &nbsp;&nbsp;[ <span class="k">else</span><br>
-    &nbsp;&nbsp;&nbsp;&nbsp;instructions ]<br>
+    &nbsp;&nbsp;[ <i><span class="k">when</span> expression { <span class="k">then</span> | \n | ; }<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;instructions </i>]*<br>
+    &nbsp;&nbsp;[ <i><span class="k">else</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;instructions </i>]<br>
     <span class="k">end</span><br>
 </p>
 
@@ -791,15 +795,17 @@
 <p>L'itération est le fait d'exécuter plusieurs fois la même instruction au sein d'une boucle. Généralement, la boucle est gardée par une condition qui est réévaluée à chaque nouvelle itération de la boucle. Il existe deux principales constructions pour faire des boucles en Ruby : <span class="k">for</span> et <span class="k">while</span>. La première parcours une itération en affectant une valeur, et la seconde est une simple boucle gardée par une condition. Il existe aussi <span class="k">until</span> qui à la différence de <span class="k">while</span>, qui exécute la boucle tant que la condition est vraie, exécutera la boucle tant que sa condition sera fausse.</p>
 
 <p class="code">
-    <span class="k">for</span> variable <span class="k">in</span> liste_de_valeurs [<span class="k">do</span>]<br>
+    <span class="k">for</span> variable <span class="k">in</span> liste_de_valeurs { <i><span class="k">do</span> | \n | ; </i>}<br>
     &nbsp;&nbsp;instructions<br>
     <span class="k">end</span><br>
     <br>
-    <span class="k">while</span> condition [<span class="k">do</span>]<br>
+    <span class="k">while</span> condition { <i><span class="k">do</span> | \n | ; </i>}<br>
     &nbsp;&nbsp;instructions<br>
+    [ <i><span class="k">else</span><br>
+    &nbsp;&nbsp;instructions ]</i><br>
     <span class="k">end</span><br>
     <br>
-    <span class="k">until</span> condition [<span class="k">do</span>]<br>
+    <span class="k">until</span> condition { <i><span class="k">do</span> | \n | ; </i>}<br>
     &nbsp;&nbsp;instructions<br>
     <span class="k">end</span><br>
 </p>
@@ -1831,6 +1837,15 @@
 <a href="#sommaire"><i>(retour sommaire)</i></a>
 
 <ul>
+  <li>Vieilles versions et notes
+    <ul>
+      <li>Découverte de Ruby par la lecture de <i>Ruby in a nutshell</i>.</li>
+      <li>5 feuilles papiers non transposées sur machine du 12 octobre <b>2005</b>.</li>
+      <li>1 feuille papier transposée sur machine du 1er mai 2006.</li>
+      <li>Petit fichier intégré du vendredi 26 mars 2010.</li>
+      <li>Fichier de transposition et d'intégration de Gdoc du 29 avril 2011.</li>
+    </ul>
+  </li>
   <li>Samedi 7 Avril
     <ul>
       <li>Version Alpha 01.</li>
