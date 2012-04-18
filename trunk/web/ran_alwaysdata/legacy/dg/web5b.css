@@ -1,0 +1,80 @@
+﻿body { 
+    background-color: #EEEEEE; 
+    color: DarkSlateGray; 
+    font-family: "Palatino Linotype", Book Antiqua, Palatino, serif; 
+    font-size: medium;
+    font-weight: normal;
+}
+
+/* Links */
+
+a.intext:link { color: DarkGoldenRod ; }
+a.intext:visited { color: Orange; }
+a.intext:hover { background-color: DarkGoldenRod; color: White; } 
+
+a.menu:link { color: DarkGoldenRod ; }
+a.menu:visited { color: Orange; }
+a.menu:hover { background-color: DarkGoldenRod; color: White; } 
+
+/* Table */
+
+table.inside { width: 100%; }
+table.inside td { vertical-align: top; padding-left: 5px; padding-right: 5px; }
+
+td.menu { border-right: 1px solid LightSlateGrey; width: 15%; }
+td.menu ul { list-style: none; margin-left: 0; padding-left: 0; }
+td.menu li { margin-bottom: 5px; } hr { color: LightSlateGrey; }
+td.menu ul li:before { content: "\00BB \0020"; }
+td.menu ul li.sep:before { content: "\00A7 \0020"; }
+td.menu ul li.part:before { content: "\233D \0020"; }
+
+td.middle { border-right: 1px solid LightSlateGrey; width: 65%; }
+
+td.right { width: 20%; } 
+
+table.invisible { margin: 0; padding: 0; width: 100%; }
+
+/* Picture */
+
+img { margin-right: 20px; }
+
+/* Text */
+
+h1 { margin: 0; text-align: left; font-size: 64px; text-shadow: 0.090em 0.090em 0.1em DarkGrey; padding-left: 10px; color: SeaGreen; font-weight: normal; }
+h2 { margin-top: 10px; margin-bottom: 5px; text-align: left; font-size: 18px; padding: 0; color: SeaGreen; }
+
+p.text:first-letter { font-weight: bolder; font-size: xx-large; margin-right: 4px; float: left; line-height: 1; color: SeaGreen; }
+p.text { text-align: justify; }
+p.footer { font-family: monospace; font-size: small; color: Grey; width: 100%; text-align: center; }
+
+p.date { text-align: center; font-family: Consolas; border-bottom: 1px dashed LightSlateGrey; width: 80%; color: LightSlateGrey; font-size: small; }
+p.rubrique { font-size: 16; font-family: "Palatino Linotype"; text-decoration: underline; margin: 0; }
+p.rubrique:first-letter { font-size: 18; } 
+
+/* Spécifique */
+
+    /* Scriptal */
+
+    p.code { font-family: "Consolas","Bitstream Vera Sans Mono","Courier New",Courier,monospace; font-size: 11px; border-style: dotted; border-width: 1px; background-color: #F9FAED; }
+    span.k { font-weight: bold; color: #006699; }
+    span.s { color: DarkOrange; }
+    
+    /* Beatrice */
+
+    span.typ { color: DarkOrange; }
+
+/* Lists */
+
+ul.rubrique { list-style: none; margin-top: 2px; margin-left: 0; padding-left: 0; font-family: "Palatino Linotype"; }
+ul.rubrique li { padding-left: 10px; }
+ul.rubrique li a:link { font-family: Consolas; font-size: small; }
+ul.rubrique li:before { content: "\00BB \0020"; }
+
+/* Divisions and tables */
+
+div.main { border: 1px solid LightSlateGrey; background-color: White; margin-top: 10px; padding-top: 0px; border-radius: 15px; -moz-border-radius: 15px; padding-bottom: 10px; width: 80%; }
+div.invisible { margin: 0; padding: 0; }
+div.menu { margin: 0; padding: 0; border-top: 1px solid LightSlateGrey; border-bottom: 1px solid LightSlateGrey; text-align: center; }
+
+table.bob { border: 1px DarkSlateGray solid; border-collapse: collapse; }
+table.bob td { border: 1px DarkSlateGray solid; text-align: center; }
