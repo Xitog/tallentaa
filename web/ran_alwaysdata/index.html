@@ -1,69 +1,105 @@
 ﻿<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="keywords" content="grammaire, cours, langue, français, italien, damien gouteux, gouteux">
-        <meta name="description" content="Site personnel de Damien Gouteux">
-        <title>Ran</title>
-        <style type="text/css">
-            html, body {
-                width: 100%;
-                height: 100%;
-                background-color: black;
-                color: red;
-                font-family: "Palatino Linotype"; 
-                font-size: 14px;
-            }
-            #main {
-                border: None;
-                text-align: center;
-                vertical-align: middle;
-                margin: auto;
-            }
-            a {
-                color: red;
-            }
-            a:hover { 
-                color: black; 
-                background-color: red; }
-            div {
-                border: 1px solid Red; 
-                width: 800px;
-                margin: auto;
-                border-radius: 25px; padding: 0;
-                    -moz-border-radius: 25p; 
-                    -webkit-border-radius: 25px; 
-                    -o-border-radius: 25px; 
-                background-color: #010101;
-                margin-top: 25px;
-            }
-            p { 
-                font-family: consolas;
-                margin: auto;
-                text-align: center;
-            }
-        </style>
-    </head>
-    <body>
-        <div>
-        <table id="main">
-            <tr>
-                <td>
-                    <img src="./Ran.jpg">
-                </td>
-                <td align="left">
-                    <dl>
-                        <dt><a href="http://ran.alwaysdata.net/beatrice/">Beatrice</a> <i>(italien)</i></dt>
-                        <dd></dd>
-                        <dt>&nbsp;</dt>
-                        <dd></dd>
-                        <dt><a href="http://ran.alwaysdata.net/cristina/">Cristina</a> <i>(français)</i></dt>
-                        <dd></dd>
-                    </dl>
-                </td>
-            </tr>
-        </table>
-        </div>
-        <p>Damien Gouteux</p>
-    </body>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="keywords" content="ruby, langage, programmation, cours, damien gouteux">
+    <meta name="description" content="grammaire de base italienne de Damien Gouteux">
+
+    <link rel="shortcut icon" href="favicon.ico" >
+    <link rel="icon" type="image/gif" href="favicon.ico" >
+
+    <title>Ran</title>
+    
+    <style type="text/css">
+        body            { font-family: "Palatino Linotype"; font-size: 14px; color: DarkSlateGray; background-color: #101010; }
+
+        a               { color: #00FF00; background-color: #000000; }
+        a:hover         { color: White; background-color: #FF0000; }
+        
+        a.d, a.d:hover, a.d:active, a.d:focus, a.d:visited { border: none; outline: none; font-weight: bold; color: #FF0000; 
+                        cursor: default; text-decoration: none; background-color: #000000; }
+
+        h1              { color: #FF0000; font-size: 64px; font-weight: normal; margin: 0; padding-left: 7px; text-align: left; 
+                            text-shadow: 0.09em 0.09em 0.1em DarkGrey; }
+        h2              { font-size: 14px; color: #FF0000; margin-top: 45px; border-bottom: 2px solid #FF0000; }
+        h2.horstexte    { font-size: 14px; color: #FF0000; margin-top: 25px; }
+        h3              { font-size: 14px; color: DarkSlateGray; }
+        h4              { font-size: 14px; color: DarkGray; }
+
+        table           { border: 1px solid DarkSlateGray; margin-left:auto; margin-right:auto; font-size: 14px; color: #EE0000;}
+        th              { border: 1px solid DarkSlateGray; background-color: #FF0000; color: White; }
+        tr              { border: 1px solid DarkSlateGray; text-align: center;}
+        tr:nth-child(even) { background-color: rgb(210, 210, 210); }
+
+        table.inv       { border: none; width: 100%; text-align: left; }
+        table.inv tr    { border: none; text-align: left; }
+        table.inv td    { border: none; }
+
+        div.menu        { border-top: 1px solid #FF0000; text-align: center; padding-top: 3px; padding-bottom: 3px; margin: 0; 
+                          font-size: 15px; border-bottom: 1px solid #FF0000; }
+        div.partie      { border: 1px solid #FF0000; text-align: left; font-size: 18px; color: #FF0000; padding: 20px 10px 20px 10px; 
+                            margin-top: 20px;}
+        div.wrapper     { border: 1px solid #FF0000; width: 800px; margin: auto; border-radius: 25px; padding: 0;
+	                        -moz-border-radius: 25p; -webkit-border-radius: 25px; -o-border-radius: 25px; background-color: #010101; }
+        div.content     { margin: 0; padding: 0; padding-left: 5px; padding-right: 5px; }
+        
+        p.info          { color: #778899; font-family: consolas; text-align: right; width: 100%;}
+        
+        header          { padding-left: 3px; padding-right: 3px; }
+
+        p.code          { font-family: Consolas, monaco, monospace; background: #fcf6ea; }
+        
+        span.code       { font-family: Consolas, monaco, monospace; }
+        span.s          { font-family: Consolas, monaco, monospace; color: brown; }
+        span.c          { font-family: Consolas, monaco, monospace; color: grey; font-style:italic; } 
+        span.k          { font-family: Consolas, monaco, monospace; color: orange; }
+        span.i          { font-family: Consolas, monaco, monospace; color: #550000; }
+
+    </style>
+</head>
+<body>
+<div class="wrapper">
+
+<header>
+    <h1>Ran</h1>
+    <p class="info">Site personnel de Damien Gouteux, 2012.</p>
+</header>
+
+<div class="menu"><a class="d" href="#sommaire">Ran</a> | <a href="http://ran.alwaysdata.net/beatrice">Beatrice</a> | <a href="http://ran.alwaysdata.net/cristina">Cristina</a> | <a href="http://ran.alwaysdata.net/ruby">Ruby</a></div>
+
+<div class="content">
+
+<table class="inv">
+  <tr>
+    <td>
+    
+        <h2 class="horstexte">Projets</h2>
+    
+        <p>Ce site web a été mis en ligne le 6 mars 2012. <i>Ran</i> évoque le chaos et le désordre du monde. Chaos qui est dû à deux choses principalement : l'injustice fondamentale inhérente aux hasards de la fortune, et l'accumulation et l'imbrication successives de relations, institutions et lois d'une variété infinie et complexe. Ce site expose mes différents projets personnels :</p>
+        
+        <p><a href="http://ran.alwaysdata.net/beatrice">Beatrice</a> est un fiche sur la langue italienne: grammaire de base, vocabulaire et conjugaison. La première version en ligne date du 12 mai 2011, sur mon site précédent.</p>
+        
+        <p><a href="http://ran.alwaysdata.net/cristina">Cristina</a> est la même chose pour la langue française. La première version en ligne date du 6 mars 2012.</p>
+        
+        <p><a href="http://ran.alwaysdata.net/ruby">Ruby</a> est une fiche sur le langage de programmation éponyme. La première version en ligne date du 7 avril 2012.</p>
+        
+        <p>Ces projets ont pour but de :
+        <ul>
+            <li>1) <u>centraliser et rendre disponible partout mes fiches de notes,</u></li>
+            <li>2) <u>mettre à disposition de qui veut ces fiches</u>.</li>
+        </ul>
+        Depuis leur mise en ligne, elles sont constamment améliorées et corrigées, mais des erreurs peuvent toujours s'y trouver. Le mieux est, si une information vous semble erronée, de la contre-vérifier auprès d'une autre source, puis si vous en avez le temps, de m'envoyer un email à mon adresse, damien POINT gouteux AROBASE gmail POINT com, pour m'en avertir. D'avance, merci.</p>
+        
+    </td>
+    <td align="right">
+      <br>
+      <a href="http://fr.wikipedia.org/wiki/Ran_(film)"><img src="http://ran.alwaysdata.net/Ran.jpg" width="300" height="481" alt="Ran"/></a>
+    </td>
+  </tr>
+</table>
+
+<br>
+
+</div> <!-- fin content -->
+</div> <!-- fin wrapper -->
+</body>
 </html>
