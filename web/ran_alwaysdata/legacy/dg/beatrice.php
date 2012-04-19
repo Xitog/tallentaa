@@ -101,7 +101,7 @@
                                             } else if ($subtag === '') {
                                                 $subtag = $arr['subtag'];
                                             }
-                                            echo '<tr><td>' . fword_it($word['form'], $word['class']) . '</td><td>' . $word['meaning'] . '</td></tr>';
+                                            echo '<tr><td>' . fword_it($word) . '</td><td>' . $word['meaning'] . '</td></tr>';
                                         }
                                         echo '</table>';
                                     } else {
@@ -120,7 +120,7 @@
                                     } else {
                                         echo '<table>';
                                         foreach ($r as $word) {
-                                            echo '<tr><td>' . fword_it($word['form'], $word['class']) . '</td><td>' . $word['meaning'] . '</td></tr>';
+                                            echo '<tr><td>' . fword_it($word) . '</td><td>' . $word['meaning'] . '</td></tr>';
                                         }
                                         echo '</table>';
                                     }
@@ -175,7 +175,7 @@
                                 $i = 1;
                                 foreach ($rand_keys as $key) {
                                     $arr = $res[$key];
-                                    echo '<tr><td>'.$i.'</td><td>' .fword_it($arr['form'], $arr['class']) . '</td><td>' . $arr['meaning'] . '</td></tr>';
+                                    echo '<tr><td>'.$i.'</td><td>' .fword_it($arr) . '</td><td>' . $arr['meaning'] . '</td></tr>';
                                     //$input[$rand_keys[0]] . "\n";
                                     $i+=1;
                                 }
