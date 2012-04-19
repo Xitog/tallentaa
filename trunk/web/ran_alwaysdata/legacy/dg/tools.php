@@ -11,7 +11,7 @@ function fsdate($date) {
 }
 
 function get($request) {
-    $db = mysql_connect("*******", "*******", "*******"); 
+    $db = mysql_connect("mysql1.alwaysdata.com", "***", "***"); 
     if(!$db) die ('Erreur à la connexion : ' . mysql_error());
     mysql_select_db("ran_db", $db);   
     mysql_query("SET NAMES UTF8");
@@ -72,8 +72,40 @@ function fword_it($w, $c, $m) {
 
 /* V2 */
 
-function fword_it($form, $class)
+function fword_it($word)
 {
+    $form = $word['form'];
+    $class = $word['class'];
+    $next = $word['gender'];
+
+    $vowels = array("a","e","i","o","u");
+    $is_voy = False;
+    if (in_array($form[0], $vowels, True)) {
+        $is_voy = True;
+    }
+    $is_spe = False;
+
+    if (strlen($form) > 2 and (($form[0] === 's' and $form[1] === 'c') or $form[0] === 'z')) {
+        $is_spe = True;
+    }
+    
+    if ($class === 'nom')
+    {
+        if ($next == 'F')
+            if ($is_voy)
+                return "l'" . $form . ' <span class="typ">' . $class . " " . strtolower($next) . ".</span>";
+            else
+                return 'la ' . $form . ' <span class="typ">' . $class . " " . strtolower($next) . ".</span>";
+        elseif ($next == 'M')
+            if ($is_voy)
+                return "l'" . $form . ' <span class="typ">' . $class . " " . strtolower($next) . ".</span>";
+            else
+                if ($is_spe)
+                    return "lo " . $form . ' <span class="typ">' . $class . " " . strtolower($next) . ".</span>";
+                else
+                    return "il " . $form . ' <span class="typ">' . $class . " " . strtolower($next) . ".</span>";
+    }
+
     return $form . ' <span class="typ">' . $class . "</span>";
 }
 
