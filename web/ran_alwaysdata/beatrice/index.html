@@ -33,7 +33,12 @@
 
         a               { color: DarkGoldenRod; }
         a:hover         { color: White; background-color: DarkGoldenRod; }
-        
+        a.d, a.d:hover, a.d:active, a.d:focus, a.d:visited { 
+            border: none; outline: none; font-weight: bold; 
+            color: SeaGreen; background-color: white;
+            cursor: default; text-decoration: none; 
+        }
+                        
         h1              { color: SeaGreen; font-size: 64px; font-weight: normal; margin: 0; padding-left: 7px; text-align: left; 
                             text-shadow: 0.09em 0.09em 0.1em DarkGrey; }
         h2              { font-size: 14px; color: SeaGreen; margin-top: 45px; }
@@ -62,15 +67,19 @@
         
         header          { padding-left: 3px; padding-right: 3px; }
 
+        span.index      { color: purple; text-decoration: underline; }
+        span.typ        { color: darkorange; }
+        
     </style>
 </head>
 <body>
 <div class="wrapper">
 <header>
     <h1>Beatrice</h1>
-    <p class="info">Mini Grammaire Italienne, Vocabulaire & Conjugaisons<br>Damien Gouteux, 2011-2012. Version 1.0.0</p>
+    <p class="info">Mini Grammaire Italienne, Vocabulaire &amp; Conjugaisons<br>Damien Gouteux, 2011-2012. Version 1.1.0</p>
 </header>
-<div class="menu"><a href="#sommaire">Sommaire</a> | <a href="http://ran.alwaysdata.net">Retour</a>  | <a href="http://looking.dwarf.free.fr/langues/it/Beatrice.pdf">Télécharger la version PDF</a></div>
+<div class="menu"><a href="http://ran.alwaysdata.net/">Ran</a> | <a class="d" href="http://ran.alwaysdata.net/beatrice">Beatrice</a> | <a href="http://ran.alwaysdata.net/cristina">Cristina</a> | <a href="http://ran.alwaysdata.net/ruby">Ruby</a></div>
+
 <div class="content">
 
 <h2 class="horstexte">Avant-propos</h2>
@@ -79,15 +88,15 @@
   <tr>
     <td>
     
-<p> Se fichier se veut un "tout-en-un" pour l'italien. Vous y trouverez la grammaire essentielle, un vocabulaire thématique, ainsi qu'une liste de verbes avec leur conjugaison. J'espère avant tout qu'elle vous sera pratique et vous aidera à progresser dans la belle langue de Dante.</p>
+<p>Se fichier se veut un "tout-en-un" pour l'italien. Vous y trouverez la grammaire essentielle, un vocabulaire thématique, ainsi qu'une liste de verbes avec leur conjugaison. J'espère avant tout qu'elle vous sera pratique et vous aidera à progresser dans la belle langue de Dante.</p>
 
-<p>Cette fiche a été faite dans un premier temps pour l'examen de fin d'année que mon groupe et votre serviteur avions pour couronner notre découverte de l'italien. Au fil du temps, j'y ai ajouté des parties pour la rendre plus complète et utile. Bien que j'essaye de vérifier chacun de mes dires ainsi que mes exemples, l'erreur est humaine, et si vous trouviez dans ce document une coquille, merci de me l'indiquer, je m'en ferai un superbe collier !</p>
+<p>Cette fiche a été faite dans un premier temps pour l'examen de fin d'année, que mon groupe et votre serviteur avions pour couronner notre découverte de l'italien. Au fil du temps, j'y ai ajouté des parties pour la rendre plus complète et utile. Bien que j'essaye de vérifier chacun de mes dires ainsi que mes exemples, mais l'erreur est humaine, et si vous trouviez dans ce document une coquille, je m'en excuse d'avance et vous remercie de me l'indiquer pour que je puisse la corriger gentiment.</p>
 
-<p>Vous pouvez me contacter à damien POINT gouteux AROBASE gmail.com, en remplaçant les mots en majuscule par le symbole correspondant. Bonne lecture et merci pour votre temps, la chose la plus précieuse de l'univers.</p>
+<p>Vous pouvez me contacter à damien POINT gouteux AROBASE gmail POINT com, en remplaçant les mots en majuscule par le symbole correspondant. Bonne lecture et merci pour votre temps, la chose la plus précieuse de l'univers !</p>
 
 <p>Damien Gouteux, Toulouse, le 5 août 2011.</p>
 
-<p>P.S. : cette page ne contient pas de pubs, surfez tranquille ! Et elle est toujours en construction !</p>
+<p>P.S. : cette page ne contient pas de publicité, surfez tranquille ! Et elle est toujours en construction !</p>
     </td>
     <td align="right">
       <a href="http://fr.wikipedia.org/wiki/Dante_Gabriel_Rossetti"><img src="http://upload.wikimedia.org/wikipedia/commons/9/94/Holygrail.jpg" width="300" height="481" alt="Damsel of the sanct grael, 1874"/></a>
@@ -106,7 +115,18 @@
   </li>
   <li><b>Seconde partie : Les éléments de la langue</b>
     <ol>
-      <li><a href="#noms">Noms et adjectifs</a></li>
+      <li><a href="#noms">Noms</a>
+        <ol>
+          <li><a href="#cas_particuliers">Cas particuliers</a></li>
+          <li><a href="#invariabilite">Invariabilité</a></li>
+        </ol>
+      </li>
+      <li><a href="#adjectifs">Adjectifs qualificatifs</a>
+        <ol>
+          <li><a href="#comparatif">Comparatif</a></li>
+          <li><a href="#superlatif">Superlatif</a></li>
+        </ol>
+      </li>
       <li><a href="#articles">Articles</a>
         <ol type="1">
           <li><a href="#articles_indef_def">Articles indéfinis et définis</a></li>
@@ -118,6 +138,7 @@
           <li><a href="#pron_sujets">Pronoms sujets, réfléchis et COD/COI</a></li>
           <li><a href="#pron_possessif">Pronoms possessifs</a></li>
           <li><a href="#pron_demonstratif">Pronoms démonstratifs</a></li>
+          <li><a href="#pron_relatifs">Pronoms relatifs</a></li>
         </ol>
       </li>
       <li><a href="#adverbes">Adverbes</a></li>
@@ -142,12 +163,22 @@
           <li><a href="#conj_conditionnel">Conditionnel</a></li>
          </ol>
       </li>
-      <li><a href="#prepositions">Prépositions</a></li>
+      <li><a href="#prepositions">Prépositions</a>
+        <ol>
+          <li><a href="#prep_simples">Les prépositions simples</a></li>
+          <li><a href="#prep_combinees">Prépositions combinées</a></li>
+          <li><a href="#prep_etendues">Les prépositions étendues</a></li>
+        </ol>
+      </li>
+      <li><a href="#conjonctions">Conjonctions</a></li>
+      <li><a href="#interjections">Interjections</a></li>
     </ol>
     <br/>
   </li>
   <li><b>Troisième partie : L'alchimie des éléments</b>
     <ol>
+      <li><a href="#fonctions">Les fonctions</a></li>
+      <li><a href="#hypothese">L'hypothèse</a></li>
       <li><a href="#negation">Exprimer la négation</a></li>
       <li><a href="#condition">Exprimer la condition</a></li>
     </ol>
@@ -160,6 +191,8 @@
           <li><a href="#buon_bel">Buon et Bel</a></li>
           <li><a href="#il_y_a">Dire il y a</a></li>
           <li><a href="#c_est">Dire "c'est"</a></li>
+          <li><a href="#aimer">Dire "aimer"</a></li>
+          <li><a href="#faut">Dire la nécessité</a></li>
         </ol>
       </li>
       <li><a href="#famille">La famille</a></li>
@@ -167,6 +200,7 @@
       <li><a href="#saisons_temps">Les saisons et le temps (climat)</a></li>
       <li><a href="#animaux">Les animaux</a></li>
       <li><a href="#jours_mois">Les jours et les mois</a></li>
+      <li><a href="#corps">Le corps</a></li>
       <li><a href="#maison">La maison</a></li>
       <li><a href="#frequence">Exprimer la fréquence</a></li>
       <li><a href="#liste_qualites">Qualités</a></li>
@@ -196,67 +230,79 @@
 
 <div class="partie">Première partie : présentation de la langue</div>
 
-<h2 class="horstexte" id="prononciation">Prononciation</h2> <a href="#sommaire"><i>(retour sommaire)</i></a>
+<h2 class="horstexte" id="prononciation">Prononciation</h2>
+<a href="#sommaire"><i>(retour sommaire)</i></a>
 
 <p>L'alphabet</p>
 
 <p>Il y a 21 lettres dans l'aphabet italien, plus 5 pour certains mots d'origine étrangère</p>
 
 <table>
-<thead>
-<tr><th>Lettre</th><th>Approximation</th><th>Prononciation API</th></tr>
-</thead>
-<tbody>
-<tr><td>a</td><td>"a"</td><td>a (<i>p<b>a</b>dre</i>)</td></tr>
-<tr><td>b</td><td>"bi"</td><td>b (<i><b>b</b>anca</i>)</td></tr>
-<tr><td>c</td><td>"tchi"</td><td>c (<i><b>ch</b>iesa</i>) ou &#x02A7; (<i><b>ci</b>ao</i>) ou k (<i><b>c</b>avolo</i>)</td></tr>
-<tr><td>d</td><td>"di"</td><td>d (<i><b>d</b>unque</i>)</td></tr>
-<tr><td>e</td><td>"è"</td><td>e (<i><b>e</b>dicola</i> ou &#x025B; (<i>c'<b>è</b></i>)</td></tr>
-<tr><td>f</td><td>"éffé"</td><td>f (<i><b>f</b>atto</i>)</td></tr>
-<tr><td>g</td><td>"dji"</td><td>&#x02A4; (<i><b>gi</b>ungla</i>) ou g (<i><b>g</b>atto</i>)ou &#x025F; (<i><b>gh</b>etto</i>)</td></tr>
-<tr><td>h</td><td>"akka"</td><td>-</td></tr>
-<tr><td>i</td><td>"i"</td><td>j (<i>ins<b>i</b>eme</i>) ou i (<i>pr<b>i</b>ma</i>)</td></tr>
-<tr><td>l</td><td>"éllé"</td><td>l (<i>pa<b>l</b>a</i>)</td></tr>
-<tr><td>m</td><td>"émmé"</td><td>m (<i>a<b>m</b>are</i>)</td></tr>
-<tr><td>n</td><td>"énné"</td><td>n (<i>pu<b>n</b>to</i>)ou &#x0271; (<i>a<b>n</b>fibio)ou &#x014B; (<i>fa<b>n</b>go</i>)</td></tr>
-<tr><td>o</td><td>"&ocirc;"</td><td>o (<i>poss<b>o</b></i>) ou &#x0254; (<i>p<b>o</b>sso</i>)</td></tr>
-<tr><td>p</td><td>"pi"</td><td>p (<i><b>p</b>iano</i>)</td></tr>
-<tr><td>q</td><td>"kou"</td><td>-</td></tr>
-<tr><td>r</td><td>"érré"</td><td>r (<i>roulé : <b>R</b>oma</i>)</td></tr>
-<tr><td>s</td><td>"éssé"</td><td>s (<i><b>s</b>ano</i>)ou z (<i>ro<b>s</b>a</i>)</td></tr>
-<tr><td>t</td><td>"ti"</td><td>t (<i>al<b>t</b>o</i>)</td></tr>
-<tr><td>u</td><td>"ou"</td><td>w (<i><b>u</b>omo</i>) ou u (<i><b>u</b>ltimo</i>)</td></tr>
-<tr><td>v</td><td>"vou"</td><td>v (<i><b>v</b>ado</i>)</td></tr>
-<tr><td>z</td><td>"zéta"</td><td>&#x02A6; (<i><b>z</b>ulù</i>) ou &#x02A3; (<i>mar<b>z</b>o</i>)</td></tr>
-</tbody>
+  <thead>
+    <tr><th>Lettre</th><th>Approximation</th><th>Transcription phonétique selon l'API*</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>a</td><td>"a"</td><td>a (<i>p<b>a</b>dre</i>)</td></tr>
+    <tr><td>b</td><td>"bi"</td><td>b (<i><b>b</b>anca</i>)</td></tr>
+    <tr><td>c</td><td>"tchi"</td><td>c (<i><b>ch</b>iesa</i>) ou &#x02A7; (<i><b>ci</b>ao</i>) ou k (<i><b>c</b>avolo</i>)</td></tr>
+    <tr><td>d</td><td>"di"</td><td>d (<i><b>d</b>unque</i>)</td></tr>
+    <tr><td>e</td><td>"è"</td><td>e (<i><b>e</b>dicola</i> ou &#x025B; (<i>c'<b>è</b></i>)</td></tr>
+    <tr><td>f</td><td>"éffé"</td><td>f (<i><b>f</b>atto</i>)</td></tr>
+    <tr><td>g</td><td>"dji"</td><td>&#x02A4; (<i><b>gi</b>ungla</i>) ou g (<i><b>g</b>atto</i>)ou &#x025F; (<i><b>gh</b>etto</i>)</td></tr>
+    <tr><td>h</td><td>"akka"</td><td>-</td></tr>
+    <tr><td>i</td><td>"i"</td><td>j (<i>ins<b>i</b>eme</i>) ou i (<i>pr<b>i</b>ma</i>)</td></tr>
+    <tr><td>l</td><td>"éllé"</td><td>l (<i>pa<b>l</b>a</i>)</td></tr>
+    <tr><td>m</td><td>"émmé"</td><td>m (<i>a<b>m</b>are</i>)</td></tr>
+    <tr><td>n</td><td>"énné"</td><td>n (<i>pu<b>n</b>to</i>)ou &#x0271; (<i>a<b>n</b>fibio)ou &#x014B; (<i>fa<b>n</b>go</i>)</td></tr>
+    <tr><td>o</td><td>"&ocirc;"</td><td>o (<i>poss<b>o</b></i>) ou &#x0254; (<i>p<b>o</b>sso</i>)</td></tr>
+    <tr><td>p</td><td>"pi"</td><td>p (<i><b>p</b>iano</i>)</td></tr>
+    <tr><td>q</td><td>"kou"</td><td>-</td></tr>
+    <tr><td>r</td><td>"érré"</td><td>r (<i>roulé : <b>R</b>oma</i>)</td></tr>
+    <tr><td>s</td><td>"éssé"</td><td>s (<i><b>s</b>ano</i>)ou z (<i>ro<b>s</b>a</i>)</td></tr>
+    <tr><td>t</td><td>"ti"</td><td>t (<i>al<b>t</b>o</i>)</td></tr>
+    <tr><td>u</td><td>"ou"</td><td>w (<i><b>u</b>omo</i>) ou u (<i><b>u</b>ltimo</i>)</td></tr>
+    <tr><td>v</td><td>"vou"</td><td>v (<i><b>v</b>ado</i>)</td></tr>
+    <tr><td>z</td><td>"zéta"</td><td>&#x02A6; (<i><b>z</b>ulù</i>) ou &#x02A3; (<i>mar<b>z</b>o</i>)</td></tr>
+  </tbody>
 </table>
+
+<ul>
+  <li>API : <a class="intext" href="http://fr.wikipedia.org/wiki/Alphabet_phon%C3%A9tique_international">Alphabet phonétique international</a>, permet de transcrire tous les sons des différentes langues du monde.</li>
+  <li>Les voyelles accentuées devant des doubles consonnes sont une hérésie bien sûr mais sont là pour mieux transcrire le son et qu'il n'y est pas d'ambivalence.</li>
+  <li>En italien, lorsque que deux consonnes identiques se suivent, <b>on prononce chacune !</b> Un peu comme le français le fait dans le prénom <i>Anna</i> : on commence par dire "anne" puis "na", prononçant ainsi les deux N.</li>
+  <li>Wiképédia fait <a class="intext" href="http://fr.wikipedia.org/wiki/Prononciation_de_l'italien">un tableau par rapport aux sons</a> très intéressant pour compléter celui-ci.</li>
+</ul>
 
 <p>Lettres pour les mots d'origine étrangère</p>
 
 <table>
-<tbody><tr><td>j</td><td>"i lounga"</td></tr>
-<tr><td>k</td><td>"kappa"</td></tr>
-<tr><td>x</td><td>"iks"</td></tr>
-<tr><td>w</td><td>"doppia vou"</td></tr>
-<tr><td>y</td><td>"i greka/ipsilon"</td></tr>
-</tbody></table>
+  <thead>
+    <tr><th>Lettre</th><th>Approximation</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>j</td><td>"i lounga"</td></tr>
+    <tr><td>k</td><td>"kappa"</td></tr>
+    <tr><td>x</td><td>"iks"</td></tr>
+    <tr><td>w</td><td>"doppia vou"</td></tr>
+    <tr><td>y</td><td>"i greka/ipsilon"</td></tr>
+  </tbody>
+</table>
 
-<ul>
-<li>$ j'emploie des voyelles accentuées devant des doubles consonnes 
-pour mieux transcrire le son et qu'il n'y est pas d'ambivalence.</li>
-</ul>
+<p>Pas de transcription phonétique, car la prononciation dépend de la langue d'origine du mot.</p>
 
-<p>Voyelle</p>
+<p>Voyelles</p>
 
 <ul>
 <li>a : comme en français</li>
-<li>e : entre le "é" et le "&amp;è" français</li>
+<li>e : entre le "é" et le "è" français</li>
 <li>i : comme en français</li>
 <li>o : comme en français</li>
 <li>u : comme le "ou" français</li>
 </ul>
 
 <p>Consonnes</p>
+
+<p>Les consonnes c et g ont deux modes de fonctionnement :</p>
 
 <ul>
 <li>c devant a, o, u se prononce "k"</li>
@@ -280,6 +326,8 @@ pour mieux transcrire le son et qu'il n'y est pas d'ambivalence.</li>
 <li>un i entre le g et le a, o ou u suivant fera se prononcer g comme "dj" : giulietta -&gt; "djulietta"</li>
 </ul>
 
+<p>On notera également :</p>
+
 <ul>
 <li>gl se dit un "l mouillé" et se prononce comme tel.</li>
 <li>gn se dit un "n mouillé" et se prononce comme tel.</li>
@@ -290,38 +338,49 @@ pour mieux transcrire le son et qu'il n'y est pas d'ambivalence.</li>
 <li>sc devant i et e se prononce "ch"</li>
 </ul>
 
-<ul>
-<li>On nous vend l'italien comme une langue s'écrivant "comme elle se 
-parle", mais il faut bien préciser comme elle se parle pour un italien !
- En effet, de nombreuses consonnes sont parfois doublées et seul le fait
- de savoir prononcer parfaitement le mot pourra aider à bien l'écrire.</li>
-<li>Dormir comme un loir existe aussi en italien : dormire come un ghiro.</li>
-</ul>
+<p>On nous vend l'italien comme une langue s'écrivant "comme elle se parle", mais il faut bien préciser comme elle se parle pour un italien ! En effet, de nombreuses consonnes sont parfois doublées et seul le fait de savoir prononcer parfaitement le mot pourra aider à bien l'écrire.</p>
 
 <div class="partie">Seconde partie : les éléments de la langue</div>
 
-<h2 class="horstexte" id="noms">Noms et adjectifs</h2> <a href="#sommaire"><i>(retour sommaire)</i></a>
+<p>Dans cette partie, nous allons aborder les différentes <span class="index">classes</span>, appelées aussi catégories ou natures, des mots en italien. Il y en a 10 : les <a href="#noms">noms</a>, les <a href="#adjectifs">adjectifs qualificatifs</a>, les <a href="#articles">articles</a>, les <a href="#pronoms">pronoms</a>, les <a href="#adverbes">adverbes</a>, les <a href="#adjectifs_non_qualificatifs">adjectifs non qualificatifs</a>, les <a href="#verbes">verbes</a>, les <a href="#prepositions">prépositions</a>, les les <a href="#conjonctions">conjonctions</a> et les <a href="#interjections">interjections</a>. Certaines grammaires fusionnent adjectifs qualificatifs et articles dans une seule classe appelée déterminants.</p>
 
-<p>Pour les noms et les adjectifs (qui s'accordent en genre et en nombre, qu'ils soient attributs ou épithètes ou apposés) on a le tableau suivant :</p>
+<p>Certains classes, comme les adverbes, les prépositions, les interjections et les conjonctions sont invariables. Les autres classes varient selon différents paramètres propres à chacune : genre (féminin ou masculin), nombre (singulier ou pluriel), personne (1ère, 2ème, 3ème et celle de politesse), temps, mode. On parlera alors de <span class="index">flexion</span>, c'est à dire fléchir selon la forme du mot selon ces paramètres, l'<a href="http://fr.wikipedia.org/wiki/Flexion_(linguistique)">article de Wikipédia</a> s'y rapportant est plutôt mignon.</p>
+
+<!-- TODO -->
+<p>En plus de leur classe, les mots dans une phrase ont une <span class="index">fonction</span>. On parlera par exemple de <i>sujet</i> ou de <i>complément d'objet</i> pour un nom. Pour l'instant, cette mini-grammaire n'aborde pas ce point, on pourra se reporter à défaut à ma mini-grammaire française, <a href="http://ran.alwaysdata.net/cristina/">Cristina</a>.</p>
+
+<h2 class="horstexte" id="noms">Noms</h2>
+<a href="#sommaire"><i>(retour sommaire)</i></a>
+
+<p>Les noms italiens ont un genre, masculin ou féminin et un nombre, singulier ou pluriel. La plupart des noms masculins ont pour terminaison au singulier <b>o</b> et un pluriel en <b>i</b> et les noms féminins ont soit <b>a</b> au singulier et <b>e</b> au pluriel, soit <b>e</b> au singulier et <b>i</b> au pluriel. Le tableau suivant regroupe tous les cas possibles sauf les exceptions. Une note importante est que <u>tous les noms singuliers, sauf les féminins en <b>a</b>, font leur pluriel en <b>i</b></u>.</p>
 
 <table>
-<tbody><tr><td></td><td>Masculin</td><td colspan="2">Féminin</td></tr>
-<tr><td>singulier</td><td><b>o</b>, e, a</td><td>a</td><td>e</td></tr>
-<tr><td>pluriel</td><td>i</td><td>e</td><td>i</td></tr>
-</tbody></table>
+  <thead>
+    <tr><td></td><th>Masculin</th><th colspan="2">Féminin</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>singulier</td><td><b>o</b>, e, a, i</td><td><b>a</b></td><td><b>e</b>, i</td></tr>
+    <tr><td>pluriel</td><td>i</td><td><b>e</b></td><td>i</td></tr>
+  </tbody>
+</table>
 
-<p>ex : un problema, i problemi (masculin en a au sg)</p>
+<p>On peut le voir ainsi également : tous les noms finissant par <b>e</b> feront leur pluriel en <b>i</b>, féminins ou masculins. Un nom finissant par <b>a</b> fera son pluriel en <b>i</b> s'il est masculin et en <b>e</b> s'il est féminin. On remarquera aussi que certains mots féminins, très rares, finissent par <b>o</b> et font leur pluriel en <b>i</b> et qu'il existe aussi d'autres exceptions.</p>
+
+<p><u>Exemples</u></p>
 
 <ul>
-<li> Un mot masculin ou féminin finissant par <b>e</b> fera toujours son pluriel en <b>i</b>.</li>
-<li> Un mot masculin ou féminin finissant par <b>a</b> fera son pluriel en <b>i</b> s'il est masculin et en <b>e</b> s'il est féminin.</li>
-<li> On peut résumer par : le pluriel est toujours en i, <br/>
-	SAUF (et c'est une grosse exception) pour les mots <b>féminins</b> dont le singulier est en <b>a</b> qui feront leur pluriel en <b>e</b>.</li>
+  <li>il ragazzo, i ragazzi <i>le garçon, les garçons</i></li>
+  <li>il cane, i cani <i>le chien, les chiens</i> (masculin en e au sg)</i></li>
+  <li>il problema, i problemi <i>le problème, les problèmes</i> (masculin en a au sg)</li>
+  <li>la donna <i>la femme</i></li>
+  <li>la tesi <i>la thèse</i> (féminin en i au sg)</li>
+  <li><u>exception</u> la mano, le mani <i>la main, les mains</i> (féminin en o au sg)</li>
+  <li><u>exception</u> l'uomo, gli uomini <i>l'homme, les hommes</i> (transformation du radical au pluriel)</li>
 </ul>
 
-<p><u>Cas particuliers</u></p>
+<p>Un cas également est l'existence de noms changeant de genre au pluriel, notamment dans les noms décrivant des parties du corps. De plus, leur terminaison plurielle est originale puisqu'il s'agit de celle du singulier de leur nouveau genre ! Ainsi, l'uovo <i>(l'œuf)</i> devient au pluriel le uova <i>(les œufs )</i>.</p></p>
 
-<p>Certains mots féminins, très rares, finissent par <b>o</b> et font leur pluriel en <b>i</b> <i>(ex : la mano -> le mani)</i>.</p>
+<h3 id="cas_particuliers">Cas particuliers</h3>
 
 <p>Pluriel des mots masculins finissant par co et go : 
 	<ol>
@@ -338,7 +397,7 @@ parle", mais il faut bien préciser comme elle se parle pour un italien !
 	</ol>
 </p>
 
-<p>Pluriel des mots féminins finissant par ca et ga : en che et ghe pour maintenir le son dur.</p>
+<p>Pluriel des mots féminins finissant par ca et ga : en che et ghe pour maintenir le son dur ("k" ou "gu").</p>
 
 <p>Pluriel des mots féminins finissant par cia et gia :
 	<ol>
@@ -348,126 +407,169 @@ parle", mais il faut bien préciser comme elle se parle pour un italien !
 	</ol>
 <p>
 
+<h3 id="invariabilite">Invariabilité</h3>
+
+<p>Les mots se terminant par un caractère accentué sont invariables, ainsi que les noms féminins terminés par <b>ie</b>, les noms monosyllabiques et les abbréviations. De même que les noms importés de langues étrangères et ceux finissant par une consonne. Au vu de toutes ces règles, on ne pourra que conseiller d'apprendre pour chaque le nom son singulier et son pluriel.</p>
+
+<p><u>Exemple</u></p>
+
 <ul>
-<li> Certains adjectifs ont une forme unique pour le masculin et le féminin au singulier se terminant par e, et feront donc leur pluriel toujours en i.</li>
-<li> Certains adjectifs ou noms terminés par co, go : attention à l'accent tonique pour ajouter ou non un h au pluriel en i.
-<li> Certains adjectifs ou noms terminés par ca, ga, eux, prennent toujours un h au pluriel en e pour conserver le son "k" ou "gu".</li>
-<li> Les adjectifs ou noms en cia et gia perdent le i au pluriel lorsque la terminaison est précédée par une consonne et qu'elle ne contient pas l'accent.</li>
-<li> Sont invariables les noms : <br/>
-	Terminés par un caractère accentué, les féminins terminés par ie, les noms monosyllabiques, les noms d'origine étrangère ainsi que les abbréviations.<br/>
-	<li><i>Ex de mot accentué sur sa dernière syllabe et donc invariable : la città, le città = la ville, les villes</i>.</li>
-<li> molto (beaucoup de), troppo (trop de), poco (peu de) peuvent s'utiliser aussi bien en tant qu'adjectifs qu'en tant qu'adverbes. Dans le premier cas, ils s'accordent comme tout adjectif.</li>
+  <li>la città, le città <i>la ville, les villes</i></li>
+  <li>il bar, i bar <i>le bar, les bars</i></li>
 </ul>
 
-<h3>Exceptions</h3>
+<h2 class="horstexte" id="adjectifs">Adjectifs qualificatifs</h2>
+<a href="#sommaire"><i>(retour sommaire)</i></a>
 
-<p>Il y a des exceptions avec des formes irrégulières <i>(ex : uomo -> uomini)</i>.</p>
-<p>Et des exceptions où le pluriel change de genre et se met à la terminaison du singulier de son nouveau genre <i>(ex : uovo -> uova)</i>.</p>
+<p>Les adjectifs s'accordent en genre et en nombre avec le nom auquel ils se rapportent, qu'ils soient attributs ou épithètes ou apposés. Il existe deux grandes classes d'adjectifs : ceux ayant une forme différente au masculin et au féminin singulier, la première en <b>o</b>, la seconde en <b>a</b> et faisant leur pluriel en <b>i</b> et <b>e</b> respectivement, et la seconde classe qui a un masculin singulier identique au féminin singulier se terminant par <b>e</b> et faisant son pluriel en <b>i</b>.</p>
 
-<h3>Comparatif</h3>
+<p><u>Exemples rotto <i>(cassé)</i> et forte <i>(fort)</i></u></p>
 
-<p>Pour les adjectifs, le comparatif s'exprime ainsi :
-    <table>
-        <tr><td>type</td><td colspan="2">Supériorité</td><td colspan="2">Infériorité</td></tr>
-	<tr><td>noms et pronoms (sans prépositions)</td><td><i>objet1</i> più <i>adj</i> <b>di</b> <i>objet2</i></td><td>plus ... que</td><td>objet1</i> meno <i>adj</i> <b>di</b> <i>objet2</i></td><td>moins ... que</td></tr>
-	<tr><td>noms et pronoms (avec prépositions), adjectifs, adverbes</td><td><i>objet1</i> più <i>adj</i> <b>che</b> <i>objet2</i></td><td>plus ... que</td><td>objet1</i> meno <i>adj</i> <b>che</b> <i>objet2</i></td><td>moins ... que</td></tr>
-   </table>
-</p>
+<table>
+  <thead>
+    <tr><td></td><th>Masculin</th><th>Féminin</th><td></td><th>Masculin et Féminin</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>singulier</td><td>rotto</td><td>rotta</td><td></td><td>forte</td></tr>
+    <tr><td>pluriel</td><td>rotti</td><td>rotte</td><td></td><td>forti</td></tr>
+  </tbody>
+</table>
+
+<p>On remarque que molto <i>(beaucoup ou beaucoup de)</i>, troppo <i>(trop ou trop de)</i>, poco <i>(peu ou peu de)</i> peuvent s'utiliser aussi bien en tant qu'adverbes qu'en tant qu'adjectifs. Dans le second cas, ils s'accordent comme tout adjectif.</p>
+
+<h3 id="comparatif">Comparatif</h3>
+
+<p>Pour les adjectifs, les <span class="index">comparatifs de supériorité et d'égalité</span> s'expriment ainsi :</p>
+
+<table>
+  <thead>
+    <tr><th>Type</th><th colspan="2">Supériorité</th><th colspan="2">Infériorité</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>noms et pronoms (sans prépositions)</td><td><i>objet1</i> più <i>adj</i> <b>di</b> <i>objet2</i></td><td>plus ... que</td><td>objet1</i> meno <i>adj</i> <b>di</b> <i>objet2</i></td><td>moins ... que</td></tr>
+    <tr><td>noms et pronoms (avec prépositions), adjectifs, adverbes</td><td><i>objet1</i> più <i>adj</i> <b>che</b> <i>objet2</i></td><td>plus ... que</td><td>objet1</i> meno <i>adj</i> <b>che</b> <i>objet2</i></td><td>moins ... que</td></tr>
+  </tbody>
+</table>
+
+<p>Pour le <span class="index">comparatif d'égalité</span>, on le construira à l'aide de <b>tanto</b> <i>(aussi, autant)</i> adjectif <b>quanto</b> <i>(que)</i>, ou bien on peut utiliser à la place de <b>tanto</b>, <b>così</b>.</p>
+
+<h3 id="superlatif">Superlatif</h3>
+
+<p>Pour former le <span class="index">superlatif</span> utilise le suffixe <b>-issim[o,a,i,e]</b> selon le genre et le nombre.</p>
 
 <h2 id="articles">Articles</h2> <a href="#sommaire"><i>(retour sommaire)</i></a>
 
-<p>Les articles en italiens.</p>
-
-<p>Ils varient en fonction du nombre, du genre et de la première lettre du mot qu'il <b>précède</b>.</p>
+<p>Les articles en italiens varient en fonction du nombre et du genre du nom qu'il détermine et de la première lettre du mot qu'ils <b>précèdent</b>.</p>
 
 <h3 id="articles_indef_def">Les articles indéfinis et définis</h3>
 
 <table>
-<tbody><tr><td>Masculin</td><td>Indéfini</td><td>Indéfini pluriel</td><td>Défini</td><td>Défini pluriel</td></tr>
-<tr><td>Devant une consonne</td><td>un</td><td>dei</td><td>il</td><td>i</td></tr>
-<tr><td>Devant une voyelle</td><td>un</td><td>degli</td><td>l'</td><td>gli</td></tr>
-<tr><td>Devant un cas spécial</td><td>uno</td><td>degli</td><td>lo</td><td>gli</td></tr>
-</tbody></table>
+  <thead>
+    <tr><th>Masculin</th><th>Indéfini</th><th>Indéfini pluriel</th><th>Défini</th><th>Défini pluriel</th></tr>
+  </thead>
+  <tbody>
+    <tr><th>Devant une consonne</th><td>un</td><td>dei</td><td>il</td><td>i</td></tr>
+    <tr><th>Devant une voyelle</th><td>un</td><td>degli</td><td>l'</td><td>gli</td></tr>
+    <tr><th>Devant un cas spécial</th><td>uno</td><td>degli</td><td>lo</td><td>gli</td></tr>
+  </tbody>
+</table>
 
-<p>Les cas spéciaux sont les mots commençant par :<ul>
-	<li>Un s suivit d'une consonne,</li>
-	<li>Un x ou z ou ps ou gn suivit d'une voyelle,</li>
-	<li>Le son /i/ suivit d'une voyelle ("ye" que peut faire y ou i suivit d'une voyelle ou j rarement).</li></ul>
-</p>
-
-<table>
-<tbody><tr><td>Féminin</td><td>Indéfini</td><td>Indéfini pluriel</td><td>Défini</td><td>Défini pluriel</td></tr>
-<tr><td>Devant une consonne</td><td>una</td><td>delle</td><td>la</td><td>le</td></tr>
-<tr><td>Devant une voyelle</td><td>un'</td><td>delle</td><td>l'</td><td>le</td></tr>
-</tbody></table>
+<p>Les cas spéciaux sont les mots commençant par :</p>
 
 <ul>
-<li> Bien voir la différence entre un' indiquant toujours un féminin et un indiquant toujours un masculin.</li>
+    <li>Un s suivit d'une consonne,</li>
+    <li>Un x ou z ou ps ou gn suivit d'une voyelle,</li>
+    <li>Le son /i/ suivit d'une voyelle (le son "ye" que peut faire y ou i suivit d'une voyelle ou j plus rarement).</li>
+</ul>
+
+<table>
+  <thead>
+    <tr><th>Féminin</th><th>Indéfini</th><th>Indéfini pluriel</th><th>Défini</th><th>Défini pluriel</th></tr>
+  </thead>
+  <tbody>
+    <tr><th>Devant une consonne</th><td>una</td><td>delle</td><td>la</td><td>le</td></tr>
+    <tr><th>Devant une voyelle</th><td>un'</td><td>delle</td><td>l'</td><td>le</td></tr>
+  </tbody>
+</table>
+
+<ul>
+<li> Bien voir la différence entre <b>un'</b> indiquant toujours un féminin et <b>un</b> indiquant toujours un masculin. Lorsque la voyelle de l'article disparaît on parle d'<span class="index">élision</span>.</li>
 </ul>
 
 <h3 id="articles_part">L'article partitif</h3>
 
-<p>Utiliser devant un indénombrable (comme en français : du lait). Il se compose de la préposition di combinée avec l'article défini correspondant au genre et au nombre du mot auquel l'article se rapporte (comme en français : de + le => du).</p>
+<p>Il faut utiliser <span class="index">l'article partitif</span> devant un indénombrable (comme en français : du lait). Il se compose de la préposition <b>di</b> combinée avec l'article défini correspondant au genre et au nombre du mot auquel l'article se rapporte (comme en français : de + le => du).</p>
 
 <table>
-<tr><td>Di + il</td><td>del</td></tr>
-<tr><td>Di + lo</td><td>dello</td></tr>
-<tr><td>Di + l'</td><td>dell'</td></tr>
-<tr><td>Di + la</td><td>delle</td></tr>
+  <thead>
+    <tr><th>Combinaison</th><th>Résultat</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Di + il</td><td>del</td></tr>
+    <tr><td>Di + lo</td><td>dello</td></tr>
+    <tr><td>Di + l'</td><td>dell'</td></tr>
+    <tr><td>Di + la</td><td>della</td></tr>
+  </tbody>
 </table>
 
 <ul>
 <li> On emploie l'article partitif seulement dans les phrases affirmatives ou interrogatives (et pas les négatives donc).</li>
-<li> Il peut être omis comme ici : <i>Bevo (del) vino</i>.</li>
+<li> Il peut être omis comme ici : Bevo (del) vino (je bois [du] vin)</i>.</li>
 </ul>
-
-<!--Mais alors il met un partitif pluriel... Hum (dei, degli, delle) ??-->
 
 <h2 id="pronoms">Pronoms</h2> <a href="#sommaire"> <i>(retour sommaire)</i></a>
 
 <h3 id="pron_sujets">Pronoms sujets, réfléchis et COD/COI</h3>
 
 <table>
-<thead>
-<tr><td rowspan="2"></td><th rowspan="2">Pronoms sujets</th><th rowspan="2">Pronoms réfléchis</th><th colspan="2">Pronoms Compléments d'Objet</th></tr>
-<tr><th>faibles</th><th>forts</th></tr>
-</thead>
-<tbody>
-<tr><th colspan="5">sg</th></tr>
-<tr><td>1ère</td><td>io (je)</td><td>mi (me)</td><td>mi (me)</td><td>me (moi)</td></tr>
-<tr><td>2ème</td><td>tu (tu)</td><td>ti (te)</td><td>ti (te)</td><td>te (toi)</td></tr>
-<tr><td>3ème masc</td><td>lui (il)</td><td>si (se)</td><td>lo/gli (le/lui)</td><td>lui (lui)</td></tr>
-<tr><td>3ème fem</td><td>lei (elle)</td><td>si (se)</td><td>la/le (la/lui)</td><td>lei (elle)</td></tr>
-<tr><th colspan="5">pl</th></tr>
-<tr><td>1ère</td><td>noi</td><td>ci (nous)</td><td>ci (nous)</td><td>noi (nous)</td></tr>
-<tr><td>2ème</td><td>voi</td><td>vi (vous)</td><td>vi (vous)</td><td>voi (vous)</td></tr>
-<tr><td>3ème</td><td>loro (masc et mixte)</td><td>si (se)</td><td>li/gli, loro (les/leur)</td><td>loro (eux)</td></tr>
-<tr><td>3ème</td><td>loro (fem)</td><td>si (se)</td><td>le/gli, lore (les/leur)</td><td>loro (elles)</td></tr>
-</tbody>
+  <thead>
+    <tr><td rowspan="2"></td><th rowspan="2">Pronoms sujets</th><th rowspan="2">Pronoms réfléchis</th><th colspan="2">Pronoms Compléments d'Objet</th></tr>
+    <tr><th>faibles</th><th>forts</th></tr>
+  </thead>
+  <tbody>
+    <tr><th colspan="5">sg</th></tr>
+    <tr><td>1ère</td><td>io (je)</td><td>mi (me)</td><td>mi (me)</td><td>me (moi)</td></tr>
+    <tr><td>2ème</td><td>tu (tu)</td><td>ti (te)</td><td>ti (te)</td><td>te (toi)</td></tr>
+    <tr><td>3ème masc</td><td>lui (il)</td><td>si (se)</td><td>lo/gli (le/lui)</td><td>lui (lui)</td></tr>
+    <tr><td>3ème fem</td><td>lei (elle)</td><td>si (se)</td><td>la/le (la/lui)</td><td>lei (elle)</td></tr>
+    <tr><th colspan="5">pl</th></tr>
+    <tr><td>1ère</td><td>noi</td><td>ci (nous)</td><td>ci (nous)</td><td>noi (nous)</td></tr>
+    <tr><td>2ème</td><td>voi</td><td>vi (vous)</td><td>vi (vous)</td><td>voi (vous)</td></tr>
+    <tr><td>3ème</td><td>loro (masc et mixte)</td><td>si (se)</td><td>li/gli, loro (les/leur)</td><td>loro (eux)</td></tr>
+    <tr><td>3ème</td><td>loro (fem)</td><td>si (se)</td><td>le/gli, loro (les/leur)</td><td>loro (elles)</td></tr>
+  </tbody>
 </table>
 
+<p>La difficulté des pronoms est que plusieurs choses s'entremêlent : le type de pronom (sujet, réfléchi, complément d'objet), sa force (faible ou fort), et le fait que le complémet d'objet soit direct <i>(lo, la, li, le)</i> ou indirect <i>(gli, le, gli ou loro)</i>. Il faut démêler chaque trait un à un. On notera que :</p>
+
 <ul>
-<li>On peut omettre les pronoms sujets car la terminaison seule permet de savoir de qui on parle.</li>
-<li>On mettra le pronom sujet en cas de quiproquo possible ou pour insister (<i>ex: Io credo... -> Moi, je crois...</i>).</li>
-<li>La forme faible se place devant le verbe sauf loro, toujours après (<i>ex : <u>ti</u> amo. <u>ti</u> do un regalo.</i>).</li>
-<li>La forme forte se place après le verbe ou une préposition pour insister ou lever une ambiguïté (<i>ex : ho un regalo per <u>te</u>.</i>).</li>
-<li>La voyelle du pronom CO à la 3ème personne du singulier peut s'élider devant une voyelle ou un h muet.</li>
-<li>On trouve parfois encore les anciens pronoms sujets : lui-&gt;egli, lei-&gt;ella, animal ou chose -&gt; esso, essa</li>
+  <li>On peut omettre les pronoms sujets car la terminaison seule permet de savoir de qui on parle.</li>
+  <li>On mettra le pronom sujet en cas de quiproquo possible ou pour insister (<i>ex: Io credo... -> Moi, je crois...</i>).</li>
+  <li>La forme faible se place devant le verbe sauf loro, toujours après (<i>ex : <u>ti</u> amo. <u>ti</u> do un regalo.</i>).</li>
+  <li>La forme forte se place après le verbe ou une préposition pour insister ou lever une ambiguïté (<i>ex : ho un regalo per <u>te</u>.</i>).</li>
+  <li>La voyelle du pronom complément d'objet à la 3ème personne du singulier peut s'élider devant une voyelle ou un h muet.</li>
+  <li>On trouve parfois encore les anciens pronoms sujets dans les textes. Pour les personnes : lui -&gt; egli, lei -&gt; ella ; pour les animaux ou choses : esso, essa</li>
 </ul>
+
+<p>Il existe également les pronoms <b>ci</b> qui expriment un complément de lieu (<b>y</b> en français) et <b>ne</b> (<b>en</b> en français) pour exprimer une partie d'un tout. On notera qu'on retrouve ci dans la traduction de "il y a" en italien : <i>il y a un problème</i> -> c'è un problema, qu'on pourrait voir un peu comme "il y est un problème". Enfin, le pronom <b>on</b> se traduira par <b>si</b>. Le verbe sera à la troisième personne et s'accordera en nombre suivant le COD.</p>
 
 <h4>Expression de la politesse</h4>
 
-<p> Pour le pronom de politesse singulier (vouvoiement), on utilise en italien la 3ème personne au féminin mais avec un L majuscule : Lei. Certains italiens utilisent aussi le Voi, comme en français.</p>
+<p> Pour le pronom de politesse singulier (le vouvoiement en français), on utilise en italien la 3ème personne au féminin mais avec un L majuscule : Lei. Certains italiens utilisent aussi le Voi, comme en français.</p>
+
 <p> Pour le pronom de politesse pluriel, deux choix : le plus fréquent et de prendre la 3ème personne pluriel avec une majuscule : Loro. Mais certains italiens utilisent aussi le Voi, comme en français.</p>
+
 <p> Pour les pronoms compléments de politesse, on utilisera le pronom correspondant de la 3ème personne singulier, au genre de la personne mais avec une majuscule également.</p>
 
 <h4>Plusieurs pronoms dans la phrase</h4>
 
 <p>Lorsqu'il y a plusieurs pronoms non sujets dans une phrase, l'italien transforme les pronoms.</p>
 
-<p>Si il y a un pronom COD ainsi qu'un pronom COI ou réfléchi, le pronom COD est mis après et le pronom réfléchi ou COI change de forme : mi, ti, ci, vi, si deviennent me, te, ce, ve, se. Gli et le deviennent glie et se combinent avec le pronom COD : on aura les formes glielo, gliela, glieli, gliele.</p>
+<p>Si il y a un pronom COD ainsi qu'un pronom COI ou réfléchi, le pronom COD est mis après et le pronom réfléchi ou COI change de forme : mi, ti, ci, vi, si deviennent me, te, ce, ve, se. <b>Gli</b> et <b>le</b> deviennent <b>glie</b> et se combinent avec le pronom COD : on aura les formes <b>glielo, gliela, glieli, gliele, gliene</b>.</p>
 
 <p>Exemple : <i>Je te le donne. -> <u>Te</u> <u>lo</u> do.</i> On remarque <i>lo</i> est le COD et est mis après <i>ti</i> devenu <i>te</i> qui est le complément d'attribution.</p>
+
+<p>Loro ne se regroupe jamais.</p>
 
 <h4>Fusion du pronom avec le verbe</h4>
 
@@ -492,14 +594,19 @@ parle", mais il faut bien préciser comme elle se parle pour un italien !
 <tr><td>3ème</td><td>il loro (le leur)</td><td>la loro (la leur)</td><td>i loro (les leurs)</td><td>le loro (les leurs)</td></tr>
 </tbody></table>
 
-<ul>
-<li> on se rappelera que loro est invariable.</li>
-<li> On omet le pronom sujet en italien. Si on le met, cela veut dire que l'on insiste : io credo = moi, je crois</li>
-</ul>
+<p>On se rappelera que loro est invariable.</p>
 
 <h3 id="pron_demonstratif">Pronoms démonstratifs</h3>
 
-<p>On utilisera questo (proximité spatiale ou temporelle) et quello (éloignement). Questo ne s'élident pas, et ils s'accordent tous deux selon les formes régulières, contrairement à leur utilisation en tant qu'adjectif. <i>Ex : questo è Mario -> celui-ci est Mario.</i></p>
+<p>On utilisera <b>questo</b> (proximité spatiale ou temporelle) et <b>quello</b> (éloignement). Questo ne s'élident pas, et ils s'accordent tous deux selon les formes régulières, contrairement à leur utilisation en tant qu'adjectif. <i>Ex : questo è Mario -> celui-ci est Mario.</i></p>
+
+<h3 id="pron_relatifs">Pronoms relatifs</h3>
+
+<p>On utilisera <b>che</b> comme pronom relatif sujet <i>(qui)</i> ou complément d'objet direct <i>(que)</i>.</p>
+
+<p>Pour <i>lequel, laquelle, lesquels, lesquelles</i>, on utilisera <b>il quale, la quale, i quali, le quali</b>. Mais on pourra aussi utiliser le pronom relatif complément <b>cui</b>.</p>
+
+<p>Pour <i>dont</i>, on utilisera l'article défini selon <span class="index">l'antécédent</span>, et <b>cui</b>.</p>
 
 <h2 id="adverbes">Adverbes</h2> <a href="#sommaire"><i>(retour sommaire)</i></a>
 
@@ -722,16 +829,17 @@ auxilaire + participe passé
     </table>
 </p>
 
-<h2 id="prepositions">Prépositions</h2> <a href="#sommaire"><i>(retour sommaire)</i></a>
+<h2 id="prepositions">Prépositions</h2>
+<a href="#sommaire"><i>(retour sommaire)</i></a>
 
-<p>Les prépositions simples</p>
+<h3 id="prep_simples">Les prépositions simples</h3>
 
 <table>
-    <thead>
-    <tr><td colspan="2">Prépositions simples</td></tr>
-    <tr><td>Italien</td><td>Français</td></tr>
-    </thead>
-    <tbody>
+  <thead>
+    <tr><th colspan="2">Prépositions simples</th></tr>
+    <tr><th>Italien</th><th>Français</th></tr>
+  </thead>
+  <tbody>
     <tr><td>a</td><td>à</td></tr>
     <tr><td>di</td><td>de (précision)</td></tr>
     <tr><td>da</td><td>chez, depuis, de (provenance)</td></tr>
@@ -741,50 +849,95 @@ auxilaire + participe passé
     <tr><td>per</td><td>pour</td></tr>
     <tr><td>fra</td><td>entre</td></tr>
     <tr><td>tra</td><td>entre</td></tr>
-    </tbody>
+  </tbody>
 </table>
 
-<ul>
-<li> L'italien utilise di pour indiquer la possession !</li>
-</ul>
+<p>On notera que l'italien utilise di pour indiquer la possession.</p>
 
-<p>Combinaisons des prépositions avec l'article défini</p>
+<h3 id="prep_combinees">Prépositions combinées</h3>
 
-<p>Les prépositions a, di, da, su, in et optionnellement con doivent se combiner avec l'article défini qui les suit. Autrefois per le faisait aussi, mais plus maintenant.</p>
+<p>Les prépositions a, di, da, su, in et optionnellement con doivent se combiner avec l'article défini qui les suit. Autrefois <b>per</b> le faisait aussi, mais plus maintenant.</p>
 
 <table>
-    <thead>
-    <tr><td>Prépositions</td><td>il</td><td>lo</td><td>l'</td><td>la</td><td>i</td><td>gli</td><td>le</td></tr>
-    </thead>
-    <tbody>
+  <thead>
+    <tr><th>Articles \ Prépositions</th><td>il</td><td>lo</td><td>l'</td><td>la</td><td>i</td><td>gli</td><td>le</td></tr>
+  </thead>
+  <tbody>
     <tr><td>a</td><td>al</td><td>allo</td><td>all'</td><td>alla</td><td>ai</td><td>agli</td><td>alle</td></tr>
-    <tr><td>di</td><td><b>de</b>l</td><td>dello</td><td>dell'</td><td>della</td><td>dei</td><td>degli</td><td>delle</td><tr>
-    <tr><td>da</td><td>dal</td><td>dallo</td><td>dall'</td><td>dalla</td><td>dai</td><td>dagli</td><td>dalle</td><tr>
-    <tr><td>su</td><td>sul</td><td>sullo</td><td>sull'</td><td>sulla</td><td>sui</td><td>sugli</td><td>sulle</td><tr>
-    <tr><td>in</td><td><b>ne</b>l</td><td>nello</td><td>nell'</td><td>nella</td><td>nei</td><td>negli</td><td>nelle</td><td>
-    </tbody>
+    <tr><td>di</td><td><b>de</b>l</td><td>dello</td><td>dell'</td><td>della</td><td>dei</td><td>degli</td><td>delle</td></tr>
+    <tr><td>da</td><td>dal</td><td>dallo</td><td>dall'</td><td>dalla</td><td>dai</td><td>dagli</td><td>dalle</td></tr>
+    <tr><td>su</td><td>sul</td><td>sullo</td><td>sull'</td><td>sulla</td><td>sui</td><td>sugli</td><td>sulle</td></tr>
+    <tr><td>in</td><td><b>ne</b>l</td><td>nello</td><td>nell'</td><td>nella</td><td>nei</td><td>negli</td><td>nelle</td></tr>
+  </tbody>
 </table>
 
 <p>On remarque le changement de radical de di (en de-) et in (en nel-).</p>
 
-<p>Les prépositions étendues</p>
+<h3 id="prep_etendues">Les prépositions étendues</h3>
 
 <ul>
-<li>sopra : sur</li>
-<li>sotto : sous</li>
+  <li>sopra : sur</li>
+  <li>sotto : sous</li>
 </ul>
+
+<h2 id="conjonctions">Conjonctions</h2>
+<a href="#sommaire"><i>(retour sommaire)</i></a>
+
+<h2 id="interjections">interjections</h2>
+<a href="#sommaire"><i>(retour sommaire)</i></a>
+
+<p>Les interjections sont invariables.</p>
 
 <div class="partie">Troisième partie : Articulations des éléments</div>
 
-<h2 class="horstexte" id="negation">La négation</h2> <a href="#sommaire"><i>(retour sommaire)</i></a>
+<h2 class="horstexte" id="fonctions">Les fonctions</h2>
+<a href="#sommaire"><i>(retour sommaire)</i></a>
+
+<p>Je vais aborder ici juste les <span class="index">compléments circonstanciels (CC)</span> : un adverbe ou un <span class="index">groupe nominal prépositionnel (GNP)</span> peut avoir cette fonction. Pour les GNP, voici un tableau regroupant le type de CC et les prépositions associées :</p>
+
+<table>
+  <thead>
+    <tr><th>Type CC</th><th>Prépositions</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Lieu</td><td>a <i>(à)</i>, da (lieu où on va, par où on passe, d'où on vient),<br> fra (distance), per (lieu où on va), su (sur)</td></tr>
+    <tr><td>Moyen</td><td>a <i>(à)</i>, con <i>(avec)</i>, per <i>(par)</i></td></tr>
+    <tr><td>Accompagnement</td><td>con <i>(avec)</i>, </td></tr>
+    <tr><td>Temps</td><td>da <i>(depuis)</i>, di <i>(au)</i>, fra (distance : <i>dans</i>), per (durée : <i>pendant</i>)</td></tr>
+    <tr><td>Manière</td><td>in <i>(en)</i>, su <i>(sur)</i>, con <i>(avec)</i></i></td></tr>
+    <tr><td>Cause</td><td>per <i>(pour)</i></td></tr>
+    <tr><td>But</td><td>per <i>(pour)</i></td></tr>
+  </tbody>
+</table>
+
+<!-- opposition prix et mesures et privation -->
+
+<h2 id="hypothese">L'hypothèse</h2>
+<a href="#sommaire"><i>(retour sommaire)</i></a>
+
+<p>On traduira <i>si</i> par <b>se</b>.</p>
+
+<table>
+  <thead>
+    <tr><th>Temps condition</th><th>Temps principal</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>indicatif présent</td><td>indicatif présent</td></tr>
+    <tr><td>indicatif futur</td><td>conditionnel présent</td></tr>
+    <tr><td>subjonctif imparfait</td><td>conditionnel présent ou passé</td></tr>
+  </tbody>
+</table>
+
+<h2 id="negation">La négation</h2>
+<a href="#sommaire"><i>(retour sommaire)</i></a>
 
 <p>On utilisera l'adverbe "non" devant le verbe : non ho capito = je n'ai pas compris.</p>
 
 <p>On pourra également utiliser :
 <ul>
-<li>non ... mai      : jamais</li>
-<li>non ... niente   : rien</li>
-<li>non ... nessuno  : personne</li>
+  <li>non ... mai      : jamais</li>
+  <li>non ... niente   : rien</li>
+  <li>non ... nessuno  : personne</li>
 </ul>
 Le second élément se mettra entre l'auxilaire et le participe aux temps composés pour mai et après le verbe pour niente et nessuno. Mai, niente et nessuno peuvent également être placés avant le verbe, dans ce cas là, on n'emploiera pas non.
 </p>
@@ -853,14 +1006,26 @@ Le second élément se mettra entre l'auxilaire et le participe aux temps compos
 
 <h4 id="il_y_a">Dire il y a</h4>
 
+<p>On peut utiliser le pronom <b>ci</b>.</p>
+
 <ul>
-<li>ci sono +pl</li>
-<li>c'è +sg</li>
+  <li>ci sono +pl</li>
+  <li>c'è +sg</li>
 </ul>
+
+<p>Pour exprimer une durée <i>(il y a 2 ans)</i> on utilisera le verbe <b>fare</b> à la troisième personne du singulier : <i>ho scoperto la lingua italiana due anni fa. -> j'ai découvert l'italien il y a deux ans.</i></p>
 
 <h4 id="c_est">Dire "c'est"</h4>
 
-On utilise directement le verbe être. è bello = C'est beau.
+<p>On utilise directement le verbe être. è bello = C'est beau.</p>
+
+<h4 id="aimer">Dire "aimer"</h4>
+
+<p>On utilise le verbe plaire : piacere. <i>Mi piace... -> j'aime ... </i> ou <i> ... me plaît</i></p>
+
+<h4 id="faut">Dire la nécessité</h4>
+
+<p>On utilise un verbe. <b>Bisogna</b> <i>(il faut)</i> + verbe, <b>ci vuole</b> ou <b>vogliono</b> selon le genre de ce qu'il faut + nom.</p>
 
 <h3 id="famille">La famille</h3> <a href="#sommaire_voc"><i>(retour vocabulaire)</i></a>
 
@@ -1003,19 +1168,81 @@ On utilise directement le verbe être. è bello = C'est beau.
   </tbody>
 </table>
 
-<h3 id="maison">La maison</h3> <a href="#sommaire_voc"><i>(retour vocabulaire)</i></a>
+<h3 id="corps">Le corps</h3> <a href="#sommaire_voc"><i>(retour vocabulaire)</i></a>
 
-<p><i>2 termes.</i></p>
+<p><i>32 termes.</i></p>
 
 <table>
-    <thead>
-        <tr><th>Italien</th><th>Français</th></tr>
-    </thead>
-    <tbody>
-        <tr><td>la casa</td><td>la maison</td></tr>
-        <tr><td>il tavolo</td><td>la table</td></tr>
-    </tbody>
+  <thead>
+    <tr><th>Italien</th><th>Français</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>magro <span class="typ">adjectif</span></td><td>maigre, maigres</td></tr>
+    <tr><td>snello <span class="typ">adjectif</span></td><td>mince, minces</td></tr>
+    <tr><td>grosso <span class="typ">adjectif</span></td><td>gros, grosse, gros, grosses</td></tr>
+    <tr><td>il corpo <span class="typ">nom m.</span></td><td>le corps</td></tr>
+    <tr><td>la mano <span class="typ">nom f.</span></td><td>la main</td></tr>
+    <tr><td>il dito <span class="typ">nom m.</span></td><td>le doigt</td></tr>
+    <tr><td>la gamba <span class="typ">nom f.</span></td><td>la jambe</td></tr>
+    <tr><td>il piede <span class="typ">nom m.</span></td><td>le pied</td></tr>
+    <tr><td>il sesso <span class="typ">nom m.</span></td><td>le sexe</td></tr>
+    <tr><td>la lingua <span class="typ">nom f.</span></td><td>la langue</td></tr>
+    <tr><td>il dente <span class="typ">nom m.</span></td><td>la dent</td></tr>
+    <tr><td>l'orecchio <span class="typ">nom m.</span></td><td>l'oreille</td></tr>
+    <tr><td>il braccio <span class="typ">nom m.</span></td><td>le bras</td></tr>
+    <tr><td>il dorso <span class="typ">nom m.</span></td><td>le dos</td></tr>
+    <tr><td>la pelle <span class="typ">nom f.</span></td><td>la peau</td></tr>
+    <tr><td>la testa <span class="typ">nom f.</span></td><td>la tête</td></tr>
+    <tr><td>la bocca <span class="typ">nom f.</span></td><td>la bouche</td></tr>
+    <tr><td>l'occhio <span class="typ">nom m.</span></td><td>l'œil</td></tr>
+    <tr><td>il labbro <span class="typ">nom m.</span></td><td>la lèvre (pl : le labbra)</td></tr>
+    <tr><td>il naso <span class="typ">nom m.</span></td><td>le nez</td></tr>
+    <tr><td>il capello <span class="typ">nom m.</span></td><td>le cheveu</td></tr>
+    <tr><td>il cuore <span class="typ">nom m.</span></td><td>Le cœur</td></tr>
+    <tr><td>il pelo <span class="typ">nom m.</span></td><td>le poil</td></tr>
+    <tr><td>la carne <span class="typ">nom f.</span></td><td>la chair</td></tr>
+    <tr><td>l'osso <span class="typ">nom m.</span></td><td>le corps</td></tr>
+    <tr><td>il stomaco <span class="typ">nom m.</span></td><td>l'estomac</td></tr>
+    <tr><td>il sangue <span class="typ">nom m.</span></td><td>le sang</td></tr>
+    <tr><td>la vista <span class="typ">nom f.</span></td><td>la vue</td></tr>
+    <tr><td>l'udito <span class="typ">nom m.</span></td><td>l'ouïe</td></tr>
+    <tr><td>l'olfatto <span class="typ">nom m.</span></td><td>l'odorat</td></tr>
+    <tr><td>il tatto <span class="typ">nom m.</span></td><td>le toucher</td></tr>
+    <tr><td>il gusto <span class="typ">nom m.</span></td><td>le goût</td></tr>
+  </tbody>
+</table>          
+
+<h3 id="maison">La maison</h3> <a href="#sommaire_voc"><i>(retour vocabulaire)</i></a>
+
+<p><i>17 termes.</i></p>
+
+<table>
+  <thead>
+    <tr><th>Italien</th><th>Français</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>la casa <span class="typ">nom f.</span></td><td>la maison</td></tr>
+    <tr><td>la camera <span class="typ">nom f.</span></td><td>la chambre</td></tr>
+    <tr><td>la chiave <span class="typ">nom f.</span></td><td>la clef, la clé</td></tr>
+    <tr><td>la porta <span class="typ">nom f.</span></td><td>la porte</td></tr>
+    <tr><td>il giardino <span class="typ">nom m.</span></td><td>le jardin</td></tr>
+    <tr><td>il bicchiere <span class="typ">nom m.</span></td><td>le verre</td></tr>
+    <tr><td>la bottiglia <span class="typ">nom f.</span></td><td>la bouteille</td></tr>
+    <tr><td>il tappo <span class="typ">nom m.</span></td><td>le bouchon</td></tr>
+    <tr><td>la caraffa <span class="typ">nom f.</span></td><td>la carafe</td></tr>
+    <tr><td>la ciotola <span class="typ">nom f.</span></td><td>le bol</td></tr>
+    <tr><td>la tazza <span class="typ">nom f.</span></td><td>la tasse</td></tr>
+    <tr><td>il piatto <span class="typ">nom m.</span></td><td>l'assiette</td></tr>
+    <tr><td>il coltello <span class="typ">nom m.</span></td><td>le couteau</td></tr>
+    <tr><td>il cucchiaino <span class="typ">nom m.</span></td><td>la petite cuillère</td></tr>
+    <tr><td>il cucchiaio <span class="typ">nom m.</span></td><td>la cuillère</td></tr>
+    <tr><td>la forchetta <span class="typ">nom f.</span></td><td>la fourchette</td></tr>
+    <tr><td>il tavolo <span class="typ">nom m.</span></td><td>la table</td></tr>
+  </tbody>
 </table>
+
+<table>
+
 
 <h3 id="frequence">Exprimer la fréquence</h3> <a href="#sommaire_voc"><i>(retour vocabulaire)</i></a>
 
@@ -1386,6 +1613,22 @@ vous l'avez).</p>
 <p>Historique des différentes versions :</p>
 
 <ul>
+<li>Version 1.1.0
+    <ul>
+        <li>Travaillé dessus le samedi 21 avril (3h).</li>
+        <li>Vocabulaire : Maison amplifiée, Corps ajoutée.</li>
+        <li>Nombreuses corrections diverses, notamment dans Prononciation.</li>
+        <li>Séparation Noms et Adjectifs.</li>
+        <li>Ajout du Superlatif.</li>
+        <li>Ajout des Pronoms relatifs.</li>
+        <li>Ajout de l'hypothèse.</li>
+        <li>Mention des fonctions, avec tableau prépositions / CC.</li>
+        <li>Sous-titres pour adjectifs et noms.</li>
+        <li>Ajout d'Interjections et Conjonctions (vide).</li>
+        <li>Ajout du span "typ" (type de mot) et du span "index" (vocabulaire grammatical).</li>
+        <li>Correction de l'Avant-Propos.</li>
+    </ul>
+</li>
 <li>Version 1.0.0
     <ul>
         <li>Lancement le 8 mars 2012 (Journée de la Femme !).</li>
