@@ -1,0 +1,44 @@
+<html>
+<head>
+
+<title>Test d'un arbre dynamique</title>
+
+<style type="text/css">
+
+img {
+  bottom: 4px;
+  position:relative ;
+}
+
+p {
+  left: 10px;
+  bottom: 10px;
+  width: 200px;
+  position:relative;
+  background-color:aliceblue;
+  border-style: dotted;
+  border-width: thin;
+  padding-left: 6px;
+}
+
+</style>
+
+<script type="text/javascript">
+
+function show(p) {
+document.getElementById(p).innerHTML = "<img src=\"TreeDynLess.png\" align=\"middle\" onclick=\"unshow('id_div_1')\"/> <i>Conjugaisons</i><p>ZEMBLA</p>";
+}
+
+function unshow(p) {
+document.getElementById(p).innerHTML = "<img src=\"TreeDynPlus.png\" align=\"middle\" onclick=\"show('id_div_1')\"/> <i>Conjugaisons</i>"
+}
+
+</script>
+
+</head>
+
+<body>
+
+<div id="id_div_1"> <img src="TreeDynPlus.png" align="middle" onclick="show('id_div_1')"/> <i>Conjugaisons</i></div>
+
+</body>
