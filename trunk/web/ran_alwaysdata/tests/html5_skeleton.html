@@ -21,6 +21,8 @@
       http://www.snoupix.com/initiation-a-ajax-avec-jquery-partie-1_tutorial_20.html
 
       http://www.alistapart.com/articles/rapid-prototyping-with-sinatra/ SINATRA, microframework Ruby
+
+      http://html5.litten.com/moving-shapes-on-the-html5-canvas-with-the-keyboard/ ***
     -->
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
     <script type="text/javascript">
@@ -50,7 +52,70 @@
             event.preventDefault();
           }
         );
+        init();
+        window.addEventListener('keydown', update, true);
       });
+    </script>
+    <script type="text/javascript">
+      var x = 150;
+      var y = 100;
+      var WIDTH = 300;
+      var HEIGHT = 200;
+      var ctx;
+      var canvas;
+      var dx = 10;
+      var dy = 10;
+
+      function circle(x,y,r) {
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI*2, true);
+        ctx.fill();
+      }
+      
+      function clear() {
+        ctx.clearRect(0, 0, WIDTH, HEIGHT);
+      }
+
+      function init() {
+        canvas = document.getElementById("canvas");
+        ctx = canvas.getContext("2d");
+        return setInterval(draw, 10);
+      }
+
+      function draw() {
+        clear();
+        ctx.fillStyle = "white";
+        ctx.strokeStyle = "black";
+        //rect(0,0,WIDTH,HEIGHT);
+        ctx.fillStyle = "purple";
+        circle(x, y, 10);
+      }
+
+      function update(evt){
+        switch (evt.keyCode) {
+          case 38:  /* Up arrow was pressed */
+            if (y - dy > 0){
+              y -= dy;
+            }
+            break;
+          case 40:  /* Down arrow was pressed */
+            if (y + dy < HEIGHT){
+              y += dy;
+            }
+            break;
+          case 37:  /* Left arrow was pressed */
+            if (x - dx > 0){
+              x -= dx;
+            }
+            break;
+          case 39:  /* Right arrow was pressed */
+            if (x + dx < WIDTH){
+              x += dx;
+            }
+            break;
+        }
+      }
+
     </script>
     <style>
       body {
@@ -99,6 +164,9 @@
           <p>Paragraphe. <a id="ajx" href="pipo">A.J.A.X.</a></p>
           <div id="dump"></div>
         </section>
+        <canvas id="canvas" width="300" height="200">
+          Your browser does not support HTML5 Canvas. Shutting down all systems...
+        </canvas>
       </article>
       <aside>
         <p>Aside area. <a id="lk" href="http://ran.alwaysdata.net">Click Me!</a></p>
