@@ -92,7 +92,12 @@ class Console:
         button.connect("clicked", self.on_click_exec, None)
         hbox.pack_start(button, True, True, 0)
         button.show()
-        ####        
+        ####
+        button = gtk.Button("Tokens")
+        button.connect("clicked", self.on_click_exec, None)
+        hbox.pack_start(button, True, True, 0)
+        button.show()
+        #####       
         button = gtk.Button("Tree")
         button.connect("clicked", self.on_click_exec, None)
         hbox.pack_start(button, True, True, 0)
