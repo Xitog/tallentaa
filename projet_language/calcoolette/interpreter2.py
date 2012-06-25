@@ -13,7 +13,7 @@ class Enum:
         for t in tab:
             setattr(self, t, t)
 
-TokenType = Enum('integer', 'float', 'id', 'operator', 'separator','keyword', 'eof', 'boolean', 'string', 'discard', 'warning')
+TokenType = Enum('integer', 'float', 'id', 'operator', 'separator','keyword', 'eof', 'boolean', 'string', 'discard', 'warning', 'invisible')
 
 #-----------------------------------------------------------------------
 # Lexer
@@ -235,6 +235,10 @@ class ExpressionHandler:
 # 17h12 : ok. It's simple, but it works.
 # afaire : gestion parentheses !!!
 
+# 11h24 : parentheses : OK OK OK pour (2+3)*2 et 2*(2+3) et aussi call(X)
+# un "call" node peut etre membre d'un unprefixed_call node ou bien d'un prefixed_call.
+# 12h17 : 3.add(2)... MARCHE ! Sniff... I never went so far away !
+
 class Node:
     def __init__(self, left, right, middle):
         self.left = left
@@ -247,43 +251,148 @@ class Node:
 # Fetch the operator to execute
 def first_op(tokens):
     i = 0
-    best = -1
     while i < len(tokens):
-        if isinstance(tokens[i], Token) and tokens[i].kind == TokenType.operator:
+        tok = tokens[i]
+        if isinstance(tok, Token):
+            if tok.val == '-' and (i == 0 or tokens[i-1].kind == TokenType.operator):
+                tok.val = 'unary-'
+            if tok.val == '(' and i > 0 and tokens[i-1].kind != TokenType.operator:
+                tok.val = 'call('
+            elif tok.val == '(':
+                tok.val = 'expr('
+        i+=1
+    i = 0
+    best = -1
+    best_prio = -1
+    prio = { ')' : 0, '+' : 10, '-' : 10, '*' : 20, '/' : 20, '**' : 30, '%' : 30, 'call' : 35,
+            '.' : 40, 'unary-' : 50, 'call(' : 51, 'expr(' : 60 }
+    lvl = 1
+    while i < len(tokens):
+        tok = tokens[i]
+        if isinstance(tok, Token) and tok.kind in [TokenType.operator, TokenType.separator]:
             if best == -1:
                 best = i
+                best_prio = prio[tok.val]*lvl
             else:
-                if tokens[best].val in ['+','-'] and tokens[i].val in ['*','/','%','**','.']:
+                if prio[tok.val]*lvl > best_prio:
                     best = i
-                elif tokens[best].val in ['*','/'] and tokens[i].val in ['%','**','.']:
-                    best = i
-                elif tokens[best].val in ['%', '**'] and tokens[i].val in ['.']:
-                    best = i
-            if tokens[i].val == '-' and (i == 0 or tokens[i-1].kind == TokenType.operator):
-                tokens[i].val = 'unary-'                
+                    best_prio = prio[tok.val]*lvl
+            # () for others
+            if tok.val == '(':
+                lvl*=10
+            elif tok.val == ')':
+                lvl/=10
+        elif isinstance(tok, Node) and tok.middle == 'call':
+            if prio[tok.middle]*lvl > best_prio:
                 best = i
-            elif tokens[i].val == '-' and tokens[i-1].kind == TokenType.operator:
-                best = i
+                best_prio = prio[tok.middle]*lvl
         i+=1
     return best
+
+def fetch_closing(sep, tokens, i):
+    lvl = 0
+    pos = 0
+    pos = i
+    while pos < len(tokens):
+        tok = tokens[pos]
+        if sep == '(' and tok.val in ['call(', 'expr(']: lvl += 1
+        elif sep == '(' and tok.val == ')': lvl -= 1
+        if lvl == 0: break
+        pos+=1
+    if lvl != 0: raise Exception("Incorrect expression ()")
+    return pos
+
+def global_function(id, args):
+    #print id
+    #print args
+    if isinstance(id, Token) and id.kind == TokenType.id and isinstance(args, Node) and args.middle == 'call':
+        if id.val == 'println':
+            if isinstance(args.right, Token):
+                print exec_node(args.right)
+                return None
+    else:
+        raise Exception("Bad global function call")
+
+def instance_function(id, args):
+    #print id
+    #print args
+    if isinstance(id, Token) and id.kind in [TokenType.integer, TokenType.float]:
+        val_left = exec_node(id)
+        if isinstance(args, Node) and args.middle == 'call':
+            if isinstance(args.left, Token) and args.left.kind == TokenType.id:
+                if args.left.val == 'add':
+                    if isinstance(args.right, Token):
+                        val_par = exec_node(args.right)
+                        return val_left + val_par
+        else:
+            raise Exception("Bad instance function call")
+
+def not_exist_or_dif(tokens, index, kind, value):
+    if len(tokens) <= index: return True
+    if not isinstance(tokens[index], kind): return True
+    if kind == Node and tokens[index].middle != value: return True
+    if kind == Token and tokens[index].kind != value: return True
+    return False
 
 # From a token list make a tree!
 def make_tree(tokens):
     while len(tokens) > 1:    
         target = first_op(tokens)
-        print '>>> target=%i %s' % (target, tokens[target])
-        if tokens[target].val == 'unary-':        
-            n = Node(left=None, right=tokens[target+1], middle=tokens[target])
-            del tokens[target+1]
-            tokens[target] = n        
-        elif target > 0:
-            n = Node(left=tokens[target-1], right=tokens[target+1], middle=tokens[target])
-            del tokens[target+1]
-            del tokens[target]
-            tokens[target-1] = n
-        elif target == -1 and len(tokens) > 0:
-            n = tokens[0]
+        #print '>>> target=%i %s' % (target, tokens[target])
+        if isinstance(tokens[target], Node):
+            if tokens[target].middle == 'call':
+                id = tokens[target-1]
+                if isinstance(id, Token) and id.kind == TokenType.id:
+                    n = Node(left=id, right=tokens[target], middle=Token(TokenType.invisible, 'unprefixed_call'))
+                    del tokens[target]
+                    tokens[target-1] = n
+                else:
+                    raise Exception("Call not understood")
+            else:
+                raise Exception("Error on target node")
+        elif isinstance(tokens[target], Token):
+            if tokens[target].val == 'unary-':        
+                n = Node(left=None, right=tokens[target+1], middle=tokens[target])
+                del tokens[target+1]
+                tokens[target] = n
+            elif tokens[target].val == 'expr(':
+                fin = fetch_closing('(', tokens, target)
+                sub = tokens[target+1:fin]
+                make_tree(sub)
+                jj = fin
+                while jj > target:
+                    del tokens[jj]
+                    jj -= 1
+                tokens[target] = sub[0]
+            elif tokens[target].val == 'call(':
+                fin = fetch_closing('(', tokens, target)
+                sub = tokens[target+1:fin]
+                make_tree(sub)
+                jj = fin
+                while jj > target:
+                    del tokens[jj]
+                    jj -= 1
+                tokens[target] = Node(left=None, right=sub[0], middle='call')
+            elif target > 0:
+                if tokens[target].val != '.' or (tokens[target].val == '.' and not_exist_or_dif(tokens, target+2, Node, "call")):
+                    n = Node(left=tokens[target-1], right=tokens[target+1], middle=tokens[target])
+                    del tokens[target+1]
+                    del tokens[target]
+                    tokens[target-1] = n
+                else:
+                    # nx -> fun, call (avec par)
+                    nx = tokens[target+2]
+                    nx.left = tokens[target+1]
+                    # n -> id, nx
+                    n = Node(left=tokens[target-1], right=nx, middle=Token(TokenType.invisible, "prefixed_call"))
+                    del tokens[target+2]
+                    del tokens[target+1]
+                    del tokens[target]
+                    tokens[target-1] = n
+            elif target == -1 and len(tokens) > 0:
+                n = tokens[0]
         else:
+            print tokens[target]
             raise Exception("Expression not understood")
         
         #for t in tokens:
@@ -329,7 +438,15 @@ def exec_node(n):
                         raise Exception("Wrong type for function trunc")
             else:
                 raise Exception("Operator not understood")
+        elif n.middle.kind == TokenType.invisible:
+            if n.middle.val == 'unprefixed_call':
+                return global_function(n.left, n.right)
+            elif n.middle.val == 'prefixed_call':
+                return instance_function(n.left, n.right)
         else:
+            print n.left
+            print n.middle
+            print n.right
             raise Exception("Node type not understood")
     elif isinstance(n, Token):
         if n.kind == TokenType.integer:
@@ -344,19 +461,19 @@ def exec_node(n):
         raise Exception("Node not known")
 
 def test(s):
-    print '--------------------------------------'
-    print s
-    print '---'
+    #print '--------------------------------------'
+    #print s
+    #print '---'
     t = Tokenizer()
     o = t.parse(s)
     i = 0
-    for e in o:
-        print '%d. %s' % (i, str(e))
-        i+=1
+    #for e in o:
+    #    print '%d. %s' % (i, str(e))
+    #    i+=1
     del o[-1] # del eof
     #print '>>> %i %s' % (first_op(o), o[first_op(o)])
     make_tree(o)
-    print "res = %s" % (str(exec_node(o[0])),)
+    print "for: %s \t res = %s" % (s, str(exec_node(o[0])))
 
 test("2+3")         # 5
 test("2**3")        # 8
@@ -371,6 +488,10 @@ test("8.5.round")   # 9.0
 test("8.4.round")   # 8.0
 test("6.5.trunc")   # 6.0
 test("1..trunc")    # 1.0 
+test("2 * ( 3 + 1)")  # 8
+test("(3 + 1) * 2")   # 8
+test("println(4)")    #
+test("3.add(2)")    # 
 
 """
 val_abs = Value('fun', abs)
