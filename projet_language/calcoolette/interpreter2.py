@@ -238,6 +238,7 @@ class ExpressionHandler:
 # 11h24 : parentheses : OK OK OK pour (2+3)*2 et 2*(2+3) et aussi call(X)
 # un "call" node peut etre membre d'un unprefixed_call node ou bien d'un prefixed_call.
 # 12h17 : 3.add(2)... MARCHE ! Sniff... I never went so far away !
+# 13h33 : a.add(1)... MARCHE !!!
 
 class Node:
     def __init__(self, left, right, middle):
@@ -313,17 +314,20 @@ def global_function(id, args):
     else:
         raise Exception("Bad global function call")
 
-def instance_function(id, args):
+def instance_function(id, args, scope):
     #print id
     #print args
     if isinstance(id, Token) and id.kind in [TokenType.integer, TokenType.float]:
         val_left = exec_node(id)
-        if isinstance(args, Node) and args.middle == 'call':
-            if isinstance(args.left, Token) and args.left.kind == TokenType.id:
-                if args.left.val == 'add':
-                    if isinstance(args.right, Token):
-                        val_par = exec_node(args.right)
-                        return val_left + val_par
+    elif isinstance(id, Token) and id.kind in [TokenType.id]:
+        val_left = scope[id.val]
+
+    if isinstance(args, Node) and args.middle == 'call':
+        if isinstance(args.left, Token) and args.left.kind == TokenType.id:
+            if args.left.val == 'add':
+                if isinstance(args.right, Token):
+                    val_par = exec_node(args.right)
+                    return val_left + val_par
         else:
             raise Exception("Bad instance function call")
 
@@ -331,7 +335,7 @@ def not_exist_or_dif(tokens, index, kind, value):
     if len(tokens) <= index: return True
     if not isinstance(tokens[index], kind): return True
     if kind == Node and tokens[index].middle != value: return True
-    if kind == Token and tokens[index].kind != value: return True
+    if kind == Token and tokens[index].val != value: return True
     return False
 
 # From a token list make a tree!
@@ -400,8 +404,10 @@ def make_tree(tokens):
         #print "length=%d" % (len(tokens),)
         #raw_input()
         
-def exec_node(n):
+def exec_node(n, scope={}):
+    #print 'Enter ExecNode', n
     if isinstance(n, Node):
+        #print 'IsNode'
         if n.middle.kind == TokenType.operator:
             if n.middle.val == '+':
                 return exec_node(n.left) + exec_node(n.right)
@@ -442,7 +448,10 @@ def exec_node(n):
             if n.middle.val == 'unprefixed_call':
                 return global_function(n.left, n.right)
             elif n.middle.val == 'prefixed_call':
-                return instance_function(n.left, n.right)
+                return instance_function(n.left, n.right, scope)
+            elif n.middle.val == 'aff':
+                scope[n.left.val] = exec_node(n.right, scope)
+                return scope[n.left.val]
         else:
             print n.left
             print n.middle
@@ -453,14 +462,35 @@ def exec_node(n):
             return int(n.val)
         elif n.kind == TokenType.float:
             return float(n.val)
+        elif n.kind == TokenType.id:
+            return scope[n.val]
         else:
+            print n
             raise Exception("TokenType not understood")
     else:
         print n.__class__
         print n
         raise Exception("Node not known")
 
+def clear(l):
+    i = len(l)-1
+    while i >= 0:
+        del l[i]
+        i-=1
+
+def make_aff(tokens):
+    sub = tokens[2:]
+    make_tree(sub)
+    nx = sub[0]
+    n = Node(left=tokens[0], right=nx, middle=Token(TokenType.invisible, 'aff'))
+    clear(tokens)
+    tokens.append(n)
+    #print '--> ', tokens
+
+root_scope = {}
+
 def test(s):
+    global root_scope
     #print '--------------------------------------'
     #print s
     #print '---'
@@ -472,7 +502,10 @@ def test(s):
     #    i+=1
     del o[-1] # del eof
     #print '>>> %i %s' % (first_op(o), o[first_op(o)])
-    make_tree(o)
+    if not_exist_or_dif(o, 1, Token, '='):
+        make_tree(o)
+    else:
+        make_aff(o)
     print "for: %s \t res = %s" % (s, str(exec_node(o[0])))
 
 test("2+3")         # 5
@@ -490,31 +523,11 @@ test("6.5.trunc")   # 6.0
 test("1..trunc")    # 1.0 
 test("2 * ( 3 + 1)")  # 8
 test("(3 + 1) * 2")   # 8
-test("println(4)")    #
-test("3.add(2)")    # 
-
-"""
-val_abs = Value('fun', abs)
-val_1   = Value('int', 1)
-ref_abs = Reference('fun', 'abs', val_abs)
-ref_a   = Reference('int', 'a', val_1)
-scope = { 'abs' : ref_abs, 'a' : ref_a }
-
-ett = ExpressionHandler()
-tree = ett.make_tree(o, scope)
-
-def mksp(lvl):
-    return "    " * lvl
-
-def display (t,lvl=-1):
-    if isinstance(t, list):
-        for e in t:
-            display(e,lvl+1)
-    else:
-        print "%s%s" % (mksp(lvl), str(t))
-
-display(tree)
-
-out = ett.execute(tree, scope)
-"""
-
+test("println(4)")    # None >> 4
+test("3.add(2)")    # 5 
+test("a = 3")       # 3
+test("a")           # 3
+test("a + 2")       # 5
+test("a = 2 + 4")   # 6
+test("a")           # 6
+test("a.add(1)")    # 7
