@@ -1,5 +1,5 @@
 # 16h54 : correction du bug 2..abs et 2.abs.
-
+#from __future__ import print_function
 import re           # for Lexer
 
 #-----------------------------------------------------------------------
@@ -303,34 +303,6 @@ def fetch_closing(sep, tokens, i):
     if lvl != 0: raise Exception("Incorrect expression ()")
     return pos
 
-def global_function(id, args):
-    #print id
-    #print args
-    if isinstance(id, Token) and id.kind == TokenType.id and isinstance(args, Node) and args.middle == 'call':
-        if id.val == 'println':
-            if isinstance(args.right, Token):
-                print exec_node(args.right)
-                return None
-    else:
-        raise Exception("Bad global function call")
-
-def instance_function(id, args, scope):
-    #print id
-    #print args
-    if isinstance(id, Token) and id.kind in [TokenType.integer, TokenType.float]:
-        val_left = exec_node(id)
-    elif isinstance(id, Token) and id.kind in [TokenType.id]:
-        val_left = scope[id.val]
-
-    if isinstance(args, Node) and args.middle == 'call':
-        if isinstance(args.left, Token) and args.left.kind == TokenType.id:
-            if args.left.val == 'add':
-                if isinstance(args.right, Token):
-                    val_par = exec_node(args.right)
-                    return val_left + val_par
-        else:
-            raise Exception("Bad instance function call")
-
 def not_exist_or_dif(tokens, index, kind, value):
     if len(tokens) <= index: return True
     if not isinstance(tokens[index], kind): return True
@@ -403,7 +375,128 @@ def make_tree(tokens):
         #    print t
         #print "length=%d" % (len(tokens),)
         #raw_input()
-        
+
+#-----------------------------------------------------------------------
+# Parse
+#-----------------------------------------------------------------------
+
+class TokenList:
+    def __init__(self, tokens=[]):
+        self.core = tokens
+    
+    def clear(self):
+        i = len(self.core)-1
+        while i >= 0:
+            del self.core[i]
+            i-=1
+    
+    def __call__(self, index):
+        return self.core[index]
+    
+    def __getitem__(self, index):
+        return self.core[index]
+    
+    def __setitem__(self, index, val):
+        self.core[index] = val
+        return val
+    
+    def add(self, tok):
+        self.core.append(tok)
+    
+    def to_a(self):
+        return self.core
+    
+    def from_a(self, tokens):
+        self.core = tokens
+    
+    def include(self, val):
+        i = 0
+        for t in self.core:
+            if t.val == val:
+                return i
+            i+=1
+        return False
+    
+    def split(self, val):
+        index = self.include(val)
+        right = []
+        left = []
+        i = 0
+        for t in self.core:
+            if i < index:
+                right.append(t)
+            elif i > index:
+                left.append(t)
+            i+=1
+        return right, left
+
+def make_aff(tl):
+    sub = tl.core[2:]
+    make_tree(sub)
+    nx = sub[0]
+    n = Node(left=tl(0), right=nx, middle=Token(TokenType.invisible, 'aff'))
+    tl.clear()
+    tl.add(n)
+    #print '--> ', tokens
+
+root_scope = {}
+
+def parse(tokens): 
+    tl = TokenList(tokens)
+    if tl.include(';'):
+        two_part = tl.split(';')
+        parse(two_part[0])
+        parse(two_part[1])
+        n = Node(middle=Token(TokenType.invisible, 'suite'), left=two_part[0][0], right=two_part[1][0])
+        tl.clear()
+        tl.add(n)
+    elif not_exist_or_dif(tokens, 1, Token, '='):
+        make_tree(tokens)
+    else:
+        make_aff(tl)
+
+#-----------------------------------------------------------------------
+# Interpreter
+#-----------------------------------------------------------------------
+
+import baselib
+bb = baselib.BaseLib()
+
+def global_function(id, args, scope):
+    if isinstance(id, Token) and id.kind == TokenType.id and isinstance(args, Node) and args.middle == 'call':
+        name = id.val
+        if isinstance(args.right, Token):
+            if args.right.kind in [TokenType.integer, TokenType.float, TokenType.string]:
+                par = exec_node(args.right)
+            elif args.right.kind == TokenType.id:
+                par = scope[args.right.val]
+            else:
+                raise Exception("Bad param for global function call")
+        else:
+            raise Exception("Bad global function call")
+        return bb.send(None, name, par, scope)
+
+def instance_function(id, args, scope):
+    if isinstance(id, Token) and id.kind in [TokenType.integer, TokenType.float]:
+        target = exec_node(id)
+    elif isinstance(id, Token) and id.kind in [TokenType.id]:
+        target = scope[id.val]
+    else:
+        raise Exception("Bad target instance function call")
+    
+    if isinstance(args, Node) and args.middle == 'call':
+        if isinstance(args.left, Token) and args.left.kind == TokenType.id:
+            name = args.left.val
+        else:
+            raise Exception("Bad id/name instance function call")
+        if isinstance(args.right, Token):
+            par = exec_node(args.right, scope)
+        else:
+            raise Exception("Bad par instance function call")
+        return bb.send(target, name, par, scope)
+    else:
+        raise Exception("Bad instance function call")
+
 def exec_node(n, scope={}):
     #print 'Enter ExecNode', n
     if isinstance(n, Node):
@@ -446,12 +539,17 @@ def exec_node(n, scope={}):
                 raise Exception("Operator not understood")
         elif n.middle.kind == TokenType.invisible:
             if n.middle.val == 'unprefixed_call':
-                return global_function(n.left, n.right)
+                return global_function(n.left, n.right, scope)
             elif n.middle.val == 'prefixed_call':
                 return instance_function(n.left, n.right, scope)
             elif n.middle.val == 'aff':
                 scope[n.left.val] = exec_node(n.right, scope)
                 return scope[n.left.val]
+            elif n.middle.val == 'suite':
+                exec_node(n.left, scope)
+                return exec_node(n.right, scope)
+            else:
+                raise Exception("Invisible Node type not understood")
         else:
             print n.left
             print n.middle
@@ -464,6 +562,8 @@ def exec_node(n, scope={}):
             return float(n.val)
         elif n.kind == TokenType.id:
             return scope[n.val]
+        elif n.kind == TokenType.string:
+            return n.val[1:len(n.val)-1]
         else:
             print n
             raise Exception("TokenType not understood")
@@ -472,41 +572,27 @@ def exec_node(n, scope={}):
         print n
         raise Exception("Node not known")
 
-def clear(l):
-    i = len(l)-1
-    while i >= 0:
-        del l[i]
-        i-=1
+#-----------------------------------------------------------------------
+# Tests
+#-----------------------------------------------------------------------
 
-def make_aff(tokens):
-    sub = tokens[2:]
-    make_tree(sub)
-    nx = sub[0]
-    n = Node(left=tokens[0], right=nx, middle=Token(TokenType.invisible, 'aff'))
-    clear(tokens)
-    tokens.append(n)
-    #print '--> ', tokens
-
-root_scope = {}
-
-def test(s):
+def test(s, debug=True):
     global root_scope
-    #print '--------------------------------------'
-    #print s
-    #print '---'
     t = Tokenizer()
     o = t.parse(s)
-    i = 0
-    #for e in o:
-    #    print '%d. %s' % (i, str(e))
-    #    i+=1
+    if debug:
+        i = 0
+        for e in o:
+            print '%d. %s' % (i, str(e))
+            i+=1
     del o[-1] # del eof
     #print '>>> %i %s' % (first_op(o), o[first_op(o)])
-    if not_exist_or_dif(o, 1, Token, '='):
-        make_tree(o)
+    parse(o)
+    if debug:
+        print "result of parse: ", o[0]
+        print "for: %s \t res = %s" % (s, str(exec_node(o[0])))
     else:
-        make_aff(o)
-    print "for: %s \t res = %s" % (s, str(exec_node(o[0])))
+        print exec_node(o[0])
 
 test("2+3")         # 5
 test("2**3")        # 8
@@ -531,3 +617,42 @@ test("a + 2")       # 5
 test("a = 2 + 4")   # 6
 test("a")           # 6
 test("a.add(1)")    # 7
+
+command = ''
+loop = True
+debug = False
+while loop:
+    command = raw_input('>>> ')
+    if command in ['exit', 'debug', '']:
+        if command == 'exit' or command == '':
+            loop = False
+        elif command == 'debug':
+            debug = not debug
+    else:
+        #try:
+            test(command, debug)
+        #except Exception as e:
+        #    print e
+
+a = Token(TokenType.id, "a")
+b = Token(TokenType.operator, "=")
+c = Token(TokenType.integer, "5")
+l = [a, b, c]
+
+a = Token(TokenType.integer, "3")
+b = Token(TokenType.separator, ";")
+c = Token(TokenType.integer, "5")
+
+#tl = TokenList([a,b,c])
+#print tl[0]
+
+#raw_input()
+
+#print exists_token([a,b,c], ';')
+#split_on([a,b,c], ';')
+
+#parse(l)
+#print exec_node(l[0])
+
+
+exit()
