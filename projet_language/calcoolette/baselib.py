@@ -15,11 +15,15 @@ class BaseLib:
             else:
                 raise Exception("Global function not known: %s" % (msg,))
         else:
-            if isinstance(target, int):
+            if isinstance(target, int) and not isinstance(target, bool):
                 return self.send_int(target, msg, par, scope)
             elif isinstance(target, float):
                 return self.send_flt(target, msg, par, scope)
-      
+            elif isinstance(target, bool):
+                return self.send_boo(target, msg, par, scope)
+            elif isinstance(target, str): 
+                return self.send_str(target, msg, par, scope)
+    
     def send_int(self, target, msg, par, scope):
         if msg == 'add':
             return target + par
@@ -33,8 +37,12 @@ class BaseLib:
             return target ** par
         elif msg == 'mod':
             return target % par
+        elif msg == 'abs':
+            return abs(target)
+        elif msg == 'inv':
+            return -target
         else:
-            raise Exception("Function not known for integer")
+            raise Exception("Function %s not known for integer" % (msg,))
     
     def send_flt(self, target, msg, par, scope):
         if msg == 'add':
@@ -49,5 +57,25 @@ class BaseLib:
             return target ** par
         elif msg == 'mod':
             return target % par
+        elif msg == 'abs':
+            return abs(target)
+        elif msg == 'inv':
+            return -target
+        elif msg == 'round':
+            return round(target)
+        elif msg == 'trunc':
+            return float(int(target))
         else:
-            raise Exception("Function not known for float")
+            raise Exception("Function %s not known for float" % (msg,))
+
+    def send_str(self, target, msg, par, scope):
+        pass
+
+    def send_boo(self, target, msg, par, scope):
+        if msg == 'and':
+            return target and par
+        elif msg == 'or':
+            return target or par
+        elif msg == 'xor':
+            return (target or par) and not (target and par)
+

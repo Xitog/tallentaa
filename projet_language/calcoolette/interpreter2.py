@@ -110,7 +110,7 @@ symbols = [
     ('[0-9]*\.[0-9]+' , Float),
     ('[0-9]+\.[0-9]*' , Float),
     ('\.[0-9]+' , Float),
-
+    
     ('[0-9]+\.[a-zA-Z]+', Error),
     
     (';' , Separator),
@@ -155,8 +155,14 @@ symbols = [
     
     ('\.' , Operator),
     
-    ('true' , Boolean),
-    ('false' , Boolean),
+    ('True', Boolean),
+    ('False', Boolean),
+    ('true', Boolean),
+    ('false', Boolean),
+    
+    ('and', Operator),
+    ('or', Operator),
+    ('xor', Operator),
     
     ('if' , Keyword),
     ('then' , Keyword),
@@ -246,8 +252,9 @@ def first_op(symbols):
     i = 0
     best = -1
     best_prio = -1
-    prio = { ')' : 0, '+' : 10, '-' : 10, '*' : 20, '/' : 20, '**' : 30, '%' : 30, 'call' : 35,
-            '.' : 40, 'unary-' : 50, 'call(' : 51, 'expr(' : 60 }
+    prio = { ')' : 0, 'and' : 9, 'or' : 9, 'xor' : 9, '+' : 10, '-' : 10, 
+             '*' : 20, '/' : 20, '**' : 30, '%' : 30, 'call' : 35, '.' : 40, 
+             'unary-' : 50, 'call(' : 51, 'expr(' : 60 }
     lvl = 1
     while i < len(symbols):
         symb = symbols[i]
@@ -336,16 +343,17 @@ def make_tree(symbols, debug=False):
                     del symbols[target+1]
                     del symbols[target]
                     symbols[target-1] = n
-                else:
-                    # nx -> fun, call (avec par)
-                    nx = symbols[target+2]
-                    nx.left = symbols[target+1]
-                    # n -> id, nx
-                    n = Symbol(left=symbols[target-1], right=nx, val="prefixed_call", kind=Structure)
-                    del symbols[target+2]
-                    del symbols[target+1]
-                    del symbols[target]
-                    symbols[target-1] = n
+                #else:
+                #    raise Exception("AAAAAAAAAAAAAAAAA")
+                #    # nx -> fun, call (avec par)
+                #    nx = symbols[target+2]
+                #    nx.left = symbols[target+1]
+                #    # n -> id, nx
+                #    n = Symbol(left=symbols[target-1], right=nx, val="prefixed_call", kind=Structure)
+                #    del symbols[target+2]
+                #    del symbols[target+1]
+                #    del symbols[target]
+                #    symbols[target-1] = n
             elif target == -1 and len(symbols) > 0:
                 n = symbols[0]
         else:
@@ -391,16 +399,16 @@ def parse(symbols):
 # Interpreter
 #-----------------------------------------------------------------------
 
-#import baselib
-#bb = baselib.BaseLib()
+import baselib
+bb = baselib.BaseLib()
 
 def global_function(id, args, scope):
-    if isinstance(id, Token) and id.kind == TokenType.id and isinstance(args, Node) and args.middle == 'call':
+    if id.terminal() and id.kind == Id and not args.terminal() and args.val == 'call(':
         name = id.val
-        if isinstance(args.right, Token):
-            if args.right.kind in [TokenType.integer, TokenType.float, TokenType.string]:
+        if args.right.terminal():
+            if args.right.kind in [Integer, Float, String]:
                 par = exec_node(args.right)
-            elif args.right.kind == TokenType.id:
+            elif args.right.kind == Id:
                 par = scope[args.right.val]
             else:
                 raise Exception("Bad param for global function call")
@@ -408,72 +416,69 @@ def global_function(id, args, scope):
             raise Exception("Bad global function call")
         return bb.send(None, name, par, scope)
 
-def instance_function(id, args, scope):
-    if isinstance(id, Token) and id.kind in [TokenType.integer, TokenType.float]:
-        target = exec_node(id)
-    elif isinstance(id, Token) and id.kind in [TokenType.id]:
-        target = scope[id.val]
+def instance_function(target, name, args, scope):
+    if target.__class__ in [int, float, str, bool]:
+        pass
+    elif target.terminal() and target.kind in [Integer, Float, String, Boolean]:
+        target = exec_node(target)
+    elif target.terminal() and target.kind == Id:
+        target = scope[target.val]
     else:
-        raise Exception("Bad target instance function call")
+        raise Exception("Bad target for instance function call: %s" % (target,))
     
-    if isinstance(args, Node) and args.middle == 'call':
-        if isinstance(args.left, Token) and args.left.kind == TokenType.id:
-            name = args.left.val
-        else:
-            raise Exception("Bad id/name instance function call")
-        if isinstance(args.right, Token):
-            par = exec_node(args.right, scope)
-        else:
-            raise Exception("Bad par instance function call")
-        return bb.send(target, name, par, scope)
+    if name.terminal() and name.kind == Id:
+        name = name.val
     else:
-        raise Exception("Bad instance function call")
+        raise Exception("Bad name for instance function call: %s" % (name,))
+    
+    if args is None:
+        par = None
+    elif args.right.__class__ in [int, float, str, bool]:
+        par = args.right
+    elif args.right.terminal():
+        par = exec_node(args.right, scope)
+    else:
+        raise Exception("Bad par for instance function call: %s" % (args.right,))
+    r = bb.send(target, name, par, scope)
+    return r
 
-def exec_node(symbol, scope={}):
-    #print 'Enter ExecNode', n
+def exec_node(symbol, scope={}, debug=False):
+    if debug: print 'Enter ExecNode: val=', symbol.val, "kind=", symbol.kind
     if not symbol.terminal():
         #print 'IsNode'
         if symbol.kind == Operator:
             if symbol.val == '+':
-                return exec_node(symbol.left) + exec_node(symbol.right)
+                return instance_function(exec_node(symbol.left), Symbol(Id, 'add'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
             elif symbol.val == '-':
-                return exec_node(symbol.left) - exec_node(symbol.right)
+                return instance_function(exec_node(symbol.left), Symbol(Id, 'sub'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
             elif symbol.val == '*':
-                return exec_node(symbol.left) * exec_node(symbol.right)
+                return instance_function(exec_node(symbol.left), Symbol(Id, 'mul'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
             elif symbol.val == '/':
-                return exec_node(symbol.left) / exec_node(symbol.right)
+                return instance_function(exec_node(symbol.left), Symbol(Id, 'div'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
             elif symbol.val == '%':
-                return exec_node(symbol.left) % exec_node(symbol.right)
+                return instance_function(exec_node(symbol.left), Symbol(Id, 'mod'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
             elif symbol.val == '**':
-                return exec_node(symbol.left) ** exec_node(symbol.right)
+                return instance_function(exec_node(symbol.left), Symbol(Id, 'pow'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
             elif symbol.val == 'unary-':
-                return -exec_node(symbol.right)
+                return instance_function(exec_node(symbol.right), Symbol(Id, 'inv'), None, scope)
+            elif symbol.val in ['and', 'or', 'xor']:
+                return instance_function(exec_node(symbol.left), Symbol(Id, symbol.val), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
             elif symbol.val == '.':
-                if symbol.right.val == 'abs':
-                    value = exec_node(symbol.left)
-                    if isinstance(value, int) or isinstance(value, float):
-                        return abs(value)
-                    else:
-                        raise Exception("Wrong type for function abs")
-                elif symbol.right.val == 'round':
-                    value = exec_node(symbol.left)
-                    if isinstance(value, float):
-                        return round(value)
-                    else:
-                        raise Exception("Wrong type for function round")
-                elif symbol.right.val == 'trunc':
-                    value = exec_node(symbol.left)
-                    if isinstance(value, float):
-                        return float(int(value))
-                    else:
-                        raise Exception("Wrong type for function trunc")
+                if symbol.right.val != 'unprefixed_call':
+                    target = exec_node(symbol.left)
+                    return instance_function(target, symbol.right, None, scope)
+                elif symbol.right.val == 'unprefixed_call':
+                    call = symbol.right
+                    return instance_function(symbol.left, call.left, call.right, scope)
+                else:
+                    raise Exception("What to do with this symbol ? : %s" % (symbol.right.val))
             else:
                 raise Exception("Operator not understood")
         elif symbol.kind == Structure:
             if symbol.val == 'unprefixed_call':
                 return global_function(symbol.left, symbol.right, scope)
-            elif symbol.val == 'prefixed_call':
-                return instance_function(symbol.left, symbol.right, scope)
+            #elif symbol.val == 'prefixed_call':
+            #    return instance_function(symbol.left, symbol.right, scope)
             elif symbol.val == 'aff':
                 scope[symbol.left.val] = exec_node(symbol.right, scope)
                 return scope[symbol.left.val]
@@ -496,6 +501,8 @@ def exec_node(symbol, scope={}):
             return scope[symbol.val]
         elif symbol.kind == String:
             return symbol.val[1:len(n.val)-1]
+        elif symbol.kind == Boolean:
+            return symbol.val in ['true', 'True']
         else:
             print symbol
             raise Exception("TokenType not understood")
@@ -512,6 +519,7 @@ def exec_node(symbol, scope={}):
 t = Symbolizer()
 #s = "2.0 * (-(2+1).abs + 2..abs) + a"
 s = "(2 + 3) * 4"
+s = "3.add(2)"
 print 'solve: %s' % (s,)
 o = t.parse(s)
 i = 0
@@ -522,7 +530,10 @@ del o[-1] # eof
 print o[first_op(o)], first_op(o)
 
 make_tree(o, True)
-print exec_node(o[0])
+r = exec_node(o[0], {}, True)
+print r
+
+exit()
 """
 
 def test(s, debug=True):
@@ -558,7 +569,6 @@ test("6.5.trunc")   # 6.0
 test("1..trunc")    # 1.0 
 test("2 * ( 3 + 1)")  # 8
 test("(3 + 1) * 2")   # 8
-"""
 test("println(4)")    # None >> 4
 test("3.add(2)")    # 5 
 test("a = 3")       # 3
@@ -567,7 +577,6 @@ test("a + 2")       # 5
 test("a = 2 + 4")   # 6
 test("a")           # 6
 test("a.add(1)")    # 7
-"""
 
 command = ''
 loop = True
