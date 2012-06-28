@@ -1,386 +1,43 @@
-# 16h54 : correction du bug 2..abs et 2.abs.
-#from __future__ import print_function
 import re           # for Lexer
 
 #-----------------------------------------------------------------------
-# Tools
+# Base
 #-----------------------------------------------------------------------
 
-class Enum:
-    def __init__(self, *tab):
-        self.tab = tab
-        i = 0
-        for t in tab:
-            setattr(self, t, t)
-
-TokenType = Enum('integer', 'float', 'id', 'operator', 'separator','keyword', 'eof', 'boolean', 'string', 'discard', 'warning', 'invisible')
-
-#-----------------------------------------------------------------------
-# Lexer
-#-----------------------------------------------------------------------
-
-tokens = [
-    
-    ('".*"', TokenType.string),
-    ("'.*'", TokenType.string),
-    
-    ('0(b|B)[0-1]*' , TokenType.integer),
-    ('0(x|X)[0-9A-Fa-f]*' , TokenType.integer),
-    ('0(c|C)[0-7]*' , TokenType.integer),
-    ('[0-9]+', TokenType.integer),     #[0-9]+(?![a-zA-Z_])
-    
-    ('[0-9]*\.[0-9]+' , TokenType.float),
-    ('[0-9]+\.[0-9]*' , TokenType.float),
-    ('\.[0-9]+' , TokenType.float),
-
-    ('[0-9]+\.[a-zA-Z]+', TokenType.warning),
-    
-    (';' , TokenType.separator),
-    ('\(' , TokenType.separator),
-    ('\)' , TokenType.separator),
-    ('\[' , TokenType.separator),
-    ('\]' , TokenType.separator),
-    ('\{' , TokenType.separator),
-    ('\}' , TokenType.separator),
-    ('\n' , TokenType.separator),
-    (',' , TokenType.separator),
-    
-    ('=' , TokenType.operator),
-    ('\+=' , TokenType.operator),
-    ('-=' , TokenType.operator),
-    ('/=' , TokenType.operator),
-    ('//=' , TokenType.operator),
-    ('\*=' , TokenType.operator),
-    ('\*\*=' , TokenType.operator),
-    ('%=' , TokenType.operator),
-    ('->' , TokenType.operator),
-    
-    ('\+' , TokenType.operator),
-    ('-' , TokenType.operator),
-    ('/' , TokenType.operator),
-    ('\*' , TokenType.operator),
-    ('//' , TokenType.operator),
-    ('\*\*' , TokenType.operator),
-    ('%' , TokenType.operator),
-    
-    ('>' , TokenType.operator),
-    ('>=' , TokenType.operator),
-    ('==' , TokenType.operator),
-    ('!=' , TokenType.operator),
-    ('<=' , TokenType.operator),
-    ('<' , TokenType.operator),
-    
-    ('!' , TokenType.operator),
-    ('&' , TokenType.operator),
-    ('\^' , TokenType.operator), 
-    ('\|' , TokenType.operator),
-    
-    ('\.' , TokenType.operator),
-    
-    ('true' , TokenType.boolean),
-    ('false' , TokenType.boolean),
-    
-    ('if' , TokenType.keyword),
-    ('then' , TokenType.keyword),
-    ('else' , TokenType.keyword),
-    ('elsif' , TokenType.keyword),
-    ('end' , TokenType.keyword),
-    ('while' , TokenType.keyword),
-    ('do' , TokenType.keyword),
-    ('until' , TokenType.keyword),
-    ('unless' , TokenType.keyword),
-    ('break' , TokenType.keyword),
-    ('next' , TokenType.keyword),
-    ('return' , TokenType.keyword),
-    ('fun' , TokenType.keyword),
-    ('class' , TokenType.keyword),
-
-    (' ', TokenType.discard),
-    ('\t', TokenType.discard),
-    ('\n', TokenType.discard),
-    
-    ('[a-zA-Z_][a-zA-Z0-9_]*(\?|!)?', TokenType.id),
-]
-
-class Token:
-    def __init__(self, kind, val):
-        self.kind = kind
-        self.val = val
-    
+class SymbolType:
+    def __init__(self, name):
+        self.name = name
     def __str__(self):
-        return 'Token(%s, %s)' % (self.val, self.kind)
+        return self.name
 
-class Tokenizer:
-    def __init__(self):
-        global tokens
-        self.tokens = tokens
-    
-    def parse(self, input):
-        input += '\0'
-        output = []
-        current = ''
-        previous = None
-        i = 0
-        while i < len(input):
-            current += input[i]
-            found = False
-            #print '-------------------------------------[', current, '] (', len(current), ')' 
-            for tok in self.tokens:
-                #print tok[0]
-                r = re.match(tok[0], current)
-                if r is not None and r.end() == len(current):
-                    #print 'found!', tok[1]
-                    previous = tok[1]
-                    found = True
-                    break
-            if not found:
-                if previous is not None:
-                    if previous != TokenType.discard:
-                        if previous != TokenType.warning:
-                            output.append(Token(previous, current[:len(current)-1]))
-                        else:
-                            num,name = current[:len(current)-1].split('.')
-                            output.append(Token(TokenType.integer, num))
-                            output.append(Token(TokenType.operator, '.'))
-                            output.append(Token(TokenType.id, name))
-                    current = ''
-                    previous = None
-                    i-=1
-                else:
-                    pass # not enough caracter to decide
-            else:
-                pass # we found at least one matching tokens
-            i+=1
-        output.append(Token(TokenType.eof, 'eof'))
-        return output
-"""
-t = Tokenizer()
-s = "2.0 * (-(2+1).abs + 2..abs) + a"
-print 'solve: %s' % (s,)
-o = t.parse(s)
-i = 0
-for e in o:
-    print '%d. %s' % (i, str(e))
-    i+=1
-"""
+Integer     = SymbolType('Integer')
+Float       = SymbolType('Float')
+Id          = SymbolType('Id')
+Operator    = SymbolType('Operator')
+Separator   = SymbolType('Separator')
+Keyword     = SymbolType('Keyword')
+EOF         = SymbolType('EOF')
+Boolean     = SymbolType('Boolean')
+String      = SymbolType('String')
+Discard     = SymbolType('Discard')
+Error       = SymbolType('Error')
+Structure   = SymbolType('Structure')
 
-class Value:
-    def __init__(self, typ, val):
-        self.typ = typ
+class Symbol:
+    def __init__(self, kind, val, left=None, right=None):
         self.val = val
-
-class Reference:
-    def __init__(self, typ, nam, val, frozen_typ = False, frozen_val = False):
-        self.typ = typ
-        self.nam = nam
-        self.val = val
-        self.frozen_typ = frozen_typ
-        self.frozen_val = frozen_val
-
-class ExpressionHandler:
-    def __init__(self):
-        pass
-    
-    def fetch_next_sep(self, sep, lvl, tokens):
-        i = 0
-        while i < len(tokens):
-            t = tokens[i]
-            if t.val == sep: lvl+=1
-            if sep == '(' and t.val == ')': lvl-=1
-            if lvl == 0: break
-            i+=1
-        if lvl==0:
-            return i
-        else:
-            raise Exception('Parenthezis not closed')
-    
-    def make_tree(self, tokens, context):
-        expr = []        
-        i = 0
-        while i < len(tokens):
-            t = tokens[i]
-            if t.kind == TokenType.separator and t.val == '(':
-                last = self.fetch_next_sep('(', 0, tokens[i:]) + i + 1
-                #for j in tokens[i:last]:
-                #    print 'sub from %d to %d : %s' % (i, last, str(j))
-                expr.append(self.make_tree(tokens[i+1:last-1], context))
-                # 
-                #
-                print '---'
-                best = -1
-                j = i+1
-                while j < last-1:
-                    print tokens[j]
-                    if best > -1 and tokens[best].val == '+' and tokens[j] == '*':
-                        best = j
-                    elif best == -1 and tokens[j].val in ['+','-','/','*','**','%','.']:
-                        best = j
-                    j+=1
-                print '---[%d]' % (best-i-1,)
-                #                
-                i = last
-            else:
-                expr.append(t)
-                i+=1
-        return expr
-    
-    def execute(self, tree, context):
-        pass
-
-#------------------------------------------------------------------------------
-
-# unary minus ok. un peu avant.
-# fun without param ok. 17h10
-# 17h18 : abs (int, float) trunc, round (float) (15 : fonction ok, 18 : fonction typee)
-# 17h12 : ok. It's simple, but it works.
-# afaire : gestion parentheses !!!
-
-# 11h24 : parentheses : OK OK OK pour (2+3)*2 et 2*(2+3) et aussi call(X)
-# un "call" node peut etre membre d'un unprefixed_call node ou bien d'un prefixed_call.
-# 12h17 : 3.add(2)... MARCHE ! Sniff... I never went so far away !
-# 13h33 : a.add(1)... MARCHE !!!
-
-class Node:
-    def __init__(self, left, right, middle):
+        self.kind = kind
         self.left = left
         self.right = right
-        self.middle = middle
-
     def __str__(self):
-        return "%s--%s--%s" % (self.left, self.middle, self.right)
-
-# Fetch the operator to execute
-def first_op(tokens):
-    i = 0
-    while i < len(tokens):
-        tok = tokens[i]
-        if isinstance(tok, Token):
-            if tok.val == '-' and (i == 0 or tokens[i-1].kind == TokenType.operator):
-                tok.val = 'unary-'
-            if tok.val == '(' and i > 0 and tokens[i-1].kind != TokenType.operator:
-                tok.val = 'call('
-            elif tok.val == '(':
-                tok.val = 'expr('
-        i+=1
-    i = 0
-    best = -1
-    best_prio = -1
-    prio = { ')' : 0, '+' : 10, '-' : 10, '*' : 20, '/' : 20, '**' : 30, '%' : 30, 'call' : 35,
-            '.' : 40, 'unary-' : 50, 'call(' : 51, 'expr(' : 60 }
-    lvl = 1
-    while i < len(tokens):
-        tok = tokens[i]
-        if isinstance(tok, Token) and tok.kind in [TokenType.operator, TokenType.separator]:
-            if best == -1:
-                best = i
-                best_prio = prio[tok.val]*lvl
-            else:
-                if prio[tok.val]*lvl > best_prio:
-                    best = i
-                    best_prio = prio[tok.val]*lvl
-            # () for others
-            if tok.val == '(':
-                lvl*=10
-            elif tok.val == ')':
-                lvl/=10
-        elif isinstance(tok, Node) and tok.middle == 'call':
-            if prio[tok.middle]*lvl > best_prio:
-                best = i
-                best_prio = prio[tok.middle]*lvl
-        i+=1
-    return best
-
-def fetch_closing(sep, tokens, i):
-    lvl = 0
-    pos = 0
-    pos = i
-    while pos < len(tokens):
-        tok = tokens[pos]
-        if sep == '(' and tok.val in ['call(', 'expr(']: lvl += 1
-        elif sep == '(' and tok.val == ')': lvl -= 1
-        if lvl == 0: break
-        pos+=1
-    if lvl != 0: raise Exception("Incorrect expression ()")
-    return pos
-
-def not_exist_or_dif(tokens, index, kind, value):
-    if len(tokens) <= index: return True
-    if not isinstance(tokens[index], kind): return True
-    if kind == Node and tokens[index].middle != value: return True
-    if kind == Token and tokens[index].val != value: return True
-    return False
-
-# From a token list make a tree!
-def make_tree(tokens):
-    while len(tokens) > 1:    
-        target = first_op(tokens)
-        #print '>>> target=%i %s' % (target, tokens[target])
-        if isinstance(tokens[target], Node):
-            if tokens[target].middle == 'call':
-                id = tokens[target-1]
-                if isinstance(id, Token) and id.kind == TokenType.id:
-                    n = Node(left=id, right=tokens[target], middle=Token(TokenType.invisible, 'unprefixed_call'))
-                    del tokens[target]
-                    tokens[target-1] = n
-                else:
-                    raise Exception("Call not understood")
-            else:
-                raise Exception("Error on target node")
-        elif isinstance(tokens[target], Token):
-            if tokens[target].val == 'unary-':        
-                n = Node(left=None, right=tokens[target+1], middle=tokens[target])
-                del tokens[target+1]
-                tokens[target] = n
-            elif tokens[target].val == 'expr(':
-                fin = fetch_closing('(', tokens, target)
-                sub = tokens[target+1:fin]
-                make_tree(sub)
-                jj = fin
-                while jj > target:
-                    del tokens[jj]
-                    jj -= 1
-                tokens[target] = sub[0]
-            elif tokens[target].val == 'call(':
-                fin = fetch_closing('(', tokens, target)
-                sub = tokens[target+1:fin]
-                make_tree(sub)
-                jj = fin
-                while jj > target:
-                    del tokens[jj]
-                    jj -= 1
-                tokens[target] = Node(left=None, right=sub[0], middle='call')
-            elif target > 0:
-                if tokens[target].val != '.' or (tokens[target].val == '.' and not_exist_or_dif(tokens, target+2, Node, "call")):
-                    n = Node(left=tokens[target-1], right=tokens[target+1], middle=tokens[target])
-                    del tokens[target+1]
-                    del tokens[target]
-                    tokens[target-1] = n
-                else:
-                    # nx -> fun, call (avec par)
-                    nx = tokens[target+2]
-                    nx.left = tokens[target+1]
-                    # n -> id, nx
-                    n = Node(left=tokens[target-1], right=nx, middle=Token(TokenType.invisible, "prefixed_call"))
-                    del tokens[target+2]
-                    del tokens[target+1]
-                    del tokens[target]
-                    tokens[target-1] = n
-            elif target == -1 and len(tokens) > 0:
-                n = tokens[0]
+        if self.left is None and self.right is None:
+            return "%s:%s" % (self.val, self.kind)
         else:
-            print tokens[target]
-            raise Exception("Expression not understood")
-        
-        #for t in tokens:
-        #    print t
-        #print "length=%d" % (len(tokens),)
-        #raw_input()
+            return "%s--%s:%s--%s" % (self.left, self.val, self.kind, self.right)
+    def terminal(self):
+        return self.left is None and self.right is None
 
-#-----------------------------------------------------------------------
-# Parse
-#-----------------------------------------------------------------------
-
-class TokenList:
+class SymbolList:
     def __init__(self, tokens=[]):
         self.core = tokens
     
@@ -399,6 +56,9 @@ class TokenList:
     def __setitem__(self, index, val):
         self.core[index] = val
         return val
+    
+    def __delitem__(self, index):
+        del self.core[index]
     
     def add(self, tok):
         self.core.append(tok)
@@ -429,38 +89,310 @@ class TokenList:
                 left.append(t)
             i+=1
         return right, left
+    
+    def __len__(self):
+        return len(self.core)
 
-def make_aff(tl):
-    sub = tl.core[2:]
+#-----------------------------------------------------------------------
+# Lexical analysis
+#-----------------------------------------------------------------------
+
+symbols = [
+    
+    ('".*"', String),
+    ("'.*'", String),
+    
+    ('0(b|B)[0-1]*' , Integer),
+    ('0(x|X)[0-9A-Fa-f]*' , Integer),
+    ('0(c|C)[0-7]*' , Integer),
+    ('[0-9]+', Integer),     #[0-9]+(?![a-zA-Z_])
+    
+    ('[0-9]*\.[0-9]+' , Float),
+    ('[0-9]+\.[0-9]*' , Float),
+    ('\.[0-9]+' , Float),
+
+    ('[0-9]+\.[a-zA-Z]+', Error),
+    
+    (';' , Separator),
+    ('\(' , Separator),
+    ('\)' , Separator),
+    ('\[' , Separator),
+    ('\]' , Separator),
+    ('\{' , Separator),
+    ('\}' , Separator),
+    ('\n' , Separator),
+    (',' , Separator),
+    
+    ('=' , Operator),
+    ('\+=' , Operator),
+    ('-=' , Operator),
+    ('/=' , Operator),
+    ('//=' , Operator),
+    ('\*=' , Operator),
+    ('\*\*=' , Operator),
+    ('%=' , Operator),
+    ('->' , Operator),
+    
+    ('\+' , Operator),
+    ('-' , Operator),
+    ('/' , Operator),
+    ('\*' , Operator),
+    ('//' , Operator),
+    ('\*\*' , Operator),
+    ('%' , Operator),
+    
+    ('>' , Operator),
+    ('>=' , Operator),
+    ('==' , Operator),
+    ('!=' , Operator),
+    ('<=' , Operator),
+    ('<' , Operator),
+    
+    ('!' , Operator),
+    ('&' , Operator),
+    ('\^' , Operator), 
+    ('\|' , Operator),
+    
+    ('\.' , Operator),
+    
+    ('true' , Boolean),
+    ('false' , Boolean),
+    
+    ('if' , Keyword),
+    ('then' , Keyword),
+    ('else' , Keyword),
+    ('elsif' , Keyword),
+    ('end' , Keyword),
+    ('while' , Keyword),
+    ('do' , Keyword),
+    ('until' , Keyword),
+    ('unless' , Keyword),
+    ('break' , Keyword),
+    ('next' , Keyword),
+    ('return' , Keyword),
+    ('fun' , Keyword),
+    ('class' , Keyword),
+
+    (' ', Discard),
+    ('\t', Discard),
+    ('\n', Discard),
+    
+    ('[a-zA-Z_][a-zA-Z0-9_]*(\?|!)?', Id),
+]
+
+class Symbolizer:
+    def __init__(self):
+        global symbols
+        self.symbols = symbols
+    
+    def parse(self, input):
+        input += '\0'
+        output = []
+        current = ''
+        previous = None
+        i = 0
+        while i < len(input):
+            current += input[i]
+            found = False
+            #print '-------------------------------------[', current, '] (', len(current), ')' 
+            for symb in self.symbols:
+                #print symb[0]
+                r = re.match(symb[0], current)
+                if r is not None and r.end() == len(current):
+                    #print 'found!', symb[1]
+                    previous = symb[1]
+                    found = True
+                    break
+            if not found:
+                if previous is not None:
+                    if previous != Discard:
+                        if previous != Error:
+                            output.append(Symbol(previous, current[:len(current)-1]))
+                        else:
+                            num,name = current[:len(current)-1].split('.')
+                            output.append(Symbol(Integer, num))
+                            output.append(Symbol(Operator, '.'))
+                            output.append(Symbol(Id, name))
+                    current = ''
+                    previous = None
+                    i-=1
+                else:
+                    pass # not enough caracter to decide
+            else:
+                pass # we found at least one matching tokens
+            i+=1
+        output.append(Symbol(EOF, 'eof'))
+        return SymbolList(output)
+
+#-----------------------------------------------------------------------
+# Syntaxic analysis (Expression)
+#-----------------------------------------------------------------------
+
+# Fetch the operator to execute
+def first_op(symbols):
+    # highlighting differences
+    i = 0
+    while i < len(symbols):
+        symb = symbols[i]
+        if symb.terminal:
+            if symb.val == '-' and (i == 0 or symbols[i-1].kind == Operator):
+                symb.val = 'unary-'
+            if symb.val == '(' and i > 0 and symbols[i-1].kind != Operator:
+                symb.val = 'call('
+            elif symb.val == '(':
+                symb.val = 'expr('
+        i+=1
+    # fetching the highest priority
+    i = 0
+    best = -1
+    best_prio = -1
+    prio = { ')' : 0, '+' : 10, '-' : 10, '*' : 20, '/' : 20, '**' : 30, '%' : 30, 'call' : 35,
+            '.' : 40, 'unary-' : 50, 'call(' : 51, 'expr(' : 60 }
+    lvl = 1
+    while i < len(symbols):
+        symb = symbols[i]
+        if symb.terminal() and symb.kind in [Operator, Separator]:
+            if best == -1:
+                best = i
+                best_prio = prio[symb.val]*lvl
+            else:
+                if prio[symb.val]*lvl > best_prio:
+                    best = i
+                    best_prio = prio[symb.val]*lvl
+            # () for others
+            if symb.val in ['call(', 'expr(']:
+                lvl*=10
+            elif symb.val == ')':
+                lvl/=10
+        elif symb.val == 'call(': # not terminal
+            if prio[symb.val]*lvl > best_prio:
+                best = i
+                best_prio = prio[symb.val]*lvl
+        i+=1
+    return best
+
+def fetch_closing(sep, symbols, i):
+    lvl = 0
+    pos = 0
+    pos = i
+    while pos < len(symbols):
+        symb = symbols[pos]
+        if sep == '(' and symb.val in ['call(', 'expr(']: lvl += 1
+        elif sep == '(' and symb.val == ')': lvl -= 1
+        if lvl == 0: break
+        pos+=1
+    if lvl != 0: raise Exception("Incorrect expression ()")
+    return pos
+
+def not_exist_or_dif(symbols, index, terminal, value):
+    if len(symbols) <= index: return True
+    if symbols[index].terminal() != terminal: return True
+    if symbols[index].val != value: return True
+    return False
+
+# From a token list make a tree!
+def make_tree(symbols, debug=False):
+    while len(symbols) > 1:    
+        target = first_op(symbols)
+        if debug:
+            print '>>> target=%i %s' % (target, symbols[target])
+        if not symbols[target].terminal():
+            if symbols[target].val == 'call(':
+                id = symbols[target-1]
+                if id.terminal() and id.kind == Id:
+                    n = Symbol(left=id, right=symbols[target], val='unprefixed_call', kind=Structure)
+                    del symbols[target]
+                    symbols[target-1] = n
+                else:
+                    raise Exception("Call not understood")
+            else:
+                raise Exception("Error on target node")
+        elif symbols[target].terminal():
+            if symbols[target].val == 'unary-':        
+                n = Symbol(left=None, right=symbols[target+1], val='unary-', kind=Operator)
+                del symbols[target+1]
+                symbols[target] = n
+            elif symbols[target].val == 'expr(':
+                fin = fetch_closing('(', symbols, target)
+                sub = symbols[target+1:fin]
+                make_tree(sub)
+                jj = fin
+                while jj > target:
+                    del symbols[jj]
+                    jj -= 1
+                symbols[target] = sub[0]
+            elif symbols[target].val == 'call(':
+                fin = fetch_closing('(', symbols, target)
+                sub = symbols[target+1:fin]
+                make_tree(sub)
+                jj = fin
+                while jj > target:
+                    del symbols[jj]
+                    jj -= 1
+                symbols[target] = Symbol(left=None, right=sub[0], val='call(', kind=Structure)
+            elif target > 0:
+                if symbols[target].val != '.' or (symbols[target].val == '.' and not_exist_or_dif(symbols, target+2, False, "call")):
+                    n = Symbol(left=symbols[target-1], right=symbols[target+1], val=symbols[target].val, kind=symbols[target].kind)
+                    del symbols[target+1]
+                    del symbols[target]
+                    symbols[target-1] = n
+                else:
+                    # nx -> fun, call (avec par)
+                    nx = symbols[target+2]
+                    nx.left = symbols[target+1]
+                    # n -> id, nx
+                    n = Symbol(left=symbols[target-1], right=nx, val="prefixed_call", kind=Structure)
+                    del symbols[target+2]
+                    del symbols[target+1]
+                    del symbols[target]
+                    symbols[target-1] = n
+            elif target == -1 and len(symbols) > 0:
+                n = symbols[0]
+        else:
+            print symbols[target]
+            raise Exception("Expression not understood")
+        
+        if debug:
+            ii=0
+            for t in symbols:
+                print ii, '. ', t
+                ii+=1
+            print "length=%d" % (len(symbols),)
+            raw_input()
+
+#-----------------------------------------------------------------------
+# Syntaxic analysis (Instruction)
+#-----------------------------------------------------------------------
+
+def make_aff(symbols):
+    sub = symbols.core[2:]
     make_tree(sub)
     nx = sub[0]
-    n = Node(left=tl(0), right=nx, middle=Token(TokenType.invisible, 'aff'))
-    tl.clear()
-    tl.add(n)
-    #print '--> ', tokens
+    n = Symbol(left=symbols(0), right=nx, val='aff', kind=Structure)
+    symbols.clear()
+    symbols.add(n)
 
 root_scope = {}
 
-def parse(tokens): 
-    tl = TokenList(tokens)
-    if tl.include(';'):
-        two_part = tl.split(';')
+def parse(symbols): 
+    if symbols.include(';'):
+        two_part = symbols.split(';')
         parse(two_part[0])
         parse(two_part[1])
-        n = Node(middle=Token(TokenType.invisible, 'suite'), left=two_part[0][0], right=two_part[1][0])
-        tl.clear()
-        tl.add(n)
-    elif not_exist_or_dif(tokens, 1, Token, '='):
-        make_tree(tokens)
+        n = Symbol(val=suite, kind=Structure, left=two_part[0][0], right=two_part[1][0])
+        symbols.clear()
+        symbols.add(n)
+    elif not_exist_or_dif(symbols, 1, True, '='):
+        make_tree(symbols)
     else:
-        make_aff(tl)
+        make_aff(symbols)
 
 #-----------------------------------------------------------------------
 # Interpreter
 #-----------------------------------------------------------------------
 
-import baselib
-bb = baselib.BaseLib()
+#import baselib
+#bb = baselib.BaseLib()
 
 def global_function(id, args, scope):
     if isinstance(id, Token) and id.kind == TokenType.id and isinstance(args, Node) and args.middle == 'call':
@@ -497,88 +429,105 @@ def instance_function(id, args, scope):
     else:
         raise Exception("Bad instance function call")
 
-def exec_node(n, scope={}):
+def exec_node(symbol, scope={}):
     #print 'Enter ExecNode', n
-    if isinstance(n, Node):
+    if not symbol.terminal():
         #print 'IsNode'
-        if n.middle.kind == TokenType.operator:
-            if n.middle.val == '+':
-                return exec_node(n.left) + exec_node(n.right)
-            elif n.middle.val == '-':
-                return exec_node(n.left) - exec_node(n.right)
-            elif n.middle.val == '*':
-                return exec_node(n.left) * exec_node(n.right)
-            elif n.middle.val == '/':
-                return exec_node(n.left) / exec_node(n.right)
-            elif n.middle.val == '%':
-                return exec_node(n.left) % exec_node(n.right)
-            elif n.middle.val == '**':
-                return exec_node(n.left) ** exec_node(n.right)
-            elif n.middle.val == 'unary-':
-                return -exec_node(n.right)
-            elif n.middle.val == '.':
-                if n.right.val == 'abs':
-                    value = exec_node(n.left)
+        if symbol.kind == Operator:
+            if symbol.val == '+':
+                return exec_node(symbol.left) + exec_node(symbol.right)
+            elif symbol.val == '-':
+                return exec_node(symbol.left) - exec_node(symbol.right)
+            elif symbol.val == '*':
+                return exec_node(symbol.left) * exec_node(symbol.right)
+            elif symbol.val == '/':
+                return exec_node(symbol.left) / exec_node(symbol.right)
+            elif symbol.val == '%':
+                return exec_node(symbol.left) % exec_node(symbol.right)
+            elif symbol.val == '**':
+                return exec_node(symbol.left) ** exec_node(symbol.right)
+            elif symbol.val == 'unary-':
+                return -exec_node(symbol.right)
+            elif symbol.val == '.':
+                if symbol.right.val == 'abs':
+                    value = exec_node(symbol.left)
                     if isinstance(value, int) or isinstance(value, float):
                         return abs(value)
                     else:
                         raise Exception("Wrong type for function abs")
-                elif n.right.val == 'round':
-                    value = exec_node(n.left)
+                elif symbol.right.val == 'round':
+                    value = exec_node(symbol.left)
                     if isinstance(value, float):
                         return round(value)
                     else:
                         raise Exception("Wrong type for function round")
-                elif n.right.val == 'trunc':
-                    value = exec_node(n.left)
+                elif symbol.right.val == 'trunc':
+                    value = exec_node(symbol.left)
                     if isinstance(value, float):
                         return float(int(value))
                     else:
                         raise Exception("Wrong type for function trunc")
             else:
                 raise Exception("Operator not understood")
-        elif n.middle.kind == TokenType.invisible:
-            if n.middle.val == 'unprefixed_call':
-                return global_function(n.left, n.right, scope)
-            elif n.middle.val == 'prefixed_call':
-                return instance_function(n.left, n.right, scope)
-            elif n.middle.val == 'aff':
-                scope[n.left.val] = exec_node(n.right, scope)
-                return scope[n.left.val]
-            elif n.middle.val == 'suite':
-                exec_node(n.left, scope)
-                return exec_node(n.right, scope)
+        elif symbol.kind == Structure:
+            if symbol.val == 'unprefixed_call':
+                return global_function(symbol.left, symbol.right, scope)
+            elif symbol.val == 'prefixed_call':
+                return instance_function(symbol.left, symbol.right, scope)
+            elif symbol.val == 'aff':
+                scope[symbol.left.val] = exec_node(symbol.right, scope)
+                return scope[symbol.left.val]
+            elif symbol.val == 'suite':
+                exec_node(symbol.left, scope)
+                return exec_node(symbol.right, scope)
             else:
                 raise Exception("Invisible Node type not understood")
         else:
-            print n.left
-            print n.middle
-            print n.right
+            print symbol.left
+            print symbol.middle
+            print symbol.right
             raise Exception("Node type not understood")
-    elif isinstance(n, Token):
-        if n.kind == TokenType.integer:
-            return int(n.val)
-        elif n.kind == TokenType.float:
-            return float(n.val)
-        elif n.kind == TokenType.id:
-            return scope[n.val]
-        elif n.kind == TokenType.string:
-            return n.val[1:len(n.val)-1]
+    elif symbol.terminal():
+        if symbol.kind == Integer:
+            return int(symbol.val)
+        elif symbol.kind == Float:
+            return float(symbol.val)
+        elif symbol.kind == Id:
+            return scope[symbol.val]
+        elif symbol.kind == String:
+            return symbol.val[1:len(n.val)-1]
         else:
-            print n
+            print symbol
             raise Exception("TokenType not understood")
     else:
-        print n.__class__
-        print n
+        print symbol.__class__
+        print symbol
         raise Exception("Node not known")
 
 #-----------------------------------------------------------------------
 # Tests
 #-----------------------------------------------------------------------
 
+"""
+t = Symbolizer()
+#s = "2.0 * (-(2+1).abs + 2..abs) + a"
+s = "(2 + 3) * 4"
+print 'solve: %s' % (s,)
+o = t.parse(s)
+i = 0
+for e in o:
+    print '%d. %s' % (i, str(e))
+    i+=1
+del o[-1] # eof
+print o[first_op(o)], first_op(o)
+
+make_tree(o, True)
+print exec_node(o[0])
+"""
+
 def test(s, debug=True):
     global root_scope
-    t = Tokenizer()
+    t = Symbolizer()
     o = t.parse(s)
     if debug:
         i = 0
@@ -609,6 +558,7 @@ test("6.5.trunc")   # 6.0
 test("1..trunc")    # 1.0 
 test("2 * ( 3 + 1)")  # 8
 test("(3 + 1) * 2")   # 8
+"""
 test("println(4)")    # None >> 4
 test("3.add(2)")    # 5 
 test("a = 3")       # 3
@@ -617,6 +567,7 @@ test("a + 2")       # 5
 test("a = 2 + 4")   # 6
 test("a")           # 6
 test("a.add(1)")    # 7
+"""
 
 command = ''
 loop = True
@@ -634,14 +585,14 @@ while loop:
         #except Exception as e:
         #    print e
 
-a = Token(TokenType.id, "a")
-b = Token(TokenType.operator, "=")
-c = Token(TokenType.integer, "5")
+a = Symbol(Id, "a")
+b = Symbol(Operator, "=")
+c = Symbol(Integer, "5")
 l = [a, b, c]
 
-a = Token(TokenType.integer, "3")
-b = Token(TokenType.separator, ";")
-c = Token(TokenType.integer, "5")
+a = Symbol(Integer, "3")
+b = Symbol(Separator, ";")
+c = Symbol(Integer, "5")
 
 #tl = TokenList([a,b,c])
 #print tl[0]
