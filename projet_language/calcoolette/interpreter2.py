@@ -1,5 +1,3 @@
-import re           # for Lexer
-
 #-----------------------------------------------------------------------
 # Base
 #-----------------------------------------------------------------------
@@ -105,17 +103,12 @@ symbols = [
     ('0(b|B)[0-1]*' , Integer),
     ('0(x|X)[0-9A-Fa-f]*' , Integer),
     ('0(c|C)[0-7]*' , Integer),
-    ('[0-9]+', Integer),     #[0-9]+(?![a-zA-Z_])
     
     ('[0-9]*\.[0-9]+' , Float),
     ('[0-9]+\.[0-9]*' , Float),
     ('\.[0-9]+' , Float),
     
-    ('[0-9]+\.[a-zA-Z]+', Error),
-    
     (';' , Separator),
-    ('\(' , Separator),
-    ('\)' , Separator),
     ('\[' , Separator),
     ('\]' , Separator),
     ('\{' , Separator),
@@ -133,102 +126,132 @@ symbols = [
     ('%=' , Operator),
     ('->' , Operator),
     
-    ('\+' , Operator),
-    ('-' , Operator),
-    ('/' , Operator),
-    ('\*' , Operator),
-    ('//' , Operator),
-    ('\*\*' , Operator),
-    ('%' , Operator),
-    
-    ('>' , Operator),
-    ('>=' , Operator),
-    ('==' , Operator),
-    ('!=' , Operator),
-    ('<=' , Operator),
-    ('<' , Operator),
-    
-    ('!' , Operator),
-    ('&' , Operator),
-    ('\^' , Operator), 
-    ('\|' , Operator),
-    
-    ('\.' , Operator),
-    
-    ('True', Boolean),
-    ('False', Boolean),
-    ('true', Boolean),
-    ('false', Boolean),
-    
-    ('and', Operator),
-    ('or', Operator),
-    ('xor', Operator),
-    
-    ('if' , Keyword),
-    ('then' , Keyword),
-    ('else' , Keyword),
-    ('elsif' , Keyword),
-    ('end' , Keyword),
-    ('while' , Keyword),
-    ('do' , Keyword),
-    ('until' , Keyword),
-    ('unless' , Keyword),
-    ('break' , Keyword),
-    ('next' , Keyword),
-    ('return' , Keyword),
-    ('fun' , Keyword),
-    ('class' , Keyword),
-
-    (' ', Discard),
-    ('\t', Discard),
-    ('\n', Discard),
+    #('!' , Operator),
+    #('&' , Operator),
+    #('\^' , Operator), 
+    #('\|' , Operator),
     
     ('[a-zA-Z_][a-zA-Z0-9_]*(\?|!)?', Id),
 ]
 
+digits = ['0','1','2','3','4','5','6','7','8','9']
+alphas = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+          'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '_']
+ops = ['+', '-', '*', '/', '**', '%', '.', '<', '>', '!', '=']
+white = [' ', '\n', '\t']
+operators = ['+', '-', '*', '/', '**', '%', '.', '<', '<<', '<=', '>', '>>', '>=', '!=', '==', '<=>', '=']
+separators = ['(', ')', ';']
+id_booleans = ['true', 'True', 'False', 'false']
+id_operators = ['and', 'xor', 'or']
+id_keywords = ['class', 'fun', 'return', 'next', 'break', 'unless', 'until', 'do', 'while', 'end', 'elsif', 'else', 'then', 'if', 'module']
+
 class Symbolizer:
+    
     def __init__(self):
-        global symbols
-        self.symbols = symbols
+        pass
+        self.symbols = []
     
     def parse(self, input):
-        input += '\0'
-        output = []
-        current = ''
-        previous = None
+        self.symbols = []
+        START = 0
+        mode = START
         i = 0
         while i < len(input):
-            current += input[i]
-            found = False
-            #print '-------------------------------------[', current, '] (', len(current), ')' 
-            for symb in self.symbols:
-                #print symb[0]
-                r = re.match(symb[0], current)
-                if r is not None and r.end() == len(current):
-                    #print 'found!', symb[1]
-                    previous = symb[1]
-                    found = True
-                    break
-            if not found:
-                if previous is not None:
-                    if previous != Discard:
-                        if previous != Error:
-                            output.append(Symbol(previous, current[:len(current)-1]))
-                        else:
-                            num,name = current[:len(current)-1].split('.')
-                            output.append(Symbol(Integer, num))
-                            output.append(Symbol(Operator, '.'))
-                            output.append(Symbol(Id, name))
-                    current = ''
-                    previous = None
-                    i-=1
-                else:
-                    pass # not enough caracter to decide
+            #print '> char at : ', input[i]
+            #print '> index   : ', i
+            #raw_input()
+            if input[i] in digits: i=self.parse_num(input, i)
+            elif input[i] in alphas: i=self.parse_id(input, i)
+            elif input[i] in ops: i=self.parse_op(input, i)
+            elif input[i] in white: i+=1
+            elif input[i] in separators:
+                self.symbols.append(Symbol(Separator, input[i]))
+                i+=1
+            else: raise Exception("Char incorrect %s at %s" % (input[i], i))
+        self.symbols.append(Symbol(EOF, 'eof'))
+        return SymbolList(self.symbols)
+    
+    def parse_num(self, input, i):
+        global digits
+        #print '> parse num'
+        float = False
+        num = input[i]
+        i+=1
+        cont = True
+        while i < len(input) and cont:
+            #print '> ', i
+            if input[i] in digits:
+                #print 'go on num'
+                num += input[i]
+                i+=1
+            elif input[i] == '.' and not float and i+1 < len(input) and input[i+1] in digits:
+                float = True
+                num += input[i]
+                i+=1
+            elif input[i] == '.' and not float and i+1 < len(input) and input[i+1] == '.':
+                float = True
+                num += input[i]
+                i+=1
+                cont = False
             else:
-                pass # we found at least one matching tokens
-            i+=1
-        output.append(Symbol(EOF, 'eof'))
-        return SymbolList(output)
+                #print 'end num'
+                cont = False
+        if not float:
+            self.symbols.append(Symbol(Integer, num))
+        else:
+            self.symbols.append(Symbol(Float, num))
+        return i
+    
+    def parse_id(self, input, i):
+        global alphas, digits
+        #print '> parse id'
+        id = input[i]
+        i+=1
+        cont = True
+        while i < len(input) and cont:
+            #print '> ', i
+            if input[i] in alphas or input[i] in digits:
+                id+=input[i]
+                i+=1
+            else:
+                cont = False
+        if id in id_booleans:
+            self.symbols.append(Symbol(Boolean, id))
+        elif id in id_operators:
+            self.symbols.append(Symbol(Operator, id))
+        elif id in id_keywords:
+            self.symbols.append(Symbol(Keyword, Id))
+        else:
+            self.symbols.append(Symbol(Id, id))
+        return i
+    
+    def parse_op(self, input, i):
+        global ops, operators
+        #print '> parse op'
+        op = input[i]
+        i+=1
+        cont = True
+        while op != '-' and i < len(input) and cont:
+            #print '>', i
+            if input[i] in ops and input[i] != '-':
+                op += input[i]
+                i+=1
+            else:
+                cont = False
+        if not op in operators:
+            raise Exception("Not known operator : %s" % (op,))
+        self.symbols.append(Symbol(Operator, op))
+        return i
+
+s = "2 + 3 - 4.to_f + (true) or False xor True ** 2.3 + 0.3.to_i / 0.to_f / 0..to_f +- 3"
+y = Symbolizer()
+l = y.parse(s)
+i = 0
+for e in l:
+    print i, '. ', l[i]
+    i+=1
+
+#exit() 16h28 : ancien symbolizer rempl car bug.
 
 #-----------------------------------------------------------------------
 # Syntaxic analysis (Expression)
@@ -252,7 +275,7 @@ def first_op(symbols):
     i = 0
     best = -1
     best_prio = -1
-    prio = { ')' : 0, 'and' : 9, 'or' : 9, 'xor' : 9, '+' : 10, '-' : 10, 
+    prio = { ')' : 0, 'and' : 5, 'or' : 5, 'xor' : 5, '<=>' : 8, '<<': 9, '>>' : 9, '+' : 10, '-' : 10, 
              '*' : 20, '/' : 20, '**' : 30, '%' : 30, 'call' : 35, '.' : 40, 
              'unary-' : 50, 'call(' : 51, 'expr(' : 60 }
     lvl = 1
@@ -472,6 +495,12 @@ def exec_node(symbol, scope={}, debug=False):
                     return instance_function(symbol.left, call.left, call.right, scope)
                 else:
                     raise Exception("What to do with this symbol ? : %s" % (symbol.right.val))
+            elif symbol.val == '<<':
+                return instance_function(exec_node(symbol.left), Symbol(Id, 'lshift'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
+            elif symbol.val == '>>':
+                return instance_function(exec_node(symbol.left), Symbol(Id, 'rshift'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
+            elif symbol.val == '<=>':
+                return instance_function(exec_node(symbol.left), Symbol(Id, 'cmp'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
             else:
                 raise Exception("Operator not understood")
         elif symbol.kind == Structure:
@@ -494,7 +523,14 @@ def exec_node(symbol, scope={}, debug=False):
             raise Exception("Node type not understood")
     elif symbol.terminal():
         if symbol.kind == Integer:
-            return int(symbol.val)
+            if len(symbol.val) > 1 and symbol.val[1] == 'x':
+                return int(symbol.val, 16)
+            elif len(symbol.val) > 1 and symbol.val[1] == 'b':
+                return int(symbol.val, 2)
+            elif len(symbol.val) > 1 and symbol.val[1] == 'c':
+                return int("0" + symbol.val[2:], 8)
+            else:
+                return int(symbol.val)
         elif symbol.kind == Float:
             return float(symbol.val)
         elif symbol.kind == Id:

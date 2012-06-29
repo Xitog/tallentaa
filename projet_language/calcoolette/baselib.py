@@ -1,4 +1,4 @@
-import sys
+import sys    # getsizeof, stdout.write
 
 class BaseLib:
     
@@ -41,6 +41,30 @@ class BaseLib:
             return abs(target)
         elif msg == 'inv':
             return -target
+        elif msg == 'lshift':
+            return target << par
+        elif msg == 'rshift':
+            return target >> par
+        elif msg == 'and':
+            return target & par
+        elif msg == 'or':
+            return target | par
+        elif msg == 'xor':
+            return target ^ par
+        elif msg == 'invbin':
+            return ~target
+        elif msg == 'cmp':
+            if target > par: return 1
+            elif target < par: return -1
+            else: return 0
+        elif msg == 'to_s':
+            return str(target)
+        elif msg == 'to_f':
+            return float(target)
+        elif msg == 'to_i':
+            return target
+        elif msg == 'size':
+            return sys.getsizeof(target)
         else:
             raise Exception("Function %s not known for integer" % (msg,))
     

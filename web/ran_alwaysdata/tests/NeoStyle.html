@@ -1,0 +1,126 @@
+<!-- Yutaka Takanashi -->
+<html>
+<head>
+    <title>Test 1</title>
+    <meta charset="utf-8">
+    <style>
+        body {
+            width: 80%;
+            height: 100%;
+            margin: auto;
+        }
+        h1 {
+            font-family: "Verdana", "Arial";
+            font-size: 22px;
+            font-weight: bold;
+            font-style: normal;
+            color: #1F1F1F;
+            line-height: 27px;
+        }
+        p {
+            font-family: "Palatino", "Georgia";
+            font-size: 14px;
+            font-weight: normal;
+            font-style: normal;
+            color: #111111;
+        }
+        p.b {
+            background-color: #F9F9F9;
+            border: 1px solid #AAAAAA;
+            padding: 2px;
+        }
+
+/*
+        ul#menu {
+            margin-left: 0;
+            padding-left: 0;
+        }
+
+        ul#menu li {
+            list-style: none;
+            margin-bottom: 3px;
+            margin-top: 3px;
+        }        
+        ul#menu li:before {
+        content: "» ";
+        }
+*/
+      
+        a {
+            font-family: "Palatino";
+        }
+
+        a.intext:link {
+            color: #929497;
+        }
+        a.intext:visited {
+            color: Orange;
+        }
+        a.intext:hover {
+            background-color: #929497;
+            color: White;
+        }
+
+        a.menu:link {
+            color: #929497;
+        }
+        a.menu:visited {
+            color: Orange;
+        }
+        a.menu:hover {
+            background-color: #929497;
+            color: White;
+        }
+
+        table#menu {
+            border-collapse: collapse;
+            border: 1px solid #929497;
+        }
+        table#menu td {
+            background-color: #E9E4D2;
+            border-bottom: 1px dotted #929497;
+        }
+        table#menu td#spe {
+            color: #FFFFFF;
+            font-size: 60px;
+            font-family: "Palatino";
+        }
+
+        p.line {
+            border-bottom: 1px dashed #CEC398;
+            color: #FF8000;
+            font-family: "Consolas";
+        }
+
+    </style>
+</head>
+<body>
+    <table width="100%">
+        <tr valign="top">
+            <td width="10%">
+<!--
+                <div>
+                    <ul id="menu">
+                        <li><a class="menu" href="http://www.google.com">Hello</a></li>
+                        <li><a class="menu" href="http://www.google.com">Zorba</a></li>
+                    </ul>
+                </div>
+-->
+                <table id=menu width="100%" height="100%">
+                    <tr><td id="spe">DG</td></tr>
+                    <tr><td><a class="menu" href="http://www.google.com">Hello</a></td></tr>
+                    <tr><td><a class="menu" href="http://www.google.com">Hello</a></td></tr>
+                </table>
+            </td>
+            <td width="90%">
+                <div id="content">
+                    <h1>Exposition</h1>
+                    <p class="b">Hello</p>
+                    <p>Ceci est du texte en Palatino. Youpi !</p>
+                    <p class="line"></p>
+                </div>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
