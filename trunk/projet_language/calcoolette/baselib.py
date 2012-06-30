@@ -86,9 +86,11 @@ class BaseLib:
         elif msg == 'inv':
             return -target
         elif msg == 'round':
-            return round(target)
-        elif msg == 'trunc':
-            return float(int(target))
+            return int(round(target))
+        elif msg == 'trunc' or msg == 'floor':
+            return int(target)
+        elif msg == 'ceil':
+            return int(target)+1
         else:
             raise Exception("Function %s not known for float" % (msg,))
 
