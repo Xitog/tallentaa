@@ -1,0 +1,207 @@
+<html>
+<head>
+    <title>DG</title>
+    <meta charset="utf-8">
+    <style>
+        body {
+            width: 80%;
+            height: 100%;
+            margin: auto;
+        }
+        h1 {
+            font-family: "Palatino", "Georgia";
+            font-size: 22px;
+            font-weight: bold;
+            font-style: normal;
+            color: #929497;
+            line-height: 27px;
+            margin-top: 10px;
+        }
+        h2 {
+            font-family: "Palatino", "Georgia";
+            font-size: 18px;
+            font-weight: normal;
+            font-style: normal;
+            color: #CEC498;
+        }
+        p {
+            font-family: "Palatino", "Georgia";
+            font-size: 14px;
+            font-weight: normal;
+            font-style: normal;
+            color: #111111;
+        }
+        p.code {
+            background-color: #F9F9F9;
+            border: 1px solid #AAAAAA;
+            padding: 2px;
+            font-family: "Consolas";
+        }
+      
+        a {
+            font-family: "Palatino";
+            color: #929497;
+        }
+        
+        a.intext:link {
+            color: #929497;
+        }
+        a.intext:visited {
+            color: Orange;
+        }
+        a.intext:hover {
+            background-color: #929497;
+            color: White;
+        }
+
+        table#menu {
+            border-collapse: collapse;
+            border: 1px solid #929497;
+            font-family: "Palatino";
+        }
+        table#menu td.cat {
+            background-color: #E9E4D2;
+            border-bottom: 1px dotted #929497;
+            color: #929497;
+        }
+        table#menu td.cat:before {
+            content: "» ";
+        }
+        table#menu td.cat:hover {
+            background-color: #929497;
+            color: White;
+            cursor: hand;
+        }
+        table#menu td.sub {
+            background-color: #FAF5E3;
+            border-bottom: 1px dotted #929497;
+            color: #929497;
+        }
+        table#menu td.sub:before {
+            content: "\233D \0020";
+        }
+        table#menu td.sub:hover {
+            background-color: #929497;
+            color: White;
+            cursor: hand;
+        }
+        table#menu td#spe {
+            background-color: #CEC498;
+            color: #FFFFFF;
+            font-size: 60px;
+            font-family: "Palatino";
+            border-bottom: 1px solid #929497;
+        }
+
+        p.line {
+            border-bottom: 1px dashed #CEC398;
+            color: #FF8000;
+            font-family: "Consolas";
+        }
+
+    </style>
+    <script>
+        
+        function all_to_none() {
+            document.getElementById("dgx_accueil").style.display = "none";
+            document.getElementById("dgx_news").style.display = "none";
+            document.getElementById("dgx_projets").style.display = "none";
+            
+            document.getElementById("calcoolette").style.display = "none";
+            document.getElementById("cal_syntaxe").style.display = "none";
+            document.getElementById("cal_fonctions").style.display = "none";
+        }
+        
+        function dgx_accueil() {
+            all_to_none();
+            document.getElementById("dgx_accueil").style.display = "block";
+        }
+        
+        function dgx_news() {
+            all_to_none();
+            document.getElementById("dgx_news").style.display = "block";
+        }
+        
+        function dgx_projets() {
+            all_to_none();
+            document.getElementById("dgx_projets").style.display = "block";
+        }
+        
+        function cal_syntaxe() {
+            all_to_none();
+            document.getElementById("cal_syntaxe").style.display = "block";
+        }
+        
+        function cal_fonctions() {
+            all_to_none();
+            document.getElementById("cal_fonctions").style.display = "block";
+        }
+        
+        function calcoolette() {
+            all_to_none();
+            document.getElementById("calcoolette").style.display = "block";
+        }
+        
+        function start() {
+            all_to_none();
+        }
+        
+        window.onload = function() {
+            start();
+        }
+    </script>
+</head>
+<body>
+    <table width="100%">
+        <tr valign="top">
+            <td width="10%">
+                <table id=menu width="100%" height="100%">
+                    <tr><td id="spe">DG</td></tr>
+                    <tr><td class="sub" onclick="dgx_accueil()">Accueil</td></tr>
+                    <tr><td class="sub" onclick="dgx_news()">News</td></tr>
+                    <tr><td class="sub" onclick="dgx_projets()">Projets</td></tr>
+                    <tr><td class="cat" onclick="window.location = 'http://ran.alwaysdata.net/beatrice/'">Beatrice</td></tr>
+                    <tr><td class="cat" onclick="window.location = 'http://ran.alwaysdata.net/cristina/'">Cristina</td></tr>
+                    <tr><td class="cat" onclick="window.location = 'http://mots.alwaysdata.net/'">Invoque</td></tr>
+                    <tr><td class="cat" onclick="calcoolette()">Calcoolette</td></tr>
+                    <tr><td class="sub" onclick="cal_syntaxe()">Syntaxe</td></tr>
+                    <tr><td class="sub" onclick="cal_fonctions()">Fonctions</td></tr>
+                </table>
+            </td>
+            <td width="90%">
+                <div id="dgx_accueil">
+                    <h1>Accueil</h1>
+                </div>
+                <div id="dgx_news">
+                </div>
+                <div id="dgx_projets">
+                </div>
+                <div id="calcoolette">
+                    <h1>Calcoolette</h1>
+                    <h2>Présentation</h2>
+                    <p class="code">a = 2 + 2</p>
+                    <p>Calcoolette, comme son nom légèrement débile le laisse à deviner, est une calculette simple à utiliser, et même marrante si l'on pousse un peu loin le bouchon. On entre une expression et le programme renvoie son résultat. Simple, vous dis-je.</p>
+                    <p class="line"></p>
+                    <h2>Documentation</h2>
+                    <p>Il y a deux sous pages de documentation. L'une détaille la <a href="#" onclick="cal_syntaxe()">syntaxe</a> des expressions qui doit être utilisée pour que la calcoolette la comprenne. Par d'inquiétude, il s'agit d'une syntaxe très proche de la notation mathématique standard, avec une petite touche venant des langages de programmation. L'autre page présente les différentes <a href="#" onclick="cal_fonctions()">fonctions</a> offertes par la bibliothèque de base de la calcoolette.</p>
+                    <ul>
+                        <li><a href="#" onclick="cal_syntaxe()">Syntaxe</a></li>
+                        <li><a href="#" onclick="cal_fonctions()">Fonctions</a></li>
+                    </ul>
+                    <p class="line"></p>
+                    <h2>Historique</h2>
+                    <p>Le projet a été mis en ligne le 30 Juin 2012 en version alpha.</p>
+                </div>
+                <div id="cal_syntaxe">
+                    <h1>Syntaxe</h1>
+                    <a href="#" onclick="calcoolette()">Back</a>
+                </div>
+                <div id="cal_fonctions">
+                    <h1>Fonctions</h1>
+                    <a href="#" onclick="calcoolette()">Back</a>
+                </div>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
