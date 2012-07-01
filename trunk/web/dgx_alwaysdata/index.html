@@ -40,20 +40,16 @@
       
         a {
             font-family: "Palatino";
-            color: #929497;
+            color: #CC6714; /*#929497;*/
+        }
+        table.tab a {
+            font-family:    Lucida Grande,Verdana,Arial,Helvetica,sans-serif;
+            font-size:      12px;
+            line-height:    1.6em;
         }
         
-        a.intext:link {
-            color: #929497;
-        }
-        a.intext:visited {
-            color: Orange;
-        }
-        a.intext:hover {
-            background-color: #929497;
-            color: White;
-        }
-
+        /* :link :visited :hover */
+        
         table#menu {
             border-collapse: collapse;
             border: 1px solid #929497;
@@ -92,7 +88,23 @@
             font-family: "Palatino";
             border-bottom: 1px solid #929497;
         }
-
+        
+        table.tab {
+            font-family:    Lucida Grande,Verdana,Arial,Helvetica,sans-serif;
+            font-size:      12px;
+            line-height:    1.6em;
+        }
+        table.tab thead th {
+            background-color: #CEC498;
+            color: white;
+        }
+        table.tab tbody tr:nth-child(odd) { 
+            background-color: #F5F5F5; 
+        }
+        table.tab tbody tr:nth-child(2n) { 
+            background-color: #FFFFFF;
+        }
+        
         p.line {
             border-bottom: 1px dashed #CEC398;
             color: #FF8000;
@@ -100,7 +112,8 @@
         }
 
     </style>
-    <script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
         
         function all_to_none() {
             document.getElementById("dgx_accueil").style.display = "none";
@@ -112,6 +125,13 @@
             document.getElementById("cal_fonctions").style.display = "none";
         }
         
+        function go_to_accueil() { window.location.hash = "#accueil"; }
+        function go_to_news()    { window.location.hash = "#news"; }
+        function go_to_projets() { window.location.hash = "#projets"; }
+        function go_to_calcoolette(){window.location.hash = "#calcoolette";}
+        function go_to_syntaxe() { window.location.hash = "#syntaxe"; }
+        function go_to_fonctions(){window.location.hash = "#fonctions";}
+        
         function dgx_accueil() {
             all_to_none();
             document.getElementById("dgx_accueil").style.display = "block";
@@ -120,6 +140,22 @@
         function dgx_news() {
             all_to_none();
             document.getElementById("dgx_news").style.display = "block";
+            
+            $.ajax(
+                {
+                    url: 'http://dgx.alwaysdata.net/news.rb',
+                    type: 'GET',
+                    success: function(data) {
+                        $('#news_content').html(data);
+                        alert('Load was performed.');
+                    },
+                    statusCode: {
+                        404: function() {
+                        alert("page not found");
+                        }
+                    }
+                }
+            );
         }
         
         function dgx_projets() {
@@ -143,12 +179,66 @@
         }
         
         function start() {
-            all_to_none();
+            var v = window.location.hash;
+            if (v === "") {
+                dgx_accueil();
+            } else if (v === "#calcoolette") {
+                calcoolette();
+            } else if (v === "#projets") {
+                dgx_projets();
+            } else if (v === "#accueil") {
+                dgx_accueil();
+            } else if (v === "#news") {
+                dgx_news();
+            } else if (v === "#fonctions") {
+                cal_fonctions();
+            } else if (v === "#syntaxe") {
+                cal_syntaxe();
+            } else if (v === "#int" || v === "#float" || v === "#bool") {
+                var a = 2; /*alert(v);*/
+            } else {
+                alert(v);
+            }
         }
         
+        $(document).ready(function(){
+            /*
+            $("#lk").click(function(event){
+                alert("Thanks for visiting!");
+                event.preventDefault(); // Empêche de partir !!!
+            });
+            $("#ajx").click(
+            function(event) {
+                $.ajax(
+                {
+                    url: 'http://ran.alwaysdata.net/tests/ajax.rb',
+                    type: 'GET',
+                    success: function(data) {
+                        $('#news_content').html(data);
+                        alert('Load was performed.');
+                    },
+                    statusCode: {
+                        404: function() {
+                        alert("page not found");
+                        }
+                    }
+                }
+                );
+                event.preventDefault();
+            }
+            );
+            */
+            start();
+        });
+        
+        /*
         window.onload = function() {
             start();
         }
+        */
+        
+        window.onhashchange = start;
+        
     </script>
 </head>
 <body>
@@ -157,36 +247,68 @@
             <td width="10%">
                 <table id=menu width="100%" height="100%">
                     <tr><td id="spe">DG</td></tr>
-                    <tr><td class="sub" onclick="dgx_accueil()">Accueil</td></tr>
-                    <tr><td class="sub" onclick="dgx_news()">News</td></tr>
-                    <tr><td class="sub" onclick="dgx_projets()">Projets</td></tr>
+                    <tr><td class="sub" onclick="go_to_accueil()">Accueil</td></tr>
+                    <tr><td class="sub" onclick="go_to_news()">News</td></tr>
+                    <tr><td class="sub" onclick="go_to_projets()">Projets</td></tr>
                     <tr><td class="cat" onclick="window.location = 'http://ran.alwaysdata.net/beatrice/'">Beatrice</td></tr>
                     <tr><td class="cat" onclick="window.location = 'http://ran.alwaysdata.net/cristina/'">Cristina</td></tr>
                     <tr><td class="cat" onclick="window.location = 'http://mots.alwaysdata.net/'">Invoque</td></tr>
-                    <tr><td class="cat" onclick="calcoolette()">Calcoolette</td></tr>
-                    <tr><td class="sub" onclick="cal_syntaxe()">Syntaxe</td></tr>
-                    <tr><td class="sub" onclick="cal_fonctions()">Fonctions</td></tr>
+                    <tr><td class="cat" onclick="go_to_calcoolette()">Calcoolette</td></tr>
+                    <tr><td class="sub" onclick="go_to_syntaxe()">Syntaxe</td></tr>
+                    <tr><td class="sub" onclick="go_to_fonctions()">Fonctions</td></tr>
                 </table>
             </td>
             <td width="90%">
                 <div id="dgx_accueil">
                     <h1>Accueil</h1>
+                    <p><a href="#news">Page des news</a></p>
+                    <p><a href="#projets">Page des projets</a></p>
                 </div>
                 <div id="dgx_news">
+                    <h1>News</h1>
+                    <div id="news_content"></div>
+                    <p><a href="#accueil">Retour à l'accueil</a></p>
                 </div>
                 <div id="dgx_projets">
+                    <h1>Projets</h1>
+                    <p>Sur cette page sont listés mes différents projets.</p>
+                    <p><a href="#accueil">Retour à l'accueil</a></p>
+                    <p class="line"></p>
+                    <h2>Langues</h2>
+                    <p><a href="http://ran.alwaysdata.net/beatrice">Beatrice</a> est un fiche sur la langue italienne: grammaire de base, vocabulaire et conjugaison. La première version en ligne date du 12 mai 2011, sur mon site précédent et l'antépénultième.</p>
+                    <p><a href="http://ran.alwaysdata.net/cristina">Cristina</a> est la même chose pour la langue française avec un vocabulaire thématique. Elle fut mise en ligne le 6 mars 2012.</p>
+                    <p><a href="http://mots.alwaysdata.net/">Invoque</a> est un vocabulaire thématique multilingue. Il a été mis en ligne pour la première fois le 29 juin 2012.</p>
+                    <p class="line"></p>
+                    <h2>Langages</h2>
+                    <p><a href="http://ran.alwaysdata.net/ruby">Ruby</a> est une fiche sur le langage de programmation éponyme. La première version en ligne date du 7 avril 2012.</p>
+                    <p><a href="#calcoolette">Calcoolette</a> est une calculette agréable à utiliser donc <i>cool</i>.</p>
+                    <p class="line"></p>
+                    <h2>Tableau synthétique</h2>
+                    <center><table class="tab">
+                        <thead>
+                            <tr><th>Nom</th><th>Version</th><th>Mise en ligne</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><a href="http://ran.alwaysdata.net/beatrice">Beatrice</a></td><td>1.1.2</td><td>12 mai 2011</td></tr>
+                            <tr><td><a href="http://ran.alwaysdata.net/cristina">Cristina</a></td><td>1.0.1</td><td>6 mars 2012</td></tr>
+                            <tr><td><a href="http://ran.alwaysdata.net/ruby">Guide Ruby</a></td><td>alpha 05</td><td>7 avril 2012</td></tr>
+                            <tr><td><a href="http://mots.alwaysdata.net/">Invoque</a></td><td>alpha 01</td><td>29 juin 2012</td></tr>
+                            <tr><td><a href="#calcoolette">Calcoolette</a></td><td>alpha 01</td><td>30 juin 2012</td></tr>
+                        </tbody>
+                    </table></center>
                 </div>
                 <div id="calcoolette">
                     <h1>Calcoolette</h1>
                     <h2>Présentation</h2>
                     <p class="code">a = 2 + 2</p>
                     <p>Calcoolette, comme son nom légèrement débile le laisse à deviner, est une calculette simple à utiliser, et même marrante si l'on pousse un peu loin le bouchon. On entre une expression et le programme renvoie son résultat. Simple, vous dis-je.</p>
+                    <p><a href="#projets">Retour à la page des projets.</a></p>
                     <p class="line"></p>
                     <h2>Documentation</h2>
                     <p>Il y a deux sous pages de documentation. L'une détaille la <a href="#" onclick="cal_syntaxe()">syntaxe</a> des expressions qui doit être utilisée pour que la calcoolette la comprenne. Par d'inquiétude, il s'agit d'une syntaxe très proche de la notation mathématique standard, avec une petite touche venant des langages de programmation. L'autre page présente les différentes <a href="#" onclick="cal_fonctions()">fonctions</a> offertes par la bibliothèque de base de la calcoolette.</p>
                     <ul>
-                        <li><a href="#" onclick="cal_syntaxe()">Syntaxe</a></li>
-                        <li><a href="#" onclick="cal_fonctions()">Fonctions</a></li>
+                        <li><a href="#syntaxe">Syntaxe</a></li>
+                        <li><a href="#fonctions">Fonctions</a></li>
                     </ul>
                     <p class="line"></p>
                     <h2>Historique</h2>
@@ -194,11 +316,71 @@
                 </div>
                 <div id="cal_syntaxe">
                     <h1>Syntaxe</h1>
-                    <a href="#" onclick="calcoolette()">Back</a>
+                    <a href="#calcoolette">Revenir à la page du projet.</a>
                 </div>
                 <div id="cal_fonctions">
                     <h1>Fonctions</h1>
-                    <a href="#" onclick="calcoolette()">Back</a>
+                    <a href="#calcoolette">Revenir à la page du projet.</a>
+                    <ul>
+                        <li><a href="#int">Nombres entiers</a></li>
+                        <li><a href="#float">Nombres réels</a></li>
+                        <li><a href="#bool">Booléens</a></li>
+                    </ul>
+                    <h2 id="int">Nombres entiers</h2>
+                    <p>Soit <i>i</i> un nombre entier, première opérande, et <i>par</i> notre seconde opérande lorsqu'elle est nécessaire, selon la fonction utilisée.</p>
+                    <center><table class="tab">
+                        <thead>
+                            <tr><th>Nom</th><th>Exemple</th><th>Explication</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>add</td><td>i + par ou i.add(par)</td><td>addition</td></tr>
+                            <tr><td>sub</td><td>i - par ou i.sub(par)</td><td>soustraction</td></tr>
+                            <tr><td>div</td><td>i / par ou i.div(par)</td><td>division</td></tr>
+                            <tr><td>mul</td><td>i * par ou i.mul(par)</td><td>multiplication</td></tr>
+                            <tr><td>mod</td><td>i % par ou i.mod(par)</td><td>modulo</td></tr>
+                            <tr><td>pow</td><td>i ** par ou i.pow(par)</td><td>élévation à la puissance</td></tr>
+                            <tr><td>abs</td><td>i.abs</td><td>valeur absolue de i</td></tr>
+                            <tr><td>inv</td><td>-i ou i.inv</td><td>valeur inverse de i</td></tr>
+                            <tr><td>lshit</td><td>i &lt;&lt; par ou i.lshift(par)</td><td>décalaga à gauche de par bits.</td></tr>
+                            <tr><td>rshit</td><td>i &gt;&gt; par ou i.rshift(par)</td><td>décalaga à droite de par bits.</td></tr>
+                            <tr><td>and</td><td>i and par</td><td>ET logique bit à bit.</td></tr>
+                            <tr><td>or</td><td>i or par</td><td>OU logique bit à bit.</td></tr>
+                            <tr><td>xor</td><td>i xor par</td><td>OU exclusif bit à bit.</td></tr>
+                            <tr><td>invbin</td><td>i.invbin</td><td>Complément à 1.</td></tr>
+                            <tr><td>cmp</td><td>i &lt;=&gt; par pi ou i.cmp(par)</td><td>Renvoie -1 si i &lt; par, 0 si i == par, 1 si i &gt; par.</td></tr>
+                            <tr><td>to_s</td><td>i.to_s</td><td>Retourne une chaîne représentant i.</td></tr>
+                            <tr><td>to_f</td><td>i.to_f</td><td>Convertit i en un nombre réel.</td></tr>
+                            <tr><td>to_i</td><td>i.to_i</td><td>Retourne i.</td></tr>
+                            <tr><td>size</td><td>i.size</td><td>Retourne la taille occupée en mémoire machine par i.</td></tr>
+                        </tbody>
+                    </table></center>
+                    <p class="line"></p>
+                    <h2 id="float">Nombres réels</h2>
+                    <p>Soit <i>i</i> un nombre réel, première opérande, et <i>par</i> notre seconde opérande.</p>
+                    <table class="tab">
+                        <thead>
+                            <tr><th>Nom</th><th>Exemple</th><th>Explication</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>add</td><td>i + par ou i.add(par)</td><td>addition</td></tr>
+                            <tr><td>sub</td><td>i - par ou i.sub(par)</td><td>soustraction</td></tr>
+                            <tr><td>div</td><td>i / par ou i.div(par)</td><td>division</td></tr>
+                            <tr><td>mul</td><td>i * par ou i.mul(par)</td><td>multiplication</td></tr>
+                            <tr><td>mod</td><td>i % par ou i.mod(par)</td><td>modulo</td></tr>
+                            <tr><td>pow</td><td>i ** par ou i.pow(par)</td><td>élévation à la puissance</td></tr>
+                        </tbody>
+                    </table>
+                    <p class="line"></p>
+                    <h2 id="bool">Booléens</h2>
+                    <p>Soit <i>i</i> un booléen, première opérande, et <i>par</i> notre seconde opérande.</p>
+                    <table class="tab">
+                        <thead>
+                            <tr><th>Nom</th><th>Exemple</th><th>Explication</th></tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                    <a href="#calcoolette">Retour à la page du projet</a>
                 </div>
             </td>
         </tr>

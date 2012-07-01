@@ -218,7 +218,10 @@ class Symbolizer:
         if id in id_booleans:
             self.symbols.append(Symbol(Boolean, id))
         elif id in id_operators:
-            self.symbols.append(Symbol(Operator, id))
+            if len(self.symbols) > 1 and i > 0 and self.symbols[-1].val == '.':
+                self.symbols.append(Symbol(Id, id))
+            else:
+                self.symbols.append(Symbol(Operator, id))
         elif id in id_keywords:
             self.symbols.append(Symbol(Keyword, Id))
         else:
@@ -572,15 +575,17 @@ print r
 exit()
 """
 
-def test(s, debug=True):
+def test(s, debug=True, mode = 'exec'):
     global root_scope
     t = Symbolizer()
     o = t.parse(s)
-    if debug:
+    if debug or mode == 'symbols':
         i = 0
         for e in o:
             print '%d. %s' % (i, str(e))
             i+=1
+    if mode == 'symbols':
+        return o
     del o[-1] # del eof
     #print '>>> %i %s' % (first_op(o), o[first_op(o)])
     parse(o)
@@ -617,16 +622,23 @@ test("a.add(1)")    # 7
 command = ''
 loop = True
 debug = False
+mode = 'exec'
 while loop:
     command = raw_input('>>> ')
-    if command in ['exit', 'debug', '']:
+    if command in ['exit', 'debug', '', 'symbols', 'exec']:
         if command == 'exit' or command == '':
             loop = False
         elif command == 'debug':
             debug = not debug
+        elif command == 'symbols':
+            mode = 'symbols'
+            print 'mode changed to symbols only'
+        elif command == 'exec':
+            mode = 'exec'
+            print 'mode changed to full execution'
     else:
         #try:
-            test(command, debug)
+            test(command, debug, mode)
         #except Exception as e:
         #    print e
 
