@@ -4,8 +4,15 @@
 
 #-----------------------------------------------------------------------
 
+import sys # puts
+
 keywords = ['while', 'end', 'if', 'begin']
 operators= ['=']
+
+def puts(*suite):
+    for elem in suite:
+        sys.stdout.write(elem)
+    sys.stdout.write('\n')
 
 #-----------------------------------------------------------------------
 
@@ -38,7 +45,7 @@ class Block(Executable):
     self.executables.append(l)
   
   def display(self,level=0):
-    print self.space(level), 'Block of %d executables <%s>:' % (len(self.executables), self.kind)
+    puts(self.space(level), 'Block of %d executables <%s>:' % (len(self.executables), self.kind))
     for ex in self.executables:
       ex.display(level+2)
   
@@ -59,7 +66,7 @@ class Line(Executable):
     self.kind = self.guess()
   
   def display(self, level=0):
-    print self.space(level), 'svg: %s [%d tokens] <%s>' % (self.raw, len(self.tokens), self.kind)
+    puts(self.space(level), '"%s" [%d tokens] <%s>' % (self.raw, len(self.tokens), self.kind))
     for t in self.tokens:
       t.display(level+2)
   
@@ -125,7 +132,7 @@ class Token(Executable):
       self.kind = 'IDENTIFIER'
   
   def display(self, level=0):
-    print self.space(level), '%s <%s>' % (self.raw, self.kind)
+    puts(self.space(level), '%s <%s>' % (self.raw, self.kind))
 
 #-----------------------------------------------------------------------
 
