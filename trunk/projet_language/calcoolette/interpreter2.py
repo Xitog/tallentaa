@@ -512,6 +512,8 @@ def exec_node(symbol, scope={}, debug=False):
             #elif symbol.val == 'prefixed_call':
             #    return instance_function(symbol.left, symbol.right, scope)
             elif symbol.val == 'aff':
+                if symbol.left.val in scope and symbol.left.val[0].isupper():
+                    raise Exception("Constant reference can't be changed")
                 scope[symbol.left.val] = exec_node(symbol.right, scope)
                 return scope[symbol.left.val]
             elif symbol.val == 'suite':
