@@ -49,7 +49,7 @@
         }
         
         /* :link :visited :hover */
-        
+
         table#menu {
             border-collapse: collapse;
             border: 1px solid #929497;
@@ -68,6 +68,11 @@
             color: White;
             cursor: hand;
         }
+        table#menu td.cat a {
+            text-decoration: none;
+            color: inherit;
+        }
+
         table#menu td.sub {
             background-color: #FAF5E3;
             border-bottom: 1px dotted #929497;
@@ -81,6 +86,11 @@
             color: White;
             cursor: hand;
         }
+        table#menu td.sub a {
+            text-decoration: none;
+            color: inherit;
+        }
+
         table#menu td#spe {
             background-color: #CEC498;
             color: #FFFFFF;
@@ -145,6 +155,7 @@
                 {
                     url: 'http://dgx.alwaysdata.net/news.rb',
                     type: 'GET',
+                    data: { 'news':'1' },
                     success: function(data) {
                         $('#news_content').html(data);
                         //alert('Load was performed.');
@@ -247,16 +258,16 @@
             <td width="10%">
                 <table id=menu width="100%" height="100%">
                     <tr><td id="spe">DG</td></tr>
-                    <tr><td class="sub" onclick="go_to_accueil()">Accueil</td></tr>
-                    <tr><td class="sub" onclick="go_to_news()">News</td></tr>
-                    <tr><td class="sub" onclick="go_to_projets()">Projets</td></tr>
-                    <tr><td class="cat" onclick="window.location = 'http://ran.alwaysdata.net/beatrice/'">Beatrice</td></tr>
-                    <tr><td class="cat" onclick="window.location = 'http://ran.alwaysdata.net/cristina/'">Cristina</td></tr>
-                    <tr><td class="cat" onclick="window.location = 'http://mots.alwaysdata.net/'">Invoque</td></tr>
-                    <tr><td class="cat" onclick="go_to_calcoolette()">Calcoolette</td></tr>
-                    <tr><td class="sub" onclick="go_to_syntaxe()">Syntaxe</td></tr>
-                    <tr><td class="sub" onclick="go_to_fonctions()">Fonctions</td></tr>
-                    <tr><td class="cat" onclick="window.location = 'http://ran.alwaysdata.net/liens.rb'">Liens</td></tr>
+                    <tr><td class="sub" onclick="go_to_accueil()"><a href="#accueil">Accueil</a></td></tr>
+                    <tr><td class="sub" onclick="go_to_news()"><a href="#news">News</a></td></tr>
+                    <tr><td class="sub" onclick="go_to_projets()"><a href="#projets">Projets</a></td></tr>
+                    <tr><td class="cat" onclick="window.location = 'http://ran.alwaysdata.net/beatrice/'"><a href="http://ran.alwaysdata.net/beatrice/">Beatrice</a></td></tr>
+                    <tr><td class="cat" onclick="window.location = 'http://ran.alwaysdata.net/cristina/'"><a href="http://ran.alwaysdata.net/cristina/">Cristina</a></td></tr>
+                    <tr><td class="cat" onclick="window.location = 'http://mots.alwaysdata.net/'"><a href="http://mots.alwaysdata.net/">Invoque</a></td></tr>
+                    <tr><td class="cat" onclick="go_to_calcoolette()"><a href="#calcoolette">Calcoolette</a></td></tr>
+                    <tr><td class="sub" onclick="go_to_syntaxe()"><a href="#syntaxe">Syntaxe</a></td></tr>
+                    <tr><td class="sub" onclick="go_to_fonctions()"><a href="#fonctions">Fonctions</a></td></tr>
+                    <tr><td class="cat" onclick="window.location = 'http://ran.alwaysdata.net/liens.rb'"><a href="http://ran.alwaysdata.net/liens.rb">Liens</a></td></tr>
                 </table>
             </td>
             <td width="90%">
@@ -267,7 +278,9 @@
                 </div>
                 <div id="dgx_news">
                     <h1>News</h1>
+                    <p class="line"></p>
                     <div id="news_content"></div>
+                    <p class="line"></p>
                     <p><a href="#accueil">Retour à l'accueil</a></p>
                 </div>
                 <div id="dgx_projets">
@@ -358,7 +371,7 @@
                     <p class="line"></p>
                     <h2 id="float">Nombres réels</h2>
                     <p>Soit <i>i</i> un nombre réel, première opérande, et <i>par</i> notre seconde opérande.</p>
-                    <table class="tab">
+                    <center><table class="tab">
                         <thead>
                             <tr><th>Nom</th><th>Exemple</th><th>Explication</th></tr>
                         </thead>
@@ -369,19 +382,31 @@
                             <tr><td>mul</td><td>i * par ou i.mul(par)</td><td>multiplication</td></tr>
                             <tr><td>mod</td><td>i % par ou i.mod(par)</td><td>modulo</td></tr>
                             <tr><td>pow</td><td>i ** par ou i.pow(par)</td><td>élévation à la puissance</td></tr>
+                            <tr><td>abs</td><td>i.abs</td><td>valeur absolue de i</td></tr>
+                            <tr><td>inv</td><td>-i ou i.inv</td><td>valeur inverse de i</td></tr>
+                            <tr><td>round</td><td>i.round</td><td>arrondit i à l'entier supérieur si la partie décimale est &gt;= 0.5 à l'inférieur sinon.</td></tr>
+                            <tr><td>trunc</td><td>i.trunc</td><td>renvoie le plus grand entier inférieur à i.</td></tr>
+                            <tr><td>floor</td><td>i.floor</td><td>renvoie le plus grand entier inférieur à i (alias de trunc).</td></tr>
+                            <tr><td>to_i</td><td>i.to_i</td><td>renvoie le plus grand entier inférieur à i (alias de trunc).</td></tr>
+                            <tr><td>ceil</td><td>i.ceil</td><td>renvoie le plus petit entier supérieur à i.</td></tr>
                         </tbody>
-                    </table>
+                    </table></center>
                     <p class="line"></p>
                     <h2 id="bool">Booléens</h2>
                     <p>Soit <i>i</i> un booléen, première opérande, et <i>par</i> notre seconde opérande.</p>
-                    <table class="tab">
+                    <center><table class="tab">
                         <thead>
                             <tr><th>Nom</th><th>Exemple</th><th>Explication</th></tr>
                         </thead>
                         <tbody>
+                            <tr><td>and</td><td>i and par ou i.and(par)</td><td>Opération booléenne i et par.</td></tr>
+                            <tr><td>or</td><td>i or par ou i.or(par)</td><td>Opération booléenne i ou par.</td></tr>
+                            <tr><td>xor</td><td>i xor par ou i.xor(par)</td><td>Opération booléenne i ou exclusif par.</td></tr>
+                            <tr><td>inv</td><td>i.inv</td><td>Retourne vrai si i == faux sinon retourne faux.</td></tr>
+                            <tr><td>to_i</td><td>i.to_i</td><td>Retourne 1 si i == vrai et 0 si i == faux.</td></tr>
                         </tbody>
                     </table>
-                    <a href="#calcoolette">Retour à la page du projet</a>
+                    <a href="#calcoolette">Retour à la page du projet</a></center>
                 </div>
             </td>
         </tr>
