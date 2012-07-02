@@ -87,7 +87,7 @@ class BaseLib:
             return -target
         elif msg == 'round':
             return int(round(target))
-        elif msg == 'trunc' or msg == 'floor':
+        elif msg == 'trunc' or msg == 'floor' or 'to_i':
             return int(target)
         elif msg == 'ceil':
             return int(target)+1
@@ -104,4 +104,8 @@ class BaseLib:
             return target or par
         elif msg == 'xor':
             return (target or par) and not (target and par)
-
+        elif msg == 'inv':
+            return target == False
+        elif msg == 'to_i':
+            if target: return 1
+            else: return 0

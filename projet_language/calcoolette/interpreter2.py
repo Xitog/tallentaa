@@ -108,7 +108,6 @@ symbols = [
     ('[0-9]+\.[0-9]*' , Float),
     ('\.[0-9]+' , Float),
     
-    (';' , Separator),
     ('\[' , Separator),
     ('\]' , Separator),
     ('\{' , Separator),
@@ -406,8 +405,6 @@ def make_aff(symbols):
     symbols.clear()
     symbols.add(n)
 
-root_scope = {}
-
 def parse(symbols): 
     if symbols.include(';'):
         two_part = symbols.split(';')
@@ -424,6 +421,9 @@ def parse(symbols):
 #-----------------------------------------------------------------------
 # Interpreter
 #-----------------------------------------------------------------------
+
+import math
+root_scope = {'PI' : math.pi, 'Pi' : math.pi }
 
 import baselib
 bb = baselib.BaseLib()
@@ -474,24 +474,24 @@ def exec_node(symbol, scope={}, debug=False):
         #print 'IsNode'
         if symbol.kind == Operator:
             if symbol.val == '+':
-                return instance_function(exec_node(symbol.left), Symbol(Id, 'add'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
+                return instance_function(exec_node(symbol.left, scope), Symbol(Id, 'add'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
             elif symbol.val == '-':
-                return instance_function(exec_node(symbol.left), Symbol(Id, 'sub'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
+                return instance_function(exec_node(symbol.left, scope), Symbol(Id, 'sub'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
             elif symbol.val == '*':
-                return instance_function(exec_node(symbol.left), Symbol(Id, 'mul'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
+                return instance_function(exec_node(symbol.left, scope), Symbol(Id, 'mul'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
             elif symbol.val == '/':
-                return instance_function(exec_node(symbol.left), Symbol(Id, 'div'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
+                return instance_function(exec_node(symbol.left, scope), Symbol(Id, 'div'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
             elif symbol.val == '%':
-                return instance_function(exec_node(symbol.left), Symbol(Id, 'mod'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
+                return instance_function(exec_node(symbol.left, scope), Symbol(Id, 'mod'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
             elif symbol.val == '**':
-                return instance_function(exec_node(symbol.left), Symbol(Id, 'pow'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
+                return instance_function(exec_node(symbol.left, scope), Symbol(Id, 'pow'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
             elif symbol.val == 'unary-':
-                return instance_function(exec_node(symbol.right), Symbol(Id, 'inv'), None, scope)
+                return instance_function(exec_node(symbol.right, scope), Symbol(Id, 'inv'), None, scope)
             elif symbol.val in ['and', 'or', 'xor']:
-                return instance_function(exec_node(symbol.left), Symbol(Id, symbol.val), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
+                return instance_function(exec_node(symbol.left, scope), Symbol(Id, symbol.val), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
             elif symbol.val == '.':
                 if symbol.right.val != 'unprefixed_call':
-                    target = exec_node(symbol.left)
+                    target = exec_node(symbol.left, scope)
                     return instance_function(target, symbol.right, None, scope)
                 elif symbol.right.val == 'unprefixed_call':
                     call = symbol.right
@@ -499,11 +499,11 @@ def exec_node(symbol, scope={}, debug=False):
                 else:
                     raise Exception("What to do with this symbol ? : %s" % (symbol.right.val))
             elif symbol.val == '<<':
-                return instance_function(exec_node(symbol.left), Symbol(Id, 'lshift'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
+                return instance_function(exec_node(symbol.left, scope), Symbol(Id, 'lshift'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
             elif symbol.val == '>>':
-                return instance_function(exec_node(symbol.left), Symbol(Id, 'rshift'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
+                return instance_function(exec_node(symbol.left, scope), Symbol(Id, 'rshift'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
             elif symbol.val == '<=>':
-                return instance_function(exec_node(symbol.left), Symbol(Id, 'cmp'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
+                return instance_function(exec_node(symbol.left, scope), Symbol(Id, 'cmp'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
             else:
                 raise Exception("Operator not understood")
         elif symbol.kind == Structure:
@@ -593,9 +593,9 @@ def test(s, debug=True, mode = 'exec'):
     parse(o)
     if debug:
         print "result of parse: ", o[0]
-        print "for: %s \t res = %s" % (s, str(exec_node(o[0])))
+        print "for: %s \t res = %s" % (s, str(exec_node(o[0], root_scope)))
     else:
-        print exec_node(o[0])
+        print exec_node(o[0], root_scope)
 
 test("2+3")         # 5
 test("2**3")        # 8
@@ -627,7 +627,7 @@ debug = False
 mode = 'exec'
 while loop:
     command = raw_input('>>> ')
-    if command in ['exit', 'debug', '', 'symbols', 'exec']:
+    if command in ['exit', 'debug', '', 'symbols', 'exec', 'dump']:
         if command == 'exit' or command == '':
             loop = False
         elif command == 'debug':
@@ -638,6 +638,9 @@ while loop:
         elif command == 'exec':
             mode = 'exec'
             print 'mode changed to full execution'
+        elif command == 'dump':
+            for e in root_scope:
+                print e
     else:
         #try:
             test(command, debug, mode)
