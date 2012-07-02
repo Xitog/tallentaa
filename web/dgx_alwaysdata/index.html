@@ -147,7 +147,7 @@
                     type: 'GET',
                     success: function(data) {
                         $('#news_content').html(data);
-                        alert('Load was performed.');
+                        //alert('Load was performed.');
                     },
                     statusCode: {
                         404: function() {
@@ -256,6 +256,7 @@
                     <tr><td class="cat" onclick="go_to_calcoolette()">Calcoolette</td></tr>
                     <tr><td class="sub" onclick="go_to_syntaxe()">Syntaxe</td></tr>
                     <tr><td class="sub" onclick="go_to_fonctions()">Fonctions</td></tr>
+                    <tr><td class="cat" onclick="window.location = 'http://ran.alwaysdata.net/liens.rb'">Liens</td></tr>
                 </table>
             </td>
             <td width="90%">

@@ -26,16 +26,32 @@ down = False
 view_left_up = (0,0)
 
 my_map = [
-    [1,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0],
-    [0,0,1,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0],
+    [1,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,1,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,1],
 ]
 
+MAP_X = 10
+MAP_Y = 10
+
+#MAX_VIEW_X = 10
+#MAX_VIEW_Y = 8
+
+SCROLL_MOD = 1
+
 while 1:
+    
+    mx, my = pygame.mouse.get_pos()
+    mx32 = (mx-X) / 32
+    my32 = (my-Y) / 32
+    
     for event in pygame.event.get():
         if event.type == pygame.QUIT: exit()
         elif event.type == KEYDOWN:
@@ -58,15 +74,20 @@ while 1:
                 left = False
             elif event.key == K_RIGHT:
                 right = False
+            elif event.key == K_SPACE:
+                SCROLL_MOD += 1
+        elif event.type == MOUSEBUTTONDOWN:
+            if mx32 in range(0, MAP_X) and my32 in range(0, MAP_Y):
+                print my_map[mx32][my32]
     
     if left:
-        X+=1
+        X+=SCROLL_MOD
     if right:
-        X-=1
+        X-=SCROLL_MOD
     if down:
-        Y-=1
+        Y-=SCROLL_MOD
     if up:
-        Y+=1
+        Y+=SCROLL_MOD
     
     #print X, Y
     
@@ -74,21 +95,14 @@ while 1:
     
     pygame.draw.circle(screen, Color(255, 255, 255, 255), (10+X, 10+Y), 10, 0)
     
-    view_left_up = (X%32,Y%32)
-    
-    MAX_VIEW_X = 9
-    MAX_VIEW_Y = 7
-    
-    for yy in range(0, MAX_VIEW_Y):
-        for xx in range(0, MAX_VIEW_X):
+    for yy in range(0, MAP_Y):
+        for xx in range(0, MAP_X):
             #sys.stdout.write(str(my_map[yy][xx]))
             r = my_map[yy][xx]
             if r == 1:
-                pygame.draw.rect(screen, Color(255, 0, 0, 128), (xx*32, yy*32, 32, 32), 1)
+                pygame.draw.rect(screen, Color(255, 0, 0, 128), (xx*32+X, yy*32+Y, 32, 32), 1)
             else:
-                pygame.draw.rect(screen, Color(0, 255, 0, 128), (xx*32, yy*32, 32, 32), 1)
-        #print
-    #raw_input()
+                pygame.draw.rect(screen, Color(0, 255, 0, 128), (xx*32+X, yy*32+Y, 32, 32), 1)
     
     #screen.blit(ball, ballrect)
     pygame.display.flip()
