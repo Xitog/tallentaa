@@ -171,7 +171,7 @@ class Symbolizer:
         return SymbolList(self.symbols)
     
     def parse_num(self, input, i):
-        global digits
+        global digits, alphas
         #print '> parse num'
         float = False
         num = input[i]
@@ -192,6 +192,8 @@ class Symbolizer:
                 num += input[i]
                 i+=1
                 cont = False
+            elif input[i] in alphas:
+                raise Exception("Incorrect Id starting with numbers")
             else:
                 #print 'end num'
                 cont = False
@@ -301,6 +303,8 @@ def first_op(symbols):
                 best = i
                 best_prio = prio[symb.val]*lvl
         i+=1
+    
+    if best == -1: raise Exception("Incorrect expression")
     return best
 
 def fetch_closing(sep, symbols, i):
@@ -423,7 +427,7 @@ def parse(symbols):
 #-----------------------------------------------------------------------
 
 import math
-root_scope = {'PI' : math.pi, 'Pi' : math.pi }
+root_scope = {'PI' : math.pi, 'Pi' : math.pi, '_' : None }
 
 import baselib
 bb = baselib.BaseLib()
@@ -591,11 +595,13 @@ def test(s, debug=True, mode = 'exec'):
     del o[-1] # del eof
     #print '>>> %i %s' % (first_op(o), o[first_op(o)])
     parse(o)
+    r = exec_node(o[0], root_scope)
+    root_scope['_'] = r
     if debug:
         print "result of parse: ", o[0]
-        print "for: %s \t res = %s" % (s, str(exec_node(o[0], root_scope)))
+        print "for: %s \t res = %s" % (s, str(r))
     else:
-        print exec_node(o[0], root_scope)
+        print r
 
 test("2+3")         # 5
 test("2**3")        # 8
