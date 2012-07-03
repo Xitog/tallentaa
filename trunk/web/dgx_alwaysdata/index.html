@@ -31,6 +31,12 @@
             font-style: normal;
             color: #111111;
         }
+        p.first:first-letter
+        {
+            font-size:18;
+            font-weight: bold;
+            color: #CEC498;  
+        }
         ul li {
             font-family: "Palatino", "Georgia";
             font-size: 14px;
@@ -154,7 +160,7 @@
             document.getElementById("dgx_accueil").style.display = "block";
         }
         
-        function dgx_news() {
+        function dgx_news(fetch) {
             all_to_none();
             document.getElementById("dgx_news").style.display = "block";
             
@@ -162,7 +168,7 @@
                 {
                     url: 'http://dgx.alwaysdata.net/news.rb',
                     type: 'GET',
-                    data: { 'news':'1' },
+                    data: { 'news':fetch },
                     success: function(data) {
                         $('#news_content').html(data);
                         //alert('Load was performed.');
@@ -207,13 +213,15 @@
             } else if (v === "#accueil") {
                 dgx_accueil();
             } else if (v === "#news") {
-                dgx_news();
+                dgx_news("last");
             } else if (v === "#fonctions") {
                 cal_fonctions();
             } else if (v === "#syntaxe") {
                 cal_syntaxe();
             } else if (v === "#int" || v === "#float" || v === "#bool") {
                 var a = 2; /*alert(v);*/
+            } else if (v.indexOf("#get_") == 0) {
+                dgx_news(v.substring(5));
             } else {
                 alert(v);
             }
