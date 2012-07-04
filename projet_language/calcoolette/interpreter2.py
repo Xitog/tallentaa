@@ -139,10 +139,11 @@ alphas = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 
 ops = ['+', '-', '*', '/', '**', '%', '.', '<', '>', '!', '=']
 white = [' ', '\n', '\t']
 operators = ['+', '-', '*', '/', '**', '%', '.', '<', '<<', '<=', '>', '>>', '>=', '!=', '==', '<=>', '=']
-separators = ['(', ')', ';']
+separators = ['(', ')', ';', ',']
 id_booleans = ['true', 'True', 'False', 'false']
 id_operators = ['and', 'xor', 'or']
 id_keywords = ['class', 'fun', 'return', 'next', 'break', 'unless', 'until', 'do', 'while', 'end', 'elsif', 'else', 'then', 'if', 'module']
+spe = ['$', '?']
 
 class Symbolizer:
     
@@ -214,6 +215,10 @@ class Symbolizer:
             if input[i] in alphas or input[i] in digits:
                 id+=input[i]
                 i+=1
+            # si i == $ ou ? et que c le dernier ou que i+1 != digits et i+1 != alphas alors
+            elif input[i] in spe and (i == len(input)-1 or (not input[i+1] in digits and not input[i+1] in alphas)):
+                id+=input[i]
+                i+=1
             else:
                 cont = False
         if id in id_booleans:
@@ -279,7 +284,7 @@ def first_op(symbols):
     i = 0
     best = -1
     best_prio = -1
-    prio = { ')' : 0, 'and' : 5, 'or' : 5, 'xor' : 5, '<=>' : 8, '<<': 9, '>>' : 9, '+' : 10, '-' : 10, 
+    prio = { ')' : 0, ',' : 1, 'and' : 5, 'or' : 5, 'xor' : 5, '<=>' : 8, '<<': 9, '>>' : 9, '+' : 10, '-' : 10, 
              '*' : 20, '/' : 20, '**' : 30, '%' : 30, 'call' : 35, '.' : 40, 
              'unary-' : 50, 'call(' : 51, 'expr(' : 60 }
     lvl = 1
@@ -366,6 +371,11 @@ def make_tree(symbols, debug=False):
                     del symbols[jj]
                     jj -= 1
                 symbols[target] = Symbol(left=None, right=sub[0], val='call(', kind=Structure)
+            elif symbols[target].val == ',':
+                n = Symbol(left=symbols[target-1], right=symbols[target+1], val='suite', kind=Structure)
+                del symbols[target+1]
+                del symbols[target]
+                symbols[target-1] = n
             elif target > 0:
                 if symbols[target].val != '.' or (symbols[target].val == '.' and not_exist_or_dif(symbols, target+2, False, "call")):
                     n = Symbol(left=symbols[target-1], right=symbols[target+1], val=symbols[target].val, kind=symbols[target].kind)
@@ -462,11 +472,18 @@ def instance_function(target, name, args, scope):
         raise Exception("Bad name for instance function call: %s" % (name,))
     
     if args is None:
-        par = None
+        par = []
     elif args.right.__class__ in [int, float, str, bool]:
-        par = args.right
+        par = [args.right]
     elif args.right.terminal():
-        par = exec_node(args.right, scope)
+        par = [exec_node(args.right, scope)]
+    elif args.right.val == 'suite':
+        a = args.right
+        par = []
+        while not a.terminal():
+            par.append(exec_node(a.right))
+            a = a.left
+        par.append(exec_node(a))
     else:
         raise Exception("Bad par for instance function call: %s" % (args.right,))
     r = bb.send(target, name, par, scope)
@@ -518,7 +535,10 @@ def exec_node(symbol, scope={}, debug=False):
             elif symbol.val == 'aff':
                 if symbol.left.val in scope and symbol.left.val[0].isupper():
                     raise Exception("Constant reference can't be changed")
-                scope[symbol.left.val] = exec_node(symbol.right, scope)
+                value = exec_node(symbol.right, scope)
+                if symbol.left.val[-1] == '?' and not isinstance(value, bool):
+                    raise Exception("?-ending id must reference boolean value")
+                scope[symbol.left.val] = value
                 return scope[symbol.left.val]
             elif symbol.val == 'suite':
                 exec_node(symbol.left, scope)
@@ -631,9 +651,10 @@ command = ''
 loop = True
 debug = False
 mode = 'exec'
+prod = True
 while loop:
     command = raw_input('>>> ')
-    if command in ['exit', 'debug', '', 'symbols', 'exec', 'dump']:
+    if command in ['exit', 'debug', '', 'symbols', 'exec', 'dump', 'prod']:
         if command == 'exit' or command == '':
             loop = False
         elif command == 'debug':
@@ -647,11 +668,18 @@ while loop:
         elif command == 'dump':
             for e in root_scope:
                 print e
+        elif command == 'prod':
+            prod = not prod
+            if prod: print 'production mode on'
+            else: print 'beware: dev mode on'
     else:
-        #try:
+        if prod:
+            try:
+                test(command, debug, mode)
+            except Exception as e:
+                print e
+        else:
             test(command, debug, mode)
-        #except Exception as e:
-        #    print e
 
 a = Symbol(Id, "a")
 b = Symbol(Operator, "=")

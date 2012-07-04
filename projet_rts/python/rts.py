@@ -10,7 +10,7 @@ import pygame, sys, math
 from pygame.locals import *
 
 pygame.init()
-size = width, height = 320, 240
+size = width, height = 800, 600 #320, 240
 screen = pygame.display.set_mode(size)
 
 #-----------------------------------------------------------------------
@@ -76,16 +76,16 @@ class Unit:
             o = self.orders[0]
             if o.kind == 'go':
                 r = self.go(o.x, o.y)
-                if r: del self.orders[-1]
+                if r: del self.orders[0]
             elif o.kind == 'attack':
                 #print o.kind, o.target, o.target.x, o.target.y
-                if math.sqrt((self.x-o.target.x)**2 + (self.y-o.target.y)**2) > self.range:
+                if math.sqrt((self.x-o.target.x)**2 + (self.y-o.target.y)**2) > self.range or (self.x-16) % 32 != 0 or (self.y-16) % 32 != 0:
                     self.go(o.target.x, o.target.y)
                 elif self.cpt <= 0:
                     o.target.life -= self.dom
                     self.cpt = self.reload
                     if o.target.life <= 0:
-                        del self.orders[-1]
+                        del self.orders[0]
                 else:
                     self.cpt -= 1
         return True
@@ -94,7 +94,30 @@ class Unit:
         #print 'order'
         self.orders = [o]
     
+    def add_order(self, o):
+        self.orders.append(o)
+    
     def go(self, x, y):
+        # 32 en 32
+        from_x32 = self.x/32
+        from_y32 = self.y/32
+        to_x32 = x/32
+        to_y32 = y/32
+        
+        #print 'dest x,y = ', x,y
+        #print 'dest32 x,y = ', to_x32, to_y32
+        
+        if to_x32 > from_x32: n_x32 = from_x32+1
+        elif to_x32 < from_x32: n_x32 = from_x32 - 1
+        elif to_x32 == from_x32: n_x32 = from_x32
+        if to_y32 > from_y32: n_y32 = from_y32+1
+        elif to_y32 < from_y32: n_y32 = from_y32 - 1
+        elif to_y32 == from_y32: n_y32 = from_y32
+        
+        x = n_x32 * 32 + 16
+        y = n_y32 * 32 + 16
+        ##
+        
         nx = self.x
         ny = self.y
         
@@ -143,20 +166,22 @@ def select(x, y):
 # Current setting
 
 my_map = [
-    [1,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,1,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0],
 ]
 
-MAP_X = 10
-MAP_Y = 10
+MAP_X = 20
+MAP_Y = 12
 
 side1 = Color(255, 255, 0)
 side2 = Color(0, 255, 255)
@@ -187,6 +212,7 @@ while 1:
             elif event.key == K_RIGHT:
                 right = True
             elif event.key == K_LSHIFT:
+                print 'add_mod!'
                 add_mod = True
         elif event.type == KEYUP:
             if event.key == K_DOWN:
@@ -199,6 +225,7 @@ while 1:
                 right = False
             elif event.key == K_LSHIFT:
                 add_mod = False
+                print 'stop add mod!'
             elif event.key == K_SPACE:
                 SCROLL_MOD += 1
         elif event.type == MOUSEBUTTONDOWN:
@@ -216,8 +243,10 @@ while 1:
                     u = select(mx-X, my-Y)
                     print 'unit=', u, 'life=', u.life
                     if add_mod:
+                        print 'ajout'
                         selected.append(u)
                     else:
+                        print 'redo'
                         selected = [u]
                 else:
                     selected = []
@@ -226,10 +255,20 @@ while 1:
                 s = select(mx-X, my-Y)
                 if not s:
                     for u in selected:
-                        u.order(Order('go', mx-X, my-Y))
+                        if not add_mod:
+                            print 'set order!'
+                            u.order(Order('go', mx-X, my-Y))
+                        else:
+                            print 'add order!'
+                            print len(u.orders)
+                            u.add_order(Order('go', mx-X, my-Y))
+                            print len(u.orders)
                 elif s.side != SIDE_PLAYER:
                     for u in selected:
-                        u.order(Order('attack', target=s))
+                        if not add_mod:
+                            u.order(Order('attack', target=s))
+                        else:
+                            u.add_order(Order('attack', target=s))
             elif event.button == 2:
                 print 'button 3'
     
@@ -274,16 +313,35 @@ while 1:
         if u in selected:
             c = Color(0, 0, 255, 255)
             if len(u.orders) > 0:
-                if u.orders[0].kind == 'go':
-                    pygame.draw.circle(screen, c, (u.orders[0].x+X, u.orders[0].y+Y), 5, 0)
-                    pygame.draw.line(screen, c, (u.x+X, u.y+Y), (u.orders[0].x+X, u.orders[0].y+Y), 1)
-                elif u.orders[0].kind == 'attack':
-                    pygame.draw.circle(screen, Color(255,0,0), (u.orders[0].target.x+X, u.orders[0].target.y+Y), 5, 0)
-                    pygame.draw.line(screen, Color(255,0,0), (u.x+X, u.y+Y), (u.orders[0].target.x+X, u.orders[0].target.y+Y), 1)
+                lx = u.x
+                ly = u.y
+                for o in u.orders:
+                    if o.kind == 'go':
+                        pygame.draw.circle(screen, c, (o.x+X, o.y+Y), 5, 0)
+                        pygame.draw.line(screen, c, (lx+X, ly+Y), (o.x+X, o.y+Y), 1)
+                        lx = o.x
+                        ly = o.y
+                    elif o.kind == 'attack':
+                        pygame.draw.circle(screen, Color(255,0,0), (o.target.x+X, o.target.y+Y), 5, 0)
+                        pygame.draw.line(screen, Color(255,0,0), (lx+X, ly+Y), (o.target.x+X, o.target.y+Y), 1)
+                        lx = o.target.x
+                        ly = o.target.y
         else:
             c = u.side
         #    c = Color(0, 255, 0, 255)
         pygame.draw.circle(screen, c, (u.x+X, u.y+Y), u.size, 0)
+    
+    INTERFACE_Y = 480
+    # Interface
+    pygame.draw.rect(screen, Color(200, 200, 200), (0, INTERFACE_Y, 799, 200), 0)
+    pygame.draw.line(screen, Color(0,0,255), (0, INTERFACE_Y), (799, INTERFACE_Y), 1)
+    for xx in range(0,3):
+        for yy in range(0,3):
+            pygame.draw.rect(screen, Color(0, 0, 255), (xx*32, yy*32+INTERFACE_Y, 32, 32), 1)
+    pygame.draw.line(screen, Color(0,0,255), (703, INTERFACE_Y), (703, INTERFACE_Y+96), 1)
+    pygame.draw.line(screen, Color(0,0,255), (703, INTERFACE_Y+96), (799, INTERFACE_Y+96), 1)
+    
+    # fin Interface
     
     #screen.blit(ball, ballrect)
     pygame.display.flip()

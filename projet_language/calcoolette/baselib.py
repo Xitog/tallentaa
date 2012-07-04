@@ -25,37 +25,45 @@ class BaseLib:
                 return self.send_str(target, msg, par, scope)
     
     def send_int(self, target, msg, par, scope):
+        # check
+        if msg in ['add', 'sub', 'div', 'mul', 'pow', 'mod', 'lshift', 'rshift', 'and', 'or', 'xor','cmp']:
+            if len(par) != 1: raise Exception('%s function take 1 parameter, %d given' % (msg, len(par)))
+        elif msg in ['abs', 'inv', 'invbin', 'to_s', 'to_f', 'to_i', 'size']:
+            if len(par) != 0: raise Exception('%s function take 1 parameter, %d given' % (msg, len(par)))
+        elif msg in ['between?']:
+            if len(par) != 2: raise Exception('%s function take 2 parameters, %d given' % (msg, len(par)))
+        # do
         if msg == 'add':
-            return target + par
+            return target + par[0]
         elif msg == 'sub':
-            return target - par
+            return target - par[0]
         elif msg == 'div':
-            return target / par
+            return target / par[0]
         elif msg == 'mul':
-            return target * par
+            return target * par[0]
         elif msg == 'pow':
-            return target ** par
+            return target ** par[0]
         elif msg == 'mod':
-            return target % par
+            return target % par[0]
         elif msg == 'abs':
             return abs(target)
         elif msg == 'inv':
             return -target
         elif msg == 'lshift':
-            return target << par
+            return target << par[0]
         elif msg == 'rshift':
-            return target >> par
+            return target >> par[0]
         elif msg == 'and':
-            return target & par
+            return target & par[0]
         elif msg == 'or':
-            return target | par
+            return target | par[0]
         elif msg == 'xor':
-            return target ^ par
+            return target ^ par[0]
         elif msg == 'invbin':
             return ~target
         elif msg == 'cmp':
-            if target > par: return 1
-            elif target < par: return -1
+            if target > par[0]: return 1
+            elif target < par[0]: return -1
             else: return 0
         elif msg == 'to_s':
             return str(target)
@@ -65,22 +73,30 @@ class BaseLib:
             return target
         elif msg == 'size':
             return sys.getsizeof(target)
+        elif msg == 'between?':
+            return target >= par[1] and target <= par[0];
         else:
             raise Exception("Function %s not known for integer" % (msg,))
     
     def send_flt(self, target, msg, par, scope):
+        # check
+        if msg in ['add', 'sub', 'div', 'mul', 'pow', 'mod']:
+            if len(par) != 1: raise Exception('%s function take 1 parameter, %d given' % (msg, len(par)))
+        elif msg in ['abs', 'inv', 'round', 'trunc', 'floor', 'to_i', 'ceil']:
+            if len(par) != 0: raise Exception('%s function take 1 parameter, %d given' % (msg, len(par)))
+        # do
         if msg == 'add':
-            return target + par
+            return target + par[0]
         elif msg == 'sub':
-            return target - par
+            return target - par[0]
         elif msg == 'div':
-            return target / par
+            return target / par[0]
         elif msg == 'mul':
-            return target * par
+            return target * par[0]
         elif msg == 'pow':
-            return target ** par
+            return target ** par[0]
         elif msg == 'mod':
-            return target % par
+            return target % par[0]
         elif msg == 'abs':
             return abs(target)
         elif msg == 'inv':
@@ -98,12 +114,16 @@ class BaseLib:
         pass
 
     def send_boo(self, target, msg, par, scope):
+        # check
+        if msg in ['and', 'or', 'xor', 'inv', 'to_i']:
+            if len(par) != 1: raise Exception('%s function take 1 parameter, %d given' % (msg, len(par)))
+        # do
         if msg == 'and':
-            return target and par
+            return target and par[0]
         elif msg == 'or':
-            return target or par
+            return target or par[0]
         elif msg == 'xor':
-            return (target or par) and not (target and par)
+            return (target or par[0]) and not (target and par[0])
         elif msg == 'inv':
             return target == False
         elif msg == 'to_i':
