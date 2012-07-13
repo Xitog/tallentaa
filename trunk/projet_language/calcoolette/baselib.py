@@ -1,4 +1,5 @@
 import sys    # getsizeof, stdout.write
+import math   # factorial
 
 class BaseLib:
     
@@ -28,7 +29,7 @@ class BaseLib:
         # check
         if msg in ['add', 'sub', 'div', 'mul', 'pow', 'mod', 'lshift', 'rshift', 'and', 'or', 'xor','cmp']:
             if len(par) != 1: raise Exception('%s function take 1 parameter, %d given' % (msg, len(par)))
-        elif msg in ['abs', 'inv', 'invbin', 'to_s', 'to_f', 'to_i', 'size']:
+        elif msg in ['abs', 'inv', 'invbin', 'to_s', 'to_f', 'to_i', 'size', 'factorial']:
             if len(par) != 0: raise Exception('%s function take 1 parameter, %d given' % (msg, len(par)))
         elif msg in ['between?']:
             if len(par) != 2: raise Exception('%s function take 2 parameters, %d given' % (msg, len(par)))
@@ -74,7 +75,9 @@ class BaseLib:
         elif msg == 'size':
             return sys.getsizeof(target)
         elif msg == 'between?':
-            return target >= par[1] and target <= par[0];
+            return target >= par[1] and target <= par[0]
+        elif msg == 'factorial':
+            return math.factorial(target)
         else:
             raise Exception("Function %s not known for integer" % (msg,))
     
