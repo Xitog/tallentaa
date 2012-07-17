@@ -1,9 +1,9 @@
 import console
-import interpreter2
+import calcoolette
 import sys              # version_info
 import traceback
 
-core_exec = interpreter2.Interpreter()
+core_exec = calcoolette.Interpreter()
 
 def todo(console, text):
     global core_exec
