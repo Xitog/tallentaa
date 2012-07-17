@@ -270,18 +270,6 @@ for e in l:
 
 # Fetch the operator to execute
 def first_op(symbols):
-    # highlighting differences
-    i = 0
-    while i < len(symbols):
-        symb = symbols[i]
-        if symb.terminal:
-            if symb.val == '-' and (i == 0 or symbols[i-1].kind == Operator):
-                symb.val = 'unary-'
-            if symb.val == '(' and i > 0 and symbols[i-1].kind != Operator:
-                symb.val = 'call('
-            elif symb.val == '(':
-                symb.val = 'expr('
-        i+=1
     # fetching the highest priority
     i = 0
     best = -1
@@ -333,8 +321,29 @@ def not_exist_or_dif(symbols, index, terminal, value):
     if symbols[index].val != value: return True
     return False
 
+def prepare(symbols):
+    # highlighting differences
+    i = 0
+    while i < len(symbols):
+        symb = symbols[i]
+        if symb.terminal:
+            if symb.val == '-' and (i == 0 or symbols[i-1].kind == Operator):
+                symb.val = 'unary-'
+            # () -> x
+            if symb.val == '(' and i < len(symbols)-1 and symbols[i+1].val == ')':
+                del symbols[i+1]
+                del symbols[i]
+                i-=1
+            #
+            if symb.val == '(' and i > 0 and symbols[i-1].kind != Operator:
+                symb.val = 'call('
+            elif symb.val == '(':
+                symb.val = 'expr('
+        i+=1
+
 # From a token list make a tree!
 def make_tree(symbols, debug=False):
+    prepare(symbols)
     while len(symbols) > 1:    
         target = first_op(symbols)
         if debug:
@@ -565,7 +574,10 @@ def exec_node(symbol, scope={}, debug=False):
         elif symbol.kind == Float:
             return float(symbol.val)
         elif symbol.kind == Id:
-            return scope[symbol.val]
+            if not symbol.val in scope:
+                raise Exception('unreferenced variable')
+            else:
+                return scope[symbol.val]
         elif symbol.kind == String:
             return symbol.val[1:len(n.val)-1]
         elif symbol.kind == Boolean:
@@ -617,11 +629,17 @@ def test(s, debug=True, mode = 'exec'):
     del o[-1] # del eof
     #print '>>> %i %s' % (first_op(o), o[first_op(o)])
     parse(o)
-    r = exec_node(o[0], root_scope)
-    root_scope['_'] = r
+    if len(o) >= 1:
+      r = exec_node(o[0], root_scope)
+      root_scope['_'] = r
+    else:
+      r = None
     if debug:
-        print "result of parse: ", o[0]
-        print "for: %s \t res = %s" % (s, str(r))
+        if len(o) >= 1:
+            print "result of parse: ", o[0]
+            print "for: %s \t res = %s" % (s, str(r))
+        else:
+            print 'empty command'
     #else:
     #    print r
     return r
@@ -668,8 +686,11 @@ if __name__ == '__main__':
     while loop:
         command = raw_input('>>> ')
         if command in ['exit', 'debug', '', 'symbols', 'exec', 'dump', 'prod', 'test']:
-            if command == 'exit' or command == '':
+            if command == 'exit':
                 loop = False
+                continue
+            elif command == '':
+                continue
             elif command == 'debug':
                 debug = not debug
             elif command == 'symbols':

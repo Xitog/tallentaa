@@ -13,9 +13,8 @@ def todo(console, text):
         #self.interpreter.scope['_'] = r
         console.write(str(r), "fg_blue")    
     except Exception as e:
-        console.write("See console for error.", "fg_red")
-        print e
-        
+        console.write(str(e), "fg_red") #console.write("See console for error.", "fg_red")
+        #print e
 
 if __name__ != "__main__":
     raise Exception("Must be launched as principal program")
