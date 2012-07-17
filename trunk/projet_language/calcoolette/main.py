@@ -1,9 +1,9 @@
 import console
-import interpreter
+import interpreter2
 import sys              # version_info
 import traceback
 
-core_exec = interpreter.Interpreter()
+core_exec = interpreter2.Interpreter()
 
 def todo(console, text):
     global core_exec

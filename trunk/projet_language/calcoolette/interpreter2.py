@@ -252,6 +252,7 @@ class Symbolizer:
         self.symbols.append(Symbol(Operator, op))
         return i
 
+"""
 s = "2 + 3 - 4.to_f + (true) or False xor True ** 2.3 + 0.3.to_i / 0.to_f / 0..to_f +- 3"
 y = Symbolizer()
 l = y.parse(s)
@@ -259,6 +260,7 @@ i = 0
 for e in l:
     print i, '. ', l[i]
     i+=1
+"""
 
 #exit() 16h28 : ancien symbolizer rempl car bug.
 
@@ -620,75 +622,88 @@ def test(s, debug=True, mode = 'exec'):
     if debug:
         print "result of parse: ", o[0]
         print "for: %s \t res = %s" % (s, str(r))
-    else:
-        print r
+    #else:
+    #    print r
+    return r
 
-test("2+3")         # 5
-test("2**3")        # 8
-test("8%2")         # 0
-test("2+3*2")       # 8
-test("-2+3")        # 1
-test("-3")          # -3
-test("5+-4")        # 1
-test("-7.abs")      # 7
-test("-8..abs")     # 8.0
-test("8.5.round")   # 9.0
-test("8.4.round")   # 8.0
-test("6.5.trunc")   # 6.0
-test("1..trunc")    # 1.0 
-test("2 * ( 3 + 1)")  # 8
-test("(3 + 1) * 2")   # 8
-test("println(4)")    # None >> 4
-test("3.add(2)")    # 5 
-test("a = 3")       # 3
-test("a")           # 3
-test("a + 2")       # 5
-test("a = 2 + 4")   # 6
-test("a")           # 6
-test("a.add(1)")    # 7
+def run_tests():
+    test("2+3")         # 5
+    test("2**3")        # 8
+    test("8%2")         # 0
+    test("2+3*2")       # 8
+    test("-2+3")        # 1
+    test("-3")          # -3
+    test("5+-4")        # 1
+    test("-7.abs")      # 7
+    test("-8..abs")     # 8.0
+    test("8.5.round")   # 9.0
+    test("8.4.round")   # 8.0
+    test("6.5.trunc")   # 6.0
+    test("1..trunc")    # 1.0 
+    test("2 * ( 3 + 1)")  # 8
+    test("(3 + 1) * 2")   # 8
+    test("println(4)")    # None >> 4
+    test("3.add(2)")    # 5 
+    test("a = 3")       # 3
+    test("a")           # 3
+    test("a + 2")       # 5
+    test("a = 2 + 4")   # 6
+    test("a")           # 6
+    test("a.add(1)")    # 7
 
-command = ''
-loop = True
-debug = False
-mode = 'exec'
-prod = True
-while loop:
-    command = raw_input('>>> ')
-    if command in ['exit', 'debug', '', 'symbols', 'exec', 'dump', 'prod']:
-        if command == 'exit' or command == '':
-            loop = False
-        elif command == 'debug':
-            debug = not debug
-        elif command == 'symbols':
-            mode = 'symbols'
-            print 'mode changed to symbols only'
-        elif command == 'exec':
-            mode = 'exec'
-            print 'mode changed to full execution'
-        elif command == 'dump':
-            for e in root_scope:
-                print e
-        elif command == 'prod':
-            prod = not prod
-            if prod: print 'production mode on'
-            else: print 'beware: dev mode on'
-    else:
-        if prod:
-            try:
-                test(command, debug, mode)
-            except Exception as e:
-                print e
+class Interpreter:
+    def __init__(self):
+        pass
+    
+    def do_string(self, text):
+        return test(text, False, 'exec')
+
+if __name__ == '__main__':
+    command = ''
+    loop = True
+    debug = False
+    mode = 'exec'
+    prod = True
+    print 'Welcome to Pypo 0.1'
+    while loop:
+        command = raw_input('>>> ')
+        if command in ['exit', 'debug', '', 'symbols', 'exec', 'dump', 'prod', 'test']:
+            if command == 'exit' or command == '':
+                loop = False
+            elif command == 'debug':
+                debug = not debug
+            elif command == 'symbols':
+                mode = 'symbols'
+                print 'mode changed to symbols only'
+            elif command == 'exec':
+                mode = 'exec'
+                print 'mode changed to full execution'
+            elif command == 'dump':
+                for e in root_scope:
+                    print e
+            elif command == 'prod':
+                prod = not prod
+                if prod: print 'production mode on'
+                else: print 'beware: dev mode on'
+            elif command == 'test':
+                run_tests()
         else:
-            test(command, debug, mode)
+            if prod:
+                try:
+                    print test(command, debug, mode)
+                except Exception as e:
+                    print e
+            else:
+                print test(command, debug, mode)
 
-a = Symbol(Id, "a")
-b = Symbol(Operator, "=")
-c = Symbol(Integer, "5")
-l = [a, b, c]
+    a = Symbol(Id, "a")
+    b = Symbol(Operator, "=")
+    c = Symbol(Integer, "5")
+    l = [a, b, c]
 
-a = Symbol(Integer, "3")
-b = Symbol(Separator, ";")
-c = Symbol(Integer, "5")
+    a = Symbol(Integer, "3")
+    b = Symbol(Separator, ";")
+    c = Symbol(Integer, "5")
 
 #tl = TokenList([a,b,c])
 #print tl[0]
@@ -702,4 +717,4 @@ c = Symbol(Integer, "5")
 #print exec_node(l[0])
 
 
-exit()
+#exit()

@@ -636,25 +636,42 @@ def base_read(scope, par):
         sys.stdout.write(str(par[e]))
     return raw_input()
 
+def base_abs(scope, par):
+    par = par[0]
+    return abs(par)
+
 global_scope['println'] = SFunction('println', [SParam('a',card='*')], 'int', base_println)
 global_scope['print'] = SFunction('print', [SParam('a',card='*')], 'int', base_print)
 global_scope['read'] = SFunction('read', [SParam('a', card='1', typ='str')], 'str', base_read)
 
+global_scope['abs'] = SFunction('abs', [SParam('a', card='1', typ='int')], 'int', base_abs)
+
 class Interpreter:
 
-    def __init__(self, scope=[]):
+    def __init__(self, stack=[], scope={}):
+        global global_scope
         self.scope = scope
+        self.scope.update(global_scope)
+        self.stack = stack
         self.MASTER_LOOP_EXIT = False
 
-    def do_string(self, s, stack=[], scope={}):
+    def do_string(self, s, stack=[], scope={}, clear=False):
+        
+        if clear:
+            self.stack = []
+            self.scope = {}
+        else:
+            self.stack += stack
+            self.scope.update(scope)
+        
         t = Tokenizer()
         tokens = t.parse(s)
         p = Parser()
         p.clear(tokens)
         master = p.parse(tokens)
-        r = self.do_node(master, scope, True)
+        r = self.do_node(master, self.scope, True)
         #self.process_python(n)
-        self.process_vm(master, stack)
+        self.process_vm(master, self.stack)
         return r
     
     def process_vm(self, n, start):
@@ -1228,28 +1245,4 @@ def clos(command):
         elif t.val == 'end':
             cend+=1
     return cdeb == cend
-    
-if console:
-    ver = sys.version_info
-    print '+- Welcome to Pypo 0.1 on Python %i.%i' % (ver[0], ver[1])
-    print '+- Enter code or type help for more information.'
-    while command != 'exit':
-        command = raw_input('>>> ') # +->
-        while not clos(command):
-            command += '\n' + raw_input('... ')
-        if not(command in commands) and not(command.split(' ')[0] in commands):
-            #try:
-                r = interpreter.do_string(command, stack, scope)
-                print r
-                scope['_'] = r
-            #except Exception as e:
-            #    print e
-            #finally:
-                previous = command
-        elif command in commands:
-            commands[command]()
-        elif command.split(' ')[0] in commands:
-            commands[command.split(' ')[0]](*command.split(' '))
 
-print '+- Goodbye!'
-print
