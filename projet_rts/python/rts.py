@@ -13,6 +13,57 @@ pygame.init()
 size = width, height = 800, 600 #320, 240
 screen = pygame.display.set_mode(size)
 
+class Particles:
+    def __init__(self):
+        self.core = []
+    
+    def add(self, p):
+        self.core.append(p)
+    
+    def update(self):
+        i = 0
+        while i < len(self.core):
+            ttl = self.core[i].update()
+            if ttl <= 0:
+                del self.core[i]
+                print ttl, len(self.core)
+            else:
+                i+=1
+                print ttl, len(self.core)
+
+class Particle:
+    def __init__(self, pos, dir, target, ttl, guided=False):
+        self.x = pos[0]
+        self.y = pos[1]
+        self.ax = dir[0]
+        self.ay = dir[1]
+        self.vel = dir[2]
+        self.tx = target[0]
+        self.ty = target[1]
+        self.ttl = ttl
+        self.guided = guided
+    
+    def update(self):
+        if self.ttl == 0:
+            return 0
+        if not self.guided:
+            self.x += self.vel*self.ax
+            self.y += self.vel*self.ay
+        else:
+            pass
+        #print self.x > self.tx and self.y > self.ty
+        if self.x > self.tx and self.y > self.ty:
+            self.ttl = 0
+        else:
+            self.ttl -= 1
+        return self.ttl
+
+class World:
+    def __init__(self):
+        self.particles = Particles()
+
+world = World()
+
 #-----------------------------------------------------------------------
 # Scrolling
 
@@ -24,7 +75,7 @@ right = False
 up = False
 down = False
 
-SCROLL_MOD = 1
+SCROLL_MOD = 5
 
 #-----------------------------------------------------------------------
 # Selection
@@ -55,7 +106,7 @@ class Order:
 
 class Unit:
     
-    def __init__(self, side, x, y, size, range, life, dom, reload=50):
+    def __init__(self, side, x, y, size, range, life, dom, reload=50, world=None):
         self.side = side
         self.x = (x/32*32)+16
         self.y = (y/32*32)+16
@@ -66,6 +117,7 @@ class Unit:
         self.dom = dom
         self.reload = reload
         self.cpt = 0
+        self.world = world
     
     def update(self):
         #print 'update ', len(self.orders)
@@ -82,6 +134,7 @@ class Unit:
                 if math.sqrt((self.x-o.target.x)**2 + (self.y-o.target.y)**2) > self.range or (self.x-16) % 32 != 0 or (self.y-16) % 32 != 0:
                     self.go(o.target.x, o.target.y)
                 elif self.cpt <= 0:
+                    world.particles.add(Particle([self.x,self.y], [1, 1, 4], [o.target.x, o.target.y], self.range+10, False))
                     o.target.life -= self.dom
                     self.cpt = self.reload
                     if o.target.life <= 0:
@@ -166,31 +219,54 @@ def select(x, y):
 # Current setting
 
 my_map = [
-    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
 ]
 
-MAP_X = 20
-MAP_Y = 12
+print 'mapX :', len(my_map[0])
+print 'mapY :', len(my_map)
+
+MAP_X = 32
+MAP_Y = 32
 
 side1 = Color(255, 255, 0)
 side2 = Color(0, 255, 255)
 
 SIDE_PLAYER = side1
 
-units.append(Unit(side1, 10, 10, size=10, range=100, life=100, dom=5))
-units.append(Unit(side1, 32, 32, size=10, range=150, life=100, dom=10))
-units.append(Unit(side2, 200,200,size=20, range=30, life=300, dom=20))
+units.append(Unit(side1, 10, 10, size=10, range=100, life=100, dom=5, world=world))
+units.append(Unit(side1, 32, 32, size=10, range=150, life=100, dom=10, world=world))
+units.append(Unit(side2, 200,200,size=20, range=30, life=300, dom=20, world=world))
 
 while 1:
     
@@ -289,6 +365,10 @@ while 1:
             units.remove(u)
             del u
 
+    #for p in world.particles.core:
+    #    p.update()
+    world.particles.update()
+    
 #-----------------------------------------------------------------------
 # Render
     
@@ -330,6 +410,9 @@ while 1:
             c = u.side
         #    c = Color(0, 255, 0, 255)
         pygame.draw.circle(screen, c, (u.x+X, u.y+Y), u.size, 0)
+    
+    for p in world.particles.core:
+        pygame.draw.circle(screen, Color(255,0,0), (p.x+X, p.y+Y), 3, 0)
     
     INTERFACE_Y = 480
     # Interface
