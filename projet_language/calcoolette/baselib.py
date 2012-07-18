@@ -1,3 +1,5 @@
+from __future__ import division
+
 import sys    # getsizeof, stdout.write
 import math   # factorial
 
@@ -27,7 +29,7 @@ class BaseLib:
     
     def send_int(self, target, msg, par, scope):
         # check
-        if msg in ['add', 'sub', 'div', 'mul', 'pow', 'mod', 'lshift', 'rshift', 'and', 'or', 'xor','cmp']:
+        if msg in ['add', 'sub', 'div', 'mul', 'pow', 'mod', 'lshift', 'rshift', 'and', 'or', 'xor','cmp', 'intdiv']:
             if len(par) != 1: raise Exception('%s function take 1 parameter, %d given' % (msg, len(par)))
         elif msg in ['abs', 'inv', 'invbin', 'to_s', 'to_f', 'to_i', 'size', 'factorial']:
             if len(par) != 0: raise Exception('%s function take 1 parameter, %d given' % (msg, len(par)))
@@ -40,6 +42,8 @@ class BaseLib:
             return target - par[0]
         elif msg == 'div':
             return target / par[0]
+        elif msg == 'intdiv':
+            return target // par[0]
         elif msg == 'mul':
             return target * par[0]
         elif msg == 'pow':

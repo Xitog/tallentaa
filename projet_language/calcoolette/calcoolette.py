@@ -138,7 +138,7 @@ alphas = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 
           'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '_']
 ops = ['+', '-', '*', '/', '**', '%', '.', '<', '>', '!', '=']
 white = [' ', '\n', '\t']
-operators = ['+', '-', '*', '/', '**', '%', '.', '<', '<<', '<=', '>', '>>', '>=', '!=', '==', '<=>', '=']
+operators = ['+', '-', '*', '/', '**', '%', '.', '<', '<<', '<=', '>', '>>', '>=', '!=', '==', '<=>', '=', '//']
 separators = ['(', ')', ';', ',']
 id_booleans = ['true', 'True', 'False', 'false']
 id_operators = ['and', 'xor', 'or']
@@ -275,7 +275,7 @@ def first_op(symbols):
     best = -1
     best_prio = -1
     prio = { ')' : 0, ',' : 1, 'and' : 5, 'or' : 5, 'xor' : 5, '<=>' : 8, '<<': 9, '>>' : 9, '+' : 10, '-' : 10, 
-             '*' : 20, '/' : 20, '**' : 30, '%' : 30, 'call' : 35, '.' : 40, 
+             '*' : 20, '/' : 20, '//' : 20, '**' : 30, '%' : 30, 'call' : 35, '.' : 40, 
              'unary-' : 50, 'call(' : 51, 'expr(' : 60 }
     lvl = 1
     while i < len(symbols):
@@ -515,6 +515,8 @@ def exec_node(symbol, scope={}, debug=False):
                 return instance_function(exec_node(symbol.left, scope), Symbol(Id, 'div'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
             elif symbol.val == '%':
                 return instance_function(exec_node(symbol.left, scope), Symbol(Id, 'mod'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
+            elif symbol.val == '//':
+                return instance_function(exec_node(symbol.left, scope), Symbol(Id, 'intdiv'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
             elif symbol.val == '**':
                 return instance_function(exec_node(symbol.left, scope), Symbol(Id, 'pow'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
             elif symbol.val == 'unary-':
@@ -582,6 +584,11 @@ def exec_node(symbol, scope={}, debug=False):
             return symbol.val[1:len(n.val)-1]
         elif symbol.kind == Boolean:
             return symbol.val in ['true', 'True']
+        # CASE OF ERRORS
+        elif symbol.kind == Operator:
+            raise Exception("Operators need one or more operands")
+        elif symbol.kind == Separator:
+            raise Exception("Separators alone are meaningless")
         else:
             print symbol
             raise Exception("TokenType not understood")
