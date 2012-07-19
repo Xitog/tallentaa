@@ -1,0 +1,52 @@
+-------------------------------------------------------------------------------
+Fil d'amélioration
+---
+
+Calcoolette
+Tokenizer
+
+---------------
+19 juillet 2012
+---------------
+
+[1] Les affectations typées
+    but : faire des références qui référencent un type constant
+    syntaxe : id : type = value
+Implémentation (171)
+    ajout       méthode commune type ou class pour afficher la classe
+    ajout       commande 'tree' pour la console : on affiche l'arbre pour l'instant.
+    ajout       commande 'help' pour la console : on affiche toutes les commandes possibles avec explications.
+    ajout       affectations typées (références constantes de types)
+    ajout       Garde sur les affections typées ou non, incomplètes
+    correction  1 bug sur ';' : convertir en SymbolList les listes.
+    correction  keyword employé comme fonction ne compte plus comme keyword.
+
+--------------
+4 juillet 2012
+--------------
+
+[0] Identifiants avec '?' à la fin et paramètres multiples de fonctions
+    but : implémenter la fonction between?(x,y) dans un premier temps qui renvoie vrai si i >= x et i =< y
+    syntaxe : between?(a, b)
+Implémentation (?)
+    ajout        9h56 Rajout de multiples paramètres à mes fonctions !!! Youpi
+    ajout        Rajout de la fonction between pour les int
+    ajout        10h24 Rajout de la possibilité de ? et ! à des identifiers, mais ils ne prennent que des booléens pour les premiers.
+    ajout        10h08 commande "prod" pour un prod/dev mode switchable
+    ajout        Garde sur le nombre de paramètres.
+Notes
+    Baselib : condition pour appeler les méthodes sur le nombre de params.
+    Interpret2 : plusieurs paramètres pour les fonctions. ? pour les id à la fin (booléen).
+
+-------------------------------------------------------------------------------
+Liens
+---
+
+http://brendaneich.com/
+
+-------------------------------------------------------------------------------
+Web
+---
+
+1. bordure épaisse en bas pour souligner une div (et pas que le texte)
+
