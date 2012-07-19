@@ -136,9 +136,9 @@ symbols = [
 digits = ['0','1','2','3','4','5','6','7','8','9']
 alphas = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
           'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '_']
-ops = ['+', '-', '*', '/', '**', '%', '.', '<', '>', '!', '=']
+ops = ['+', '-', '*', '/', '**', '%', '.', '<', '>', '!', '=', ':']
 white = [' ', '\n', '\t']
-operators = ['+', '-', '*', '/', '**', '%', '.', '<', '<<', '<=', '>', '>>', '>=', '!=', '==', '<=>', '=', '//']
+operators = ['+', '-', '*', '/', '**', '%', '.', '<', '<<', '<=', '>', '>>', '>=', '!=', '==', '<=>', '=', '//', ':']
 separators = ['(', ')', ';', ',']
 id_booleans = ['true', 'True', 'False', 'false']
 id_operators = ['and', 'xor', 'or']
@@ -224,12 +224,17 @@ class Symbolizer:
         if id in id_booleans:
             self.symbols.append(Symbol(Boolean, id))
         elif id in id_operators:
+            # operator boolean as function
             if len(self.symbols) > 1 and i > 0 and self.symbols[-1].val == '.':
                 self.symbols.append(Symbol(Id, id))
             else:
                 self.symbols.append(Symbol(Operator, id))
         elif id in id_keywords:
-            self.symbols.append(Symbol(Keyword, Id))
+            # keyword as function
+            if len(self.symbols) > 1 and i > 0 and self.symbols[-1].val == '.':
+                self.symbols.append(Symbol(Id, id))
+            else:
+                self.symbols.append(Symbol(Keyword, Id))
         else:
             self.symbols.append(Symbol(Id, id))
         return i
@@ -430,18 +435,35 @@ def make_aff(symbols):
     symbols.clear()
     symbols.add(n)
 
+def make_typed_aff(symbols):
+    sub = symbols.core[4:]
+    make_tree(sub)
+    nx = sub[0]
+    nid = Symbol(left=symbols(0), right=symbols(2), val='typed_id', kind=Structure)
+    n = Symbol(left=nid, right=nx, val='typed_aff', kind=Structure)
+    symbols.clear()
+    symbols.add(n)
+
 def parse(symbols): 
     if symbols.include(';'):
         two_part = symbols.split(';')
-        parse(two_part[0])
-        parse(two_part[1])
-        n = Symbol(val=suite, kind=Structure, left=two_part[0][0], right=two_part[1][0])
+        parse(SymbolList(two_part[0]))
+        parse(SymbolList(two_part[1]))
+        n = Symbol(val='suite', kind=Structure, left=two_part[0][0], right=two_part[1][0])
         symbols.clear()
         symbols.add(n)
-    elif not_exist_or_dif(symbols, 1, True, '='):
-        make_tree(symbols)
+    elif not not_exist_or_dif(symbols, 1, True, '='):
+        if len(symbols) > 2:
+            make_aff(symbols)
+        else:
+            raise Exception("Incorrect declaration")
+    elif not not_exist_or_dif(symbols, 1, True, ':'):
+        if len(symbols) > 4:
+            make_typed_aff(symbols)
+        else:
+            raise Exception("Incorrect typed declaration")
     else:
-        make_aff(symbols)
+        make_tree(symbols)
 
 #-----------------------------------------------------------------------
 # Interpreter
@@ -500,6 +522,20 @@ def instance_function(target, name, args, scope):
     r = bb.send(target, name, par, scope)
     return r
 
+def concordance(typ, val):
+    if typ == 'int':
+        if not isinstance(val, int):
+            raise Exception("Reference of type %s cannot reference value of type %s" % (typ,val.__class__))
+    elif typ == 'bool':
+        if not isinstance(val, bool):
+            raise Exception("Reference of type %s cannot reference value of type %s" % (typ,val.__class__))
+    elif typ == 'float':
+        if not isinstance(val, float):
+            raise Exception("Reference of type %s cannot reference value of type %s" % (typ,val.__class__))
+    else:
+        raise Exception("Type %s unknown" % (typ,))
+    return True
+
 def exec_node(symbol, scope={}, debug=False):
     if debug: print 'Enter ExecNode: val=', symbol.val, "kind=", symbol.kind
     if not symbol.terminal():
@@ -551,8 +587,26 @@ def exec_node(symbol, scope={}, debug=False):
                 value = exec_node(symbol.right, scope)
                 if symbol.left.val[-1] == '?' and not isinstance(value, bool):
                     raise Exception("?-ending id must reference boolean value")
-                scope[symbol.left.val] = value
-                return scope[symbol.left.val]
+                # typ
+                id = symbol.left.val
+                if id in scope and scope[id][1] is not None:
+                    concordance(scope[id][1], value)
+                # aff
+                scope[id] = (value, None)
+                return scope[id][0]
+            elif symbol.val == 'typed_aff':
+                id = symbol.left.left.val
+                typ= symbol.left.right.val
+                val= exec_node(symbol.right, scope)
+                #print id
+                #print typ
+                #print val
+                # on essaye de typer quelque chose de deja declare
+                if id in scope:
+                    raise Exception("Cannot type reference already declared: %s" % (id,))
+                concordance(typ, val)
+                scope[id] = (val, typ)
+                return scope[id][0]
             elif symbol.val == 'suite':
                 exec_node(symbol.left, scope)
                 return exec_node(symbol.right, scope)
@@ -577,9 +631,9 @@ def exec_node(symbol, scope={}, debug=False):
             return float(symbol.val)
         elif symbol.kind == Id:
             if not symbol.val in scope:
-                raise Exception('unreferenced variable')
+                raise Exception('unreferenced variable %s' % (symbol.val,))
             else:
-                return scope[symbol.val]
+                return scope[symbol.val][0]
         elif symbol.kind == String:
             return symbol.val[1:len(n.val)-1]
         elif symbol.kind == Boolean:
@@ -622,6 +676,18 @@ print r
 exit()
 """
 
+def print_tree(o):
+    if o.terminal():
+        print o.val
+    else:
+        if o.right is not None:
+            print 'right=' 
+            print_tree(o.right)
+        if o.left is not None:
+            print 'left='
+            print_tree(o.left)
+        print 'val=', o.val
+
 def test(s, debug=True, mode = 'exec'):
     global root_scope
     t = Symbolizer()
@@ -636,6 +702,9 @@ def test(s, debug=True, mode = 'exec'):
     del o[-1] # del eof
     #print '>>> %i %s' % (first_op(o), o[first_op(o)])
     parse(o)
+    if mode == 'tree':
+        print_tree(o[0])
+        return o
     if len(o) >= 1:
       r = exec_node(o[0], root_scope)
       root_scope['_'] = r
@@ -690,9 +759,10 @@ if __name__ == '__main__':
     mode = 'exec'
     prod = True
     print 'Welcome to Pypo 0.1'
+    print 'Type help for more information'
     while loop:
         command = raw_input('>>> ')
-        if command in ['exit', 'debug', '', 'symbols', 'exec', 'dump', 'prod', 'test']:
+        if command in ['exit', 'debug', '', 'symbols', 'exec', 'dump', 'prod', 'test', 'help', 'tree']:
             if command == 'exit':
                 loop = False
                 continue
@@ -706,6 +776,9 @@ if __name__ == '__main__':
             elif command == 'exec':
                 mode = 'exec'
                 print 'mode changed to full execution'
+            elif command == 'tree':
+                mode = 'tree'
+                print 'mode changed to tree only'
             elif command == 'dump':
                 for e in root_scope:
                     print e
@@ -713,6 +786,14 @@ if __name__ == '__main__':
                 prod = not prod
                 if prod: print 'production mode on'
                 else: print 'beware: dev mode on'
+            elif command == 'help':
+                print 'debug    debug mode on'
+                print 'symbols  retrieve only symbols (no exec)'
+                print 'exec     execution'
+                print 'tree     syntax tree only (no exec)'
+                print 'dump     dump root scope'
+                print 'prod     switch to prod mode on/off'
+                print 'test     run all tests'
             elif command == 'test':
                 run_tests()
         else:

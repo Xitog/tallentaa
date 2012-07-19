@@ -27,12 +27,23 @@ class BaseLib:
             elif isinstance(target, str): 
                 return self.send_str(target, msg, par, scope)
     
+    def send_object(self, target, msg, par, scope):
+        # check
+        if msg in ['type', 'class']:
+            if len(par) != 0: raise Exception('%s function take 0 parameter, %d given' % (msg, len(par)))
+        # do
+        if msg == 'type' or msg == 'class':
+            return target.__class__
+    
     def send_int(self, target, msg, par, scope):
+        # common
+        if msg in ['type', 'class']:
+            return self.send_object(target, msg, par, scope)
         # check
         if msg in ['add', 'sub', 'div', 'mul', 'pow', 'mod', 'lshift', 'rshift', 'and', 'or', 'xor','cmp', 'intdiv']:
             if len(par) != 1: raise Exception('%s function take 1 parameter, %d given' % (msg, len(par)))
         elif msg in ['abs', 'inv', 'invbin', 'to_s', 'to_f', 'to_i', 'size', 'factorial']:
-            if len(par) != 0: raise Exception('%s function take 1 parameter, %d given' % (msg, len(par)))
+            if len(par) != 0: raise Exception('%s function take 0 parameter, %d given' % (msg, len(par)))
         elif msg in ['between?']:
             if len(par) != 2: raise Exception('%s function take 2 parameters, %d given' % (msg, len(par)))
         # do
@@ -86,11 +97,14 @@ class BaseLib:
             raise Exception("Function %s not known for integer" % (msg,))
     
     def send_flt(self, target, msg, par, scope):
+        # common
+        if msg in ['type', 'class']:
+            return self.send_object(target, msg, par, scope)
         # check
         if msg in ['add', 'sub', 'div', 'mul', 'pow', 'mod']:
             if len(par) != 1: raise Exception('%s function take 1 parameter, %d given' % (msg, len(par)))
         elif msg in ['abs', 'inv', 'round', 'trunc', 'floor', 'to_i', 'ceil']:
-            if len(par) != 0: raise Exception('%s function take 1 parameter, %d given' % (msg, len(par)))
+            if len(par) != 0: raise Exception('%s function take 0 parameter, %d given' % (msg, len(par)))
         # do
         if msg == 'add':
             return target + par[0]
@@ -118,9 +132,14 @@ class BaseLib:
             raise Exception("Function %s not known for float" % (msg,))
 
     def send_str(self, target, msg, par, scope):
-        pass
-
+        # common
+        if msg in ['type', 'class']:
+            return self.send_object(target, msg, par, scope)
+    
     def send_boo(self, target, msg, par, scope):
+        # common
+        if msg in ['type', 'class']:
+            return self.send_object(target, msg, par, scope)
         # check
         if msg in ['and', 'or', 'xor', 'inv', 'to_i']:
             if len(par) != 1: raise Exception('%s function take 1 parameter, %d given' % (msg, len(par)))
