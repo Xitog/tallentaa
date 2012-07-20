@@ -77,16 +77,18 @@
     vex trouver un emploi/travail
 
 #* maison
-    nf chambre
-    nm lit
-    nf pièce
-    nf cuisine
-    nf table
-    nm salon
-    nm escalier
-    nm appartement
-    nf maison
-
+    maison (nf)         | house (n)        | domo (n)         | casa (nf)          | Haus (nn)
+    porte (nf)          | gate (n)         | pordo (n)        | porta (nf)         | Tür (nf)
+    chambre	(nf)        | room (n)         | ĉambro (n)       | camera (nf)        | Schlafzimmer (nn)
+    lit	(nm)            | bed (n)          | lito (n)         | letto (nm)         | Bett (nn)
+    fenêtre (nf)        | window (n)       | fenestro (n)     | finestra (nf)      | Fenster (nn)
+    pièce (nf)          | room (n)         | ĉambro (n)       | camera (nf)        | Zimmer (nn)
+    cuisine (nf)        | kitchen (n)      | kuirejo (n)      | cucina (nf)        | Küche (nf)
+    table (nf)          | table (n)        | tablo (n)        | tavolo (nm)        | Tisch (nm)
+    salon (nm)          | lounge (n)       | salono (n)       | salone (nm)        | Wohnzimmer (nn)
+    escalier (nm)       | staircase (n)    | ŝtuparo (n)      | scala (nf)         | Treppe (nf)
+    appartement (nm)    | flat (n)         | apartamento (n)  | appartamento (nm)  | Wohnung (nf)
+    
 #* manger et boire
     nm repas
     nm dîner
