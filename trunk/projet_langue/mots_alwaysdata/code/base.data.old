@@ -1,0 +1,625 @@
+acheter             :v      :acheter
+cher                :adj    :acheter
+bon marché          :expr   :acheter
+magasin             :nm     :acheter
+boutique            :nf     :acheter
+monnaie             :nf     :acheter
+argent              :nm     :acheter
+
+animal              :nm     :animaux
+    élevage         :nm     :animaux
+        vache       :nf     :animaux
+        mouton      :nm     :animaux
+        agneau      :nm     :animaux
+        bœuf        :nm     :animaux
+        brebis      :nf     :animaux
+        canard      :nm     :animaux
+        canne       :nf     :animaux
+        cheval      :nm     :animaux
+        chèvre      :nf     :animaux
+        cochon      :nm     :animaux
+        coq         :nm     :animaux
+    domestique      :adj    :animaux
+        chat        :nm     :animaux
+        chien       :nm     :animaux
+        perroquet   :nm     :animaux
+        hamster     :nm     :animaux
+    sauvage         :adj    :animaux
+        tortue      :nf     :animaux
+        serpent     :nm     :animaux
+        ours        :nm     :animaux
+        loup        :nm     :animaux
+    ver             :nm     :animaux
+    pou             :nm     :animaux
+    poisson         :nm     :animaux
+    papillon        :nm     :animaux
+    oiseau          :nm     :animaux
+    moustique       :nm     :animaux
+    mouche          :nf     :animaux
+    lézard          :nm     :animaux
+    lapin           :nm     :animaux
+    insecte         :nm     :animaux
+    écureuil        :nm     :animaux
+    grenouille      :nf     :animaux
+    guêpe           :nf     :animaux
+
+ville               :nf     :artificiel
+campagne            :nf     :artificiel
+
+boire               :v      :boire
+    bouteille       :nf     :boire
+    bouchon         :nm     :boire
+    carafe          :nf     :boire
+    bol             :nm     :boire
+    tasse           :nf     :boire
+boisson             :nf     :manger
+    bière           :nf     :boire
+    café            :nm     :boire
+    chocolat        :nm     :boire
+    citronnade      :nf     :boire
+    eau             :nf     :boire, nature
+    jus de fruit    :nm     :boire
+    lait            :nm     :boire
+    limonade        :nf     :boire
+    orangeade       :nf     :boire
+    thé             :nm     :boire
+    vin             :nm     :boire
+    infusion/tisane :nf     :boire
+naturelle           :adj    :boire
+minérale            :adj    :boire
+plate               :adj    :boire
+gazeuse,pétillante  :adj    :boire
+fruit pressé        :expr   :boire
+
+
+couleur             :nf     :couleurs
+blanc               :adj    :couleurs
+bleu (foncé)        :adj    :couleurs
+bleu clair / azur   :adj    :couleurs
+gris                :adj    :couleurs
+jaune               :adj    :couleurs
+marron              :adj    :couleurs
+noir                :adj    :couleurs
+orange              :adj    :couleurs
+rose                :adj    :couleurs
+rouge               :adj    :couleurs
+vert                :adj    :couleurs
+violet              :adj    :couleurs
+clair               :adj    :couleurs
+foncé               :adj    :couleurs
+coloré              :adj    :couleurs
+terne               :adj    :couleurs
+
+corps               :nm     :corps
+genou               :nm     :corps
+ongle               :nm     :corps
+ventre              :nm     :corps
+cou                 :nm     :corps
+main                :nf     :corps
+doigt               :nm     :corps
+jambe               :nf     :corps
+pied                :nm     :corps
+sexe                :nm     :corps
+langue (organe)     :nf     :corps
+dent                :nf     :corps
+oreille             :nf     :corps
+bras                :nm     :corps
+dos                 :nm     :corps
+peau                :nf     :corps
+tête                :nf     :corps
+bouche              :nf     :corps
+œil                 :nm     :corps
+lèvre               :nf     :corps
+nez                 :nm     :corps
+cheveu              :nm     :corps
+cœur                :nm     :corps
+poil                :nm     :corps
+chair               :nf     :corps
+os                  :nm     :corps
+estomac             :nm     :corps
+sang                :nm     :corps
+vue                 :nf     :corps
+ouïe                :nf     :corps
+odorat              :nm     :corps
+toucher             :nm     :corps
+goût                :nm     :corps
+voir                :v      :corps
+regarder            :v      :corps
+entendre            :v      :corps
+écouter             :v      :corps
+sentir (odorat)     :v      :corps
+humer               :v      :corps
+toucher             :v      :corps
+aveugle             :adj    :corps
+malade              :adj    :corps
+en bonne santé      :expr   :corps
+bien portant        :expr   :corps
+corne               :nf     :corps
+queue (d'un animal) :nf     :corps
+plume (d'un oiseau) :nf     :corps
+aile                :nf     :corps
+entraille           :nf     :corps
+intestin            :nm     :corps
+poitrine            :nf     :corps
+taille              :nf     :corps
+hanche              :nf     :corps
+foie                :nf     :corps
+
+concept             :nm     :concepts
+liberté             :nf     :concepts
+égalité             :nf     :concepts
+libre               :adj    :concepts
+aliéné              :adj    :concepts
+vertu               :nf     :concepts
+vice                :nm     :concepts
+courageux           :adj    :concepts
+peureux             :adj    :concepts
+
+diplomatie          :nf     :diplomatie
+guerre              :nf     :diplomatie
+paix                :nf     :diplomatie
+espion              :nm     :diplomatie
+
+éducation           :nf     :éducation
+école               :nf     :éducation
+université          :nf     :éducation
+étudiant            :nm     :éducation
+étudiante           :nf     :éducation
+professeur          :nm     :éducation
+classe              :nf     :éducation
+camarade            :nm     :éducation
+
+famille             :nf     :famille
+père                :nm     :famille
+mère                :nf     :famille
+fils                :nm     :famille
+fille               :nf     :famille
+frère               :nm     :famille
+sœur                :nf     :famille
+cousin              :nm     :famille
+cousine             :nf     :famille
+oncle               :nm     :famille
+tante               :nf     :famille
+grand-père          :mn     :famille
+grand-mère          :nf     :famille
+neveu               :nm     :famille
+nièce               :nf     :famille
+grand (frère)       :adj    :famille
+petit (frère)       :adj    :famille
+jumeau/jumelle      :adj    :famille
+jumeau              :nm     :famille
+jumelle             :nf     :famille
+bébé                :nm     :famille
+enfant              :nm     :famille
+germain/germaine    :adj    :famille
+paternel/paternelle :adj    :famille
+maternel/maternelle :adj    :famille
+
+fruit               :nm     :fruits et légumes
+pomme               :nf     :fruits et légumes
+banane              :nf     :fruits et légumes
+cerise              :nf     :fruits et légumes
+fraise              :nf     :fruits et légumes
+framboise           :nf     :fruits et légumes
+noix                :nf     :fruits et légumes
+pêche               :nf     :fruits et légumes
+
+habit               :nm     :habits
+vêtement            :nm     :habits
+
+lire                :v      :intellectuel
+écrire              :v      :intellectuel
+livre               :nm     :intellectuel
+intellectuel        :adj    :intellectuel
+oublier             :v      :intellectuel
+réfléchir           :v      :intellectuel
+étudier             :v      :intellectuel
+bon                 :adj    :intellectuel
+mauvais             :adj    :intellectuel
+juste, correct      :adj    :intellectuel
+décider             :v      :intellectuel
+choisir             :v      :intellectuel
+absolu              :adj    :intellectuel
+
+maison              :nf     :maison
+chambre             :nf     :maison
+clé                 :nf     :maison
+porte               :nf     :maison
+jardin              :nm     :maison
+lit                 :nm     :maison
+salon               :nm     :maison
+cuisine             :nf     :maison,manger
+bureau              :nm     :maison
+chaise              :nf     :maison
+lampe               :nf     :maison
+fenêtre             :nf     :maison
+
+chaud/chaude        :adj    :manger
+frais/fraîche       :adj    :manger
+dîner               :v      :manger
+dîner               :nm     :manger
+dîner d'affaires    :expr   :manger
+dîner aux chandelles:expr   :manger
+déjeuner            :v      :manger
+déjeuner            :nm     :manger
+repas               :nm     :manger
+petit-déjeuner      :nm     :manger
+manger              :v      :manger
+fourchette          :nf     :manger
+couteau             :nm     :manger
+cuillère            :nf     :manger
+petite-cuillère     :nf     :manger
+assiette            :nf     :manger
+casserole           :nf     :manger
+poêle               :nf     :manger
+four                :nm     :manger
+verre               :nm     :manger
+mettre la table     :expr   :manger
+table               :nf     :manger
+cuire               :v      :manger
+manger              :v      :manger
+sel                 :nm     :manger
+poivre              :nm     :manger
+viande              :nf     :manger
+graisse             :nf     :manger
+œuf                 :nm     :manger
+
+toujours            :adv    :mots-outils
+souvent             :adv    :mots-outils
+beaucoup            :adv    :mots-outils
+parfois             :adv    :mots-outils
+quelques            :adv    :mots-outils
+peu                 :adv    :mots-outils
+rarement            :adv    :mots-outils
+jamais              :adv    :mots-outils
+preque-X            :adv    :mots-outils
+trop                :adv    :mots-outils
+aussi               :adv    :mots-outils
+mais                :conj   :mots-outils
+ou                  :conj   :mots-outils
+et                  :conj   :mots-outils
+donc                :conj   :mots-outils
+or                  :conj   :mots-outils
+ni                  :conj   :mots-outils
+car                 :conj   :mots-outils
+je                  :pronS  :mots-outils
+tu                  :pronS  :mots-outils
+il                  :pronS  :mots-outils
+elle                :pronS  :mots-outils
+nous                :pronS  :mots-outils
+vous                :pronS  :mots-outils
+ils                 :pronS  :mots-outils
+elles               :pronS  :mots-outils
+on                  :pronS  :mots-outils
+mon                 :pronP  :mots-outils
+ma                  :pronP  :mots-outils
+mes                 :pronP  :mots-outils
+ton                 :pronP  :mots-outils
+ta                  :pronP  :mots-outils
+tes                 :pronP  :mots-outils
+son                 :pronP  :mots-outils
+sa                  :pronP  :mots-outils
+ses                 :pronP  :mots-outils
+notre               :pronP  :mots-outils
+nos                 :pronP  :mots-outils
+votre               :pronP  :mots-outils
+vos                 :pronP  :mots-outils
+leur                :pronP  :mots-outils
+leurs               :pronP  :mots-outils
+ceci                :promD  :mots-outils
+cela                :promD  :mots-outils
+qui                 :pronI  :mots-outils
+quoi                :pronI  :mots-outils
+où                  :pronI  :mots-outils
+quand               :pronI  :mots-outils
+comment             :pronI  :mots-outils
+ne...pas            :adv    :mots-outils
+autre               :adj    :mots-outils
+à                   :prep   :mots-outils
+dans                :prep   :mots-outils
+avec (ensemble)     :prep   :mots-outils
+comme               :prep   :mots-outils
+
+nature              :nf     :nature
+air                 :nm     :nature
+arbre               :nm     :nature
+forêt               :nf     :nature
+bâton               :nm     :nature
+fruit               :nm     :nature
+graine              :nf     :nature
+feuille (arbre)     :nf     :nature
+racine              :nf     :nature
+écorce              :nf     :nature
+fleur               :nf     :nature
+herbe               :nf     :nature
+pierre              :nf     :nature
+sable               :nm     :nature
+poussière           :nf     :nature
+terre (sol)         :nf     :nature
+soleil              :nm     :nature
+lune                :nf     :nature
+étoile              :nf     :nature
+pluie               :nf     :nature
+rivière             :nf     :nature
+lac                 :nm     :nature
+mer                 :nf     :nature
+nuage               :nm     :nature
+brouillard          :nm     :nature
+ciel                :nm     :nature
+vent                :nm     :nature
+neige               :nf     :nature
+glace               :nf     :nature
+montagne            :nf     :nature
+fumée               :nf     :nature
+feu                 :nm     :nature
+cendre              :nf     :nature
+
+zéro                :adjN   :nombres
+un                  :adjN   :nombres
+deux                :adjN   :nombres
+trois               :adjN   :nombres
+quatre              :adjN   :nombres
+cinq                :adjN   :nombres
+six                 :adjN   :nombres
+sept                :adjN   :nombres
+huit                :adjN   :nombres
+neuf                :adjN   :nombres
+dix                 :adjN   :nombres
+cinquante           :adjN   :nombres
+cent                :adjN   :nombres
+mille               :adjN   :nombres
+million             :adjN   :nombres
+milliard            :adjN   :nombres
+chiffre             :nm     :nombres
+nombre              :nm     :nombres
+addition            :nf     :nombres
+soustraction        :nf     :nombres
+multiplication      :nf     :nombres
+division            :nf     :nombres
+X plus Y            :expr   :nombres
+X moins Y           :expr   :nombres
+X fois Y            :expr   :nombres
+X divisé par Y      :expr   :nombres
+
+outil               :nm     :outils
+corde               :nf     :outils
+
+allemand            :adj    :pays
+anglais             :adj    :pays
+français            :adj    :pays
+japonais            :adj    :pays
+italien             :adj    :pays
+finlandais          :adj    :pays
+grec                :adj    :pays
+turc                :adj    :pays
+suisse              :adj    :pays
+espagnol            :adj    :pays
+portugais           :adj    :pays
+irlandais           :adj    :pays
+belge               :adj    :pays
+hollandais          :adj    :pays
+luxembourgeois      :adj    :pays
+danois              :adj    :pays
+suédois             :adj    :pays
+norvégien           :adj    :pays
+russe               :adj    :pays
+chinois             :adj    :pays
+américains          :adj    :pays
+
+grand               :adj    :physique
+petit               :adj    :physique
+long                :adj    :physique
+court               :adj    :physique
+large               :adj    :physique
+étroit              :adj    :physique
+maigre              :adj    :physique
+gras                :adj    :physique
+fin                 :adj    :physique
+épais               :adj    :physique
+mince               :adj    :physique
+gros                :adj    :physique
+lourd               :adj    :physique
+léger               :adj    :physique
+vieux               :adj    :physique
+jeune               :adj    :physique
+chaud (température) :adj    :physique
+froid (température) :adj    :physique
+sale                :adj    :physique
+propre              :adj    :physique
+beau                :adj    :physique
+laid                :adj    :physique
+flotter             :v      :physique
+couler (liquide)    :v      :physique
+geler               :v      :physique
+gonfler             :vi     :physique
+brûler              :vi     :physique
+pourri              :adj    :physique
+droit (rectiligne)  :adj    :physique
+courbe              :adj    :physique
+rond                :adj    :physique
+rond                :n      :physique
+carré               :adj    :physique
+carré               :n      :physique
+tranchant           :adj    :physique
+émoussé             :adj    :physique
+lisse               :adj    :physique
+rugueux             :adj    :physique
+mouillé, humide     :adj    :physique
+sec                 :adj    :physique
+loin                :adj    :physique
+près,proche         :adj    :physique
+droite              :adj    :physique
+gauche              :adj    :physique
+tomber              :v      :physique
+ouvrir              :v      :physique
+fermer              :v      :physique
+âgé                 :adj    :physique
+ancien              :adj    :physique
+
+se marrier          :v      :relation
+divorcer            :v      :relation
+tromper             :v      :relation
+faire confiance     :expr   :relation
+être ami            :v      :relation
+vivre en couple     :expr   :relation
+trahir              :v      :relation
+tuer                :v      :relation
+aimer               :v      :relation
+demander            :v      :relation
+répondre            :v      :relation
+parler              :v      :relation
+crier               :v      :relation
+se présenter        :v      :relation
+s'appeler           :v      :relation
+âge                 :nm     :relation
+nom                 :nm     :relation
+prénom              :nm     :relation
+
+pleurer             :v      :sentiments
+sentiment           :nm     :sentiments
+peur                :nf     :sentiments
+joie                :nf     :sentiments
+tristesse           :nf     :sentiments
+heureux             :adj    :sentiments
+malheureux          :adj    :sentiments
+juste               :adj    :sentiments
+injuste             :adj    :sentiments
+
+sport               :nm     :sports
+courrir             :v      :sports
+
+hiver               :nm     :temps
+été                 :nm     :temps
+printemps           :nm     :temps
+automne             :nm     :temps
+saison              :nf     :temps
+solstice            :nm     :temps
+équinoxe            :nf     :temps
+lundi               :nm     :temps
+mardi               :nm     :temps
+mercredi            :nm     :temps
+jeudi               :nm     :temps
+vendredi            :nm     :temps
+samedi              :nm     :temps
+dimanche            :nm     :temps
+aujourd'hui         :adv    :temps
+hier                :adv    :temps
+demain              :adv    :temps
+nuit                :nf     :temps
+jour                :nm     :temps
+an                  :nm     :temps
+année               :nf     :temps
+
+travail             :nm     :travail
+
+être                :v      :vie
+avoir               :v      :vie
+naître              :v      :vie
+habiter             :v      :vie
+connaître           :v      :vie
+travailler          :v      :vie
+jouer               :v      :vie
+dire                :v      :vie
+vivre               :v      :vie
+vouloir             :v      :vie
+mourir              :v      :vie
+pouvoir             :v      :vie
+devoir              :v      :vie
+savoir              :v      :vie,intellectuel
+faire               :v      :vie
+commencer           :v      :vie
+finir               :v      :vie
+femme               :nf     :vie
+homme               :nm     :vie
+domir               :v      :vie
+penser              :v      :vie,intellectuel
+dire                :v      :vie
+
+aéroport            :nm     :voyage
+bagage              :nm     :voyage
+bateau              :nm     :voyage
+bus                 :nm     :voyage
+caravane            :nm     :voyage
+carte d'embarquement:nm     :voyage
+à pied              :expr   :voyage
+aller               :v      :voyage
+ici                 :adv    :voyage
+là                  :adv    :voyage
+venir               :v      :voyage
+arriver             :v      :voyage
+
+attendre
+tomber
+changer
+courir
+donner
+inviter
+manquer
+mettre
+bouger
+penser
+perdre
+poser, mettre
+poser
+prendre
+propose
+réduire
+remplir
+rester
+monter
+cesser,rompre
+être assis
+servir
+envoyer
+éteindre
+se taire
+craindre
+tenir
+enlever
+tirer
+sortir
+
+mordre
+sucer
+cracher
+vomir
+souffler
+respirer
+rire
+craindre
+tuer
+se battre
+chasser (le gibier)
+frapper
+couper
+fendre
+poignarder
+gratter
+creuser
+nager
+voler (dans l'air)
+marcher
+s'étendre, être étendu
+s'asseoir, être assis
+se lever, se tenir debout
+tourner (intransitif)
+donner
+tenir
+serrer, presser
+frotter
+laver
+essuyer
+tirer
+pousser
+jeter, lancer
+lier
+coudre
+compter
+chanter
+jouer (s'amuser)    
+route
+plein
+nouveau
+si (condition)
+parce que
+nom

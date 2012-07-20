@@ -1,0 +1,1471 @@
+dét.:181161:son:adjectif:possessif:::mots-outils
+dét.:141389:ce:adjectif:démonstratif:::mots-outils
+dét.:70121:mon:adjectif:possessif:::mots-outils
+adj.:47221:tout:adjectif::::mots-outils
+dét.:33950:leur:adjectif:possessif:::mots-outils
+numér.:30211:deux:adjectif:numérique:cardinal::les nombres
+adj.:25388:grand:adjectif:qualificatif:::x
+dét.:23883:notre:adjectif:possessif:::mots-outils
+dét.:19942:votre:adjectif:possessif:::mots-outils
+adj.:19008:petit:adjectif:qualificatif:::x
+dét.:17953:quelque:adjectif:indéfini:::mots-outils
+adj.:16081:même:adjectif::::mots-outils
+dét.:15513:ton:adjectif:possessif:::mots-outils
+adj.:14688:autre:adjectif::::mots-outils
+numér.:13798:cent:adjectif:numérique:cardinal::les nombres
+adj.:13104:seul:adjectif::::x
+adj.:12593:jeune:adjectif:qualificatif:::x
+dét.:12051:tout:adjectif:indéfini:::mots-outils
+numér.:11758:mille:adjectif:numérique:cardinal::les nombres
+adj.:11731:premier:adjectif:numérique:ordinal:dernier:les nombres
+adj.:11483:bon:adjectif:qualificatif:::x
+numér.:11372:trois:adjectif:numérique:cardinal::les nombres
+numér.:10970:quatre:adjectif:numérique:cardinal::les nombres
+adj.:10343:quel:adjectif:interrogatif::DOUBLE DET/ADJ:mots-outils
+adj.:9870:beau:adjectif:qualificatif:::x
+adj.:9515:vieux:adjectif:qualificatif::jeune:x
+numér.:8920:vingt:adjectif:numérique:cardinal::les nombres
+adj.:7038:noir:adjectif:qualificatif:::les couleurs
+adj.:7019:nouveau:adjectif:qualificatif::ancien:x
+numér.:6723:cinq:adjectif:numérique:cardinal::les nombres
+adj.:6650:dernier:adjectif:qualificatif::premier:les nombres
+numér.:6609:dix:adjectif:numérique:cardinal::les nombres
+adj.:6246:blanc:adjectif:qualificatif:::les couleurs
+adj.:6059:cher:adjectif:qualificatif:::x
+dét.:5774:aucun:adjectif:indéfini:::mots-outils
+adj.:5562:long:adjectif:qualificatif:::x
+numér.:5508:neuf:adjectif:numérique:cardinal::les nombres
+dét.:5505:tel:adjectif:indéfini:::mots-outils
+adj.:5434:pauvre:adjectif:qualificatif:::x
+adj.:5413:plein:adjectif:qualificatif:::x
+adj.:5385:vrai:adjectif:qualificatif:::x
+adj.:5258:toute:adjectif:qualificatif:::mots-outils
+adj.:5087:bas:adjectif:qualificatif:::x
+adj.:4537:gros:adjectif:qualificatif:::x
+numér.:4463:six:adjectif:numérique:cardinal::les nombres
+adj.:4355:doux:adjectif:qualificatif:::x
+adj.:4332:heureux:adjectif:qualificatif:::x
+numér.:4052:huit:adjectif:numérique:cardinal::les nombres
+adj.:3953:haut:adjectif:qualificatif:::x
+adj.:3878:profond:adjectif:qualificatif:::x
+dét.:3667:certain:adjectif:indéfini:::mots-outils
+adj.:3576:rouge:adjectif:qualificatif:::les couleurs
+dét.:3480:plusieurs:adjectif:indéfini:::mots-outils
+adj.:3393:humain:adjectif:qualificatif:::l'homme
+adj.:3337:général:adjectif:qualificatif:::x
+adj.:3299:français:adjectif:qualificatif:::les pays
+numér.:3289:sept:adjectif:numérique:cardinal::les nombres
+adj.:3250:froid:adjectif:qualificatif:::x
+adj.:3234:sombre:adjectif:qualificatif:::les couleurs
+adj.:3211:sûr:adjectif:qualificatif:::x
+adj.:3190:ancien:adjectif:qualificatif:::x
+adj.:3125:propre:adjectif:qualificatif:::x
+adj.:3054:politique:adjectif:qualificatif:::la politique
+adj.:3013:possible:adjectif:qualificatif:::x
+adj.:2948:immense:adjectif:qualificatif:::x
+adj.:2929:public:adjectif:qualificatif:::x
+adj.:2914:pareil:adjectif:qualificatif:::x
+adj.:2906:bleu:adjectif:qualificatif:::les couleurs
+dét.:2865:d'autres:adjectif:indéfini::???:x
+adj.:2851:fort:adjectif:qualificatif:::x
+numér.:2809:trente:adjectif:numérique:cardinal::les nombres
+adj.:2717:entier:adjectif:qualificatif:::x
+adj.:2704:simple:adjectif:qualificatif:::x
+adj.:2654:nécessaire:adjectif:qualificatif:::x
+adj.:2570:mauvais:adjectif:qualificatif:::x
+adj.:2510:social:adjectif:qualificatif:::x
+adj.:2416:important:adjectif:qualificatif:::x
+adj.:2380:certain:adjectif:qualificatif:::x
+adj.:2307:triste:adjectif:qualificatif:::x
+adj.:2301:joli:adjectif:qualificatif:::x
+adj.:2254:différent:adjectif:qualificatif:::
+adj.:2218:terrible:adjectif:qualificatif:::
+adj.:2165:fou:adjectif:qualificatif:::
+adj.:2158:léger:adjectif:qualificatif:::
+adj.:2147:libre:adjectif:qualificatif:::
+adj.:2118:pur:adjectif:qualificatif:::
+adj.:2081:vert:adjectif:qualificatif:::
+adj.:2077:moindre:adjectif:qualificatif:::
+numér.:2073:quarante:adjectif:numérique:cardinal::
+numér.:2072:cinquante:adjectif:numérique:cardinal::
+adj.:2048:riche:adjectif:qualificatif:::
+adj.:2046:étrange:adjectif:qualificatif:::
+adj.:2020:naturel:adjectif:qualificatif:::
+numér.:2000:quinze:adjectif:numérique:cardinal::
+adj.:1952:gris:adjectif:qualificatif:::
+adj.:1934:faible:adjectif:qualificatif:::
+adj.:1921:difficile:adjectif:qualificatif:::
+adj.:1856:grave:adjectif:qualificatif:::
+adj.:1818:impossible:adjectif:qualificatif:::
+adj.:1813:prêt:adjectif:qualificatif:::
+adj.:1792:large:adjectif:qualificatif:::
+adj.:1769:immobile:adjectif:qualificatif:::
+adj.:1756:juste:adjectif:qualificatif:::
+adj.:1751:vivant:adjectif:qualificatif:::
+adj.:1733:vif:adjectif:qualificatif:::
+adj.:1679:moyen:adjectif:qualificatif:::
+adj.:1676:tranquille:adjectif:qualificatif:::
+adj.:1675:unique:adjectif:qualificatif:::
+adj.:1649:supérieur:adjectif:qualificatif:::
+adj.:1638:sec:adjectif:qualificatif:::
+numér.:1591:douze:adjectif:numérique:cardinal::
+adj.:1578:ouvert:adjectif:qualificatif:::
+adj.:1571:meilleur:adjectif:qualificatif:::
+adj.:1527:faux:adjectif:qualificatif:::
+adj.:1526:énorme:adjectif:qualificatif:::
+adj.:1506:puissant:adjectif:qualificatif:::
+adj.:1497:inconnu:adjectif:qualificatif:::
+adj.:1489:beaux:adjectif:qualificatif:::
+adj.:1446:particulier:adjectif:qualificatif:::
+adj.:1438:vide:adjectif:qualificatif:::
+adj.:1431:second:adjectif:numérique:ordinal::
+adj.:1422:lourd:adjectif:qualificatif:::
+adj.:1422:véritable:adjectif:qualificatif:::
+adj.:1419:vaste:adjectif:qualificatif:::
+adj.:1418:nu:adjectif:qualificatif:::
+numér.:1390:un:adjectif:numérique:cardinal::
+adj.:1386:court:adjectif:qualificatif:::
+adj.:1384:semblable:adjectif:qualificatif:::
+adj.:1379:frais:adjectif:qualificatif:::
+adj.:1369:mort:adjectif:qualificatif:::
+adj.:1366:étranger:adjectif:qualificatif:::
+adj.:1360:jaune:adjectif:qualificatif:::
+adj.:1351:rapide:adjectif:qualificatif:::
+adj.:1350:digne:adjectif:qualificatif:::
+adj.:1349:chaud:adjectif:qualificatif:::
+adj.:1336:clair:adjectif:qualificatif:::
+adj.:1301:secret:adjectif:qualificatif:::
+adj.:1287:capable:adjectif:qualificatif:::
+adj.:1280:facile:adjectif:qualificatif:::
+adj.:1276:fier:adjectif:qualificatif:::
+adj.:1265:saint:adjectif:qualificatif:::
+adj.:1247:demi:adjectif:qualificatif:::
+adj.:1246:calme:adjectif:qualificatif:::
+adj.:1222:rare:adjectif:qualificatif:::
+adj.:1205:intérieur:adjectif:qualificatif:::
+adj.:1199:complet:adjectif:qualificatif:::
+adj.:1191:suivant:adjectif:qualificatif:::
+adj.:1181:étroit:adjectif:qualificatif:::
+adj.:1175:égal:adjectif:qualificatif:::
+adj.:1166:violent:adjectif:qualificatif:::
+adj.:1156:magnifique:adjectif:qualificatif:::
+adj.:1136:prochain:adjectif:qualificatif:::
+adj.:1115:malade:adjectif:qualificatif:::
+adj.:1075:fait:adjectif:qualificatif:::
+adj.:1063:éternel:adjectif:qualificatif:::
+adj.:1053:sauvage:adjectif:qualificatif:::
+adj.:1046:double:adjectif:qualificatif:::
+adj.:1039:tendre:adjectif:qualificatif:::
+adj.:1022:droit:adjectif:qualificatif:::
+adj.:1022:sérieux:adjectif:qualificatif:::
+adj.:1014:dur:adjectif:qualificatif:::
+adj.:1010:neuf:adjectif:qualificatif:::
+adj.:1000:vague:adjectif:qualificatif:::
+adj.:993:inutile:adjectif:qualificatif:::
+adj.:992:content:adjectif:qualificatif:::
+adj.:970:dangereux:adjectif:qualificatif:::
+adj.:954:épais:adjectif:qualificatif:::
+adj.:949:nombreux:adjectif:qualificatif:::
+adj.:948:muet:adjectif:qualificatif:::
+adj.:937:réel:adjectif:qualificatif:::
+adj.:930:sourd:adjectif:qualificatif:::
+adj.:929:cruel:adjectif:qualificatif:::
+adj.:914:troisième:adjectif:qualificatif:::
+adj.:906:vieil:adjectif:qualificatif:::
+adj.:901:droite:adjectif:qualificatif:::
+adj.:899:drôle:adjectif:qualificatif:::
+adj.:892:voisin:adjectif:qualificatif:::
+adj.:890:militaire:adjectif:qualificatif:::
+adj.:869:rose:adjectif:qualificatif:::
+adj.:869:silencieux:adjectif:qualificatif:::
+adj.:868:anglais:adjectif:qualificatif:::
+adj.:831:fidèle:adjectif:qualificatif:::
+adj.:822:gauche:adjectif:qualificatif:::
+adj.:822:présent:adjectif:qualificatif:::
+adj.:814:extraordinaire:adjectif:qualificatif:::
+adj.:803:divers:adjectif:qualificatif:::
+adj.:800:mince:adjectif:qualificatif:::
+adj.:781:passé:adjectif:qualificatif:::
+adj.:779:fine:adjectif:qualificatif:::
+adj.:779:fixe:adjectif:qualificatif:::
+adj.:774:rond:adjectif:qualificatif:::
+adj.:746:humide:adjectif:qualificatif:::
+adj.:738:curieux:adjectif:qualificatif:::
+adj.:715:précieux:adjectif:qualificatif:::
+adj.:714:précis:adjectif:qualificatif:::
+adj.:694:noire:adjectif:qualificatif:::
+adj.:690:nerveux:adjectif:qualificatif:::
+dét.:690:nul:adjectif:indéfini:::
+adj.:689:commun:adjectif:qualificatif:::
+adj.:684:claire:adjectif:qualificatif:::
+adj.:680:haute:adjectif:qualificatif:::
+adj.:676:âgé:adjectif:qualificatif:::
+adj.:664:absolu:adjectif:qualificatif:::
+adj.:652:blond:adjectif:qualificatif:::
+adj.:643:fin:adjectif:qualificatif:::
+adj.:627:visible:adjectif:qualificatif:::
+adj.:625:perdu:adjectif:qualificatif:::
+::quel:adjectif:exclamatif::DOUBLE DET/ADJ:mots-outils
+adv.:186755:ne:adverbe:négation:::mots-outils
+adv.:103083:pas:adverbe:négation:::mots-outils
+adv.:75499:plus:adverbe::::mots-outils
+conj.:59902:comme:adverbe:::ERROR:mots-outils
+adv.:37171:bien:adverbe::::x
+adv.:32024:si:adverbe::::mots-outils
+adv.:22695:là:adverbe::::mots-outils
+adv.:19994:même:adverbe::::mots-outils
+adv.:19915:tout:adverbe::::mots-outils
+adv.:19176:encore:adverbe::::mots-outils
+adv.:18311:aussi:adverbe::::mots-outils
+adv.:16251:peu:adverbe::::mots-outils
+adv.:15639:alors:adverbe::::mots-outils
+adv.:14336:toujours:adverbe:::jamais:mots-outils
+adv.:14255:jamais:adverbe:::toujours:mots-outils
+adv.:14039:non:adverbe:::oui:mots-outils
+adv.:12432:très:adverbe::::mots-outils
+adv.:11296:ainsi:adverbe::::mots-outils
+adv.:9472:moins:adverbe::::x
+adv.:9098:ici:adverbe::::mots-outils
+adv.:9005:oui:adverbe:::non:mots-outils
+adv.:8686:trop:adverbe::::mots-outils
+adv.:8170:déjà:adverbe::::mots-outils
+adv.:7960:tant:adverbe::::mots-outils
+adv.:7126:enfin:adverbe::::mots-outils
+adv.:7024:maintenant:adverbe::::mots-outils
+adv.:6399:beaucoup:adverbe::::mots-outils
+adv.:6090:assez:adverbe::::mots-outils
+adv.:5996:loin:adverbe:::proche:x
+adv.:5961:point:adverbe::::x
+adv.:5662:presque:adverbe::::mots-outils
+adv.:5629:ailleurs:adverbe::::mots-outils
+adv.:5544:seulement:adverbe::::mots-outils
+adv.:4915:aujourd'hui:adverbe::::le temps
+adv.:4881:mieux:adverbe::::x
+adv.:4764:autour:adverbe::::mots-outils
+conj.:4700:pourquoi:adverbe:interrogatif::ERROR:mots-outils
+adv.:4665:souvent:adverbe::::mots-outils
+adv.:4657:dessus:adverbe::::mots-outils
+adv.:4355:longtemps:adverbe::::le temps
+adv.:4350:fort:adverbe::::x
+adv.:4324:comme:adverbe::::mots-outils
+adv.:4163:comment:adverbe::::mots-outils
+adv.:3834:autant:adverbe::::x
+adv.:3783:d'abord:adverbe::::mots-outils
+adv.:3669:surtout:adverbe::::mots-outils
+adv.:3508:cependant:adverbe::::mots-outils
+adv.:3465:vite:adverbe::::x
+adv.:3281:tard:adverbe::::le temps
+adv.:3271:pourtant:adverbe::::mots-outils
+adv.:3223:ci:adverbe::::mots-outils
+adv.:3097:mal:adverbe::::x
+adv.:3076:parfois:adverbe::::le temps
+adv.:2960:vraiment:adverbe::::x
+adv.:2839:bientôt:adverbe::::x
+adv.:2810:partout:adverbe::::x
+conj.:2721:comment:adverbe:interrogatif:ERROR::mots-outils
+adv.:2515:debout:adverbe::::x
+adv.:2328:plutôt:adverbe::::x
+adv.:2281:lentement:adverbe::::x
+adv.:2280:combien:adverbe::::mots-outils
+adv.:2141:hier:adverbe::::
+adv.:2131:pourquoi:adverbe::::
+adv.:2100:également:adverbe::::
+adv.:2083:quelque:adverbe::::
+adv.:2076:demain:adverbe::::
+adv.:2068:aussitôt:adverbe::::
+adv.:2032:ensuite:adverbe::::
+adv.:2013:puis:adverbe::::
+adv.:1953:ensemble:adverbe::::
+adv.:1894:près:adverbe::::
+adv.:1882:après:adverbe::::
+adv.:1740:autrefois:adverbe::::
+adv.:1680:en:adverbe::::
+adv.:1620:doucement:adverbe::::
+adv.:1568:soudain:adverbe::::
+adv.:1527:depuis:adverbe::::
+adv.:1505:simplement:adverbe::::
+adv.:1504:environ:adverbe::::
+adv.:1504:tellement:adverbe::::
+adv.:1491:dehors:adverbe::::
+adv.:1490:certes:adverbe::::
+adv.:1485:brusquement:adverbe::::
+adv.:1372:avant:adverbe::::
+adv.:1356:etc:adverbe::::
+adv.:1307:tantôt:adverbe::::
+adv.:1253:haut:adverbe::::
+adv.:1218:davantage:adverbe::::
+adv.:1163:devant:adverbe::::
+adv.:1136:delà:adverbe::::
+adv.:1124:tôt:adverbe::::
+adv.:1105:avec:adverbe::::
+adv.:1044:guère:adverbe::::
+adv.:946:absolument:adverbe::::
+adv.:924:rapidement:adverbe::::
+adv.:918:lors:adverbe::::
+adv.:899:autrement:adverbe::::
+adv.:855:parfaitement:adverbe::::
+adv.:833:désormais:adverbe::::
+adv.:815:complètement:adverbe::::
+adv.:800:naturellement:adverbe:qualificatif::ERROR:
+adv.:730:profondément:adverbe::::
+adv.:696:certainement:adverbe::::
+adv.:655:beau:adverbe::::
+adv.:620:bas:adverbe::::
+dét.:1050561:le:article:défini:::mots-outils
+dét.:419564:un:article:indéfini:::mots-outils
+dét.:127384:du:article:partitif:::mots-outils
+dét.:123502:au:article:défini:contracté:à le:mots-outils
+dét.:119106:de:article:partitif::il n'y a pas de pain:mots-outils
+dét.:8419:chaque:article:indéfini:::mots-outils
+::du:article:contracté::de le:mots-outils
+::de:article:indéfini::il y a de grands arbres:mots-outils
+conj.:362093:et:conjonction:coordination:::mots-outils
+conj.:176161:que:conjonction:subordination:::mots-outils
+conj.:57690:mais:conjonction:coordination:::mots-outils
+conj.:34897:ou:conjonction:coordination:::mots-outils
+conj.:25592:quand:conjonction:subordination:::mots-outils
+conj.:24024:si:conjonction:subordination:::mots-outils
+conj.:14257:puis:conjonction:subordination:::mots-outils
+conj.:13562:donc:conjonction:coordination:::mots-outils
+conj.:11695:car:conjonction:coordination:::mots-outils
+conj.:11640:ni:conjonction:coordination:::mots-outils
+conj.:7824:parce que:conjonction:subordination:::mots-outils
+conj.:4041:lorsque:conjonction:subordination:::mots-outils
+conj.:3189:tandis que:conjonction:subordination:::mots-outils
+conj.:3139:puisque:conjonction:subordination:::mots-outils
+conj.:2297:soit:conjonction:subordination:::mots-outils
+conj.:1940:or:conjonction:coordination:::mots-outils
+interj.:6138:ah:interjection::::figés
+interj.:4766:oh:interjection::::figés
+interj.:4584:eh:interjection::::figés
+subst.:33202:homme:nom:masculin:::l'homme
+subst.:30082:mari:nom:masculin:::l'homme
+subst.:26148:femme:nom:féminin:::l'homme
+subst.:22232:jour:nom:masculin:nuit::le temps
+subst.:17166:mer:nom:féminin:::la nature
+subst.:16785:temps:nom:masculin:::le temps
+subst.:15540:main:nom:féminin:::le corps
+subst.:15524:chose:nom:féminin:::la vie
+subst.:15241:vie:nom:féminin:::la vie
+subst.:14981:yeux:nom:masculin pluriel:::le corps
+subst.:13940:heure:nom:féminin:::le temps
+subst.:13737:monde:nom:masculin:::la nature
+subst.:13348:enfant:nom:mixte:::l'homme
+subst.:13191:fois:nom:féminin:::x
+subst.:12274:moment:nom:masculin:::le temps
+subst.:11999:tête:nom:féminin:::le corps
+subst.:11854:père:nom:masculin:::la famille
+subst.:11842:fille:nom:féminin:::la famille
+subst.:11312:coeur:nom:masculin:::le corps
+subst.:11274:an:nom:masculin:::le temps
+subst.:10786:terre:nom:féminin:::la nature
+subst.:10661:dieu:nom:masculin:::la religion
+subst.:10489:monsieur:nom:masculin:::l'homme
+subst.:10469:voix:nom:féminin:::le corps
+subst.:10287:maison:nom:féminin:::la maison
+subst.:9991:coup:nom:masculin:::x
+subst.:9755:air:nom:masculin:::la nature
+subst.:9752:mot:nom:masculin:::la nature
+subst.:9694:nuit:nom:féminin:jour::le temps
+subst.:9603:eau:nom:féminin:::la nature
+subst.:8744:ami:nom:masculin:::les relations
+subst.:8649:porte:nom:féminin:::la maison
+subst.:8283:amour:nom:masculin:::les relations
+subst.:8040:pied:nom:masculin:::le corps
+subst.:7944:gens:nom:masculin:::les relations
+subst.:7795:nom:nom:masculin:::les relations
+subst.:7451:pays:nom:masculin:::les pays
+subst.:7433:ciel:nom:masculin:::la nature
+subst.:7415:frère:nom:masculin:::la famille
+subst.:7399:regard:nom:masculin:::le corps
+subst.:7255:âme:nom:féminin:::la religion
+subst.:7245:côté:nom:masculin:::x
+subst.:7182:mort:nom:féminin:::la vie
+subst.:7031:esprit:nom:masculin:::l'esprit
+subst.:6983:ville:nom:masculin:::la ville
+subst.:6923:rue:nom:féminin:::la ville
+subst.:6877:soir:nom:masculin:::le temps
+subst.:6835:chambre:nom:féminin:::la maison
+subst.:6751:pas:nom:masculin:::le mouvement
+subst.:6692:soleil:nom:masculin:::la nature
+subst.:6588:roi:nom:masculin:::la politique
+subst.:6489:état:nom:masculin:::la politique
+subst.:6425:corps:nom:masculin:::le corps
+subst.:6304:bras:nom:masculin:::le corps
+subst.:6178:place:nom:féminin:::le mouvement
+subst.:6102:parti:nom:masculin:::la politique
+subst.:6004:année:nom:féminin:::le temps
+subst.:5954:visage:nom:masculin:::le corps
+subst.:5946:bruit:nom:masculin:::x
+subst.:5946:lettre:nom:féminin:::x
+subst.:5922:franc:nom:masculin:::x
+subst.:5861:fond:nom:masculin:::x
+subst.:5835:force:nom:féminin:::x
+subst.:5829:effet:nom:masculin:::x
+subst.:5706:milieu:nom:masculin:::x
+subst.:5702:saint:nom:masculin:::la religion
+subst.:5686:idée:nom:féminin:::l'esprit
+subst.:5623:travail:nom:masculin:::x
+subst.:5622:lumière:nom:féminin:::la nature
+subst.:5527:mois:nom:masculin:::le temps
+subst.:5520:fils:nom:masculin:::la famille
+subst.:5481:raison:nom:féminin:::x
+subst.:5470:gouvernement:nom:masculin:::la politique
+subst.:5416:point:nom:masculin:::x
+subst.:5391:personne:nom:féminin:::l'homme
+subst.:5349:peuple:nom:masculin:::l'homme
+subst.:5343:fait:nom:masculin:::x
+subst.:5295:parole:nom:féminin:::la parole
+subst.:5273:guerre:nom:féminin:::la politique
+subst.:5214:pensée:nom:féminin:::l'esprit
+subst.:5179:affaire:nom:féminin:::le commerce
+subst.:5145:matin:nom:masculin:::le temps
+subst.:5127:pierre:nom:féminin:::la nature
+subst.:5002:vent:nom:masculin:::la nature
+subst.:4977:doute:nom:masculin:::x
+subst.:4969:front:nom:masculin:::le corps
+subst.:4939:ombre:nom:féminin:::la nature
+subst.:4932:part:nom:féminin:::x
+subst.:4916:maître:nom:masculin:::x
+subst.:4908:question:nom:féminin:::la parole
+subst.:4908:besoin:nom:masculin:::x
+subst.:4859:peine:nom:féminin:::x
+subst.:4836:tour:nom:masculin:::le mouvement
+subst.:4705:famille:nom:féminin:::la famille
+subst.:4653:madame:nom:féminin:::l'homme
+subst.:4635:sorte:nom:féminin:::x
+subst.:4618:figure:nom:féminin:::x
+subst.:4595:droit:nom:masculin:::la politique
+subst.:4574:peur:nom:féminin:::x
+subst.:4571:bout:nom:masculin:::x
+subst.:4554:lieu:nom:masculin:::le mouvement
+subst.:4541:silence:nom:masculin:::x
+subst.:4503:chef:nom:masculin:::la politique
+subst.:4460:bois:nom:masculin:::la nature
+subst.:4457:mari:nom:masculin:::la famille
+subst.:4451:histoire:nom:féminin:::x
+subst.:4429:feu:nom:masculin:::la nature
+subst.:4271:partie:nom:féminin:::x
+subst.:4236:face:nom:féminin:::x
+subst.:4231:mouvement:nom:masculin:::le mouvement
+subst.:4217:fin:nom:féminin:::x
+subst.:4155:route:nom:féminin:::la ville
+subst.:4097:livre:nom:masculin:::l'esprit
+subst.:4070:arbre:nom:masculin:::la nature
+subst.:4058:cas:nom:masculin:::x
+subst.:4034:mur:nom:masculin:::x
+subst.:4028:ordre:nom:masculin:::x
+subst.:3994:est:nom:masculin:::x
+subst.:3978:bonheur:nom:masculin:::x
+subst.:3922:intérêt:nom:masculin:::x
+subst.:3876:argent:nom:masculin:::x
+subst.:3856:cause:nom:féminin:::x
+subst.:3825:travers:nom:masculin:::x
+subst.:3809:grand:nom:masculin:::x
+subst.:3807:instant:nom:masculin:::x
+subst.:3784:façon:nom:féminin:::x
+subst.:3783:oeil:nom:masculin:::le corps
+subst.:3763:forme:nom:féminin:::x
+subst.:3711:chemin:nom:masculin:::x
+subst.:3704:cheveu:nom:masculin:::le corps
+subst.:3656:plaisir:nom:masculin:::x
+subst.:3639:suite:nom:féminin:::x
+subst.:3571:sang:nom:masculin:::le corps
+subst.:3548:sentiment:nom:masculin:::les relations
+subst.:3516:fleur:nom:féminin:::la nature
+subst.:3498:service:nom:féminin:::x
+subst.:3472:table:nom:féminin:::manger et boire
+subst.:3446:paix:nom:féminin:::la politique
+subst.:3444:moyen:nom:masculin:::x
+subst.:3410:lit:nom:masculin:::la maison
+subst.:3387:voiture:nom:féminin:::x
+subst.:3345:être:nom:masculin:::la vie
+subst.:3335:nature:nom:féminin:::la nature
+subst.:3326:or:nom:masculin:::x
+subst.:3309:pouvoir:nom:masculin:::la vie
+subst.:3307:nouveau:nom:masculin:::x
+subst.:3292:joie:nom:féminin:::x
+subst.:3272:président:nom:masculin:::la politique
+subst.:3266:bouche:nom:féminin:::le corps
+subst.:3256:petit:nom:masculin:::x
+subst.:3245:sens:nom:masculin:::le corps
+subst.:3240:cri:nom:masculin:::la parole
+subst.:3238:espèce:nom:féminin:::les animaux
+subst.:3237:cheval:nom:masculin:::les animaux
+subst.:3236:loi:nom:féminin:::la politique
+subst.:3145:ministre:nom:masculin:::la politique
+subst.:3079:société:nom:féminin:::la politique
+subst.:3071:politique:nom:masculin:::la politique
+subst.:3063:oreille:nom:féminin:::le corps
+subst.:3046:fenêtre:nom:féminin:::la maison
+subst.:3010:fortune:nom:féminin:::le commerce
+subst.:3002:compte:nom:masculin:::le commerce
+subst.:2979:champ:nom:masculin:::la campagne
+subst.:2961:manier:verbe:::ERROR:manipuler
+subst.:2942:action:nom:féminin:::x
+subst.:2914:garçon:nom:masculin:::l'homme
+subst.:2906:exemple:nom:masculin:::x
+subst.:2890:couleur:nom:féminin:::les couleurs
+subst.:2875:papier:nom:masculin:::x
+subst.:2861:mal:nom:masculin:::x
+subst.:2820:pièce:nom:féminin:::x
+subst.:2818:montagne:nom:féminin:::la nature
+subst.:2812:sol:nom:masculin:::la nature
+subst.:2811:oeuvre:nom:féminin:::x
+subst.:2797:cours:nom:masculin:::l'école
+subst.:2790:désir:nom:masculin:::l'esprit
+subst.:2776:cour:nom:féminin:::x
+subst.:2753:bord:nom:masculin:::x
+subst.:2749:douleur:nom:féminin:::x
+subst.:2732:salle:nom:féminin:::x
+subst.:2722:premier:nom:masculin:::les nombres
+subst.:2715:projet:nom:masculin:::x
+subst.:2701:étude:nom:féminin:::l'esprit
+subst.:2699:journal:nom:masculin:::x
+subst.:2697:geste:nom:masculin:::x
+subst.:2664:situation:nom:féminin:::x
+subst.:2661:oiseau:nom:féminin:::les animaux
+subst.:2647:siècle:nom:masculin:::le temps
+subst.:2633:million:nom:masculin:::les nombres
+subst.:2616:prix:nom:masculin:::le commerce
+subst.:2612:groupe:nom:masculin:::x
+subst.:2610:centre:nom:masculin:::x
+subst.:2603:malheur:nom:masculin:::x
+subst.:2602:honneur:nom:masculin:::x
+subst.:2575:garde:nom:féminin:::x
+subst.:2547:problème:nom:masculin:::x
+subst.:2546:larme:nom:féminin:::x
+subst.:2539:chien:nom:masculin:::les animaux
+subst.:2534:peau:nom:féminin:::le corps
+subst.:2530:reste:nom:masculin:::x
+subst.:2517:nombre:nom:masculin:::les nombres
+subst.:2514:mesure:nom:féminin:::x
+subst.:2507:article:nom:masculin:::x
+subst.:2502:vue:nom:féminin:::le corps
+subst.:2490:âge:nom:masculin:::l'homme
+subst.:2483:système:nom:masculin:::x
+subst.:2482:long:adjectif:qualificatif::ERROR:x
+subst.:2468:effort:nom:masculin:::x
+subst.:2455:rêve:nom:masculin:::l'esprit
+subst.:2448:passion:nom:féminin:::les relations
+subst.:2426:rapport:nom:masculin:::x
+subst.:2398:soldat:nom:masculin:::x
+subst.:2397:lèvre:nom:féminin:::le corps
+subst.:2397:signe:nom:masculin:::x
+subst.:2390:vérité:nom:féminin:::x
+subst.:2386:mariage:nom:masculin:::les relations
+subst.:2365:plan:nom:masculin:::x
+subst.:2348:dos:nom:masculin:::le corps
+subst.:2341:marche:nom:féminin:::le mouvement
+subst.:2334:souvenir:nom:masculin:::l'esprit
+subst.:2333:dame:nom:féminin:::l'homme
+subst.:2318:conseil:nom:masculin:::x
+subst.:2314:sou:nom:masculin:::x
+subst.:2306:coin:nom:masculin:::x
+subst.:2303:jardin:nom:masculin:::x
+subst.:2289:doigt:nom:masculin:::le corps
+subst.:2288:objet:nom:masculin:::x
+subst.:2284:fer:nom:masculin:::la nature
+subst.:2281:lendemain:nom:masculin:::le temps
+subst.:2259:train:nom:masculin:::le mouvement
+subst.:2256:papa:nom:masculin:::la famille
+subst.:2252:valeur:nom:féminin:::
+subst.:2247:jeu:nom:masculin:::
+subst.:2234:secret:nom:masculin:::
+subst.:2233:haut:adjectif:qualificatif::ERROR:
+subst.:2226:vieillard:nom:masculin:::
+subst.:2222:docteur:nom:masculin:::
+subst.:2213:ton:nom:masculin:::
+subst.:2204:jambe:nom:féminin:::le corps
+subst.:2194:endroit:nom:masculin:::
+subst.:2192:minute:nom:féminin:::le temps
+subst.:2190:nuage:nom:masculin:::la nature
+subst.:2187:présence:nom:féminin:::
+subst.:2163:épaule:nom:féminin:::le corps
+subst.:2155:feuille:nom:féminin:::la nature
+subst.:2155:liberté:nom:féminin:::
+subst.:2149:journée:nom:féminin:::le temps
+subst.:2143:avenir:nom:masculin:::
+subst.:2142:sourire:nom:masculin:::
+subst.:2136:résultat:nom:masculin:::
+subst.:2125:hôtel:nom:féminin:::
+subst.:2124:semaine:nom:féminin:::le temps
+subst.:2122:forêt:nom:féminin:::la nature
+subst.:2116:qualité:nom:féminin:::
+subst.:2108:prince:nom:masculin:::
+subst.:2101:bien:nom:masculin:::
+subst.:2093:médecin:nom:masculin:::
+subst.:2087:volonté:nom:féminin:::
+subst.:2086:seigneur:nom:masculin:::
+subst.:2077:art:nom:masculin:::
+subst.:2070:foule:nom:féminin:::
+subst.:2068:ligne:nom:féminin:::
+subst.:2061:intérieur:nom:masculin:::
+subst.:2054:beauté:nom:féminin:::
+subst.:2025:soin:nom:masculin:::
+subst.:2017:hasard:nom:masculin:::
+subst.:2006:condition:nom:féminin:::
+subst.:1997:classe:nom:féminin:::
+subst.:1996:voyage:nom:féminin:::
+subst.:1990:expression:nom:féminin:::
+subst.:1955:présent:nom:masculin:::
+subst.:1953:caractère:nom:masculin:::
+subst.:1952:attention:nom:féminin:::
+subst.:1925:scène:nom:féminin:::
+subst.:1921:français:nom:masculin:::les pays
+subst.:1920:foi:nom:féminin:::
+subst.:1913:odeur:nom:féminin:::
+subst.:1912:musique:nom:féminin:::
+subst.:1909:oncle:nom:masculin:::la famille
+subst.:1906:événement:nom:masculin:::
+subst.:1905:village:nom:masculin:::la campagne
+subst.:1903:envie:nom:féminin:::
+subst.:1902:midi:nom:masculin:::le temps
+subst.:1896:herbe:nom:féminin:::la nature
+subst.:1896:vieux:nom:masculin:::
+subst.:1895:pluie:nom:féminin:::la nature
+subst.:1892:bas:adjectif:qualificatif::ERROR:
+subst.:1882:général:nom:masculin:::
+subst.:1880:lutte:nom:féminin:::
+subst.:1877:réponse:nom:féminin:::
+subst.:1873:grâce:nom:féminin:::
+subst.:1872:espace:nom:masculin:::
+subst.:1866:habitude:nom::::
+subst.:1861:existence:nom::::
+subst.:1861:mémoire:nom::::
+subst.:1845:verre:nom::::
+subst.:1840:campagne:nom::::
+subst.:1832:juge:nom::::
+subst.:1827:genou:nom::::
+subst.:1816:fête:nom::::
+subst.:1792:parent:nom::::
+subst.:1790:colère:nom::::
+subst.:1788:étoile:nom::::
+subst.:1787:devoir:nom::::
+subst.:1784:conscience:nom::::
+subst.:1756:puissance:nom::::
+subst.:1755:matière:nom::::
+subst.:1754:sable:nom::::
+subst.:1746:accord:nom::::
+subst.:1745:hiver:nom::::
+subst.:1744:retour:nom::::
+subst.:1736:genre:nom::::
+subst.:1725:acte:nom::::
+subst.:1724:image:nom::::
+subst.:1722:horizon:nom::::
+subst.:1717:danger:nom::::
+subst.:1716:rôle:nom::::
+subst.:1711:escalier:nom::::
+subst.:1708:goût:nom::::
+subst.:1706:bête:nom::::
+subst.:1705:recherche:nom::::
+subst.:1704:membre:nom::::
+subst.:1700:pain:nom::::
+subst.:1697:phrase:nom::::
+subst.:1692:rire:nom::::
+subst.:1687:terme:nom::::
+subst.:1680:eaux:nom::::
+subst.:1678:police:nom::::
+subst.:1678:rocher:nom::::
+subst.:1667:type:nom::::
+subst.:1656:vin:nom::::
+subst.:1636:justice:nom::::
+subst.:1635:époque:nom::::
+subst.:1635:passage:nom::::
+subst.:1635:somme:nom::::
+subst.:1634:science:nom::::
+subst.:1626:côte:nom::::
+subst.:1617:gauche:nom::::
+subst.:1613:faute:nom::::
+subst.:1612:école:nom::::
+subst.:1603:bon:nom::::
+subst.:1603:ensemble:nom::::
+subst.:1602:rayon:nom::::
+subst.:1598:sujet:nom::::
+subst.:1585:dernier:nom::::
+subst.:1582:avis:nom::::
+subst.:1573:poète:nom::::
+subst.:1570:paysan:nom::::
+subst.:1568:chair:nom::::
+subst.:1561:succès:nom::::
+subst.:1558:île:nom::::
+subst.:1544:détail:nom::::
+subst.:1543:arme:nom::::
+subst.:1543:réalité:nom::::
+subst.:1539:confiance:nom::::
+subst.:1539:masse:nom::::
+subst.:1537:crise:nom::::
+subst.:1535:poste:nom::::
+subst.:1524:principe:nom::::
+subst.:1517:direction:nom::::
+subst.:1514:taille:nom::::
+subst.:1512:santé:nom::::
+subst.:1511:ventre:nom::::
+subst.:1508:marché:nom::::
+subst.:1507:entrée:nom::::
+subst.:1498:trou:nom::::
+subst.:1495:pont:nom::::
+subst.:1494:lune:nom::::
+subst.:1489:robe:nom::::
+subst.:1486:cesse:nom::::
+subst.:1482:source:nom::::
+subst.:1475:espoir:nom::::
+subst.:1471:camarade:nom::::
+subst.:1470:dent:nom::::
+subst.:1469:connaissance:nom::::
+subst.:1469:cou:nom::::
+subst.:1466:but:nom::::
+subst.:1460:vague:nom::::
+subst.:1459:élément:nom::::
+subst.:1457:fil:nom::::
+subst.:1457:voie:nom::::
+subst.:1453:nez:nom::::
+subst.:1443:discours:nom::::
+subst.:1443:maladie:nom::::
+subst.:1442:chaleur:nom::::
+subst.:1440:gloire:nom::::
+subst.:1434:aide:nom::::
+subst.:1432:début:nom::::
+subst.:1432:ennemi:nom::::
+subst.:1426:aile:nom::::
+subst.:1426:flamme:nom::::
+subst.:1422:chaise:nom::::
+subst.:1422:sein:nom::::
+subst.:1421:toit:nom::::
+subst.:1413:poussière:nom::::
+subst.:1411:nord:nom::::
+subst.:1393:émotion:nom::::
+subst.:1388:révolution:nom::::
+subst.:1388:théâtre:nom::::
+subst.:1386:armée:nom::::
+subst.:1385:noir:nom::::
+subst.:1384:appartement:nom::::
+subst.:1382:haine:nom::::
+subst.:1382:jeune:nom::::
+subst.:1381:position:nom::::
+subst.:1381:seconde:nom::::
+subst.:1378:appel:nom::::
+subst.:1370:arrière:nom::::
+subst.:1370:droite:nom::::
+subst.:1370:poitrine:nom::::
+subst.:1368:jeunesse:nom::::
+subst.:1367:bureau:nom::::
+subst.:1367:sac:nom::::
+subst.:1363:courage:nom::::
+subst.:1360:page:nom::::
+subst.:1359:étranger:nom::::
+subst.:1353:miser:nom::::
+subst.:1352:passé:nom::::
+subst.:1349:propos:nom::::
+subst.:1327:occasion:nom::::
+subst.:1325:voile:nom::::
+subst.:1322:importance:nom::::
+subst.:1322:quartier:nom::::
+subst.:1318:auteur:nom::::
+subst.:1316:religion:nom::::
+subst.:1314:palais:nom::::
+subst.:1309:flot:nom::::
+subst.:1309:intelligence:nom::::
+subst.:1307:voisin:nom::::
+subst.:1305:carte:nom::::
+subst.:1296:animal:nom::::
+subst.:1293:été:nom::::
+subst.:1292:cabinet:nom::::
+subst.:1292:morceau:nom::::
+subst.:1286:souffrance:nom::::
+subst.:1284:titre:nom::::
+subst.:1282:désert:nom::::
+subst.:1280:spectacle:nom::::
+subst.:1276:départ:nom::::
+subst.:1268:demande:nom::::
+subst.:1267:lueur:nom::::
+subst.:1266:joue:nom::::
+subst.:1264:prière:nom::::
+subst.:1260:fonction:nom::::
+subst.:1251:aspect:nom::::
+subst.:1251:sommeil:nom::::
+subst.:1249:éclat:nom::::
+subst.:1248:moitié:nom::::
+subst.:1244:contraire:nom::::
+subst.:1239:colline:nom::::
+subst.:1223:terrain:nom::::
+subst.:1221:poids:nom::::
+subst.:1219:changement:nom::::
+subst.:1218:charge:nom::::
+subst.:1211:poche:nom::::
+subst.:1208:son:nom::::
+subst.:1204:veille:nom::::
+subst.:1200:fruit:nom::::
+subst.:1192:croix:nom::::
+subst.:1185:trésor:nom::::
+subst.:1184:compagnie:nom::::
+subst.:1180:cuisine:nom::::
+subst.:1174:empire:nom::::
+subst.:1170:nation:nom::::
+subst.:1167:conversation:nom::::
+subst.:1166:soirée:nom::::
+subst.:1164:impression:nom::::
+subst.:1164:trait:nom::::
+subst.:1154:désespoir:nom::::
+subst.:1153:témoin:nom::::
+subst.:1152:visite:nom::::
+subst.:1148:respect:nom::::
+subst.:1142:solitude:nom::::
+subst.:1135:anglais:nom::::
+subst.:1127:officier:nom::::
+subst.:1125:fauteuil:nom::::
+subst.:1118:relation:nom::::
+subst.:1117:fumée:nom::::
+subst.:1115:branche:nom::::
+subst.:1113:circonstance:nom::::
+subst.:1113:ouvrage:nom::::
+subst.:1108:compagnon:nom::::
+subst.:1106:expérience:nom::::
+subst.:1106:port:nom::::
+subst.:1099:goutte:nom::::
+subst.:1098:chant:nom::::
+subst.:1087:combat:nom::::
+subst.:1086:personnage:nom::::
+subst.:1085:aventure:nom::::
+subst.:1081:absence:nom::::
+subst.:1079:machine:nom::::
+subst.:1077:chaîne:nom::::
+subst.:1076:honte:nom::::
+subst.:1072:faim:nom::::
+subst.:1072:plaine:nom::::
+subst.:1066:pointe:nom::::
+subst.:1065:preuve:nom::::
+subst.:1060:bataille:nom::::
+subst.:1060:énergie:nom::::
+subst.:1055:victime:nom::::
+subst.:1052:usage:nom::::
+subst.:1045:tache:nom::::
+subst.:1043:hauteur:nom::::
+subst.:1037:beau:nom::::
+subst.:1037:curiosité:nom::::
+subst.:1031:glace:nom::::
+subst.:1027:froid:nom::::
+subst.:1024:prison:nom::::
+subst.:1023:étage:nom::::
+subst.:1022:billet:nom::::
+subst.:1019:pauvre:nom::::
+subst.:1019:rose:nom::::
+subst.:1014:attitude:nom::::
+subst.:1012:mode:nom::::
+subst.:1006:crainte:nom::::
+subst.:1003:vêtement:nom::::
+subst.:998:violence:nom::::
+subst.:992:courant:nom::::
+subst.:992:folie:nom::::
+subst.:992:pitié:nom::::
+subst.:988:intention:nom::::
+subst.:985:trace:nom::::
+subst.:980:toile:nom::::
+subst.:972:blanc:nom::::
+subst.:967:poésie:nom::::
+subst.:962:sommet:nom::::
+subst.:956:avance:nom::::
+subst.:955:autorité:nom::::
+subst.:953:inquiétude:nom::::
+subst.:952:choix:nom::::
+subst.:951:tombe:nom::::
+subst.:950:marchand:nom::::
+subst.:944:cercle:nom::::
+subst.:940:défaut:nom::::
+subst.:938:enfance:nom::::
+subst.:937:faveur:nom::::
+subst.:928:dimanche:nom::::
+subst.:928:erreur:nom::::
+subst.:927:cerveau:nom::::
+subst.:924:arrivée:nom::::
+subst.:922:vol:nom::::
+subst.:918:seuil:nom::::
+subst.:915:perte:nom::::
+subst.:913:chance:nom::::
+subst.:901:douceur:nom::::
+subst.:900:vide:nom::::
+subst.:899:ruine:nom::::
+subst.:898:rang:nom::::
+subst.:896:chiffre:nom::::
+subst.:884:roche:nom::::
+subst.:883:distance:nom::::
+subst.:882:apparence:nom::::
+subst.:877:françois:nom::::
+subst.:876:discussion:nom::::
+subst.:873:banc:nom::::
+subst.:873:terreur:nom::::
+subst.:872:vers:nom::::
+subst.:868:course:nom::::
+subst.:865:portier:nom::::
+subst.:861:chat:nom::::
+subst.:856:tempête:nom::::
+subst.:855:paysage:nom::::
+subst.:855:quart:nom::::
+subst.:842:public:nom::::
+subst.:838:race:nom::::
+subst.:837:barbe:nom::::
+subst.:835:couche:nom::::
+subst.:833:colon:nom::::
+subst.:829:rideau:nom::::
+subst.:824:fatigue:nom::::
+subst.:823:règle:nom::::
+subst.:820:naissance:nom::::
+subst.:818:loup:nom::::
+subst.:804:chute:nom::::
+subst.:802:résistance:nom::::
+subst.:800:chemise:nom::::
+subst.:799:siège:nom::::
+subst.:797:as:nom::::
+subst.:797:patron:nom::::
+subst.:796:calme:nom::::
+subst.:795:printemps:nom::::
+subst.:793:angoisse:nom::::
+subst.:788:habitant:nom::::
+subst.:784:métier:nom::::
+subst.:782:note:nom::::
+subst.:777:fusil:nom::::
+subst.:771:agent:nom::::
+subst.:760:roman:nom::::
+subst.:759:plante:nom::::
+subst.:746:réflexion:nom::::
+subst.:740:accent:nom::::
+subst.:735:repas:nom::::
+subst.:731:étendue:nom::::
+subst.:729:secours:nom::::
+subst.:728:commencement:nom::::
+subst.:724:corde:nom::::
+subst.:720:secrétaire:nom::::
+subst.:718:saison:nom::::
+subst.:700:paupière:nom::::
+subst.:695:tapis:nom::::
+subst.:691:chasse:nom::::
+subst.:686:clef:nom::::
+subst.:677:sueur:nom::::
+subst.:675:ferme:nom::::
+subst.:669:instinct:nom::::
+subst.:667:paquet:nom::::
+subst.:666:drame:nom::::
+subst.:661:savoir:nom::::
+subst.:660:mine:nom::::
+subst.:660:vision:nom::::
+subst.:658:sentier:nom::::
+subst.:657:demain:nom::::
+subst.:650:planche:nom::::
+subst.:649:dehors:nom::::
+subst.:647:salut:nom::::
+subst.:646:tâche:nom::::
+subst.:642:abri:nom::::
+subst.:636:rencontre:nom::::
+subst.:633:rouge:nom::::
+subst.:627:professeur:nom::::
+subst.:618:lien:nom::::
+subst.:615:queue:nom::::
+subst.:608:bande:nom::::
+subst.:605:grain:nom::::
+subst.:603:mensonge:nom::::
+pron.:1322:pronom:personnel:réfléchi:::mots-outils
+prép.:862100:de:préposition::::mots-outils
+prép.:293083:à:préposition::::mots-outils
+prép.:143565:en:préposition::::mots-outils
+prép.:139185:dans:préposition::::mots-outils
+prép.:104779:pour:préposition::::mots-outils
+prép.:82277:par:préposition::::mots-outils
+prép.:80180:sur:préposition::::mots-outils
+prép.:55081:avec:préposition:::sans:mots-outils
+prép.:35915:sans:préposition:::avec:mots-outils
+prép.:15944:sous:préposition:::sur:mots-outils
+prép.:14606:après:préposition:::avant:mots-outils
+prép.:13684:entre:préposition::::mots-outils
+prép.:12781:vers:préposition::::mots-outils
+prép.:12698:chez:préposition::::mots-outils
+prép.:12465:jusque:préposition::::mots-outils
+prép.:10692:contre:préposition::::mots-outils
+prép.:9995:devant:préposition::::mots-outils
+prép.:8907:depuis:préposition::::mots-outils
+prép.:8202:pendant:préposition::::mots-outils
+prép.:7425:avant:préposition::::mots-outils
+prép.:6054:voilà:préposition::::mots-outils
+prép.:4731:près:préposition::::mots-outils
+prép.:4141:dès:préposition::::mots-outils
+prép.:3612:malgré:préposition::::mots-outils
+prép.:3191:voici:préposition::::mots-outils
+prép.:3134:selon:préposition::::mots-outils
+prép.:3019:derrière:préposition::::mots-outils
+prép.:2547:parmi:préposition::::mots-outils
+prép.:2452:afin de:préposition::::mots-outils
+prép.:1955:auprès:préposition::::mots-outils
+prép.:1470:quant à:préposition::::mots-outils
+prép.:1390:hors:préposition::::mots-outils
+prép.:1256:durant:préposition::::mots-outils
+prép.:1078:grâce:préposition::::mots-outils
+prép.:788:plein:préposition::::mots-outils
+pron.:270395:il:pronom:personnel:sujet::mots-outils
+pron.:184186:je:pronom:personnel:sujet::mots-outils
+pron.:168684:se:pronom:personnel:réfléchi::mots-outils
+pron.:148392:qui:pronom:relatif:::mots-outils
+pron.:126397:elle:pronom:personnel:sujet::mots-outils
+pron.:107074:ce:pronom:démonstratif:::mots-outils
+pron.:105873:le:pronom:personnel:::mots-outils
+pron.:99412:que:pronom:interrogatif:::mots-outils
+pron.:89623:vous:pronom:personnel:sujet::mots-outils
+pron.:71086:me:pronom:personnel:::mots-outils
+pron.:70246:on:pronom:indéfini:::mots-outils
+pron.:65988:lui:pronom:personnel:::mots-outils
+pron.:62554:nous:pronom:personnel:sujet::mots-outils
+pron.:46031:y:pronom:personnel:::mots-outils
+pron.:38935:en:pronom:personnel:::mots-outils
+pron.:36089:où:pronom:interrogatif:::mots-outils
+pron.:35774:tu:pronom:personnel:sujet::mots-outils
+pron.:30053:moi:pronom:personnel:::mots-outils
+pron.:28542:te:pronom:personnel:::mots-outils
+pron.:24270:celui:pronom:démonstratif:::mots-outils
+pron.:19379:rien:pronom:indéfini:::mots-outils
+pron.:17797:dont:pronom:relatif:::mots-outils
+pron.:17486:tout:pronom:indéfini:::mots-outils
+pron.:16494:ça:pronom:démonstratif:::mots-outils
+pron.:14253:cela:pronom:démonstratif:::mots-outils
+pron.:13063:autre:pronom:indéfini:::mots-outils
+pron.:10941:un:pronom:indéfini:::mots-outils
+pron.:8997:toi:pronom:personnel:::mots-outils
+pron.:8574:lequel:pronom:relatif:::mots-outils
+pron.:6078:leur:pronom:personnel:::mots-outils
+pron.:5152:quoi:pronom:interrogatif:::mots-outils
+pron.:4164:personne:pronom:indéfini:::mots-outils
+pron.:3910:l'un:pronom:indéfini:::mots-outils
+pron.:3890:chacun:pronom:indéfini:::mots-outils
+pron.:2440:auquel:pronom:relatif:::mots-outils
+pron.:1838:quelqu'un:pronom:indéfini:::mots-outils
+pron.:1734:d'autres:pronom:indéfini:::mots-outils
+pron.:1706:ceci:pronom:démonstratif:::mots-outils
+pron.:1587:l'une:pronom:indéfini:::mots-outils
+pron.:1162:sien:pronom:possessif:::mots-outils
+pron.:1099:mien:pronom:possessif:::mots-outils
+pron.:1078:aucun:pronom:indéfini:::mots-outils
+pron.:905:même:pronom:indéfini:::mots-outils
+::auquel:pronom:interrogatif:::mots-outils
+::on:pronom:personnel:::mots-outils
+::lui:pronom:réfléchi:::mots-outils
+::lequel:pronom:interrogatif:::mots-outils
+::quoi:pronom:exclamatif:::mots-outils
+::quoi:pronom:relatif:::mots-outils
+verbe:351960:être:verbe::::la vie
+verbe:248488:avoir:verbe::::la vie
+verbe:77608:faire:verbe::::la vie
+verbe:72134:dire:verbe::::la parole
+verbe:55394:pouvoir:verbe::::la vie
+verbe:41702:aller:verbe::::le mouvement
+verbe:39659:voir:verbe::::le corps
+verbe:29435:vouloir:verbe::::la vie
+verbe:26023:venir:verbe::::le mouvement
+verbe:22703:devoir:verbe::::la vie
+verbe:20489:prendre:verbe::::la vie
+verbe:16833:trouver:verbe::::manipuler
+verbe:16795:donner:verbe::::manipuler
+verbe:16078:falloir:verbe::::la vie
+verbe:15814:parler:verbe::::la parole
+verbe:15339:mettre:verbe::::la vie
+verbe:15102:savoir:verbe::::la vie
+verbe:14976:passer:verbe::::manipuler
+verbe:14604:regarder:verbe::::le corps
+verbe:14138:aimer:verbe::::les relations
+verbe:13881:croire:verbe::::la religion
+verbe:12597:demander:verbe::::la parole
+verbe:12155:rester:verbe::::le mouvement
+verbe:12063:répondre:verbe::::la parole
+verbe:12009:entendre:verbe::::le corps
+verbe:10358:penser:verbe::::la vie
+verbe:10288:arriver:verbe::::le mouvement
+verbe:9769:connaître:verbe::::la vie
+verbe:9759:devenir:verbe::::la vie
+verbe:9585:sentir:verbe::::le corps
+verbe:9482:sembler:verbe::::la vie
+verbe:9312:tenir:verbe::::manipuler
+verbe:9037:comprendre:verbe::::la vie
+verbe:9002:rendre:verbe::::manipuler
+verbe:8851:attendre:verbe::::le mouvement
+verbe:8768:sortir:verbe::::le mouvement
+verbe:7625:vivre:verbe::::la vie
+verbe:7614:entrer:verbe::::le mouvement
+verbe:7544:reprendre:verbe::::manipuler
+verbe:7499:porter:verbe::::manipuler
+verbe:7304:chercher:verbe::::la vie
+verbe:7114:revenir:verbe::::le mouvement
+verbe:6892:appeler:verbe::::la parole
+verbe:6785:mourir:verbe::::la vie
+verbe:6726:partir:verbe::::le mouvement
+verbe:6610:jeter:verbe::::manipuler
+verbe:6397:suivre:verbe::::le mouvement
+verbe:6256:écrire:verbe::::l'esprit
+verbe:6195:montrer:verbe::::manipuler
+verbe:6182:tomber:verbe::::manipuler
+verbe:6169:ouvrir:verbe::::manipuler
+verbe:5812:arrêter:verbe::::le mouvement
+verbe:5786:perdre:verbe::::la vie
+verbe:5783:commencer:verbe::::la vie
+verbe:5779:paraître:verbe::::x
+verbe:5747:marcher:verbe::::le mouvement
+verbe:5494:lever:verbe::::manipuler
+verbe:5467:permettre:verbe::::la vie
+verbe:5417:asseoir:verbe::::le mouvement
+verbe:5216:écouter:verbe::::le corps
+verbe:5088:monter:verbe::::manipuler
+verbe:4904:apercevoir:verbe::::le corps
+verbe:4891:recevoir:verbe::::manipuler
+verbe:4806:servir:verbe::::x
+verbe:4709:finir:verbe::::la vie
+verbe:4662:rire:verbe::::la vie
+verbe:4449:crier:verbe::::la parole
+verbe:4447:jouer:verbe::::la vie
+verbe:4371:tourner:verbe::::le mouvement
+verbe:4272:garder:verbe::::manipuler
+verbe:4198:reconnaître:verbe::::l'esprit
+verbe:4180:quitter:verbe::::le mouvement
+verbe:4127:manger:verbe::::manger et boire
+verbe:4059:courir:verbe::::le mouvement
+verbe:4022:continuer:verbe::::la vie
+verbe:3965:oublier:verbe::::la vie
+verbe:3955:descendre:verbe::::le mouvement
+verbe:3920:cacher:verbe::::manipuler
+verbe:3841:poser:verbe::::manipuler
+verbe:3778:tirer:verbe::::manipuler
+verbe:3757:présenter:verbe::::l'homme
+verbe:3755:ajouter:verbe::::manipuler
+verbe:3753:agir:verbe::::manipuler
+verbe:3717:retrouver:verbe::::le mouvement
+verbe:3671:offrir:verbe::::les relations
+verbe:3616:apprendre:verbe::::x
+verbe:3598:tuer:verbe::::la vie
+verbe:3559:retourner:verbe::::le mouvement
+verbe:3556:rencontrer:verbe::::les relations
+verbe:3482:envoyer:verbe::::manipuler
+verbe:3438:dormir:verbe::::la vie
+verbe:3422:pousser:verbe::::manipuler
+verbe:3362:rappeler:verbe::::la parole
+verbe:3340:lire:verbe::::x
+verbe:3258:changer:verbe::::la vie
+verbe:3254:essayer:verbe::::la vie
+verbe:3248:compter:verbe::::l'esprit
+verbe:3245:occuper:verbe::::manipuler
+verbe:3238:expliquer:verbe::::l'esprit
+verbe:3161:frapper:verbe::::manipuler
+verbe:3133:travailler:verbe::::la vie
+verbe:3124:obtenir:verbe::::la vie
+verbe:3099:rentrer:verbe::::le mouvement
+verbe:3096:pleurer:verbe::::x
+verbe:3079:répéter:verbe::::la parole
+verbe:3056:payer:verbe::::x
+verbe:3053:apporter:verbe::::le mouvement
+verbe:2944:exister:verbe::::la vie
+verbe:2937:boire:verbe::::manger et boire
+verbe:2904:sourire:verbe::::x
+verbe:2889:coucher:verbe::::x
+verbe:2825:causer:verbe::::la parole
+verbe:2794:raconter:verbe::::la parole
+verbe:2792:songer:verbe::::l'esprit
+verbe:2792:serrer:verbe::::manipuler
+verbe:2787:manquer:verbe::::la vie
+verbe:2754:nommer:verbe::::l'homme
+verbe:2735:conduire:verbe::::le mouvement
+verbe:2729:saisir:verbe::::manipuler
+verbe:2709:demeurer:verbe::::le mouvement
+verbe:2700:remettre:verbe::::manipuler
+verbe:2689:disparaître:verbe::::x
+verbe:2678:battre:verbe::::x
+verbe:2670:toucher:verbe::::le corps
+verbe:2645:apparaître:verbe::::x
+verbe:2635:souffrir:verbe::::x
+verbe:2590:fermer:verbe::::manipuler
+verbe:2585:accepter:verbe::::x
+verbe:2569:tendre:verbe::::manipuler
+verbe:2555:naître:verbe::::la vie
+verbe:2554:sauver:verbe::::x
+verbe:2544:avancer:verbe::::le mouvement
+verbe:2522:traverser:verbe::::le mouvement
+verbe:2508:souvenir:verbe::::l'esprit
+verbe:2491:couvrir:verbe::::manipuler
+verbe:2485:gagner:verbe::::la vie
+verbe:2481:former:verbe::::x
+verbe:2477:plaire:verbe::::x
+verbe:2458:embrasser:verbe::::les relations
+verbe:2454:oser:verbe::::x
+verbe:2427:empêcher:verbe::::x
+verbe:2420:refuser:verbe::::x
+verbe:2415:décider:verbe::::l'esprit
+verbe:2401:produire:verbe::::x
+verbe:2389:charger:verbe::::manipuler
+verbe:2385:mêler:verbe::::manipuler
+verbe:2371:espérer:verbe::::l'esprit
+verbe:2349:cesser:verbe::::la vie
+verbe:2349:ressembler:verbe::::x
+verbe:2332:chanter:verbe::::la parole
+verbe:2272:approcher:verbe::::le mouvement
+verbe:2265:prier:verbe::::la religion
+verbe:2240:échapper:verbe::::
+verbe:2239:glisser:verbe::::
+verbe:2225:briller:verbe::::
+verbe:2218:brûler:verbe::::
+verbe:2214:placer:verbe::::
+verbe:2202:juger:verbe::::
+verbe:2201:suffire:verbe::::
+verbe:2190:atteindre:verbe::::
+verbe:2146:annoncer:verbe::::
+verbe:2135:élever:verbe::::
+verbe:2134:acheter:verbe::::
+verbe:2133:mener:verbe::::
+verbe:2133:préparer:verbe::::
+verbe:2118:assurer:verbe::::
+verbe:2095:deviner:verbe::::
+verbe:2092:considérer:verbe::::
+verbe:2069:appartenir:verbe::::
+verbe:2067:représenter:verbe::::
+verbe:2065:tromper:verbe::::
+verbe:2056:vendre:verbe::::
+verbe:2047:craindre:verbe::::
+verbe:2035:emporter:verbe::::
+verbe:1951:exprimer:verbe::::
+verbe:1939:rouler:verbe::::
+verbe:1931:posséder:verbe::::
+verbe:1921:réveiller:verbe::::
+verbe:1918:aider:verbe::::
+verbe:1918:découvrir:verbe::::
+verbe:1912:choisir:verbe::::
+verbe:1905:prononcer:verbe::::
+verbe:1904:taire:verbe::::
+verbe:1886:rêver:verbe::::
+verbe:1884:appuyer:verbe::::
+verbe:1884:étendre:verbe::::
+verbe:1880:trembler:verbe::::
+verbe:1864:défendre:verbe::::
+verbe:1856:créer:verbe::::
+verbe:1853:maintenir:verbe::::
+verbe:1814:indiquer:verbe::::
+verbe:1812:promettre:verbe::::
+verbe:1810:relever:verbe::::
+verbe:1809:abandonner:verbe::::
+verbe:1797:ignorer:verbe::::
+verbe:1769:accompagner:verbe::::
+verbe:1763:adresser:verbe::::
+verbe:1757:observer:verbe::::
+verbe:1753:séparer:verbe::::
+verbe:1752:marier:verbe::::
+verbe:1751:prévoir:verbe::::
+verbe:1731:amener:verbe::::
+verbe:1729:obliger:verbe::::
+verbe:1720:éclairer:verbe::::
+verbe:1719:poursuivre:verbe::::
+verbe:1717:livrer:verbe::::
+verbe:1696:contenir:verbe::::
+verbe:1688:fuir:verbe::::
+verbe:1687:couler:verbe::::
+verbe:1676:proposer:verbe::::
+verbe:1673:éprouver:verbe::::
+verbe:1667:retenir:verbe::::
+verbe:1645:attacher:verbe::::
+verbe:1642:voler:verbe::::
+verbe:1636:entraîner:verbe::::
+verbe:1633:surprendre:verbe::::
+verbe:1601:briser:verbe::::
+verbe:1596:imaginer:verbe::::
+verbe:1593:diriger:verbe::::
+verbe:1581:parvenir:verbe::::
+verbe:1574:pénétrer:verbe::::
+verbe:1569:remarquer:verbe::::
+verbe:1568:éviter:verbe::::
+verbe:1556:établir:verbe::::
+verbe:1553:réussir:verbe::::
+verbe:1550:pencher:verbe::::
+verbe:1547:habiter:verbe::::
+verbe:1546:entourer:verbe::::
+verbe:1544:déclarer:verbe::::
+verbe:1535:étonner:verbe::::
+verbe:1528:dresser:verbe::::
+verbe:1528:durer:verbe::::
+verbe:1527:fixer:verbe::::
+verbe:1512:désirer:verbe::::
+verbe:1503:arracher:verbe::::
+verbe:1501:soutenir:verbe::::
+verbe:1499:couper:verbe::::
+verbe:1497:examiner:verbe::::
+verbe:1488:douter:verbe::::
+verbe:1487:retirer:verbe::::
+verbe:1460:promener:verbe::::
+verbe:1447:forcer:verbe::::
+verbe:1436:revoir:verbe::::
+verbe:1420:remplir:verbe::::
+verbe:1419:terminer:verbe::::
+verbe:1397:tenter:verbe::::
+verbe:1389:remonter:verbe::::
+verbe:1383:installer:verbe::::
+verbe:1375:soulever:verbe::::
+verbe:1373:allumer:verbe::::
+verbe:1373:imposer:verbe::::
+verbe:1371:respirer:verbe::::
+verbe:1370:baisser:verbe::::
+verbe:1363:souffler:verbe::::
+verbe:1348:attirer:verbe::::
+verbe:1344:prêter:verbe::::
+verbe:1329:amuser:verbe::::
+verbe:1323:éclater:verbe::::
+verbe:1314:réunir:verbe::::
+verbe:1310:traiter:verbe::::
+verbe:1309:engager:verbe::::
+verbe:1293:traîner:verbe::::
+verbe:1290:employer:verbe::::
+verbe:1285:marquer:verbe::::
+verbe:1285:prouver:verbe::::
+verbe:1284:importer:verbe::::
+verbe:1279:exiger:verbe::::
+verbe:1277:reposer:verbe::::
+verbe:1275:danser:verbe::::
+verbe:1268:saluer:verbe::::
+verbe:1264:accorder:verbe::::
+verbe:1262:achever:verbe::::
+verbe:1262:avouer:verbe::::
+verbe:1261:distinguer:verbe::::
+verbe:1261:emmener:verbe::::
+verbe:1238:agiter:verbe::::
+verbe:1232:hésiter:verbe::::
+verbe:1221:sonner:verbe::::
+verbe:1217:composer:verbe::::
+verbe:1215:enlever:verbe::::
+verbe:1210:rejoindre:verbe::::
+verbe:1203:ramener:verbe::::
+verbe:1199:étudier:verbe::::
+verbe:1198:partager:verbe::::
+verbe:1187:chasser:verbe::::
+verbe:1186:interrompre:verbe::::
+verbe:1185:éloigner:verbe::::
+verbe:1177:réduire:verbe::::
+verbe:1169:éteindre:verbe::::
+verbe:1169:recommencer:verbe::::
+verbe:1169:sauter:verbe::::
+verbe:1168:plaindre:verbe::::
+verbe:1162:préférer:verbe::::
+verbe:1162:révéler:verbe::::
+verbe:1140:subir:verbe::::
+verbe:1135:rapporter:verbe::::
+verbe:1128:coûter:verbe::::
+verbe:1128:réfléchir:verbe::::
+verbe:1127:remercier:verbe::::
+verbe:1126:déposer:verbe::::
+verbe:1124:fumer:verbe::::
+verbe:1119:affirmer:verbe::::
+verbe:1116:convenir:verbe::::
+verbe:1108:vêtir:verbe::::
+verbe:1105:accomplir:verbe::::
+verbe:1103:résoudre:verbe::::
+verbe:1100:plonger:verbe::::
+verbe:1095:détruire:verbe::::
+verbe:1085:intéresser:verbe::::
+verbe:1084:disposer:verbe::::
+verbe:1075:lisser:verbe::::
+verbe:1071:verser:verbe::::
+verbe:1065:obéir:verbe::::
+verbe:1062:lutter:verbe::::
+verbe:1061:prétendre:verbe::::
+verbe:1060:construire:verbe::::
+verbe:1052:soumettre:verbe::::
+verbe:1050:peser:verbe::::
+verbe:1043:troubler:verbe::::
+verbe:1032:répandre:verbe::::
+verbe:1031:résister:verbe::::
+verbe:1021:protéger:verbe::::
+verbe:1016:enfermer:verbe::::
+verbe:1006:creuser:verbe::::
+verbe:1006:grandir:verbe::::
+verbe:1004:enfoncer:verbe::::
+verbe:1001:envelopper:verbe::::
+verbe:999:prévenir:verbe::::
+verbe:996:inspirer:verbe::::
+verbe:988:ramasser:verbe::::
+verbe:987:endormir:verbe::::
+verbe:986:inventer:verbe::::
+verbe:977:presser:verbe::::
+verbe:976:confier:verbe::::
+verbe:976:effacer:verbe::::
+verbe:973:reculer:verbe::::
+verbe:973:user:verbe::::
+verbe:971:nourrir:verbe::::
+verbe:961:remplacer:verbe::::
+verbe:960:souhaiter:verbe::::
+verbe:947:signer:verbe::::
+verbe:944:interroger:verbe::::
+verbe:942:dominer:verbe::::
+verbe:934:commander:verbe::::
+verbe:934:supposer:verbe::::
+verbe:933:dépasser:verbe::::
+verbe:926:accuser:verbe::::
+verbe:921:habiller:verbe::::
+verbe:920:condamner:verbe::::
+verbe:918:menacer:verbe::::
+verbe:916:écraser:verbe::::
+verbe:902:céder:verbe::::
+verbe:898:écarter:verbe::::
+verbe:897:réclamer:verbe::::
+verbe:881:dessiner:verbe::::
+verbe:877:conclure:verbe::::
+verbe:877:lier:verbe::::
+verbe:873:admettre:verbe::::
+verbe:872:attaquer:verbe::::
+verbe:871:respecter:verbe::::
+verbe:860:pendre:verbe::::
+verbe:859:supporter:verbe::::
+verbe:853:figurer:verbe::::
+verbe:851:profiter:verbe::::
+verbe:847:accrocher:verbe::::
+verbe:843:calmer:verbe::::
+verbe:843:satisfaire:verbe::::
+verbe:838:valoir:verbe::::
+verbe:836:signifier:verbe::::
+verbe:834:inquiéter:verbe::::
+verbe:829:assister:verbe::::
+verbe:828:inviter:verbe::::
+verbe:827:déchirer:verbe::::
+verbe:824:risquer:verbe::::
+verbe:822:parcourir:verbe::::
+verbe:821:rejeter:verbe::::
+verbe:816:renoncer:verbe::::
+verbe:810:veiller:verbe::::
+verbe:806:transformer:verbe::::
+verbe:805:tracer:verbe::::
+verbe:801:contenter:verbe::::
+verbe:795:mériter:verbe::::
+verbe:791:précipiter:verbe::::
+verbe:791:rompre:verbe::::
+verbe:784:caresser:verbe::::
+verbe:783:étouffer:verbe::::
+verbe:782:animer:verbe::::
+verbe:778:casser:verbe::::
+verbe:763:fonder:verbe::::
+verbe:759:franchir:verbe::::
+verbe:754:abattre:verbe::::
+verbe:754:discuter:verbe::::
+verbe:748:fatiguer:verbe::::
+verbe:745:consentir:verbe::::
+verbe:731:regretter:verbe::::
+verbe:730:joindre:verbe::::
+verbe:720:vaincre:verbe::::
+verbe:712:consulter:verbe::::
+verbe:709:haïr:verbe::::
+verbe:701:repousser:verbe::::
+verbe:690:exécuter:verbe::::
+verbe:689:exposer:verbe::::
+verbe:683:voyager:verbe::::
+verbe:680:renverser:verbe::::
+verbe:675:rassurer:verbe::::
+verbe:674:retomber:verbe::::
+verbe:672:décrire:verbe::::
+verbe:670:mentir:verbe::::
+verbe:667:armer:verbe::::
+verbe:659:étaler:verbe::::
+verbe:651:essuyer:verbe::::
+verbe:650:précéder:verbe::::
+verbe:644:désigner:verbe::::
+verbe:641:détacher:verbe::::
+verbe:638:recueillir:verbe::::
+verbe:634:croiser:verbe::::
+verbe:633:entretenir:verbe::::
+verbe:627:surveiller:verbe::::
+verbe:622:réserver:verbe::::
+verbe:608:confondre:verbe::::
+verbe:602:dégager:verbe::::
