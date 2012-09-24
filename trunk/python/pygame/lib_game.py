@@ -145,7 +145,7 @@ class Application:
         if font == 'underlined':
             self.line(x1, y1+s.get_height(), x1+s.get_width(), y1+s.get_height(), color)
     
-    def line(self, x1, y1, x2, y2, color, thickness=1):
+    def line(self, x1, y1, x2, y2, color=(0, 0, 0), thickness=1):
         pygame.draw.line(self.screen, color, (x1, y1), (x2, y2), thickness)
     
     def point(self, x1, y1, color=(0, 0, 0)):
@@ -201,7 +201,65 @@ class MyApp(Application):
         if self.time > 0:
             self.fill((0, 255, 0))
             self.time -= 1
-
+        
+        self.algo_line(10, 20, 100, 30)
+        self.line(10, 120, 100, 130)
+        self.algo_line(10, 10, 100, 100)
+        self.algo_line(10, 10, 100, 10)
+        self.algo_line(10, 10, 10, 100)
+        self.algo_line(600,  95, 650,  95)
+        self.algo_line(650, 95, 650, 125)
+        self.rectangle(600, 100, 650, 150)
+        self.rectangle_size(600, 100, 50, 50)
+    
+    # <= ou < ?
+    # Algorithme pour tracer des droites
+    def algo_line(self, x1, y1, x2, y2):
+        x_start = min(x1, x2)
+        x_end = max(x1, x2)
+        y_start = min(y1, y2)
+        y_end = max(y1, y2)
+        x_dif = x_end - x_start
+        y_dif = y_end - y_start
+        if y_dif == 0:
+            i = x_start
+            j = y1 # = y2
+            while i < x_end:
+                self.point(i, j, (0, 255, 0))
+                i = i+1
+        elif x_dif == 0:
+            i = y_start
+            j = x1 # = x2
+            while i < y_end:
+                self.point(j, i, (0, 255, 0))
+                i = i+1
+        elif x_dif > y_dif:
+            factor = float(y_dif) / x_dif
+            i = x_start
+            if x1 < x2: j = y1
+            else: j = y2
+            mod = 0
+            while i < x_end:
+                self.point(i, j, (0, 255, 0))
+                i = i+1
+                mod += factor
+                if mod >= 1: 
+                    j += 1
+                    mod -= 1
+        elif x_dif <= y_dif:
+            factor = float(x_dif) / y_dif
+            i = y_start
+            if y1 < y2: j = x1
+            else: j = x2
+            mod = 0
+            while i < y_end:
+                self.point(j, i, (0, 255, 0))
+                i = i+1
+                mod += factor
+                if mod >= 1:
+                    j += 1
+                    mod -= 1
+        
 #MyApp().config(800, 600).run()
 MyApp().run()
 
