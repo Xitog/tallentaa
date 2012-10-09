@@ -9,6 +9,51 @@ class Entity:
     def __init__(self):
         pass
 
+class Window:
+    
+    def __init__(self, x, y, w, h, background_color):
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
+        self.background_color = background_color
+    
+    def on_event(self, event):
+        print event
+    
+    def draw(self, surf):
+        pygame.draw.rect(surf, self.background_color, (self.x, self.y, self.w, self.h), 0)
+
+class Menu(Window):
+    
+    def __init__(self, editor, x, y, w, h, background_color):
+        Window.__init__(self, x, y, w, h, background_color)
+        self.editor = editor
+    
+    def on_event(self, event):
+        if event.type == MOUSEBUTTONUP:
+            x,y = event.pos
+            print x,y
+    
+    def draw(self, surf):
+        pygame.draw.rect(surf, self.background_color, (self.x, self.y, self.w, self.h), 1)
+        if self.editor.mode == 'ground':
+            pygame.draw.rect(surf, (255, 255, 0), (390, 490, 128, 128), 1)
+            pygame.draw.rect(surf, (255, 255, 0), (8, 500, 80, 25), 1)
+            for i in range(0, 22):
+                pygame.draw.rect(surf, (i*10, i*10, i*10), (100+(i*35%665),500+(35*((i*35)/665)),32,32), 0)
+        elif self.editor.mode == 'doodad':
+            pygame.draw.rect(surf, (255, 255, 0), (500, 490, 128, 128), 1)
+            pygame.draw.rect(surf, (255, 255, 0), (8, 525, 80, 25), 1)
+        elif self.editor.mode == 'entity':
+            pygame.draw.rect(surf, (255, 255, 0), (290, 490, 128, 128), 1)
+            pygame.draw.rect(surf, (255, 255, 0), (8, 550, 80, 25), 1)
+        
+        surf.blit(self.editor.font.render("bonjour", True, (255,255,255)), (10,0))
+        surf.blit(self.editor.font.render("ground", True, (255, 255, 255)), (10, 500))
+        surf.blit(self.editor.font.render("doodad", True, (255, 255, 255)), (10, 525))
+        surf.blit(self.editor.font.render("entity", True, (255, 255, 255)), (10, 550))
+    
 class Editor:
     
     def __init__(self):
@@ -77,7 +122,11 @@ class Editor:
         
         for i in range(0, random.randint(1, 10)):
             self.build()
-    
+
+        self.font = pygame.font.SysFont(pygame.font.get_default_font(), 32)
+        
+        self.menu = Menu(self, 0, 32*self.MAX_Y, 32*self.MAX_X, 100, (255, 0, 0))
+        
     def build(self):
         # ia pour "faire des salles"
         size_x = random.randint(3,10)
@@ -100,9 +149,22 @@ class Editor:
         mx, my = pygame.mouse.get_pos()
         mx32 = mx / 32 + self.X
         my32 = my / 32 + self.Y
-
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT: exit()
+            elif event.type in [MOUSEBUTTONDOWN, MOUSEBUTTONUP]:
+                if mx >= self.menu.x and mx <= self.menu.x + self.menu.w and my >= self.menu.y and my <= self.menu.y + self.menu.h:
+                    self.menu.on_event(event)
+                else:
+                    if event.type == MOUSEBUTTONDOWN:
+                        if event.button == 1:
+                            self.apply = True
+                    elif event.type == MOUSEBUTTONUP:
+                        if event.button == 1:
+                            self.apply = False
+                        elif event.button == 3:
+                            print 'line=', my32, 'column=', mx32, self.Y, self.X
+                            if mx32 > 0 and mx32 < self.MAP_X and my32 > 0 and my32 < self.MAP_Y: print self.doodad[my32][mx32]
             elif event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     exit()
@@ -127,16 +189,7 @@ class Editor:
                     elif self.mode == 'ground': self.mode = 'entity'
                     elif self.mode == 'entity': self.mode = 'doodad'
                     print self.mode
-            elif event.type == MOUSEBUTTONDOWN:
-                if event.button == 1:
-                    self.apply = True
-            elif event.type == MOUSEBUTTONUP:
-                if event.button == 1:
-                    self.apply = False
-                elif event.button == 3:
-                    print 'line=', my32, 'column=', mx32, self.Y, self.X
-                    if mx32 > 0 and mx32 < self.MAP_X and my32 > 0 and my32 < self.MAP_Y: print self.doodad[my32][mx32]
-
+        
         #---------------------------------------------------------------
         # Update
         if self.left:
@@ -199,12 +252,8 @@ class Editor:
             pygame.draw.rect(self.screen, (255, 0, 0), (400, 500, 32, 32), 0)
         pygame.draw.circle(self.screen, (255, 255, 0), (300+16, 500+16), 16, 0)
         
-        if self.mode == 'ground':
-            pygame.draw.rect(self.screen, (255, 255, 0), (390, 490, 128, 128), 1)
-        elif self.mode == 'doodad':
-            pygame.draw.rect(self.screen, (255, 255, 0), (500, 490, 128, 128), 1)
-        elif self.mode == 'entity':
-            pygame.draw.rect(self.screen, (255, 255, 0), (290, 490, 128, 128), 1)
+        self.menu.draw(self.screen)
+        
         pygame.display.flip()
         pygame.time.Clock().tick(60)
 
