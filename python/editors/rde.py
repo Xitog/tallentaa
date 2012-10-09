@@ -2,17 +2,28 @@
 # 14h23
 
 import pygame
+import random
 
-class Button:
+class Selectable:
+    def __init__(self):
+        self.selected = False
+    
+    def select(self):
+        self.selected = True
+    
+    def unselect(self):
+        self.selected = False
+
+class Button(Selectable):
     
     def __init__(self, name, x, y, size_x, size_y, border_size):
+        Selectable.__init__(self)
         self.name = name
         self.x = x
         self.y = y
         self.size_x = size_x
         self.size_y = size_y
         self.border_size = border_size
-        self.selected = False
     
     def draw(self, surf):
         mx, my = pygame.mouse.get_pos()
@@ -28,22 +39,16 @@ class Button:
             return True
         else:
             return False
-    
-    def select(self):
-        self.selected = True
-    
-    def unselect(self):
-        self.selected = False
 
-class Role:
+class Role(Selectable):
     
     def __init__(self, name, x, y, size_x, size_y):
+        Selectable.__init__(self)
         self.name = name
         self.x = x
         self.y = y
         self.size_x = size_x
         self.size_y = size_y
-        self.selected = False
         self.border_size = 2
     
     def collision(self, x, y):
@@ -60,24 +65,23 @@ class Role:
             pygame.draw.rect(surf, (0,255,0), (self.x, self.y, self.size_x, self.size_y), self.border_size)
         else:
             pygame.draw.rect(surf, (0,0,0), (self.x, self.y, self.size_x, self.size_y), self.border_size)
-    
-    def select(self):
-        self.selected = True
-    
-    def unselect(self):
-        self.selected = False
 
-class Link:
+class Link(Selectable):
     
     def __init__(self, name, x1, y1, x2, y2):
+        Selectable.__init__(self)
         self.name = name
         self.x1 = x1
         self.y1 = y1
         self.x2 = x2
         self.y2 = y2
+        self.color = (random.randint(0,255), random.randint(0,255), random.randint(0,255))
     
     def draw(self, surf):
-        pygame.draw.line(surf, (0,0,0), (self.x1, self.y1), (self.x2, self.y2), 2)
+        if self.selected:
+            pygame.draw.line(surf, (0,255,0), (self.x1, self.y1), (self.x2, self.y2), 2)
+        else:
+            pygame.draw.line(surf, self.color, (self.x1, self.y1), (self.x2, self.y2), 2)
 
 class Editor:
     
@@ -100,7 +104,8 @@ class Editor:
     
     def build(self):
         self.buttons = []
-        self.buttons.append(Button("Selection", 3, 100, 64, 64, 2))
+        self.selection = Button("Selection", 3, 100, 64, 64, 2)
+        self.buttons.append(self.selection)
         self.buttons.append(Button("Role", 3, 170, 64, 64, 2))
         self.buttons.append(Button("Lien", 3, 240, 64, 64, 2))
         self.buttons.append(Button("Commentaire", 3, 310, 64, 64, 2))
@@ -129,6 +134,25 @@ class Editor:
                 self.ecart_my = my - r.y
             else:
                 r.unselect()
+        found_link = None
+        for i in range(mx-5, mx+5):
+            for j in range(my-5, my+5):
+                c = self.screen.get_at((i, j))
+                for l in self.links:
+                    if l.color == c:
+                        found_link = l
+                        break
+        if found_link is not None:
+            print "we've got a line! " + str(found_link)
+            found_link.select()
+    
+    def select_button_x(self, button):
+        for b in self.buttons:
+            if b == button:
+                b.select()
+                self.mode = b.name
+            else:
+                b.unselect()
     
     def select_button(self):
         mx, my = pygame.mouse.get_pos()
@@ -145,6 +169,8 @@ class Editor:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.esc = True
+            if event.type == pygame.VIDEORESIZE: #on peut pas agrandir sous Linux!
+                print event.size, event.w, event.h
             if self.mode == 'Role':
                 if event.type == pygame.MOUSEBUTTONUP:
                     self.m_down = False
@@ -153,7 +179,7 @@ class Editor:
                         if self.element_selected is None:
                             self.roles.append(Role('ano', mx, my, 128, 64))
                         else:
-                            pass
+                            self.select_button_x(self.selection)
                     elif mx <= 70:
                         self.select_button()
             elif self.mode == 'Lien':
