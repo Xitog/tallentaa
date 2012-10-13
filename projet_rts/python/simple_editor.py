@@ -20,7 +20,7 @@ DOODAD = 2
 ENTITY = 3
 MODE_MAX = 4
 
-GROUND_DATA = [ '100', '101', '102', '103', '104', '105' ]
+GROUND_DATA = [ '100', '101', '102', '103', '104', '105', '106', '107', '108', '109', '110', '111', '112', '113', '114' ]
 ENTITY_DATA = [ '900', '904', '908', '912', '916', '920', '924', '928', '932', '936', '940', '944', '948', '952', '956' ]
 
 #-----------------------------------------------------------------------
@@ -78,7 +78,8 @@ class Menu(Window):
                 print b
     
     def draw(self, surf):
-        pygame.draw.rect(surf, self.background_color, (self.x, self.y, self.w, self.h), 1)
+        pygame.draw.rect(surf, (0,0,0), (self.x, self.y, self.w, self.h), 0)
+        pygame.draw.rect(surf, (0,162,232), (self.x, self.y, self.w, self.h), 1)
         
         if self.editor.mode == SELECT:
             pygame.draw.rect(surf, (255, 255, 0), (8, self.editor.MAX_Y*32+5, 80, 25), 1)
@@ -99,23 +100,16 @@ class Menu(Window):
             pygame.draw.line(surf, (255, 0, 255), (131,501), (101,531), 1)
         
         #surf.blit(self.editor.font.render("select", True, (255, 255, 255)), (10, self.editor.MAX_Y*32+5))
-        #surf.blit(self.editor.font.render("ground", True, (255, 255, 255)), (10, self.editor.MAX_Y*32+30))
-        #surf.blit(self.editor.font.render("doodad", True, (255, 255, 255)), (10, self.editor.MAX_Y*32+55))
-        #surf.blit(self.editor.font.render("entity", True, (255, 255, 255)), (10, self.editor.MAX_Y*32+80))
-
-        surf.blit(self.editor.button_select, (1, self.editor.MAX_Y*32+1))
-        surf.blit(self.editor.button_ground, (1, (self.editor.MAX_Y+1)*32+1))
-        surf.blit(self.editor.button_doodad, (1, (self.editor.MAX_Y+2)*32+1))
-        surf.blit(self.editor.button_entity, (1, (self.editor.MAX_Y+3)*32+1))
-        if self.editor.mode != SELECT: pygame.draw.rect(surf, (0,0,0), (0,self.editor.MAX_Y*32,97,32), 1)
-        else: pygame.draw.rect(surf, (255,255,0), (0,self.editor.MAX_Y*32,97,32), 2)
-        if self.editor.mode != GROUND: pygame.draw.rect(surf, (0,0,0), (0,(self.editor.MAX_Y+1)*32,97,32), 1)
-        else: pygame.draw.rect(surf, (255,255,0), (0,(self.editor.MAX_Y+1)*32,97,32), 2)
-        if self.editor.mode != DOODAD: pygame.draw.rect(surf, (0,0,0), (0,(self.editor.MAX_Y+2)*32,97,32), 1)
-        else: pygame.draw.rect(surf, (255,255,0), (0,(self.editor.MAX_Y+2)*32,97,32), 2)
-        if self.editor.mode != ENTITY: pygame.draw.rect(surf, (0,0,0), (0,(self.editor.MAX_Y+3)*32,97,32), 1)
-        else: pygame.draw.rect(surf, (255,255,0), (0,(self.editor.MAX_Y+3)*32,97,32), 2)
         
+        if self.editor.mode == SELECT: surf.blit(self.editor.button_select_on, (1, self.editor.MAX_Y*32+1))
+        else: surf.blit(self.editor.button_select, (1, self.editor.MAX_Y*32+1))
+        if self.editor.mode == GROUND: surf.blit(self.editor.button_ground_on, (1, (self.editor.MAX_Y+1)*32+1))
+        else: surf.blit(self.editor.button_ground, (1, (self.editor.MAX_Y+1)*32+1))
+        if self.editor.mode == DOODAD: surf.blit(self.editor.button_doodad_on, (1, (self.editor.MAX_Y+2)*32+1))        
+        else: surf.blit(self.editor.button_doodad, (1, (self.editor.MAX_Y+2)*32+1))        
+        if self.editor.mode == ENTITY: surf.blit(self.editor.button_entity_on, (1, (self.editor.MAX_Y+3)*32+1))
+        else: surf.blit(self.editor.button_entity, (1, (self.editor.MAX_Y+3)*32+1))
+
 class MapView(Window):
     
     def __init__(self, editor, x, y, w, h, background_color):
@@ -145,10 +139,12 @@ class MapView(Window):
                 g = self.editor.ground[yy+self.editor.Y][xx+self.editor.X]
                 surf.blit(GROUND_DATA[g], (xx*32, yy*32))
                 # DOODAD
-                r = self.editor.doodad[yy+self.editor.Y][xx+self.editor.X]
-                if r > 0:
-                    pygame.draw.rect(surf, Color(255, 0, 0, 128), (xx*32, yy*32, 32, 32), 1)
-                    surf.blit(self.editor.content_img[r], (xx*32+self.editor.content[r][1],yy*32+self.editor.content[r][2]))
+                #r = self.editor.doodad[yy+self.editor.Y][xx+self.editor.X]
+                #if r > 0:
+                #    pygame.draw.rect(surf, Color(255, 0, 0, 128), (xx*32, yy*32, 32, 32), 1)
+                #    surf.blit(self.editor.content_img[r], (xx*32+self.editor.content[r][1],yy*32+self.editor.content[r][2]))
+                for d in self.editor.doodadx:
+                    surf.blit(self.editor.content_img[d[0]], ((d[1]-self.editor.X)*32+self.editor.content[d[0]][1],(d[2]-self.editor.Y)*32+self.editor.content[d[0]][2]))
                 #else:
                 #    pygame.draw.rect(surf, Color(0, 255, 0, 128), (xx*32, yy*32, 32, 32), 1)
                 # ENTITY
@@ -164,7 +160,7 @@ class Editor:
 
         self.MAP_X = 32
         self.MAP_Y = 32
-        self.MAX_X = 24
+        self.MAX_X = 25
         self.MAX_Y = 15
         self.X = 0
         self.Y = 0
@@ -172,6 +168,7 @@ class Editor:
         self.ground = []
         self.doodad = []
         self.entity = []
+        self.doodadx= []
         for yy in range(0, self.MAP_Y):
             self.ground.append([])
             self.doodad.append([])
@@ -182,9 +179,11 @@ class Editor:
                 self.entity[yy].append(0)
                 sys.stdout.write(str(self.doodad[yy][xx]))
         print
-        self.doodad[4][4] = 1
-        self.doodad[31][31] = 1
-        self.doodad[3][2] = 1
+        #self.doodad[4][4] = 1
+        #self.doodad[31][31] = 1
+        #self.doodad[3][2] = 1
+        self.doodadx.append((1, 3, 2))
+        self.doodadx.append((1, 31, 31))
         self.entity[7][7] = 1
         
         self.down = False
@@ -224,6 +223,10 @@ class Editor:
         self.button_ground = pygame.image.load('button_ground.png').convert()
         self.button_doodad = pygame.image.load('button_doodad.png').convert()
         self.button_entity = pygame.image.load('button_entity.png').convert()
+        self.button_select_on = pygame.image.load('button_select_on.png').convert()
+        self.button_ground_on = pygame.image.load('button_ground_on.png').convert()
+        self.button_doodad_on = pygame.image.load('button_doodad_on.png').convert()
+        self.button_entity_on = pygame.image.load('button_entity_on.png').convert()
         
         print 'bas : scrolling vers le bas'
         print 'haut : scrolling vers le haut'
