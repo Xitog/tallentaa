@@ -6,7 +6,7 @@
 # Imports
 #-----------------------------------------------------------------------
 
-import pygame, sys, math, random
+import pygame, sys, math, random, pickle
 from pygame.locals import *
 
 #-----------------------------------------------------------------------
@@ -21,17 +21,59 @@ ENTITY = 3
 MODE_MAX = 4
 
 GROUND_DATA = [ '100', '101', '102', '103', '104', '105', '106', '107', '108', '109', '110', '111', '112', '113', '114' ]
-ENTITY_DATA = [ '900', '904', '908', '912', '916', '920', '924', '928', '932', '936', '940', '944', '948', '952', '956' ]
+ENTITY_DATA = [ '900', '904', '908', '912', '916', '920', '924', '928', '932', '936', '940', '944', '948', '952', '956', 'tour_ico', 'bat1_ico' ]
+DOODAD_DATA = [ '900', 'tree1_ico', 'tree2_ico', 'tree3_ico']
+
+ENTITY_15 = None # TOWER 15
+ENTITY_16 = None
+
+# Test
+class Texture:
+    # filename texture, filename icon, sizex, sizey, passable matrix, surface content
+    def __init__(self, name, ico=None, sx=1, sy=1, passable=[[0]], content=None, content_ico=None):
+        self.name = name
+        self.ico = ico
+        self.sx = sx
+        self.sy = sy
+        self.passable = passable
+
+TEXTURES = [
+    Texture('100.png'),
+    Texture('101.png'),
+    Texture('102.png'),
+    Texture('103.png'),
+    Texture('104.png'),
+    Texture('105.png', passable=[[1]]),
+    Texture('106.png'),
+    Texture('107.png'),
+    Texture('108.png'),
+    Texture('109.png'),
+    Texture('110.png'),
+    Texture('111.png'),
+    Texture('112.png'),
+    Texture('113.png'),
+    Texture('114.png'),
+    Texture('115.png', '115_ico.png', 4, 2, [[1,1,1,0],[1,0,1,1]]),
+]
 
 #-----------------------------------------------------------------------
 # Classes
 #-----------------------------------------------------------------------
 
+# sx, sy = modifier pour dessin only!
+# tx, ty = taille x,y
 class Entity:
-    def __init__(self, vie_max=100, vie=100):
+    def __init__(self, x, y, cat, sx=0, sy=0, tx=1, ty=1, vie_max=100, vie=100):
         self.angle = 1
         self.vie = vie
         self.vie_max = vie_max
+        self.x = x
+        self.y = y
+        self.cat = cat
+        self.sx = sx
+        self.sy = sy
+        self.tx = tx
+        self.ty = ty
 
 class Window:
     
@@ -63,41 +105,58 @@ class Menu(Window):
             x,y = event.pos
             #print x,y
             #print (x-100)/35
-            #print (y-500)/35
-            i = (x-100)/35 + 19*((y-500)/35)
-            if self.editor.mode == GROUND and i < len(GROUND_DATA) and i >= 0:
+            #print (y-500)/35 
+            # 14*35 = 490 et 19*35=665
+            i = (x-200)/35 + 14*((y-500)/35)
+            if self.editor.mode == GROUND and i < len(TEXTURES) and i >= 0:
                 self.editor.ground_content = i
             elif self.editor.mode == ENTITY and i < len(ENTITY_DATA) and i >= 0:
                 self.editor.entity_content = i
+            elif self.editor.mode == DOODAD and i < len(DOODAD_DATA) and i >= 0:
+                self.editor.doodad_content = i
             if x <= 97:
                 b = (y-self.editor.MAX_Y*32)/32
                 if b == 0: self.editor.mode = SELECT
                 elif b == 1: self.editor.mode = GROUND
                 elif b == 2: self.editor.mode = DOODAD
-                elif b == 3: self.editor.mode = ENTITY
+            elif x > 97 and x <= 96*2:
+                b = (y-self.editor.MAX_Y*32)/32
+                if b == 0: self.editor.mode = ENTITY
                 print b
     
     def draw(self, surf):
+        global ENTITY_15, ENTITY_16 # TOWER 15
+        
         pygame.draw.rect(surf, (0,0,0), (self.x, self.y, self.w, self.h), 0)
         pygame.draw.rect(surf, (0,162,232), (self.x, self.y, self.w, self.h), 1)
         
+        # Les lignes du bas et de separation avec les boutons du menu
+        pygame.draw.line(surf, (0, 162, 232), (0,self.editor.MAX_Y*32+97), (self.editor.MAX_X*32,self.editor.MAX_Y*32+97), 1)
+        pygame.draw.line(surf, (0, 162, 232), (96*2+1,self.editor.MAX_Y*32), (96*2+1,(self.editor.MAX_Y+3)*32), 1)
+        pygame.draw.line(surf, (0, 162, 232), ((self.editor.MAX_X-3)*32-1,self.editor.MAX_Y*32), ((self.editor.MAX_X-3)*32-1,(self.editor.MAX_Y+3)*32), 1)
+
         if self.editor.mode == SELECT:
-            pygame.draw.rect(surf, (255, 255, 0), (8, self.editor.MAX_Y*32+5, 80, 25), 1)
+            pass
         elif self.editor.mode == GROUND:
-            pygame.draw.rect(surf, (255, 255, 0), (8, self.editor.MAX_Y*32+30, 80, 25), 1)
-            for i in range(0, len(GROUND_DATA)):
-                surf.blit(GROUND_DATA[i], (100+(i*35%665),500+(35*((i*35)/665))))
-            pygame.draw.rect(surf, (255, 255, 0), (100+(self.editor.ground_content*35%665)-2,500+(35*((self.editor.ground_content*35)/665))-2,32+2,32+2), 2)
+            for i in range(0, len(TEXTURES)):
+                surf.blit(TEXTURES[i].content_ico, (200+(i*35%490),500+(35*((i*35)/490))))
+            #for i in range(0, len(GROUND_DATA)):
+            #    surf.blit(GROUND_DATA[i], (200+(i*35%490),500+(35*((i*35)/490))))
+            pygame.draw.rect(surf, (255, 255, 0), (200+(self.editor.ground_content*35%490)-2,500+(35*((self.editor.ground_content*35)/490))-2,32+2,32+2), 2)
         elif self.editor.mode == DOODAD:
-            pygame.draw.rect(surf, (255, 255, 0), (8, self.editor.MAX_Y*32+55, 80, 25), 1)
-            surf.blit(self.editor.content_img[self.editor.doodad_content], (500, 450))
+            for i in range(0, len(DOODAD_DATA)):
+                surf.blit(DOODAD_DATA[i], (200+(i*35%490),500+(35*((i*35)/490))))
+            pygame.draw.rect(surf, (255, 255, 0), (200+(self.editor.doodad_content*35%490)-2,500+(35*((self.editor.doodad_content*35)/490))-2,32+2,32+2), 2)
+            # La croix pour "pas de doodad"
+            pygame.draw.line(surf, (255, 0, 255), (201,501), (231,531), 1)
+            pygame.draw.line(surf, (255, 0, 255), (231,501), (201,531), 1)
         elif self.editor.mode == ENTITY:
-            pygame.draw.rect(surf, (255, 255, 0), (8, self.editor.MAX_Y*32+80, 80, 25), 1)
             for i in range(0, len(ENTITY_DATA)):
-                surf.blit(ENTITY_DATA[i], (100+(i*35%665),500+(35*((i*35)/665))))
-            pygame.draw.rect(surf, (255, 255, 0), (100+(self.editor.entity_content*35%665)-2,500+(35*((self.editor.entity_content*35)/665))-2,32+2,32+2), 2)
-            pygame.draw.line(surf, (255, 0, 255), (101,501), (131,531), 1)
-            pygame.draw.line(surf, (255, 0, 255), (131,501), (101,531), 1)
+                surf.blit(ENTITY_DATA[i], (200+(i*35%490),500+(35*((i*35)/490))))
+            pygame.draw.rect(surf, (255, 255, 0), (200+(self.editor.entity_content*35%490)-2,500+(35*((self.editor.entity_content*35)/490))-2,32+2,32+2), 2)
+            # La croix pour "pas d'entity"
+            pygame.draw.line(surf, (255, 0, 255), (201,501), (231,531), 1)
+            pygame.draw.line(surf, (255, 0, 255), (231,501), (201,531), 1)
         
         #surf.blit(self.editor.font.render("select", True, (255, 255, 255)), (10, self.editor.MAX_Y*32+5))
         
@@ -107,9 +166,20 @@ class Menu(Window):
         else: surf.blit(self.editor.button_ground, (1, (self.editor.MAX_Y+1)*32+1))
         if self.editor.mode == DOODAD: surf.blit(self.editor.button_doodad_on, (1, (self.editor.MAX_Y+2)*32+1))        
         else: surf.blit(self.editor.button_doodad, (1, (self.editor.MAX_Y+2)*32+1))        
-        if self.editor.mode == ENTITY: surf.blit(self.editor.button_entity_on, (1, (self.editor.MAX_Y+3)*32+1))
-        else: surf.blit(self.editor.button_entity, (1, (self.editor.MAX_Y+3)*32+1))
+        if self.editor.mode == ENTITY: surf.blit(self.editor.button_entity_on, (1+96, (self.editor.MAX_Y+0)*32+1))
+        else: surf.blit(self.editor.button_entity, (1+96, (self.editor.MAX_Y+0)*32+1))
 
+        # minimap
+        x = (self.editor.MAX_X-3)*32
+        y = (self.editor.MAX_Y)*32
+        for yy in range(0, self.editor.MAP_Y):
+            for xx in range(0, self.editor.MAP_X):
+                g = self.editor.ground[yy][xx]
+                if g == 0:
+                    pygame.draw.rect(surf, (255,255,255), (xx*3+x, yy*3+y+1, 3, 3), 0)
+                else:
+                    pygame.draw.rect(surf, (255,0,0), (xx*3+x, yy*3+y+1, 3, 3), 0)
+        
 class MapView(Window):
     
     def __init__(self, editor, x, y, w, h, background_color):
@@ -133,27 +203,33 @@ class MapView(Window):
     
     def draw(self, surf):
         surf.fill(Color(0, 0, 0, 255))
-        for yy in range(0, self.editor.MAX_Y):
-            for xx in range(0, self.editor.MAX_X):
-                # GROUND
-                g = self.editor.ground[yy+self.editor.Y][xx+self.editor.X]
-                surf.blit(GROUND_DATA[g], (xx*32, yy*32))
-                # DOODAD
-                #r = self.editor.doodad[yy+self.editor.Y][xx+self.editor.X]
-                #if r > 0:
-                #    pygame.draw.rect(surf, Color(255, 0, 0, 128), (xx*32, yy*32, 32, 32), 1)
-                #    surf.blit(self.editor.content_img[r], (xx*32+self.editor.content[r][1],yy*32+self.editor.content[r][2]))
-                for d in self.editor.doodadx:
-                    surf.blit(self.editor.content_img[d[0]], ((d[1]-self.editor.X)*32+self.editor.content[d[0]][1],(d[2]-self.editor.Y)*32+self.editor.content[d[0]][2]))
-                #else:
-                #    pygame.draw.rect(surf, Color(0, 255, 0, 128), (xx*32, yy*32, 32, 32), 1)
-                # ENTITY
-                e = self.editor.entity[yy+self.editor.Y][xx+self.editor.X]
-                surf.blit(ENTITY_DATA[e], (xx*32, yy*32))
+        for yy in range(0, self.editor.MAX_Y+3):
+            for xx in range(0, self.editor.MAX_X+1):
+                if xx+self.editor.X < self.editor.MAP_X and yy+self.editor.Y < self.editor.MAP_Y:
+                    # GROUND
+                    g = self.editor.ground[yy+self.editor.Y][xx+self.editor.X]
+                    surf.blit(GROUND_DATA[g], (xx*32, yy*32))
+                    # DOODAD
+                    r = self.editor.doodad[yy+self.editor.Y][xx+self.editor.X]
+                    if r > 0:
+                        pygame.draw.rect(surf, Color(255, 0, 0, 128), (xx*32, yy*32, 32, 32), 1)
+                        surf.blit(self.editor.content_img[r], (xx*32+self.editor.content[r][1],yy*32+self.editor.content[r][2]))
+                    #for d in self.editor.doodadx:
+                    #    surf.blit(self.editor.content_img[d[0]], ((d[1]-self.editor.X)*32+self.editor.content[d[0]][1],(d[2]-self.editor.Y)*32+self.editor.content[d[0]][2]))
+                    #else:
+                    #    pygame.draw.rect(surf, Color(0, 255, 0, 128), (xx*32, yy*32, 32, 32), 1)
+                    # ENTITY
+                    e = self.editor.entity[yy+self.editor.Y][xx+self.editor.X]
+                    if e != 0 and e is not None: #surf.blit(ENTITY_DATA[e], (xx*32, yy*32))
+                        if e.cat < 15: surf.blit(ENTITY_DATA[e.cat], ((e.x-self.editor.X)*32, (e.y-self.editor.Y)*32))
+                        elif e.cat == 15: surf.blit(ENTITY_15, ((e.x-self.editor.X-e.sx)*32, (e.y-self.editor.Y-e.sy)*32)) # TOWER 15
+                        elif e.cat == 16: surf.blit(ENTITY_16, ((e.x-self.editor.X-e.sx)*32, (e.y-self.editor.Y-e.sy)*32))
 
 class Editor:
     
     def __init__(self):
+        global ENTITY_15, ENTITY_16 # TOWER 15
+        
         pygame.init()
         self.size = self.width, self.height = 800, 600
         self.screen = pygame.display.set_mode(self.size)
@@ -168,7 +244,6 @@ class Editor:
         self.ground = []
         self.doodad = []
         self.entity = []
-        self.doodadx= []
         for yy in range(0, self.MAP_Y):
             self.ground.append([])
             self.doodad.append([])
@@ -179,12 +254,10 @@ class Editor:
                 self.entity[yy].append(0)
                 sys.stdout.write(str(self.doodad[yy][xx]))
         print
-        #self.doodad[4][4] = 1
-        #self.doodad[31][31] = 1
-        #self.doodad[3][2] = 1
-        self.doodadx.append((1, 3, 2))
-        self.doodadx.append((1, 31, 31))
-        self.entity[7][7] = 1
+        self.doodad[4][4] = 1
+        self.doodad[31][31] = 1
+        self.doodad[3][2] = 1
+        self.entity[7][7] = Entity(7, 7, 1) #1
         
         self.down = False
         self.up = False
@@ -201,7 +274,6 @@ class Editor:
         self.ground_content = 1
         self.doodad_content = 1
         self.entity_content = 1
-        self.MAX_DOODAD_CONTENT = 4
         
         self.mode = GROUND
         
@@ -218,6 +290,25 @@ class Editor:
         for i in range(0, len(ENTITY_DATA)):
             ENTITY_DATA[i] = pygame.image.load('./media/'+ENTITY_DATA[i]+'.png').convert()
             ENTITY_DATA[i].set_colorkey((255,0,255))
+        
+        for i in range(0, len(DOODAD_DATA)):
+            DOODAD_DATA[i] = pygame.image.load('./media/'+DOODAD_DATA[i]+'.png').convert()
+            DOODAD_DATA[i].set_colorkey((255,0,255))
+        
+        # TEXTURES
+        for i in range(0, len(TEXTURES)):
+            TEXTURES[i].content = pygame.image.load('./media/'+TEXTURES[i].name).convert()
+            if TEXTURES[i].ico is not None:
+                TEXTURES[i].content_ico = pygame.image.load('./media/'+TEXTURES[i].ico).convert()
+            else:
+                TEXTURES[i].content_ico = TEXTURES[i].content
+            
+            TEXTURES[i].content.set_colorkey((255,0,255))
+        
+        ENTITY_15 = pygame.image.load('./media/tour.png').convert() # TOWER 15
+        ENTITY_15.set_colorkey((255,0,255))
+        ENTITY_16 = pygame.image.load('./media/bat1.png').convert() # TOWER 15
+        ENTITY_16.set_colorkey((255,0,255))
         
         self.button_select = pygame.image.load('button_select.png').convert()
         self.button_ground = pygame.image.load('button_ground.png').convert()
@@ -236,6 +327,8 @@ class Editor:
         print 'm (,) : changement de mode (sol / motif)'
         print 'bouton gauche : application motif'
         print 'bouton droit : information'
+        print 's : save ground map'
+        print 'l : load ground map'
         
         for i in range(0, random.randint(1, 10)):
             self.build()
@@ -289,7 +382,7 @@ class Editor:
                 elif event.key == K_RIGHT: self.right = False
                 elif event.key == K_SPACE:
                     if self.mode == DOODAD:
-                        self.doodad_content = (self.doodad_content + 1) % self.MAX_DOODAD_CONTENT
+                        self.doodad_content = (self.doodad_content + 1) % len(DOODAD_DATA)
                     elif self.mode == GROUND:
                         self.ground_content = (self.ground_content + 1) % len(GROUND_DATA)
                     elif self.mode == ENTITY:
@@ -297,22 +390,28 @@ class Editor:
                 elif event.key == K_m:
                     self.mode = (self.mode + 1) % MODE_MAX
                     print self.mode
+                elif event.key == K_l:
+                    f = file('out.svg', 'r')
+                    self.ground = pickle.load(f)
+                elif event.key == K_s:
+                    f = file('out.svg', 'w')
+                    pickle.dump(self.ground, f)
         
         #---------------------------------------------------------------
         # Update
-        if self.left:
+        if self.left or mx < 5:
             if self.X > 0: 
                 self.X -= 1
             print self.X, self.Y
-        if self.right:
+        if self.right or mx > 800-5:
             if self.X < self.MAP_X-self.MAX_X: 
                 self.X += 1
             print self.X, self.Y
-        if self.down:
+        if self.down or my > 600-5:
             if self.Y < self.MAP_Y-self.MAX_Y: 
                 self.Y += 1
             print self.X, self.Y
-        if self.up:
+        if self.up or my < 5:
             if self.Y > 0: 
                 self.Y -= 1
             print self.X, self.Y
@@ -320,11 +419,20 @@ class Editor:
         if self.apply:
             if self.mode == DOODAD:
                 if mx32 >= 0 and mx32 < self.MAP_X and my32 >= 0 and my32 < self.MAP_Y: self.doodad[my32][mx32] = self.doodad_content
+                #self.doodadx.append((self.doodad_content, mx32, my32))
             elif self.mode == GROUND:
                 if mx32 >= 0 and mx32 < self.MAP_X and my32 >= 0 and my32 < self.MAP_Y: self.ground[my32][mx32] = self.ground_content
             elif self.mode == ENTITY:
-                if mx32 >= 0 and mx32 < self.MAP_X and my32 >= 0 and my32 < self.MAP_Y: self.entity[my32][mx32] = self.entity_content
-            
+                if mx32 >= 0 and mx32 < self.MAP_X and my32 >= 0 and my32 < self.MAP_Y: #self.entity[my32][mx32] = self.entity_content
+                    u = self.entity[my32][mx32]
+                    if u != 0 and u is not None: del u
+                    if self.entity_content < 15:
+                        self.entity[my32][mx32] = Entity(mx32, my32, self.entity_content)
+                    elif self.entity_content == 15:
+                        self.entity[my32][mx32] = Entity(mx32, my32, self.entity_content,1,3) # TOWER 15
+                    elif self.entity_content == 16:
+                        self.entity[my32][mx32] = Entity(mx32, my32, self.entity_content,1,1)
+    
     def draw(self):
         self.view.draw(self.screen)
         self.menu.draw(self.screen)
