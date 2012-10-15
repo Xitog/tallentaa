@@ -8,6 +8,7 @@
 
 import pygame, sys, math, random, pickle
 from pygame.locals import *
+from definition import *
 
 #-----------------------------------------------------------------------
 # Global Vars
@@ -20,41 +21,12 @@ DOODAD = 2
 ENTITY = 3
 MODE_MAX = 4
 
-GROUND_DATA = [ '100', '101', '102', '103', '104', '105', '106', '107', '108', '109', '110', '111', '112', '113', '114' ]
 ENTITY_DATA = [ '900', '904', '908', '912', '916', '920', '924', '928', '932', '936', '940', '944', '948', '952', '956', 'tour_ico', 'bat1_ico' ]
 DOODAD_DATA = [ '900', 'tree1_ico', 'tree2_ico', 'tree3_ico']
 
 ENTITY_15 = None # TOWER 15
 ENTITY_16 = None
 
-# Test
-class Texture:
-    # filename texture, filename icon, sizex, sizey, passable matrix, surface content
-    def __init__(self, name, ico=None, sx=1, sy=1, passable=[[0]], content=None, content_ico=None):
-        self.name = name
-        self.ico = ico
-        self.sx = sx
-        self.sy = sy
-        self.passable = passable
-
-TEXTURES = [
-    Texture('100.png'),
-    Texture('101.png'),
-    Texture('102.png'),
-    Texture('103.png'),
-    Texture('104.png'),
-    Texture('105.png', passable=[[1]]),
-    Texture('106.png'),
-    Texture('107.png'),
-    Texture('108.png'),
-    Texture('109.png'),
-    Texture('110.png'),
-    Texture('111.png'),
-    Texture('112.png'),
-    Texture('113.png'),
-    Texture('114.png'),
-    Texture('115.png', '115_ico.png', 4, 2, [[1,1,1,0],[1,0,1,1]]),
-]
 
 #-----------------------------------------------------------------------
 # Classes
@@ -175,7 +147,7 @@ class Menu(Window):
         for yy in range(0, self.editor.MAP_Y):
             for xx in range(0, self.editor.MAP_X):
                 g = self.editor.ground[yy][xx]
-                if g == 0:
+                if g == 100:
                     pygame.draw.rect(surf, (255,255,255), (xx*3+x, yy*3+y+1, 3, 3), 0)
                 else:
                     pygame.draw.rect(surf, (255,0,0), (xx*3+x, yy*3+y+1, 3, 3), 0)
@@ -224,8 +196,27 @@ class MapView(Window):
                         if e.cat < 15: surf.blit(ENTITY_DATA[e.cat], ((e.x-self.editor.X)*32, (e.y-self.editor.Y)*32))
                         elif e.cat == 15: surf.blit(ENTITY_15, ((e.x-self.editor.X-e.sx)*32, (e.y-self.editor.Y-e.sy)*32)) # TOWER 15
                         elif e.cat == 16: surf.blit(ENTITY_16, ((e.x-self.editor.X-e.sx)*32, (e.y-self.editor.Y-e.sy)*32))
+        # mouse
+        mx, my = pygame.mouse.get_pos()
+        #mx32 = mx / 32 + self.X
+        #my32 = my / 32 + self.Y
+        if self.editor.mode == GROUND:
+            pygame.draw.rect(surf, (0, 0, 255), ((mx/32)*32, (my/32)*32, TEXTURES[self.editor.ground_content].size_x*32, TEXTURES[self.editor.ground_content].size_y*32), 1)
 
 class Editor:
+    
+    def load(self):
+        # loading of ground data
+        for i in range(0, len(GROUND_DEF)):
+            GROUND_DATA[GROUND_DEF[i]] = pygame.image.load(DIRECTORY+str(GROUND_DEF[i])+EXTENSION).convert()
+            GROUND_DATA[GROUND_DEF[i]].set_colorkey((255,0,255))
+        
+        # icon creation for texture
+        for i in range(0, len(TEXTURES)):
+            if TEXTURES[i].ico is None:
+                TEXTURES[i].content_ico = GROUND_DATA[TEXTURES[i].tex[0][0]]
+            else:
+                TEXTURES[i].content_ico = pygame.image.load(DIRECTORY+TEXTURES[i].ico+EXTENSION).convert()
     
     def __init__(self):
         global ENTITY_15, ENTITY_16 # TOWER 15
@@ -249,7 +240,7 @@ class Editor:
             self.doodad.append([])
             self.entity.append([])
             for xx in range(0, self.MAP_X):
-                self.ground[yy].append(0)
+                self.ground[yy].append(100)
                 self.doodad[yy].append(0)
                 self.entity[yy].append(0)
                 sys.stdout.write(str(self.doodad[yy][xx]))
@@ -283,10 +274,6 @@ class Editor:
             i.set_colorkey((255,0,255))
             self.content_img.append(i)
         
-        for i in range(0, len(GROUND_DATA)):
-            GROUND_DATA[i] = pygame.image.load('./media/'+GROUND_DATA[i]+'.png').convert()
-            GROUND_DATA[i].set_colorkey((255,0,255))
-        
         for i in range(0, len(ENTITY_DATA)):
             ENTITY_DATA[i] = pygame.image.load('./media/'+ENTITY_DATA[i]+'.png').convert()
             ENTITY_DATA[i].set_colorkey((255,0,255))
@@ -295,29 +282,21 @@ class Editor:
             DOODAD_DATA[i] = pygame.image.load('./media/'+DOODAD_DATA[i]+'.png').convert()
             DOODAD_DATA[i].set_colorkey((255,0,255))
         
-        # TEXTURES
-        for i in range(0, len(TEXTURES)):
-            TEXTURES[i].content = pygame.image.load('./media/'+TEXTURES[i].name).convert()
-            if TEXTURES[i].ico is not None:
-                TEXTURES[i].content_ico = pygame.image.load('./media/'+TEXTURES[i].ico).convert()
-            else:
-                TEXTURES[i].content_ico = TEXTURES[i].content
-            
-            TEXTURES[i].content.set_colorkey((255,0,255))
+        self.load()
         
         ENTITY_15 = pygame.image.load('./media/tour.png').convert() # TOWER 15
         ENTITY_15.set_colorkey((255,0,255))
         ENTITY_16 = pygame.image.load('./media/bat1.png').convert() # TOWER 15
         ENTITY_16.set_colorkey((255,0,255))
         
-        self.button_select = pygame.image.load('button_select.png').convert()
-        self.button_ground = pygame.image.load('button_ground.png').convert()
-        self.button_doodad = pygame.image.load('button_doodad.png').convert()
-        self.button_entity = pygame.image.load('button_entity.png').convert()
-        self.button_select_on = pygame.image.load('button_select_on.png').convert()
-        self.button_ground_on = pygame.image.load('button_ground_on.png').convert()
-        self.button_doodad_on = pygame.image.load('button_doodad_on.png').convert()
-        self.button_entity_on = pygame.image.load('button_entity_on.png').convert()
+        self.button_select = pygame.image.load('./media/gui/button_select.png').convert()
+        self.button_ground = pygame.image.load('./media/gui/button_ground.png').convert()
+        self.button_doodad = pygame.image.load('./media/gui/button_doodad.png').convert()
+        self.button_entity = pygame.image.load('./media/gui/button_entity.png').convert()
+        self.button_select_on = pygame.image.load('./media/gui/button_select_on.png').convert()
+        self.button_ground_on = pygame.image.load('./media/gui/button_ground_on.png').convert()
+        self.button_doodad_on = pygame.image.load('./media/gui/button_doodad_on.png').convert()
+        self.button_entity_on = pygame.image.load('./media/gui/button_entity_on.png').convert()
         
         print 'bas : scrolling vers le bas'
         print 'haut : scrolling vers le haut'
@@ -346,7 +325,7 @@ class Editor:
         y = random.randint(0, self.MAP_Y-size_y-1)
         for yy in range(x, x+size_x):
             for xx in range(y, y+size_y):
-                self.ground[yy][xx] = 1
+                self.ground[yy][xx] = 105
         print 'creating a room of ', size_x, 'by', size_y, 'at', x, ',', y
     
     def run(self):
@@ -421,7 +400,11 @@ class Editor:
                 if mx32 >= 0 and mx32 < self.MAP_X and my32 >= 0 and my32 < self.MAP_Y: self.doodad[my32][mx32] = self.doodad_content
                 #self.doodadx.append((self.doodad_content, mx32, my32))
             elif self.mode == GROUND:
-                if mx32 >= 0 and mx32 < self.MAP_X and my32 >= 0 and my32 < self.MAP_Y: self.ground[my32][mx32] = self.ground_content
+                if mx32 >= 0 and mx32 < self.MAP_X and my32 >= 0 and my32 < self.MAP_Y: #self.ground[my32][mx32] = self.ground_content
+                    for v in range(my32, my32+TEXTURES[self.ground_content].size_y):
+                        for w in range(mx32, mx32+TEXTURES[self.ground_content].size_x):
+                            if TEXTURES[self.ground_content].tex[v-my32][w-mx32] != 0:
+                                self.ground[v][w] = TEXTURES[self.ground_content].tex[v-my32][w-mx32]
             elif self.mode == ENTITY:
                 if mx32 >= 0 and mx32 < self.MAP_X and my32 >= 0 and my32 < self.MAP_Y: #self.entity[my32][mx32] = self.entity_content
                     u = self.entity[my32][mx32]
