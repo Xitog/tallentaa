@@ -9,6 +9,11 @@
 # TEXTURES est une liste des textures qui peuvent etre composees de un
 # ou plusieurs fichiers (voir la matrice tex). Une texture ne sert qu'a
 # deposer plus facilement des fichiers qui vont ensemble.
+#
+# Faire une texture :
+#  - Preparer les differents fichiers + 1 fichier _ico
+#  - Enregistrer le chiffre des fichiers dans GROUND_DEF
+#  - Enregistrer l'assemblage dans TEXTURES (avec la matrice de passabilite)
 #-----------------------------------------------------------------------
 
 DIRECTORY = './media/textures/'
@@ -31,12 +36,16 @@ GROUND_DEF = [
     112, 
     113, 
     114,
-    115,
+    115, # dragon squelette
     116,
     117,
     118,
     119,
-    120, ]
+    120,
+    121, # soucoupe
+    122,
+    123,
+    124, ]
 
 GROUND_DATA = {
 }
@@ -76,4 +85,8 @@ TEXTURES = [
                                             [116, 0,   119, 120] ],
                                           [ [ 1, 1, 1, 0],
                                             [ 1, 0, 1, 1] ]),
+    Texture('soucoupe', 2, 2, '121_ico', [ [121, 122],
+                                           [123, 124] ],
+                                         [ [1, 1],
+                                           [1, 1] ]),
 ]
