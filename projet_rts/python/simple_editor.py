@@ -21,12 +21,8 @@ DOODAD = 2
 ENTITY = 3
 MODE_MAX = 4
 
-ENTITY_DATA = [ '900', '904', '908', '912', '916', '920', '924', '928', '932', '936', '940', '944', '948', '952', '956', 'tour_ico', 'bat1_ico' ]
-DOODAD_DATA = [ '900', 'tree1_ico', 'tree2_ico', 'tree3_ico']
-
 ENTITY_15 = None # TOWER 15
 ENTITY_16 = None
-
 
 #-----------------------------------------------------------------------
 # Classes
@@ -84,7 +80,7 @@ class Menu(Window):
                 self.editor.ground_content = i
             elif self.editor.mode == ENTITY and i < len(ENTITY_DATA) and i >= 0:
                 self.editor.entity_content = i
-            elif self.editor.mode == DOODAD and i < len(DOODAD_DATA) and i >= 0:
+            elif self.editor.mode == DOODAD and i < len(DOODADS) and i >= 0:
                 self.editor.doodad_content = i
             if x <= 97:
                 b = (y-self.editor.MAX_Y*32)/32
@@ -116,8 +112,8 @@ class Menu(Window):
             #    surf.blit(GROUND_DATA[i], (200+(i*35%490),500+(35*((i*35)/490))))
             pygame.draw.rect(surf, (255, 255, 0), (200+(self.editor.ground_content*35%490)-2,500+(35*((self.editor.ground_content*35)/490))-2,32+2,32+2), 2)
         elif self.editor.mode == DOODAD:
-            for i in range(0, len(DOODAD_DATA)):
-                surf.blit(DOODAD_DATA[i], (200+(i*35%490),500+(35*((i*35)/490))))
+            for i in range(0, len(DOODADS)):
+                surf.blit(DOODADS[i].ico, (200+(i*35%490),500+(35*((i*35)/490))))
             pygame.draw.rect(surf, (255, 255, 0), (200+(self.editor.doodad_content*35%490)-2,500+(35*((self.editor.doodad_content*35)/490))-2,32+2,32+2), 2)
             # La croix pour "pas de doodad"
             pygame.draw.line(surf, (255, 0, 255), (201,501), (231,531), 1)
@@ -146,8 +142,8 @@ class Menu(Window):
         y = (self.editor.MAX_Y)*32
         for yy in range(0, self.editor.MAP_Y):
             for xx in range(0, self.editor.MAP_X):
-                g = self.editor.ground[yy][xx]
-                if g == 100:
+                g = self.editor.blocks[yy][xx] #self.editor.ground[yy][xx]
+                if g == 0: #100:
                     pygame.draw.rect(surf, (255,255,255), (xx*3+x, yy*3+y+1, 3, 3), 0)
                 else:
                     pygame.draw.rect(surf, (255,0,0), (xx*3+x, yy*3+y+1, 3, 3), 0)
@@ -185,11 +181,7 @@ class MapView(Window):
                     r = self.editor.doodad[yy+self.editor.Y][xx+self.editor.X]
                     if r > 0:
                         pygame.draw.rect(surf, Color(255, 0, 0, 128), (xx*32, yy*32, 32, 32), 1)
-                        surf.blit(self.editor.content_img[r], (xx*32+self.editor.content[r][1],yy*32+self.editor.content[r][2]))
-                    #for d in self.editor.doodadx:
-                    #    surf.blit(self.editor.content_img[d[0]], ((d[1]-self.editor.X)*32+self.editor.content[d[0]][1],(d[2]-self.editor.Y)*32+self.editor.content[d[0]][2]))
-                    #else:
-                    #    pygame.draw.rect(surf, Color(0, 255, 0, 128), (xx*32, yy*32, 32, 32), 1)
+                        surf.blit(DOODADS[r].tex, (xx*32+DOODADS[r].dev_x,yy*32+DOODADS[r].dev_y))
                     # ENTITY
                     e = self.editor.entity[yy+self.editor.Y][xx+self.editor.X]
                     if e != 0 and e is not None: #surf.blit(ENTITY_DATA[e], (xx*32, yy*32))
@@ -202,6 +194,8 @@ class MapView(Window):
         #my32 = my / 32 + self.Y
         if self.editor.mode == GROUND:
             pygame.draw.rect(surf, (0, 0, 255), ((mx/32)*32, (my/32)*32, TEXTURES[self.editor.ground_content].size_x*32, TEXTURES[self.editor.ground_content].size_y*32), 1)
+        elif self.editor.mode == DOODAD:
+            pygame.draw.rect(surf, (0, 0, 255), ((mx/32)*32, (my/32)*32, DOODADS[self.editor.doodad_content].size_x*32, DOODADS[self.editor.doodad_content].size_y*32), 1)
 
 class Editor:
     
@@ -217,7 +211,19 @@ class Editor:
                 TEXTURES[i].content_ico = GROUND_DATA[TEXTURES[i].tex[0][0]]
             else:
                 TEXTURES[i].content_ico = pygame.image.load(DIRECTORY+TEXTURES[i].ico+EXTENSION).convert()
-    
+        
+        # loading doodads icons
+        for i in range(0, len(DOODADS)):
+            DOODADS[i].ico = pygame.image.load('./media/doodads/'+DOODADS[i].name_ico+'.png').convert()
+            DOODADS[i].ico.set_colorkey((255,0,255))
+            DOODADS[i].tex = pygame.image.load('./media/doodads/'+DOODADS[i].name_tex+'.png').convert()
+            DOODADS[i].tex.set_colorkey((255,0,255))
+        
+        # loading entities
+        for i in range(0, len(ENTITY_DATA)):
+            ENTITY_DATA[i] = pygame.image.load('./media/'+ENTITY_DATA[i]+'.png').convert()
+            ENTITY_DATA[i].set_colorkey((255,0,255))
+
     def __init__(self):
         global ENTITY_15, ENTITY_16 # TOWER 15
         
@@ -235,14 +241,17 @@ class Editor:
         self.ground = []
         self.doodad = []
         self.entity = []
+        self.blocks = []
         for yy in range(0, self.MAP_Y):
             self.ground.append([])
             self.doodad.append([])
             self.entity.append([])
+            self.blocks.append([])
             for xx in range(0, self.MAP_X):
                 self.ground[yy].append(100)
                 self.doodad[yy].append(0)
                 self.entity[yy].append(0)
+                self.blocks[yy].append(0)
                 sys.stdout.write(str(self.doodad[yy][xx]))
         print
         self.doodad[4][4] = 1
@@ -256,31 +265,11 @@ class Editor:
         self.right = False
 
         self.apply = False
-        self.content = [
-            ('none', 0, 0),
-            ('tree1', -48, -4*32),
-            ('tree2', -48, -4*32),
-            ('tree3', -48, -4*32),
-        ]
         self.ground_content = 1
         self.doodad_content = 1
         self.entity_content = 1
         
         self.mode = GROUND
-        
-        self.content_img = []
-        for c in self.content:
-            i =  pygame.image.load(c[0]+'.png').convert()
-            i.set_colorkey((255,0,255))
-            self.content_img.append(i)
-        
-        for i in range(0, len(ENTITY_DATA)):
-            ENTITY_DATA[i] = pygame.image.load('./media/'+ENTITY_DATA[i]+'.png').convert()
-            ENTITY_DATA[i].set_colorkey((255,0,255))
-        
-        for i in range(0, len(DOODAD_DATA)):
-            DOODAD_DATA[i] = pygame.image.load('./media/'+DOODAD_DATA[i]+'.png').convert()
-            DOODAD_DATA[i].set_colorkey((255,0,255))
         
         self.load()
         
@@ -326,6 +315,7 @@ class Editor:
         for yy in range(x, x+size_x):
             for xx in range(y, y+size_y):
                 self.ground[yy][xx] = 105
+                self.blocks[yy][xx] = 1
         print 'creating a room of ', size_x, 'by', size_y, 'at', x, ',', y
     
     def run(self):
@@ -397,14 +387,15 @@ class Editor:
         #if left or right or down or up: print X, Y
         if self.apply:
             if self.mode == DOODAD:
-                if mx32 >= 0 and mx32 < self.MAP_X and my32 >= 0 and my32 < self.MAP_Y: self.doodad[my32][mx32] = self.doodad_content
-                #self.doodadx.append((self.doodad_content, mx32, my32))
+                if mx32 >= 0 and mx32 < self.MAP_X and my32 >= 0 and my32 < self.MAP_Y: 
+                    self.doodad[my32][mx32] = self.doodad_content
             elif self.mode == GROUND:
                 if mx32 >= 0 and mx32 < self.MAP_X and my32 >= 0 and my32 < self.MAP_Y: #self.ground[my32][mx32] = self.ground_content
                     for v in range(my32, my32+TEXTURES[self.ground_content].size_y):
                         for w in range(mx32, mx32+TEXTURES[self.ground_content].size_x):
                             if TEXTURES[self.ground_content].tex[v-my32][w-mx32] != 0:
                                 self.ground[v][w] = TEXTURES[self.ground_content].tex[v-my32][w-mx32]
+                                self.blocks[v][w] = TEXTURES[self.ground_content].passable[v-my32][w-mx32]
             elif self.mode == ENTITY:
                 if mx32 >= 0 and mx32 < self.MAP_X and my32 >= 0 and my32 < self.MAP_Y: #self.entity[my32][mx32] = self.entity_content
                     u = self.entity[my32][mx32]

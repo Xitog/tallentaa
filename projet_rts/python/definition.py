@@ -51,8 +51,9 @@ GROUND_DATA = {
 }
 
 #-----------------------------------------------------------------------
+# Textures
+#-----------------------------------------------------------------------
 
-# Test TEXTURE
 class Texture:
     def __init__(self, name, size_x=1, size_y=1, ico=None, tex=[[0]], passable=[[0]]): 
         self.name = name
@@ -90,3 +91,55 @@ TEXTURES = [
                                          [ [1, 1],
                                            [1, 1] ]),
 ]
+
+#-----------------------------------------------------------------------
+# Doodads
+#-----------------------------------------------------------------------
+
+class Doodad:
+    def __init__(self, name_ico, name_tex, dev_x, dev_y, size_x, size_y):
+        self.name_ico = name_ico
+        self.name_tex = name_tex
+        self.dev_x = dev_x
+        self.dev_y = dev_y
+        self.size_x = size_x
+        self.size_y = size_y
+        self.ico = None
+        self.tex = None
+
+# icons
+DOODADS = [
+    Doodad('900', 'none', 0, 0, 1, 1),
+    Doodad('tree1_ico', 'tree1', -48, -4*32, 1, 1),
+    Doodad('tree2_ico', 'tree2', -48, -4*32, 1, 1),
+    Doodad('tree3_ico', 'tree3', -48, -4*32, 1, 1),
+]
+
+#-----------------------------------------------------------------------
+# Entities
+#-----------------------------------------------------------------------
+
+ENTITY_DATA = [ 
+    '900', 
+    '904', 
+    '908', 
+    '912', 
+    '916', 
+    '920', 
+    '924', 
+    '928', 
+    '932', 
+    '936', 
+    '940', 
+    '944', 
+    '948', 
+    '952', 
+    '956', 
+    'tour_ico', 
+    'bat1_ico' 
+]
+
+class EntityDef:
+    def __init__(self, graph):
+        self.graph = graph
+
