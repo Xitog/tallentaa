@@ -97,7 +97,7 @@ TEXTURES = [
 #-----------------------------------------------------------------------
 
 class Doodad:
-    def __init__(self, name_ico, name_tex, dev_x, dev_y, size_x, size_y):
+    def __init__(self, name_ico, name_tex=None, dev_x=0, dev_y=0, size_x=1, size_y=1):
         self.name_ico = name_ico
         self.name_tex = name_tex
         self.dev_x = dev_x
@@ -114,6 +114,20 @@ DOODADS = [
     Doodad('tree2_ico', 'tree2', -48, -4*32, 1, 1),
     Doodad('tree3_ico', 'tree3', -48, -4*32, 1, 1),
     Doodad('speeder_ico', 'speeder', 0, 0, 2, 1),
+    Doodad('coin_bas_droit1', 'coin_bas_droit1', 0, 0, 1, 1),
+    Doodad('coin_bas_droit2', 'coin_bas_droit2', 0, 0, 1, 1),
+    Doodad('coin_bas_gauche1'),
+    Doodad('coin_bas_gauche2'),
+    Doodad('coin_haut_droit'),
+    Doodad('coin_haut_gauche'),
+    Doodad('mur_bas1'),
+    Doodad('mur_bas2'),
+    Doodad('mur_bas3'),
+    Doodad('mur_bas4'),
+    Doodad('mur_droit1'),
+    Doodad('mur_droit2'),
+    Doodad('mur_gauche'),
+    Doodad('mur_haut'),
 ]
 
 class Use:

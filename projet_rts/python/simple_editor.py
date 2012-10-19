@@ -186,7 +186,7 @@ class MapView(Window):
             there_is_something = False
             for v in range(my32, my32+obj.size_y):
                 for w in range(mx32, mx32+obj.size_x):
-                    if self.editor.blocks[v][w] == 1 or self.editor.doodad[v][w] != 0:
+                    if v >= self.editor.MAP_Y or w >= self.editor.MAP_X or self.editor.blocks[v][w] == 1 or self.editor.doodad[v][w] != 0:
                         there_is_something = True
             if there_is_something:
                 pygame.draw.rect(surf, (255, 0, 0), ((mx/32)*32, (my/32)*32, obj.size_x*32, obj.size_y*32), 1)
@@ -212,8 +212,11 @@ class Editor:
         for i in range(0, len(DOODADS)):
             DOODADS[i].ico = pygame.image.load('./media/doodads/'+DOODADS[i].name_ico+'.png').convert()
             DOODADS[i].ico.set_colorkey((255,0,255))
-            DOODADS[i].tex = pygame.image.load('./media/doodads/'+DOODADS[i].name_tex+'.png').convert()
-            DOODADS[i].tex.set_colorkey((255,0,255))
+            if DOODADS[i].name_tex is None:
+                DOODADS[i].tex = DOODADS[i].ico
+            else:
+                DOODADS[i].tex = pygame.image.load('./media/doodads/'+DOODADS[i].name_tex+'.png').convert()
+                DOODADS[i].tex.set_colorkey((255,0,255))
         
         # loading entities
         for i in range(0, len(ENTITIES)):
@@ -397,7 +400,7 @@ class Editor:
                     there_is_something = False
                     for v in range(my32, my32+obj.size_y):
                         for w in range(mx32, mx32+obj.size_x):
-                            if self.blocks[v][w] == 1 or self.doodad[v][w] != 0:
+                            if v >= self.MAP_Y or w >= self.MAP_X or self.blocks[v][w] == 1 or self.doodad[v][w] != 0:
                                 there_is_something = True
                     if not there_is_something:
                         u = Use(obj, mx32, my32)
