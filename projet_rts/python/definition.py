@@ -115,6 +115,12 @@ DOODADS = [
     Doodad('tree3_ico', 'tree3', -48, -4*32, 1, 1),
 ]
 
+class DoodadUsed:
+    def __init__(self, doodad, x, y):
+        self.doodad = doodad
+        self.x = x
+        self.y = y
+
 #-----------------------------------------------------------------------
 # Entities
 #-----------------------------------------------------------------------
