@@ -28,21 +28,6 @@ ENTITY_16 = None
 # Classes
 #-----------------------------------------------------------------------
 
-# sx, sy = modifier pour dessin only!
-# tx, ty = taille x,y
-class Entity:
-    def __init__(self, x, y, cat, sx=0, sy=0, tx=1, ty=1, vie_max=100, vie=100):
-        self.angle = 1
-        self.vie = vie
-        self.vie_max = vie_max
-        self.x = x
-        self.y = y
-        self.cat = cat
-        self.sx = sx
-        self.sy = sy
-        self.tx = tx
-        self.ty = ty
-
 class Window:
     
     def __init__(self, x, y, w, h, background_color):
@@ -78,7 +63,7 @@ class Menu(Window):
             i = (x-200)/35 + 14*((y-500)/35)
             if self.editor.mode == GROUND and i < len(TEXTURES) and i >= 0:
                 self.editor.ground_content = i
-            elif self.editor.mode == ENTITY and i < len(ENTITY_DATA) and i >= 0:
+            elif self.editor.mode == ENTITY and i < len(ENTITIES) and i >= 0:
                 self.editor.entity_content = i
             elif self.editor.mode == DOODAD and i < len(DOODADS) and i >= 0:
                 self.editor.doodad_content = i
@@ -93,7 +78,6 @@ class Menu(Window):
                 print b
     
     def draw(self, surf):
-        global ENTITY_15, ENTITY_16 # TOWER 15
         
         pygame.draw.rect(surf, (0,0,0), (self.x, self.y, self.w, self.h), 0)
         pygame.draw.rect(surf, (0,162,232), (self.x, self.y, self.w, self.h), 1)
@@ -119,8 +103,8 @@ class Menu(Window):
             pygame.draw.line(surf, (255, 0, 255), (201,501), (231,531), 1)
             pygame.draw.line(surf, (255, 0, 255), (231,501), (201,531), 1)
         elif self.editor.mode == ENTITY:
-            for i in range(0, len(ENTITY_DATA)):
-                surf.blit(ENTITY_DATA[i], (200+(i*35%490),500+(35*((i*35)/490))))
+            for i in range(0, len(ENTITIES)):
+                surf.blit(ENTITIES[i].ico, (200+(i*35%490),500+(35*((i*35)/490))))
             pygame.draw.rect(surf, (255, 255, 0), (200+(self.editor.entity_content*35%490)-2,500+(35*((self.editor.entity_content*35)/490))-2,32+2,32+2), 2)
             # La croix pour "pas d'entity"
             pygame.draw.line(surf, (255, 0, 255), (201,501), (231,531), 1)
@@ -165,7 +149,7 @@ class MapView(Window):
                 mx, my = pygame.mouse.get_pos()
                 mx32 = mx / 32 + self.editor.X
                 my32 = my / 32 + self.editor.Y
-                print 'line=', my32, 'column=', mx32, 'scrollX=', self.editor.X, 'scrollY=', self.editor.Y
+                print 'line=', my32, 'column=', mx32, 'scrollX=', self.editor.X, 'scrollY=', self.editor.Y, 'doodad=', self.editor.doodad[my32][mx32]
                 #elif event.button == 3:
                 #    if mx32 > 0 and mx32 < self.MAP_X and my32 > 0 and my32 < self.MAP_Y: print self.doodad[my32][mx32]
     
@@ -180,40 +164,34 @@ class MapView(Window):
                     # GROUND
                     g = self.editor.ground[yy+self.editor.Y][xx+self.editor.X]
                     surf.blit(GROUND_DATA[g], (xx*32, yy*32))
-                    # DOODAD
+                    # DOODAD & ENTITY
                     r = self.editor.doodad[yy+self.editor.Y][xx+self.editor.X]
-                    #if r > 0:
-                    #    pygame.draw.rect(surf, Color(255, 0, 0, 128), (xx*32, yy*32, 32, 32), 1)
-                    #    surf.blit(DOODADS[r].tex, (xx*32+DOODADS[r].dev_x,yy*32+DOODADS[r].dev_y))
                     if r != 0 and r is not None:
-                        surf.blit(r.doodad.tex, ((r.x-self.editor.X)*32+r.doodad.dev_x,(r.y-self.editor.Y)*32+r.doodad.dev_y))
-                    # ENTITY
-                    e = self.editor.entity[yy+self.editor.Y][xx+self.editor.X]
-                    if e != 0 and e is not None: #surf.blit(ENTITY_DATA[e], (xx*32, yy*32))
-                        if e.cat < 15: surf.blit(ENTITY_DATA[e.cat], ((e.x-self.editor.X)*32, (e.y-self.editor.Y)*32))
-                        elif e.cat == 15: surf.blit(ENTITY_15, ((e.x-self.editor.X-e.sx)*32, (e.y-self.editor.Y-e.sy)*32)) # TOWER 15
-                        elif e.cat == 16: surf.blit(ENTITY_16, ((e.x-self.editor.X-e.sx)*32, (e.y-self.editor.Y-e.sy)*32))
+                        surf.blit(r.obj.tex, ((r.x-self.editor.X)*32+r.obj.dev_x,(r.y-self.editor.Y)*32+r.obj.dev_y))
+        
         #
         # Curseur de la souris
         #
         mx, my = pygame.mouse.get_pos()
+        mx32 = mx / 32 + self.editor.X
+        my32 = my / 32 + self.editor.Y
         if self.editor.mode == GROUND:
             # on dessine un rectangle bleu de la taille de la texture.
             pygame.draw.rect(surf, (0, 0, 255), ((mx/32)*32, (my/32)*32, TEXTURES[self.editor.ground_content].size_x*32, TEXTURES[self.editor.ground_content].size_y*32), 1)
-        elif self.editor.mode == DOODAD:
-            # on verifie si il n'y a rien dans [blocks] pour la taille du doodad.
+        elif self.editor.mode in [ENTITY, DOODAD]:
+            if self.editor.mode == ENTITY: obj = ENTITIES[self.editor.entity_content]
+            elif self.editor.mode == DOODAD: obj = DOODADS[self.editor.doodad_content]
+            # on verifie si il n'y a rien dans [blocks] pour la taille de l'objet (doodad ou entity).
             # si oui, le rectangle du curseur est bleu, rouge sinon.
-            mx32 = mx / 32 + self.editor.X
-            my32 = my / 32 + self.editor.Y
             there_is_something = False
-            for v in range(my32, my32+DOODADS[self.editor.doodad_content].size_y):
-                for w in range(mx32, mx32+DOODADS[self.editor.doodad_content].size_x):
+            for v in range(my32, my32+obj.size_y):
+                for w in range(mx32, mx32+obj.size_x):
                     if self.editor.blocks[v][w] == 1 or self.editor.doodad[v][w] != 0:
                         there_is_something = True
             if there_is_something:
-                pygame.draw.rect(surf, (255, 0, 0), ((mx/32)*32, (my/32)*32, DOODADS[self.editor.doodad_content].size_x*32, DOODADS[self.editor.doodad_content].size_y*32), 1)
+                pygame.draw.rect(surf, (255, 0, 0), ((mx/32)*32, (my/32)*32, obj.size_x*32, obj.size_y*32), 1)
             else:
-                pygame.draw.rect(surf, (0, 0, 255), ((mx/32)*32, (my/32)*32, DOODADS[self.editor.doodad_content].size_x*32, DOODADS[self.editor.doodad_content].size_y*32), 1)
+                pygame.draw.rect(surf, (0, 0, 255), ((mx/32)*32, (my/32)*32, obj.size_x*32, obj.size_y*32), 1)
 
 class Editor:
     
@@ -238,12 +216,16 @@ class Editor:
             DOODADS[i].tex.set_colorkey((255,0,255))
         
         # loading entities
-        for i in range(0, len(ENTITY_DATA)):
-            ENTITY_DATA[i] = pygame.image.load('./media/'+ENTITY_DATA[i]+'.png').convert()
-            ENTITY_DATA[i].set_colorkey((255,0,255))
-
+        for i in range(0, len(ENTITIES)):
+            ENTITIES[i].ico = pygame.image.load('./media/'+ENTITIES[i].name_ico+'.png').convert()
+            ENTITIES[i].ico.set_colorkey((255,0,255))
+            if ENTITIES[i].name_tex is None:
+                ENTITIES[i].tex = ENTITIES[i].ico
+            else:
+                ENTITIES[i].tex = pygame.image.load('./media/'+ENTITIES[i].name_tex+'.png').convert()
+                ENTITIES[i].tex.set_colorkey((255,0,255))
+    
     def __init__(self):
-        global ENTITY_15, ENTITY_16 # TOWER 15
         
         pygame.init()
         self.size = self.width, self.height = 800, 600
@@ -258,24 +240,21 @@ class Editor:
 
         self.ground = []
         self.doodad = []
-        self.entity = []
         self.blocks = []
         for yy in range(0, self.MAP_Y):
             self.ground.append([])
             self.doodad.append([])
-            self.entity.append([])
             self.blocks.append([])
             for xx in range(0, self.MAP_X):
                 self.ground[yy].append(100)
                 self.doodad[yy].append(0)
-                self.entity[yy].append(0)
                 self.blocks[yy].append(0)
                 sys.stdout.write(str(self.doodad[yy][xx]))
         print
         #self.doodad[4][4] = 1
         #self.doodad[31][31] = 1
         #self.doodad[3][2] = 1
-        self.entity[7][7] = Entity(7, 7, 1) #1
+        #self.entity[7][7] = Entity(7, 7, 1) #1
         
         self.down = False
         self.up = False
@@ -290,11 +269,6 @@ class Editor:
         self.mode = GROUND
         
         self.load()
-        
-        ENTITY_15 = pygame.image.load('./media/tour.png').convert() # TOWER 15
-        ENTITY_15.set_colorkey((255,0,255))
-        ENTITY_16 = pygame.image.load('./media/bat1.png').convert() # TOWER 15
-        ENTITY_16.set_colorkey((255,0,255))
         
         self.button_select = pygame.image.load('./media/gui/button_select.png').convert()
         self.button_ground = pygame.image.load('./media/gui/button_ground.png').convert()
@@ -408,37 +382,28 @@ class Editor:
         # Application du curseur
         #
         if self.apply:
-            if self.mode == DOODAD:
-                if mx32 >= 0 and mx32 < self.MAP_X and my32 >= 0 and my32 < self.MAP_Y: 
-                    # on empeche de mettre des doodads la ou [blocks] est a 1 et si il y a deja un doodad
-                    there_is_something = False
-                    for v in range(my32, my32+DOODADS[self.doodad_content].size_y):
-                        for w in range(mx32, mx32+DOODADS[self.doodad_content].size_x):
-                            if self.blocks[v][w] == 1 or self.doodad[v][w] != 0:
-                                there_is_something = True
-                    if not there_is_something:
-                        d = DoodadUsed(DOODADS[self.doodad_content], mx32, my32)
-                        for v in range(my32, my32+DOODADS[self.doodad_content].size_y):
-                            for w in range(mx32, mx32+DOODADS[self.doodad_content].size_x):
-                                self.doodad[my32][mx32] = d
-                        #self.doodad[my32][mx32] = self.doodad_content
-            elif self.mode == GROUND:
+            if self.mode == GROUND:
                 if mx32 >= 0 and mx32 < self.MAP_X and my32 >= 0 and my32 < self.MAP_Y: #self.ground[my32][mx32] = self.ground_content
                     for v in range(my32, my32+TEXTURES[self.ground_content].size_y):
                         for w in range(mx32, mx32+TEXTURES[self.ground_content].size_x):
                             if TEXTURES[self.ground_content].tex[v-my32][w-mx32] != 0:
                                 self.ground[v][w] = TEXTURES[self.ground_content].tex[v-my32][w-mx32]
                                 self.blocks[v][w] = TEXTURES[self.ground_content].passable[v-my32][w-mx32]
-            elif self.mode == ENTITY:
-                if mx32 >= 0 and mx32 < self.MAP_X and my32 >= 0 and my32 < self.MAP_Y: #self.entity[my32][mx32] = self.entity_content
-                    u = self.entity[my32][mx32]
-                    if u != 0 and u is not None: del u
-                    if self.entity_content < 15:
-                        self.entity[my32][mx32] = Entity(mx32, my32, self.entity_content)
-                    elif self.entity_content == 15:
-                        self.entity[my32][mx32] = Entity(mx32, my32, self.entity_content,1,3) # TOWER 15
-                    elif self.entity_content == 16:
-                        self.entity[my32][mx32] = Entity(mx32, my32, self.entity_content,1,1)
+            elif self.mode in [DOODAD, ENTITY]:
+                if mx32 >= 0 and mx32 < self.MAP_X and my32 >= 0 and my32 < self.MAP_Y:
+                    # on empeche de mettre des entities la ou [blocks] est a 1 et si il y a deja un doodad ou une entities
+                    if self.mode == ENTITY: obj = ENTITIES[self.entity_content]
+                    elif self.mode == DOODAD: obj = DOODADS[self.doodad_content]
+                    there_is_something = False
+                    for v in range(my32, my32+obj.size_y):
+                        for w in range(mx32, mx32+obj.size_x):
+                            if self.blocks[v][w] == 1 or self.doodad[v][w] != 0:
+                                there_is_something = True
+                    if not there_is_something:
+                        u = Use(obj, mx32, my32)
+                        for v in range(my32, my32+obj.size_y):
+                            for w in range(mx32, mx32+obj.size_x):
+                                self.doodad[v][w] = u
     
     def draw(self):
         self.view.draw(self.screen)

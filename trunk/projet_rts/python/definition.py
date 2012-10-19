@@ -113,11 +113,12 @@ DOODADS = [
     Doodad('tree1_ico', 'tree1', -48, -4*32, 1, 1),
     Doodad('tree2_ico', 'tree2', -48, -4*32, 1, 1),
     Doodad('tree3_ico', 'tree3', -48, -4*32, 1, 1),
+    Doodad('speeder_ico', 'speeder', 0, 0, 2, 1),
 ]
 
-class DoodadUsed:
-    def __init__(self, doodad, x, y):
-        self.doodad = doodad
+class Use:
+    def __init__(self, obj, x, y):
+        self.obj = obj
         self.x = x
         self.y = y
 
@@ -125,27 +126,33 @@ class DoodadUsed:
 # Entities
 #-----------------------------------------------------------------------
 
-ENTITY_DATA = [ 
-    '900', 
-    '904', 
-    '908', 
-    '912', 
-    '916', 
-    '920', 
-    '924', 
-    '928', 
-    '932', 
-    '936', 
-    '940', 
-    '944', 
-    '948', 
-    '952', 
-    '956', 
-    'tour_ico', 
-    'bat1_ico' 
+class Entity:
+    def __init__(self, name_ico, name_tex=None, size_x=1, size_y=1, dev_x=0, dev_y=0):
+        self.name_ico = name_ico
+        self.name_tex = name_tex
+        self.size_x = size_x
+        self.size_y = size_y
+        self.dev_x = dev_x
+        self.dev_y = dev_y
+        self.ico = None
+        self.tex = None
+
+ENTITIES = [
+    Entity('900'), 
+    Entity('904'), 
+    Entity('908'), 
+    Entity('912'), 
+    Entity('916'), 
+    Entity('920'), 
+    Entity('924'), 
+    Entity('928'), 
+    Entity('932'), 
+    Entity('936'), 
+    Entity('940'), 
+    Entity('944'), 
+    Entity('948'), 
+    Entity('952'), 
+    Entity('956'), 
+    Entity('tour_ico', 'tour', 1, 1, -32, -96), 
+    Entity('bat1_ico', 'bat1', 2, 2),
 ]
-
-class EntityDef:
-    def __init__(self, graph):
-        self.graph = graph
-
