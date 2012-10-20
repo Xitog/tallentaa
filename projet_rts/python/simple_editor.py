@@ -51,7 +51,8 @@ class Menu(Window):
     def __init__(self, editor, x, y, w, h, background_color):
         Window.__init__(self, x, y, w, h, background_color)
         self.editor = editor
-    
+        self.Y_ELEMENTS = 485
+        
     def on_event(self, event):
         if event.type == MOUSEBUTTONUP:
             self.editor.apply = False
@@ -60,7 +61,7 @@ class Menu(Window):
             #print (x-100)/35
             #print (y-500)/35 
             # 14*35 = 490 et 19*35=665
-            i = (x-200)/35 + 14*((y-500)/35)
+            i = (x-200)/35 + 14*((y-self.Y_ELEMENTS)/35)
             if self.editor.mode == GROUND and i < len(TEXTURES) and i >= 0:
                 self.editor.ground_content = i
             elif self.editor.mode == ENTITY and i < len(ENTITIES) and i >= 0:
@@ -91,24 +92,24 @@ class Menu(Window):
             pass
         elif self.editor.mode == GROUND:
             for i in range(0, len(TEXTURES)):
-                surf.blit(TEXTURES[i].content_ico, (200+(i*35%490),500+(35*((i*35)/490))))
+                surf.blit(TEXTURES[i].content_ico, (200+(i*35%490),self.Y_ELEMENTS+(35*((i*35)/490))))
             #for i in range(0, len(GROUND_DATA)):
             #    surf.blit(GROUND_DATA[i], (200+(i*35%490),500+(35*((i*35)/490))))
-            pygame.draw.rect(surf, (255, 255, 0), (200+(self.editor.ground_content*35%490)-2,500+(35*((self.editor.ground_content*35)/490))-2,32+2,32+2), 2)
+            pygame.draw.rect(surf, (255, 255, 0), (200+(self.editor.ground_content*35%490)-2,self.Y_ELEMENTS+(35*((self.editor.ground_content*35)/490))-2,32+2,32+2), 2)
         elif self.editor.mode == DOODAD:
             for i in range(0, len(DOODADS)):
                 surf.blit(DOODADS[i].ico, (200+(i*35%490),500+(35*((i*35)/490))))
-            pygame.draw.rect(surf, (255, 255, 0), (200+(self.editor.doodad_content*35%490)-2,500+(35*((self.editor.doodad_content*35)/490))-2,32+2,32+2), 2)
+            pygame.draw.rect(surf, (255, 255, 0), (200+(self.editor.doodad_content*35%490)-2,self.Y_ELEMENTS+(35*((self.editor.doodad_content*35)/490))-2,32+2,32+2), 2)
             # La croix pour "pas de doodad"
-            pygame.draw.line(surf, (255, 0, 255), (201,501), (231,531), 1)
-            pygame.draw.line(surf, (255, 0, 255), (231,501), (201,531), 1)
+            pygame.draw.line(surf, (255, 0, 255), (201,self.Y_ELEMENTS+1), (231,self.Y_ELEMENTS+31), 1)
+            pygame.draw.line(surf, (255, 0, 255), (231,self.Y_ELEMENTS+1), (201,self.Y_ELEMENTS+31), 1)
         elif self.editor.mode == ENTITY:
             for i in range(0, len(ENTITIES)):
-                surf.blit(ENTITIES[i].ico, (200+(i*35%490),500+(35*((i*35)/490))))
-            pygame.draw.rect(surf, (255, 255, 0), (200+(self.editor.entity_content*35%490)-2,500+(35*((self.editor.entity_content*35)/490))-2,32+2,32+2), 2)
+                surf.blit(ENTITIES[i].ico, (200+(i*35%490),self.Y_ELEMENTS+(35*((i*35)/490))))
+            pygame.draw.rect(surf, (255, 255, 0), (200+(self.editor.entity_content*35%490)-2,self.Y_ELEMENTS+(35*((self.editor.entity_content*35)/490))-2,32+2,32+2), 2)
             # La croix pour "pas d'entity"
-            pygame.draw.line(surf, (255, 0, 255), (201,501), (231,531), 1)
-            pygame.draw.line(surf, (255, 0, 255), (231,501), (201,531), 1)
+            pygame.draw.line(surf, (255, 0, 255), (201,self.Y_ELEMENTS+1), (231,self.Y_ELEMENTS+31), 1)
+            pygame.draw.line(surf, (255, 0, 255), (231,self.Y_ELEMENTS+1), (201,self.Y_ELEMENTS+31), 1)
         
         #surf.blit(self.editor.font.render("select", True, (255, 255, 255)), (10, self.editor.MAX_Y*32+5))
         
@@ -127,7 +128,8 @@ class Menu(Window):
         for yy in range(0, self.editor.MAP_Y):
             for xx in range(0, self.editor.MAP_X):
                 g = self.editor.map.blocks[yy][xx] #self.editor.ground[yy][xx]
-                if g == 0: #100:
+                r = self.editor.map.doodad[yy][xx]
+                if g == 0 and r == 0: #100:
                     pygame.draw.rect(surf, (255,255,255), (xx*3+x, yy*3+y+1, 3, 3), 0)
                 else:
                     pygame.draw.rect(surf, (255,0,0), (xx*3+x, yy*3+y+1, 3, 3), 0)
@@ -249,10 +251,12 @@ class Map:
             if parts[0] == 'd':
                 for doo in DOODADS:
                     if doo.name_ico == parts[1]:
+                        #print 'load at x=', int(parts[2]), 'y=', int(parts[3])
                         u = Use(doo, int(parts[2]), int(parts[3]))
                         for v in range(int(parts[2]), int(parts[2])+doo.size_y):
                             for w in range(int(parts[3]), int(parts[3])+doo.size_x):
-                                self.doodad[v][w] = u
+                                self.doodad[w][v] = u
+                                #print 'written', u, 'at v=', v, 'w=', w
                         break
             elif parts[1] == 'e':
                 for ent in ENTITIES:
@@ -260,7 +264,7 @@ class Map:
                         u = Use(ent, int(parts[2]), int(parts[3]))
                         for v in range(int(parts[2]), int(parts[2])+ent.size_y):
                             for w in range(int(parts[3]), int(parts[3])+ent.size_x):
-                                self.doodad[v][w] = u
+                                self.doodad[w][v] = u
                         break
 
 class Editor:
@@ -353,8 +357,9 @@ class Editor:
         print 'l : load ground map'
         print 'backspace : delete selected doodad'
         
-        for i in range(0, random.randint(1, 10)):
-            self.build()
+        # salle aleatoire
+        #for i in range(0, random.randint(1, 10)):
+        #    self.build()
 
         self.font = pygame.font.SysFont(pygame.font.get_default_font(), 32)
         
