@@ -126,7 +126,7 @@ class Menu(Window):
         y = (self.editor.MAX_Y)*32
         for yy in range(0, self.editor.MAP_Y):
             for xx in range(0, self.editor.MAP_X):
-                g = self.editor.blocks[yy][xx] #self.editor.ground[yy][xx]
+                g = self.editor.map.blocks[yy][xx] #self.editor.ground[yy][xx]
                 if g == 0: #100:
                     pygame.draw.rect(surf, (255,255,255), (xx*3+x, yy*3+y+1, 3, 3), 0)
                 else:
@@ -149,7 +149,9 @@ class MapView(Window):
                 mx, my = pygame.mouse.get_pos()
                 mx32 = mx / 32 + self.editor.X
                 my32 = my / 32 + self.editor.Y
-                print 'line=', my32, 'column=', mx32, 'scrollX=', self.editor.X, 'scrollY=', self.editor.Y, 'doodad=', self.editor.doodad[my32][mx32]
+                print 'line=', my32, 'column=', mx32, 'scrollX=', self.editor.X, 'scrollY=', self.editor.Y, 'doodad=', self.editor.map.doodad[my32][mx32]
+                if self.editor.map.doodad[my32][mx32] != 0:
+                    self.editor.selected = self.editor.map.doodad[my32][mx32]
                 #elif event.button == 3:
                 #    if mx32 > 0 and mx32 < self.MAP_X and my32 > 0 and my32 < self.MAP_Y: print self.doodad[my32][mx32]
     
@@ -162,12 +164,14 @@ class MapView(Window):
             for xx in range(0, self.editor.MAX_X+1):
                 if xx+self.editor.X < self.editor.MAP_X and yy+self.editor.Y < self.editor.MAP_Y:
                     # GROUND
-                    g = self.editor.ground[yy+self.editor.Y][xx+self.editor.X]
+                    g = self.editor.map.ground[yy+self.editor.Y][xx+self.editor.X]
                     surf.blit(GROUND_DATA[g], (xx*32, yy*32))
                     # DOODAD & ENTITY
-                    r = self.editor.doodad[yy+self.editor.Y][xx+self.editor.X]
+                    r = self.editor.map.doodad[yy+self.editor.Y][xx+self.editor.X]
                     if r != 0 and r is not None:
                         surf.blit(r.obj.tex, ((r.x-self.editor.X)*32+r.obj.dev_x,(r.y-self.editor.Y)*32+r.obj.dev_y))
+                        if self.editor.selected == r:
+                            pygame.draw.rect(surf, (0, 255, 0), ((r.x-self.editor.X)*32,(r.y-self.editor.Y)*32, r.obj.size_x*32, r.obj.size_y*32), 1)
         
         #
         # Curseur de la souris
@@ -186,12 +190,78 @@ class MapView(Window):
             there_is_something = False
             for v in range(my32, my32+obj.size_y):
                 for w in range(mx32, mx32+obj.size_x):
-                    if v >= self.editor.MAP_Y or w >= self.editor.MAP_X or self.editor.blocks[v][w] == 1 or self.editor.doodad[v][w] != 0:
+                    if v >= self.editor.MAP_Y or w >= self.editor.MAP_X or self.editor.map.blocks[v][w] == 1 or self.editor.map.doodad[v][w] != 0:
                         there_is_something = True
             if there_is_something:
                 pygame.draw.rect(surf, (255, 0, 0), ((mx/32)*32, (my/32)*32, obj.size_x*32, obj.size_y*32), 1)
             else:
                 pygame.draw.rect(surf, (0, 0, 255), ((mx/32)*32, (my/32)*32, obj.size_x*32, obj.size_y*32), 1)
+
+class Map:
+    def __init__(self, MAP_X, MAP_Y):
+        self.ground = []
+        self.doodad = []
+        self.blocks = []
+        self.MAP_X = MAP_X
+        self.MAP_Y = MAP_Y
+        for yy in range(0, self.MAP_Y):
+            self.ground.append([])
+            self.doodad.append([])
+            self.blocks.append([])
+            for xx in range(0, self.MAP_X):
+                self.ground[yy].append(100)
+                self.doodad[yy].append(0)
+                self.blocks[yy].append(0)
+        #        sys.stdout.write(str(self.doodad[yy][xx]))
+        #print
+    
+    def save(self, name):
+        ground_map = file(name+"_ground.map", 'w')
+        blocks_map = file(name+"_blocks.map", 'w')
+        doodad_map = file(name+"_doodad.map", 'w')
+        u = []
+        for yy in range(0, self.MAP_Y):
+            for xx in range(0, self.MAP_X):
+                ground_map.write(str(self.ground[yy][xx])+"\n")
+                blocks_map.write(str(self.blocks[yy][xx])+"\n")
+                if self.doodad[yy][xx] != 0 and not self.doodad[yy][xx] in u:
+                    u.append(self.doodad[yy][xx])
+        for i in u:
+            if i.obj.__class__ == Doodad:
+                doodad_map.write('d,'+i.obj.name_ico+','+str(i.x)+","+str(i.y)+"\n")
+            elif i.obj.__class__ == Entity:
+                doodad_map.write('e,'+i.obj.name_ico+','+str(i.x)+","+str(i.y)+"\n")
+    
+    def load(self, name):
+        ground_map = file(name+"_ground.map", 'r')
+        ground_content = ground_map.readlines()
+        blocks_map = file(name+"_blocks.map", 'r')
+        blocks_content = blocks_map.readlines()
+        doodad_map = file(name+"_doodad.map", 'r')
+        doodad_content = doodad_map.readlines()
+        for yy in range(0, self.MAP_Y):
+            for xx in range(0, self.MAP_X):
+                self.ground[yy][xx] = int(ground_content[yy*self.MAP_Y+xx])
+                self.blocks[yy][xx] = int(blocks_content[yy*self.MAP_Y+xx])
+                self.doodad[yy][xx] = 0
+        for d in doodad_content:
+            parts = d.split(',')
+            if parts[0] == 'd':
+                for doo in DOODADS:
+                    if doo.name_ico == parts[1]:
+                        u = Use(doo, int(parts[2]), int(parts[3]))
+                        for v in range(int(parts[2]), int(parts[2])+doo.size_y):
+                            for w in range(int(parts[3]), int(parts[3])+doo.size_x):
+                                self.doodad[v][w] = u
+                        break
+            elif parts[1] == 'e':
+                for ent in ENTITIES:
+                    if ent.name_ico == parts[1]:
+                        u = Use(ent, int(parts[2]), int(parts[3]))
+                        for v in range(int(parts[2]), int(parts[2])+ent.size_y):
+                            for w in range(int(parts[3]), int(parts[3])+ent.size_x):
+                                self.doodad[v][w] = u
+                        break
 
 class Editor:
     
@@ -220,12 +290,12 @@ class Editor:
         
         # loading entities
         for i in range(0, len(ENTITIES)):
-            ENTITIES[i].ico = pygame.image.load('./media/'+ENTITIES[i].name_ico+'.png').convert()
+            ENTITIES[i].ico = pygame.image.load('./media/entities/'+ENTITIES[i].name_ico+'.png').convert()
             ENTITIES[i].ico.set_colorkey((255,0,255))
             if ENTITIES[i].name_tex is None:
                 ENTITIES[i].tex = ENTITIES[i].ico
             else:
-                ENTITIES[i].tex = pygame.image.load('./media/'+ENTITIES[i].name_tex+'.png').convert()
+                ENTITIES[i].tex = pygame.image.load('./media/entities/'+ENTITIES[i].name_tex+'.png').convert()
                 ENTITIES[i].tex.set_colorkey((255,0,255))
     
     def __init__(self):
@@ -240,20 +310,9 @@ class Editor:
         self.MAX_Y = 15
         self.X = 0
         self.Y = 0
-
-        self.ground = []
-        self.doodad = []
-        self.blocks = []
-        for yy in range(0, self.MAP_Y):
-            self.ground.append([])
-            self.doodad.append([])
-            self.blocks.append([])
-            for xx in range(0, self.MAP_X):
-                self.ground[yy].append(100)
-                self.doodad[yy].append(0)
-                self.blocks[yy].append(0)
-                sys.stdout.write(str(self.doodad[yy][xx]))
-        print
+        
+        self.map = Map(self.MAP_X, self.MAP_Y)
+        
         #self.doodad[4][4] = 1
         #self.doodad[31][31] = 1
         #self.doodad[3][2] = 1
@@ -292,6 +351,7 @@ class Editor:
         print 'bouton droit : information'
         print 's : save ground map'
         print 'l : load ground map'
+        print 'backspace : delete selected doodad'
         
         for i in range(0, random.randint(1, 10)):
             self.build()
@@ -300,7 +360,9 @@ class Editor:
         
         self.menu = Menu(self, 0, 32*self.MAX_Y, 32*self.MAX_X, 32*4, (255, 0, 0))
         self.view = MapView(self, 0, 0, 32*self.MAX_X, 32*self.MAX_Y, (0, 0, 255))
-    
+        
+        self.selected = None
+        
     def build(self):
         # ia pour "faire des salles"
         size_x = random.randint(3,10)
@@ -309,8 +371,8 @@ class Editor:
         y = random.randint(0, self.MAP_Y-size_y-1)
         for yy in range(x, x+size_x):
             for xx in range(y, y+size_y):
-                self.ground[yy][xx] = 105
-                self.blocks[yy][xx] = 1
+                self.map.ground[yy][xx] = 105
+                self.map.blocks[yy][xx] = 1
         print 'creating a room of ', size_x, 'by', size_y, 'at', x, ',', y
     
     def run(self):
@@ -357,11 +419,20 @@ class Editor:
                     self.mode = (self.mode + 1) % MODE_MAX
                     print self.mode
                 elif event.key == K_l:
-                    f = file('out.svg', 'r')
-                    self.ground = pickle.load(f)
+                    #f = file('out.svg', 'r')
+                    #self.map = pickle.load(f)
+                    self.map.load('out')
                 elif event.key == K_s:
-                    f = file('out.svg', 'w')
-                    pickle.dump(self.ground, f)
+                    #f = file('out.svg', 'w')
+                    #pickle.dump(self.map, f)
+                    self.map.save('out')
+                elif event.key == K_BACKSPACE:
+                    if self.selected is not None:
+                        for v in range(self.selected.y, self.selected.y+self.selected.obj.size_y):
+                            for w in range(self.selected.x, self.selected.x+self.selected.obj.size_x):
+                                self.map.doodad[v][w] = 0
+                        del self.selected
+                        self.selected = None
         #
         # Scrolling
         #
@@ -390,8 +461,8 @@ class Editor:
                     for v in range(my32, my32+TEXTURES[self.ground_content].size_y):
                         for w in range(mx32, mx32+TEXTURES[self.ground_content].size_x):
                             if TEXTURES[self.ground_content].tex[v-my32][w-mx32] != 0:
-                                self.ground[v][w] = TEXTURES[self.ground_content].tex[v-my32][w-mx32]
-                                self.blocks[v][w] = TEXTURES[self.ground_content].passable[v-my32][w-mx32]
+                                self.map.ground[v][w] = TEXTURES[self.ground_content].tex[v-my32][w-mx32]
+                                self.map.blocks[v][w] = TEXTURES[self.ground_content].passable[v-my32][w-mx32]
             elif self.mode in [DOODAD, ENTITY]:
                 if mx32 >= 0 and mx32 < self.MAP_X and my32 >= 0 and my32 < self.MAP_Y:
                     # on empeche de mettre des entities la ou [blocks] est a 1 et si il y a deja un doodad ou une entities
@@ -400,13 +471,13 @@ class Editor:
                     there_is_something = False
                     for v in range(my32, my32+obj.size_y):
                         for w in range(mx32, mx32+obj.size_x):
-                            if v >= self.MAP_Y or w >= self.MAP_X or self.blocks[v][w] == 1 or self.doodad[v][w] != 0:
+                            if v >= self.MAP_Y or w >= self.MAP_X or self.map.blocks[v][w] == 1 or self.map.doodad[v][w] != 0:
                                 there_is_something = True
                     if not there_is_something:
                         u = Use(obj, mx32, my32)
                         for v in range(my32, my32+obj.size_y):
                             for w in range(mx32, mx32+obj.size_x):
-                                self.doodad[v][w] = u
+                                self.map.doodad[v][w] = u
     
     def draw(self):
         self.view.draw(self.screen)
