@@ -98,7 +98,7 @@ class Menu(Window):
             pygame.draw.rect(surf, (255, 255, 0), (200+(self.editor.ground_content*35%490)-2,self.Y_ELEMENTS+(35*((self.editor.ground_content*35)/490))-2,32+2,32+2), 2)
         elif self.editor.mode == DOODAD:
             for i in range(0, len(DOODADS)):
-                surf.blit(DOODADS[i].ico, (200+(i*35%490),500+(35*((i*35)/490))))
+                surf.blit(DOODADS[i].ico, (200+(i*35%490),self.Y_ELEMENTS+(35*((i*35)/490))))
             pygame.draw.rect(surf, (255, 255, 0), (200+(self.editor.doodad_content*35%490)-2,self.Y_ELEMENTS+(35*((self.editor.doodad_content*35)/490))-2,32+2,32+2), 2)
             # La croix pour "pas de doodad"
             pygame.draw.line(surf, (255, 0, 255), (201,self.Y_ELEMENTS+1), (231,self.Y_ELEMENTS+31), 1)
