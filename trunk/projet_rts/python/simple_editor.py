@@ -19,7 +19,8 @@ SELECT = 0
 GROUND = 1
 DOODAD = 2
 ENTITY = 3
-MODE_MAX = 4
+LAYER2 = 4
+MODE_MAX = 5
 
 ENTITY_15 = None # TOWER 15
 ENTITY_16 = None
@@ -57,18 +58,18 @@ class Menu(Window):
         if event.type == MOUSEBUTTONUP:
             self.editor.apply = False
             x,y = event.pos
-            #print x,y
-            #print (x-100)/35
-            #print (y-500)/35 
             # 14*35 = 490 et 19*35=665
-            i = (x-200)/35 + 14*((y-self.Y_ELEMENTS)/35)
-            if self.editor.mode == GROUND and i < len(TEXTURES) and i >= 0:
-                self.editor.ground_content = i
-            elif self.editor.mode == ENTITY and i < len(ENTITIES) and i >= 0:
-                self.editor.entity_content = i
-            elif self.editor.mode == DOODAD and i < len(DOODADS) and i >= 0:
-                self.editor.doodad_content = i
-            if x <= 97:
+            if x > 200:
+                i = (x-200)/35 + 14*((y-self.Y_ELEMENTS)/35)
+                if self.editor.mode == GROUND and i < len(TEXTURES) and i >= 0:
+                    self.editor.ground_content = i
+                elif self.editor.mode == ENTITY and i < len(ENTITIES) and i >= 0:
+                    self.editor.entity_content = i
+                elif self.editor.mode == DOODAD and i < len(DOODADS) and i >= 0:
+                    self.editor.doodad_content = i
+                elif self.editor.mode == LAYER2 and i < len(LAYER2_DATA) and i >= 0:
+                    self.editor.layer2_content = i
+            elif x <= 97:
                 b = (y-self.editor.MAX_Y*32)/32
                 if b == 0: self.editor.mode = SELECT
                 elif b == 1: self.editor.mode = GROUND
@@ -76,7 +77,7 @@ class Menu(Window):
             elif x > 97 and x <= 96*2:
                 b = (y-self.editor.MAX_Y*32)/32
                 if b == 0: self.editor.mode = ENTITY
-                print b
+                elif b == 1: self.editor.mode = LAYER2
     
     def draw(self, surf):
         
@@ -110,6 +111,12 @@ class Menu(Window):
             # La croix pour "pas d'entity"
             pygame.draw.line(surf, (255, 0, 255), (201,self.Y_ELEMENTS+1), (231,self.Y_ELEMENTS+31), 1)
             pygame.draw.line(surf, (255, 0, 255), (231,self.Y_ELEMENTS+1), (201,self.Y_ELEMENTS+31), 1)
+        elif self.editor.mode == LAYER2:
+            i = 0
+            for k in LAYER2_DATA:
+                surf.blit(LAYER2_DATA[k].tex, (200+(i*35%490),self.Y_ELEMENTS+(35*((i*35)/490))))
+                i+=1
+            pygame.draw.rect(surf, (255, 255, 0), (200+(self.editor.layer2_content*35%490)-2,self.Y_ELEMENTS+(35*((self.editor.layer2_content*35)/490))-2,32+2,32+2), 2)
         
         #surf.blit(self.editor.font.render("select", True, (255, 255, 255)), (10, self.editor.MAX_Y*32+5))
         
@@ -121,6 +128,8 @@ class Menu(Window):
         else: surf.blit(self.editor.button_doodad, (1, (self.editor.MAX_Y+2)*32+1))        
         if self.editor.mode == ENTITY: surf.blit(self.editor.button_entity_on, (1+96, (self.editor.MAX_Y+0)*32+1))
         else: surf.blit(self.editor.button_entity, (1+96, (self.editor.MAX_Y+0)*32+1))
+        if self.editor.mode == LAYER2: surf.blit(self.editor.button_layer2_on, (1+96, (self.editor.MAX_Y+1)*32+1))
+        else: surf.blit(self.editor.button_layer2, (1+96, (self.editor.MAX_Y+1)*32+1))
 
         # minimap
         x = (self.editor.MAX_X-3)*32
@@ -167,7 +176,10 @@ class MapView(Window):
                 if xx+self.editor.X < self.editor.MAP_X and yy+self.editor.Y < self.editor.MAP_Y:
                     # GROUND
                     g = self.editor.map.ground[yy+self.editor.Y][xx+self.editor.X]
-                    surf.blit(GROUND_DATA[g], (xx*32, yy*32))
+                    layer1 = g % 1000
+                    layer2 = (g / 1000)*1000
+                    surf.blit(GROUND_DATA[layer1], (xx*32, yy*32))
+                    if layer2 != 0: surf.blit(LAYER2_DATA[layer2].tex, (xx*32, yy*32))
                     # DOODAD & ENTITY
                     r = self.editor.map.doodad[yy+self.editor.Y][xx+self.editor.X]
                     if r != 0 and r is not None:
@@ -301,7 +313,12 @@ class Editor:
             else:
                 ENTITIES[i].tex = pygame.image.load('./media/entities/'+ENTITIES[i].name_tex+'.png').convert()
                 ENTITIES[i].tex.set_colorkey((255,0,255))
-    
+        
+        # layer2
+        for k in LAYER2_DATA:
+            LAYER2_DATA[k].tex = pygame.image.load('./media/layer2/'+LAYER2_DATA[k].name+'.png').convert()
+            LAYER2_DATA[k].tex.set_colorkey((255,0,255))
+        
     def __init__(self):
         
         pygame.init()
@@ -331,6 +348,7 @@ class Editor:
         self.ground_content = 1
         self.doodad_content = 1
         self.entity_content = 1
+        self.layer2_content = 0
         
         self.mode = GROUND
         
@@ -340,10 +358,12 @@ class Editor:
         self.button_ground = pygame.image.load('./media/gui/button_ground.png').convert()
         self.button_doodad = pygame.image.load('./media/gui/button_doodad.png').convert()
         self.button_entity = pygame.image.load('./media/gui/button_entity.png').convert()
+        self.button_layer2 = pygame.image.load('./media/gui/button_layer2.png').convert()
         self.button_select_on = pygame.image.load('./media/gui/button_select_on.png').convert()
         self.button_ground_on = pygame.image.load('./media/gui/button_ground_on.png').convert()
         self.button_doodad_on = pygame.image.load('./media/gui/button_doodad_on.png').convert()
         self.button_entity_on = pygame.image.load('./media/gui/button_entity_on.png').convert()
+        self.button_layer2_on = pygame.image.load('./media/gui/button_layer2_on.png').convert()
         
         print 'bas : scrolling vers le bas'
         print 'haut : scrolling vers le haut'
@@ -483,6 +503,9 @@ class Editor:
                         for v in range(my32, my32+obj.size_y):
                             for w in range(mx32, mx32+obj.size_x):
                                 self.map.doodad[v][w] = u
+            elif self.mode == LAYER2:
+                layer1 = self.map.ground[my32][mx32] % 1000
+                self.map.ground[my32][mx32] = layer1 + LAYER2_DATA.keys()[self.layer2_content]
     
     def draw(self):
         self.view.draw(self.screen)
