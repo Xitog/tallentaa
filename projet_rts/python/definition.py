@@ -74,6 +74,22 @@ GROUND_DEF = [
 GROUND_DATA = {
 }
 
+class Tile:
+    def __init__(self, name):
+        self.name = name
+        self.tex = None
+
+LAYER2_DATA = {
+    1000 : Tile('coin_bas_droit1'),
+    2000 : Tile('coin_bas_droit2'),
+    3000 : Tile('coin1'),
+    4000 : Tile('coin2'),
+    5000 : Tile('coin3'),
+    6000 : Tile('coin4'),
+    7000 : Tile('coin5'),
+    8000 : Tile('mur_bout1'),
+}
+
 #-----------------------------------------------------------------------
 # Textures
 #-----------------------------------------------------------------------
