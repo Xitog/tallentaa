@@ -80,6 +80,7 @@ class Tile:
         self.tex = None
 
 LAYER2_DATA = {
+       0 : Tile('0'),
     1000 : Tile('coin_bas_droit1'),
     2000 : Tile('coin_bas_droit2'),
     3000 : Tile('coin1'),
@@ -88,6 +89,22 @@ LAYER2_DATA = {
     6000 : Tile('coin4'),
     7000 : Tile('coin5'),
     8000 : Tile('mur_bout1'),
+    9000 : Tile('mur_bout2'),
+   10000 : Tile('mur_bout3'),
+   11000 : Tile('mur_bout4'),
+   12000 : Tile('mur_bout5'),
+   13000 : Tile('mur_bout6'),
+   14000 : Tile('mur_brise'),
+   15000 : Tile('mur_coin1'),
+   16000 : Tile('mur_coin2'),
+   17000 : Tile('mur_coin3'),
+   18000 : Tile('mur_coin4'),
+   19000 : Tile('mur_horizontal'),
+   20000 : Tile('mur_triplet1'),
+   21000 : Tile('mur_triplet2'),
+   22000 : Tile('mur_triplet3'),
+   23000 : Tile('mur_triplet4'),
+   24000 : Tile('mur_vertical'),
 }
 
 #-----------------------------------------------------------------------
