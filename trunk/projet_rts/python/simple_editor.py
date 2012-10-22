@@ -6,7 +6,7 @@
 # Imports
 #-----------------------------------------------------------------------
 
-import pygame, sys, math, random, pickle
+import pygame, sys, math, random, pickle, zipfile, os
 from pygame.locals import *
 from definition import *
 
@@ -117,6 +117,9 @@ class Menu(Window):
                 surf.blit(LAYER2_DATA[k].tex, (200+(i*35%490),self.Y_ELEMENTS+(35*((i*35)/490))))
                 i+=1
             pygame.draw.rect(surf, (255, 255, 0), (200+(self.editor.layer2_content*35%490)-2,self.Y_ELEMENTS+(35*((self.editor.layer2_content*35)/490))-2,32+2,32+2), 2)
+            # La croix pour "pas d'entity"
+            pygame.draw.line(surf, (255, 0, 255), (201,self.Y_ELEMENTS+1), (231,self.Y_ELEMENTS+31), 1)
+            pygame.draw.line(surf, (255, 0, 255), (231,self.Y_ELEMENTS+1), (201,self.Y_ELEMENTS+31), 1)
         
         #surf.blit(self.editor.font.render("select", True, (255, 255, 255)), (10, self.editor.MAX_Y*32+5))
         
@@ -136,13 +139,14 @@ class Menu(Window):
         y = (self.editor.MAX_Y)*32
         for yy in range(0, self.editor.MAP_Y):
             for xx in range(0, self.editor.MAP_X):
-                g = self.editor.map.blocks[yy][xx] #self.editor.ground[yy][xx]
-                r = self.editor.map.doodad[yy][xx]
-                if g == 0 and r == 0: #100:
+                #g = self.editor.map.blocks[yy][xx] #self.editor.ground[yy][xx]
+                #r = self.editor.map.doodad[yy][xx]
+                #if g == 0 and r == 0: #100:
+                if not self.editor.map.is_blocked(xx, yy):
                     pygame.draw.rect(surf, (255,255,255), (xx*3+x, yy*3+y+1, 3, 3), 0)
                 else:
                     pygame.draw.rect(surf, (255,0,0), (xx*3+x, yy*3+y+1, 3, 3), 0)
-        
+
 class MapView(Window):
     
     def __init__(self, editor, x, y, w, h, background_color):
@@ -210,6 +214,8 @@ class MapView(Window):
                 pygame.draw.rect(surf, (255, 0, 0), ((mx/32)*32, (my/32)*32, obj.size_x*32, obj.size_y*32), 1)
             else:
                 pygame.draw.rect(surf, (0, 0, 255), ((mx/32)*32, (my/32)*32, obj.size_x*32, obj.size_y*32), 1)
+        elif self.editor.mode == LAYER2:
+            pygame.draw.rect(surf, (0, 0, 255), ((mx/32)*32, (my/32)*32, 32, 32), 1)
 
 class Map:
     def __init__(self, MAP_X, MAP_Y):
@@ -229,6 +235,19 @@ class Map:
         #        sys.stdout.write(str(self.doodad[yy][xx]))
         #print
     
+    def set(self, ref, x, y, layer):
+        layer1 = self.ground[y][x] % 1000
+        layer2 = (self.ground[y][x] / 1000) * 1000
+        if layer == 1:
+            layer1 = ref
+        else:
+            layer2 = ref
+        self.ground[y][x] = layer1 + layer2
+    
+    def is_blocked(self, x, y):
+        if self.blocks[y][x] != 0 or self.doodad[y][x] != 0 or self.ground[y][x] >= 1000 : return True
+        else: return False
+    
     def save(self, name):
         ground_map = file(name+"_ground.map", 'w')
         blocks_map = file(name+"_blocks.map", 'w')
@@ -245,13 +264,29 @@ class Map:
                 doodad_map.write('d,'+i.obj.name_ico+','+str(i.x)+","+str(i.y)+"\n")
             elif i.obj.__class__ == Entity:
                 doodad_map.write('e,'+i.obj.name_ico+','+str(i.x)+","+str(i.y)+"\n")
-    
+        # zip into one file
+        ground_map.close()
+        blocks_map.close()
+        doodad_map.close()
+        save = zipfile.ZipFile(name+'.zip', mode='w')
+        save.write(name+"_ground.map")
+        save.write(name+"_blocks.map")
+        save.write(name+"_doodad.map")
+        save.close()
+        os.remove(name+"_ground.map")
+        os.remove(name+"_blocks.map")
+        os.remove(name+"_doodad.map")
+        
     def load(self, name):
-        ground_map = file(name+"_ground.map", 'r')
+        load = zipfile.ZipFile(name+'.zip')
+        ground_map = load.open(name+"_ground.map")
+        #ground_map = file(name+"_ground.map", 'r')
         ground_content = ground_map.readlines()
-        blocks_map = file(name+"_blocks.map", 'r')
+        blocks_map = load.open(name+"_blocks.map")
+        #blocks_map = file(name+"_blocks.map", 'r')
         blocks_content = blocks_map.readlines()
-        doodad_map = file(name+"_doodad.map", 'r')
+        doodad_map = load.open(name+"_doodad.map")
+        #doodad_map = file(name+"_doodad.map", 'r')
         doodad_content = doodad_map.readlines()
         for yy in range(0, self.MAP_Y):
             for xx in range(0, self.MAP_X):
@@ -486,7 +521,8 @@ class Editor:
                     for v in range(my32, my32+TEXTURES[self.ground_content].size_y):
                         for w in range(mx32, mx32+TEXTURES[self.ground_content].size_x):
                             if TEXTURES[self.ground_content].tex[v-my32][w-mx32] != 0:
-                                self.map.ground[v][w] = TEXTURES[self.ground_content].tex[v-my32][w-mx32]
+                                #self.map.ground[v][w] = TEXTURES[self.ground_content].tex[v-my32][w-mx32]
+                                self.map.set(TEXTURES[self.ground_content].tex[v-my32][w-mx32], w, v, 1)
                                 self.map.blocks[v][w] = TEXTURES[self.ground_content].passable[v-my32][w-mx32]
             elif self.mode in [DOODAD, ENTITY]:
                 if mx32 >= 0 and mx32 < self.MAP_X and my32 >= 0 and my32 < self.MAP_Y:
@@ -504,8 +540,9 @@ class Editor:
                             for w in range(mx32, mx32+obj.size_x):
                                 self.map.doodad[v][w] = u
             elif self.mode == LAYER2:
-                layer1 = self.map.ground[my32][mx32] % 1000
-                self.map.ground[my32][mx32] = layer1 + LAYER2_DATA.keys()[self.layer2_content]
+                self.map.set(LAYER2_DATA.keys()[self.layer2_content], mx32, my32, 2)
+                #layer1 = self.map.ground[my32][mx32] % 1000
+                #self.map.ground[my32][mx32] = layer1 + LAYER2_DATA.keys()[self.layer2_content]
     
     def draw(self):
         self.view.draw(self.screen)
