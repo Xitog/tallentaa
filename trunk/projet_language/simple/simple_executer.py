@@ -1,11 +1,22 @@
 from simple_parser import *
 
+# Simple BIB
+
+def send_to_int(value, message):
+    if message == 'abs':
+        return abs(value)
+    else:
+        raise Exception('FUNCTION NOT UNDERSTOOD %s' % (message,))
+
+def send_to_flt(value, message):
+    if message == 'abs':
+        return abs(value)
+    else:
+        raise Exception('FUNCTION NOT UNDERSTOOD %s' % (message,))
+
+# Simple Execute
+
 def execute(ast):
-    #print ast.__class__
-    #print ast.sbg
-    #print ast.sbd
-    #print ast.typ
-    #print ast.par
     if ast.sbg is not None and ast.sbg.__class__ == list and ast.sbd is None and ast.typ == 'list' and ast.par == 'sta':
         r = None
         for statement in ast.sbg:
@@ -26,9 +37,26 @@ def execute(ast):
             return execute(ast.sbg) % execute(ast.sbd)
         elif ast.par == '**':
             return execute(ast.sbg) ** execute(ast.sbd)
+        elif ast.par == '.':
+            left = execute(ast.sbg)
+            if left.__class__ == int: return send_to_int(left, ast.sbd)
+            elif left.__class__ == float: return send_to_flt(left, ast.sbd)
+            else: raise Exception('CALL MSG TO UNSPECIFIED TYPE')
+    elif ast.typ == 'unaop':
+        if ast.par == '-':
+            return -execute(ast.sbg)
     elif ast.typ == 'value':
         if ast.par == 'int':
             return ast.sbg
+        elif ast.par == 'flt':
+            return ast.sbg
+        elif ast.par == 'str':
+            return ast.sbg
+    print ast.__class__
+    print ast.sbg
+    print ast.sbd
+    print ast.typ
+    print ast.par
     raise Exception('AST NOT UNDERSTOOD')
 
 #-----------------------------------------------------------------------

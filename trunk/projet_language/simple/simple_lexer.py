@@ -34,6 +34,7 @@ t_LE = r'<='
 
 # Special Op
 t_KEY_OP = r'=>'
+t_POINT  = r'\.'
 
 # Delimiteurs
 t_LEFT_PAR    = r'\('
@@ -74,7 +75,7 @@ t_ELSIF   = r'elsif'
 # keywords
 keywords  = ('IF', 'WHILE', 'ELSE', 'VAR', 'THEN', 'END', 'AND', 'OR', 'NOT', 'TRUE', 'FALSE', 'NIL', 'DO', 'BREAK', 'FOR', 'IN', 'UNLESS', 'DEF', 'REQUIRE', 'INCLUDE','CONTINUE','MODULE','RETURN','CLASS', 'ELSIF')
 symbols   = ('LEFT_PAR', 'RIGHT_PAR', 'LEFT_SB', 'RIGHT_SB', 'LEFT_BR', 'RIGHT_BR', 'SEMI', 'COMMA', 'DOT')
-operators = ('ADD', 'MIN', 'MUL', 'DIV', 'DIV_INT', 'POW', 'MOD', 'AFFECT', 'ADD_AFF', 'MUL_AFF', 'MIN_AFF', 'MOD_AFF', 'DIV_AFF', 'DIV_INT_AFF', 'EQ', 'NE', 'LE', 'LT', 'GE', 'GT', 'KEY_OP','POW_AFF')
+operators = ('ADD', 'MIN', 'MUL', 'DIV', 'DIV_INT', 'POW', 'MOD', 'AFFECT', 'ADD_AFF', 'MUL_AFF', 'MIN_AFF', 'MOD_AFF', 'DIV_AFF', 'DIV_INT_AFF', 'EQ', 'NE', 'LE', 'LT', 'GE', 'GT', 'KEY_OP','POW_AFF', 'POINT')
 types     = ('FLOAT', 'INT', 'STRING', 'ID')
 tokens    = keywords + symbols + operators + types + ('COMMENT', 'NEWLINE')
 
@@ -98,8 +99,10 @@ def t_INT(t):
     return t
 
 def t_STRING(t):
-    r"""(\'\'\'.*?\'\'\')|(\".*?\")|(\'.*?\')"""
+    r"""(\"\"\".*?\"\"\")|(\'\'\'.*?\'\'\')|(\".*?\")|(\'.*?\')"""
     if len(t.value) >= 6 and t.value[0:3] == "'''" and t.value[len(t.value)-3:len(t.value)] == "'''":
+        t.value = t.value[3:len(t.value)-3]
+    elif len(t.value) >= 6 and t.value[0:3] == '"""' and t.value[len(t.value)-3:len(t.value)] == '"""':
         t.value = t.value[3:len(t.value)-3]
     else:
         t.value = t.value[1:len(t.value)-1]
