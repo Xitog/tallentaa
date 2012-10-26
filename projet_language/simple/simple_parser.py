@@ -12,6 +12,8 @@ precedence = (
                ('left', 'ADD','MIN'),
                ('left', 'MUL','DIV', 'MOD', 'DIV_INT'),
                ('left', 'POW'),
+               ('left', 'POINT'),
+               ('right','UMINUS'),
                ('left', 'LEFT_SB'),
                ('left', 'LEFT_PAR'),
 )
@@ -116,9 +118,38 @@ def p_expression_binop(p):
                   | expression LE expression
                   | expression GT expression
                   | expression GE expression
-                  | expression IN expression'''
+                  | expression IN expression
+                  | expression POINT ID
+                  | expression POINT ID LEFT_PAR RIGHT_PAR'''
     if DEBUG: print('> binop')
     p[0] = Node(typ='binop', par=p[2], sbg=p[1], sbd=p[3])
+
+def p_expression_par(p):
+    '''expression : LEFT_PAR expression RIGHT_PAR'''
+    p[0] = p[2]
+
+# 2.abc est interprete comme un float avec un id : FLOAT ID
+# pour corriger cela, je fais la manip suivante :
+def p_expression_bug(p):
+    '''expression : FLOAT ID
+                  | FLOAT ID LEFT_PAR RIGHT_PAR'''
+    if DEBUG: print('> spe binop')
+    # on forge un entier a partir du faux flottant !
+    int_from_float = Node(typ='value', par='int', sbg=int(p[1]))
+    p[0] = Node(typ='binop', par='.', sbg=int_from_float, sbd=p[2])
+
+def p_expression_uminus(t): 
+    '''expression : MIN expression %prec UMINUS'''
+    # -3.abs est interpretre comme FLOAT(3.) ID(abs) puis le - est applique. Je suis aussi oblige de forger. 19h36 26/10
+    if t[2].__class__ == Node:
+        if t[2].typ == 'binop' and t[2].par == '.':
+            inner_node = Node(typ='unaop', par='-', sbg=t[2].sbg, sbd=None)
+            outer_node = Node(typ='binop', par='.', sbg=inner_node, sbd=t[2].sbd)
+            t[0] = outer_node
+        else:
+            t[0] = Node(typ='unaop', par='-', sbg=t[2], sbd=None)
+    else:
+        t[0] = Node(typ='unaop', par='-', sbg=t[2], sbd=None)
 
 def p_expression_int(p):
     '''expression : INT'''
@@ -144,6 +175,11 @@ def p_expression_false(p):
     '''expression  : FALSE'''
     if DEBUG: print('> false')
     p[0] = Node(typ='value', par='bool', sbg=False)
+
+def p_expression_string(p):
+    '''expression  : STRING'''
+    if DEBUG: print('> string')
+    p[0] = Node(typ='value', par='str', sbg=p[1])
 
 def p_expression_nil(p):
     if DEBUG: '''expression : NIL'''

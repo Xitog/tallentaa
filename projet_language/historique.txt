@@ -1,0 +1,59 @@
+#------------------------------------------------------------------------------
+# Fichier historique du projet langage de programmation
+#------------------------------------------------------------------------------
+
+Ceci est un fichier retrançant les différents stades du projet "langage" de 
+programmation. Il y a déjà eu 5 itérations :
+
+Arborix (durant l'été 2010, Python)
+-------
+Commentaire original : AST ! Trois étages : lexer parser interpreter Py
+C'est là où j'ai découvert la puissance de l'Abstract Syntax Tree. C'est à dire
+de ne plus directement interprété le langage mais de construire d'abord un 
+arbre puis d'exécuter cette arbre. C'est ainsi qu'on peut gérer un 'while' de
+façon simple. Cette découverte a été une vrai rupture, mettant en place dans
+mon esprit toutes les notions abordées durant les TPs de l'INSA.
+C'est là où s'établit l'architecture à trois étages initiales : un lexer (pour
+les tokens), un parser (pour les règles) et un interpreter (pour exécuter l'AST
+).
+
+Pypo (fin en septembre 2010, Python)
+----
+Commentaire original : go go go Py
+Je recommence mais "en mieux". Tellement enthousiaste que je fais un google
+code project.
+
+n (janvier 2011, Python)
+-
+Commentaire original : éviter les conflicts/reduces(1 voir 0 pour return expr).
+Je recommence avec comme objectif d'éviter le plus possible les conflits de
+shift/reduce qui devait être assez préoccupant dans Pypo.
+
+Zembla (fin avril 2011, Ruby puis Python)
+------
+Commentaire original : 4 étages : lexer parser interpreter basiclib
+Sans ply cette fois-ci je développe un petit interpréteur en ajoutant un étage:
+celui pour la bibliothèque. On a donc l'architecture complète à présent.
+
+nn (Python)
+--
+Commentaire original : Fusion du meilleur de n et zembla. 4 étages. Py.
+On a donc là une re-reprise de n et Zembla en utillisant PLY. C'est l'itération
+qui ira le plus loin, jusqu'en mai 2011. Après il y aura une accalmie.
+
+#------------------------------------------------------------------------------
+# Annexes
+#------------------------------------------------------------------------------
+
+Ancien frontispice du projet google code 'Pypo':
+
+Project Summary
+
+Basically, I want to target the python platform (with its huge available librairies set) but with a more friendly syntax (I mean without any radical ideology about tabs and ':').
+
+It is not a production tool or whatever, and it is not competitive with high-level stuff like Pypy, but a way for me to explore Lex and Yacc and the arcane of language making.
+
+If you find it useful, let me know! I would be as much delighted as surprised!
+
+Yksin 
+
