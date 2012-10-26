@@ -1,0 +1,113 @@
+anInteger = 5
+aFloat = 3.4
+aString = "hello"
+
+a = 5
+println(a)
+
+while a >= 0 do
+	println(a)
+	a -= 1
+	if a == 2 then break end
+end
+
+if a == 2 then
+	println("Super, tout va bien !")
+else
+	println("Oh non !")
+end
+
+if a != 2 then
+	println("Oh non !")
+else
+	println("Super, tout va bien !")
+end
+
+if a == 2 and a != 2 then
+	println("Jamais")
+else
+	println("Toujours (and)")
+end
+
+if a == 2 or a != 2 then
+	println("Toujours (or)")
+end
+
+if True then
+	println("Toujours (true)")
+end
+
+if not False then
+	println("Toujours (not false)")
+end
+
+println("Fin ","du programme")
+range(1,5)
+
+if 1 in range(1,3) then
+	println("In Range !")
+end
+
+if not (1 in range(2,3)) then
+	println("if: Not In Range !")
+end
+
+unless 1 in range(2,3) then
+	println("unless: Not In Range !")
+end
+
+a = 22
+unless a == 22 then
+	println("never")
+else
+	println("always")
+end
+
+for b in range(1,5) do
+	println(b)
+end
+
+l = [1, 2, 3, 4, 5, a]
+
+if 22 in l then
+	println("il y a 22 !")
+end
+
+for i in l do
+	println(i)
+end
+
+def say_hello ()
+end
+
+def print_all ( liste )
+end
+
+println(1 + l[5] + 2)
+
+println("Essayons les affichages de listes et de matrix")
+
+a1 = [11,12,13,14,15]
+a2 = [21,22,23,24,25]
+a3 = [31,32,33,34,35]
+a4 = [41,42,43,44,45]
+a5 = [51,52,53,54,55]
+
+map = [a1, a2, a3, a4, a5]
+
+for i in range(1,5) do
+	println(map[i])
+end
+
+println("----------------------------------")
+
+for i in range(1,10) do
+	for j in range(1,10) do
+		print(map[i][j])
+		#print("0")
+	end
+	print("\n")
+end
+
+println("----------------------------------")
+

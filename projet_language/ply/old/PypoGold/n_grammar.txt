@@ -1,0 +1,127 @@
+# Fichier de grammaire pour un rubylike
+
+precedence = (
+               ('left', 'AND', 'OR'),
+               ('left', 'EQ', 'NE', 'IN'),
+               ('left', 'GE', 'GT', 'LE', 'LT'),
+               ('left', 'ADD','MIN'),
+               ('left', 'MUL','DIV', 'MOD', 'DIV_INT'),
+               ('left', 'POW'),
+               ('left', 'LEFT_SB', 'LEFT_PAR'),
+               ('right','UMIN', 'NOT')
+)
+
+# Left_sb et Left_par sont consideres comme des operateurs. C'est tres important !
+
+    statements  : statements NEWLINE statement
+                | statement
+
+    statement   :
+                | expression
+                | selection
+                | iteration
+                | flux
+                | definition
+                | declaration
+                | modulation
+                | interfiles
+                | affectation
+
+    flux        : BREAK
+                | CONTINUE
+                | RETURN
+                | RETURN expression
+
+    selection   : IF expression THEN statements ELSE statements END
+                | IF expression NEWLINE statements ELSE statements END
+                | IF expression THEN statements END
+                | IF expression NEWLINE statements END
+                | UNLESS expression THEN statements ELSE statements END
+                | UNLESS expression NEWLINE statements ELSE statements END
+                | UNLESS expression THEN statements END
+                | UNLESS expression NEWLINE statements END
+
+    iteration   : WHILE expression DO statements END
+                | WHILE expression NEWLINE statements END
+                | FOR ID IN expression DO statements END
+                | FOR ID IN expression NEWLINE statements END
+
+    affectation : ID AFFECT expression
+                | ID ADD_AFF expression
+                | ID MIN_AFF expression
+                | ID MUL_AFF expression
+                | ID DIV_AFF expression
+                | ID DIV_INT_AFF expression
+                | ID MOD_AFF expression
+                | ID POW_AFF expression
+
+# Binary operator expression
+
+    expression  : expression ADD expression
+                | expression MIN expression
+                | expression DIV expression
+                | expression MUL expression
+                | expression POW expression
+                | expression MOD expression
+                | expression DIV_INT expression
+                | expression AND expression
+                | expression OR expression
+                | expression EQ expression
+                | expression NE expression
+                | expression LT expression
+                | expression LE expression
+                | expression GT expression
+                | expression GE expression
+                | expression IN expression 
+
+# Parenthesis
+
+    expression  : LEFT_PAR expression RIGHT_PAR
+
+# Unary operator expression
+
+    expression  : MIN expression %prec UMIN
+                | NOT expression
+
+# Index operator
+
+    expression  : expression LEFT_SB expression RIGHT_SB
+
+# Call operator
+
+    expression  : expression LEFT_PAR values RIGHT_PAR
+
+    values      : values COMMA expression
+                | expression
+
+# Litterals
+
+    expression  : INT
+                | FLOAT
+                | ID
+                | TRUE
+                | FALSE
+                | STRING
+                | LEFT_SB values RIGHT_SB
+                | LEFT_SB RIGHT_SB
+                | LEFT_BR keys RIGHT_BR
+                | LEFT_BR RIGHT_BR
+                | NIL
+
+    keys        : keys COMMA expression KEY_OP expression
+                | expression KEY_OP expression
+
+    definition  : DEF ID LEFT_PAR parameters RIGHT_PAR statements END
+                | DEF ID LEFT_PAR RIGHT_PAR statements END
+
+    parameters  : parameters COMMA ID
+                | ID
+
+    declaration : CLASS ID LT ID statements END
+                | CLASS ID statements END
+
+    modulation  : MODULE ID statements END
+
+    interfiles  : REQUIRE STRING
+                | INCLUDE ID
+
