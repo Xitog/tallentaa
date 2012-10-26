@@ -1,0 +1,197 @@
+[PYPO]
+
+Condition non booléenne
+Identifiant inconnu
+Mauvais nombre de paramètres
+Argument de for ou de in non itérable
+
+http://www.lua.org/manual/5.1/manual.html
+
+print(expression)
+
+if condition then
+	actions
+[else
+	actions]
+end
+
+while condition do
+	actions
+end
+
+break
+
+Keywords Lua :
+     and       break     do        else      elseif
+     end       false     for       function  if
+     in        local     nil       not       or
+     repeat    return    then      true      until     while
+
+Keywords Pypo :
+     end       break     do        else      if
+     and       or        while     then      not
+     True      False     for       in
+
+Lua - Pypo :
+elseif
+function
+local
+nil
+repeat
+return
+until
+(unless)
+
+L'ajout de "unless" fait passer de 91 à 124 ! les shifts/reduces conflict !!!
+Purée !!!
+
+http://stackoverflow.com/questions/3061/calling-a-function-from-a-string-with-the-functions-name-in-python
+import foo or foo = __import__('foo')
+methodToCall = getattr(foo, 'bar')
+result = methodToCall()
+
+or
+
+locals()["myfunction"]()
+
+or
+
+exec "a=foo.%s()"%string
+
+
+1. CONTINUE
+
+Idée pour le continue :
+On a un arbre ainsi :
+	(statement1, suite)
+		(statement2, suite)
+			(statement3)
+Si statement2 est un continu on doit "parasiter" l'exécution du statement3.
+Il suffit de faire une variable globale glb_continue et de dire si elle est vraie, mise à faux et on ne fait pas le reste dans :
+
+	elif n.code == 'PROGRAM':
+ 	        if n.sbd is not None:
+ 	            compute(n.sbg)
+ 	            return compute(n.sbd)
+ 	        elif n.sbg is not None and glb_continue == False:
+ 	            return compute(n.sbg)
+		elif glb_continue:
+		    glb_continue = False
+		    return None
+ 	        else: 
+ 	            return None
+
+2. LISTES
+
+list : element, list
+     | element
+
+parlist : ( list )
+        | ( )
+
+fundecl : def id parlist statements end
+
+funcall : id ( list )
+
+On stocke un objet fonction dans le Scope, et pour l'appeler :
+on récupère son id, et on fait dans le scope :
+Scope.ids[id]
+
+http://www.linuxtopia.org/online_books/programming_books/python_programming/python_ch10s04.html
+http://en.wikipedia.org/wiki/Function_object
+
+Ruby  has a number of objects that can be considered function objects, in particular Method and Proc objects. Ruby also has two kinds of objects that can be thought of as semi-function objects: UnboundMethod and block. UnboundMethods must first be bound to an object (thus becoming a Method) before they can be used as a function object. Blocks can be called like function objects, but in order to be used in any other capacity as an object (eg. passed as an argument) they must first be converted to a Proc. More recently, symbols (accessed via the literal unary indicator :) can also be converted to Procs. Using Ruby's unary & operator—equivalent to calling to_proc on an object, and assuming that method exists—the Ruby Extensions Project created a simple hack.
+
+class Functor
+  def initialize(&func)
+    @func = func
+  end
+  def method_missing(op, *args, &blk)
+    @func.call(op, *args, &blk)
+  end
+end
+
+http://facets.rubyforge.org/
+http://facets.rubyforge.org/learn.html#books
+http://facets.rubyforge.org/apidoc/index.html
+
+def id(a,b)
+	print(a)
+	print(b)
+	return a+b
+end
+
+id = do
+	|a,b|
+	print(a)
+	print(b)
+	return a+b
+end
+
+for i in 1..5
+	actions
+end
+
+repeat i=5 to 10
+repeat forever
+repeat until i=5
+repeat while i=5
+end
+
+until/while
+unless/if
+
+11h36 : break marche (lexer, parser, interpreter adapté) 7 septembre
+
+- Ajout du littéral liste : 131 shift/reduce conflicts
+- Ajout de l'expression ID[expression] : 133
+- Ajout des fonctions : 171
+- Ajout de l'opérateur d'indexation : 179 (2nd rewrite)
+
+16h01 le 16 ajout de ID[expression] comme expression.
+16h24 : purée. Je peux inclure des fonctions, même si pour l'instant ça ne fait rien.
+
+17h35, le 24 septembre : réécrit les expressions indexés pour que cela soit un opérateur,
+pas une option d'un id. D'où l'ajout très important d'une priorité pour le crochet gauche !
+map[i][j] marche !!!
+
+Note sur les appels de fonctions : http://docs.python.org/tutorial/controlflow.html
+    def pipo(a,b):
+        return a+b
+    lis = [2,4]
+    pipo(*lis) # unpack lis a=2 and b=4
+    locals()['pipo'](*lis)
+    
+    def multipipo(*lis): # Variable length list of args
+        r = 0
+        for i in lis:
+            r+=i
+        return r
+    multipipo(1,2,3,4,5,6) # 21
+    multipipo(*lis) # Unpack!
+
+Il faut que je sache le niveau de transparence que je veux :
+interagir avec des variables et des fonctions pythons directement ?
+
+Donc le but est simple : avoir un langage de script simple et qui marche.
+Pas d'objet (pour l'instant).
+Structures simples mais complètes.
+Impératifs.
+
+------------------------------------------------------------------------
+
+#k ID affectation_operator expression
+#k expression binary_operator expression
+#k unary_operator expression
+#k expression (bool, string, float, int, id)
+#k ( expressiion )
+#k if condition then statements else statements end   # 15hxx OK
+#k print( expression ) # 16h03 a present il va falloir faire une pile !11 Juillet
+#k while condition do statements end 16h34 Le 13 Juillet
+#k break (only for while)
+#t continue
+
+------------------------------------------------------------------------
+
+14h30 : j'ai un GUI ! OOOOOUUUUIIII
+14h36 : tuné un peu, il est nickel.
