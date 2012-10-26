@@ -1,6 +1,9 @@
 import lex
 import yacc
+
 from simple_lexer import *
+
+DEBUG = False
 
 precedence = (
                ('left', 'AND', 'OR'),
@@ -54,22 +57,21 @@ def pretty_list(o):
     else:
         return str(o)
 
-
 def p_program(p):
     '''program : statements_suite'''
-    print('> program')
+    if DEBUG: print('> program')
     p[0] = Node(typ='list', par='sta', sbg=p[1])
 
 def p_statements_suite(p):
     '''statements_suite : statements_suite statement
                         | statement'''
     if len(p) == 3: # statements_suite
-        print('> statements suite')
+        if DEBUG: print('> statements suite')
         if p[2] != 'newline':
             p[1].append(p[2])
         p[0] = p[1]
     elif len(p) == 2: # statement
-        print('> statement')
+        if DEBUG: print('> statement')
         if p[1] != 'newline':
             p[0] = [p[1]]
         else:
@@ -81,13 +83,13 @@ def p_statement_empty(p):
 
 def p_statement(p):
     '''statement : statement_libre NEWLINE'''
-    print('> complete')    
+    if DEBUG: print('> complete')    
     p[0] = p[1]
 
 def p_statement_libre(p):
     '''statement_libre : selection
                        | expression'''
-    print('> libre')    
+    if DEBUG: print('> libre')    
     p[0] = p[1]
 
 def p_selection_multi(p):
@@ -115,36 +117,36 @@ def p_expression_binop(p):
                   | expression GT expression
                   | expression GE expression
                   | expression IN expression'''
-    print('> binop')
+    if DEBUG: print('> binop')
     p[0] = Node(typ='binop', par=p[2], sbg=p[1], sbd=p[3])
 
 def p_expression_int(p):
     '''expression : INT'''
-    print('> int')
+    if DEBUG: print('> int')
     p[0] = Node(typ='value', par='int', sbg=int(p[1]))
 
 def p_expression_id(p):
     '''expression : ID'''
-    print('> id')
+    if DEBUG: print('> id')
     p[0] = Node(typ='value', par='id', sbg=p[1])
 
 def p_expression_flt(p):
     '''expression  : FLOAT'''
-    print('> float')
+    if DEBUG: print('> float')
     p[0] = Node(typ='value', par='flt', sbg=float(p[1]))
 
 def p_expression_true(p):
     '''expression  : TRUE'''
-    print('> true')
+    if DEBUG: print('> true')
     p[0] = Node(typ='value', par='bool', sbg=True)
 
 def p_expression_false(p):
     '''expression  : FALSE'''
-    print('> false')
+    if DEBUG: print('> false')
     p[0] = Node(typ='value', par='bool', sbg=False)
 
 def p_expression_nil(p):
-    '''expression : NIL'''
+    if DEBUG: '''expression : NIL'''
     p[0] = Node(typ='value', par='nil', sbg=None)
 
 def p_error(p):
@@ -160,13 +162,7 @@ def p_error(p):
 
 yacc.yacc()
 
-def cmd_exit():
-    pass
-
-shell = True
-debug = True
-commands = { 'exit' : cmd_exit}
-Root = {}
+#-----------------------------------------------------------------------
 
 def get_tokens(string):
     tokens = lex.input(string)
@@ -181,16 +177,7 @@ def get_ast(string):
     ast = yacc.parse(string)
     return ast
 
-def compute_string(string, scope):
-    global debug
-    ast = get_ast(string)
-    if ast is None:
-        print 'ERROR : Ast could not be generated.'
-    else:
-        if debug:
-            print('Ast built')
-            print('Exploring')
-            explore(ast)
+#?Compute_string
 
 def explore(ast):
     print ast
@@ -218,28 +205,4 @@ def disp(s):
     for t in get_tokens(s):
         print(t)
 
-if __name__ == '__main__':
-    if shell:
-        s = ''
-        while s != 'exit':
-            String = s
-            s = raw_input('> ')
-            if s in commands:
-                commands[s]()
-            else:
-                s += "\n"
-                if debug: disp(s)
-                while good(s) != 0:
-                    s2 = raw_input('. ')                    
-                    s += s2
-                    s += "\n"
-                    if debug: disp(s)
-                result = compute_string(s, Root)
-                #Root.vars['_'] = result
-                #print result
-    else:
-        files = ('essai.pypo',)
-        String = read(files[0])
-        compute_string(String)
-        dump()
 
