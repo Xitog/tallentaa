@@ -40,12 +40,36 @@ nn (Python)
 Commentaire original : Fusion du meilleur de n et zembla. 4 étages. Py.
 On a donc là une re-reprise de n et Zembla en utillisant PLY. C'est l'itération
 qui ira le plus loin, jusqu'en mai 2011. Après il y aura une accalmie.
+Il y aura la fameuse release NNIfWhile6Mai2011.zip qui marquera "un certain
+zénith" de cette version.
+
+Calcoolette (22 Oct-1 Nov 2011, C)
+-----------
+Un essai en C de langage de programmation simple. Pour faire une calculette.
+Sans Flex/Bison (Lex/Yacc), "à la main".
+
+Simple (Janvier 2012, Python)
+------
+Une tentative de reprendre simplement les bases de PLY en Python. Reprise fin
+Octobre 2012.
+
+Tokenizer (premier semestre 2012, Python)
+---------
+Un essai de faire sans PLY en Python, en se basant sur l'expérience de
+Calcoolette en C.
+
+Calcoolette (sorti le 30 juin 2012, Python)
+-----------
+Un essai de faire sans PLY en Python en gérant toute la complexité en se
+basant sur Tokenizer (ils partagent la même base commune mais ont divergés).
 
 #------------------------------------------------------------------------------
 # Annexes
 #------------------------------------------------------------------------------
 
-Ancien frontispice du projet google code 'Pypo':
+#
+# Ancien frontispice du projet google code 'Pypo':
+#
 
 Project Summary
 
@@ -57,3 +81,18 @@ If you find it useful, let me know! I would be as much delighted as surprised!
 
 Yksin 
 
+#
+# Ancien frontispice du projet google code 'Calcoolette' (en C):
+#
+
+This a simple calculator in command line, written in C.
+
+It features a simple Lexer / Parser / Interpreter structure written WITHOUT flex/bison.
+
+Its primary goal is to experiment with these concepts, by making a code easy to follow (without code generation nor magical library except the standard librairies), to offer a service to its users, and finally to be the basis for a simple scripting language, but that's another story.
+
+This is not "professional quality software", even if some truly ugly stuff are made under this label, and, even worse, sold! This is just a toy, and as its main programmer, it has the main advantage to bring me some fun. If, by the merest chance, it could be useful to someone, please, let me know, I will so delighted to ear that!
+
+In the meantime, I'm going on with my little toy, if we meet and you are reading this, I wish you luck and happiness, wanderer!
+
+D&G
