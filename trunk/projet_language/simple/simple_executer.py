@@ -1,5 +1,69 @@
 from simple_parser import *
 
+# Advanced BIB
+
+def missing(*par):
+    raise Exception('AttributeError')
+
+class XObject:
+    def __init__(self, xclass=None):
+        self.core = {}
+        self.core['class'] = xclass
+        self.core['missing'] = XFunction(missing)
+    def set(self, name, value):
+        self.core[name] = value
+    def send(self, msg, *par):
+        if msg in self.core:
+            if self.core[msg].__class__ == XFunction:
+                return self.core[msg].do(*par)
+            else:
+                return self.core[msg]
+        else:
+            return self.core['missing'].do(*par)
+
+class XClass(XObject):
+    def __init__(self, xclass=None):
+        XObject.__init__(self, xclass)
+
+class XFunction:
+    def __init__(self, code):
+        self.code = code
+    def do(self, *par):
+        self.code(*par)
+
+def test(a,b):
+    print a+b
+
+# class root
+r = XClass()
+r.set('name', 'Class')
+r.set('class', r) # THIS IS THE KEY. Class.class => pointe sur elle-meme
+
+# class
+xc = XClass(r)
+xc.set('name', 'Personne')
+
+# object & attribute
+xo = XObject(xc)
+xo.set('age', 25)
+print xo.send('age')
+
+# object & class
+print xo.send('class').send('name')
+print xo.send('class').send('class').send('name')
+print xo.send('class').send('class').send('class').send('name')
+
+# unbound fun
+xf = XFunction(test)
+xf.do(2,3)
+
+# bound fun
+xo.set('add', xf)
+xo.send('add', 2, 3)
+
+# method not found
+# xo.send('blob')
+
 # Simple BIB
 
 def send_to_int(value, message):
