@@ -85,6 +85,9 @@ Yksin
 # Ancien frontispice du projet google code 'Calcoolette' (en C):
 #
 
+calcoolette
+a simple calculator in command line 
+
 This a simple calculator in command line, written in C.
 
 It features a simple Lexer / Parser / Interpreter structure written WITHOUT flex/bison.
