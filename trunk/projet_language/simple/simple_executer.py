@@ -1,68 +1,5 @@
 from simple_parser import *
-
-# Advanced BIB
-
-def missing(*par):
-    raise Exception('AttributeError')
-
-class XObject:
-    def __init__(self, xclass=None):
-        self.core = {}
-        self.core['class'] = xclass
-        self.core['missing'] = XFunction(missing)
-    def set(self, name, value):
-        self.core[name] = value
-    def send(self, msg, *par):
-        if msg in self.core:
-            if self.core[msg].__class__ == XFunction:
-                return self.core[msg].do(*par)
-            else:
-                return self.core[msg]
-        else:
-            return self.core['missing'].do(*par)
-
-class XClass(XObject):
-    def __init__(self, xclass=None):
-        XObject.__init__(self, xclass)
-
-class XFunction:
-    def __init__(self, code):
-        self.code = code
-    def do(self, *par):
-        self.code(*par)
-
-def test(a,b):
-    print a+b
-
-# class root
-r = XClass()
-r.set('name', 'Class')
-r.set('class', r) # THIS IS THE KEY. Class.class => pointe sur elle-meme
-
-# class
-xc = XClass(r)
-xc.set('name', 'Personne')
-
-# object & attribute
-xo = XObject(xc)
-xo.set('age', 25)
-print xo.send('age')
-
-# object & class
-print xo.send('class').send('name')
-print xo.send('class').send('class').send('name')
-print xo.send('class').send('class').send('class').send('name')
-
-# unbound fun
-xf = XFunction(test)
-xf.do(2,3)
-
-# bound fun
-xo.set('add', xf)
-xo.send('add', 2, 3)
-
-# method not found
-# xo.send('blob')
+from simple_lib import *
 
 # Simple BIB
 
@@ -88,30 +25,36 @@ def execute(ast):
         return r
     if ast.typ == 'binop':
         if ast.par == '+':
-            return execute(ast.sbg) + execute(ast.sbd)
+            # return execute(ast.sbg) + execute(ast.sbd)
+            return execute(ast.sbg).send('add', execute(ast.sbd))
         elif ast.par == '-':
-            return execute(ast.sbg) - execute(ast.sbd)
+            #return execute(ast.sbg) - execute(ast.sbd)
+            return execute(ast.sbg).send('sub', execute(ast.sbd))
         elif ast.par == '/':
-            return float(execute(ast.sbg)) / execute(ast.sbd)
+            #return float(execute(ast.sbg)) / execute(ast.sbd)
+            return execute(ast.sbg).send('div', execute(ast.sbd))
         elif ast.par == '//':
             return int(execute(ast.sbg)) / int(execute(ast.sbd))
         elif ast.par == '*':
-            return execute(ast.sbg) * execute(ast.sbd)
+            #return execute(ast.sbg) * execute(ast.sbd)
+            return execute(ast.sbg).send('mul', execute(ast.sbd))
         elif ast.par == '%':
             return execute(ast.sbg) % execute(ast.sbd)
         elif ast.par == '**':
             return execute(ast.sbg) ** execute(ast.sbd)
         elif ast.par == '.':
             left = execute(ast.sbg)
-            if left.__class__ == int: return send_to_int(left, ast.sbd)
-            elif left.__class__ == float: return send_to_flt(left, ast.sbd)
-            else: raise Exception('CALL MSG TO UNSPECIFIED TYPE')
+            return left.send(ast.sbd)
+            #if left.__class__ == int: return send_to_int(left, ast.sbd)
+            #elif left.__class__ == float: return send_to_flt(left, ast.sbd)
+            #else: raise Exception('CALL MSG TO UNSPECIFIED TYPE')
     elif ast.typ == 'unaop':
         if ast.par == '-':
-            return -execute(ast.sbg)
+            #return -execute(ast.sbg)
+            return execute(ast.sbg).send('neg')
     elif ast.typ == 'value':
         if ast.par == 'int':
-            return ast.sbg
+            return make_int(ast.sbg)
         elif ast.par == 'flt':
             return ast.sbg
         elif ast.par == 'str':
@@ -161,7 +104,12 @@ if __name__ == '__main__':
                     if DEBUG: disp(s)
                 result = compute_string(s, Root)
                 #Root.vars['_'] = result
-                print result
+                # print result
+                if result.__class__ == XObject:
+                    if result.send('class') == Integer:
+                        print result.send('value')
+                else:
+                    print result
     else:
         files = ('essai.pypo',)
         String = read(files[0])
