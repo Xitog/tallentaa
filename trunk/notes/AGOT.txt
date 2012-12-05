@@ -34,13 +34,15 @@ Intitulé		page		jour		heures
 10 Jon II        96     Dim. 10 IV  23h11-23h22 11
 11 Daenerys II  102     Lun. 11 I   16h12-16h38 26
 12 Eddard II    112     Lun. 11 II  16h39-17h04 25
-13 Tyron II     121
+13 Tyrion II    121
 14 Catelyn III  130     Tentative d'assassinat
 15 Sansa I      140     Joffrey blessé par Nymeria
 16 Eddard III   154     Le jugement (mort de Lady)
 17 Bran III     161     Le réveil
 19 Jon III      177     Les nouveaux frères
-20 Eddard IV    190
+20 Eddard IV    190     Retrouvailles avec Catelyn
+21 Tyrion III   202     Dernier meeting avec Jon
+22 Arya II      213
 
 -------------------------------------------------------------------------------
 -- Questions --
@@ -50,6 +52,11 @@ Pourquoi et comment Lyanna est-elle morte ? Soulevé par Ch4. Robert a tué Rhae
 Qui est la mère de Jon ? Soulevé par Ch6.
 Remarque : Jon Arryn et Jon Snow !
 
+Sources : 
+    - http://iceandfire.wikia.com/wiki/A_Song_of_Ice_and_Fire_Wiki
+    - http://westeros.org/
+    - http://awoiaf.westeros.org/ (bien plus complet que le premier ! résumé des chapitres et personnages)
+    
 -------------------------------------------------------------------------------
 -- Info monde --
 -------------------------------------------------------------------------------
@@ -136,6 +143,11 @@ Ch 19 Jon
 Jon méprise ses condisciples qu'il bat facilement. L'armurier lui fait comprendre qu'il les humilie. Il reçoit une lettre disant que Bran s'est réveillé, paralysé. Dans sa joie, il propose son aide à un de ses camarades et provoque le maître d'armes.
 
 Ch 20 Eddard
+Eddard retrouve sa femme par l'entremise de Littlefinger. Elle lui dévoile la tentative d'assassinat sur Bran. Avec le meurtre de Jon Arryn, cela fait deux crimes imputables aux Lannisters, Eddard craint une guerre.
+
+Ch 21 Tyrion
+Tyrion décide de jeter un dernier coup d'oeil du haut du mur avant de repartir pour le Sud. Il y croise Jon qui lui demande d'aider Bran  
+comme il l'a fait pour lui : par des mots.
 
 -------------------------------------------------------------------------------
 Prélude
@@ -863,14 +875,6 @@ Tyrion p90
 -------------------------------------------------------------------------------
 22h50-23h06
 
-Bran est dans le coma depuis 4 jours, veillé par son loup, qui selon  
-Tyrion, semble le maintenir en vie. Tyrion ordonne à Joffrey d'aller  
-donner sa sollicitude aux Starks puis déjeune avec sa fratrie. A la  
-mention du fait qu'il pourrait survivre, C et J échangent un regard  
-furtif que Tyrion surprend, se demandant bien ce qu'il pourrait  
-révéler, une fois revenu. Il leur fait part aussi de son souhait  
-de partir visitier le mur.
-
 Tyrion ne dort pas trop.
 Jambes torses
 
@@ -914,6 +918,18 @@ Compisser
 
 La mort a quelque chose d'effroyablement définitif. La vie ouvre,  
 elle, sur d'inombrables virtualités. Tyrion
+
+Floculer
+
+Résume du Tyrion 90 (reprise)
+
+Tyrion invite Joffrey a aller donner sa sympathie aux Starks pour Bran. Il surprend un regard coupable entre Jaime et Cersei lorsqu'il annonce que Bran pourrait ssurvivre à sa chute.
+
+Tommen
+Myrcella
+
+"""La mort a quelque chose d'effroyablement définitif. La vie ouvre,  
+elle, sur d'innombrables virtualités."""
 
 Floculer
 
@@ -1224,6 +1240,80 @@ ser Waymar Royce, Benjen est parti le rechercher
 
 -------------------------------------------------------------------------------
 20 Eddard IV p190
+-------------------------------------------------------------------------------
+
+Eddard 190 aaa
+Vayon Poole intendant de Ned
+Myr, îles d'Été, Norvos, Qohor, Lys
+Tyrosh, Braavos
+
+Varys
+Littlefinger, Grand Argentier
+lord Renly 8 ans lorsque Robert devient roi 191
+Grand Mestre Pycelle sa chaîne 192
+lord Stannis
+ser Barristan commandant suprême de la Garde
+Tournoi de la Main
+torve
+6 millions de pièces d'or dette 194
+Banque de Fer de Braavos
+Lord Jon Arryn, ancienne Main
+Et leur père rêvait d'un enfer glacé réservé aux Stark de  
+Winterfell.
+196 globe rouge = bordel
+
+Littlefinger a défié puis affronté Brandon Starck qui l'a épargné.  
+192
+
+Supplications de Lyanna 198
+Cadavre du fils de Rhaegar
+
+14 ans depuis le meurtre de Brandon 199
+
+Aerys le Dément
+Son Excellence la Main
+
+Helman Tallhart et Galbart Glover, vassaux de Ned.
+Lord Manderly a Blancport
+Moat Cailin sur le Neck
+
+-------------------------------------------------------------------------------
+21 Tyrion 202
+-------------------------------------------------------------------------------
+
+les Sept Couronnes
+lord intendant Bowen Marsh
+ser Jeremy Rykker et ser Allister Thorne était avec les Targaryen à  
+Pirt-Réal. Ils ont eu la vie sauve par Tywin Lannister contre endosser  
+le noir.
+"prendre le noir"
+
+la porte du Roi (Port-Réal)
+205 le fils de Lord Mormont s'est déshonoré. Sa sœur régit (au  
+lord) l'île aux Ours.
+Garde de Nuit < 1000
+  600 châteaunoir
+  200 Tour Ombreuse
+  < 200 Fort-Levant
+Mur = 100 lieues de long
+
+Yohn Royce père du chevalier du prélude. Gared était avec lui et est  
+le déserteur du ch1 !
+Viel Ours 68 ans
+Été de neuf ans ! 206
+
+Denys Mallister Cd de Tour Ombreuse ?
+
+Moleville bourgade proche de châteaunoire.
+
+ligneux
+Jon et Fantôme
+Halder, Grenn, Pypar = Pyp 210
+
+Un demi-mille sans arbre puis la forêt hantée.
+
+-------------------------------------------------------------------------------
+22 Arya 213
 -------------------------------------------------------------------------------
 
 (remarque de décembre 2011)
