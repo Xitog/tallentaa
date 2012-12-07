@@ -34,7 +34,7 @@ Intitulé		page		jour		heures
 10 Jon II        96     Dim. 10 IV  23h11-23h22 11
 11 Daenerys II  102     Lun. 11 I   16h12-16h38 26
 12 Eddard II    112     Lun. 11 II  16h39-17h04 25
-13 Tyrion II    121
+13 Tyrion II    121     Vers le mur. La vraie nature de la Garde de Nuit.
 14 Catelyn III  130     Tentative d'assassinat
 15 Sansa I      140     Joffrey blessé par Nymeria
 16 Eddard III   154     Le jugement (mort de Lady)
@@ -42,7 +42,11 @@ Intitulé		page		jour		heures
 19 Jon III      177     Les nouveaux frères
 20 Eddard IV    190     Retrouvailles avec Catelyn
 21 Tyrion III   202     Dernier meeting avec Jon
-22 Arya II      213
+22 Arya II      213     Une fille et son père. Le maître d'armes.
+23 Daenerys III 223     La vie rude. La révolte contre son frère. Enceinte.
+24 Bran IV      234     Tyron offre les plans d'une selle.
+25 Eddard V     246     L'enquête sur la mort de Jon Arryn.
+26 Jon IV       255     L'arrivée de Samwell.
 
 -------------------------------------------------------------------------------
 -- Questions --
@@ -122,7 +126,7 @@ Ch12 Eddard
 Eddard et Robert chevauche seul au devant du convoi.
 
 Ch 13 Tyrion
-???
+Tyrion remonte vers le Mur avec Benjen et Yoren. Il affute son esprit en lisant sur les dragons. Jon réalise la nature de la Garde de Nuit. Tyrion le lui rappelle et une altercation survient où fantôme intervient mais Jon finit par l'accepter.
 
 Ch 14 Catelyn
 Catelyn est folle de douleur depuis l'accident de Bran et veille sur lui, qui est inconscient. Mestre Luwin vient la quérir pour des nominations, mais celle-ci le rabroue. Robb intervient alors, demandant à sa mère de se reprendre. Soudain un feu démarre à la bibliothèque. Tous y courent sauf Catelyn, lorsqu'un sinistre individu fait irruption dans la pièce. Il blesse Catelyn mais un loup surgit et le dévore. Remise, Catelyn confit à ses proches qu'elle soupçonne les Lannisters d'avoir poussé Bran et envoyé l'assassin, suite à la lettre de sa sœur clamant qu'ils ont tué son mari. Elle décide de se rendre à Port-Réal pour en avoir le cœur net.
@@ -148,6 +152,21 @@ Eddard retrouve sa femme par l'entremise de Littlefinger. Elle lui dévoile la t
 Ch 21 Tyrion
 Tyrion décide de jeter un dernier coup d'oeil du haut du mur avant de repartir pour le Sud. Il y croise Jon qui lui demande d'aider Bran  
 comme il l'a fait pour lui : par des mots.
+
+Ch 22 Arya
+Arya en veut à tous de ne pas avoir proteger Mycah et surtout elle-même car elle se sent responsable de sa mort. Son père la console, et lui dit que pour affronter l'hiver il faut surmonter les querelles et faire front commun. Il embauche un maître d'armes pour elle.
+
+Ch 23 Daenerys
+Daenerys apprend la vie du khalasar, elle y trouve même du plaisir. Elle s'oppose enfin à son frère et le découvre pour ce qu'il est : moins qu'un serpent. Enfin elle est enceinte.
+
+Ch 24 Bran
+Bran est cloué sur son fauteuil. Robb accueille Tyrion, l'épée tirée. Mais celui-ci offre à Bran les plans d'une selle pour monter à nouveau. Confus Robb finit par lui offrir l'hospitalité mais celui-ci refuse.
+
+Ch 25 Eddard
+Eddard enquête sur la disparition de lord Arryn survenu peu après qu'il est demandé un livre à Pycelle sur les lignés.
+
+Ch 26 Jon
+Samwell arrive à Châteaunoir et raconte son histoire à Jon : obligé de prendre le noir par son père. Jon conclut un pacte avec tous les autres pour qu'ils l'epargnent à l'entraînement.
 
 -------------------------------------------------------------------------------
 Prélude
@@ -760,8 +779,9 @@ Amender
 Vespérale
 
 -------------------------------------------------------------------------------
-P81 Bran
+8 Bran p81
 -------------------------------------------------------------------------------
+
 18h??-19h03
 20 ?
 22h37-22h47
@@ -871,8 +891,9 @@ Guigner
 Ce que me fait faire l'amour, quand même ! Jaime
 
 -------------------------------------------------------------------------------
-Tyrion p90
+9 Tyrion p90
 -------------------------------------------------------------------------------
+
 22h50-23h06
 
 Tyrion ne dort pas trop.
@@ -934,9 +955,9 @@ elle, sur d'innombrables virtualités."""
 Floculer
 
 -------------------------------------------------------------------------------
-Jon
+10 Jon p96
 -------------------------------------------------------------------------------
-P96
+
 2311-2322
 
 Lady Stark veille sur Bran pendant 2 semaines, nuits et jours. Elle  
@@ -966,8 +987,9 @@ Le consteller de baisers.
 Aiguille, nom choisit par Jon !
 
 -------------------------------------------------------------------------------
-Daenerys 102
+11 Daenerys p102
 -------------------------------------------------------------------------------
+
 1612-1638
 
 Dothrakis : évnts majeurs sous le ciel (sans toits)
@@ -1032,11 +1054,10 @@ Drogo est un tendtre !
 1638 :Oui
 
 -------------------------------------------------------------------------------
-Eddard
+12 Eddard p112
 -------------------------------------------------------------------------------
 
 1639-1704
-p112
 
 Alyn, servante des Stark ?
 
@@ -1097,6 +1118,19 @@ Tywin gouv de l'Ouest
 picaillons
 du frai (sans s)
 gourmer
+
+-------------------------------------------------------------------------------
+13 Tyrion 121
+-------------------------------------------------------------------------------
+
+Père de Tyrion 20 ans Main d'Aerys.
+Il lit un livre sur les Dragons (124) et le Champ de Feu.
+
+Bois-aux-Loups : forêt entre Winterfell et le mur.
+
+"La plupart des hommes aiment mieux nier les vérités dures que les  
+affronter."
+Tyrion à Jon 128
 
 -------------------------------------------------------------------------------
 14 Catelyn 130 III tentative d'assassinat
@@ -1316,6 +1350,195 @@ Un demi-mille sans arbre puis la forêt hantée.
 22 Arya 213
 -------------------------------------------------------------------------------
 
+septa Mordane
+Jeyne Poole amie de Sansa fille de Vayon Poole ? Intendant de W ? 215
+
+Connais ceux qui te suivent et fais-toi connaître d'eux. Ne leur  
+demande pas de mourir pour un étranger. Eddard à Robb 215
+
+Vayon Poole
+Mikken forgeron
+Hullen écuries
+septon Chayle
+septa Mordane
+Jory capitaine de la garde
+Ser Rodrick
+Vieille Nan
+Halwin
+Alyn
+Gros Tom
+
+Jeux d'enfants 215
+Aiguille 217
+
+217-218 ma propre fille LOL
+Lien Arya-Lyanna. 218
+
+Elle a fait fuir Nymeria avec Jory ! 219
+
+Syrio Forel, première épée du Grand Amiral de Braavos pendant neuf  
+ans.
+
+-------------------------------------------------------------------------------
+23 Daenerys 223
+-------------------------------------------------------------------------------
+
+Herbes 223
+Contrées de l'Ombre
+Maître Illyrio à Pentos
+
+Irri f
+Doreah f blonde de Lys ~ 20 ans
+Jhiqui f
+Jhogo m
+Quaro m
+
+le khal - seigneur
+le khalasar - le groupe/clan
+Vaes Dothrak
+le khas ??
+khaleesi femme du khal
+ser Jorah Mormont
+
+Forêt de Qohor
+Collines de Norvos
+Jungle de Yi Ti
+mer/archipel de Jade
+Asshai
+
+capricante
+
+Route valyriennes droites 226
+
+Elle est naît à Peyredragon.
+
+Valyria et Pays du Grand Été : cataclysme 231
+
+Aegon III Fléau-dragon : fin des dragons
+
+Nécropurule 231
+
+Elle a 14 ans !
+
+-------------------------------------------------------------------------------
+24 Bran 234
+-------------------------------------------------------------------------------
+
+siège de Pyk, rébellion de Balon Greyjoy après que Robert soit Roi.
+Hodor est du sang de Vieille Nan. C son arrière gd mère 238 colosse  
+de sept  pieds. Son vrai nom est Walder. 239
+lord Rickard gd père de Bran
+Un Brandon 235
+
+1/4 des gardes sont partis.
+
+Brandon le Bâtisseur 236
+Hallis Mollen
+Loups-garous 234
+Les Autres = les marcheurs blancs
+
+enfants de la forêt (face sculptée des barrals).
+Premiers Hommes
+Andals
+Femmes des cités de la Rhoyne
+237
+
+cathèdre bras ornés de gueules de loups-garous.
+
+Tyrion un œuil noir l'autre vert.
+
+Fantôme Jon
+Vent Gris Robb
+Été Bran
+Brousaille Rickon
+Nymeria Arya
+Lady Sansa
+
+Bouffe 244
+Les autres ont des araignées 245. 238
+
+-------------------------------------------------------------------------------
+25 Eddard 246
+-------------------------------------------------------------------------------
+
+Forger sa chaîne
+L'été du roi Maekar
+
+"""la graine est vigoureuse."""
+Dernières paroles de Jon Arryn
+
+Valétudinaire
+
+Aegon V le Fortuné père de
+Jaehaerys II père de
+Aerys Targaryen
+Pycelle Grand Mestre des Sept Couronnes les servit tous
+
+"le meutre gît, latent, dans tous les cœurs" Grand Mestre Aethelmure
+
+Le tournoi de la fête de Joffrey (ou Loras gagna contre Jaime) 250
+arroi
+
+Gd Mestre Malleon : somme consacrée aux généalogies des grandes  
+maisons.
+
+"Ailes noires, noires nouvelles" Ned à Pycelle 250
+
+Bran devait venir au Sud 251
+les mers du Crépuscule
+leste
+Tournoi résultats 252
+
+Ser Hugh du Val écuyer de lord Arryn
+
+-------------------------------------------------------------------------------
+26 Jon 255
+-------------------------------------------------------------------------------
+
+Pyp 255 petit 256 ami 257 Pypar 258
+Grenn ami 257
+Daeron
+Halder 256
+Rast
+Albett
+
+Samwell Tarly de Corcolline
+son père lord Randyll banneret des Tyrell de Hautjardin.
+
+Bowen Marsh : inventaire et comptabilité.
+
+Porc en croûte 261
+Le Mur : haut de 700 pieds
+
+Quorin Halfhand de Tour Ombreuse
+ser Jaremy Rikker
+
+Mace Tyrell, sire de Hautjardin et gouverneur du Sud.
+Corvenin épée des Tarly
+Il a trois sœurs et un frère, Dickon
+15 ans
+
+sorciers de Qarth à la peau blanche et aux lèvres bleues.
+
+Daeron apprenti chanteur surpris au lit avec la fille de lord Rowan de  
+Boisdoré. Elle cria au viol...
+
+cidre chaud 265
+
+Jeren
+Crapaud
+
+Catelyn Stark n'aimait pas trop Jon.
+
+-------------------------------------------------------------------------------
+27 Eddard 268
+-------------------------------------------------------------------------------
+
+la rue des Sœurs
+l'étang de l'Arc-en-ciel
+
+Janos Slynt, cd du guet
+
 (remarque de décembre 2011)
 
 786 pages, j'en ai fait 1/8, youpi !
@@ -1326,3 +1549,4 @@ Je voulais relire la saga avant d'aborder le dernier tome... Mais
 c'est immense ! J'en suis au premier, il y en a 4 ! Et le premier est  
 loin d'être fini ! En fait la série m'a rappeler l'essentiel du 1 et  
 du 2, je devrais relire le 4 directement !
+
