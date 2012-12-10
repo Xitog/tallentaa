@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<!-- http://api.jquery.com/show/ -->
+<!-- http://jqueryui.com/show/ -->
+<html>
+<head>
+  <style>
+      p.invisible { background:yellow; }
+      p.invisible { display: none;}
+      </style>
+  <script src="http://code.jquery.com/jquery-latest.js"></script>
+  <script>
+      $(document).ready(function(){
+          /*$("a").click(function () {
+            alert("zembla!");
+            $(this).fadeTo("fast", .5).removeAttr("href");
+          });*/ 
+          $.cookie("test", 0);
+          start();
+      });
+      function start() {
+          var v = window.location.hash;
+          alert(v);
+          //$("p a").css("color", "white");
+          
+          // convert #1 (string) to 1 (int)
+          s = v.substr(1);
+          i = parseInt(s);
+
+          //$(v).show("slow");
+          
+          // mono affiche
+          $("p").css("display", "none");
+          if (v === "") {
+            $("#1").show("slow");
+          } else {
+            $(v).show("slow");
+          }
+          
+      }
+      window.onhashchange = start;
+  </script>
+</head>
+<body>
+
+  A simple test.
+
+  <p id="1">Blah <button id="b2">Show it</button></p>
+  <p id="2" class="invisible">Hello 2 <a href="#3">go to 3</a></p>
+  <p id="3" class="invisible">Hello 3 <a href="#4">go to 4</a> or <a href="#5">go to 5</a></p>
+  <p id="4" class="invisible">Hello 4 </p>
+  <p id="5" class="invisible">Hello 5 </p>
+  
+  <script>
+    $("#b2").click(function () {
+        $("#2").show("slow");
+    });
+  </script>
+
+</body>
+</html>
