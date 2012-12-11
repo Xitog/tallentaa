@@ -47,6 +47,8 @@ Intitulé		page		jour		heures
 24 Bran IV      234     Tyron offre les plans d'une selle.
 25 Eddard V     246     L'enquête sur la mort de Jon Arryn.
 26 Jon IV       255     L'arrivée de Samwell.
+27 Eddard VI    268     La visite à l'armurerie et Gendry, le bâtard de Robert.
+28 Catelyn IV   279     
 
 -------------------------------------------------------------------------------
 -- Questions --
@@ -167,6 +169,12 @@ Eddard enquête sur la disparition de lord Arryn survenu peu après qu'il est de
 
 Ch 26 Jon
 Samwell arrive à Châteaunoir et raconte son histoire à Jon : obligé de prendre le noir par son père. Jon conclut un pacte avec tous les autres pour qu'ils l'epargnent à l'entraînement.
+
+Ch 27 Eddard
+Eddard se rend dans une armurie dans laquelle s'était rendus Arryn et Stannis (qui se terre à Peyredragon). Il y découvre un bâtard de Robert, Gendry, apprenti forgeron.
+
+Ch 28 Catelyn
+???
 
 -------------------------------------------------------------------------------
 Prélude
@@ -1538,6 +1546,49 @@ la rue des Sœurs
 l'étang de l'Arc-en-ciel
 
 Janos Slynt, cd du guet
+
+"""Les grands y trouvent une occasion de gloire, les petits une récréation à leurs infortunes."""
+Pycelle à Eddard à propos du tournoi de la Main.
++de 20 gardes Eddard a car il en prête 20 au guet avec Alyn a leur tête.
+Lann le Futé, origine des Lannister.
+émerillon
+271 l'ARMURE il est allé la choisir avec Stannis.
+
+Stannis a conquis Peyredragon.
+Stannis 1 an de moins que Robert. """austère, dépourvu d'humour, inexorable, homme de devoir à vous en dégoûter"""
+a tenu durant 1 an le dur siège d'Accalmie face au Redwyne et Tyrell
+
+269 DE mériter
+272 LE quel
+
+école de Myr (peinture) 273
+
+rue d'Acier, place du marché, porte du Fleuve
+
+Harwin, Porther, Jacks, Varly, Desmond, Tomard (hommes du Nord)
+affûtiaux
+morion d'acier
+
+lord Béric
+
+maître armurier : Tobho Mott
+colore l'acier dans la masse
+équipe Renly et le chevalier des Fleurs
+acier valyrien 275
+
+le silence plus efficace que des questions 276
+aménité
+Gendry
+277 mère de Gendry blonde
+
+apprentissage du métier payant
+
+Lord Stannis a une fille. Il a proposé d'interdire les bordels.
+flagelle
+
+-------------------------------------------------------------------------------
+28 Catelyn 279
+-------------------------------------------------------------------------------
 
 (remarque de décembre 2011)
 
