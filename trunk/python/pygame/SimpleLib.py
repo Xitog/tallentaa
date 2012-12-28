@@ -4,12 +4,18 @@
 
 # incorpore :
 # - pygame_framework.py du 27/10/2012
+# - TutoPygame.py du 24/07/2012
 
 # Import
 import pygame
 from pygame.locals import *
 
 import math # is_in for Circle
+
+class Image:
+    def __init__(self, path, color=(255, 0, 255)):
+        self.core = pygame.image.load(path).convert()
+        self.core.set_colorkey(color)
 
 # Moyen d'ameliorer les surfaces PyGame en les dotant de plus de methode (enrobage de celle-ci)
 class Canvas:
@@ -21,6 +27,9 @@ class Canvas:
     
     def rectangle(self, x, y, width, height, color, thickness=0):
         pygame.draw.rect(self.core, color, (x, y, width, height), thickness)
+    
+    def blit(self, x, y, img):
+        self.core.blit(img.core, (x, y))
 
 # La base : un update et draw sur une surface (en fait un Canvas)
 class GraphicItem:
@@ -62,12 +71,19 @@ class Container(GraphicItem):
 # Un container special qui est en fait l'ecran et l'application a la fois.
 class Application(Container):
     
-    def __init__(self, title, width, height):
+    def __init__(self, title, width, height,debug=False):
         self.title = title
         self.size = width, height
+        flags = pygame.DOUBLEBUF
         
         pygame.init()
-        self.screen = pygame.display.set_mode(self.size)
+        if debug:
+            if pygame.display.mode_ok(self.size) == 0:
+                print "Resolution ERROR"
+                exit(1)
+            else:
+                print "Best pixel depth: ", pygame.display.mode_ok(self.size)
+        self.screen = pygame.display.set_mode(self.size, flags, pygame.display.mode_ok(self.size))
         pygame.display.set_caption(self.title)
         
         self.clock = pygame.time.Clock()
@@ -79,6 +95,8 @@ class Application(Container):
     def get_io(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                exit(0)
+            elif event.type == KEYDOWN and event.key == K_ESCAPE:
                 exit(0)
             elif event.type == pygame.MOUSEBUTTONUP:
                 for e in self.content:
@@ -131,9 +149,20 @@ class Circle(GraphicItem):
     def on_event(self, event):
         self.color = (128, 128, 128)
 
-s = Application("SimpleLib", 640, 400)
+class Sprite(GraphicItem):
+    def __init__(self, x, y, img):
+        self.x = x
+        self.y = y
+        self.img = img
+    
+    def draw(self, surface):
+        surface.blit(self.x, self.y, self.img)
+    
+s = Application("SimpleLib", 640, 400, debug=True)
 s.add(Circle(30, 30, 20, (255, 0, 0)), 10)
 s.add(Circle(30, 30, 10, (0, 0, 255)), 11)
 s.add(Square(40, 40, 60, 30, (120, 0, 0)), 8)
+flower = Image('SimpleFlower.png')
+s.add(Sprite(60, 60, flower), 5)
 s.run()
 

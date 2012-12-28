@@ -31,7 +31,7 @@ area = [[1,1,1,1,1,1,1,1,1,1,1,1,1],
 
 position = [212,212]    # position vector (point)
 direction = [1,0]       # direction vector
-camera = [0, 0.66]      # camera plane (orthogonal to direction vector) 2 * atan(0.66/1.0)=66°
+camera = [0, 0.66]      # camera plane (orthogonal to direction vector) 2 * atan(0.66/1.0)=66 deg
 
 modx = 0.0
 mody = 0.0
