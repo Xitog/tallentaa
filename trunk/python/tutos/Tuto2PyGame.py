@@ -16,9 +16,6 @@ print(pygame.display.mode_ok(resolution))
 
 screen = pygame.display.set_mode(resolution,flags,32)
 
-sprite1 = pygame.image.load('flower.png').convert()
-sprite1.set_colorkey((255,0,255))
-
 clock = pygame.time.Clock()
 
 escape = False
@@ -65,8 +62,6 @@ while not escape:
     
     # Draw
     screen.fill((0,0,0))
-    
-    screen.blit(sprite1, (100, 100))
     
     for i in range(0, len(area)):
         line = area[i]
