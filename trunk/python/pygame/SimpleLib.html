@@ -1,0 +1,92 @@
+<html>
+  <head>
+    <title>Simple Lib for PyGame</title>
+    <meta charset="utf-8">
+    <style>
+      h3 {
+        font-family: Palatino;
+        color: blue;
+      }
+      table, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+      }
+      .code {
+        font-family: consolas;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Simple Lib</h1>
+    <h2>Télécharger</h2>
+    <a href="SimpleLib.py">Dernière version</a>
+    <h2>Sommaire des classes</h2>
+    <ul>
+      <li><a href="#canvas">Canvas</a></li>
+      <li><a href="#graphicitem">GraphicItem</a></li>
+      <li><a href="#container">Container</a></li>
+      <li><a href="#application">Application</a></li>
+    </ul>
+    
+    <h3 id="canvas">Canvas</h3>
+    <p>Améliore les surfaces basiques de PyGame en les dotant d'une véritable interface orientée objet.</p>
+    <table>
+      <tr>
+        <td class="code">__init__(self:Canvas, pygame_surf:pygame.Surface)</td><td>Initialise avec un surface de PyGame.</td>
+      </tr>
+      <tr>
+        <td class="code">circle(self:Canvas, x:int, y:int, radius:int, color:Color, thickness:int)</td><td>Dessine un cercle. Si thickness est à 0, le cercle est plein.</td>
+      </tr>
+    </table>
+    
+    <h3 id="graphicitem">GraphicItem</h3>
+    <p>Objet graphique de base.</p>
+    <table>
+      <tr>
+        <td class="code">update(self:GraphicItem)</td><td>Appelé pour mettre à jour l'objet.</td>
+      </tr>
+      <tr>
+        <td class="code">draw(self:GraphicItem, surface:Canvas)</td><td>Appelé pour dessiner l'objet sur le Canvas.</td>
+      </tr>
+      <tr>
+        <td class="code">is_in(self:GraphicItem, x:int, y:int)</td><td>Fait un test de collision entre le point x,y et le GraphicItem.</td>
+      </tr>
+      <tr>
+        <td class="code">on_event(self:GraphicItem, event:pygame.Event)</td><td>Réagit à un évènement.</td>
+      </tr>
+    </table>
+    
+    <h3 id="container">Container (GraphicItem)</h3>
+    <p>Un composite constitué d'une liste de GraphicItem qu'il gère.</p>
+    <table>
+      <tr>
+        <td class="code">update(self:Container)</td><td>Met à jour le composite et ses composants.</td>
+      </tr>
+      <tr>
+        <td class="code">draw(self:Container, surface:Canvas)</td><td>Dessine tous ses composants.</td>
+      </tr>
+      <tr>
+        <td class="code">add(self:Container, gi:GraphicItem, z:int)</td><td>Ajoute un GraphicItem au Container avec une profondeur donnée. Plus z est grand, plus il sera dessiné dessus.</td>
+      </tr>
+    </table>
+    
+    <h3 id="application">Application (Container)</h3>
+    <p>Un composite spécial représentant tout l'écran.</p>
+    <table>
+      <tr>
+        <td class="code">__init__(self:Application, title:String, x:int, y:int)</td><td>Initialisation et on indique la taille de l'écran (x,y).</td>
+      </tr>
+      <tr>
+        <td class="code">run(self:Application)</td><td>Boucle infinie qui fait tourner l'application.</td>
+      </tr>
+      <tr>
+        <td class="code">get_io(self:Application)</td><td>Prend en compte les évènements et les envoie aux composants concernés.</td>
+      </tr>
+    </table>
+    
+    <h2>Historique</h2>
+    <ul>
+      <li>Création le 27 Décembre 2012.</li>
+    </ul>
+  </body>
+</html>
