@@ -1,3 +1,9 @@
+#
+# Symbolizer  string   -> [tokens]
+# Parser      [tokens] -> abstract syntax tree (AST)
+# Interpreter AST      -> result
+#
+
 #-----------------------------------------------------------------------
 # Base
 #-----------------------------------------------------------------------
@@ -146,6 +152,7 @@ id_keywords = ['class', 'fun', 'return', 'next', 'break', 'unless', 'until', 'do
 spe = ['$', '?']
 
 class Symbolizer:
+    """From a string make a list of symbol"""
     
     def __init__(self):
         pass
@@ -234,7 +241,7 @@ class Symbolizer:
             if len(self.symbols) > 1 and i > 0 and self.symbols[-1].val == '.':
                 self.symbols.append(Symbol(Id, id))
             else:
-                self.symbols.append(Symbol(Keyword, Id))
+                self.symbols.append(Symbol(Keyword, id))
         else:
             self.symbols.append(Symbol(Id, id))
         return i
@@ -279,7 +286,9 @@ def first_op(symbols):
     i = 0
     best = -1
     best_prio = -1
-    prio = { ')' : 0, ',' : 1, 'and' : 5, 'or' : 5, 'xor' : 5, '<=>' : 8, '<<': 9, '>>' : 9, '+' : 10, '-' : 10, 
+    prio = { ')' : 0, ',' : 1, 'and' : 5, 'or' : 5, 'xor' : 5, 
+             '>' : 8, '<' : 8, '>=' : 8, '<=' : 8, '==' : 8, '!=' : 8, '<=>' : 8, 
+             '<<': 9, '>>' : 9, '+' : 10, '-' : 10, 
              '*' : 20, '/' : 20, '//' : 20, '**' : 30, '%' : 30, 'call' : 35, '.' : 40, 
              'unary-' : 50, 'call(' : 51, 'expr(' : 60 }
     lvl = 1
@@ -444,26 +453,84 @@ def make_typed_aff(symbols):
     symbols.clear()
     symbols.add(n)
 
-def parse(symbols): 
-    if symbols.include(';'):
-        two_part = symbols.split(';')
-        parse(SymbolList(two_part[0]))
-        parse(SymbolList(two_part[1]))
-        n = Symbol(val='suite', kind=Structure, left=two_part[0][0], right=two_part[1][0])
-        symbols.clear()
-        symbols.add(n)
-    elif not not_exist_or_dif(symbols, 1, True, '='):
-        if len(symbols) > 2:
-            make_aff(symbols)
+class Parser:
+    """From a list of symbol make an abstract syntax tree"""
+    
+    def __init__(self):
+        pass
+    
+    def fetch_end(self, symbols, start):
+        parcours = start+1
+        level = 1
+        while parcours < len(symbols):
+            #print symbols[parcours].val, level
+            if symbols[parcours].val == 'if': level += 1
+            elif symbols[parcours].val == 'end': level -= 1
+            if level == 0:
+                return parcours
+            parcours += 1
+        return -1
+    
+    def fetch_x(self, symbols, start, symb):
+        parcours = start+1
+        while parcours < len(symbols):
+            if symbols[parcours].val == symb: return parcours
+            parcours += 1
+        return -1
+    
+    def parse(self, symbols):
+        #print symbols[0].val
+        if symbols.include(';'):
+            #print 'parse -> ; detected'
+            two_part = symbols.split(';')
+            self.parse(SymbolList(two_part[0]))
+            self.parse(SymbolList(two_part[1]))
+            n = Symbol(val='suite', kind=Structure, left=two_part[0][0], right=two_part[1][0])
+            symbols.clear()
+            symbols.add(n)
+        elif symbols[0].val == 'if':
+            #print 'parse -> if detected'
+            to = self.fetch_end(symbols, 0)
+            if to == -1: raise Exception("Unclosed if")
+            elif to == 1: raise Exception("If without condition and body!")
+            else:
+                then = self.fetch_x(symbols, 0, 'then')
+                if then == -1: raise Exception("No then!")
+                elif then == 1: raise Exception("No condition!")
+                else:
+                    condition = SymbolList(symbols[1:then])
+                    self.parse(condition)
+                    action_else = [None]
+                    if to == then + 1: action = [None]
+                    else:
+                        s_else = self.fetch_x(symbols, 0, 'else')
+                        if s_else == -1:
+                            action = SymbolList(symbols[then+1:to])
+                            self.parse(action)
+                        else:
+                            action = SymbolList(symbols[then+1:s_else])
+                            self.parse(action)
+                            action_else = SymbolList(symbols[s_else+1:to])
+                            self.parse(action_else)
+                    n = Symbol(val='if', kind=Structure, left=condition[0], right=action[0])
+                    n.right_else = action_else[0]
+                    symbols.clear()
+                    symbols.add(n)
+        elif not not_exist_or_dif(symbols, 1, True, '='):
+            #print 'parse -> = detected'
+            if len(symbols) > 2:
+                make_aff(symbols)
+            else:
+                raise Exception("Incorrect declaration")
+        elif not not_exist_or_dif(symbols, 1, True, ':'):
+            #print 'parse -> : detected'
+            if len(symbols) > 4:
+                make_typed_aff(symbols)
+            else:
+                raise Exception("Incorrect typed declaration")
         else:
-            raise Exception("Incorrect declaration")
-    elif not not_exist_or_dif(symbols, 1, True, ':'):
-        if len(symbols) > 4:
-            make_typed_aff(symbols)
-        else:
-            raise Exception("Incorrect typed declaration")
-    else:
-        make_tree(symbols)
+            #print 'parse -> standard'
+            make_tree(symbols)
 
 #-----------------------------------------------------------------------
 # Interpreter
@@ -574,6 +641,28 @@ def exec_node(symbol, scope={}, debug=False):
                 return instance_function(exec_node(symbol.left, scope), Symbol(Id, 'rshift'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
             elif symbol.val == '<=>':
                 return instance_function(exec_node(symbol.left, scope), Symbol(Id, 'cmp'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
+            elif symbol.val in ['>', '<', '>=', '<=', '==', '!=']:
+                r = instance_function(exec_node(symbol.left, scope), Symbol(Id, 'cmp'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope)
+                if symbol.val == '==':
+                    if r == 0: return True
+                    else: return False
+                elif symbol.val == '!=':
+                    if r != 0: return True
+                    else: return False
+                elif symbol.val == '>':
+                    if r == 1: return True
+                    else: return False
+                elif symbol.val == '>=':
+                    if r == 1 or r == 0: return True
+                    else: return False
+                elif symbol.val == '<':
+                    if r == -1: return True
+                    else: return False
+                elif symbol.val == '<=':
+                    if r == -1 or r == 0: return True
+                    else: return False
+                else:
+                    raise Exception("You shouldn't be there!")
             else:
                 raise Exception("Operator not understood")
         elif symbol.kind == Structure:
@@ -610,6 +699,16 @@ def exec_node(symbol, scope={}, debug=False):
             elif symbol.val == 'suite':
                 exec_node(symbol.left, scope)
                 return exec_node(symbol.right, scope)
+            elif symbol.val == 'if':
+                condition = exec_node(symbol.left)
+                action = None
+                if condition and symbol.right is not None:
+                    action = exec_node(symbol.right)
+                    return action
+                if not condition and symbol.right_else is not None:
+                    action = exec_node(symbol.right_else)
+                    return action
+                return None
             else:
                 raise Exception("Invisible Node type not understood")
         else:
@@ -701,7 +800,7 @@ def test(s, debug=True, mode = 'exec'):
         return o
     del o[-1] # del eof
     #print '>>> %i %s' % (first_op(o), o[first_op(o)])
-    parse(o)
+    Parser().parse(o)
     if mode == 'tree':
         print_tree(o[0])
         return o
