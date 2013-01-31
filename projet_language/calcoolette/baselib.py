@@ -3,6 +3,10 @@ from __future__ import division
 import sys    # getsizeof, stdout.write
 import math   # factorial
 
+# Il faut un meilleur systeme que ajouter a la main pour chaque fonction
+# les tests du nb de parametre et l'affichage dans functions !
+# De plus functions retourne une liste, ce qui n'est pas gerer !
+
 class BaseLib:
     
     def send(self, target, msg, par, scope):
@@ -42,7 +46,7 @@ class BaseLib:
         # check
         if msg in ['add', 'sub', 'div', 'mul', 'pow', 'mod', 'lshift', 'rshift', 'and', 'or', 'xor','cmp', 'intdiv']:
             if len(par) != 1: raise Exception('%s function take 1 parameter, %d given' % (msg, len(par)))
-        elif msg in ['abs', 'inv', 'invbin', 'to_s', 'to_f', 'to_i', 'size', 'factorial']:
+        elif msg in ['abs', 'inv', 'invbin', 'to_s', 'to_f', 'to_i', 'size', 'factorial', 'functions']:
             if len(par) != 0: raise Exception('%s function take 0 parameter, %d given' % (msg, len(par)))
         elif msg in ['between?']:
             if len(par) != 2: raise Exception('%s function take 2 parameters, %d given' % (msg, len(par)))
@@ -93,6 +97,10 @@ class BaseLib:
             return target >= par[1] and target <= par[0]
         elif msg == 'factorial':
             return math.factorial(target)
+        elif msg == 'functions':
+            r = ['type', 'class', 'add', 'sub', 'div', 'intdiv', 'mul', 'pow', 'mod', 'abs', 'inv', 'lshift', 'rshift', 'and', 'or', 'xor', 'invbin', 'cmp', 'to_s', 'to_f', 'to_i', 'size', 'between?', 'factorial', 'functions' ]
+            r.sort()
+            return r 
         else:
             raise Exception("Function %s not known for integer" % (msg,))
     
