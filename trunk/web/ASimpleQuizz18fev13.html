@@ -1,0 +1,33 @@
+﻿<html>
+  <head>
+    <title>Test</title>
+    <link rel="stylesheet" type="text/css" href="http://ran.alwaysdata.net/palatino.css">
+    <meta charset="utf-8">
+    <script>
+      function check(element, answer) {
+        var e = document.getElementById(element);
+        if (e == null) {
+          alert(e);
+        } else {
+          if (e.value == answer) {
+            e.style.backgroundColor = "rgb(0,255,0)";
+            e.style.color = "rgb(255,255,255)";
+          } else {
+            e.style.backgroundColor = "rgb(255,0,0)";
+            e.style.color = "rgb(255,255,255)";
+            //e.style.fontStyle = "italic";
+            e.value = e.value + ' (' + answer + ')';
+          }
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <form>
+      <table>
+        <tr><td>alpha</td><td><input type="text" id="input1" size="20" name="input1"></td><td><button onclick="check('input1', 'alpha')" type="button">Go</button></td></tr>
+        <tr><td>beta</td><td><input type="text" id="input2" size="20" name="input2"></td><td><button onclick="check('input2', 'beta')" type="button">Go</button></td></tr>
+      </table>
+    </form>
+  </body>
+</html>
