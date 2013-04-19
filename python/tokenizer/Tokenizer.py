@@ -1229,10 +1229,7 @@ def com_blocks():
     p.clear(tokens)
     p.parse(tokens, True)
     
-command = ''
-previous = ''
-commands = { 'keywords' : com_keywords, 'help' : com_help, 'exit' : com_exit, 'tests' : com_tests, 'clear' : com_clear, 'tokens' : com_tokens, 'blocks' : com_blocks}
-
+# utils
 def clos(command):
     t = Tokenizer()
     tokens = t.parse(command)
@@ -1246,3 +1243,19 @@ def clos(command):
             cend+=1
     return cdeb == cend
 
+#------------------------------------------------------------------------------
+# Console core
+#------------------------------------------------------------------------------
+
+commands = { 'keywords' : com_keywords, 'help' : com_help, 'exit' : com_exit, 'tests' : com_tests, 'clear' : com_clear, 'tokens' : com_tokens, 'blocks' : com_blocks}
+	
+if __name__ == "__main__":
+	print "Hello to the Tokenizer"
+	while True:
+		command = raw_input(">>> ")
+		if command == 'exit':
+			break
+		elif command in commands:
+			commands[command]()
+		else:
+			print interpreter.do_string(command, stack, scope)
