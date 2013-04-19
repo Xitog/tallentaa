@@ -1209,9 +1209,6 @@ def com_tests():
 def com_clear():
     os.system('cls')
 
-def com_exit():
-    pass
-
 def com_tokens():
     global previous
     t = Tokenizer()
@@ -1243,19 +1240,18 @@ def clos(command):
             cend+=1
     return cdeb == cend
 
-#------------------------------------------------------------------------------
-# Console core
-#------------------------------------------------------------------------------
+commands = { 'keywords' : com_keywords, 'help' : com_help, 'tests' : com_tests, 'clear' : com_clear, 'tokens' : com_tokens, 'blocks' : com_blocks}
+previous = ''
 
-commands = { 'keywords' : com_keywords, 'help' : com_help, 'exit' : com_exit, 'tests' : com_tests, 'clear' : com_clear, 'tokens' : com_tokens, 'blocks' : com_blocks}
-	
 if __name__ == "__main__":
-	print "Hello to the Tokenizer"
-	while True:
-		command = raw_input(">>> ")
-		if command == 'exit':
-			break
-		elif command in commands:
-			commands[command]()
-		else:
-			print interpreter.do_string(command, stack, scope)
+    if console:
+        print "Hello to the Tokenizer"
+        while True:
+            command = raw_input(">>> ")
+            if command == 'exit':
+                break
+            elif command in commands:
+                commands[command]()
+            else:   
+                print interpreter.do_string(command, stack, scope)
+            previous = command
