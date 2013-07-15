@@ -160,8 +160,6 @@ class Symbolizer:
     
     def parse(self, input):
         self.symbols = []
-        START = 0
-        mode = START
         i = 0
         while i < len(input):
             #print '> char at : ', input[i]
