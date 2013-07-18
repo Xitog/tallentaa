@@ -1,12 +1,21 @@
 ﻿<html>
     <head>
+        <link href='http://fonts.googleapis.com/css?family=Lobster' rel='stylesheet' type='text/css'>
+        <link href='http://fonts.googleapis.com/css?family=Dosis' rel='stylesheet' type='text/css'>
         <style type="text/css">
         body {
             width:800px;
             margin: auto;
+            margin-top: 10px;
+            margin-bottom: 10px;
             color: #000000;
             background-color: #FFFFFF;
-            border: 1px solid #000000;
+            border: 1px solid #e59e40;
+            font-family: 'Dosis', monospace, "Consolas";
+            //background-image:url(http://dribbble.s3.amazonaws.com/users/13774/screenshots/318774/attachments/13998/Midcenturian_1.jpg);
+            //background-position:50% 50%;
+            //background-repeat:no-repeat;
+            //background-size: 100%;
         }
         td {
             border-right: 1px solid #000000;
@@ -63,13 +72,49 @@
             padding-left: 2px;
             box-sizing: border-box;
             border: 1px solid #DDDDDD;
+            //padding-bottom: 30px;   /* Height of the footer */
+            display: none;
+        }
+        
+        #menu {
+            margin-top: 30px;
+            width: 100%;
+            text-align: center;
         }
         
         div.title {
-            font-family: "Palatino Linotype";
+            font-family: 'Dosis', sans-serif; // font-family: "Palatino Linotype";
             padding-left: 5px;
             text-decoration: underline;
             margin-top: 15px;
+        }
+        
+        h1 {
+            font-family: "Lobster", cursive, monospace, "Consolas", "Century Gothic";
+            font-weight: 400;
+            font-size: 24px;
+            width: 100%;
+            background-color: #e59e40;
+            color: #4087e4;
+            margin: auto;
+            margin-top: 5px;
+            text-align: center;
+        }
+        
+        #footer {
+            position: absolute;
+            bottom: 0;
+            width: 800px;
+            height: 30px;   /* Height of the footer */
+            font-family: "Lobster", cursive;
+            font-weight: 100;
+            font-size: 12px;
+            color: #4087e4;
+            text-align: center;
+        }
+
+        a {
+            color: #4087e4;
         }
         
         //<div style="position: absolute; left: 10px; top: 10px; padding: 10px; width:50%; height: 50%; border: 1px solid #000000;">
@@ -153,6 +198,7 @@
                 var title_interpret = document.getElementById("interpret_title");
                 title_interpret.innerHTML = "Interpretation result";
                 var display_result = document.getElementById("result");
+                display_result.style.display = "block";
                 display_result.innerHTML = '';
                 display_result.innerHTML = scmd + "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>Result = </i>" + result;
             }
@@ -160,11 +206,12 @@
         </script>
     </head>
     <body>
+        <h1>Calcoolette</h1>
         <div id="box">
             <div id="output">
             </div>
             <div id="input">
-                <textarea id="inputtext" rows="1" placeholder="feed me some code!" onkeypress="return myKeyPress(event)"></textarea>
+                <textarea id="inputtext" rows="1" placeholder=">>> feed me some code here!" onkeypress="return myKeyPress(event)"></textarea>
             </div>
             <div id="output_lex">
                 <div id="lex_title" class="title"></div>
@@ -180,6 +227,10 @@
                 <div id="interpret_title" class="title"></div>
                 <div id="result"></div>
             </div>
+            <div id="menu">
+                <a href="http://ran.alwaysdata.net/">Retour</a>
+            </div>
+            <div id="footer">Calcoolette 2012-2013</div>
         </div>
         <!--<input type="text" name="cmd"></input>-->
         <!--<button onclick="main()">Magic</button>-->
