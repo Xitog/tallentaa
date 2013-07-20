@@ -33,13 +33,13 @@ function Symbol(kind, val, left, right) {
 
 Symbol.prototype.toString = function() {
     if (this.left == null && this.right == null) {
-        return "" + this.val + ":" + this.kind;
+        return "SymbolStr(" + this.val + ":" + this.kind + ")";
     } else if (this.right == null && this.left != null) {
-        return "" + this.left + "--" + this.val + ":" + this.kind;
+        return "SymbolStr(" + this.left + "--" + this.val + ":" + this.kind + ")";
     } else if (this.left == null && this.right != null) {
-        return "" + this.val + ":" + this.kind + "--" + this.right;
+        return "SymbolStr(" + this.val + ":" + this.kind + "--" + this.right + ")";
     } else {
-        return "" + this.left + "--" + this.val + ":" + this.kind + "--" + this.right;
+        return "SymbolStr(" + this.left + "--" + this.val + ":" + this.kind + "--" + this.right + ")";
     }
 }
 
@@ -482,7 +482,7 @@ Parser.prototype.parse_expression = function(symbols) {
                 symbols[target-1] = n;
             } else if (target > 0) {
                 if (symbols[target].val != '.' || (symbols[target].val == '.' && this.not_exist_or_dif(symbols, target+2, False, "call"))) {
-                    var n = new Symbol(symbols[target].val, symbols[target].kind, symbols[target-1], symbols[target+1]); // kind val left right
+                    var n = new Symbol(symbols[target].kind, symbols[target].val, symbols[target-1], symbols[target+1]); // kind val left right
                     symbols.splice(target+1, 1);
                     symbols.splice(target, 1);
                     symbols[target-1] = n;
@@ -529,6 +529,8 @@ Parser.prototype.parse = function(symbols) {
     return this.tree;
 }
 
+// NOT IMPORTED YET
+
 //-----------------------------------------------------------------------------
 // Interpreter
 //-----------------------------------------------------------------------------
@@ -546,6 +548,14 @@ function Value(value, kind) {
 }
 
 Value.prototype.toString = function() {
+    return 'ValueStr(' + this.value + " : " + this.kind + ')';
+}
+
+Value.prototype.toStringValue = function() {
+    return '' + this.value;
+}
+
+Value.prototype.toStringTypedValue = function() {
     return '' + this.value + " : " + this.kind;
 }
 
@@ -563,12 +573,253 @@ Interpreter.prototype.exec_node = function(symbol, scope) {
     if (symbol.terminal()) {
         return this.exec_terminal(symbol, scope);
     } else {
-        console.log(typeof symbol);
-        console.log(symbol);
-        alert("Node not known");
+        return this.exec_non_terminal(symbol, scope);
+        //console.log(typeof symbol);
+        //console.log(symbol);
+        //alert("Node not known");
     }
 }
 
+//import baselib
+//bb = baselib.BaseLib()
+
+var bb = {
+    send : function(subject, name, par, scope) {
+        console.log(subject);
+        console.log(name);
+        console.log(par);
+        console.log(scope);
+    }
+}
+
+// NOT TESTED YET
+Interpreter.prototype.global_function = function(id, args, scope) {
+    if (id.terminal() && id.kind == SymbolType.Id && ! args.terminal() && args.val == 'call(') {
+        var name = id.val;
+        if (args.right.terminal()) {
+            if ([SymbolType.Integer, SymbolType.Float, SymbolType.String].indexOf(args.right.kind) > -1) {
+                par = this.exec_node(args.right);
+            } else if (args.right.kind == SymbolType.Id) {
+                par = scope[args.right.val];
+            } else {
+                throw new Error("Bad param for global function call")
+            }
+        } else {
+            throw new Error("Bad global function call");
+        }
+        return bb.send(None, name, par, scope);
+    } else {
+        throw new Error("ERROR 1002");
+    }
+}
+
+// NOT CONVERTED YET
+/*
+Interpreter.prototype.instance_function = function(target, name, args, scope) {
+    if target.__class__ in [int, float, str, bool]:
+        pass
+    elif target.terminal() and target.kind in [Integer, Float, String, Boolean]:
+        target = exec_node(target)
+    elif target.terminal() and target.kind == Id:
+        target = scope[target.val]
+    else:
+        raise Exception("Bad target for instance function call: %s" % (target,))
+    
+    if name.terminal() and name.kind == Id:
+        name = name.val
+    else:
+        raise Exception("Bad name for instance function call: %s" % (name,))
+    
+    if args is None:
+        par = []
+    elif args.right.__class__ in [int, float, str, bool]:
+        par = [args.right]
+    elif args.right.terminal():
+        par = [exec_node(args.right, scope)]
+    elif args.right.val == 'suite':
+        a = args.right
+        par = []
+        while not a.terminal():
+            par.append(exec_node(a.right))
+            a = a.left
+        par.append(exec_node(a))
+    else:
+        raise Exception("Bad par for instance function call: %s" % (args.right,))
+    r = bb.send(target, name, par, scope)
+    return r
+}
+*/
+
+/*
+// NOT DEBUGGED YET
+Interpreter.prototype.concordance = function(typ, val) {
+    if (typ == 'int') {
+        if (!isinstance(val, int)) {
+            throw new Error("Reference of type " + typ + " cannot reference value of type " + val.__class__);
+        }
+    } else if (typ == 'bool') {
+        if (!isinstance(val, bool)) {
+            throw new Error("Reference of type " + typ + " cannot reference value of type " + val.__class__);
+        }
+    } else if (typ == 'float') {
+        if (!isinstance(val, float)) {
+            throw new Error("Reference of type " + typ + " cannot reference value of type " + val.__class__);
+        }
+    } else {
+        throw new Error("Type unknown : " + typ);
+    }
+    return true;
+}
+*/
+
+// SUBSET
+Interpreter.prototype.exec_non_terminal = function(symbol, scope) {
+    if (symbol.kind == SymbolType.Operator) {
+        if (symbol.val == '+') {
+            return new Value(this.exec_node(symbol.left).value + this.exec_node(symbol.right).value, TypeSystem.Integer);
+        } else {
+            throw new Error("Operator not understood");
+        }
+    } else {
+        throw new Error("Node type not understood : val=" + symbol.val + " left=" + symbol.left + " right=" + symbol.right);
+    }
+}
+
+// NOT DEBUGGED YET
+/*
+Interpreter.prototype.exec_non_terminal = function(symbol, scope) {
+    
+        
+            return instance_function(exec_node(symbol.left, scope), new Symbol(Id, 'add'), new Symbol(SymbolType.Structure, 'call(', right=exec_node(symbol.right)), scope);
+        } else if (symbol.val == '-') {
+            return instance_function(exec_node(symbol.left, scope), new Symbol(Id, 'sub'), new Symbol(SymbolType.Structure, 'call(', right=exec_node(symbol.right)), scope);
+        ) else if (symbol.val == '*') {
+            return instance_function(exec_node(symbol.left, scope), new Symbol(Id, 'mul'), new Symbol(SymbolType.Structure, 'call(', right=exec_node(symbol.right)), scope);
+        } else if (symbol.val == '/') {
+            return instance_function(exec_node(symbol.left, scope), new Symbol(Id, 'div'), new Symbol(SymbolType.Structure, 'call(', right=exec_node(symbol.right)), scope);
+        } else if (symbol.val == '%') {
+            return instance_function(exec_node(symbol.left, scope), new Symbol(Id, 'mod'), new Symbol(SymbolType.Structure, 'call(', right=exec_node(symbol.right)), scope);
+        } else if (symbol.val == '//') {
+            return instance_function(exec_node(symbol.left, scope), new Symbol(Id, 'intdiv'), new Symbol(SymbolType.Structure, 'call(', right=exec_node(symbol.right)), scope);
+        } else if (symbol.val == '**') {
+            return instance_function(exec_node(symbol.left, scope), new Symbol(Id, 'pow'), new Symbol(SymbolType.Structure, 'call(', right=exec_node(symbol.right)), scope);
+        } else if (symbol.val == 'unary-') {
+            return instance_function(exec_node(symbol.right, scope), new Symbol(Id, 'inv'), null, scope);
+        } else if (symbol.val in ['and', 'or', 'xor']) {
+            return instance_function(exec_node(symbol.left, scope), new Symbol(Id, symbol.val), new Symbol(SymbolType.Structure, 'call(', right=exec_node(symbol.right)), scope);
+        } else if (symbol.val == '.') {
+            if symbol.right.val != 'unprefixed_call') {
+                target = exec_node(symbol.left, scope);
+                return instance_function(target, symbol.right, None, scope);
+            } else if (symbol.right.val == 'unprefixed_call') {
+                call = symbol.right;
+                return instance_function(symbol.left, call.left, call.right, scope);
+            } else {
+                throw new Error("What to do with this symbol ? : " + symbol.right.val);
+            }
+        } else if (symbol.val == '<<') {
+            return instance_function(exec_node(symbol.left, scope), Symbol(Id, 'lshift'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope);
+        } else if (symbol.val == '>>') {
+            return instance_function(exec_node(symbol.left, scope), Symbol(Id, 'rshift'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope);
+        } else if (symbol.val == '<=>') {
+            return instance_function(exec_node(symbol.left, scope), Symbol(Id, 'cmp'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope);
+        } else if (symbol.val in ['>', '<', '>=', '<=', '==', '!=']) {
+            r = instance_function(exec_node(symbol.left, scope), Symbol(Id, 'cmp'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope);
+            if symbol.val == '==') {
+                if (r == 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else if (symbol.val == '!=') {
+                if (r != 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else if (symbol.val == '>') {
+                if (r == 1) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else if (symbol.val == '>=') {
+                if (r == 1 or r == 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else if (symbol.val == '<') {
+                if (r == -1) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else if (symbol.val == '<=') {
+                if (r == -1 or r == 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                throw new Error("You shouldn't be there!");
+        
+    } else if (symbol.kind == SymbolType.Structure) {
+        if (symbol.val == 'unprefixed_call') {
+            return global_function(symbol.left, symbol.right, scope);
+        //} else if (symbol.val == 'prefixed_call':
+        //    return instance_function(symbol.left, symbol.right, scope)
+        } else if (symbol.val == 'aff') {
+            // const
+            if (symbol.left.val in scope && symbol.left.val[0].isupper()) {
+                throw new Error("Constant reference can't be changed");
+            }
+            value = exec_node(symbol.right, scope);
+            if (symbol.left.val[-1] == '?' && not isinstance(value, bool)) {
+                throw new Error("?-ending id must reference boolean value");
+            }
+            // typ
+            id = symbol.left.val;
+            if (id in scope && scope[id][1] is not None) {
+                concordance(scope[id][1], value);
+            }
+            // aff
+            scope[id] = (value, None);
+            return scope[id][0];
+        } else if (symbol.val == 'typed_aff') {
+            id = symbol.left.left.val;
+            typ= symbol.left.right.val;
+            val= exec_node(symbol.right, scope);
+            // print id
+            // print typ
+            // print val
+            // on essaye de typer quelque chose de deja declare
+            if (id in scope) {
+                throw new Error("Cannot type reference already declared: %s" % (id,));
+            }
+            concordance(typ, val);
+            scope[id] = (val, typ);
+            return scope[id][0];
+        } else if (symbol.val == 'suite') {
+            exec_node(symbol.left, scope);
+            return exec_node(symbol.right, scope);
+        } else if (symbol.val == 'if') {
+            condition = exec_node(symbol.left);
+            action = None;
+            if (condition && symbol.right is not None) {
+                action = exec_node(symbol.right);
+                return action;
+            if (not condition && symbol.right_else is not None) {
+                action = exec_node(symbol.right_else);
+                return action;
+            return None;
+        } else {
+            throw new Error("Invisible Node type not understood");
+        }
+
+}
+*/
+        
 Interpreter.prototype.exec_terminal = function(symbol, scope) {
     if (symbol.kind == SymbolType.Integer) {
         if (symbol.val.length > 1 && (symbol.val[1] == 'x' || symbol.val[1] == 'X')) {
