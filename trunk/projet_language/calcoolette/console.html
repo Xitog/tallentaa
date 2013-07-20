@@ -1,5 +1,8 @@
 ﻿<html>
     <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="user-scalable=no, width=device-width" />
+        <title>Calcoolette</title>
         <link href='http://fonts.googleapis.com/css?family=Lobster' rel='stylesheet' type='text/css'>
         <link href='http://fonts.googleapis.com/css?family=Dosis' rel='stylesheet' type='text/css'>
         <style type="text/css">
@@ -144,13 +147,20 @@
                 if (node == null) {
                     return '';
                 }
-                s = "<li>" + node + "</li>";
+                s = "<li>" + node.val + " : " + node.kind;
+                if (node.left !== null || node.right !== null) {
+                    s += "<ul>";
+                }
                 if (node.left !== null) {
-                    s += "<li><ul>" + do_node(node.left) + "</ul></li>";
+                    s += do_node(node.left);
                 }
                 if (node.right !== null) {
-                    s += "<li><ul>" + do_node(node.right) + "</ul></li>";
+                    s += do_node(node.right);
                 }
+                if (node.left !== null || node.right !== null) {
+                    s += "</ul>";
+                }
+                s += "</li>";
                 return s;
             }
             function main(scmd) {
@@ -180,6 +190,14 @@
                     cell1.innerHTML = tokens[i].val;
                     cell2.innerHTML = tokens[i].kind;
                 }
+                var head = table.insertRow(0);
+                var head0 = head.insertCell(0);
+                var head1 = head.insertCell(1);
+                var head2 = head.insertCell(2);
+                head0.innerHTML = "<span style='color: #FFFFFF'>Number</span>";
+                head0.bgColor = '#666666';
+                head1.innerHTML = "Val";
+                head2.innerHTML = "Kind";
                 // Parsing
                 // Parsing:Parse
                 parser = new Parser();
@@ -200,7 +218,7 @@
                 var display_result = document.getElementById("result");
                 display_result.style.display = "block";
                 display_result.innerHTML = '';
-                display_result.innerHTML = scmd + "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>Result = </i>" + result;
+                display_result.innerHTML = scmd + "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>Result = </i>" + result.toStringValue(); //result.toStringTypedValue();
             }
         // -->
         </script>
