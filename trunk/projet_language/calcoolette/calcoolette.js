@@ -567,8 +567,8 @@ function Interpreter() {
 }
 
 Interpreter.prototype.exec_node = function(symbol, scope) {
-    if (typeof symbol == "undefined") { 
-        return null; //alert("undefined !") 
+    if (typeof symbol == "undefined" || symbol == null) { 
+        return null; //alert("undefined or null!") 
     }
     if (symbol.terminal()) {
         return this.exec_terminal(symbol, scope);
@@ -612,6 +612,47 @@ Interpreter.prototype.global_function = function(id, args, scope) {
         throw new Error("ERROR 1002");
     }
 }
+
+//- Lib
+
+Interpreter.prototype.dispatch = function(target, name, args, scope) {
+    if (!(target instanceof Value)) {
+        throw new Error("Dispatch : Not a value");
+    }
+    if (Baselib.hasOwnProperty(target.kind)) {
+        if (Baselib[target.kind].hasOwnProperty(name)) {
+            return Baselib[target.kind][name](target, args, scope);
+        } else {
+            throw new Error("Dispatch : Function not known");
+        }
+    } else {
+        throw new Error("Dispatch : Type not known");
+    }
+}
+
+Baselib = {
+    // String
+    "String" : {
+        "add" : function (target, args, scope) {
+            p = args[0];
+            if (target.kind != TypeSystem.String || p.kind != TypeSystem.String) {
+                throw new Error("Bad param for function String#add");
+            }
+            return new Value(target.value.concat(p.value), TypeSystem.String);
+        },
+    },
+    // Integer
+    "Integer" : {
+        "add" : function (target, args, scope) {
+            p = args[0];
+            if (target.kind != TypeSystem.Integer || p.kind != TypeSystem.Integer) {
+                throw new Error("Bad param for function Integer#add");
+            }
+            return new Value(target.value + p.value, TypeSystem.Integer);
+        },
+    }
+};
+
 
 // NOT CONVERTED YET
 /*
@@ -676,7 +717,22 @@ Interpreter.prototype.concordance = function(typ, val) {
 Interpreter.prototype.exec_non_terminal = function(symbol, scope) {
     if (symbol.kind == SymbolType.Operator) {
         if (symbol.val == '+') {
-            return new Value(this.exec_node(symbol.left).value + this.exec_node(symbol.right).value, TypeSystem.Integer);
+            return this.dispatch(this.exec_node(symbol.left), "add", [this.exec_node(symbol.right)], scope);
+            //return new Value(this.exec_node(symbol.left).value + this.exec_node(symbol.right).value, TypeSystem.Integer);
+        } else if (symbol.val == '-') {
+            return new Value(this.exec_node(symbol.left).value - this.exec_node(symbol.right).value, TypeSystem.Integer);
+        } else if (symbol.val == '*') {
+            return new Value(this.exec_node(symbol.left).value * this.exec_node(symbol.right).value, TypeSystem.Integer);
+        } else if (symbol.val == '/') {
+            return new Value(this.exec_node(symbol.left).value / this.exec_node(symbol.right).value, TypeSystem.Integer);
+        } else if (symbol.val == '//') {
+            return new Value(Math.floor(this.exec_node(symbol.left).value / this.exec_node(symbol.right).value, TypeSystem.Integer));
+        } else if (symbol.val == '**') {
+            return new Value(Math.pow(this.exec_node(symbol.left).value, this.exec_node(symbol.right).value, TypeSystem.Integer));
+        } else if (symbol.val == '%') {
+            return new Value(this.exec_node(symbol.left).value % this.exec_node(symbol.right).value, TypeSystem.Integer);
+        } else if (symbol.val == 'unary-') {
+            return new Value(-this.exec_node(symbol.right).value, TypeSystem.Integer);
         } else {
             throw new Error("Operator not understood");
         }
@@ -687,24 +743,11 @@ Interpreter.prototype.exec_non_terminal = function(symbol, scope) {
 
 // NOT DEBUGGED YET
 /*
-Interpreter.prototype.exec_non_terminal = function(symbol, scope) {
     
-        
-            return instance_function(exec_node(symbol.left, scope), new Symbol(Id, 'add'), new Symbol(SymbolType.Structure, 'call(', right=exec_node(symbol.right)), scope);
-        } else if (symbol.val == '-') {
-            return instance_function(exec_node(symbol.left, scope), new Symbol(Id, 'sub'), new Symbol(SymbolType.Structure, 'call(', right=exec_node(symbol.right)), scope);
-        ) else if (symbol.val == '*') {
-            return instance_function(exec_node(symbol.left, scope), new Symbol(Id, 'mul'), new Symbol(SymbolType.Structure, 'call(', right=exec_node(symbol.right)), scope);
-        } else if (symbol.val == '/') {
-            return instance_function(exec_node(symbol.left, scope), new Symbol(Id, 'div'), new Symbol(SymbolType.Structure, 'call(', right=exec_node(symbol.right)), scope);
-        } else if (symbol.val == '%') {
-            return instance_function(exec_node(symbol.left, scope), new Symbol(Id, 'mod'), new Symbol(SymbolType.Structure, 'call(', right=exec_node(symbol.right)), scope);
-        } else if (symbol.val == '//') {
-            return instance_function(exec_node(symbol.left, scope), new Symbol(Id, 'intdiv'), new Symbol(SymbolType.Structure, 'call(', right=exec_node(symbol.right)), scope);
-        } else if (symbol.val == '**') {
-            return instance_function(exec_node(symbol.left, scope), new Symbol(Id, 'pow'), new Symbol(SymbolType.Structure, 'call(', right=exec_node(symbol.right)), scope);
-        } else if (symbol.val == 'unary-') {
-            return instance_function(exec_node(symbol.right, scope), new Symbol(Id, 'inv'), null, scope);
+add sub mul div mod intdiv pow 
+return instance_function(exec_node(symbol.left, scope), new Symbol(Id, 'add'), new Symbol(SymbolType.Structure, 'call(', right=exec_node(symbol.right)), scope);
+return instance_function(exec_node(symbol.right, scope), new Symbol(Id, 'inv'), null, scope); -unary
+
         } else if (symbol.val in ['and', 'or', 'xor']) {
             return instance_function(exec_node(symbol.left, scope), new Symbol(Id, symbol.val), new Symbol(SymbolType.Structure, 'call(', right=exec_node(symbol.right)), scope);
         } else if (symbol.val == '.') {
