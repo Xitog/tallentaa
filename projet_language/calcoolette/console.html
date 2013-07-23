@@ -120,6 +120,18 @@
             color: #4087e4;
         }
         
+        button {
+            background:none;
+            border:none; 
+            padding: 0;
+            //border-bottom:1px solid #444; 
+            color: #4087e4;
+            text-decoration: underline;
+            font-family: 'Dosis', sans-serif;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
         //<div style="position: absolute; left: 10px; top: 10px; padding: 10px; width:50%; height: 50%; border: 1px solid #000000;">
 
         </style>
@@ -142,7 +154,14 @@
                 }
                 //alert(keynum); //String.fromCharCode(keynum));
             }
-        
+            
+            function execute() {
+                var o = document.getElementById("inputtext");
+                main(o.value);
+                o.value = '';
+                return false; // event.preventDefault(); 
+            }
+            
             function do_node(node) {
                 if (node == null) {
                     return '';
@@ -246,7 +265,7 @@
                 <div id="result"></div>
             </div>
             <div id="menu">
-                <a href="http://ran.alwaysdata.net/">Retour</a>
+                 - <button onClick="execute()">Exécute</button> | <a href="http://ran.alwaysdata.net/">Retour</a> -
             </div>
             <div id="footer">Calcoolette 2012-2013</div>
         </div>
