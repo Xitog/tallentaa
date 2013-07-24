@@ -108,7 +108,7 @@ Lexer.prototype.tokenize = function(input) {
         } else if (delimiters.indexOf(input[i]) > -1) {
             i = this.read_string(input, i);
         } else {
-            alert("Char incorrect " + input[i] + " at " + i);
+            throw new Error("Char incorrect " + input[i] + " at " + i);
         }
     }
     //this.symbols.push(new Symbol(EOF, 'eof'));
@@ -164,7 +164,7 @@ Lexer.prototype.read_num = function(input, i) {
                 num += input[i];
                 i += 1;
             } else {
-                alert("Incorrect Id starting with numbers");
+                throw new Error("Incorrect Id starting with numbers");
             }
         } else if (all_separators.indexOf(input[i]) > -1) {
             break;
@@ -237,7 +237,7 @@ Lexer.prototype.read_op = function(input, i) {
         }
     }
     if (operators.indexOf(op) == -1) {
-        alert("Not known operator : " + op)
+        throw new Error("Not known operator : " + op)
     }
     this.symbols.push(new Symbol(SymbolType.Operator, op))
     return i
@@ -253,7 +253,7 @@ Lexer.prototype.read_string = function(input, i) {
         i += 1;
     }
     if (input[i] != begin_by) {
-        alert("Unfinished string");
+        throw new Error("Unfinished string");
     } else {
         i += 1;
     }
@@ -289,7 +289,7 @@ Lexer.prototype.test = function(input, result) {
             console.log("" + i + ". " + this.symbols[i]);
         }
         if (!r) {
-            alert("ERROR : " + input);
+            throw new Error("ERROR : " + input);
         }
     }
     return r;
@@ -355,13 +355,13 @@ Parser.prototype.first_op = function(symbols) {
                 best = i
                 best_prio = prio[symb.val]*lvl
             } else {
-                alert("Incorrect expression call");
+                throw new Error("Incorrect expression call");
             }
         }
         i +=1;
     }
     if (best == -1) {
-        alert("Incorrect expression");
+        throw new Error("Incorrect expression");
     }
     return best;
 }
@@ -383,7 +383,7 @@ Parser.prototype.fetch_closing = function(sep, symbols, i) {
         pos += 1;
     }
     if (lvl != 0) {
-        alert("Incorrect expression ()");
+        throw new Error("Incorrect expression ()");
     }
     return pos;
 }
@@ -409,7 +409,7 @@ Parser.prototype.prepare = function(symbols) {
     while (i < symbols.length) {
         symb = symbols[i];
         if (symb.terminal()) {
-            if (symb.val == '-' && (i == 0 || symbols[i-1].kind == Operator)) {
+            if (symb.val == '-' && (i == 0 || symbols[i-1].kind == SymbolType.Operator)) {
                 symb.val = 'unary-';
             }
             // () -> x
@@ -419,7 +419,7 @@ Parser.prototype.prepare = function(symbols) {
                 i-=1;
             }
             //
-            if (symb.val == '(' && i > 0 && symbols[i-1].kind != Operator) {
+            if (symb.val == '(' && i > 0 && symbols[i-1].kind != SymbolType.Operator) {
                 symb.val = 'call(';
             } else if (symb.val == '(') {
                 symb.val = 'expr(';
@@ -445,10 +445,10 @@ Parser.prototype.parse_expression = function(symbols) {
                     symbols.splice(target, 1);
                     symbols[target-1] = n;
                 } else {
-                    alert("Call not understood");
+                    throw new Error("Call not understood");
                 }
             } else {
-                alert("Error on target node");
+                throw new Error("Error on target node");
             }
         } else if (symbols[target].terminal()) {
             if (symbols[target].val == 'unary-') {
@@ -487,10 +487,10 @@ Parser.prototype.parse_expression = function(symbols) {
                     symbols.splice(target, 1);
                     symbols[target-1] = n;
                 } else {
-                    alert("WTF?");
+                    throw new Error("WTF?");
                 }
                 //} else { No converted Python
-                //    alert("AAAAAAAAAAAAAAAAA");
+                //    throw new Error("AAAAAAAAAAAAAAAAA");
                 //    // nx -> fun, call (avec par)
                 //    nx = symbols[target+2]
                 //    nx.left = symbols[target+1]
@@ -504,10 +504,10 @@ Parser.prototype.parse_expression = function(symbols) {
             } else if (target == -1 && symbols.length > 0) {
                 var n = symbols[0];
             } else {
-                alert("YOUPI!");
+                throw new Error("YOUPI!");
             }
         } else {
-            alert("Expression not understood : " + symbols[target]);
+            throw new Error("Expression not understood : " + symbols[target]);
         }
         if (DEBUG) {
             for(ii = 0; ii < symbols.length; ii++) {
@@ -568,7 +568,7 @@ function Interpreter() {
 
 Interpreter.prototype.exec_node = function(symbol, scope) {
     if (typeof symbol == "undefined" || symbol == null) { 
-        return null; //alert("undefined or null!") 
+        return null; //throw new Error("undefined or null!") 
     }
     if (symbol.terminal()) {
         return this.exec_terminal(symbol, scope);
@@ -576,7 +576,7 @@ Interpreter.prototype.exec_node = function(symbol, scope) {
         return this.exec_non_terminal(symbol, scope);
         //console.log(typeof symbol);
         //console.log(symbol);
-        //alert("Node not known");
+        //throw new Error("Node not known");
     }
 }
 
@@ -640,15 +640,78 @@ Baselib = {
             }
             return new Value(target.value.concat(p.value), TypeSystem.String);
         },
+        "mul" : function (target, args, scope) {
+            p = args[0];
+            if (target.kind != TypeSystem.String || p.kind != TypeSystem.Integer) {
+                throw new Error("Bad param type for function String#mul");
+            }
+            if (p.value < 0 || p.value === 1) { new Value(target.value, TypeSystem.String); }
+            else if (p.value === 0) { new Value("", TypeSystem.String); }
+            else if (p.value > 0) {
+                s = target.value;
+                for (i=0; i < p.value-1; i++) {
+                    s = s.concat(target.value);
+                }
+            }
+            return new Value(s, TypeSystem.String);
+        },
     },
     // Integer
     "Integer" : {
         "add" : function (target, args, scope) {
             p = args[0];
             if (target.kind != TypeSystem.Integer || p.kind != TypeSystem.Integer) {
-                throw new Error("Bad param for function Integer#add");
+                throw new Error("Bad param type for function Integer#add");
             }
             return new Value(target.value + p.value, TypeSystem.Integer);
+        },
+        "sub" : function (target, args, scope) {
+            p = args[0];
+            if (target.kind != TypeSystem.Integer || p.kind != TypeSystem.Integer) {
+                throw new Error("Bad param type for function Integer#sub");
+            }
+            return new Value(target.value - p.value, TypeSystem.Integer);
+        },
+        "mul" : function (target, args, scope) {
+            p = args[0];
+            if (target.kind != TypeSystem.Integer || p.kind != TypeSystem.Integer) {
+                throw new Error("Bad param type for function Integer#mul");
+            }
+            return new Value(target.value * p.value, TypeSystem.Integer);
+        },
+        "div" : function (target, args, scope) {
+            p = args[0];
+            if (target.kind != TypeSystem.Integer || p.kind != TypeSystem.Integer) {
+                throw new Error("Bad param type for function Integer#div");
+            }
+            return new Value(target.value / p.value, TypeSystem.Integer);
+        },
+        "mod" : function (target, args, scope) {
+            p = args[0];
+            if (target.kind != TypeSystem.Integer || p.kind != TypeSystem.Integer) {
+                throw new Error("Bad param type for function Integer#mod");
+            }
+            return new Value(target.value % p.value, TypeSystem.Integer);
+        },
+        "pow" : function (target, args, scope) {
+            p = args[0];
+            if (target.kind != TypeSystem.Integer || p.kind != TypeSystem.Integer) {
+                throw new Error("Bad param type for function Integer#pow");
+            }
+            return new Value(Math.pow(target.value, p.value), TypeSystem.Integer);
+        },
+        "intdiv" : function (target, args, scope) {
+            p = args[0];
+            if (target.kind != TypeSystem.Integer || p.kind != TypeSystem.Integer) {
+                throw new Error("Bad param type for function Integer#intdiv");
+            }
+            return new Value(Math.floor(target.value / p.value), TypeSystem.Integer);
+        },
+        "inv" : function (target, args, scope) {
+            if (target.kind != TypeSystem.Integer) {
+                throw new Error("Bad param type for function Integer#inv");
+            }
+            return new Value(-target.value , TypeSystem.Integer);
         },
     }
 };
@@ -720,19 +783,19 @@ Interpreter.prototype.exec_non_terminal = function(symbol, scope) {
             return this.dispatch(this.exec_node(symbol.left), "add", [this.exec_node(symbol.right)], scope);
             //return new Value(this.exec_node(symbol.left).value + this.exec_node(symbol.right).value, TypeSystem.Integer);
         } else if (symbol.val == '-') {
-            return new Value(this.exec_node(symbol.left).value - this.exec_node(symbol.right).value, TypeSystem.Integer);
+            return this.dispatch(this.exec_node(symbol.left), "sub", [this.exec_node(symbol.right)], scope);
         } else if (symbol.val == '*') {
-            return new Value(this.exec_node(symbol.left).value * this.exec_node(symbol.right).value, TypeSystem.Integer);
+            return this.dispatch(this.exec_node(symbol.left), "mul", [this.exec_node(symbol.right)], scope);
         } else if (symbol.val == '/') {
-            return new Value(this.exec_node(symbol.left).value / this.exec_node(symbol.right).value, TypeSystem.Integer);
+            return this.dispatch(this.exec_node(symbol.left), "div", [this.exec_node(symbol.right)], scope);
         } else if (symbol.val == '//') {
-            return new Value(Math.floor(this.exec_node(symbol.left).value / this.exec_node(symbol.right).value, TypeSystem.Integer));
+            return this.dispatch(this.exec_node(symbol.left), "intdiv", [this.exec_node(symbol.right)], scope);
         } else if (symbol.val == '**') {
-            return new Value(Math.pow(this.exec_node(symbol.left).value, this.exec_node(symbol.right).value, TypeSystem.Integer));
+            return this.dispatch(this.exec_node(symbol.left), "pow", [this.exec_node(symbol.right)], scope);
         } else if (symbol.val == '%') {
-            return new Value(this.exec_node(symbol.left).value % this.exec_node(symbol.right).value, TypeSystem.Integer);
+            return this.dispatch(this.exec_node(symbol.left), "mod", [this.exec_node(symbol.right)], scope);
         } else if (symbol.val == 'unary-') {
-            return new Value(-this.exec_node(symbol.right).value, TypeSystem.Integer);
+            return this.dispatch(this.exec_node(symbol.right), "inv", [], scope); // Attention, on le stocke dans le right !
         } else {
             throw new Error("Operator not understood");
         }
@@ -878,7 +941,7 @@ Interpreter.prototype.exec_terminal = function(symbol, scope) {
         return new Value(parseFloat(symbol.val), TypeSystem.Float);
     } else if (symbol.kind == SymbolType.Id) {
         if (!scope.hasOwnProperty(symbol.val)) {
-            alert('unreferenced variable ' + symbol.val);
+            throw new Error('unreferenced variable ' + symbol.val);
         } else {
             return scope[symbol.val]
         }
@@ -893,11 +956,11 @@ Interpreter.prototype.exec_terminal = function(symbol, scope) {
     }
     // CASE OF ERRORS
     else if (symbol.kind == SymbolType.Operator) {
-        alert("Operators need one or more operands");
+        throw new Error("Operators need one or more operands");
     } else if (symbol.kind == Separator) {
-        alert("Separators alone are meaningless");
+        throw new Error("Separators alone are meaningless");
     } else {
-        alert("TokenType not understood : " + symbol);
+        throw new Error("TokenType not understood : " + symbol);
     }
 }
 

@@ -131,7 +131,11 @@
             font-size: 16px;
             cursor: pointer;
         }
-
+        
+        span.red {
+            color: red;
+        }
+        
         //<div style="position: absolute; left: 10px; top: 10px; padding: 10px; width:50%; height: 50%; border: 1px solid #000000;">
 
         </style>
@@ -150,7 +154,6 @@
                 if (keynum == 13) {
                     var o = document.getElementById("inputtext");
                     main(o.value);
-                    o.value = '';
                 }
                 //alert(keynum); //String.fromCharCode(keynum));
             }
@@ -183,61 +186,94 @@
                 return s;
             }
             function main(scmd) {
+                // Clear everything
+                // Reboot cmd
+                var field_input = document.getElementById("inputtext");
+                field_input.value = '';
+                
+                var title_lexing = document.getElementById("lex_title");
+                title_lexing.innerHTML = '';
+                var table = document.getElementById("myTable");
+                while (table.rows.length > 0) {
+                    table.deleteRow(0);
+                }
+                
+                var title_parsing = document.getElementById("parse_title");
+                title_parsing.innerHTML = "";
+                var display_parsing = document.getElementById("parse_list");
+                display_parsing.innerHTML = '';
+                
+                var title_interpret = document.getElementById("interpret_title");
+                title_interpret.innerHTML = "";
+                var display_result = document.getElementById("result");
+                display_result.innerHTML = '';
+                
                 //var cmd = document.getElementsByName("cmd")[0];
                 //var scmd = cmd.value;
                 // Lexing
                 // Lexing:Lex
                 lex = new Lexer();
-                tokens = lex.tokenize(scmd); //r = lex.tokenize("a = 5; 12 + a * 2 + 20 # 42");
-                // Lexing:Display
-                var title_lexing = document.getElementById("lex_title");
-                title_lexing.innerHTML = "Lexing result";
-                var table = document.getElementById("myTable");
-                while (table.rows.length > 0) {
-                    table.deleteRow(0);
-                }
-                for(i = tokens.length-1; i >= 0; i--) {
-                    var row = table.insertRow(0);
-                    if (i%2 == 0) {
-                        row.bgColor = '#F6F6F6';
+                try {
+                    tokens = lex.tokenize(scmd); //r = lex.tokenize("a = 5; 12 + a * 2 + 20 # 42");
+                    // Lexing:Display
+                    title_lexing.innerHTML = "Lexing result";
+                    for(i = tokens.length-1; i >= 0; i--) {
+                        var row = table.insertRow(0);
+                        if (i%2 == 0) {
+                            row.bgColor = '#F6F6F6';
+                        }
+                        var cell0=row.insertCell(0);
+                        var cell1=row.insertCell(1);
+                        var cell2=row.insertCell(2);
+                        cell0.innerHTML = "<span style='color: #FFFFFF'>"+i+"</span>";
+                        cell0.bgColor = '#666666';
+                        cell1.innerHTML = tokens[i].val;
+                        cell2.innerHTML = tokens[i].kind;
                     }
+                    var head = table.insertRow(0);
+                    var head0 = head.insertCell(0);
+                    var head1 = head.insertCell(1);
+                    var head2 = head.insertCell(2);
+                    head0.innerHTML = "<span style='color: #FFFFFF'>Number</span>";
+                    head0.bgColor = '#666666';
+                    head1.innerHTML = "Val";
+                    head2.innerHTML = "Kind";
+                } catch (err) {
+                    title_lexing.innerHTML = "Lexing result ERROR";
+                    var row = table.insertRow(0);
                     var cell0=row.insertCell(0);
-                    var cell1=row.insertCell(1);
-                    var cell2=row.insertCell(2);
-                    cell0.innerHTML = "<span style='color: #FFFFFF'>"+i+"</span>";
-                    cell0.bgColor = '#666666';
-                    cell1.innerHTML = tokens[i].val;
-                    cell2.innerHTML = tokens[i].kind;
+                    cell0.innerHTML = scmd + "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class='red'>" + err.message + "</span>";
+                    return;
                 }
-                var head = table.insertRow(0);
-                var head0 = head.insertCell(0);
-                var head1 = head.insertCell(1);
-                var head2 = head.insertCell(2);
-                head0.innerHTML = "<span style='color: #FFFFFF'>Number</span>";
-                head0.bgColor = '#666666';
-                head1.innerHTML = "Val";
-                head2.innerHTML = "Kind";
                 // Parsing
                 // Parsing:Parse
                 parser = new Parser();
-                tree   = parser.parse(tokens);
-                // Parsing:Display
-                var title_parsing = document.getElementById("parse_title");
-                title_parsing.innerHTML = "Parsing result";
-                var display_parsing = document.getElementById("parse_list");
-                display_parsing.innerHTML = '';
-                display_parsing.innerHTML = do_node(tree);
+                try {
+                    tree = parser.parse(tokens);
+                    // Parsing:Display
+                    title_parsing.innerHTML = "Parsing result";
+                    display_parsing.innerHTML = do_node(tree);
+                } catch (err) {
+                    title_parsing.innerHTML = "Parsing result ERROR";
+                    display_parsing.innerHTML = scmd + "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class='red'>" + err.message + "</span>";
+                    return;
+                }
                 // Executing
                 // Executing:Execute
                 interp = new Interpreter();
-                result = interp.exec_node(tree);
-                // Executing:Display
-                var title_interpret = document.getElementById("interpret_title");
-                title_interpret.innerHTML = "Interpretation result";
-                var display_result = document.getElementById("result");
-                display_result.style.display = "block";
-                display_result.innerHTML = '';
-                display_result.innerHTML = scmd + "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>Result = </i>" + result.toStringValue(); //result.toStringTypedValue();
+                try {
+                    result = interp.exec_node(tree);
+                    // Executing:Display
+                    title_interpret.innerHTML = "Interpretation result";
+                    display_result.style.display = "block";
+                    display_result.innerHTML = scmd + "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>Result = </i>" + result.toStringValue(); //toStringTypedValue();
+                } catch (err) {
+                    title_interpret.innerHTML = "Interpretation result ERROR";
+                    display_result.style.display = "block";
+                    display_result.innerHTML = scmd + "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class='red'>" + err.message + "</span>";
+                    return;
+                }
+
             }
         // -->
         </script>
