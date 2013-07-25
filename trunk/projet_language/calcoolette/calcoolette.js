@@ -24,22 +24,22 @@ var SymbolType = {
     Structure : 'Structure',
 };
 
-function Symbol(kind, val, left, right) {
+function Symbol(kind, value, left, right) {
     this.kind = kind;
-    this.val = val;
+    this.value = value;
     this.left = typeof left !== 'undefined' ? left : null;
     this.right = typeof right !== 'undefined' ? right : null;
 }
 
 Symbol.prototype.toString = function() {
     if (this.left == null && this.right == null) {
-        return "SymbolStr(" + this.val + ":" + this.kind + ")";
+        return "SymbolStr(" + this.value + ":" + this.kind + ")";
     } else if (this.right == null && this.left != null) {
-        return "SymbolStr(" + this.left + "--" + this.val + ":" + this.kind + ")";
+        return "SymbolStr(" + this.left + "--" + this.value + ":" + this.kind + ")";
     } else if (this.left == null && this.right != null) {
-        return "SymbolStr(" + this.val + ":" + this.kind + "--" + this.right + ")";
+        return "SymbolStr(" + this.value + ":" + this.kind + "--" + this.right + ")";
     } else {
-        return "SymbolStr(" + this.left + "--" + this.val + ":" + this.kind + "--" + this.right + ")";
+        return "SymbolStr(" + this.left + "--" + this.value + ":" + this.kind + "--" + this.right + ")";
     }
 }
 
@@ -206,14 +206,14 @@ Lexer.prototype.read_id = function(input, i) {
         this.symbols.push(new Symbol(SymbolType.Boolean, id));
     } else if (id_operators.indexOf(id) > -1) {
         // operator boolean as function
-        if (this.symbols.length > 1 && i > 0 && this.symbols[this.symbols.length-1].val == '.') {
+        if (this.symbols.length > 1 && i > 0 && this.symbols[this.symbols.length-1].value == '.') {
             this.symbols.push(new Symbol(SymbolType.Id, id));
         } else {
             this.symbols.push(new Symbol(SymbolType.Operator, id));
         }
     } else if (id_keywords.indexOf(id) > -1) {
         // keyword as function
-        if (this.symbols.length > 1 && i > 0 && this.symbols[this.symbols.length-1].val == '.') {
+        if (this.symbols.length > 1 && i > 0 && this.symbols[this.symbols.length-1].value == '.') {
             this.symbols.push(new Symbol(SymbolType.Id, id));
         } else {
             this.symbols.push(new Symbol(SymbolType.Keyword, id));
@@ -276,9 +276,9 @@ Lexer.prototype.test = function(input, result) {
         r = false;
     } else {
         for (i = 0; i < result.length; i++) {
-            //console.log(this.symbols[i].val);
+            //console.log(this.symbols[i].value);
             //console.log(result[i][0].toString());
-            if (this.symbols[i].val != result[i][0].toString() || this.symbols[i].kind != result[i][1]) {
+            if (this.symbols[i].value != result[i][0].toString() || this.symbols[i].kind != result[i][1]) {
                 r = false;
                 break;
             }
@@ -337,23 +337,23 @@ Parser.prototype.first_op = function(symbols) {
         if (symb.terminal() && (symb.kind == SymbolType.Operator || symb.kind == SymbolType.Separator)) {
             if (best == -1) {
                 best = i
-                best_prio = prio[symb.val]*lvl
+                best_prio = prio[symb.value]*lvl
             } else {
-                if (prio[symb.val]*lvl > best_prio) {
+                if (prio[symb.value]*lvl > best_prio) {
                     best = i
-                    best_prio = prio[symb.val]*lvl
+                    best_prio = prio[symb.value]*lvl
                 }
             }
             // () for others
-            if (symb.val == 'call(' || symb.val == 'expr(') {
+            if (symb.value == 'call(' || symb.value == 'expr(') {
                 lvl*=10
-            } else if (symb.val == ')') {
+            } else if (symb.value == ')') {
                 lvl/=10
             }
-        } else if (symb.val == 'call(') { // not terminal
-            if (prio[symb.val]*lvl > best_prio) {
+        } else if (symb.value == 'call(') { // not terminal
+            if (prio[symb.value]*lvl > best_prio) {
                 best = i
-                best_prio = prio[symb.val]*lvl
+                best_prio = prio[symb.value]*lvl
             } else {
                 throw new Error("Incorrect expression call");
             }
@@ -372,9 +372,9 @@ Parser.prototype.fetch_closing = function(sep, symbols, i) {
     pos = i;
     while (pos < symbols.length) {
         symb = symbols[pos];
-        if (sep == '(' && (symb.val == 'call(' || symb.val == 'expr(')) {
+        if (sep == '(' && (symb.value == 'call(' || symb.value == 'expr(')) {
             lvl += 1;
-        } else if (sep == '(' && symb.val == ')') {
+        } else if (sep == '(' && symb.value == ')') {
             lvl -= 1;
         }
         if (lvl == 0) {
@@ -395,7 +395,7 @@ Parser.prototype.not_exist_or_dif = function(symbols, index, terminal, value) {
     if (symbols[index].terminal() != terminal) {
         return true;
     }
-    if (symbols[index].val != value) {
+    if (symbols[index].value != value) {
         return true;
     }
     return false;
@@ -409,20 +409,20 @@ Parser.prototype.prepare = function(symbols) {
     while (i < symbols.length) {
         symb = symbols[i];
         if (symb.terminal()) {
-            if (symb.val == '-' && (i == 0 || symbols[i-1].kind == SymbolType.Operator)) {
-                symb.val = 'unary-';
+            if (symb.value == '-' && (i == 0 || symbols[i-1].kind == SymbolType.Operator)) {
+                symb.value = 'unary-';
             }
             // () -> x
-            if (symb.val == '(' && i < symbols.length-1 && symbols[i+1].val == ')') {
+            if (symb.value == '(' && i < symbols.length-1 && symbols[i+1].value == ')') {
                 symbols.splice(i+1 , 1);
                 symbols.splire(i, 1);
                 i-=1;
             }
             //
-            if (symb.val == '(' && i > 0 && symbols[i-1].kind != SymbolType.Operator) {
-                symb.val = 'call(';
-            } else if (symb.val == '(') {
-                symb.val = 'expr(';
+            if (symb.value == '(' && i > 0 && symbols[i-1].kind != SymbolType.Operator) {
+                symb.value = 'call(';
+            } else if (symb.value == '(') {
+                symb.value = 'expr(';
             }
         i+=1;
         }
@@ -438,10 +438,10 @@ Parser.prototype.parse_expression = function(symbols) {
             console.log('>>> target=' + target + ' symb=' + symbols[target]);
         }
         if (!symbols[target].terminal()) {
-            if (symbols[target].val == 'call(') {
+            if (symbols[target].value == 'call(') {
                 var id = symbols[target-1];
                 if (id.terminal() && id.kind == SymbolType.Id) {
-                    var n = new Symbol(SymbolType.Structure, 'unprefixed_call', id, symbols[target]); // kind val left right
+                    var n = new Symbol(SymbolType.Structure, 'unprefixed_call', id, symbols[target]); // kind value left right
                     symbols.splice(target, 1);
                     symbols[target-1] = n;
                 } else {
@@ -451,11 +451,11 @@ Parser.prototype.parse_expression = function(symbols) {
                 throw new Error("Error on target node");
             }
         } else if (symbols[target].terminal()) {
-            if (symbols[target].val == 'unary-') {
-                var n = new Symbol(SymbolType.Operator, 'unary-', null, symbols[target+1]); // kind val left right
+            if (symbols[target].value == 'unary-') {
+                var n = new Symbol(SymbolType.Operator, 'unary-', null, symbols[target+1]); // kind value left right
                 symbols.splice(target+1, 1);
                 symbols[target] = n;
-            } else if (symbols[target].val == 'expr(') {
+            } else if (symbols[target].value == 'expr(') {
                 var fin = this.fetch_closing('(', symbols, target);
                 var sub = symbols.slice(target+1, fin);
                 this.make_tree(sub);
@@ -465,7 +465,7 @@ Parser.prototype.parse_expression = function(symbols) {
                     jj -= 1;
                 }
                 symbols[target] = sub[0];
-            } else if (symbols[target].val == 'call(') {
+            } else if (symbols[target].value == 'call(') {
                 var fin = this.fetch_closing('(', symbols, target);
                 var sub = symbols.slice(target+1, fin);
                 this.make_tree(sub);
@@ -474,15 +474,15 @@ Parser.prototype.parse_expression = function(symbols) {
                     this.symbols.splice(jj, 1);
                     jj -= 1;
                 }
-                symbols[target] = new Symbol(SymbolType.Structure, 'call(', null, sub[0]); // kind val left right
-            } else if (symbols[target].val == ',') {
-                var n = new Symbol(SymbolType.Structure, 'suite', symbols[target-1], symbols[target+1]); // kind val left right
+                symbols[target] = new Symbol(SymbolType.Structure, 'call(', null, sub[0]); // kind value left right
+            } else if (symbols[target].value == ',') {
+                var n = new Symbol(SymbolType.Structure, 'suite', symbols[target-1], symbols[target+1]); // kind value left right
                 symbols.splice(target+1, 1);
                 symbols.splice(target, 1);
                 symbols[target-1] = n;
             } else if (target > 0) {
-                if (symbols[target].val != '.' || (symbols[target].val == '.' && this.not_exist_or_dif(symbols, target+2, False, "call"))) {
-                    var n = new Symbol(symbols[target].kind, symbols[target].val, symbols[target-1], symbols[target+1]); // kind val left right
+                if (symbols[target].value != '.' || (symbols[target].value == '.' && this.not_exist_or_dif(symbols, target+2, false, "call"))) {
+                    var n = new Symbol(symbols[target].kind, symbols[target].value, symbols[target-1], symbols[target+1]); // kind value left right
                     symbols.splice(target+1, 1);
                     symbols.splice(target, 1);
                     symbols[target-1] = n;
@@ -594,13 +594,13 @@ var bb = {
 
 // NOT TESTED YET
 Interpreter.prototype.global_function = function(id, args, scope) {
-    if (id.terminal() && id.kind == SymbolType.Id && ! args.terminal() && args.val == 'call(') {
+    if (id.terminal() && id.kind == SymbolType.Id && ! args.terminal() && args.value == 'call(') {
         var name = id.val;
         if (args.right.terminal()) {
             if ([SymbolType.Integer, SymbolType.Float, SymbolType.String].indexOf(args.right.kind) > -1) {
                 par = this.exec_node(args.right);
             } else if (args.right.kind == SymbolType.Id) {
-                par = scope[args.right.val];
+                par = scope[args.right.value];
             } else {
                 throw new Error("Bad param for global function call")
             }
@@ -655,6 +655,12 @@ Baselib = {
             }
             return new Value(s, TypeSystem.String);
         },
+        "to_s" : function(target, args, scope) {
+            if (target.kind != TypeSystem.String) {
+                throw new Error("Bad param type for function String#to_s");
+            }
+            return new Value(target.value, TypeSystem.String);
+        }
     },
     // Integer
     "Integer" : {
@@ -713,6 +719,12 @@ Baselib = {
             }
             return new Value(-target.value , TypeSystem.Integer);
         },
+        "to_s" : function(target, args, scope) {
+            if (target.kind != TypeSystem.Integer) {
+                throw new Error("Bad param type for function Integer#to_s");
+            }
+            return new Value(target.value.toString(), TypeSystem.String);
+        }
     }
 };
 
@@ -725,7 +737,7 @@ Interpreter.prototype.instance_function = function(target, name, args, scope) {
     elif target.terminal() and target.kind in [Integer, Float, String, Boolean]:
         target = exec_node(target)
     elif target.terminal() and target.kind == Id:
-        target = scope[target.val]
+        target = scope[target.value]
     else:
         raise Exception("Bad target for instance function call: %s" % (target,))
     
@@ -740,7 +752,7 @@ Interpreter.prototype.instance_function = function(target, name, args, scope) {
         par = [args.right]
     elif args.right.terminal():
         par = [exec_node(args.right, scope)]
-    elif args.right.val == 'suite':
+    elif args.right.value == 'suite':
         a = args.right
         par = []
         while not a.terminal():
@@ -779,28 +791,38 @@ Interpreter.prototype.concordance = function(typ, val) {
 // SUBSET
 Interpreter.prototype.exec_non_terminal = function(symbol, scope) {
     if (symbol.kind == SymbolType.Operator) {
-        if (symbol.val == '+') {
+        if (symbol.value == '+') {
             return this.dispatch(this.exec_node(symbol.left), "add", [this.exec_node(symbol.right)], scope);
             //return new Value(this.exec_node(symbol.left).value + this.exec_node(symbol.right).value, TypeSystem.Integer);
-        } else if (symbol.val == '-') {
-            return this.dispatch(this.exec_node(symbol.left), "sub", [this.exec_node(symbol.right)], scope);
-        } else if (symbol.val == '*') {
-            return this.dispatch(this.exec_node(symbol.left), "mul", [this.exec_node(symbol.right)], scope);
-        } else if (symbol.val == '/') {
-            return this.dispatch(this.exec_node(symbol.left), "div", [this.exec_node(symbol.right)], scope);
-        } else if (symbol.val == '//') {
-            return this.dispatch(this.exec_node(symbol.left), "intdiv", [this.exec_node(symbol.right)], scope);
-        } else if (symbol.val == '**') {
-            return this.dispatch(this.exec_node(symbol.left), "pow", [this.exec_node(symbol.right)], scope);
-        } else if (symbol.val == '%') {
-            return this.dispatch(this.exec_node(symbol.left), "mod", [this.exec_node(symbol.right)], scope);
-        } else if (symbol.val == 'unary-') {
-            return this.dispatch(this.exec_node(symbol.right), "inv", [], scope); // Attention, on le stocke dans le right !
+        } else if (symbol.value == '-') {
+            return this.dispatch(this.exec_node(symbol.left, scope), "sub", [this.exec_node(symbol.right, scope)], scope);
+        } else if (symbol.value == '*') {
+            return this.dispatch(this.exec_node(symbol.left, scope), "mul", [this.exec_node(symbol.right, scope)], scope);
+        } else if (symbol.value == '/') {
+            return this.dispatch(this.exec_node(symbol.left, scope), "div", [this.exec_node(symbol.right, scope)], scope);
+        } else if (symbol.value == '//') {
+            return this.dispatch(this.exec_node(symbol.left, scope), "intdiv", [this.exec_node(symbol.right, scope)], scope);
+        } else if (symbol.value == '**') {
+            return this.dispatch(this.exec_node(symbol.left, scope), "pow", [this.exec_node(symbol.right, scope)], scope);
+        } else if (symbol.value == '%') {
+            return this.dispatch(this.exec_node(symbol.left, scope), "mod", [this.exec_node(symbol.right, scope)], scope);
+        } else if (symbol.value == 'unary-') {
+            return this.dispatch(this.exec_node(symbol.right, scope), "inv", [], scope); // Attention, on le stocke dans le right !
+        } else if (symbol.value == '.') {
+            if (symbol.right.value != 'unprefixed_call') { // right(Id, "name")
+                return this.dispatch(this.exec_node(symbol.left, scope), symbol.right.value, [], scope);
+            } else {
+                console.log(symbol.right.kind);
+                console.log(symbol.right.value);
+                console.log(symbol.left.kind);
+                console.log(symbol.left.value);
+                return "aaa";
+            }
         } else {
             throw new Error("Operator not understood");
         }
     } else {
-        throw new Error("Node type not understood : val=" + symbol.val + " left=" + symbol.left + " right=" + symbol.right);
+        throw new Error("Node type not understood : val=" + symbol.value + " left=" + symbol.left + " right=" + symbol.right);
     }
 }
 
@@ -811,57 +833,57 @@ add sub mul div mod intdiv pow
 return instance_function(exec_node(symbol.left, scope), new Symbol(Id, 'add'), new Symbol(SymbolType.Structure, 'call(', right=exec_node(symbol.right)), scope);
 return instance_function(exec_node(symbol.right, scope), new Symbol(Id, 'inv'), null, scope); -unary
 
-        } else if (symbol.val in ['and', 'or', 'xor']) {
-            return instance_function(exec_node(symbol.left, scope), new Symbol(Id, symbol.val), new Symbol(SymbolType.Structure, 'call(', right=exec_node(symbol.right)), scope);
-        } else if (symbol.val == '.') {
-            if symbol.right.val != 'unprefixed_call') {
+        } else if (symbol.value in ['and', 'or', 'xor']) {
+            return instance_function(exec_node(symbol.left, scope), new Symbol(Id, symbol.value), new Symbol(SymbolType.Structure, 'call(', right=exec_node(symbol.right)), scope);
+        } else if (symbol.value == '.') {
+            if symbol.right.value != 'unprefixed_call') {
                 target = exec_node(symbol.left, scope);
                 return instance_function(target, symbol.right, None, scope);
-            } else if (symbol.right.val == 'unprefixed_call') {
+            } else if (symbol.right.value == 'unprefixed_call') {
                 call = symbol.right;
                 return instance_function(symbol.left, call.left, call.right, scope);
             } else {
-                throw new Error("What to do with this symbol ? : " + symbol.right.val);
+                throw new Error("What to do with this symbol ? : " + symbol.right.value);
             }
-        } else if (symbol.val == '<<') {
+        } else if (symbol.value == '<<') {
             return instance_function(exec_node(symbol.left, scope), Symbol(Id, 'lshift'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope);
-        } else if (symbol.val == '>>') {
+        } else if (symbol.value == '>>') {
             return instance_function(exec_node(symbol.left, scope), Symbol(Id, 'rshift'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope);
-        } else if (symbol.val == '<=>') {
+        } else if (symbol.value == '<=>') {
             return instance_function(exec_node(symbol.left, scope), Symbol(Id, 'cmp'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope);
-        } else if (symbol.val in ['>', '<', '>=', '<=', '==', '!=']) {
+        } else if (symbol.value in ['>', '<', '>=', '<=', '==', '!=']) {
             r = instance_function(exec_node(symbol.left, scope), Symbol(Id, 'cmp'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope);
-            if symbol.val == '==') {
+            if symbol.value == '==') {
                 if (r == 0) {
                     return true;
                 } else {
                     return false;
                 }
-            } else if (symbol.val == '!=') {
+            } else if (symbol.value == '!=') {
                 if (r != 0) {
                     return true;
                 } else {
                     return false;
                 }
-            } else if (symbol.val == '>') {
+            } else if (symbol.value == '>') {
                 if (r == 1) {
                     return true;
                 } else {
                     return false;
                 }
-            } else if (symbol.val == '>=') {
+            } else if (symbol.value == '>=') {
                 if (r == 1 or r == 0) {
                     return true;
                 } else {
                     return false;
                 }
-            } else if (symbol.val == '<') {
+            } else if (symbol.value == '<') {
                 if (r == -1) {
                     return true;
                 } else {
                     return false;
                 }
-            } else if (symbol.val == '<=') {
+            } else if (symbol.value == '<=') {
                 if (r == -1 or r == 0) {
                     return true;
                 } else {
@@ -871,17 +893,17 @@ return instance_function(exec_node(symbol.right, scope), new Symbol(Id, 'inv'), 
                 throw new Error("You shouldn't be there!");
         
     } else if (symbol.kind == SymbolType.Structure) {
-        if (symbol.val == 'unprefixed_call') {
+        if (symbol.value == 'unprefixed_call') {
             return global_function(symbol.left, symbol.right, scope);
-        //} else if (symbol.val == 'prefixed_call':
+        //} else if (symbol.value == 'prefixed_call':
         //    return instance_function(symbol.left, symbol.right, scope)
-        } else if (symbol.val == 'aff') {
+        } else if (symbol.value == 'aff') {
             // const
-            if (symbol.left.val in scope && symbol.left.val[0].isupper()) {
+            if (symbol.left.value in scope && symbol.left.value[0].isupper()) {
                 throw new Error("Constant reference can't be changed");
             }
             value = exec_node(symbol.right, scope);
-            if (symbol.left.val[-1] == '?' && not isinstance(value, bool)) {
+            if (symbol.left.value[-1] == '?' && not isinstance(value, bool)) {
                 throw new Error("?-ending id must reference boolean value");
             }
             // typ
@@ -892,7 +914,7 @@ return instance_function(exec_node(symbol.right, scope), new Symbol(Id, 'inv'), 
             // aff
             scope[id] = (value, None);
             return scope[id][0];
-        } else if (symbol.val == 'typed_aff') {
+        } else if (symbol.value == 'typed_aff') {
             id = symbol.left.left.val;
             typ= symbol.left.right.val;
             val= exec_node(symbol.right, scope);
@@ -906,10 +928,10 @@ return instance_function(exec_node(symbol.right, scope), new Symbol(Id, 'inv'), 
             concordance(typ, val);
             scope[id] = (val, typ);
             return scope[id][0];
-        } else if (symbol.val == 'suite') {
+        } else if (symbol.value == 'suite') {
             exec_node(symbol.left, scope);
             return exec_node(symbol.right, scope);
-        } else if (symbol.val == 'if') {
+        } else if (symbol.value == 'if') {
             condition = exec_node(symbol.left);
             action = None;
             if (condition && symbol.right is not None) {
@@ -928,27 +950,27 @@ return instance_function(exec_node(symbol.right, scope), new Symbol(Id, 'inv'), 
         
 Interpreter.prototype.exec_terminal = function(symbol, scope) {
     if (symbol.kind == SymbolType.Integer) {
-        if (symbol.val.length > 1 && (symbol.val[1] == 'x' || symbol.val[1] == 'X')) {
-            return new Value(parseInt(symbol.val), TypeSystem.Integer);
-        } else if (symbol.val.length > 1 && (symbol.val[1] == 'b' || symbol.val[1] == 'B')) {
-            return new Value(parseInt(symbol.val.slice(2, symbol.val.length), 2), TypeSystem.Integer);
-        } else if (symbol.val.length > 1 && (symbol.val[1] == 't' || symbol.val[1] == 'T')) {
-            return new Value(parseInt("0" + symbol.val.slice(2, symbol.val.length), 8), TypeSystem.Integer);
+        if (symbol.value.length > 1 && (symbol.value[1] == 'x' || symbol.value[1] == 'X')) {
+            return new Value(parseInt(symbol.value), TypeSystem.Integer);
+        } else if (symbol.value.length > 1 && (symbol.value[1] == 'b' || symbol.value[1] == 'B')) {
+            return new Value(parseInt(symbol.value.slice(2, symbol.value.length), 2), TypeSystem.Integer);
+        } else if (symbol.value.length > 1 && (symbol.value[1] == 't' || symbol.value[1] == 'T')) {
+            return new Value(parseInt("0" + symbol.value.slice(2, symbol.value.length), 8), TypeSystem.Integer);
         } else {
-            return new Value(parseInt(symbol.val), TypeSystem.Integer);
+            return new Value(parseInt(symbol.value), TypeSystem.Integer);
         }
     } else if (symbol.kind == SymbolType.Float) {
-        return new Value(parseFloat(symbol.val), TypeSystem.Float);
+        return new Value(parseFloat(symbol.value), TypeSystem.Float);
     } else if (symbol.kind == SymbolType.Id) {
-        if (!scope.hasOwnProperty(symbol.val)) {
-            throw new Error('unreferenced variable ' + symbol.val);
+        if (!scope.hasOwnProperty(symbol.value)) {
+            throw new Error('unreferenced variable ' + symbol.value);
         } else {
-            return scope[symbol.val]
+            return scope[symbol.value]
         }
     } else if (symbol.kind == SymbolType.String) {
-        return new Value(symbol.val, TypeSystem.String);
+        return new Value(symbol.value, TypeSystem.String);
     } else if (symbol.kind == SymbolType.Boolean) {
-        if (symbol.val == 'true' || symbol.val == 'True' || symbol.val == 'TRUE') {
+        if (symbol.value == 'true' || symbol.value == 'True' || symbol.value == 'TRUE') {
             return new Value(true, TypeSystem.Boolean);
         } else {
             return new Value(false, TypeSystem.Boolean);
