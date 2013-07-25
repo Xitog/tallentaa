@@ -169,7 +169,7 @@
                 if (node == null) {
                     return '';
                 }
-                s = "<li>" + node.val + " : " + node.kind;
+                s = "<li>" + node.value + " : " + node.kind;
                 if (node.left !== null || node.right !== null) {
                     s += "<ul>";
                 }
@@ -227,7 +227,7 @@
                         var cell2=row.insertCell(2);
                         cell0.innerHTML = "<span style='color: #FFFFFF'>"+i+"</span>";
                         cell0.bgColor = '#666666';
-                        cell1.innerHTML = tokens[i].val;
+                        cell1.innerHTML = tokens[i].value;
                         cell2.innerHTML = tokens[i].kind;
                     }
                     var head = table.insertRow(0);
@@ -266,7 +266,7 @@
                     // Executing:Display
                     title_interpret.innerHTML = "Interpretation result";
                     display_result.style.display = "block";
-                    display_result.innerHTML = scmd + "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>Result = </i>" + result.toStringValue(); //toStringTypedValue();
+                    display_result.innerHTML = scmd + "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>Result = </i>" + result.toStringTypedValue(); //toStringValue();
                 } catch (err) {
                     title_interpret.innerHTML = "Interpretation result ERROR";
                     display_result.style.display = "block";
