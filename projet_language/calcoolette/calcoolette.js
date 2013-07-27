@@ -415,7 +415,7 @@ Parser.prototype.prepare = function(symbols) {
             // () -> x
             if (symb.value == '(' && i < symbols.length-1 && symbols[i+1].value == ')') {
                 symbols.splice(i+1 , 1);
-                symbols.splire(i, 1);
+                symbols.splice(i, 1);
                 i-=1;
             }
             //
@@ -441,7 +441,7 @@ Parser.prototype.parse_expression = function(symbols) {
             if (symbols[target].value == 'call(') {
                 var id = symbols[target-1];
                 if (id.terminal() && id.kind == SymbolType.Id) {
-                    var n = new Symbol(SymbolType.Structure, 'unprefixed_call', id, symbols[target]); // kind value left right
+                    var n = new Symbol(SymbolType.Structure, 'call_with_args', id, symbols[target]); // kind value left right
                     symbols.splice(target, 1);
                     symbols[target-1] = n;
                 } else {
@@ -458,20 +458,25 @@ Parser.prototype.parse_expression = function(symbols) {
             } else if (symbols[target].value == 'expr(') {
                 var fin = this.fetch_closing('(', symbols, target);
                 var sub = symbols.slice(target+1, fin);
-                this.make_tree(sub);
+                this.parse_expression(sub);
                 var jj = fin;
                 while (jj > target) {
-                    this.symbols.splice(jj, 1);
+                    symbols.splice(jj, 1);
                     jj -= 1;
                 }
                 symbols[target] = sub[0];
             } else if (symbols[target].value == 'call(') {
                 var fin = this.fetch_closing('(', symbols, target);
+                //console.log("fin = " + fin);
                 var sub = symbols.slice(target+1, fin);
-                this.make_tree(sub);
+                //console.log("sub before = " + sub);
+                this.parse_expression(sub);
+                //console.log("sub after = " + sub);
                 jj = fin;
                 while (jj > target) {
-                    this.symbols.splice(jj, 1);
+                    //console.log("symbols before = " + this.symbols);
+                    //console.log("removing at = " + jj);
+                    symbols.splice(jj, 1);
                     jj -= 1;
                 }
                 symbols[target] = new Symbol(SymbolType.Structure, 'call(', null, sub[0]); // kind value left right
@@ -548,15 +553,27 @@ function Value(value, kind) {
 }
 
 Value.prototype.toString = function() {
-    return 'ValueStr(' + this.value + " : " + this.kind + ')';
+    if (this.value == null) {
+        return 'ValueStr(nihil : ' + this.kind + ')';
+    } else {
+        return 'ValueStr(' + this.value + " : " + this.kind + ')';
+    }
 }
 
 Value.prototype.toStringValue = function() {
-    return '' + this.value;
+    if (this.value == null) {
+        return 'nihil';
+    } else {
+        return '' + this.value;
+    }
 }
 
 Value.prototype.toStringTypedValue = function() {
-    return '' + this.value + " : " + this.kind;
+    if (this.value == null) {
+        return 'nihil : ' + this.kind;
+    } else {
+        return '' + this.value + " : " + this.kind;
+    }
 }
 
 Value.prototype.equal = function(v) {
@@ -724,10 +741,120 @@ Baselib = {
                 throw new Error("Bad param type for function Integer#to_s");
             }
             return new Value(target.value.toString(), TypeSystem.String);
-        }
+        },
+        "to_i" : function(target, args, scope) {
+            if (target.kind != TypeSystem.Integer) {
+                throw new Error("Bad param type for function Integer#to_i");
+            }
+            return new Value(target.value, TypeSystem.Integer);
+        },
+        "to_f" : function(target, args, scope) {
+            if (target.kind != TypeSystem.Integer) {
+                throw new Error("Bad param type for function Integer#to_f");
+            }
+            return new Value(target.value, TypeSystem.Float);
+        },
+        "abs" : function(target, args, scope) {
+            if (target.kind != TypeSystem.Integer) {
+                throw new Error("Bad param type for function Integer#to_s");
+            }
+            var v = target.value;
+            if (v < 0) { v = v * -1; }
+            return new Value(v, TypeSystem.Integer);
+        },
+        "lshift" : function(target, args, scope) {
+            p = args[0];
+            if (target.kind != TypeSystem.Integer || p.kind != TypeSystem.Integer) {
+                throw new Error("Bad param type for function Integer#lshift");
+            }
+            return new Value(Math.floor(target.value << p.value), TypeSystem.Integer);
+        },
+        "rshift" : function(target, args, scope) {
+            p = args[0];
+            if (target.kind != TypeSystem.Integer || p.kind != TypeSystem.Integer) {
+                throw new Error("Bad param type for function Integer#rshift");
+            }
+            return new Value(Math.floor(target.value >> p.value), TypeSystem.Integer);
+        }, 
+        "and" : function(target, args, scope) {
+            p = args[0];
+            if (target.kind != TypeSystem.Integer || p.kind != TypeSystem.Integer) {
+                throw new Error("Bad param type for function Integer#and");
+            }
+            return new Value(Math.floor(target.value & p.value), TypeSystem.Integer);
+        },
+        "or" : function(target, args, scope) {
+            p = args[0];
+            if (target.kind != TypeSystem.Integer || p.kind != TypeSystem.Integer) {
+                throw new Error("Bad param type for function Integer#or");
+            }
+            return new Value(Math.floor(target.value | p.value), TypeSystem.Integer);
+        }, 
+        "xor" : function(target, args, scope) {
+            p = args[0];
+            if (target.kind != TypeSystem.Integer || p.kind != TypeSystem.Integer) {
+                throw new Error("Bad param type for function Integer#xor");
+            }
+            return new Value(Math.floor(target.value ^ p.value), TypeSystem.Integer);
+        }, 
+        "invbin" : function(target, args, scope) {
+            if (target.kind != TypeSystem.Integer) {
+                throw new Error("Bad param type for function Integer#invbin");
+            }
+            return new Value(~ target.value, TypeSystem.Integer);
+        },
+        "cmp" : function(target, args, scope) {
+            p = args[0];
+            if (target.kind != TypeSystem.Integer || p.kind != TypeSystem.Integer) {
+                throw new Error("Bad param type for function Integer#cmp");
+            }
+            if (target.value == p.value) { return new Value(0, TypeSystem.Integer); }
+            else if (target.value > p.value) { return new Value(1, TypeSystem.Integer); }
+            else { return new Value(-1, TypeSystem.Integer); }
+        }, 
+        "size" : function(target, args, scope) {
+            if (target.kind != TypeSystem.Integer) {
+                throw new Error("Bad param type for function Integer#size");
+            }
+            return new Value(roughSizeOfObject(target), TypeSystem.Integer);
+        }, // manque intdiv dans la doc ,lshit au lieu de lshift, decalaga !
     }
 };
 
+// http://stackoverflow.com/questions/1248302/javascript-object-size
+function roughSizeOfObject( object ) {
+
+    var objectList = [];
+    var stack = [ object ];
+    var bytes = 0;
+
+    while ( stack.length ) {
+        var value = stack.pop();
+
+        if ( typeof value === 'boolean' ) {
+            bytes += 4;
+        }
+        else if ( typeof value === 'string' ) {
+            bytes += value.length * 2;
+        }
+        else if ( typeof value === 'number' ) {
+            bytes += 8;
+        }
+        else if
+        (
+            typeof value === 'object'
+            && objectList.indexOf( value ) === -1
+        )
+        {
+            objectList.push( value );
+
+            for( i in value ) {
+                stack.push( value[ i ] );
+            }
+        }
+    }
+    return bytes;
+}
 
 // NOT CONVERTED YET
 /*
@@ -809,17 +936,38 @@ Interpreter.prototype.exec_non_terminal = function(symbol, scope) {
         } else if (symbol.value == 'unary-') {
             return this.dispatch(this.exec_node(symbol.right, scope), "inv", [], scope); // Attention, on le stocke dans le right !
         } else if (symbol.value == '.') {
-            if (symbol.right.value != 'unprefixed_call') { // right(Id, "name")
+            if (symbol.right.kind == SymbolType.Id) {         // 2.abs => . 2 abs
                 return this.dispatch(this.exec_node(symbol.left, scope), symbol.right.value, [], scope);
+            } else if (symbol.right.kind == SymbolType.Structure && symbol.right.value == 'call_with_args') {   // 2.abs(3) => . 2 call_with_args abs call(
+                var caller = this.exec_node(symbol.left, scope);
+                var appel_fonction = symbol.right;
+                var nom_fonction = appel_fonction.left.value; // C'est un id normalement
+                var parametres = appel_fonction.right;  // C'est une Structure qui a pour valeur 'call('
+                if (parametres.right.kind == SymbolType.Integer) {
+                    var le_parametre = this.exec_terminal(parametres.right, scope);
+                    return this.dispatch(caller, nom_fonction, [le_parametre], scope);
+                }
             } else {
-                console.log(symbol.right.kind);
-                console.log(symbol.right.value);
-                console.log(symbol.left.kind);
-                console.log(symbol.left.value);
+                console.log(symbol.right.kind); // Structure
+                console.log(symbol.right.value);// call_with_args
+                console.log(symbol.left.kind);  // Type de l'objet à gauche de l'appel (2.)
+                console.log(symbol.left.value); // Valeur de l'objet à gauche de l'appel (2.)
                 return "aaa";
             }
         } else {
             throw new Error("Operator not understood");
+        }
+    } else if (symbol.kind == SymbolType.Structure) {
+        if (symbol.value == 'call_with_args') { // Ici on n'a pas de prefix, d'objet caller, si on passe ici !
+            if (symbol.left.kind == SymbolType.Id && symbol.left.value == 'println') {
+                var parametre = symbol.right.right.value;
+                console.log(parametre);
+                return new Value(null, TypeSystem.Object);
+            } else {
+                throw new Error("Global function not known : " + symbol.left.value + " of type : " + symbol.left.kind);
+            }
+        } else {
+            throw new Error("1042");
         }
     } else {
         throw new Error("Node type not understood : val=" + symbol.value + " left=" + symbol.left + " right=" + symbol.right);
@@ -836,10 +984,10 @@ return instance_function(exec_node(symbol.right, scope), new Symbol(Id, 'inv'), 
         } else if (symbol.value in ['and', 'or', 'xor']) {
             return instance_function(exec_node(symbol.left, scope), new Symbol(Id, symbol.value), new Symbol(SymbolType.Structure, 'call(', right=exec_node(symbol.right)), scope);
         } else if (symbol.value == '.') {
-            if symbol.right.value != 'unprefixed_call') {
+            if symbol.right.value != 'call_with_args') {
                 target = exec_node(symbol.left, scope);
                 return instance_function(target, symbol.right, None, scope);
-            } else if (symbol.right.value == 'unprefixed_call') {
+            } else if (symbol.right.value == 'call_with_args') {
                 call = symbol.right;
                 return instance_function(symbol.left, call.left, call.right, scope);
             } else {
@@ -893,7 +1041,7 @@ return instance_function(exec_node(symbol.right, scope), new Symbol(Id, 'inv'), 
                 throw new Error("You shouldn't be there!");
         
     } else if (symbol.kind == SymbolType.Structure) {
-        if (symbol.value == 'unprefixed_call') {
+        if (symbol.value == 'call_with_args') {
             return global_function(symbol.left, symbol.right, scope);
         //} else if (symbol.value == 'prefixed_call':
         //    return instance_function(symbol.left, symbol.right, scope)
