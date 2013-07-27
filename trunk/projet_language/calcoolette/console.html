@@ -165,19 +165,25 @@
                 return false; // event.preventDefault(); 
             }
             
-            function do_node(node) {
+            function do_node(node, is_left) {
                 if (node == null) {
                     return '';
                 }
-                s = "<li>" + node.value + " : " + node.kind;
+                if (is_left === true) {
+                    s = "<li><i>left</i>&nbsp;&nbsp;&nbsp;&nbsp;" + node.value + " : " + node.kind;
+                } else if (is_left === false) {
+                    s = "<li><i>right</i>&nbsp;&nbsp;&nbsp;&nbsp;" + node.value + " : " + node.kind;
+                } else {
+                    s = "<li>" + node.value + " : " + node.kind;
+                }
                 if (node.left !== null || node.right !== null) {
                     s += "<ul>";
                 }
                 if (node.left !== null) {
-                    s += do_node(node.left);
+                    s += do_node(node.left, true);
                 }
                 if (node.right !== null) {
-                    s += do_node(node.right);
+                    s += do_node(node.right, false);
                 }
                 if (node.left !== null || node.right !== null) {
                     s += "</ul>";
@@ -242,7 +248,7 @@
                     title_lexing.innerHTML = "Lexing result ERROR";
                     var row = table.insertRow(0);
                     var cell0=row.insertCell(0);
-                    cell0.innerHTML = scmd + "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class='red'>" + err.message + "</span>";
+                    cell0.innerHTML = scmd + "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class='red'>" + err.message + "<br>" + err.stack + "</span>";
                     return;
                 }
                 // Parsing
@@ -255,14 +261,14 @@
                     display_parsing.innerHTML = do_node(tree);
                 } catch (err) {
                     title_parsing.innerHTML = "Parsing result ERROR";
-                    display_parsing.innerHTML = scmd + "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class='red'>" + err.message + "</span>";
+                    display_parsing.innerHTML = scmd + "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class='red'>" + err.message + "<br>" + err.stack + "</span>";
                     return;
                 }
                 // Executing
                 // Executing:Execute
                 interp = new Interpreter();
                 try {
-                    result = interp.exec_node(tree);
+                    result = interp.exec_node(tree, {});
                     // Executing:Display
                     title_interpret.innerHTML = "Interpretation result";
                     display_result.style.display = "block";
@@ -270,7 +276,7 @@
                 } catch (err) {
                     title_interpret.innerHTML = "Interpretation result ERROR";
                     display_result.style.display = "block";
-                    display_result.innerHTML = scmd + "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class='red'>" + err.message + "</span>";
+                    display_result.innerHTML = scmd + "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class='red'>" + err.message + "<br>" + err.stack + "</span>";
                     return;
                 }
 
