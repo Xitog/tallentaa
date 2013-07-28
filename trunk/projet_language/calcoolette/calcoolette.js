@@ -11,40 +11,50 @@ DEBUG = true;
 //-----------------------------------------------------------------------------
 
 var SymbolType = {
-    Integer : 'Integer',
-    Float : 'Float',
-    Id : 'Id',
-    Operator : 'Operator',
-    Separator : 'Separator',
-    Keyword : 'Keyword',
-    Boolean : 'Boolean',
-    String : 'String',
+    Integer : 'Integer Symbol',
+    Float : 'Float Symbol',
+    Id : 'Id Symbol',
+    Operator : 'Operator Symbol',
+    Separator : 'Separator Symbol',
+    Keyword : 'Keyword Symbol',
+    Boolean : 'Boolean Symbol',
+    String : 'String Symbol',
     //Discard : 'Discard',
     //Error : 'Error',
-    Structure : 'Structure',
 };
 
-function Symbol(kind, value, left, right) {
-    this.kind = kind;
+function Symbol(type, value, line) {
+    this.type = type;
     this.value = value;
-    this.left = typeof left !== 'undefined' ? left : null;
-    this.right = typeof right !== 'undefined' ? right : null;
-}
-
-Symbol.prototype.toString = function() {
-    if (this.left == null && this.right == null) {
-        return "SymbolStr(" + this.value + ":" + this.kind + ")";
-    } else if (this.right == null && this.left != null) {
-        return "SymbolStr(" + this.left + "--" + this.value + ":" + this.kind + ")";
-    } else if (this.left == null && this.right != null) {
-        return "SymbolStr(" + this.value + ":" + this.kind + "--" + this.right + ")";
-    } else {
-        return "SymbolStr(" + this.left + "--" + this.value + ":" + this.kind + "--" + this.right + ")";
-    }
+    this.line = line;
 }
 
 Symbol.prototype.terminal = function() {
-        return this.left == null && this.right == null;
+    return true;
+}
+
+Symbol.prototype.getValue = function() {
+    return this.value;
+}
+
+Symbol.prototype.setValue = function(v) {
+    this.value = v;
+}
+
+Symbol.prototype.getType = function() {
+    return this.type;
+}
+
+Symbol.prototype.getLine = function() {
+    return this.line;
+}
+
+Symbol.prototype.getLength = function() {
+    return 1;
+}
+
+Symbol.prototype.toString = function() {
+    return this.getValue() + " : " + this.type; // + " @" + this.line;
 }
 
 //-----------------------------------------------------------------------------
@@ -85,38 +95,68 @@ function Lexer() {
     this.symbols = [];
 }
 
+// highlighting differences between :
+//     - (unary) et - (binary)
+//     () (call) et () (expr)
+Lexer.prototype.prepare = function() {
+    var i = 0;
+    while (i < this.symbols.length) {
+        symb = this.symbols[i];
+        if (symb.terminal()) {
+            if (symb.getValue() == '-' && (i == 0 || this.symbols[i-1].getType() == SymbolType.Operator)) {
+                symb.setValue('unary-');
+            }
+            // () -> x
+            if (symb.getValue() == '(' && i < this.symbols.length-1 && this.symbols[i+1].getValue() == ')') {
+                this.symbols.splice(i+1 , 1);
+                this.symbols.splice(i, 1);
+                i-=1;
+            }
+            //
+            if (symb.getValue() == '(' && i > 0 && this.symbols[i-1].getType() != SymbolType.Operator) {
+                symb.setValue('call(');
+            } else if (symb.getValue() == '(') {
+                symb.setValue('expr(');
+            }
+        i+=1;
+        }
+    }
+}
+
 // Main function. From a stream of characters produces a list of terminal symbols (tokens).
 Lexer.prototype.tokenize = function(input) {
     this.symbols = [];
     var i = 0;
+    var nb_line = 1;
     while (i < input.length) {
         if (digits.indexOf(input[i]) > -1) { 
-            i = this.read_num(input, i); 
+            i = this.read_num(input, i, nb_line); 
         } else if (alphas.indexOf(input[i]) > -1) { 
-            i = this.read_id(input, i); 
+            i = this.read_id(input, i, nb_line); 
         } else if (ops.indexOf(input[i]) > -1) { 
-            i = this.read_op(input, i); 
+            i = this.read_op(input, i, nb_line); 
         } else if (white.indexOf(input[i]) > -1) { 
+            if (input[i] == "\n") { nb_line += 1; }
             i += 1; 
         } else if (separators.indexOf(input[i]) > -1) {
-            this.symbols.push(new Symbol(SymbolType.Separator, input[i]));
+            this.symbols.push(new Symbol(SymbolType.Separator, input[i], nb_line));
             i += 1;
         } else if (comment.indexOf(input[i]) > -1) {
             while (i < input.length && input[i] != '\n' && input[i] != ';') {
                 i += 1;
             }
         } else if (delimiters.indexOf(input[i]) > -1) {
-            i = this.read_string(input, i);
+            i = this.read_string(input, i, nb_line);
         } else {
             throw new Error("Char incorrect " + input[i] + " at " + i);
         }
     }
-    //this.symbols.push(new Symbol(EOF, 'eof'));
-    return this.symbols; // SymbolList(self.symbols)
+    this.prepare();
+    return this.symbols;
 }
 
 // Read a number
-Lexer.prototype.read_num = function(input, i) {
+Lexer.prototype.read_num = function(input, i, nb_line) {
     var is_float = false;
     var num = input[i];
     i +=1;
@@ -170,22 +210,22 @@ Lexer.prototype.read_num = function(input, i) {
             break;
         } else {
             console.log("problem at " + this.symbols.length);
-            for (ii=0; ii < this.symbols.length; i++) {
+            for (var ii=0; ii < this.symbols.length; i++) {
                 console.log(this.symbols[ii]);
             }
             throw new Error("Lexing number at character [" + input[i] + "]");
         }
     }
     if (! is_float) {
-        this.symbols.push(new Symbol(SymbolType.Integer, num));
+        this.symbols.push(new Symbol(SymbolType.Integer, num, nb_line));
     } else {
-        this.symbols.push(new Symbol(SymbolType.Float, num));
+        this.symbols.push(new Symbol(SymbolType.Float, num, nb_line));
     }
     return i;
 }
 
 // Read an id
-Lexer.prototype.read_id = function(input, i) {
+Lexer.prototype.read_id = function(input, i, nb_line) {
     var id = input[i];
     i +=1;
     var cont = true;
@@ -203,29 +243,29 @@ Lexer.prototype.read_id = function(input, i) {
         }
     }
     if (id_booleans.indexOf(id) > -1) {
-        this.symbols.push(new Symbol(SymbolType.Boolean, id));
+        this.symbols.push(new Symbol(SymbolType.Boolean, id, nb_line));
     } else if (id_operators.indexOf(id) > -1) {
         // operator boolean as function
-        if (this.symbols.length > 1 && i > 0 && this.symbols[this.symbols.length-1].value == '.') {
-            this.symbols.push(new Symbol(SymbolType.Id, id));
+        if (this.symbols.length > 1 && i > 0 && this.symbols[this.symbols.length-1].getValue() == '.') {
+            this.symbols.push(new Symbol(SymbolType.Id, id, nb_line));
         } else {
-            this.symbols.push(new Symbol(SymbolType.Operator, id));
+            this.symbols.push(new Symbol(SymbolType.Operator, id, nb_line));
         }
     } else if (id_keywords.indexOf(id) > -1) {
         // keyword as function
-        if (this.symbols.length > 1 && i > 0 && this.symbols[this.symbols.length-1].value == '.') {
-            this.symbols.push(new Symbol(SymbolType.Id, id));
+        if (this.symbols.length > 1 && i > 0 && this.symbols[this.symbols.length-1].getValue() == '.') {
+            this.symbols.push(new Symbol(SymbolType.Id, id, nb_line));
         } else {
-            this.symbols.push(new Symbol(SymbolType.Keyword, id));
+            this.symbols.push(new Symbol(SymbolType.Keyword, id, nb_line));
         }
     } else {
-        this.symbols.push(new Symbol(SymbolType.Id, id));
+        this.symbols.push(new Symbol(SymbolType.Id, id, nb_line));
     }
     return i;
 }
 
 // Read an operator
-Lexer.prototype.read_op = function(input, i) {
+Lexer.prototype.read_op = function(input, i, nb_line) {
     var op = input[i];
     i +=1;
     while (op != '-' && i < input.length) {             // 2 +- 3 should not be seen as an "+-" operator but as "+" and "-" operators
@@ -239,12 +279,12 @@ Lexer.prototype.read_op = function(input, i) {
     if (operators.indexOf(op) == -1) {
         throw new Error("Not known operator : " + op)
     }
-    this.symbols.push(new Symbol(SymbolType.Operator, op))
+    this.symbols.push(new Symbol(SymbolType.Operator, op, nb_line))
     return i
 }
 
 // Read a string
-Lexer.prototype.read_string = function(input, i) {
+Lexer.prototype.read_string = function(input, i, nb_line) {
     var str = '';
     var begin_by = input[i];
     i += 1;
@@ -257,7 +297,7 @@ Lexer.prototype.read_string = function(input, i) {
     } else {
         i += 1;
     }
-    this.symbols.push(new Symbol(SymbolType.String, str));
+    this.symbols.push(new Symbol(SymbolType.String, str, nb_line));
     return i;
 }
 
@@ -271,25 +311,27 @@ Lexer.prototype.test = function(input, result) {
     this.clear();
     this.tokenize(input);
     var r = true;
+    var error_at;
     if (this.symbols.length != result.length) {
         console.log("length!");
         r = false;
     } else {
-        for (i = 0; i < result.length; i++) {
-            //console.log(this.symbols[i].value);
+        for (var i = 0; i < result.length; i++) {
+            //console.log(this.symbols[i].getValue());
             //console.log(result[i][0].toString());
-            if (this.symbols[i].value != result[i][0].toString() || this.symbols[i].kind != result[i][1]) {
+            if (this.symbols[i].getValue() != result[i][0].toString() || this.symbols[i].getType() != result[i][1]) {
                 r = false;
+                error_at = i;
                 break;
             }
         }
     }
     if (DEBUG) {
-        for (i = 0; i < this.symbols.length; i += 1) {
+        for (var i = 0; i < this.symbols.length; i += 1) {
             console.log("" + i + ". " + this.symbols[i]);
         }
         if (!r) {
-            throw new Error("ERROR : " + input);
+            throw new Error("ERROR mismatch : " + this.symbols[error_at] + " for result : " + result[error_at]);
         }
     }
     return r;
@@ -306,7 +348,7 @@ test_lexer.test("true", [[true, SymbolType.Boolean]]) ? console.log("=> true OK"
 test_lexer.test("true or false", [[true, SymbolType.Boolean], ["or", SymbolType.Operator], [false, SymbolType.Boolean]]) ? console.log("=> true or false OK") : console.log("ERROR : true or false");
 
 cmd = "2 + 3 - 4.to_f + (true) or False xor True ** 2.3 + 0.3.to_i / 0.to_f / 0..to_f +- 3";
-result = [[2, SymbolType.Integer], ["+", SymbolType.Operator], [3, SymbolType.Integer], ["-", SymbolType.Operator], [4, SymbolType.Integer], [".", SymbolType.Operator], ["to_f", SymbolType.Id], ["+", SymbolType.Operator], ["(", SymbolType.Separator], ["true", SymbolType.Boolean], [")", SymbolType.Separator], ["or", SymbolType.Operator], ["False", SymbolType.Boolean], ["xor", SymbolType.Operator], ["True", SymbolType.Boolean], ["**", SymbolType.Operator], [2.3, SymbolType.Float], ["+", SymbolType.Operator], ["0.3", SymbolType.Float], [".", SymbolType.Operator], ["to_i", SymbolType.Id], ["/", SymbolType.Operator], [0, SymbolType.Integer], [".", SymbolType.Operator], ["to_f", SymbolType.Id], ["/", SymbolType.Operator], ["0.", SymbolType.Float], [".", SymbolType.Operator], ["to_f", SymbolType.Id], ["+", SymbolType.Operator], ["-", SymbolType.Operator], [3, SymbolType.Integer]];
+result = [[2, SymbolType.Integer], ["+", SymbolType.Operator], [3, SymbolType.Integer], ["-", SymbolType.Operator], [4, SymbolType.Integer], [".", SymbolType.Operator], ["to_f", SymbolType.Id], ["+", SymbolType.Operator], ["expr(", SymbolType.Separator], ["true", SymbolType.Boolean], [")", SymbolType.Separator], ["or", SymbolType.Operator], ["False", SymbolType.Boolean], ["xor", SymbolType.Operator], ["True", SymbolType.Boolean], ["**", SymbolType.Operator], [2.3, SymbolType.Float], ["+", SymbolType.Operator], ["0.3", SymbolType.Float], [".", SymbolType.Operator], ["to_i", SymbolType.Id], ["/", SymbolType.Operator], [0, SymbolType.Integer], [".", SymbolType.Operator], ["to_f", SymbolType.Id], ["/", SymbolType.Operator], ["0.", SymbolType.Float], [".", SymbolType.Operator], ["to_f", SymbolType.Id], ["+", SymbolType.Operator], ["unary-", SymbolType.Operator], [3, SymbolType.Integer]];
 test_lexer.test(cmd, result) ? console.log("=> 2 + 3 - 4.to_f + (true) or False xor True ** 2.3 + 0.3.to_i / 0.to_f / 0..to_f +- 3 OK") : console.log("ERROR : 2 + 3 - 4.to_f + (true) or False xor True ** 2.3 + 0.3.to_i / 0.to_f / 0..to_f +- 3");
 
 test_lexer.test("'abc'", [["abc", SymbolType.String]]) ? console.log("=> 'abc' OK") : console.log("ERROR : 'abc'");
@@ -317,64 +359,109 @@ test_lexer.test("if", [["if", SymbolType.Keyword]]) ? console.log('=> if OK') : 
 // Syntaxic analysis (Expression)
 //-----------------------------------------------------------------------
 
+var NodeType = {
+    Terminal    : 'Terminal Node',
+    BinaryOp    : 'Binary Operator Node',
+    UnaryOp     : 'Unary Operator Node',
+    FunctionCall: 'Function Call Node',
+    Structure   : 'Structure Node',
+    ParamList   : 'Parameter List',
+};
+
+function Node(type, elem1, elem2, elem3, elem4) {
+    this.type = type;
+    this.suite = [];
+    if (typeof elem1 !== 'undefined') { this.suite.push(elem1); }
+    if (typeof elem2 !== 'undefined') { this.suite.push(elem2); }
+    if (typeof elem3 !== 'undefined') { this.suite.push(elem3); }
+}
+
+Node.prototype.terminal = function() {
+    return (this.suite.length == 1);
+}
+
+Node.prototype.getValue = function() {
+    if (this.terminal()) {
+        return this.suite[0].getValue();
+    } else {
+        return null;
+    }
+}
+
+Node.prototype.getType = function() {
+    return this.type;
+}
+
+Node.prototype.getLength = function() {
+    return this.suite.length;
+}
+
+Node.prototype.toString = function() {
+    return this.type;
+}
+
 function Parser() {
     this.tree = null;
 }
 
 // Fetch the operator with the highest priority to execute
 Parser.prototype.first_op = function(symbols) {
-    i = 0;
-    best = -1;
-    best_prio = -1;
-    prio = { ')' : 0, ',' : 1, 'and' : 5, 'or' : 5, 'xor' : 5, 
+    var i = 0;
+    var best = -1;
+    var best_prio = -1;
+    var prio = { ')' : 0, ',' : 1, 'and' : 5, 'or' : 5, 'xor' : 5, 
              '>' : 8, '<' : 8, '>=' : 8, '<=' : 8, '==' : 8, '!=' : 8, '<=>' : 8, 
              '<<': 9, '>>' : 9, '+' : 10, '-' : 10, 
-             '*' : 20, '/' : 20, '//' : 20, '**' : 30, '%' : 30, 'call' : 35, '.' : 40, 
+             '*' : 20, '/' : 20, '//' : 20, '**' : 30, '%' : 30, '.' : 40, // 'call' : 35,  ???
              'unary-' : 50, 'call(' : 51, 'expr(' : 60 };
-    lvl = 1;
+    var lvl = 1;
     while (i < symbols.length) {
         symb = symbols[i];
-        if (symb.terminal() && (symb.kind == SymbolType.Operator || symb.kind == SymbolType.Separator)) {
+        if (symb.terminal() && (symb.getType() == SymbolType.Operator || symb.getType() == SymbolType.Separator)) {
             if (best == -1) {
                 best = i
-                best_prio = prio[symb.value]*lvl
+                best_prio = prio[symb.getValue()]*lvl
             } else {
-                if (prio[symb.value]*lvl > best_prio) {
+                if (prio[symb.getValue()]*lvl > best_prio) {
                     best = i
-                    best_prio = prio[symb.value]*lvl
+                    best_prio = prio[symb.getValue()]*lvl
                 }
             }
             // () for others
-            if (symb.value == 'call(' || symb.value == 'expr(') {
+            if (symb.getValue() == 'call(' || symb.getValue() == 'expr(') {
                 lvl*=10
-            } else if (symb.value == ')') {
+            } else if (symb.getValue() == ')') {
                 lvl/=10
             }
-        } else if (symb.value == 'call(') { // not terminal
-            if (prio[symb.value]*lvl > best_prio) {
+        } else if (symb.getValue() == 'call(') { // not terminal
+            if (prio[symb.getValue()]*lvl > best_prio) {
                 best = i
-                best_prio = prio[symb.value]*lvl
+                best_prio = prio[symb.getValue()]*lvl
             } else {
                 throw new Error("Incorrect expression call");
             }
         }
         i +=1;
     }
-    if (best == -1) {
-        throw new Error("Incorrect expression");
+    if (best == -1) { // Hack for global
+        if (symbols.length == 2 && symbols[0].getType() == SymbolType.Id && symbols[1].getType() == NodeType.ParamList) {
+                best = 1;
+        } else {
+            throw new Error("Incorrect expression");
+        }
     }
     return best;
 }
 
 Parser.prototype.fetch_closing = function(sep, symbols, i) {
-    lvl = 0;
-    pos = 0;
-    pos = i;
+    var lvl = 0;
+    var pos = 0;
+    var pos = i;
     while (pos < symbols.length) {
         symb = symbols[pos];
-        if (sep == '(' && (symb.value == 'call(' || symb.value == 'expr(')) {
+        if (sep == '(' && (symb.getValue() == 'call(' || symb.getValue() == 'expr(')) {
             lvl += 1;
-        } else if (sep == '(' && symb.value == ')') {
+        } else if (sep == '(' && symb.getValue() == ')') {
             lvl -= 1;
         }
         if (lvl == 0) {
@@ -395,67 +482,30 @@ Parser.prototype.not_exist_or_dif = function(symbols, index, terminal, value) {
     if (symbols[index].terminal() != terminal) {
         return true;
     }
-    if (symbols[index].value != value) {
+    if (symbols[index].getValue() != value) {
         return true;
     }
     return false;
 }
 
-// highlighting differences between :
-//     - (unary) et - (binary)
-//     () (call) et () (expr)
-Parser.prototype.prepare = function(symbols) {
-    i = 0;
-    while (i < symbols.length) {
-        symb = symbols[i];
-        if (symb.terminal()) {
-            if (symb.value == '-' && (i == 0 || symbols[i-1].kind == SymbolType.Operator)) {
-                symb.value = 'unary-';
-            }
-            // () -> x
-            if (symb.value == '(' && i < symbols.length-1 && symbols[i+1].value == ')') {
-                symbols.splice(i+1 , 1);
-                symbols.splice(i, 1);
-                i-=1;
-            }
-            //
-            if (symb.value == '(' && i > 0 && symbols[i-1].kind != SymbolType.Operator) {
-                symb.value = 'call(';
-            } else if (symb.value == '(') {
-                symb.value = 'expr(';
-            }
-        i+=1;
-        }
-    }
-}
-
 // From a token list make a tree!
 Parser.prototype.parse_expression = function(symbols) {
-    this.prepare(symbols);
+    //this.prepare(symbols);
     while (symbols.length > 1) {    
         var target = this.first_op(symbols);
         if (DEBUG) {
             console.log('>>> target=' + target + ' symb=' + symbols[target]);
         }
-        if (!symbols[target].terminal()) {
-            if (symbols[target].value == 'call(') {
-                var id = symbols[target-1];
-                if (id.terminal() && id.kind == SymbolType.Id) {
-                    var n = new Symbol(SymbolType.Structure, 'call_with_args', id, symbols[target]); // kind value left right
-                    symbols.splice(target, 1);
-                    symbols[target-1] = n;
-                } else {
-                    throw new Error("Call not understood");
-                }
-            } else {
-                throw new Error("Error on target node");
-            }
+        if (symbols[target].getType() == NodeType.ParamList) { // !symbols[target].terminal()) {
+            var n = new Node(NodeType.FunctionCall, null, symbols[target-1], symbols[target]); // caller fun params
+            symbols.splice(target, 1);
+            symbols[target-1] = n;
         } else if (symbols[target].terminal()) {
-            if (symbols[target].value == 'unary-') {
-                var n = new Symbol(SymbolType.Operator, 'unary-', null, symbols[target+1]); // kind value left right
+            if (symbols[target].getValue() == 'unary-') {
+                var n = new Node(NodeType.UnaryOp, symbols[target], symbols[target+1]);
                 symbols.splice(target+1, 1);
                 symbols[target] = n;
-            } else if (symbols[target].value == 'expr(') {
+            } else if (symbols[target].getValue() == 'expr(') {
                 var fin = this.fetch_closing('(', symbols, target);
                 var sub = symbols.slice(target+1, fin);
                 this.parse_expression(sub);
@@ -465,47 +515,31 @@ Parser.prototype.parse_expression = function(symbols) {
                     jj -= 1;
                 }
                 symbols[target] = sub[0];
-            } else if (symbols[target].value == 'call(') {
+            } else if (symbols[target].getValue() == 'call(') {
                 var fin = this.fetch_closing('(', symbols, target);
-                //console.log("fin = " + fin);
                 var sub = symbols.slice(target+1, fin);
-                //console.log("sub before = " + sub);
                 this.parse_expression(sub);
-                //console.log("sub after = " + sub);
                 jj = fin;
                 while (jj > target) {
-                    //console.log("symbols before = " + this.symbols);
-                    //console.log("removing at = " + jj);
                     symbols.splice(jj, 1);
                     jj -= 1;
                 }
-                symbols[target] = new Symbol(SymbolType.Structure, 'call(', null, sub[0]); // kind value left right
-            } else if (symbols[target].value == ',') {
-                var n = new Symbol(SymbolType.Structure, 'suite', symbols[target-1], symbols[target+1]); // kind value left right
+                symbols[target] = new Node(NodeType.ParamList, sub[0]);
+            } else if (symbols[target].getValue() == ',') {
+                var n = new Node(NodeType.ParamList, symbols[target-1], symbols[target+1]);
                 symbols.splice(target+1, 1);
                 symbols.splice(target, 1);
                 symbols[target-1] = n;
             } else if (target > 0) {
-                if (symbols[target].value != '.' || (symbols[target].value == '.' && this.not_exist_or_dif(symbols, target+2, false, "call"))) {
-                    var n = new Symbol(symbols[target].kind, symbols[target].value, symbols[target-1], symbols[target+1]); // kind value left right
-                    symbols.splice(target+1, 1);
-                    symbols.splice(target, 1);
-                    symbols[target-1] = n;
+                if (symbols[target].getValue() == '.' && !(typeof symbols[target+1] == "undefined") && symbols[target+1].getType() == SymbolType.Id && !(typeof symbols[target+2] == "undefined") && symbols[target+2].getType() == NodeType.ParamList) { // Ternary .
+                    var n = new Node(NodeType.FunctionCall, symbols[target-1], symbols[target+1], symbols[target+2]); // caller fun params
+                    symbols.splice(target+2, 1);
                 } else {
-                    throw new Error("WTF?");
+                    var n = new Node(NodeType.BinaryOp, symbols[target], symbols[target-1], symbols[target+1]); // bin op1 op2
                 }
-                //} else { No converted Python
-                //    throw new Error("AAAAAAAAAAAAAAAAA");
-                //    // nx -> fun, call (avec par)
-                //    nx = symbols[target+2]
-                //    nx.left = symbols[target+1]
-                //    // n -> id, nx
-                //    n = Symbol(left=symbols[target-1], right=nx, val="prefixed_call", kind=Structure)
-                //    del symbols[target+2]
-                //    del symbols[target+1]
-                //    del symbols[target]
-                //    symbols[target-1] = n
-                //}
+                symbols.splice(target+1, 1);
+                symbols.splice(target, 1);
+                symbols[target-1] = n;
             } else if (target == -1 && symbols.length > 0) {
                 var n = symbols[0];
             } else {
@@ -515,7 +549,7 @@ Parser.prototype.parse_expression = function(symbols) {
             throw new Error("Expression not understood : " + symbols[target]);
         }
         if (DEBUG) {
-            for(ii = 0; ii < symbols.length; ii++) {
+            for(var ii = 0; ii < symbols.length; ii++) {
                 console.log('' + ii + '. ' + symbols[ii]);
                 ii +=1 ;
             }
@@ -540,93 +574,67 @@ Parser.prototype.parse = function(symbols) {
 // Interpreter
 //-----------------------------------------------------------------------------
 
-var TypeSystem = {
+var ValueType = {
     Object : 'Object',
     String : 'String',
     Float : 'Float',
     Integer : 'Integer',
+    Boolean : 'Boolean',
 }
 
-function Value(value, kind) {
+function Value(value, type) {
     this.value = value;
-    this.kind = kind;
+    this.type = type;
+}
+
+Value.prototype.getValue = function() {
+    return this.value;
+}
+
+Value.prototype.getType = function() {
+    return this.type;
 }
 
 Value.prototype.toString = function() {
-    if (this.value == null) {
-        return 'ValueStr(nihil : ' + this.kind + ')';
+    if (this.getValue() == null) {
+        return 'ValueStr(nihil : ' + this.getType() + ')';
     } else {
-        return 'ValueStr(' + this.value + " : " + this.kind + ')';
+        return 'ValueStr(' + this.getValue() + " : " + this.getType() + ')';
     }
 }
 
 Value.prototype.toStringValue = function() {
-    if (this.value == null) {
+    if (this.getValue() == null) {
         return 'nihil';
     } else {
-        return '' + this.value;
+        return '' + this.getValue();
     }
 }
 
 Value.prototype.toStringTypedValue = function() {
-    if (this.value == null) {
-        return 'nihil : ' + this.kind;
+    if (this.getValue() == null) {
+        return 'nihil : ' + this.getType();
     } else {
-        return '' + this.value + " : " + this.kind;
+        return '' + this.getValue() + " : " + this.getType();
     }
 }
 
 Value.prototype.equal = function(v) {
-    return (v.value === this.value && v.kind === this.kind);
+    return (v.getValue() === this.getValue() && v.getType() === this.getType());
 }
 
 function Interpreter() {
 }
 
-Interpreter.prototype.exec_node = function(symbol, scope) {
-    if (typeof symbol == "undefined" || symbol == null) { 
-        return null; //throw new Error("undefined or null!") 
-    }
-    if (symbol.terminal()) {
-        return this.exec_terminal(symbol, scope);
+Interpreter.prototype.exec_node = function(node, scope) {
+    if (node instanceof Symbol) {
+        return this.exec_terminal(node, scope);
+    } else if (node instanceof Node) {
+        return this.exec_non_terminal(node, scope);
     } else {
-        return this.exec_non_terminal(symbol, scope);
-        //console.log(typeof symbol);
-        //console.log(symbol);
-        //throw new Error("Node not known");
-    }
-}
-
-//import baselib
-//bb = baselib.BaseLib()
-
-var bb = {
-    send : function(subject, name, par, scope) {
-        console.log(subject);
-        console.log(name);
-        console.log(par);
-        console.log(scope);
-    }
-}
-
-// NOT TESTED YET
-Interpreter.prototype.global_function = function(id, args, scope) {
-    if (id.terminal() && id.kind == SymbolType.Id && ! args.terminal() && args.value == 'call(') {
-        var name = id.val;
-        if (args.right.terminal()) {
-            if ([SymbolType.Integer, SymbolType.Float, SymbolType.String].indexOf(args.right.kind) > -1) {
-                par = this.exec_node(args.right);
-            } else if (args.right.kind == SymbolType.Id) {
-                par = scope[args.right.value];
-            } else {
-                throw new Error("Bad param for global function call")
-            }
-        } else {
-            throw new Error("Bad global function call");
-        }
-        return bb.send(None, name, par, scope);
-    } else {
-        throw new Error("ERROR 1002");
+        console.log(typeof node);
+        console.log(node);
+        throw new Error("Node not known");
     }
 }
 
@@ -634,190 +642,221 @@ Interpreter.prototype.global_function = function(id, args, scope) {
 
 Interpreter.prototype.dispatch = function(target, name, args, scope) {
     if (!(target instanceof Value)) {
-        throw new Error("Dispatch : Not a value");
-    }
-    if (Baselib.hasOwnProperty(target.kind)) {
-        if (Baselib[target.kind].hasOwnProperty(name)) {
-            return Baselib[target.kind][name](target, args, scope);
+        if (target == null) { // Global
+            if (Baselib["Base"].hasOwnProperty(name)) {
+                return Baselib["Base"][name](target, args, scope);
+            } else {
+                throw new Error("Dispatch : Global function " + name + " not known.");
+            }
         } else {
-            throw new Error("Dispatch : Function not known");
+            throw new Error("Dispatch : Not a value");
+        }
+    }
+    if (Baselib.hasOwnProperty(target.getType())) {
+        if (Baselib[target.getType()].hasOwnProperty(name)) {
+            return Baselib[target.getType()][name](target, args, scope);
+        } else {
+            throw new Error("Dispatch : Function " + name + " not known for " + target.getType());
         }
     } else {
-        throw new Error("Dispatch : Type not known");
+        throw new Error("Dispatch : Type not known " + target.getType());
     }
 }
 
+//-----------------------------------------------------------------------------
+// Baselib
+//-----------------------------------------------------------------------------
+
 Baselib = {
+    // Base
+    "Base" : {
+        "print" : function(target, args, scope) {
+            p = args[0];
+            console.log(p);
+            return new Value(null, ValueType.Object);
+        }
+    },
     // String
     "String" : {
         "add" : function (target, args, scope) {
             p = args[0];
-            if (target.kind != TypeSystem.String || p.kind != TypeSystem.String) {
+            if (target.getType() != ValueType.String || p.getType() != ValueType.String) {
                 throw new Error("Bad param for function String#add");
             }
-            return new Value(target.value.concat(p.value), TypeSystem.String);
+            return new Value(target.getValue().concat(p.getValue()), ValueType.String);
         },
         "mul" : function (target, args, scope) {
             p = args[0];
-            if (target.kind != TypeSystem.String || p.kind != TypeSystem.Integer) {
+            if (target.getType() != ValueType.String || p.getType() != ValueType.Integer) {
                 throw new Error("Bad param type for function String#mul");
             }
-            if (p.value < 0 || p.value === 1) { new Value(target.value, TypeSystem.String); }
-            else if (p.value === 0) { new Value("", TypeSystem.String); }
-            else if (p.value > 0) {
-                s = target.value;
-                for (i=0; i < p.value-1; i++) {
-                    s = s.concat(target.value);
+            if (p.getValue() < 0 || p.getValue() === 1) { new Value(target.getValue(), ValueType.String); }
+            else if (p.getValue() === 0) { new Value("", ValueType.String); }
+            else if (p.getValue() > 0) {
+                s = target.getValue();
+                for (var i=0; i < p.getValue()-1; i++) {
+                    s = s.concat(target.getValue());
                 }
             }
-            return new Value(s, TypeSystem.String);
+            return new Value(s, ValueType.String);
         },
         "to_s" : function(target, args, scope) {
-            if (target.kind != TypeSystem.String) {
+            if (target.getType() != ValueType.String) {
                 throw new Error("Bad param type for function String#to_s");
             }
-            return new Value(target.value, TypeSystem.String);
+            return new Value(target.getValue(), ValueType.String);
         }
     },
     // Integer
     "Integer" : {
         "add" : function (target, args, scope) {
             p = args[0];
-            if (target.kind != TypeSystem.Integer || p.kind != TypeSystem.Integer) {
+            if (target.getType() != ValueType.Integer || p.getType() != ValueType.Integer) {
                 throw new Error("Bad param type for function Integer#add");
             }
-            return new Value(target.value + p.value, TypeSystem.Integer);
+            return new Value(target.getValue() + p.getValue(), ValueType.Integer);
         },
         "sub" : function (target, args, scope) {
             p = args[0];
-            if (target.kind != TypeSystem.Integer || p.kind != TypeSystem.Integer) {
+            if (target.getType() != ValueType.Integer || p.getType() != ValueType.Integer) {
                 throw new Error("Bad param type for function Integer#sub");
             }
-            return new Value(target.value - p.value, TypeSystem.Integer);
+            return new Value(target.getValue() - p.getValue(), ValueType.Integer);
         },
         "mul" : function (target, args, scope) {
             p = args[0];
-            if (target.kind != TypeSystem.Integer || p.kind != TypeSystem.Integer) {
+            if (target.getType() != ValueType.Integer || p.getType() != ValueType.Integer) {
                 throw new Error("Bad param type for function Integer#mul");
             }
-            return new Value(target.value * p.value, TypeSystem.Integer);
+            return new Value(target.getValue() * p.getValue(), ValueType.Integer);
         },
         "div" : function (target, args, scope) {
             p = args[0];
-            if (target.kind != TypeSystem.Integer || p.kind != TypeSystem.Integer) {
+            if (target.getType() != ValueType.Integer || p.getType() != ValueType.Integer) {
                 throw new Error("Bad param type for function Integer#div");
             }
-            return new Value(target.value / p.value, TypeSystem.Integer);
+            return new Value(target.getValue() / p.getValue(), ValueType.Integer);
         },
         "mod" : function (target, args, scope) {
             p = args[0];
-            if (target.kind != TypeSystem.Integer || p.kind != TypeSystem.Integer) {
+            if (target.getType() != ValueType.Integer || p.getType() != ValueType.Integer) {
                 throw new Error("Bad param type for function Integer#mod");
             }
-            return new Value(target.value % p.value, TypeSystem.Integer);
+            return new Value(target.getValue() % p.getValue(), ValueType.Integer);
         },
         "pow" : function (target, args, scope) {
             p = args[0];
-            if (target.kind != TypeSystem.Integer || p.kind != TypeSystem.Integer) {
+            if (target.getType() != ValueType.Integer || p.getType() != ValueType.Integer) {
                 throw new Error("Bad param type for function Integer#pow");
             }
-            return new Value(Math.pow(target.value, p.value), TypeSystem.Integer);
+            return new Value(Math.pow(target.getValue(), p.getValue()), ValueType.Integer);
         },
         "intdiv" : function (target, args, scope) {
             p = args[0];
-            if (target.kind != TypeSystem.Integer || p.kind != TypeSystem.Integer) {
+            if (target.getType() != ValueType.Integer || p.getType() != ValueType.Integer) {
                 throw new Error("Bad param type for function Integer#intdiv");
             }
-            return new Value(Math.floor(target.value / p.value), TypeSystem.Integer);
+            return new Value(Math.floor(target.getValue() / p.getValue()), ValueType.Integer);
         },
         "inv" : function (target, args, scope) {
-            if (target.kind != TypeSystem.Integer) {
+            if (target.getType() != ValueType.Integer) {
                 throw new Error("Bad param type for function Integer#inv");
             }
-            return new Value(-target.value , TypeSystem.Integer);
+            return new Value(-target.getValue() , ValueType.Integer);
         },
         "to_s" : function(target, args, scope) {
-            if (target.kind != TypeSystem.Integer) {
+            if (target.getType() != ValueType.Integer) {
                 throw new Error("Bad param type for function Integer#to_s");
             }
-            return new Value(target.value.toString(), TypeSystem.String);
+            return new Value(target.getValue().toString(), ValueType.String);
         },
         "to_i" : function(target, args, scope) {
-            if (target.kind != TypeSystem.Integer) {
+            if (target.getType() != ValueType.Integer) {
                 throw new Error("Bad param type for function Integer#to_i");
             }
-            return new Value(target.value, TypeSystem.Integer);
+            return new Value(target.getValue(), ValueType.Integer);
         },
         "to_f" : function(target, args, scope) {
-            if (target.kind != TypeSystem.Integer) {
+            if (target.getType() != ValueType.Integer) {
                 throw new Error("Bad param type for function Integer#to_f");
             }
-            return new Value(target.value, TypeSystem.Float);
+            return new Value(target.getValue(), ValueType.Float);
         },
         "abs" : function(target, args, scope) {
-            if (target.kind != TypeSystem.Integer) {
+            if (target.getType() != ValueType.Integer) {
                 throw new Error("Bad param type for function Integer#to_s");
             }
-            var v = target.value;
+            var v = target.getValue();
             if (v < 0) { v = v * -1; }
-            return new Value(v, TypeSystem.Integer);
+            return new Value(v, ValueType.Integer);
         },
         "lshift" : function(target, args, scope) {
             p = args[0];
-            if (target.kind != TypeSystem.Integer || p.kind != TypeSystem.Integer) {
+            if (target.getType() != ValueType.Integer || p.getType() != ValueType.Integer) {
                 throw new Error("Bad param type for function Integer#lshift");
             }
-            return new Value(Math.floor(target.value << p.value), TypeSystem.Integer);
+            return new Value(target.getValue() << p.getValue(), ValueType.Integer);
         },
         "rshift" : function(target, args, scope) {
             p = args[0];
-            if (target.kind != TypeSystem.Integer || p.kind != TypeSystem.Integer) {
+            if (target.getType() != ValueType.Integer || p.getType() != ValueType.Integer) {
                 throw new Error("Bad param type for function Integer#rshift");
             }
-            return new Value(Math.floor(target.value >> p.value), TypeSystem.Integer);
+            return new Value(target.getValue() >> p.getValue(), ValueType.Integer);
         }, 
         "and" : function(target, args, scope) {
             p = args[0];
-            if (target.kind != TypeSystem.Integer || p.kind != TypeSystem.Integer) {
+            if (target.getType() != ValueType.Integer || p.getType() != ValueType.Integer) {
                 throw new Error("Bad param type for function Integer#and");
             }
-            return new Value(Math.floor(target.value & p.value), TypeSystem.Integer);
+            return new Value(target.getValue() & p.getValue(), ValueType.Integer);
         },
         "or" : function(target, args, scope) {
             p = args[0];
-            if (target.kind != TypeSystem.Integer || p.kind != TypeSystem.Integer) {
+            if (target.getType() != ValueType.Integer || p.getType() != ValueType.Integer) {
                 throw new Error("Bad param type for function Integer#or");
             }
-            return new Value(Math.floor(target.value | p.value), TypeSystem.Integer);
+            return new Value(target.getValue() | p.getValue(), ValueType.Integer);
         }, 
         "xor" : function(target, args, scope) {
             p = args[0];
-            if (target.kind != TypeSystem.Integer || p.kind != TypeSystem.Integer) {
+            if (target.getType() != ValueType.Integer || p.getType() != ValueType.Integer) {
                 throw new Error("Bad param type for function Integer#xor");
             }
-            return new Value(Math.floor(target.value ^ p.value), TypeSystem.Integer);
+            return new Value(target.getValue() ^ p.getValue(), ValueType.Integer);
         }, 
         "invbin" : function(target, args, scope) {
-            if (target.kind != TypeSystem.Integer) {
+            if (target.getType() != ValueType.Integer) {
                 throw new Error("Bad param type for function Integer#invbin");
             }
-            return new Value(~ target.value, TypeSystem.Integer);
+            return new Value(~ target.getValue(), ValueType.Integer);
         },
         "cmp" : function(target, args, scope) {
             p = args[0];
-            if (target.kind != TypeSystem.Integer || p.kind != TypeSystem.Integer) {
+            if (target.getType() != ValueType.Integer || p.getType() != ValueType.Integer) {
                 throw new Error("Bad param type for function Integer#cmp");
             }
-            if (target.value == p.value) { return new Value(0, TypeSystem.Integer); }
-            else if (target.value > p.value) { return new Value(1, TypeSystem.Integer); }
-            else { return new Value(-1, TypeSystem.Integer); }
+            if (target.getValue() == p.getValue()) { return new Value(0, ValueType.Integer); }
+            else if (target.getValue() > p.getValue()) { return new Value(1, ValueType.Integer); }
+            else { return new Value(-1, ValueType.Integer); }
         }, 
         "size" : function(target, args, scope) {
-            if (target.kind != TypeSystem.Integer) {
+            if (target.getType() != ValueType.Integer) {
                 throw new Error("Bad param type for function Integer#size");
             }
-            return new Value(roughSizeOfObject(target), TypeSystem.Integer);
-        }, // manque intdiv dans la doc ,lshit au lieu de lshift, decalaga !
+            return new Value(roughSizeOfObject(target), ValueType.Integer);
+        }, 
+        "gt" : function(target, args, scope) {
+            if (target.getType() != ValueType.Integer) {
+                throw new Error("Bad param type for function Integer#size");
+            }
+            var r = Baselib["Integer"]["cmp"](target, args, scope);
+            if (r.value === 1) {
+                return new Value(true, ValueType.Boolean);
+            } else {
+                return new Value(false, ValueType.Boolean);
+            }
+        }// manque intdiv dans la doc ,lshit au lieu de lshift, decalaga !
     }
 };
 
@@ -848,7 +887,7 @@ function roughSizeOfObject( object ) {
         {
             objectList.push( value );
 
-            for( i in value ) {
+            for(var i in value ) {
                 stack.push( value[ i ] );
             }
         }
@@ -861,14 +900,14 @@ function roughSizeOfObject( object ) {
 Interpreter.prototype.instance_function = function(target, name, args, scope) {
     if target.__class__ in [int, float, str, bool]:
         pass
-    elif target.terminal() and target.kind in [Integer, Float, String, Boolean]:
+    elif target.terminal() and target.getType() in [Integer, Float, String, Boolean]:
         target = exec_node(target)
-    elif target.terminal() and target.kind == Id:
-        target = scope[target.value]
+    elif target.terminal() and target.getType() == Id:
+        target = scope[target.getValue()]
     else:
         raise Exception("Bad target for instance function call: %s" % (target,))
     
-    if name.terminal() and name.kind == Id:
+    if name.terminal() and name.getType() == Id:
         name = name.val
     else:
         raise Exception("Bad name for instance function call: %s" % (name,))
@@ -879,7 +918,7 @@ Interpreter.prototype.instance_function = function(target, name, args, scope) {
         par = [args.right]
     elif args.right.terminal():
         par = [exec_node(args.right, scope)]
-    elif args.right.value == 'suite':
+    elif args.right.getValue() == 'suite':
         a = args.right
         par = []
         while not a.terminal():
@@ -915,62 +954,66 @@ Interpreter.prototype.concordance = function(typ, val) {
 }
 */
 
+var op_to_fun = {
+    "+" : "add",
+    "-" : "sub",
+    "*" : "mul",
+    "/" : "div",
+    "//": "intdiv",
+    "**": "pow",
+    "%" : "mod",
+    ">" : "gt",
+    "<" : "lt",
+    ">=": "ge",
+    "<=": "le",
+    "==": "equal",
+    "!=": "diff",
+};
+
 // SUBSET
-Interpreter.prototype.exec_non_terminal = function(symbol, scope) {
-    if (symbol.kind == SymbolType.Operator) {
-        if (symbol.value == '+') {
-            return this.dispatch(this.exec_node(symbol.left), "add", [this.exec_node(symbol.right)], scope);
-            //return new Value(this.exec_node(symbol.left).value + this.exec_node(symbol.right).value, TypeSystem.Integer);
-        } else if (symbol.value == '-') {
-            return this.dispatch(this.exec_node(symbol.left, scope), "sub", [this.exec_node(symbol.right, scope)], scope);
-        } else if (symbol.value == '*') {
-            return this.dispatch(this.exec_node(symbol.left, scope), "mul", [this.exec_node(symbol.right, scope)], scope);
-        } else if (symbol.value == '/') {
-            return this.dispatch(this.exec_node(symbol.left, scope), "div", [this.exec_node(symbol.right, scope)], scope);
-        } else if (symbol.value == '//') {
-            return this.dispatch(this.exec_node(symbol.left, scope), "intdiv", [this.exec_node(symbol.right, scope)], scope);
-        } else if (symbol.value == '**') {
-            return this.dispatch(this.exec_node(symbol.left, scope), "pow", [this.exec_node(symbol.right, scope)], scope);
-        } else if (symbol.value == '%') {
-            return this.dispatch(this.exec_node(symbol.left, scope), "mod", [this.exec_node(symbol.right, scope)], scope);
-        } else if (symbol.value == 'unary-') {
-            return this.dispatch(this.exec_node(symbol.right, scope), "inv", [], scope); // Attention, on le stocke dans le right !
-        } else if (symbol.value == '.') {
-            if (symbol.right.kind == SymbolType.Id) {         // 2.abs => . 2 abs
-                return this.dispatch(this.exec_node(symbol.left, scope), symbol.right.value, [], scope);
-            } else if (symbol.right.kind == SymbolType.Structure && symbol.right.value == 'call_with_args') {   // 2.abs(3) => . 2 call_with_args abs call(
-                var caller = this.exec_node(symbol.left, scope);
-                var appel_fonction = symbol.right;
-                var nom_fonction = appel_fonction.left.value; // C'est un id normalement
-                var parametres = appel_fonction.right;  // C'est une Structure qui a pour valeur 'call('
-                if (parametres.right.kind == SymbolType.Integer) {
-                    var le_parametre = this.exec_terminal(parametres.right, scope);
-                    return this.dispatch(caller, nom_fonction, [le_parametre], scope);
-                }
+Interpreter.prototype.exec_non_terminal = function(node, scope) {
+    if (node.type == NodeType.UnaryOp) {
+        var op     = node.suite[0].getValue();
+        var caller = this.exec_node(node.suite[1], scope);
+        
+        if (op == 'unary-') {
+            return this.dispatch(caller, "inv", [], scope);
+        } else {
+            throw new Error("Unary operator not known : " + op);
+        }
+        
+    } else if (node.type == NodeType.BinaryOp) {
+        var op = node.suite[0].getValue();
+        
+        if (op in op_to_fun) {
+            var caller = this.exec_node(node.suite[1], scope);
+            var param  = this.exec_node(node.suite[2], scope);
+            return this.dispatch(caller, op_to_fun[op], [param], scope);
+        } else if (op == '.') {
+            var caller = this.exec_node(node.suite[1], scope);
+            if (node.suite[2].getType() == SymbolType.Id) {         // 2.abs => . 2 abs
+                return this.dispatch(caller, node.suite[2].getValue(), [], scope);
             } else {
-                console.log(symbol.right.kind); // Structure
-                console.log(symbol.right.value);// call_with_args
-                console.log(symbol.left.kind);  // Type de l'objet à gauche de l'appel (2.)
-                console.log(symbol.left.value); // Valeur de l'objet à gauche de l'appel (2.)
-                return "aaa";
+                throw new Error("Unknown field"); // Thériquement impossible
             }
         } else {
-            throw new Error("Operator not understood");
+            throw new Error("Binary operator not known : " + op);
         }
-    } else if (symbol.kind == SymbolType.Structure) {
-        if (symbol.value == 'call_with_args') { // Ici on n'a pas de prefix, d'objet caller, si on passe ici !
-            if (symbol.left.kind == SymbolType.Id && symbol.left.value == 'println') {
-                var parametre = symbol.right.right.value;
-                console.log(parametre);
-                return new Value(null, TypeSystem.Object);
-            } else {
-                throw new Error("Global function not known : " + symbol.left.value + " of type : " + symbol.left.kind);
-            }
-        } else {
-            throw new Error("1042");
+    } else if (node.getType() == NodeType.FunctionCall) {
+        var caller;
+        if (node.suite[0] != null) { // Method
+            caller = this.exec_node(node.suite[0], scope);
+        } else { // Global
+            caller = null;
         }
+        var nom_fonction = node.suite[1].getValue();
+        var parametres = node.suite[2];
+        var le_parametre = this.exec_terminal(parametres.suite[0], scope);
+        return this.dispatch(caller, nom_fonction, [le_parametre], scope);   
+    } else if (node.getType() == NodeType.Structure) {
+        throw new Error("Structure not yet handled");
     } else {
-        throw new Error("Node type not understood : val=" + symbol.value + " left=" + symbol.left + " right=" + symbol.right);
+        throw new Error("Node type not understood : val=" + symbol.getValue() + " left=" + symbol.left + " right=" + symbol.right);
     }
 }
 
@@ -981,57 +1024,57 @@ add sub mul div mod intdiv pow
 return instance_function(exec_node(symbol.left, scope), new Symbol(Id, 'add'), new Symbol(SymbolType.Structure, 'call(', right=exec_node(symbol.right)), scope);
 return instance_function(exec_node(symbol.right, scope), new Symbol(Id, 'inv'), null, scope); -unary
 
-        } else if (symbol.value in ['and', 'or', 'xor']) {
-            return instance_function(exec_node(symbol.left, scope), new Symbol(Id, symbol.value), new Symbol(SymbolType.Structure, 'call(', right=exec_node(symbol.right)), scope);
-        } else if (symbol.value == '.') {
-            if symbol.right.value != 'call_with_args') {
+        } else if (symbol.getValue() in ['and', 'or', 'xor']) {
+            return instance_function(exec_node(symbol.left, scope), new Symbol(Id, symbol.getValue()), new Symbol(SymbolType.Structure, 'call(', right=exec_node(symbol.right)), scope);
+        } else if (symbol.getValue() == '.') {
+            if symbol.right.getValue() != 'call_with_args') {
                 target = exec_node(symbol.left, scope);
                 return instance_function(target, symbol.right, None, scope);
-            } else if (symbol.right.value == 'call_with_args') {
+            } else if (symbol.right.getValue() == 'call_with_args') {
                 call = symbol.right;
                 return instance_function(symbol.left, call.left, call.right, scope);
             } else {
-                throw new Error("What to do with this symbol ? : " + symbol.right.value);
+                throw new Error("What to do with this symbol ? : " + symbol.right.getValue());
             }
-        } else if (symbol.value == '<<') {
+        } else if (symbol.getValue() == '<<') {
             return instance_function(exec_node(symbol.left, scope), Symbol(Id, 'lshift'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope);
-        } else if (symbol.value == '>>') {
+        } else if (symbol.getValue() == '>>') {
             return instance_function(exec_node(symbol.left, scope), Symbol(Id, 'rshift'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope);
-        } else if (symbol.value == '<=>') {
+        } else if (symbol.getValue() == '<=>') {
             return instance_function(exec_node(symbol.left, scope), Symbol(Id, 'cmp'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope);
-        } else if (symbol.value in ['>', '<', '>=', '<=', '==', '!=']) {
+        } else if (symbol.getValue() in ['>', '<', '>=', '<=', '==', '!=']) {
             r = instance_function(exec_node(symbol.left, scope), Symbol(Id, 'cmp'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope);
-            if symbol.value == '==') {
+            if symbol.getValue() == '==') {
                 if (r == 0) {
                     return true;
                 } else {
                     return false;
                 }
-            } else if (symbol.value == '!=') {
+            } else if (symbol.getValue() == '!=') {
                 if (r != 0) {
                     return true;
                 } else {
                     return false;
                 }
-            } else if (symbol.value == '>') {
+            } else if (symbol.getValue() == '>') {
                 if (r == 1) {
                     return true;
                 } else {
                     return false;
                 }
-            } else if (symbol.value == '>=') {
+            } else if (symbol.getValue() == '>=') {
                 if (r == 1 or r == 0) {
                     return true;
                 } else {
                     return false;
                 }
-            } else if (symbol.value == '<') {
+            } else if (symbol.getValue() == '<') {
                 if (r == -1) {
                     return true;
                 } else {
                     return false;
                 }
-            } else if (symbol.value == '<=') {
+            } else if (symbol.getValue() == '<=') {
                 if (r == -1 or r == 0) {
                     return true;
                 } else {
@@ -1040,18 +1083,18 @@ return instance_function(exec_node(symbol.right, scope), new Symbol(Id, 'inv'), 
             } else {
                 throw new Error("You shouldn't be there!");
         
-    } else if (symbol.kind == SymbolType.Structure) {
-        if (symbol.value == 'call_with_args') {
+    } else if (symbol.getType() == SymbolType.Structure) {
+        if (symbol.getValue() == 'call_with_args') {
             return global_function(symbol.left, symbol.right, scope);
-        //} else if (symbol.value == 'prefixed_call':
+        //} else if (symbol.getValue() == 'prefixed_call':
         //    return instance_function(symbol.left, symbol.right, scope)
-        } else if (symbol.value == 'aff') {
+        } else if (symbol.getValue() == 'aff') {
             // const
-            if (symbol.left.value in scope && symbol.left.value[0].isupper()) {
+            if (symbol.left.getValue() in scope && symbol.left.getValue()[0].isupper()) {
                 throw new Error("Constant reference can't be changed");
             }
             value = exec_node(symbol.right, scope);
-            if (symbol.left.value[-1] == '?' && not isinstance(value, bool)) {
+            if (symbol.left.getValue()[-1] == '?' && not isinstance(value, bool)) {
                 throw new Error("?-ending id must reference boolean value");
             }
             // typ
@@ -1062,7 +1105,7 @@ return instance_function(exec_node(symbol.right, scope), new Symbol(Id, 'inv'), 
             // aff
             scope[id] = (value, None);
             return scope[id][0];
-        } else if (symbol.value == 'typed_aff') {
+        } else if (symbol.getValue() == 'typed_aff') {
             id = symbol.left.left.val;
             typ= symbol.left.right.val;
             val= exec_node(symbol.right, scope);
@@ -1076,10 +1119,10 @@ return instance_function(exec_node(symbol.right, scope), new Symbol(Id, 'inv'), 
             concordance(typ, val);
             scope[id] = (val, typ);
             return scope[id][0];
-        } else if (symbol.value == 'suite') {
+        } else if (symbol.getValue() == 'suite') {
             exec_node(symbol.left, scope);
             return exec_node(symbol.right, scope);
-        } else if (symbol.value == 'if') {
+        } else if (symbol.getValue() == 'if') {
             condition = exec_node(symbol.left);
             action = None;
             if (condition && symbol.right is not None) {
@@ -1097,37 +1140,37 @@ return instance_function(exec_node(symbol.right, scope), new Symbol(Id, 'inv'), 
 */
         
 Interpreter.prototype.exec_terminal = function(symbol, scope) {
-    if (symbol.kind == SymbolType.Integer) {
-        if (symbol.value.length > 1 && (symbol.value[1] == 'x' || symbol.value[1] == 'X')) {
-            return new Value(parseInt(symbol.value), TypeSystem.Integer);
-        } else if (symbol.value.length > 1 && (symbol.value[1] == 'b' || symbol.value[1] == 'B')) {
-            return new Value(parseInt(symbol.value.slice(2, symbol.value.length), 2), TypeSystem.Integer);
-        } else if (symbol.value.length > 1 && (symbol.value[1] == 't' || symbol.value[1] == 'T')) {
-            return new Value(parseInt("0" + symbol.value.slice(2, symbol.value.length), 8), TypeSystem.Integer);
+    if (symbol.getType() == SymbolType.Integer) {
+        if (symbol.getValue().length > 1 && (symbol.getValue()[1] == 'x' || symbol.getValue()[1] == 'X')) {
+            return new Value(parseInt(symbol.getValue()), ValueType.Integer);
+        } else if (symbol.getValue().length > 1 && (symbol.getValue()[1] == 'b' || symbol.getValue()[1] == 'B')) {
+            return new Value(parseInt(symbol.getValue().slice(2, symbol.getValue().length), 2), ValueType.Integer);
+        } else if (symbol.getValue().length > 1 && (symbol.getValue()[1] == 't' || symbol.getValue()[1] == 'T')) {
+            return new Value(parseInt("0" + symbol.getValue().slice(2, symbol.getValue().length), 8), ValueType.Integer);
         } else {
-            return new Value(parseInt(symbol.value), TypeSystem.Integer);
+            return new Value(parseInt(symbol.getValue()), ValueType.Integer);
         }
-    } else if (symbol.kind == SymbolType.Float) {
-        return new Value(parseFloat(symbol.value), TypeSystem.Float);
-    } else if (symbol.kind == SymbolType.Id) {
-        if (!scope.hasOwnProperty(symbol.value)) {
-            throw new Error('unreferenced variable ' + symbol.value);
+    } else if (symbol.getType() == SymbolType.Float) {
+        return new Value(parseFloat(symbol.getValue()), ValueType.Float);
+    } else if (symbol.getType() == SymbolType.Id) {
+        if (!scope.hasOwnProperty(symbol.getValue())) {
+            throw new Error('unreferenced variable ' + symbol.getValue());
         } else {
-            return scope[symbol.value]
+            return scope[symbol.getValue()]
         }
-    } else if (symbol.kind == SymbolType.String) {
-        return new Value(symbol.value, TypeSystem.String);
-    } else if (symbol.kind == SymbolType.Boolean) {
-        if (symbol.value == 'true' || symbol.value == 'True' || symbol.value == 'TRUE') {
-            return new Value(true, TypeSystem.Boolean);
+    } else if (symbol.getType() == SymbolType.String) {
+        return new Value(symbol.getValue(), ValueType.String);
+    } else if (symbol.getType() == SymbolType.Boolean) {
+        if (symbol.getValue() == 'true' || symbol.getValue() == 'True' || symbol.getValue() == 'TRUE') {
+            return new Value(true, ValueType.Boolean);
         } else {
-            return new Value(false, TypeSystem.Boolean);
+            return new Value(false, ValueType.Boolean);
         }
     }
     // CASE OF ERRORS
-    else if (symbol.kind == SymbolType.Operator) {
+    else if (symbol.getType() == SymbolType.Operator) {
         throw new Error("Operators need one or more operands");
-    } else if (symbol.kind == Separator) {
+    } else if (symbol.getType() == Separator) {
         throw new Error("Separators alone are meaningless");
     } else {
         throw new Error("TokenType not understood : " + symbol);
@@ -1152,7 +1195,7 @@ Interpreter.prototype.test = function(cmd, scope, waiting_for) {
     if (!result.equal(waiting_for)) {
         console.warn("ERROR : waiting for " + waiting_for + " and the result was " + result);
         console.warn("Parsed tokens :");
-        for (i=0; i < tokens.length; i++) {
+        for (var i=0; i < tokens.length; i++) {
             console.warn(tokens[i]);
         }
         console.warn("Head of the tree :");
@@ -1165,9 +1208,9 @@ Interpreter.prototype.test = function(cmd, scope, waiting_for) {
 
 
 root_scope = {
-    'Pi' : Value(Math.PI, TypeSystem.Float),
-    'PI' : Value(Math.PI, TypeSystem.Float),
-    '_'  : Value(null, TypeSystem.Object),
+    'Pi' : Value(Math.PI, ValueType.Float),
+    'PI' : Value(Math.PI, ValueType.Float),
+    '_'  : Value(null, ValueType.Object),
 }
 
 // Tests
@@ -1185,7 +1228,30 @@ console.log(test_parser.tree);
 
 test_interpreter = new Interpreter();
 
-test_interpreter.test("2", root_scope, new Value(2, TypeSystem.Integer));
-test_interpreter.test("0b10", root_scope, new Value(2, TypeSystem.Integer));
-test_interpreter.test("0xA", root_scope, new Value(10, TypeSystem.Integer));
-test_interpreter.test("0t10", root_scope, new Value(8, TypeSystem.Integer));
+test_interpreter.test("2", root_scope, new Value(2, ValueType.Integer));
+test_interpreter.test("0b10", root_scope, new Value(2, ValueType.Integer));
+test_interpreter.test("0xA", root_scope, new Value(10, ValueType.Integer));
+test_interpreter.test("0t10", root_scope, new Value(8, ValueType.Integer));
+
+//-----------------------------------------------------------------------------
+// GUI
+//-----------------------------------------------------------------------------
+
+function do_node(node) {
+    var s = '';
+    if (node == null) {
+        s = '';
+    } else if (node.terminal()) {
+        s = "<li>" + node.toString() + "</li>"; //node.getValue() + " : " + node.getType() + "</li>";
+    } else {
+        s = "<li>" + node.toString();
+        //if (node.getValue() == null) { s = "<li>" + node.toString(); }
+        //else { s = "<li>" + node.getValue() + " : " + node.getType(); }
+        s += "<ol start='0'>";
+        for(var i = 0; i < node.getLength(); i++) {
+            s += do_node(node.suite[i]);
+        }
+        s += "</ol></li>";
+    }
+    return s;
+}
