@@ -165,37 +165,16 @@
                 return false; // event.preventDefault(); 
             }
             
-            function do_node(node, is_left) {
-                if (node == null) {
-                    return '';
-                }
-                if (is_left === true) {
-                    s = "<li><i>left</i>&nbsp;&nbsp;&nbsp;&nbsp;" + node.value + " : " + node.kind;
-                } else if (is_left === false) {
-                    s = "<li><i>right</i>&nbsp;&nbsp;&nbsp;&nbsp;" + node.value + " : " + node.kind;
-                } else {
-                    s = "<li>" + node.value + " : " + node.kind;
-                }
-                if (node.left !== null || node.right !== null) {
-                    s += "<ul>";
-                }
-                if (node.left !== null) {
-                    s += do_node(node.left, true);
-                }
-                if (node.right !== null) {
-                    s += do_node(node.right, false);
-                }
-                if (node.left !== null || node.right !== null) {
-                    s += "</ul>";
-                }
-                s += "</li>";
-                return s;
-            }
             function main(scmd) {
                 // Clear everything
                 // Reboot cmd
                 var field_input = document.getElementById("inputtext");
                 field_input.value = '';
+                
+                var title_text = document.getElementById("text_title");
+                title_text.innerHTML = '';
+                var text_text = document.getElementById("text_text");
+                text_text.innerHTML = '';
                 
                 var title_lexing = document.getElementById("lex_title");
                 title_lexing.innerHTML = '';
@@ -216,6 +195,9 @@
                 
                 //var cmd = document.getElementsByName("cmd")[0];
                 //var scmd = cmd.value;
+                // Text
+                title_text.innerHTML = "Text entered";
+                text_text.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + scmd;
                 // Lexing
                 // Lexing:Lex
                 lex = new Lexer();
@@ -231,19 +213,25 @@
                         var cell0=row.insertCell(0);
                         var cell1=row.insertCell(1);
                         var cell2=row.insertCell(2);
-                        cell0.innerHTML = "<span style='color: #FFFFFF'>"+i+"</span>";
-                        cell0.bgColor = '#666666';
-                        cell1.innerHTML = tokens[i].value;
-                        cell2.innerHTML = tokens[i].kind;
+                        var cell3=row.insertCell(3);
+                        cell0.innerHTML = i;
+                        cell1.innerHTML = tokens[i].getValue();
+                        cell2.innerHTML = tokens[i].getType();
+                        cell3.innerHTML = tokens[i].getLine();
                     }
                     var head = table.insertRow(0);
                     var head0 = head.insertCell(0);
                     var head1 = head.insertCell(1);
                     var head2 = head.insertCell(2);
-                    head0.innerHTML = "<span style='color: #FFFFFF'>Number</span>";
+                    var head3 = head.insertCell(3);
+                    head0.innerHTML = "<span style='color: #FFFFFF'><u>Number</u></span>";
                     head0.bgColor = '#666666';
-                    head1.innerHTML = "Val";
-                    head2.innerHTML = "Kind";
+                    head1.innerHTML = "<span style='color: #FFFFFF'><u>Value</u></span>";
+                    head1.bgColor = '#666666';
+                    head2.innerHTML = "<span style='color: #FFFFFF'><u>Type</u></span>";
+                    head2.bgColor = '#666666';
+                    head3.innerHTML = "<span style='color: #FFFFFF'><u>Line</u></span>";
+                    head3.bgColor = '#666666';
                 } catch (err) {
                     title_lexing.innerHTML = "Lexing result ERROR";
                     var row = table.insertRow(0);
@@ -291,6 +279,10 @@
             </div>
             <div id="input">
                 <textarea id="inputtext" rows="1" placeholder=">>> feed me some code here!" onkeypress="return myKeyPress(event)"></textarea>
+            </div>
+            <div id="output_text">
+                <div id="text_title" class="title"></div>
+                <div id="text_text"></div>
             </div>
             <div id="output_lex">
                 <div id="lex_title" class="title"></div>
