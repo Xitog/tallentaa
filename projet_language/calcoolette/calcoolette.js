@@ -4,7 +4,7 @@
 // Interpreter    AST    -> result
 //
 
-DEBUG = true;
+DEBUG = false;
 
 //-----------------------------------------------------------------------------
 // Base
@@ -366,6 +366,7 @@ var NodeType = {
     FunctionCall: 'Function Call Node',
     Structure   : 'Structure Node',
     ParamList   : 'Parameter List',
+    Affectation : 'Affectation',
 };
 
 function Node(type, elem1, elem2, elem3, elem4) {
@@ -563,12 +564,112 @@ Parser.prototype.parse_expression = function(symbols) {
 // Syntaxic analysis (Instruction)
 //-----------------------------------------------------------------------------
 
-Parser.prototype.parse = function(symbols) {
+/*
+
+
+def make_typed_aff(symbols):
+    sub = symbols.core[4:]
+    make_tree(sub)
+    nx = sub[0]
+    nid = Symbol(left=symbols(0), right=symbols(2), val='typed_id', kind=Structure)
+    n = Symbol(left=nid, right=nx, val='typed_aff', kind=Structure)
+    symbols.clear()
+    symbols.add(n)
+
+class Parser:
+    """From a list of symbol make an abstract syntax tree"""
+    
+    def __init__(self):
+        pass
+    
+    def fetch_end(self, symbols, start):
+        parcours = start+1
+        level = 1
+        while parcours < len(symbols):
+            #print symbols[parcours].val, level
+            if symbols[parcours].val == 'if': level += 1
+            elif symbols[parcours].val == 'end': level -= 1
+            if level == 0:
+                return parcours
+            parcours += 1
+        return -1
+    
+    def fetch_x(self, symbols, start, symb):
+        parcours = start+1
+        while parcours < len(symbols):
+            if symbols[parcours].val == symb: return parcours
+            parcours += 1
+        return -1
+    
+    def parse(self, symbols):
+        #print symbols[0].val
+        if symbols.include(';'):
+            #print 'parse -> ; detected'
+            two_part = symbols.split(';')
+            self.parse(SymbolList(two_part[0]))
+            self.parse(SymbolList(two_part[1]))
+            n = Symbol(val='suite', kind=Structure, left=two_part[0][0], right=two_part[1][0])
+            symbols.clear()
+            symbols.add(n)
+        elif symbols[0].val == 'if':
+            #print 'parse -> if detected'
+            to = self.fetch_end(symbols, 0)
+            if to == -1: raise Exception("Unclosed if")
+            elif to == 1: raise Exception("If without condition and body!")
+            else:
+                then = self.fetch_x(symbols, 0, 'then')
+                if then == -1: raise Exception("No then!")
+                elif then == 1: raise Exception("No condition!")
+                else:
+                    condition = SymbolList(symbols[1:then])
+                    self.parse(condition)
+                    action_else = [None]
+                    if to == then + 1: action = [None]
+                    else:
+                        s_else = self.fetch_x(symbols, 0, 'else')
+                        if s_else == -1:
+                            action = SymbolList(symbols[then+1:to])
+                            self.parse(action)
+                        else:
+                            action = SymbolList(symbols[then+1:s_else])
+                            self.parse(action)
+                            action_else = SymbolList(symbols[s_else+1:to])
+                            self.parse(action_else)
+                    n = Symbol(val='if', kind=Structure, left=condition[0], right=action[0])
+                    n.right_else = action_else[0]
+                    symbols.clear()
+                    symbols.add(n)
+        elif not not_exist_or_dif(symbols, 1, True, ':'):
+            #print 'parse -> : detected'
+            if len(symbols) > 4:
+                make_typed_aff(symbols)
+            else:
+                raise Exception("Incorrect typed declaration")
+        else:
+            #print 'parse -> standard'
+            make_tree(symbols)
+*/
+
+Parser.prototype.parse_affectation = function(symbols) {
+    var id = symbols.shift();   // id
+    symbols.shift();            // =
     this.parse_expression(symbols);
-    return this.tree;
+    var n = new Node(NodeType.Affectation, id, this.tree);
+    this.tree = n;
 }
 
-// NOT IMPORTED YET
+Parser.prototype.parse = function(symbols) {
+    if (!this.not_exist_or_dif(symbols, 1, true, '=')) {
+        if (symbols.length > 2) {
+            this.parse_affectation(symbols);
+        } else {
+            throw new Error("Incorrect typed declaration");
+        }
+    } else {
+        this.parse_expression(symbols);
+    }
+    return this.tree;
+}
 
 //-----------------------------------------------------------------------------
 // Interpreter
@@ -663,6 +764,314 @@ Interpreter.prototype.dispatch = function(target, name, args, scope) {
     }
 }
 
+// NOT CONVERTED YET
+/*
+Interpreter.prototype.instance_function = function(target, name, args, scope) {
+    if target.__class__ in [int, float, str, bool]:
+        pass
+    elif target.terminal() and target.getType() in [Integer, Float, String, Boolean]:
+        target = exec_node(target)
+    elif target.terminal() and target.getType() == Id:
+        target = scope[target.getValue()]
+    else:
+        raise Exception("Bad target for instance function call: %s" % (target,))
+    
+    if name.terminal() and name.getType() == Id:
+        name = name.val
+    else:
+        raise Exception("Bad name for instance function call: %s" % (name,))
+    
+    if args is None:
+        par = []
+    elif args.right.__class__ in [int, float, str, bool]:
+        par = [args.right]
+    elif args.right.terminal():
+        par = [exec_node(args.right, scope)]
+    elif args.right.getValue() == 'suite':
+        a = args.right
+        par = []
+        while not a.terminal():
+            par.append(exec_node(a.right))
+            a = a.left
+        par.append(exec_node(a))
+    else:
+        raise Exception("Bad par for instance function call: %s" % (args.right,))
+    r = bb.send(target, name, par, scope)
+    return r
+}
+*/
+
+/*
+// NOT DEBUGGED YET
+Interpreter.prototype.concordance = function(typ, val) {
+    if (typ == 'int') {
+        if (!isinstance(val, int)) {
+            throw new Error("Reference of type " + typ + " cannot reference value of type " + val.__class__);
+        }
+    } else if (typ == 'bool') {
+        if (!isinstance(val, bool)) {
+            throw new Error("Reference of type " + typ + " cannot reference value of type " + val.__class__);
+        }
+    } else if (typ == 'float') {
+        if (!isinstance(val, float)) {
+            throw new Error("Reference of type " + typ + " cannot reference value of type " + val.__class__);
+        }
+    } else {
+        throw new Error("Type unknown : " + typ);
+    }
+    return true;
+}
+*/
+
+var op_to_fun = {
+    "+" : "add",
+    "-" : "sub",
+    "*" : "mul",
+    "/" : "div",
+    "//": "intdiv",
+    "**": "pow",
+    "%" : "mod",
+    ">" : "gt",
+    "<" : "lt",
+    ">=": "ge",
+    "<=": "le",
+    "==": "equal",
+    "!=": "diff",
+    "<<": "lshift",
+    ">>": "rshift",
+    "and": "and",
+    "or" : "or",
+    "xor": "xor",
+    "<=>": "cmp",
+};
+
+// SUBSET
+Interpreter.prototype.exec_non_terminal = function(node, scope) {
+    if (node.type == NodeType.UnaryOp) {
+        var op     = node.suite[0].getValue();
+        var caller = this.exec_node(node.suite[1], scope);
+        
+        if (op == 'unary-') {
+            return this.dispatch(caller, "inv", [], scope);
+        } else {
+            throw new Error("Unary operator not known : " + op);
+        }
+    } else if (node.type == NodeType.BinaryOp) {
+        var op = node.suite[0].getValue();
+        
+        if (op in op_to_fun) {
+            var caller = this.exec_node(node.suite[1], scope);
+            var param  = this.exec_node(node.suite[2], scope);
+            return this.dispatch(caller, op_to_fun[op], [param], scope);
+        } else if (op == '.') {
+            var caller = this.exec_node(node.suite[1], scope);
+            if (node.suite[2].getType() == SymbolType.Id) {         // 2.abs => . 2 abs
+                return this.dispatch(caller, node.suite[2].getValue(), [], scope);
+            } else {
+                throw new Error("Unknown field"); // Thériquement impossible
+            }
+        } else {
+            throw new Error("Binary operator not known : " + op);
+        }
+    } else if (node.getType() == NodeType.FunctionCall) {
+        var caller;
+        if (node.suite[0] != null) { // Method
+            caller = this.exec_node(node.suite[0], scope);
+        } else { // Global
+            caller = null;
+        }
+        var nom_fonction = node.suite[1].getValue();
+        var parametres = node.suite[2];
+        var le_parametre = this.exec_terminal(parametres.suite[0], scope);
+        return this.dispatch(caller, nom_fonction, [le_parametre], scope);
+    } else if (node.getType() == NodeType.Affectation) {
+        var id = node.suite[0].getValue();
+        var value = this.exec_node(node.suite[1], scope);
+        marshallIdValue(id, value);
+        return new Value(null, ValueType.Object);
+    } else if (node.getType() == NodeType.Structure) {
+        throw new Error("Structure not yet handled");
+    } else {
+        throw new Error("Node type not understood : val=" + symbol.getValue() + " left=" + symbol.left + " right=" + symbol.right);
+    }
+}
+
+function marshallIdValue(name,value) {
+    localStorage.setItem(name, value.getType()+"#"+value.getValue());
+}
+
+function unmarshallIdValue(name) {
+    var n = localStorage.getItem(name);
+    if (typeof n != "undefined" && n != null) {
+        var tab = n.split("#");
+        if (tab[0] === ValueType.Integer) {
+            return new Value(parseInt(tab[1]), tab[0]);
+        } else if (tab[0] === ValueType.Boolean) {
+            if (tab[1] === "true") {
+                return new Value(true, tab[0]);
+            } else {
+                return new Value(false, tab[0]);
+            }
+        } else {
+            throw new Error("How to unmarshall this ? " + tab[0]);
+        }
+    } else {
+        return null;
+    }
+}
+
+// NOT DEBUGGED YET
+/*
+    
+add sub mul div mod intdiv pow 
+return instance_function(exec_node(symbol.left, scope), new Symbol(Id, 'add'), new Symbol(SymbolType.Structure, 'call(', right=exec_node(symbol.right)), scope);
+return instance_function(exec_node(symbol.right, scope), new Symbol(Id, 'inv'), null, scope); -unary
+
+        } else if (symbol.getValue() in ['and', 'or', 'xor']) {
+            return instance_function(exec_node(symbol.left, scope), new Symbol(Id, symbol.getValue()), new Symbol(SymbolType.Structure, 'call(', right=exec_node(symbol.right)), scope);
+        } else if (symbol.getValue() == '.') {
+            if symbol.right.getValue() != 'call_with_args') {
+                target = exec_node(symbol.left, scope);
+                return instance_function(target, symbol.right, None, scope);
+            } else if (symbol.right.getValue() == 'call_with_args') {
+                call = symbol.right;
+                return instance_function(symbol.left, call.left, call.right, scope);
+            } else {
+                throw new Error("What to do with this symbol ? : " + symbol.right.getValue());
+            }
+        } else if (symbol.getValue() == '<=>') {
+            return instance_function(exec_node(symbol.left, scope), Symbol(Id, 'cmp'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope);
+        } else if (symbol.getValue() in ['>', '<', '>=', '<=', '==', '!=']) {
+            r = instance_function(exec_node(symbol.left, scope), Symbol(Id, 'cmp'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope);
+
+    } else if (symbol.getType() == SymbolType.Structure) {
+        if (symbol.getValue() == 'call_with_args') {
+            return global_function(symbol.left, symbol.right, scope);
+        //} else if (symbol.getValue() == 'prefixed_call':
+        //    return instance_function(symbol.left, symbol.right, scope)
+        } else if (symbol.getValue() == 'aff') {
+            // const
+            if (symbol.left.getValue() in scope && symbol.left.getValue()[0].isupper()) {
+                throw new Error("Constant reference can't be changed");
+            }
+            value = exec_node(symbol.right, scope);
+            if (symbol.left.getValue()[-1] == '?' && not isinstance(value, bool)) {
+                throw new Error("?-ending id must reference boolean value");
+            }
+            // typ
+            id = symbol.left.val;
+            if (id in scope && scope[id][1] is not None) {
+                concordance(scope[id][1], value);
+            }
+            // aff
+            scope[id] = (value, None);
+            return scope[id][0];
+        } else if (symbol.getValue() == 'typed_aff') {
+            id = symbol.left.left.val;
+            typ= symbol.left.right.val;
+            val= exec_node(symbol.right, scope);
+            // print id
+            // print typ
+            // print val
+            // on essaye de typer quelque chose de deja declare
+            if (id in scope) {
+                throw new Error("Cannot type reference already declared: %s" % (id,));
+            }
+            concordance(typ, val);
+            scope[id] = (val, typ);
+            return scope[id][0];
+        } else if (symbol.getValue() == 'suite') {
+            exec_node(symbol.left, scope);
+            return exec_node(symbol.right, scope);
+        } else if (symbol.getValue() == 'if') {
+            condition = exec_node(symbol.left);
+            action = None;
+            if (condition && symbol.right is not None) {
+                action = exec_node(symbol.right);
+                return action;
+            if (not condition && symbol.right_else is not None) {
+                action = exec_node(symbol.right_else);
+                return action;
+            return None;
+        } else {
+            throw new Error("Invisible Node type not understood");
+        }
+}
+*/
+        
+Interpreter.prototype.exec_terminal = function(symbol, scope) {
+    if (symbol.getType() == SymbolType.Integer) {
+        if (symbol.getValue().length > 1 && (symbol.getValue()[1] == 'x' || symbol.getValue()[1] == 'X')) {
+            return new Value(parseInt(symbol.getValue()), ValueType.Integer);
+        } else if (symbol.getValue().length > 1 && (symbol.getValue()[1] == 'b' || symbol.getValue()[1] == 'B')) {
+            return new Value(parseInt(symbol.getValue().slice(2, symbol.getValue().length), 2), ValueType.Integer);
+        } else if (symbol.getValue().length > 1 && (symbol.getValue()[1] == 't' || symbol.getValue()[1] == 'T')) {
+            return new Value(parseInt("0" + symbol.getValue().slice(2, symbol.getValue().length), 8), ValueType.Integer);
+        } else {
+            return new Value(parseInt(symbol.getValue()), ValueType.Integer);
+        }
+    } else if (symbol.getType() == SymbolType.Float) {
+        return new Value(parseFloat(symbol.getValue()), ValueType.Float);
+    } else if (symbol.getType() == SymbolType.Id) {
+        if (!scope.hasOwnProperty(symbol.getValue())) {
+            var v = unmarshallIdValue(symbol.getValue());
+            if (v == null) {
+                throw new Error('unreferenced variable ' + symbol.getValue());
+            } else {
+                return v;
+            }
+        } else {
+            return scope[symbol.getValue()]
+        }
+    } else if (symbol.getType() == SymbolType.String) {
+        return new Value(symbol.getValue(), ValueType.String);
+    } else if (symbol.getType() == SymbolType.Boolean) {
+        if (symbol.getValue() == 'true' || symbol.getValue() == 'True' || symbol.getValue() == 'TRUE') {
+            return new Value(true, ValueType.Boolean);
+        } else {
+            return new Value(false, ValueType.Boolean);
+        }
+    }
+    // CASE OF ERRORS
+    else if (symbol.getType() == SymbolType.Operator) {
+        throw new Error("Operators need one or more operands");
+    } else if (symbol.getType() == Separator) {
+        throw new Error("Separators alone are meaningless");
+    } else {
+        throw new Error("TokenType not understood : " + symbol);
+    }
+}
+
+Interpreter.prototype.do_string = function(cmd, scope) {
+    l = new Lexer();
+    p = new Parser();
+    tokens = l.tokenize(cmd);
+    tree   = p.parse(tokens);
+    result = this.exec_node(tree);
+    marshallIdValue('_', result);
+    return result;
+}
+
+Interpreter.prototype.test = function(cmd, scope, waiting_for) {
+    l = new Lexer();
+    p = new Parser();
+    tokens = l.tokenize(cmd);
+    tree   = p.parse(tokens);
+    result = this.exec_node(tree, scope);
+    if (!result.equal(waiting_for)) {
+        console.warn("ERROR : waiting for " + waiting_for + " and the result was " + result);
+        console.warn("Parsed tokens :");
+        for (var i=0; i < tokens.length; i++) {
+            console.warn(tokens[i]);
+        }
+        console.warn("Head of the tree :");
+        console.warn("    " + tree);
+    } else {
+        console.log("OK : " + cmd + " => " + result);
+    }
+    return result;
+}
+
 //-----------------------------------------------------------------------------
 // Baselib
 //-----------------------------------------------------------------------------
@@ -707,35 +1116,279 @@ Baselib = {
             return new Value(target.getValue(), ValueType.String);
         }
     },
+    // Float
+    "Float" : {
+        "add" : function(target, args, scope) {
+            p = args[0];
+            if (p.getType() == ValueType.Float || p.getType() == ValueType.Integer) {
+                return new Value(target.getValue() + p.getValue(), ValueType.Float);
+            } else {
+                throw new Error("Bad param type for function Float#add");
+            }
+        },
+        "sub" : function(target, args, scope) {
+            p = args[0];
+            if (p.getType() == ValueType.Float || p.getType() == ValueType.Integer) {
+                return new Value(target.getValue() - p.getValue(), ValueType.Float);
+            } else {
+                throw new Error("Bad param type for function Float#sub");
+            }
+        },
+        "mul" : function(target, args, scope) {
+            p = args[0];
+            if (p.getType() == ValueType.Float || p.getType() == ValueType.Integer) {
+                return new Value(target.getValue() * p.getValue(), ValueType.Float);
+            } else {
+                throw new Error("Bad param type for function Float#mul");
+            }
+        },
+        "div" : function(target, args, scope) {
+            p = args[0];
+            if (p.getType() == ValueType.Float || p.getType() == ValueType.Integer) {
+                if (p.getValue() == 0) {
+                    throw new Error("Error: divided by zero");
+                }
+                return new Value(target.getValue() / p.getValue(), ValueType.Float);
+            } else {
+                throw new Error("Bad param type for function Float#div");
+            }
+        },
+        "mod" : function(target, args, scope) {
+            p = args[0];
+            if (p.getType() == ValueType.Float || p.getType() == ValueType.Integer) {
+                return new Value(target.getValue() % p.getValue(), ValueType.Float);
+            } else {
+                throw new Error("Bad param type for function Float#mod");
+            }
+        },
+        "pow" : function(target, args, scope) {
+            p = args[0];
+            if (p.getType() == ValueType.Float || p.getType() == ValueType.Integer) {
+                return new Value(Math.pow(target.getValue(), p.getValue()), ValueType.Float);
+            } else {
+                throw new Error("Bad param type for function Float#pow");
+            }
+        },
+        "abs" : function(target, args, scope) {
+            var v = target.getValue();
+            if (v < 0.0) { v = v * -1; }
+            return new Value(v, ValueType.Float);
+        },
+        "inv" : function (target, args, scope) {
+            return new Value(-target.getValue() , ValueType.Float);
+        },
+        "round" : function (target, args, scope) {
+            return new Value(Math.round(target.getValue()) , ValueType.Integer);
+        },
+        "trunc" : function (target, args, scope) {
+            return new Value(Math.floor(target.getValue()) , ValueType.Float);
+        },
+        "floor" : function (target, args, scope) {
+            return new Value(Math.floor(target.getValue()) , ValueType.Float);
+        },
+        "ceil" : function (target, args, scope) {
+            return new Value(Math.ceil(target.getValue()) , ValueType.Float);
+        },
+        "to_s" : function(target, args, scope) {
+            return new Value(target.getValue().toString(), ValueType.String);
+        },
+        "to_i" : function(target, args, scope) {
+            return new Value(Math.floor(target.getValue()) , ValueType.Float);
+        },
+        "to_f" : function(target, args, scope) {
+            return new Value(target.getValue(), ValueType.Float);
+        },
+        "equal" : function(target, args, scope) {
+            p = args[0];
+            if (p.getType() == ValueType.Float) {
+                if (target.value === p.value) {
+                    return new Value(true, ValueType.Boolean);
+                } else {
+                    return new Value(false, ValueType.Boolean);
+                }
+            } else {
+                throw new Error("Bad param type for function Float#equal");
+            }
+        },
+        "diff" : function(target, args, scope) {
+            p = args[0];
+            if (p.getType() == ValueType.Float) {
+                if (target.value !== p.value) {
+                    return new Value(true, ValueType.Boolean);
+                } else {
+                    return new Value(false, ValueType.Boolean);
+                }
+            } else {
+                throw new Error("Bad param type for function Float#diff");
+            }
+        },
+        "gt" : function(target, args, scope) {
+            var r = Baselib["Float"]["cmp"](target, args, scope);
+            if (r.value === 1) {
+                return new Value(true, ValueType.Boolean);
+            } else {
+                return new Value(false, ValueType.Boolean);
+            }
+        },
+        "ge" : function(target, args, scope) {
+            var r = Baselib["Float"]["cmp"](target, args, scope);
+            if (r.value === 1 || r.value === 0) {
+                return new Value(true, ValueType.Boolean);
+            } else {
+                return new Value(false, ValueType.Boolean);
+            }
+        },
+        "lt" : function(target, args, scope) {
+            var r = Baselib["Float"]["cmp"](target, args, scope);
+            if (r.value === -1) {
+                return new Value(true, ValueType.Boolean);
+            } else {
+                return new Value(false, ValueType.Boolean);
+            }
+        },
+        "le" : function(target, args, scope) {
+            var r = Baselib["Float"]["cmp"](target, args, scope);
+            if (r.value === -1 || r.value === 0) {
+                return new Value(true, ValueType.Boolean);
+            } else {
+                return new Value(false, ValueType.Boolean);
+            }
+        },
+        "cmp" : function(target, args, scope) {
+            p = args[0];
+            if (p.getType() != ValueType.Integer && p.getType() != ValueType.Float) {
+                throw new Error("Bad param type for function Float#cmp");
+            }
+            if (target.getValue() == p.getValue()) { return new Value(0, ValueType.Integer); }
+            else if (target.getValue() > p.getValue()) { return new Value(1, ValueType.Integer); }
+            else { return new Value(-1, ValueType.Integer); }
+        }, 
+    },
+    "Boolean" : {
+        "and" : function (target, args, scope) {
+            p = args[0];
+            if (p.getType() == ValueType.Boolean) {
+                return new Value(target.getValue() && p.getValue(), ValueType.Boolean);
+            } else {
+                throw new Error("Bad param type for function Boolean#and");
+            }
+        },
+        "or" : function (target, args, scope) {
+            p = args[0];
+            if (p.getType() == ValueType.Boolean) {
+                return new Value(target.getValue() || p.getValue(), ValueType.Boolean);
+            } else {
+                throw new Error("Bad param type for function Boolean#or");
+            }
+        },
+        "xor" : function(target, args, scope) {
+            p = args[0];
+            if (p.getType() == ValueType.Boolean) {
+                var r = false;
+                if (target.getValue() && p.getValue) {
+                    r = false;
+                } else if (target.getValue()) {
+                    r = true;
+                } else if (p.getValue()) {
+                    r = true;
+                }
+                return new Value(r, ValueType.Boolean);
+            } else {
+                throw new Error("Bad param type for function Boolean#xor");
+            }
+        },
+        "inv" : function(target, args, scope) {
+            return new Value(!target.getValue(), ValueType.Boolean);
+        },
+        "to_s" : function(target, args, scope) {
+            if (target.getValue()) {
+                return new Value("true", ValueType.String);
+            } else {
+                return new Value("false", ValueType.String);
+            }
+        },
+        "to_i" : function(target, args, scope) {
+            if (target.getValue()) {
+                return new Value(1, ValueType.Integer);
+            } else {
+                return new Value(0, ValueType.Integer);
+            }
+        },
+        "to_f" : function(target, args, scope) {
+            if (target.getValue()) {
+                return new Value(1.0, ValueType.Float);
+            } else {
+                return new Value(0.0, ValueType.Float);
+            }
+        },
+        "equal" : function(target, args, scope) {
+            p = args[0];
+            if (p.getType() == ValueType.Boolean) {
+                if (target.value === p.value) {
+                    return new Value(true, ValueType.Boolean);
+                } else {
+                    return new Value(false, ValueType.Boolean);
+                }
+            } else {
+                throw new Error("Bad param type for function Boolean#equal");
+            }
+        },
+        "diff" : function(target, args, scope) {
+            p = args[0];
+            if (p.getType() == ValueType.Boolean) {
+                if (target.value !== p.value) {
+                    return new Value(true, ValueType.Boolean);
+                } else {
+                    return new Value(false, ValueType.Boolean);
+                }
+            } else {
+                throw new Error("Bad param type for function Boolean#diff");
+            }
+        },
+    },
     // Integer
     "Integer" : {
         "add" : function (target, args, scope) {
-            p = args[0];
-            if (target.getType() != ValueType.Integer || p.getType() != ValueType.Integer) {
+            var p = args[0];
+            if (p.getType() == ValueType.Float) {
+                return new Value(target.getValue() + p.getValue(), ValueType.Float);
+            } else if (target.getType() != ValueType.Integer || p.getType() != ValueType.Integer) {
                 throw new Error("Bad param type for function Integer#add");
             }
             return new Value(target.getValue() + p.getValue(), ValueType.Integer);
         },
         "sub" : function (target, args, scope) {
-            p = args[0];
-            if (target.getType() != ValueType.Integer || p.getType() != ValueType.Integer) {
+            var p = args[0];
+            if (p.getType() == ValueType.Float) {
+                return new Value(target.getValue() - p.getValue(), ValueType.Float);
+            } else if (target.getType() != ValueType.Integer || p.getType() != ValueType.Integer) {
                 throw new Error("Bad param type for function Integer#sub");
             }
             return new Value(target.getValue() - p.getValue(), ValueType.Integer);
         },
         "mul" : function (target, args, scope) {
-            p = args[0];
-            if (target.getType() != ValueType.Integer || p.getType() != ValueType.Integer) {
+            var p = args[0];
+            if (p.getType() == ValueType.Float) {
+                return new Value(target.getValue() * p.getValue(), ValueType.Float);
+            } else if (target.getType() != ValueType.Integer || p.getType() != ValueType.Integer) {
                 throw new Error("Bad param type for function Integer#mul");
             }
             return new Value(target.getValue() * p.getValue(), ValueType.Integer);
         },
         "div" : function (target, args, scope) {
-            p = args[0];
-            if (target.getType() != ValueType.Integer || p.getType() != ValueType.Integer) {
+            var p = args[0];
+            if (p.getType() != ValueType.Integer && p.getType() != ValueType.Float) {
                 throw new Error("Bad param type for function Integer#div");
             }
-            return new Value(target.getValue() / p.getValue(), ValueType.Integer);
+            if (p.getValue() == 0) {
+                throw new Error("Error: divided by zero");
+            }
+            var r = target.getValue() / p.getValue();
+            if (r == Math.floor(r) && p.getType() == ValueType.Integer) {
+                return new Value(r, ValueType.Integer);
+            } else {
+                return new Value(r, ValueType.Float);
+            }
         },
         "mod" : function (target, args, scope) {
             p = args[0];
@@ -833,7 +1486,7 @@ Baselib = {
         },
         "cmp" : function(target, args, scope) {
             p = args[0];
-            if (target.getType() != ValueType.Integer || p.getType() != ValueType.Integer) {
+            if (target.getType() != ValueType.Integer || (p.getType() != ValueType.Integer && p.getType() != ValueType.Float)) {
                 throw new Error("Bad param type for function Integer#cmp");
             }
             if (target.getValue() == p.getValue()) { return new Value(0, ValueType.Integer); }
@@ -848,7 +1501,7 @@ Baselib = {
         }, 
         "gt" : function(target, args, scope) {
             if (target.getType() != ValueType.Integer) {
-                throw new Error("Bad param type for function Integer#size");
+                throw new Error("Bad param type for function Integer#gt");
             }
             var r = Baselib["Integer"]["cmp"](target, args, scope);
             if (r.value === 1) {
@@ -856,7 +1509,62 @@ Baselib = {
             } else {
                 return new Value(false, ValueType.Boolean);
             }
-        }// manque intdiv dans la doc ,lshit au lieu de lshift, decalaga !
+        },
+        "ge" : function(target, args, scope) {
+            if (target.getType() != ValueType.Integer) {
+                throw new Error("Bad param type for function Integer#ge");
+            }
+            var r = Baselib["Integer"]["cmp"](target, args, scope);
+            if (r.value === 1 || r.value === 0) {
+                return new Value(true, ValueType.Boolean);
+            } else {
+                return new Value(false, ValueType.Boolean);
+            }
+        },
+        "lt" : function(target, args, scope) {
+            if (target.getType() != ValueType.Integer) {
+                throw new Error("Bad param type for function Integer#lt");
+            }
+            var r = Baselib["Integer"]["cmp"](target, args, scope);
+            if (r.value === -1) {
+                return new Value(true, ValueType.Boolean);
+            } else {
+                return new Value(false, ValueType.Boolean);
+            }
+        },
+        "le" : function(target, args, scope) {
+            if (target.getType() != ValueType.Integer) {
+                throw new Error("Bad param type for function Integer#le");
+            }
+            var r = Baselib["Integer"]["cmp"](target, args, scope);
+            if (r.value === -1 || r.value === 0) {
+                return new Value(true, ValueType.Boolean);
+            } else {
+                return new Value(false, ValueType.Boolean);
+            }
+        },
+        "equal" : function(target, args, scope) {
+            if (target.getType() != ValueType.Integer && target.getType() != ValueType.Float) {
+                throw new Error("Bad param type for function Integer#size");
+            }
+            var r = Baselib["Integer"]["cmp"](target, args, scope);
+            if (r.value === 0) {
+                return new Value(true, ValueType.Boolean);
+            } else {
+                return new Value(false, ValueType.Boolean);
+            }
+        },
+        "diff" : function(target, args, scope) {
+            if (target.getType() != ValueType.Integer && target.getType() != ValueType.Float) {
+                throw new Error("Bad param type for function Integer#size");
+            }
+            var r = Baselib["Integer"]["cmp"](target, args, scope);
+            if (r.value !== 0) {
+                return new Value(true, ValueType.Boolean);
+            } else {
+                return new Value(false, ValueType.Boolean);
+            }
+        },
     }
 };
 
@@ -895,318 +1603,6 @@ function roughSizeOfObject( object ) {
     return bytes;
 }
 
-// NOT CONVERTED YET
-/*
-Interpreter.prototype.instance_function = function(target, name, args, scope) {
-    if target.__class__ in [int, float, str, bool]:
-        pass
-    elif target.terminal() and target.getType() in [Integer, Float, String, Boolean]:
-        target = exec_node(target)
-    elif target.terminal() and target.getType() == Id:
-        target = scope[target.getValue()]
-    else:
-        raise Exception("Bad target for instance function call: %s" % (target,))
-    
-    if name.terminal() and name.getType() == Id:
-        name = name.val
-    else:
-        raise Exception("Bad name for instance function call: %s" % (name,))
-    
-    if args is None:
-        par = []
-    elif args.right.__class__ in [int, float, str, bool]:
-        par = [args.right]
-    elif args.right.terminal():
-        par = [exec_node(args.right, scope)]
-    elif args.right.getValue() == 'suite':
-        a = args.right
-        par = []
-        while not a.terminal():
-            par.append(exec_node(a.right))
-            a = a.left
-        par.append(exec_node(a))
-    else:
-        raise Exception("Bad par for instance function call: %s" % (args.right,))
-    r = bb.send(target, name, par, scope)
-    return r
-}
-*/
-
-/*
-// NOT DEBUGGED YET
-Interpreter.prototype.concordance = function(typ, val) {
-    if (typ == 'int') {
-        if (!isinstance(val, int)) {
-            throw new Error("Reference of type " + typ + " cannot reference value of type " + val.__class__);
-        }
-    } else if (typ == 'bool') {
-        if (!isinstance(val, bool)) {
-            throw new Error("Reference of type " + typ + " cannot reference value of type " + val.__class__);
-        }
-    } else if (typ == 'float') {
-        if (!isinstance(val, float)) {
-            throw new Error("Reference of type " + typ + " cannot reference value of type " + val.__class__);
-        }
-    } else {
-        throw new Error("Type unknown : " + typ);
-    }
-    return true;
-}
-*/
-
-var op_to_fun = {
-    "+" : "add",
-    "-" : "sub",
-    "*" : "mul",
-    "/" : "div",
-    "//": "intdiv",
-    "**": "pow",
-    "%" : "mod",
-    ">" : "gt",
-    "<" : "lt",
-    ">=": "ge",
-    "<=": "le",
-    "==": "equal",
-    "!=": "diff",
-};
-
-// SUBSET
-Interpreter.prototype.exec_non_terminal = function(node, scope) {
-    if (node.type == NodeType.UnaryOp) {
-        var op     = node.suite[0].getValue();
-        var caller = this.exec_node(node.suite[1], scope);
-        
-        if (op == 'unary-') {
-            return this.dispatch(caller, "inv", [], scope);
-        } else {
-            throw new Error("Unary operator not known : " + op);
-        }
-        
-    } else if (node.type == NodeType.BinaryOp) {
-        var op = node.suite[0].getValue();
-        
-        if (op in op_to_fun) {
-            var caller = this.exec_node(node.suite[1], scope);
-            var param  = this.exec_node(node.suite[2], scope);
-            return this.dispatch(caller, op_to_fun[op], [param], scope);
-        } else if (op == '.') {
-            var caller = this.exec_node(node.suite[1], scope);
-            if (node.suite[2].getType() == SymbolType.Id) {         // 2.abs => . 2 abs
-                return this.dispatch(caller, node.suite[2].getValue(), [], scope);
-            } else {
-                throw new Error("Unknown field"); // Thériquement impossible
-            }
-        } else {
-            throw new Error("Binary operator not known : " + op);
-        }
-    } else if (node.getType() == NodeType.FunctionCall) {
-        var caller;
-        if (node.suite[0] != null) { // Method
-            caller = this.exec_node(node.suite[0], scope);
-        } else { // Global
-            caller = null;
-        }
-        var nom_fonction = node.suite[1].getValue();
-        var parametres = node.suite[2];
-        var le_parametre = this.exec_terminal(parametres.suite[0], scope);
-        return this.dispatch(caller, nom_fonction, [le_parametre], scope);   
-    } else if (node.getType() == NodeType.Structure) {
-        throw new Error("Structure not yet handled");
-    } else {
-        throw new Error("Node type not understood : val=" + symbol.getValue() + " left=" + symbol.left + " right=" + symbol.right);
-    }
-}
-
-// NOT DEBUGGED YET
-/*
-    
-add sub mul div mod intdiv pow 
-return instance_function(exec_node(symbol.left, scope), new Symbol(Id, 'add'), new Symbol(SymbolType.Structure, 'call(', right=exec_node(symbol.right)), scope);
-return instance_function(exec_node(symbol.right, scope), new Symbol(Id, 'inv'), null, scope); -unary
-
-        } else if (symbol.getValue() in ['and', 'or', 'xor']) {
-            return instance_function(exec_node(symbol.left, scope), new Symbol(Id, symbol.getValue()), new Symbol(SymbolType.Structure, 'call(', right=exec_node(symbol.right)), scope);
-        } else if (symbol.getValue() == '.') {
-            if symbol.right.getValue() != 'call_with_args') {
-                target = exec_node(symbol.left, scope);
-                return instance_function(target, symbol.right, None, scope);
-            } else if (symbol.right.getValue() == 'call_with_args') {
-                call = symbol.right;
-                return instance_function(symbol.left, call.left, call.right, scope);
-            } else {
-                throw new Error("What to do with this symbol ? : " + symbol.right.getValue());
-            }
-        } else if (symbol.getValue() == '<<') {
-            return instance_function(exec_node(symbol.left, scope), Symbol(Id, 'lshift'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope);
-        } else if (symbol.getValue() == '>>') {
-            return instance_function(exec_node(symbol.left, scope), Symbol(Id, 'rshift'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope);
-        } else if (symbol.getValue() == '<=>') {
-            return instance_function(exec_node(symbol.left, scope), Symbol(Id, 'cmp'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope);
-        } else if (symbol.getValue() in ['>', '<', '>=', '<=', '==', '!=']) {
-            r = instance_function(exec_node(symbol.left, scope), Symbol(Id, 'cmp'), Symbol(Structure, 'call(', right=exec_node(symbol.right)), scope);
-            if symbol.getValue() == '==') {
-                if (r == 0) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } else if (symbol.getValue() == '!=') {
-                if (r != 0) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } else if (symbol.getValue() == '>') {
-                if (r == 1) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } else if (symbol.getValue() == '>=') {
-                if (r == 1 or r == 0) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } else if (symbol.getValue() == '<') {
-                if (r == -1) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } else if (symbol.getValue() == '<=') {
-                if (r == -1 or r == 0) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } else {
-                throw new Error("You shouldn't be there!");
-        
-    } else if (symbol.getType() == SymbolType.Structure) {
-        if (symbol.getValue() == 'call_with_args') {
-            return global_function(symbol.left, symbol.right, scope);
-        //} else if (symbol.getValue() == 'prefixed_call':
-        //    return instance_function(symbol.left, symbol.right, scope)
-        } else if (symbol.getValue() == 'aff') {
-            // const
-            if (symbol.left.getValue() in scope && symbol.left.getValue()[0].isupper()) {
-                throw new Error("Constant reference can't be changed");
-            }
-            value = exec_node(symbol.right, scope);
-            if (symbol.left.getValue()[-1] == '?' && not isinstance(value, bool)) {
-                throw new Error("?-ending id must reference boolean value");
-            }
-            // typ
-            id = symbol.left.val;
-            if (id in scope && scope[id][1] is not None) {
-                concordance(scope[id][1], value);
-            }
-            // aff
-            scope[id] = (value, None);
-            return scope[id][0];
-        } else if (symbol.getValue() == 'typed_aff') {
-            id = symbol.left.left.val;
-            typ= symbol.left.right.val;
-            val= exec_node(symbol.right, scope);
-            // print id
-            // print typ
-            // print val
-            // on essaye de typer quelque chose de deja declare
-            if (id in scope) {
-                throw new Error("Cannot type reference already declared: %s" % (id,));
-            }
-            concordance(typ, val);
-            scope[id] = (val, typ);
-            return scope[id][0];
-        } else if (symbol.getValue() == 'suite') {
-            exec_node(symbol.left, scope);
-            return exec_node(symbol.right, scope);
-        } else if (symbol.getValue() == 'if') {
-            condition = exec_node(symbol.left);
-            action = None;
-            if (condition && symbol.right is not None) {
-                action = exec_node(symbol.right);
-                return action;
-            if (not condition && symbol.right_else is not None) {
-                action = exec_node(symbol.right_else);
-                return action;
-            return None;
-        } else {
-            throw new Error("Invisible Node type not understood");
-        }
-
-}
-*/
-        
-Interpreter.prototype.exec_terminal = function(symbol, scope) {
-    if (symbol.getType() == SymbolType.Integer) {
-        if (symbol.getValue().length > 1 && (symbol.getValue()[1] == 'x' || symbol.getValue()[1] == 'X')) {
-            return new Value(parseInt(symbol.getValue()), ValueType.Integer);
-        } else if (symbol.getValue().length > 1 && (symbol.getValue()[1] == 'b' || symbol.getValue()[1] == 'B')) {
-            return new Value(parseInt(symbol.getValue().slice(2, symbol.getValue().length), 2), ValueType.Integer);
-        } else if (symbol.getValue().length > 1 && (symbol.getValue()[1] == 't' || symbol.getValue()[1] == 'T')) {
-            return new Value(parseInt("0" + symbol.getValue().slice(2, symbol.getValue().length), 8), ValueType.Integer);
-        } else {
-            return new Value(parseInt(symbol.getValue()), ValueType.Integer);
-        }
-    } else if (symbol.getType() == SymbolType.Float) {
-        return new Value(parseFloat(symbol.getValue()), ValueType.Float);
-    } else if (symbol.getType() == SymbolType.Id) {
-        if (!scope.hasOwnProperty(symbol.getValue())) {
-            throw new Error('unreferenced variable ' + symbol.getValue());
-        } else {
-            return scope[symbol.getValue()]
-        }
-    } else if (symbol.getType() == SymbolType.String) {
-        return new Value(symbol.getValue(), ValueType.String);
-    } else if (symbol.getType() == SymbolType.Boolean) {
-        if (symbol.getValue() == 'true' || symbol.getValue() == 'True' || symbol.getValue() == 'TRUE') {
-            return new Value(true, ValueType.Boolean);
-        } else {
-            return new Value(false, ValueType.Boolean);
-        }
-    }
-    // CASE OF ERRORS
-    else if (symbol.getType() == SymbolType.Operator) {
-        throw new Error("Operators need one or more operands");
-    } else if (symbol.getType() == Separator) {
-        throw new Error("Separators alone are meaningless");
-    } else {
-        throw new Error("TokenType not understood : " + symbol);
-    }
-}
-
-Interpreter.prototype.do_string = function(cmd, scope) {
-    l = new Lexer();
-    p = new Parser();
-    tokens = l.tokenize(cmd);
-    tree   = p.parse(tokens);
-    result = this.exec_node(tree);
-    return result;
-}
-
-Interpreter.prototype.test = function(cmd, scope, waiting_for) {
-    l = new Lexer();
-    p = new Parser();
-    tokens = l.tokenize(cmd);
-    tree   = p.parse(tokens);
-    result = this.exec_node(tree);
-    if (!result.equal(waiting_for)) {
-        console.warn("ERROR : waiting for " + waiting_for + " and the result was " + result);
-        console.warn("Parsed tokens :");
-        for (var i=0; i < tokens.length; i++) {
-            console.warn(tokens[i]);
-        }
-        console.warn("Head of the tree :");
-        console.warn("    " + tree);
-    } else {
-        console.log("OK : " + cmd + " => " + result);
-    }
-    return result;
-}
-
-
 root_scope = {
     'Pi' : Value(Math.PI, ValueType.Float),
     'PI' : Value(Math.PI, ValueType.Float),
@@ -1233,6 +1629,46 @@ test_interpreter.test("0b10", root_scope, new Value(2, ValueType.Integer));
 test_interpreter.test("0xA", root_scope, new Value(10, ValueType.Integer));
 test_interpreter.test("0t10", root_scope, new Value(8, ValueType.Integer));
 
+function i(v) {
+    return new Value(v, ValueType.Integer);
+}
+
+function b(v) {
+    return new Value(v, ValueType.Boolean);
+}
+
+function nihil() {
+    return new Value(null, ValueType.Object);
+}
+
+// Test from nn
+// Integer
+test_interpreter.test('2+3', root_scope, i(5));
+test_interpreter.test('2', root_scope, i(2));
+test_interpreter.test('(2+2)*3', root_scope, i(12));
+test_interpreter.test('3*(2+2)', root_scope, i(12));
+test_interpreter.test('3*2+2', root_scope, i(8));
+test_interpreter.test('(3+2)*(2*2)', root_scope, i(20));
+test_interpreter.test('(3)', root_scope, i(3));
+// Boolean
+test_interpreter.test('a = true', root_scope, nihil()); //v(true))
+test_interpreter.test('true == true', root_scope, b(true));
+test_interpreter.test('true == false', root_scope, b(false));
+test_interpreter.test('false == false', root_scope, b(true));
+//test_interpreter.test('not true', root_scope, b(false));
+//test_interpreter.test('not false', root_scope, b(true));
+test_interpreter.test('a', root_scope, b(true));
+//test_interpreter.test('not a', root_scope, b(false));
+test_interpreter.test('true and true', root_scope, b(true));
+test_interpreter.test('true and false', root_scope, b(false));
+test_interpreter.test('false and true', root_scope, b(false));
+test_interpreter.test('false or true', root_scope, b(true));
+test_interpreter.test('true or false', root_scope, b(true));
+test_interpreter.test('true and true and false', root_scope, b(false));
+test_interpreter.test('false or false or true', root_scope, b(true));
+test_interpreter.test('false and false or true', root_scope, b(true));
+test_interpreter.test('false and (false or true)', root_scope, b(false));
+            
 //-----------------------------------------------------------------------------
 // GUI
 //-----------------------------------------------------------------------------

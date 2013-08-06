@@ -6,76 +6,104 @@
         <link href='http://fonts.googleapis.com/css?family=Lobster' rel='stylesheet' type='text/css'>
         <link href='http://fonts.googleapis.com/css?family=Dosis' rel='stylesheet' type='text/css'>
         <style type="text/css">
+        
         body {
-            width:800px;
+            width: 100%;
+            max-width: 800px;
             margin: auto;
             margin-top: 10px;
             margin-bottom: 10px;
             color: #000000;
             background-color: #FFFFFF;
-            border: 1px solid #e59e40;
+            border: 1px solid #CEC498; //#e59e40;
             font-family: 'Dosis', monospace, "Consolas";
-            //background-image:url(http://dribbble.s3.amazonaws.com/users/13774/screenshots/318774/attachments/13998/Midcenturian_1.jpg);
-            //background-position:50% 50%;
-            //background-repeat:no-repeat;
-            //background-size: 100%;
         }
+        
+        h1 {
+            font-family: "Lobster", cursive, monospace, "Consolas", "Century Gothic";
+            font-weight: 400;
+            font-size: 24px;
+            width: 100%;
+            color: #4087e4;
+            margin: auto;
+            margin-top: 5px;
+            text-align: center;
+        }
+        
+        table {
+            border-collapse: collapse;
+        } 
         td {
             border-right: 1px solid #000000;
         }
         tr {
             border-bottom: 1px solid #000000;
         }
-        table {
-            border-collapse: collapse;
-        }
         td.number {
             color: #FFFFFF;
             background-color: #666666;
         }
-        #box {
+        
+        #main {
             width: 100%;
         }
         
         #input {
+            margin-top: 20px;
             width: 100%;
+            text-align: center;
         }
-        #input textarea {
-            width: 790px;
+        
+        #input {
+            width: 95%;
+            margin: auto;
             margin-top: 5px;
-            margin-right: 5px;
-            margin-left: 5px;
-            box-sizing: border-box; 
-            border: 1px solid #FF0000; 
+            
+            -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+            -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+            box-sizing: border-box;         /* Standard */
+        }
+        
+        #inputtext {
+            width: 100%;
+            border: 1px solid #AAAAAA; // #FF0000; 
+            background-color: #F9F9F9;
             resize: none;
             overflow: hidden;
         }
         
         #output_lex table {
-            width: 790px;
+            width: 95%;
+            margin: auto;
             margin-top: 5px;
-            margin-right: 5px;
-            margin-left: 5px;
-            box-sizing: border-box;
+            
+            -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+            -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+            box-sizing: border-box;         /* Standard */
+            
         }
         
         #output_parse ul {
-            width: 790px;
+            width: 95%;
+            margin: auto;
             margin-top: 5px;
-            margin-right: 5px;
-            margin-left: 5px;
-            box-sizing: border-box;
+            
+            -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+            -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+            box-sizing: border-box;         /* Standard */
         }
         
         #output_interpret #result {
-            width: 790px;
-            margin-top: 5px;
-            margin-right: 5px;
-            margin-left: 5px;
-            padding-left: 2px;
-            box-sizing: border-box;
             border: 1px solid #DDDDDD;
-            //padding-bottom: 30px;   /* Height of the footer */
+            
+            width: 95%;
+            margin: auto;
+            margin-top: 5px;
+            
+            -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+            -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+            box-sizing: border-box;         /* Standard */
+            
             display: none;
         }
         
@@ -83,6 +111,7 @@
             margin-top: 30px;
             width: 100%;
             text-align: center;
+            color: #CEC498;
         }
         
         div.title {
@@ -92,22 +121,11 @@
             margin-top: 15px;
         }
         
-        h1 {
-            font-family: "Lobster", cursive, monospace, "Consolas", "Century Gothic";
-            font-weight: 400;
-            font-size: 24px;
-            width: 100%;
-            background-color: #e59e40;
-            color: #4087e4;
-            margin: auto;
-            margin-top: 5px;
-            text-align: center;
-        }
-        
         #footer {
-            position: absolute;
+            position: fixed;
             bottom: 0;
-            width: 800px;
+            width: 100%;
+            max-width: 800px;
             height: 30px;   /* Height of the footer */
             font-family: "Lobster", cursive;
             font-weight: 100;
@@ -117,18 +135,19 @@
         }
 
         a {
-            color: #4087e4;
+            font-family: "Palatino Linotype";
+            font-size: 14px;
+            color: #CC6714; //#4087e4;
         }
         
         button {
             background:none;
             border:none; 
             padding: 0;
-            //border-bottom:1px solid #444; 
-            color: #4087e4;
+            color: #CC6714;
             text-decoration: underline;
-            font-family: 'Dosis', sans-serif;
-            font-size: 16px;
+            font-family: "Palatino Linotype"; //, 'Dosis', sans-serif;
+            font-size: 14px; //16px;
             cursor: pointer;
         }
         
@@ -136,8 +155,6 @@
             color: red;
         }
         
-        //<div style="position: absolute; left: 10px; top: 10px; padding: 10px; width:50%; height: 50%; border: 1px solid #000000;">
-
         </style>
         <script src="calcoolette.js"></script>
         <script language="javascript" type="text/javascript" defer>
@@ -166,10 +183,18 @@
             }
             
             function main(scmd) {
+
+                // Clear footer (pb on mobile)
+                document.getElementById("footer").style.display = "none";
+                
                 // Clear everything
                 // Reboot cmd
                 var field_input = document.getElementById("inputtext");
                 field_input.value = '';
+                
+                if (!scmd) { // empty
+                    return;
+                }
                 
                 var title_text = document.getElementById("text_title");
                 title_text.innerHTML = '';
@@ -225,13 +250,13 @@
                     var head2 = head.insertCell(2);
                     var head3 = head.insertCell(3);
                     head0.innerHTML = "<span style='color: #FFFFFF'><u>Number</u></span>";
-                    head0.bgColor = '#666666';
+                    head0.bgColor = '#CEC498';
                     head1.innerHTML = "<span style='color: #FFFFFF'><u>Value</u></span>";
-                    head1.bgColor = '#666666';
+                    head1.bgColor = '#CEC498';
                     head2.innerHTML = "<span style='color: #FFFFFF'><u>Type</u></span>";
-                    head2.bgColor = '#666666';
+                    head2.bgColor = '#CEC498';
                     head3.innerHTML = "<span style='color: #FFFFFF'><u>Line</u></span>";
-                    head3.bgColor = '#666666';
+                    head3.bgColor = '#CEC498';
                 } catch (err) {
                     title_lexing.innerHTML = "Lexing result ERROR";
                     var row = table.insertRow(0);
@@ -274,36 +299,40 @@
     </head>
     <body>
         <h1>Calcoolette</h1>
-        <div id="box">
-            <div id="output">
-            </div>
+        <div id="main">
+            
             <div id="input">
-                <textarea id="inputtext" rows="1" placeholder=">>> feed me some code here!" onkeypress="return myKeyPress(event)"></textarea>
+                <input type="text" id="inputtext" placeholder=">>> enter your code here!" onkeypress="return myKeyPress(event)"></input>
             </div>
+            
             <div id="output_text">
                 <div id="text_title" class="title"></div>
                 <div id="text_text"></div>
             </div>
+            
             <div id="output_lex">
                 <div id="lex_title" class="title"></div>
                 <table id="myTable" style="border:1px solid #000000;">
                 </table>
             </div>
+            
             <div id="output_parse">
                 <div id="parse_title" class="title"></div>
                 <ul id="parse_list">
                 </ul>
             </div>
+            
             <div id="output_interpret">
                 <div id="interpret_title" class="title"></div>
                 <div id="result"></div>
             </div>
+            
             <div id="menu">
-                 - <button onClick="execute()">Exécute</button> | <a href="http://ran.alwaysdata.net/">Retour</a> -
+                 - <button onClick="execute()">Exécute</button> | <a href="http://ran.alwaysdata.net/calcoolette/index.html">Documentation</a> | <a href="http://ran.alwaysdata.net/">Ran</a> -
             </div>
+            
             <div id="footer">Calcoolette 2012-2013</div>
+            
         </div>
-        <!--<input type="text" name="cmd"></input>-->
-        <!--<button onclick="main()">Magic</button>-->
     </body>
 </html>
