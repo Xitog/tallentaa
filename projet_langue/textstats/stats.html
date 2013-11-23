@@ -1,0 +1,476 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<link href='http://fonts.googleapis.com/css?family=Lobster' rel='stylesheet' type='text/css'>
+<style type="text/css">
+    h1 {
+        font-family: "Lobster", cursive, monospace, "Consolas", "Century Gothic";
+        font-weight: 400;
+        font-size: 24px;
+        width: 100%;
+        color: #4087e4;
+        margin: auto;
+        margin-top: 5px;
+        text-align: center;
+    }
+    
+    a {
+        font-family: "Palatino Linotype";
+        font-size: 14px;
+        color: #CC6714;
+    }
+</style>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<!--<script src="http://tinymce.cachefly.net/4.0/tinymce.min.js"></script>-->
+<script>
+        //tinymce.init({selector:'textarea', height : 300});
+        
+        function main() {
+            //var textarea = document.getElementById("input");
+            //var content = textarea.textContent;
+            //var content = tinyMCE.get('input').getContent({format: 'raw'});
+            
+            //var reg = new RegExp("(<p>)", "g");
+            //content = content.replace(reg, "");
+            //reg = new RegExp("(</p>)", "g");
+            //content = content.replace(reg, "\n");
+            var content = $("#txt_input").val();
+            
+            stats(content);
+        }
+        
+        function is_us_letter(c) {
+            code = c.charCodeAt(0);
+            return ((code >= 65 && code <= 90) || (code >= 97 && code <= 122) || ["É", "é", "è", "ê", "ë", "ù", "À", "à", "Ç", "ç", "â", "ô", "î", "ï", "œ", "û", "ü"].indexOf(c) > -1);
+        }
+        
+        function is_number(c) {
+            code = c.charCodeAt(0);
+            return (code >= 48 && code <= 57);
+        }
+        
+        function is_white(c) {
+            return (c == " " || c == "\n" || c == "\t");
+        }
+        
+        function is_punctuation(c) {
+            return ([".", ",", ";", ":", "-", "(", ")", "’", "'", "?", "!", "«", "»", '"', "*", "–", "…", "[", "]"].indexOf(c) > -1);
+        }
+        
+        // str : int
+        function sort(xwords) {
+            var w = []
+            var n = []
+            var base_wrd = "";
+            var base_num = 0;
+            var found = false;
+            while (w.length < size(xwords)) {
+                for (var key in xwords) {
+                    if (w.indexOf(key) == -1 && xwords[key] >= base_num) {
+                        base_wrd = key;
+                        base_num = xwords[key];
+                        found = true;
+                    }
+                }
+                if (found) {
+                    w.push(base_wrd);
+                    n.push(base_num);
+                    base_wrd = "";
+                    base_num = 0;
+                    found = false;
+                }
+            }
+            return [w, n];
+        }
+        
+        // http://stackoverflow.com/questions/5223/length-of-javascript-object-ie-associative-array
+        //Object.size = function(obj) {
+        //    var size = 0, key;
+        //    for (key in obj) {
+        //        if (obj.hasOwnProperty(key)) size++;
+        //    }
+        //    return size;
+        //};
+
+        function size(dic) {
+            var size = 0, key;
+            for (key in dic) {
+                if (dic.hasOwnProperty(key)) size++; //??? test encore???
+            }
+            return size;
+        }
+        
+        function stats(s) {
+            // Char count
+            var count_letter = 0;
+            var count_white = 0;
+            var count_punctuation = 0;
+            var count_number = 0;
+            var count_other = 0;
+            var others = "";
+            // Block count
+            // Words
+            var count_word = 0;
+            var in_word = false;
+            var word = "";
+            var words = [];
+            // Sentences
+            var last_word_number = 0;
+            var sentence_length = [];
+            var count_sentence = 0;
+            var big_sentence = 0;
+            var accu_length = 0;
+            // Paragraph
+            var count_paragraph = 0;
+            for (var i=0; i < s.length; i++) {
+                var c = s[i];
+                if (is_us_letter(c)) {
+                    count_letter += 1;
+                    if (!in_word) {
+                        in_word = true;
+                        word = c;
+                    } else {
+                        word += c;
+                    }
+                } else if (is_number(c)) {
+                    count_number += 1;
+                    if (in_word) {
+                        in_word = false;
+                        count_word += 1;
+                        words.push(word);
+                    }
+                } else if (is_white(c)) {
+                    count_white += 1;
+                    if (c == "\n") {
+                        count_paragraph += 1;
+                    }
+                    if (in_word) {
+                        in_word = false;
+                        count_word += 1;
+                        words.push(word);
+                    }
+                } else if (is_punctuation(c)) {
+                    count_punctuation += 1;
+                    if (in_word) {
+                        in_word = false;
+                        count_word += 1;
+                        words.push(word);
+                    }
+                    if (c == "." || c == "?" || c == "!" || c == "…") {
+                        count_sentence += 1;
+                        sentence_length.push(count_word - last_word_number);
+                        if (count_word - last_word_number > 12) {
+                            big_sentence += 1;
+                        }
+                        accu_length += count_word - last_word_number;
+                        last_word_number = count_word;
+                    }
+                } else {
+                    count_other += 1;
+                    others += c;
+                    if (in_word) {
+                        in_word = false;
+                        count_word += 1;
+                        words.push(word);
+                    }
+                }
+            }
+            if (in_word) {
+                count_word += 1;
+                words.push(word);
+            }
+            
+            xwords = {};
+            for (var i=0; i < words.length; i++) {
+                if (words[i] in xwords) {
+                    xwords[words[i]] += 1;
+                } else {
+                    xwords[words[i]] = 1;
+                }
+            }
+            
+            //alert("lettres = " + count_letter + ", ponctuation = " + count_punctuation + ", blanc = " + count_white + ", autres = " + count_other + "\n phrases = " + count_sentence + ", paragraphes = " + count_paragraph + "\n" + others);
+            
+            // Get
+            var res_title = document.getElementById("res_title");
+            var res_table = document.getElementById("res_table");
+            var title_mot_apercu = document.getElementById("title_mot_apercu");
+            var res_mot_apercu = document.getElementById("res_mot_apercu");
+            var title_phrase_apercu = document.getElementById("title_phrase_apercu");
+            var res_phrase_apercu = document.getElementById("res_phrase_apercu");
+            var title_phrase = document.getElementById("title_phrase");
+            var res_phrase = document.getElementById("res_phrase");
+            var title_mot = document.getElementById("title_mot");
+            var res_mot = document.getElementById("res_mot");
+            // Clear
+            res_title.innerHTML = '';
+            title_phrase.innerHTML = '';
+            title_mot.innerHTML = '';
+            while (res_table.rows.length > 0) {
+                res_table.deleteRow(0);
+            }
+            while (res_mot_apercu.rows.length > 0) {
+                res_mot_apercu.deleteRow(0);
+            }
+            while (res_phrase_apercu.rows.length > 0) {
+                res_phrase_apercu.deleteRow(0);
+            }
+            while (res_phrase.rows.length > 0) {
+                res_phrase.deleteRow(0);
+            }
+            while (res_mot.rows.length > 0) {
+                res_mot.deleteRow(0);
+            }
+            // Complete
+            //
+            res_title.innerHTML = '<br><u>Résultats caractères</u><br><br>';
+            
+            var row_head = res_table.insertRow(0);
+            var head0 = row_head.insertCell(0);
+            var head1 = row_head.insertCell(1);
+            head0.innerHTML = "<span style='color: #FFFFFF'><u>Caractéristique</u></span>";
+            head0.bgColor = '#CEC498';
+            head1.innerHTML = "<span style='color: #FFFFFF'><u>Comptage</u></span>";
+            head1.bgColor = '#CEC498';
+            
+            var row_letter = res_table.insertRow(1);
+            row_letter.bgColor = '#F6F6F6';
+            row_letter_label = row_letter.insertCell(0);
+            row_letter_label.innerHTML = "Lettres";
+            row_letter_value = row_letter.insertCell(1);
+            row_letter_value.innerHTML = count_letter;
+            
+            var row_ponctuation = res_table.insertRow(2);
+            row_ponctuation_label = row_ponctuation.insertCell(0);
+            row_ponctuation_label.innerHTML = "Ponctuation";
+            row_ponctuation_value = row_ponctuation.insertCell(1);
+            row_ponctuation_value.innerHTML = count_punctuation;
+            
+            var row_white = res_table.insertRow(3);
+            row_white.bgColor = '#F6F6F6';
+            row_white_label = row_white.insertCell(0);
+            row_white_label.innerHTML = "Blancs";
+            row_white_value = row_white.insertCell(1);
+            row_white_value.innerHTML = count_white;
+            
+            var row_other = res_table.insertRow(4);
+            row_other_label = row_other.insertCell(0);
+            row_other_label.innerHTML = "Autres";
+            row_other_value = row_other.insertCell(1);
+            row_other_value.innerHTML = count_other;
+            
+            var row_signes = res_table.insertRow(5);
+            row_signes.bgColor = '#F6F6F6';
+            row_signes_label = row_signes.insertCell(0);
+            row_signes_label.innerHTML = "Signes";
+            row_signes_value = row_signes.insertCell(1);
+            row_signes_value.innerHTML = count_other + count_white + count_punctuation + count_letter;
+            
+            var row_others_content = res_table.insertRow(6);
+            row_others_content_label = row_others_content.insertCell(0);
+            row_others_content_label.innerHTML = "Autres (contenu)";
+            row_others_content_value = row_others_content.insertCell(1);
+            row_others_content_value.innerHTML = others;
+            
+            //
+            //
+            title_mot_apercu.innerHTML = '<br><u>Résultats mots</u><br><br>';
+            
+            var row_head = res_mot_apercu.insertRow(0);
+            var head0 = row_head.insertCell(0);
+            var head1 = row_head.insertCell(1);
+            head0.innerHTML = "<span style='color: #FFFFFF'><u>Caractéristique</u></span>";
+            head0.bgColor = '#CEC498';
+            head1.innerHTML = "<span style='color: #FFFFFF'><u>Comptage</u></span>";
+            head1.bgColor = '#CEC498';
+            
+            var row_word = res_mot_apercu.insertRow(1);
+            row_word_label = row_word.insertCell(0);
+            row_word_label.innerHTML = "Mots";
+            row_word_value = row_word.insertCell(1);
+            row_word_value.innerHTML = count_word;
+
+            var row_word_diff = res_mot_apercu.insertRow(2);
+            row_word_diff.bgColor = '#F6F6F6';
+            row_word_label = row_word_diff.insertCell(0);
+            row_word_label.innerHTML = "Mots différents";
+            row_word_value = row_word_diff.insertCell(1);
+            row_word_value.innerHTML = size(xwords);
+            
+            var row_word_reu = res_mot_apercu.insertRow(3);
+            row_word_label = row_word_reu.insertCell(0);
+            row_word_label.innerHTML = "Réutilisation";
+            row_word_value = row_word_reu.insertCell(1);
+            row_word_value.innerHTML = ((1 - (size(xwords)/count_word))*100).toFixed(0) + "%";
+            
+            //
+            //
+            title_phrase_apercu.innerHTML = '<br><u>Résultats phrases et paragraphes</u><br><br>';
+            
+            var row_head = res_phrase_apercu.insertRow(0);
+            var head0 = row_head.insertCell(0);
+            var head1 = row_head.insertCell(1);
+            head0.innerHTML = "<span style='color: #FFFFFF'><u>Caractéristique</u></span>";
+            head0.bgColor = '#CEC498';
+            head1.innerHTML = "<span style='color: #FFFFFF'><u>Comptage</u></span>";
+            head1.bgColor = '#CEC498';
+            
+            var row_sentence = res_phrase_apercu.insertRow(1);
+            row_sentence_label = row_sentence.insertCell(0);
+            row_sentence_label.innerHTML = "Phrases";
+            row_sentence_value = row_sentence.insertCell(1);
+            row_sentence_value.innerHTML = count_sentence;
+            
+            var row_big_sentence = res_phrase_apercu.insertRow(2);
+            row_big_sentence.bgColor = '#F6F6F6';
+            row_big_sentence_label = row_big_sentence.insertCell(0);
+            row_big_sentence_label.innerHTML = "Phrases >12 mots";
+            row_big_sentence_value = row_big_sentence.insertCell(1);
+            row_big_sentence_value.innerHTML = big_sentence + " (" + ((big_sentence/count_sentence)*100).toFixed(2) + "%)";
+            
+            var row_accu_length = res_phrase_apercu.insertRow(3);
+            row_paragraph_label = row_accu_length.insertCell(0);
+            row_paragraph_label.innerHTML = "Moyenne mots/phrase";
+            row_paragraph_value = row_accu_length.insertCell(1);
+            row_paragraph_value.innerHTML = (accu_length / count_sentence).toFixed(2);
+            
+            var row_paragraph = res_phrase_apercu.insertRow(4);
+            row_paragraph.bgColor = '#F6F6F6';
+            row_paragraph_label = row_paragraph.insertCell(0);
+            row_paragraph_label.innerHTML = "Paragraphes";
+            row_paragraph_value = row_paragraph.insertCell(1);
+            row_paragraph_value.innerHTML = count_paragraph;
+            
+            //
+            //
+            title_phrase.innerHTML = '<br><u>Analyse détaillée des phrases</u><br><br>';
+            
+            var row_head = res_phrase.insertRow(0);
+            var head0 = row_head.insertCell(0);
+            var head1 = row_head.insertCell(1);
+            var head2 = row_head.insertCell(2);
+            head0.innerHTML = "<span style='color: #FFFFFF'><u>Numéro de phrase</u></span>";
+            head0.bgColor = '#CEC498';
+            head1.innerHTML = "<span style='color: #FFFFFF'><u>Mots</u></span>";
+            head1.bgColor = '#CEC498';
+            head2.innerHTML = "<span style='color: #FFFFFF'><u>Contenu</u></span>";
+            head2.bgColor = '#CEC498';
+            
+            var total = 0;
+            var last_sentence = 0;
+            for (var i = 0; i < sentence_length.length; i++) {
+                var row = res_phrase.insertRow(i+1);
+                var cell_num = row.insertCell(0);
+                cell_num.innerHTML = "phrase numéro " + (i+1);
+                var cell_count = row.insertCell(1);
+                cell_count.innerHTML = sentence_length[i];
+                var cell_content = row.insertCell(2);
+                var scontent = "";
+                for (var j = last_sentence; j < last_sentence+sentence_length[i]; j++) {
+                    scontent += words[j] + " ";
+                }
+                last_sentence = last_sentence+sentence_length[i];
+                cell_content.innerHTML = scontent;
+                // Coloration
+                if (sentence_length[i] > 12) {
+                    row.bgColor = '#FF0000';
+                } else {
+                    if (i%2 == 0) {
+                        row.bgColor = '#F6F6F6';
+                    }
+                }
+                total += sentence_length[i];
+            }
+            var row_total = res_phrase.insertRow(i);
+            var cell_total_lbl = row_total.insertCell(0);
+            cell_total_lbl.innerHTML = "Moyenne";
+            var cell_total_num = row_total.insertCell(1);
+            cell_total_num.innerHTML = (total / i).toFixed(2);
+            if (i%2 == 0) {
+                row_total.bgColor = '#F6F6F6';
+            }
+            
+            title_mot.innerHTML = '<br><u>Analyses des mots</u><br><br>';
+            
+            var row_head = res_mot.insertRow(0);
+            var head0 = row_head.insertCell(0);
+            var head1 = row_head.insertCell(1);
+            head0.innerHTML = "<span style='color: #FFFFFF'><u>Mot</u></span>";
+            head0.bgColor = '#CEC498';
+            head1.innerHTML = "<span style='color: #FFFFFF'><u>Fréquence</u></span>";
+            head1.bgColor = '#CEC498';
+            
+            //var i = 0;
+            var total = 0;
+            var rtable = sort(xwords);
+            for (var i = 0; i < rtable[0].length; i++) {
+            //for (var key in xwords) {
+                var row = res_mot.insertRow(i+1);
+                var cell_word = row.insertCell(0);
+                cell_word.innerHTML = rtable[0][i]; // key;
+                var cell_num = row.insertCell(1);
+                cell_num.innerHTML = rtable[1][i]; // xwords[key];
+                total += rtable[1][i]; //xwords[key];
+                if (i%2 == 0) {
+                    row.bgColor = '#F6F6F6';
+                }
+                //i+=1;
+            }
+            var row_total = res_mot.insertRow(i);
+            var cell_total_lbl = row_total.insertCell(0);
+            cell_total_lbl.innerHTML = "Total";
+            var cell_total_num = row_total.insertCell(1);
+            cell_total_num.innerHTML = total;
+            if (i%2 == 0) {
+                row.bgColor = '#F6F6F6';
+            }
+                
+            //for (var i=0; i < words.length; i++)
+        }
+</script>
+</head>
+<body width="100%" height="100%">
+    <center>
+        <h1>Brieumatique</h1>
+        <textarea id="txt_input" rows="40" cols="80" placeholder="Entrer votre texte..."></textarea>
+        <br>
+        <button onclick="main()">Brieullant or not ?</button>
+        <div id="result"></div>
+            <div id="res_title" class="title"></div>
+            <table id="res_table" style="border:1px solid #000000;"></table>
+            
+            <div id="title_mot_apercu" class="title"></div>
+            <table id="res_mot_apercu" style="border:1px solid #000000;"></table>
+            
+            <div id="title_phrase_apercu" class="title"></div>
+            <table id="res_phrase_apercu" style="border:1px solid #000000;"></table>
+            
+            <div id="title_phrase" class="title"></div>
+            <table id="res_phrase" style="border:1px solid #000000;"></table>
+            
+            <div id="title_mot" class="title"></div>
+            <table id="res_mot" style="border:1px solid #000000;"></table>
+        </div>
+        <br>
+        <p><a href="http://ran.alwaysdata.net/index.html">Damien Gouteux 2013</a></p>
+    </center>
+        
+    <!--<table width="100%" height="100%">
+        <tr>
+            <td width="33%">
+                <textarea id="txt_input" rows="40" cols="80" placeholder="Entrer votre texte..."></textarea>
+            </td>
+            <td width="33%">
+                <button onclick="main()">Analyse</button>
+            </td>
+            <td width="33%">
+                <div id="result"></div>
+                    <div id="res_title" class="title"></div>
+                    <table id="res_table" style="border:1px solid #000000;"></table>
+                    <table id="res_mot" style="border:1px solid #000000;"></table>
+                </div>
+            </td>
+        </tr>
+    </table>-->
+</body>
+</html>
