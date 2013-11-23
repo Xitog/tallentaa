@@ -19,11 +19,32 @@
         font-size: 14px;
         color: #CC6714;
     }
+    
+    td.red {
+        background-color: #FF0000;
+    }
+    
+    td.orange {
+        background-color: #E04006;
+    }
+    
+    td.green {
+        background-color: #00FF00;
+    }
+    
 </style>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <!--<script src="http://tinymce.cachefly.net/4.0/tinymce.min.js"></script>-->
 <script>
         //tinymce.init({selector:'textarea', height : 300});
+        
+        var BIG_SENTENCE = 12;
+        var VERY_BIG_SENTENCE = 19;
+        var MOTS_WARNING = ["dis", "dit", "disons", "dites", "disent", "disais", "disait", "disions", "disiez", "disaient", "dîmes", "dîtes", "dirent", "dirai", "diras", "dira", "dirons", "direz", "diront", "dirais", "dirait", "dirions", "diriez", "diraient", "dise", "dises", "disse", "disses", "dît", "dissions", "dissiez","dissent", "disant", "dire", "fais", "fait", "faisons", "faites", "font", "faisais", "faisait", "faisions", "faisiez", "faisaient", "fis", "fit", "fîmes", "fîtes", "firent", "ferai", "feras", "fera", "ferons", "ferez", "feront", "ferais", "ferait", "ferions", "feriez", "feraient", "fasse", "fasses", "fassions", "fassiez", "fisse", "fisses", "fîts", "fissions", "fissiez", "fissent", "faire", "faisant"];
+        var MOTS_ERROR = ["personne", "gens", "on"];
+        var COLOR_WARNING = '#FF6103';
+        var COLOR_ERROR = '#FC1501';
+        var COLOR_OK = '#00FF00';
         
         function main() {
             //var textarea = document.getElementById("input");
@@ -102,12 +123,13 @@
         
         function stats(s) {
             // Char count
-            var count_letter = 0;
-            var count_white = 0;
-            var count_punctuation = 0;
-            var count_number = 0;
-            var count_other = 0;
-            var others = "";
+            var count_letter = 0;           // Nombre de lettres
+            var count_white = 0;            // Nombre d'espace blanc
+            var count_punctuation = 0;      // Nombre de signes de ponctuation
+            var count_number = 0;           // Nombre de chiffres
+            var count_other = 0;            // Nombre d'autres signes
+            var others = "";                // Les autres signes
+            var last_char = "";
             // Block count
             // Words
             var count_word = 0;
@@ -115,13 +137,17 @@
             var word = "";
             var words = [];
             // Sentences
-            var last_word_number = 0;
-            var sentence_length = [];
-            var count_sentence = 0;
-            var big_sentence = 0;
-            var accu_length = 0;
+            var last_word_number = 0;       // Dernier mot compté
+            var sentence_length = [];       // Longueur des phrases
+            var count_sentence = 0;         // Nombre de phrase
+            var big_sentence = 0;           // Nombre de phrase > BIG_SENTENCE
+            var accu_length_sentence = 0;   // Somme de toutes les longueurs
             // Paragraph
             var count_paragraph = 0;
+            var paragraph_length = [];
+            var last_sentence_number = 0;
+            var accu_length_paragraph = 0;
+            // Run
             for (var i=0; i < s.length; i++) {
                 var c = s[i];
                 if (is_us_letter(c)) {
@@ -142,7 +168,30 @@
                 } else if (is_white(c)) {
                     count_white += 1;
                     if (c == "\n") {
-                        count_paragraph += 1;
+                        if (in_word) {
+                            in_word = false;
+                            count_word += 1;
+                            words.push(word);
+                        }
+                        if ([".", "?", "!", "…", "\n"].indexOf(last_char) == -1) { // Si on a pas fermé d'un point le dernier paragraphe, il faut néanmoins compter une phrase. Sauf si c'est une suite de \n
+                            // Sentence
+                            count_sentence += 1;
+                            sentence_length.push(count_word - last_word_number);
+                            if (count_word - last_word_number > BIG_SENTENCE) {
+                                big_sentence += 1;
+                            }
+                            accu_length_sentence += count_word - last_word_number;
+                            last_word_number = count_word;
+                            // End Sentence
+                        }
+                        if(last_char != "\n") {
+                            // Paragraph
+                            count_paragraph += 1;
+                            paragraph_length.push(count_sentence - last_sentence_number);
+                            accu_length_paragraph += count_sentence - last_sentence_number;
+                            last_sentence_number = count_sentence;
+                            // End Paragraph
+                        }
                     }
                     if (in_word) {
                         in_word = false;
@@ -156,14 +205,16 @@
                         count_word += 1;
                         words.push(word);
                     }
-                    if (c == "." || c == "?" || c == "!" || c == "…") {
+                    if ((c == "." || c == "?" || c == "!" || c == "…") && ([".", "?", "!", "…"].indexOf(last_char) == -1)) {
+                        // Sentence
                         count_sentence += 1;
                         sentence_length.push(count_word - last_word_number);
-                        if (count_word - last_word_number > 12) {
+                        if (count_word - last_word_number > BIG_SENTENCE) {
                             big_sentence += 1;
                         }
-                        accu_length += count_word - last_word_number;
+                        accu_length_sentence += count_word - last_word_number;
                         last_word_number = count_word;
+                        // End Sentence
                     }
                 } else {
                     count_other += 1;
@@ -174,10 +225,21 @@
                         words.push(word);
                     }
                 }
+                last_char = c;
             }
+            // Dernier mot
             if (in_word) {
                 count_word += 1;
                 words.push(word);
+            }
+            // Dernier paragraph
+            if(last_char != "\n") {
+                // Paragraph
+                count_paragraph += 1;
+                paragraph_length.push(count_sentence - last_sentence_number);
+                accu_length_paragraph += count_sentence - last_sentence_number;
+                last_sentence_number = count_sentence;
+                // End Paragraph
             }
             
             xwords = {};
@@ -194,12 +256,23 @@
             // Get
             var res_title = document.getElementById("res_title");
             var res_table = document.getElementById("res_table");
+            
             var title_mot_apercu = document.getElementById("title_mot_apercu");
             var res_mot_apercu = document.getElementById("res_mot_apercu");
+            
             var title_phrase_apercu = document.getElementById("title_phrase_apercu");
             var res_phrase_apercu = document.getElementById("res_phrase_apercu");
+            
+            var title_paragraph_apercu = document.getElementById("title_paragraph_apercu");
+            var res_paragraph_apercu = document.getElementById("res_paragraph_apercu");
+            
+            var title_paragraph = document.getElementById("title_paragraph");
+            var res_paragraph = document.getElementById("res_paragraph");
+            
             var title_phrase = document.getElementById("title_phrase");
+            var map_phrase = document.getElementById("map_phrase");
             var res_phrase = document.getElementById("res_phrase");
+            
             var title_mot = document.getElementById("title_mot");
             var res_mot = document.getElementById("res_mot");
             // Clear
@@ -214,6 +287,15 @@
             }
             while (res_phrase_apercu.rows.length > 0) {
                 res_phrase_apercu.deleteRow(0);
+            }
+            while (res_paragraph_apercu.rows.length > 0) {
+                res_paragraph_apercu.deleteRow(0);
+            }
+            while (res_paragraph.rows.length > 0) {
+                res_paragraph.deleteRow(0);
+            }
+            while (map_phrase.rows.length > 0) {
+                map_phrase.deleteRow(0);
             }
             while (res_phrase.rows.length > 0) {
                 res_phrase.deleteRow(0);
@@ -272,7 +354,7 @@
             row_others_content_value = row_others_content.insertCell(1);
             row_others_content_value.innerHTML = others;
             
-            //
+            // APERCU MOTS
             //
             title_mot_apercu.innerHTML = '<br><u>Résultats mots</u><br><br>';
             
@@ -303,9 +385,9 @@
             row_word_value = row_word_reu.insertCell(1);
             row_word_value.innerHTML = ((1 - (size(xwords)/count_word))*100).toFixed(0) + "%";
             
+            // APERCU PHRASES
             //
-            //
-            title_phrase_apercu.innerHTML = '<br><u>Résultats phrases et paragraphes</u><br><br>';
+            title_phrase_apercu.innerHTML = '<br><u>Résultats phrases</u><br><br>';
             
             var row_head = res_phrase_apercu.insertRow(0);
             var head0 = row_head.insertCell(0);
@@ -324,7 +406,7 @@
             var row_big_sentence = res_phrase_apercu.insertRow(2);
             row_big_sentence.bgColor = '#F6F6F6';
             row_big_sentence_label = row_big_sentence.insertCell(0);
-            row_big_sentence_label.innerHTML = "Phrases >12 mots";
+            row_big_sentence_label.innerHTML = "Phrases >" + BIG_SENTENCE + " mots";
             row_big_sentence_value = row_big_sentence.insertCell(1);
             row_big_sentence_value.innerHTML = big_sentence + " (" + ((big_sentence/count_sentence)*100).toFixed(2) + "%)";
             
@@ -332,18 +414,76 @@
             row_paragraph_label = row_accu_length.insertCell(0);
             row_paragraph_label.innerHTML = "Moyenne mots/phrase";
             row_paragraph_value = row_accu_length.insertCell(1);
-            row_paragraph_value.innerHTML = (accu_length / count_sentence).toFixed(2);
+            row_paragraph_value.innerHTML = (accu_length_sentence / count_sentence).toFixed(2);
             
-            var row_paragraph = res_phrase_apercu.insertRow(4);
-            row_paragraph.bgColor = '#F6F6F6';
+            // APERCU PARAGRAPHES
+            //
+            title_paragraph_apercu.innerHTML = '<br><u>Résultats paragraphes</u><br><br>';
+            
+            var row_head = res_paragraph_apercu.insertRow(0);
+            var head0 = row_head.insertCell(0);
+            var head1 = row_head.insertCell(1);
+            head0.innerHTML = "<span style='color: #FFFFFF'><u>Caractéristique</u></span>";
+            head0.bgColor = '#CEC498';
+            head1.innerHTML = "<span style='color: #FFFFFF'><u>Comptage</u></span>";
+            head1.bgColor = '#CEC498';
+            
+            var row_paragraph = res_paragraph_apercu.insertRow(1);
             row_paragraph_label = row_paragraph.insertCell(0);
             row_paragraph_label.innerHTML = "Paragraphes";
             row_paragraph_value = row_paragraph.insertCell(1);
             row_paragraph_value.innerHTML = count_paragraph;
             
-            //
+            var row_accu_length_par = res_paragraph_apercu.insertRow(2);
+            row_accu_length_label = row_accu_length_par.insertCell(0);
+            row_accu_length_label.innerHTML = "Moyenne phrases/paragraphe";
+            row_accu_length_value = row_accu_length_par.insertCell(1);
+            row_accu_length_value.innerHTML = (accu_length_paragraph / count_paragraph).toFixed(2);
+            
+            // DETAILS PARAGRAPHES
+            
+            title_paragraph.innerHTML = '<br><u>Analyse détaillée des paragraphes</u><br><br>';
+            
+            var row_head = res_paragraph.insertRow(0);
+            var head0 = row_head.insertCell(0);
+            var head1 = row_head.insertCell(1);
+            head0.innerHTML = "<span style='color: #FFFFFF'><u>Numéro de paragraphe</u></span>";
+            head0.bgColor = '#CEC498';
+            head1.innerHTML = "<span style='color: #FFFFFF'><u>Longueur en phrases</u></span>";
+            head1.bgColor = '#CEC498';
+            
+            for (var i = 0; i < count_paragraph; i++) {
+                var row = res_paragraph.insertRow(i+1);
+                var cell = row.insertCell(0);
+                cell.innerHTML = "Paragraphe n°" + (i+1);
+                cell = row.insertCell(1);
+                cell.innerHTML = paragraph_length[i];
+            }
+            
+            // DETAILS PHRASES
             //
             title_phrase.innerHTML = '<br><u>Analyse détaillée des phrases</u><br><br>';
+            
+            var last = 0;
+            for (var i = 0; i < count_paragraph; i++) {
+                var row = map_phrase.insertRow(i);
+                var cell = row.insertCell(0);
+                cell.innerHTML = "Paragraphe n°" + (i+1);
+                for (var j = 0; j < paragraph_length[i]; j++) {
+                    cell = row.insertCell(j+1);
+                    if (sentence_length[last + j] > BIG_SENTENCE) {
+                        if (sentence_length[last + j] > VERY_BIG_SENTENCE) {
+                            cell.bgColor = COLOR_ERROR;
+                        } else {
+                            cell.bgColor = COLOR_WARNING;
+                        }
+                    } else {
+                        cell.bgColor = COLOR_OK;
+                    }
+                    cell.innerHTML = "n°" + (last + j + 1) + " (" + sentence_length[last + j] + ")";
+                }
+                last += paragraph_length[i];
+            }
             
             var row_head = res_phrase.insertRow(0);
             var head0 = row_head.insertCell(0);
@@ -351,7 +491,7 @@
             var head2 = row_head.insertCell(2);
             head0.innerHTML = "<span style='color: #FFFFFF'><u>Numéro de phrase</u></span>";
             head0.bgColor = '#CEC498';
-            head1.innerHTML = "<span style='color: #FFFFFF'><u>Mots</u></span>";
+            head1.innerHTML = "<span style='color: #FFFFFF'><u>Longueur en mots</u></span>";
             head1.bgColor = '#CEC498';
             head2.innerHTML = "<span style='color: #FFFFFF'><u>Contenu</u></span>";
             head2.bgColor = '#CEC498';
@@ -372,8 +512,12 @@
                 last_sentence = last_sentence+sentence_length[i];
                 cell_content.innerHTML = scontent;
                 // Coloration
-                if (sentence_length[i] > 12) {
-                    row.bgColor = '#FF0000';
+                if (sentence_length[i] > BIG_SENTENCE) {
+                    if (sentence_length[i] > VERY_BIG_SENTENCE) {
+                        row.bgColor = COLOR_ERROR;
+                    } else {
+                        row.bgColor = COLOR_WARNING;
+                    }
                 } else {
                     if (i%2 == 0) {
                         row.bgColor = '#F6F6F6';
@@ -381,15 +525,17 @@
                 }
                 total += sentence_length[i];
             }
-            var row_total = res_phrase.insertRow(i);
+            var row_total = res_phrase.insertRow(sentence_length.length+1);
             var cell_total_lbl = row_total.insertCell(0);
-            cell_total_lbl.innerHTML = "Moyenne";
+            cell_total_lbl.innerHTML = "Moyenne de mots / phrase";
             var cell_total_num = row_total.insertCell(1);
             cell_total_num.innerHTML = (total / i).toFixed(2);
             if (i%2 == 0) {
                 row_total.bgColor = '#F6F6F6';
             }
             
+            // DETAILS MOTS
+            //
             title_mot.innerHTML = '<br><u>Analyses des mots</u><br><br>';
             
             var row_head = res_mot.insertRow(0);
@@ -407,16 +553,20 @@
             //for (var key in xwords) {
                 var row = res_mot.insertRow(i+1);
                 var cell_word = row.insertCell(0);
-                cell_word.innerHTML = rtable[0][i]; // key;
+                cell_word.innerHTML = rtable[0][i]; // key; mot
                 var cell_num = row.insertCell(1);
-                cell_num.innerHTML = rtable[1][i]; // xwords[key];
+                cell_num.innerHTML = rtable[1][i]; // xwords[key]; nb occurence
                 total += rtable[1][i]; //xwords[key];
-                if (i%2 == 0) {
+                if (MOTS_ERROR.indexOf(rtable[0][i]) != -1) {
+                    row.bgColor = COLOR_ERROR;
+                } else if (MOTS_WARNING.indexOf(rtable[0][i]) != -1) {
+                    row.bgColor = COLOR_WARNING;
+                } else if (i%2 == 0) {
                     row.bgColor = '#F6F6F6';
                 }
                 //i+=1;
             }
-            var row_total = res_mot.insertRow(i);
+            var row_total = res_mot.insertRow(rtable[0].length+1);
             var cell_total_lbl = row_total.insertCell(0);
             cell_total_lbl.innerHTML = "Total";
             var cell_total_num = row_total.insertCell(1);
@@ -434,22 +584,30 @@
         <h1>Brieumatique</h1>
         <textarea id="txt_input" rows="40" cols="80" placeholder="Entrer votre texte..."></textarea>
         <br>
-        <button onclick="main()">Brieullant or not ?</button>
+        <button onclick="main()">Brieuillant or not ?</button>
         <div id="result"></div>
             <div id="res_title" class="title"></div>
-            <table id="res_table" style="border:1px solid #000000;"></table>
+            <table id="res_table"></table>
             
             <div id="title_mot_apercu" class="title"></div>
-            <table id="res_mot_apercu" style="border:1px solid #000000;"></table>
+            <table id="res_mot_apercu"></table>
             
             <div id="title_phrase_apercu" class="title"></div>
-            <table id="res_phrase_apercu" style="border:1px solid #000000;"></table>
+            <table id="res_phrase_apercu"></table>
+            
+            <div id="title_paragraph_apercu" class="title"></div>
+            <table id="res_paragraph_apercu"></table>
+            
+            <div id="title_paragraph" class="title"></div>
+            <table id="res_paragraph"></table>
             
             <div id="title_phrase" class="title"></div>
-            <table id="res_phrase" style="border:1px solid #000000;"></table>
+            <table id="map_phrase"></table>
+            <br><br>
+            <table id="res_phrase"></table>
             
             <div id="title_mot" class="title"></div>
-            <table id="res_mot" style="border:1px solid #000000;"></table>
+            <table id="res_mot"></table>
         </div>
         <br>
         <p><a href="http://ran.alwaysdata.net/index.html">Damien Gouteux 2013</a></p>
