@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+# http://www.pygame.org/docs/
+# http://docs.python.org/library/urllib.html
+
 # Une bibliotheque simple.
 # Gere la profondeur (axe z)
 #
@@ -10,7 +14,22 @@
 import pygame
 from pygame.locals import *
 
-import math # is_in for Circle
+import math # sqrt for is_in for Circle
+
+# Constants (tirées d'un autre fichier : utile ?)
+Red     = (255, 0, 0)
+Green   = (0, 255, 0)
+Blue    = (0, 0, 255)
+Black   = (0, 0, 0)
+Grey    = (128, 128, 128)
+
+Fill    = 0
+
+Blend   = 1
+NoBlend = 0
+
+All     = None
+# fin constantes
 
 class Image:
     def __init__(self, path, color=(255, 0, 255)):
@@ -157,7 +176,7 @@ class Sprite(GraphicItem):
     
     def draw(self, surface):
         surface.blit(self.x, self.y, self.img)
-    
+
 s = Application("SimpleLib", 640, 400, debug=True)
 s.add(Circle(30, 30, 20, (255, 0, 0)), 10)
 s.add(Circle(30, 30, 10, (0, 0, 255)), 11)

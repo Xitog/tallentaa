@@ -338,7 +338,7 @@ def prepare(symbols):
     i = 0
     while i < len(symbols):
         symb = symbols[i]
-        if symb.terminal:
+        if symb.terminal():
             if symb.val == '-' and (i == 0 or symbols[i-1].kind == Operator):
                 symb.val = 'unary-'
             # () -> x
