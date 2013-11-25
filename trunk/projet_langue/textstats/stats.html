@@ -38,13 +38,32 @@
 <script>
         //tinymce.init({selector:'textarea', height : 300});
         
+        // Stats : textual statistics
+        // Copyright (C) 2013 Damien Gouteux
+        
+        // This program is free software: you can redistribute it and/or modify
+        // it under the terms of the GNU General Public License as published by
+        // the Free Software Foundation, either version 3 of the License, or
+        // (at your option) any later version.
+        
+        // This program is distributed in the hope that it will be useful,
+        // but WITHOUT ANY WARRANTY; without even the implied warranty of
+        // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        // GNU General Public License for more details.
+
+        // You should have received a copy of the GNU General Public License
+        // along with this program.  If not, see <http://www.gnu.org/licenses/>.
+        
+        var BIG_WORD = 9;
         var BIG_SENTENCE = 12;
         var VERY_BIG_SENTENCE = 19;
         var MOTS_WARNING = ["dis", "dit", "disons", "dites", "disent", "disais", "disait", "disions", "disiez", "disaient", "dîmes", "dîtes", "dirent", "dirai", "diras", "dira", "dirons", "direz", "diront", "dirais", "dirait", "dirions", "diriez", "diraient", "dise", "dises", "disse", "disses", "dît", "dissions", "dissiez","dissent", "disant", "dire", "fais", "fait", "faisons", "faites", "font", "faisais", "faisait", "faisions", "faisiez", "faisaient", "fis", "fit", "fîmes", "fîtes", "firent", "ferai", "feras", "fera", "ferons", "ferez", "feront", "ferais", "ferait", "ferions", "feriez", "feraient", "fasse", "fasses", "fassions", "fassiez", "fisse", "fisses", "fîts", "fissions", "fissiez", "fissent", "faire", "faisant"];
-        var MOTS_ERROR = ["personne", "gens", "on"];
+        var MOTS_ERROR = ["personne", "gens", "on", "je"];
+        var MOTS_SIGNATURE = ["Delmas", "Demaure", "Desseigne", "Douet", "Dumas", "Estrade", "Evrard", "Frederic", "Gauthier", "Gillard", "Giraud", "Gouteux", "Gozioso", "Guerre", "Hassenjee", "Henry", "Koualef", "Laforcade", "Laison", "Lambert", "Latour", "Gohébel", "Piver", "Lemaire", "Lompech", "Loppy", "Michel", "Morand", "Pennanec", "Perrin", "Pouzin", "Pradier", "Prétagut", "Sens", "Seurin", "Tauotaha"];
         var COLOR_WARNING = '#FF6103';
         var COLOR_ERROR = '#FC1501';
         var COLOR_OK = '#00FF00';
+        var ADVERBES = ["abondamment","absolument","abstraitement","abusivement","accessoirement","actuellement","admirablement","adorablement","adroitement","affablement","affectueusement","affirmativement","agilement","agréablement","aimablement","aisément","altrnativement","ambigument","ambitieusement","amèrement","amicalement","amoureusement","amplement","anciennement","annuellment","antérieurement","apparemment","arbitrairement","ardemment","artificiellement","assidûment","assurément","astucieuement","atrocement","attentivement","aucunement","audacieusement","austèrement","avantageusement","aveuglément","avidemet","banalement","bassement","bestialement","bonnement","bravement","brillamment","brusquement","brutalement","bruyamment","candidement","capricieusement","carrément","catégoriquement","cavalièrement","censément","cérémonieusement","certaineent","chaleureusement","charitablement","chèrement","chrétiennement","cinquièmement","civilement","clairement","clandestnement","collectivement","commodément","communément","comparativement","concurremment","conditionnellement","confidentielement","conformément","confortablement","confusément","congrûment","conjointement","consciencieusement","consciemment", "consécutivement","conséquemment","considérablement","constamment","constitutionnellement","continûment","continuellement","contradictoirement","convenablement","conventionnellement","copieusement","coquettement","cordialement","correctement","courageusement","couramment","craintivement","criminellement","crûment","cruellement","curieusement","dangereusement","décemment","décidément","décisivement","dédaigneusement","défensivement","définitivement","délibérément","délicatement","délicieusement","déloyalement","démesurément","dernièrement","désagréablement","désespérément","désordonnément","détermnément","détestablement","deuxièmement","diaboliquement","diagonalement","diamétralement","différemment","difficilement","diffusément","dignement","diligemment","directement","discrètement","disproportionnément","distinctement","distraitement","divinement","dixièmement","docilement","doublement","douloureusement","doucement","douzièmement","dramatiquement","dôement","dûment","durement","économiquement","effectivement","efficacement","effrontément","effroyablement","également","éogïstement","élégamment","éloquemment","éminemment","emphatiquement","ennuyeusement","énormément","éperdument","épouvantblement","équitablement","essentiellement","éternellement","étonnamment","étrangement","étroitement","évasivement","évenuellement","évidemment","exactement","excessivement","exclusivement","exécrablement","exemplairement","explicitement","epressément","exquisément","extérieurement","extraordinairement","extrêmement","fabuleusement","facilement","faiblement","fallacieusement","familièrement","fanatiquement","fastidieusement","fastueusement","fatalement","faussement","fervemment","fidèlement","fièrement","figurativement","figurément","finement","foncièrement","fondamentalement","forcément","formelement","formidablement","fortement","fortuitement","fougueusement","fraîchement","franchement","fraternellement","fraudleusement","frénétiquement","fréquemment","frivolement","froidement","furieusement","furtivement","gaiement","galamment","généralement","généreusement","glorieusement","goulûment","gracieusement","grammaticalement","gratuitement","gravement","grossièrement","habilement","habituellement","hardiment","harmonieusement","hâtivement","hautement","héréditairement","éoïquement","heureusement","hiérarchiquement","historiquement","honnêtement","honorablement","honteusement","horizontaleent","horriblement","hostilement","huitièmement","humainement","humblement","identiquement","illégalement","illicitement","illisiblement","illusoirement","immanquablement","immédiatement","immensément","immodérément","immuablement","imparfatement","impartialement","impatiemment","impérativement","imperceptiblement","impérieusement","impersonnellement","imperurbablement","impétueusement","impitoyablement","implicitement","importunément","imprudemment","incessamment","incidemmet","inclusivement","incommodément","incongrûment","inconsciemment","inconsidérément","incorrectement","incroyablement","ndécemment","indéfiniment","indépendamment","indéterminément","indifféremment","indirectement","indiscutablement","indisinctement","individuellement","indivisément","indûment","indubitablement","inébranlablement","inégalement","inéluctablemnt","inespérément","inévitablement","inexactement","inexorablement","inextricablement","infailliblement","infatigablement","inférieurement","infiniment","ingénieusement","ingénument","inlassablement","innocemment","innombrablement","inopinéent","inoubliablement","insatiablement","insidieusement","instamment","instantanément","insuffisamment","insupportablemet","intégralement","intelligemment","intelligiblement","intensément","intérieurement","interminablement","intrinsèquement","intuitivement","inutilement","invariablement","involontairement","ironiquement","irrégulièrement","irrémédiablement","irrésistiblement","irrésolument","irrévocablement","isolément","joliment","joyeusement","judiciairement","judicieusement","juridiquement","justement","laborieusement","lâchement","laconiquement","lamentablement","largement","latéralement","légalement","légitimement","lentement","libéralement","librement","licitement","lisiblement","littéralement","logiquement","longuement","longitudinalement","lourdement","loyalement","lucidement","luxueusement","machinalement","magistralement","magnifiquement","maigrement","majestueusement","maladivement","maladroitement","malaisément","malencontreusement","mlhabilement","malheureusement","malhonnêtement","malicieusement","manifestement","manuellement","maritalement","massivemnt","matériellement","maternellement","mathématiquement","mécaniquement","méchamment","médiocrement","mélancoliquement","mélodieusement","mentalement","merveilleusement","mesquinement","métaphoriquement","méthodiquement","mignonnement","miliairement","miraculeusement","misérablement","modérément","modestement","modiquement","momentanément","monstrueusement","oralement","mortellement","musicalement","mutuellement","mystérieusement","naïvement","nationalement","naturellement","nécessairement","négativement","négligemment","nerveusement","nettement","neuvièmement","noblement","nommément","nonchalament","normalement","nûment","nullement","numériquement","obliquement","obscurément","obstinément","occasionnellement","dieusement","offensivement","officiellement","officieusement","onzièmement","opiniâtrement","opportunément","ordinairemet","originairement","originellement","ostensiblement","outrageusement","ouvertement","pacifiquement","paisiblement","parillement","paresseusement","parfaitement","partialement","particulièrement","partiellement","passablement","passivement","passionnément","patiemment","pauvrement","péniblement","pensivement","périlleusement","périodiquement","pernicieusement","perpendiculairement","perpétuellement","personnellement","pertinemment","pesamment","petitement","peureusement","physquement","piteusement","pitoyablement","plaintivement","plaisamment","pleinement","poliment","politiquement","pompeusemet","ponctuellement","populairement","posément","positivement","postérieurement","pratiquement","préalablement","précédement","précieusement","précisément","préférablement","préliminairement","prématurément","premièrement","présentement","préomptueusement","primitivement","primordialement","principalement","probablement","prochainement","prodigieusement","proondément","profusément","progressivement","promptement","prophétiquement","proportionnément","proportionnellement","propement","proverbialement","provisoirement","prudemment","publiquement","pudiquement","puissamment","purement","quatorzièmment","quatrièmement","quinzièmement","quotidiennement","radicalement","raisonnablement","rapidement","rarement","récemmnt","réellement","régulièrement","relativement","religieusement","résolument","respectivement","respectueusement","révérncieusement","rêveusement","révolutionnairement","richement","ridiculement","rigidement","rigoureusement","risiblement","royalement","rudement","sagement","sainement","salutairement","satiriquement","sauvagement","savamment","savoureusement","scandaleusement","scientifiquement","scrupuleusement","sèchement","secrètement","seizièmement","sensément","sensiblement","sensuellement","sentimentalement","séparément","septièmement","sérieusement","servilement","seulement","sévèrement","simultanément","sincèrement","singulièrement","sixièmement","socialement","soigneusement","solennellement","solidairement","solidement","solitairement","sommairement","somptueusement","sordidement","sottement","soudainement","sournoisement","souverainement","spacieusement","spécialement","spécifiquement","spirituellement","splendidement","spontanément","stoïqement","strictement","stupidement","subitement","sublimement","subséquemment","substantiellement","subtilement","successvement","succinctement","suffisamment","superbement","superficiellement","supérieurement","superlativement","superstitiesement","suprêmement","sûrement","surabondamment","surnaturellement","symboliquement","symétriquement","synthétiquement","systématiquement","tacitement","tardivement","tellement","témérairement","temporairement","tendrement","terriblement","txtuellement","théoriquement","timidement","totalement","tragiquement","transversalement","treizièmement","triomphalement","tristement","trivialement","troisièmement","tumultueusement","tyranniquement","ultérieurement","unanimement","uniforméent","uniquement","universellement","usuellement","utilement","vaguement","vaillamment","vainement","valablement","valereusement","validement","vaniteusement","véhémentement","verbalement","véridiquement","véritablement","vertement","vertialement","vicieusement","victorieusement","vivement","vigilamment","vigoureusement","vilement","vilainement","violemment","virilement","virtuellement","visiblement","volontairement","voluptueusement","vraiment","vraisemblablement","vulgairement"];
         
         function main() {
             //var textarea = document.getElementById("input");
@@ -75,7 +94,7 @@
         }
         
         function is_punctuation(c) {
-            return ([".", ",", ";", ":", "-", "(", ")", "’", "'", "?", "!", "«", "»", '"', "*", "–", "…", "[", "]"].indexOf(c) > -1);
+            return ([".", ",", ";", ":", "-", "(", ")", "’", "'", "?", "!", "«", "»", '"', "*", "–", "…", "[", "]", "/", "\"", "$", "€", "#", "%", "“", "”"].indexOf(c) > -1);
         }
         
         // str : int
@@ -129,19 +148,23 @@
             var count_number = 0;           // Nombre de chiffres
             var count_other = 0;            // Nombre d'autres signes
             var others = "";                // Les autres signes
-            var last_char = "";
+            var last_char = "";             // Dernier caractère lu
+            var accu_length_word = 0;       // Somme de toutes les longueurs de mots
+            var big_word = 0;               // Nombre de mots > BIG_WORD
             // Block count
             // Words
             var count_word = 0;
             var in_word = false;
             var word = "";
             var words = [];
+            var adverbes = [];
+            var adverbes_count = 0;
             // Sentences
             var last_word_number = 0;       // Dernier mot compté
             var sentence_length = [];       // Longueur des phrases
             var count_sentence = 0;         // Nombre de phrase
             var big_sentence = 0;           // Nombre de phrase > BIG_SENTENCE
-            var accu_length_sentence = 0;   // Somme de toutes les longueurs
+            var accu_length_sentence = 0;   // Somme de toutes les longueurs de phrases
             // Paragraph
             var count_paragraph = 0;
             var paragraph_length = [];
@@ -243,15 +266,34 @@
             }
             
             xwords = {};
+            var count_mot_error = 0;
+            var count_mot_warning = 0;
             for (var i=0; i < words.length; i++) {
+                accu_length_word += words[i].length;
+                if (words[i].length >= BIG_WORD) {
+                    big_word += 1;
+                }
+                var adv = ADVERBES.indexOf(words[i]);
+                if (adv != -1) {
+                    adverbes_count += 1;
+                    adverbes.push(ADVERBES[adv]);
+                }
+                if (MOTS_ERROR.indexOf(words[i]) != -1) {
+                    count_mot_error += 1;
+                } else if (MOTS_WARNING.indexOf(words[i]) != -1) {
+                    count_mot_warning += 1;
+                }
                 if (words[i] in xwords) {
                     xwords[words[i]] += 1;
                 } else {
                     xwords[words[i]] = 1;
                 }
             }
+            var rtable = sort(xwords); // Table qui a pour clé les mots et pour valeur leur fréquence. Triée.
             
             //alert("lettres = " + count_letter + ", ponctuation = " + count_punctuation + ", blanc = " + count_white + ", autres = " + count_other + "\n phrases = " + count_sentence + ", paragraphes = " + count_paragraph + "\n" + others);
+            
+            //-----------------------------------------------------------------
             
             // Get
             var res_title = document.getElementById("res_title");
@@ -259,12 +301,20 @@
             
             var title_mot_apercu = document.getElementById("title_mot_apercu");
             var res_mot_apercu = document.getElementById("res_mot_apercu");
+            var com_mot_apercu = document.getElementById("com_mot_apercu");
             
             var title_phrase_apercu = document.getElementById("title_phrase_apercu");
             var res_phrase_apercu = document.getElementById("res_phrase_apercu");
             
             var title_paragraph_apercu = document.getElementById("title_paragraph_apercu");
             var res_paragraph_apercu = document.getElementById("res_paragraph_apercu");
+            
+            var title_text_apercu = document.getElementById("title_text_apercu");
+            var res_text_apercu = document.getElementById("res_text_apercu");
+            var com_text_apercu = document.getElementById("com_text_apercu");
+            
+            var title_signature = document.getElementById("title_signature");
+            var res_signature = document.getElementById("res_signature");
             
             var title_paragraph = document.getElementById("title_paragraph");
             var res_paragraph = document.getElementById("res_paragraph");
@@ -279,6 +329,9 @@
             res_title.innerHTML = '';
             title_phrase.innerHTML = '';
             title_mot.innerHTML = '';
+            com_mot_apercu.innerHTML = '';
+            title_signature.innerHTML = '';
+            res_signature.innerHTML = '';
             while (res_table.rows.length > 0) {
                 res_table.deleteRow(0);
             }
@@ -290,6 +343,9 @@
             }
             while (res_paragraph_apercu.rows.length > 0) {
                 res_paragraph_apercu.deleteRow(0);
+            }
+            while (res_text_apercu.rows.length > 0) {
+                res_text_apercu.deleteRow(0);
             }
             while (res_paragraph.rows.length > 0) {
                 res_paragraph.deleteRow(0);
@@ -363,7 +419,7 @@
             var head1 = row_head.insertCell(1);
             head0.innerHTML = "<span style='color: #FFFFFF'><u>Caractéristique</u></span>";
             head0.bgColor = '#CEC498';
-            head1.innerHTML = "<span style='color: #FFFFFF'><u>Comptage</u></span>";
+            head1.innerHTML = "<span style='color: #FFFFFF'><u>Valeur</u></span>";
             head1.bgColor = '#CEC498';
             
             var row_word = res_mot_apercu.insertRow(1);
@@ -385,6 +441,61 @@
             row_word_value = row_word_reu.insertCell(1);
             row_word_value.innerHTML = ((1 - (size(xwords)/count_word))*100).toFixed(0) + "%";
             
+            var label;
+            var value;
+            
+            var row_word_error = res_mot_apercu.insertRow(4);
+            row_word_error.bgColor = '#F6F6F6';
+            label = row_word_error.insertCell(0);
+            label.innerHTML = "Mots interdits";
+            value = row_word_error.insertCell(1);
+            value.innerHTML = count_mot_error;
+            if (count_mot_error > 0) {
+                value.bgColor = COLOR_ERROR;
+            } else {
+                value.bgColor = COLOR_OK;
+            }
+            
+            var row_word_warning = res_mot_apercu.insertRow(5);
+            label = row_word_warning.insertCell(0);
+            label.innerHTML = "Mots à éviter";
+            value = row_word_warning.insertCell(1);
+            value.innerHTML = count_mot_warning;
+            if (count_mot_warning > 0) {
+                value.bgColor = COLOR_WARNING;
+            } else {
+                value.bgColor = COLOR_OK;
+            }
+            
+            var row_word_length = res_mot_apercu.insertRow(6);
+            row_word_length.bgColor = '#F6F6F6';
+            label = row_word_length.insertCell(0);
+            label.innerHTML = "Longueur moyenne";
+            value = row_word_length.insertCell(1);
+            value.innerHTML = (accu_length_word / words.length).toFixed(2);
+            
+            var row_big_word = res_mot_apercu.insertRow(6);
+            label = row_big_word.insertCell(0);
+            label.innerHTML = "Mots > " + BIG_WORD + " lettres";
+            value = row_big_word.insertCell(1);
+            value.innerHTML = big_word + " (" + ((big_word/words.length)*100).toFixed(2) + "%)";
+            
+            var row_adverbe = res_mot_apercu.insertRow(7);
+            row_adverbe.bgColor = '#F6F6F6';
+            label = row_adverbe.insertCell(0);
+            label.innerHTML = "Adverbes";
+            value = row_adverbe.insertCell(1);
+            value.innerHTML = adverbes_count;
+            
+            com_mot_apercu.innerHTML = "Adverbes détectés : ";
+            for (var z = 0; z < adverbes.length; z++) {
+                com_mot_apercu.innerHTML += adverbes[z];
+                if (z < adverbes.length-1) {
+                    com_mot_apercu.innerHTML += ", ";
+                }
+            }
+            com_mot_apercu.innerHTML += ".";
+            
             // APERCU PHRASES
             //
             title_phrase_apercu.innerHTML = '<br><u>Résultats phrases</u><br><br>';
@@ -394,7 +505,7 @@
             var head1 = row_head.insertCell(1);
             head0.innerHTML = "<span style='color: #FFFFFF'><u>Caractéristique</u></span>";
             head0.bgColor = '#CEC498';
-            head1.innerHTML = "<span style='color: #FFFFFF'><u>Comptage</u></span>";
+            head1.innerHTML = "<span style='color: #FFFFFF'><u>Valeur</u></span>";
             head1.bgColor = '#CEC498';
             
             var row_sentence = res_phrase_apercu.insertRow(1);
@@ -425,7 +536,7 @@
             var head1 = row_head.insertCell(1);
             head0.innerHTML = "<span style='color: #FFFFFF'><u>Caractéristique</u></span>";
             head0.bgColor = '#CEC498';
-            head1.innerHTML = "<span style='color: #FFFFFF'><u>Comptage</u></span>";
+            head1.innerHTML = "<span style='color: #FFFFFF'><u>Valeur</u></span>";
             head1.bgColor = '#CEC498';
             
             var row_paragraph = res_paragraph_apercu.insertRow(1);
@@ -440,8 +551,56 @@
             row_accu_length_value = row_accu_length_par.insertCell(1);
             row_accu_length_value.innerHTML = (accu_length_paragraph / count_paragraph).toFixed(2);
             
-            // DETAILS PARAGRAPHES
+            // APERCU TEXTE
+            //
+            title_text_apercu.innerHTML = '<br><u>Résultat texte</u><br><br>';
             
+            var row_head = res_text_apercu.insertRow(0);
+            var head0 = row_head.insertCell(0);
+            var head1 = row_head.insertCell(1);
+            head0.innerHTML = "<span style='color: #FFFFFF'><u>Caractéristique</u></span>";
+            head0.bgColor = '#CEC498';
+            head1.innerHTML = "<span style='color: #FFFFFF'><u>Valeur</u></span>";
+            head1.bgColor = '#CEC498';
+            
+            var row_gunning = res_text_apercu.insertRow(1);
+            label = row_gunning.insertCell(0);
+            label.innerHTML = "Indice de Gunning";
+            value = row_gunning.insertCell(1);
+            var gunning = ((accu_length_sentence / count_sentence) + ((big_word / words.length)*100)) * 0.4
+            value.innerHTML = gunning.toFixed(2);
+            if (gunning <= 8) {
+                value.bgColor = COLOR_OK;
+            } else if (gunning < 12) {
+                value.bgColor = COLOR_WARNING;
+            } else {
+                value.bgColor = COLOR_ERROR;
+            }
+            
+            com_text_apercu.innerHTML = "L'indice de Gunning mesure la lisibilité de votre texte. La longueur moyenne des phrases et le nombre de mots d'une longueur de plus de " + BIG_WORD + " sont pris en compte. Entre 6 et 8, le texte est facile à lire, entre 12 et 15, difficile."
+            
+            // Signature
+            //
+            title_signature.innerHTML = '<br><u>Présence signature</u><br>';
+            var a = false;
+            for (var i = words.length-1; i >= 0; i--) {
+                var a = MOTS_SIGNATURE.indexOf(words[i]);
+                if (a != -1) {
+                    break;
+                }
+            }
+            if (a == false || a == -1) {
+                res_signature.innerHTML = '<p><span style="color:red">Le logiciel n\'a pas réussi à détecter de signature.</span></p>';
+            } else {
+                if (a == 24) {
+                    // White Rabbit
+                    res_signature.innerHTML = '<p><a href="' + String.fromCharCode(97,108,112,104,97) + '.jpg">' + String.fromCharCode(86,111,115,32,121,101,117,120,44,32,98,105,101,110,32,113,117,39,105,108,32,102,251,116,32,110,117,105,116,44,32,114,97,109,101,110,232,114,101,110,116,32,108,101,32,106,111,117,114) + '</a><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>' + String.fromCharCode(82,111,110,115,97,114,100,44,32,83,111,110,110,101,116,115,32,112,111,117,114,32,72,233,108,232,110,101) + '</i></p>';
+                }
+                res_signature.innerHTML += '<p>Signature détectée : <span style="color:blue">' + MOTS_SIGNATURE[a] + '</span></p>';
+            }
+            
+            // DETAILS PARAGRAPHES
+            //
             title_paragraph.innerHTML = '<br><u>Analyse détaillée des paragraphes</u><br><br>';
             
             var row_head = res_paragraph.insertRow(0);
@@ -548,7 +707,6 @@
             
             //var i = 0;
             var total = 0;
-            var rtable = sort(xwords);
             for (var i = 0; i < rtable[0].length; i++) {
             //for (var key in xwords) {
                 var row = res_mot.insertRow(i+1);
@@ -591,12 +749,20 @@
             
             <div id="title_mot_apercu" class="title"></div>
             <table id="res_mot_apercu"></table>
+            <p id="com_mot_apercu"></p>
             
             <div id="title_phrase_apercu" class="title"></div>
             <table id="res_phrase_apercu"></table>
             
             <div id="title_paragraph_apercu" class="title"></div>
             <table id="res_paragraph_apercu"></table>
+            
+            <div id="title_text_apercu" class="title"></div>
+            <table id="res_text_apercu"></table>
+            <p id="com_text_apercu"></p>
+            
+            <div id="title_signature" class="title"></div>
+            <div id="res_signature"></div>
             
             <div id="title_paragraph" class="title"></div>
             <table id="res_paragraph"></table>
