@@ -56,7 +56,7 @@
         
         var BIG_WORD = 9;
         var BIG_SENTENCE = 12;
-        var VERY_BIG_SENTENCE = 19;
+        var VERY_BIG_SENTENCE = 17;
         var MOTS_WARNING = ["dis", "dit", "disons", "dites", "disent", "disais", "disait", "disions", "disiez", "disaient", "dîmes", "dîtes", "dirent", "dirai", "diras", "dira", "dirons", "direz", "diront", "dirais", "dirait", "dirions", "diriez", "diraient", "dise", "dises", "disse", "disses", "dît", "dissions", "dissiez","dissent", "disant", "dire", "fais", "fait", "faisons", "faites", "font", "faisais", "faisait", "faisions", "faisiez", "faisaient", "fis", "fit", "fîmes", "fîtes", "firent", "ferai", "feras", "fera", "ferons", "ferez", "feront", "ferais", "ferait", "ferions", "feriez", "feraient", "fasse", "fasses", "fassions", "fassiez", "fisse", "fisses", "fîts", "fissions", "fissiez", "fissent", "faire", "faisant"];
         var MOTS_ERROR = ["personne", "gens", "on", "je"];
         var MOTS_SIGNATURE = ["Delmas", "Demaure", "Desseigne", "Douet", "Dumas", "Estrade", "Evrard", "Frederic", "Gauthier", "Gillard", "Giraud", "Gouteux", "Gozioso", "Guerre", "Hassenjee", "Henry", "Koualef", "Laforcade", "Laison", "Lambert", "Latour", "Gohébel", "Piver", "Lemaire", "Lompech", "Loppy", "Michel", "Morand", "Pennanec", "Perrin", "Pouzin", "Pradier", "Prétagut", "Sens", "Seurin", "Tauotaha"];
@@ -164,6 +164,7 @@
             var sentence_length = [];       // Longueur des phrases
             var count_sentence = 0;         // Nombre de phrase
             var big_sentence = 0;           // Nombre de phrase > BIG_SENTENCE
+            var very_big_sentence = 0;      // Nombre de phrase > VERY_BIG_SENTENCE
             var accu_length_sentence = 0;   // Somme de toutes les longueurs de phrases
             // Paragraph
             var count_paragraph = 0;
@@ -203,6 +204,9 @@
                             if (count_word - last_word_number > BIG_SENTENCE) {
                                 big_sentence += 1;
                             }
+                            if (count_word - last_word_number > VERY_BIG_SENTENCE) {
+                                very_big_sentence += 1;
+                            }
                             accu_length_sentence += count_word - last_word_number;
                             last_word_number = count_word;
                             // End Sentence
@@ -234,6 +238,9 @@
                         sentence_length.push(count_word - last_word_number);
                         if (count_word - last_word_number > BIG_SENTENCE) {
                             big_sentence += 1;
+                        }
+                        if (count_word - last_word_number > VERY_BIG_SENTENCE) {
+                            very_big_sentence += 1;
                         }
                         accu_length_sentence += count_word - last_word_number;
                         last_word_number = count_word;
@@ -509,23 +516,43 @@
             head1.bgColor = '#CEC498';
             
             var row_sentence = res_phrase_apercu.insertRow(1);
-            row_sentence_label = row_sentence.insertCell(0);
-            row_sentence_label.innerHTML = "Phrases";
-            row_sentence_value = row_sentence.insertCell(1);
-            row_sentence_value.innerHTML = count_sentence;
+            label = row_sentence.insertCell(0);
+            label.innerHTML = "Phrases";
+            value = row_sentence.insertCell(1);
+            value.innerHTML = count_sentence;
             
             var row_big_sentence = res_phrase_apercu.insertRow(2);
             row_big_sentence.bgColor = '#F6F6F6';
-            row_big_sentence_label = row_big_sentence.insertCell(0);
-            row_big_sentence_label.innerHTML = "Phrases >" + BIG_SENTENCE + " mots";
-            row_big_sentence_value = row_big_sentence.insertCell(1);
-            row_big_sentence_value.innerHTML = big_sentence + " (" + ((big_sentence/count_sentence)*100).toFixed(2) + "%)";
+            label = row_big_sentence.insertCell(0);
+            label.innerHTML = "Phrases >" + BIG_SENTENCE + " mots";
+            value = row_big_sentence.insertCell(1);
+            value.innerHTML = big_sentence + " (" + ((big_sentence/count_sentence)*100).toFixed(2) + "%)";
+            if (((big_sentence/count_sentence)*100) > 50) {
+                value.bgColor = COLOR_ERROR;
+            }
             
-            var row_accu_length = res_phrase_apercu.insertRow(3);
-            row_paragraph_label = row_accu_length.insertCell(0);
-            row_paragraph_label.innerHTML = "Moyenne mots/phrase";
-            row_paragraph_value = row_accu_length.insertCell(1);
-            row_paragraph_value.innerHTML = (accu_length_sentence / count_sentence).toFixed(2);
+            var row_very_big_sentence = res_phrase_apercu.insertRow(3);
+            label = row_very_big_sentence.insertCell(0);
+            label.innerHTML = "Phrases >" + VERY_BIG_SENTENCE + " mots";
+            value = row_very_big_sentence.insertCell(1);
+            value.innerHTML = very_big_sentence + " (" + ((very_big_sentence/count_sentence)*100).toFixed(2) + "%)";
+            if (((very_big_sentence/count_sentence)*100) > 50) {
+                value.bgColor = COLOR_ERROR;
+            }
+            
+            var row_accu_length = res_phrase_apercu.insertRow(4);
+            row_accu_length.bgColor = '#F6F6F6';
+            label = row_accu_length.insertCell(0);
+            label.innerHTML = "Moyenne mots/phrase";
+            value = row_accu_length.insertCell(1);
+            value.innerHTML = (accu_length_sentence / count_sentence).toFixed(2);
+            if ((accu_length_sentence / count_sentence) <= BIG_SENTENCE) {
+                value.bgColor = COLOR_OK;
+            } else if ((accu_length_sentence / count_sentence) <= VERY_BIG_SENTENCE) {
+                value.bgColor = COLOR_WARNING;
+            } else if ((accu_length_sentence / count_sentence) > VERY_BIG_SENTENCE) {
+                value.bgColor = COLOR_ERROR;
+            }
             
             // APERCU PARAGRAPHES
             //
