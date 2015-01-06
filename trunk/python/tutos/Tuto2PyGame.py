@@ -1,87 +1,111 @@
+#-----------------------------------------------------------------------
 # Import
-import pygame
-from pygame.locals import *
+#-----------------------------------------------------------------------
 
-# Init
-pygame.init()
+import pygame               # L'import principal
+from pygame.locals import * # Les codes des touches du clavier
 
-pygame.display.set_caption('Woolfie 3D')
+#-----------------------------------------------------------------------
+# Start
+#-----------------------------------------------------------------------
 
-resolution = (800,600)
-flags = pygame.DOUBLEBUF
+class Application:
+    
+    def __init__(self, title, width, height, fps=30):
+        pygame.init()
+        pygame.display.set_caption(title)
+        
+        resolution = (width, height)
+        flags = pygame.DOUBLEBUF
+        best_color_depth = pygame.display.mode_ok(resolution) # 0 = not ok
+        
+        self.fps = fps
+        self.escape = False
+        self.screen = pygame.display.set_mode(resolution,flags, best_color_depth)
+        self.clock = pygame.time.Clock()
 
-print(pygame.display.mode_ok(resolution))
-# 0 : not ok
-# !0: best color depth
+    def update(self):
+        pass
 
-screen = pygame.display.set_mode(resolution,flags,32)
+    def draw(self):
+        pass
+    
+    def stop(self):
+        self.escape = True
 
-clock = pygame.time.Clock()
+    def fill(self, color):
+        self.screen.fill(color)
 
-escape = False
+    def rect(self, x, y, w, h, color):
+        pygame.draw.rect(self.screen, color, (x, y, w, h), 0)
+    
+    def run(self):
+        while not self.escape:
+            self.update()
+            self.draw()
+            pygame.display.flip()
+            self.clock.tick(self.fps) # Limit to x fps maximum
+
+#-----------------------------------------------------------------------
+# Specific
+#-----------------------------------------------------------------------
 
 area = [[1,1,1,1,1,1,1,1,1,1,1,1,1],
         [1,0,0,0,0,0,0,0,0,0,0,0,1],
         [1,0,0,1,1,1,0,1,0,1,0,0,1],
         [1,0,0,0,0,0,0,0,0,0,0,0,1],
         [1,1,1,1,1,1,1,1,1,1,1,1,1]]
+MOD = 200
+SIZE = 10
+position = [1,1]        # position vector (point)
 
-position = [212,212]    # position vector (point)
-direction = [1,0]       # direction vector
-camera = [0, 0.66]      # camera plane (orthogonal to direction vector) 2 * atan(0.66/1.0)=66 deg
+class Test(Application):
 
-modx = 0.0
-mody = 0.0
+    def __init__(self):
+        Application.__init__(self, 'Tutoriel PyGame', 800, 600)
+        self.modx = 0
+        self.mody = 0
+        
+    def update(self):
+        # Handle events
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                self.stop()
+            elif event.type == KEYDOWN and event.key == K_ESCAPE:
+                self.stop()
+            elif event.type == KEYDOWN and event.key == K_LEFT:
+                self.modx = -1
+            elif event.type == KEYDOWN and event.key == K_RIGHT:
+                self.modx = 1
+            elif event.type == KEYDOWN and event.key == K_UP:
+                self.mody = -1
+            elif event.type == KEYDOWN and event.key == K_DOWN:
+                self.mody = 1
+            elif event.type == KEYUP:
+                if event.key == K_LEFT or event.key == K_RIGHT:
+                    self.modx = 0
+                elif event.key == K_DOWN or event.key == K_UP:
+                    self.mody = 0
+        # Update
+        if (area[position[1] + self.mody][position[0] + self.modx] == 0):
+            position[0] += self.modx
+            position[1] += self.mody
+    
+    def draw(self):
+        # Draw
+        self.fill((0,0,0))
 
-# Main loop
-while not escape:
-    
-    # Handle events
-    for event in pygame.event.get():
-        if event.type == QUIT:
-            escape = True
-        elif event.type == KEYDOWN and event.key == K_ESCAPE:
-            escape = True
-        elif event.type == KEYDOWN and event.key == K_LEFT:
-            modx = -1
-        elif event.type == KEYDOWN and event.key == K_RIGHT:
-            modx = 1
-        elif event.type == KEYDOWN and event.key == K_UP:
-            mody = -1
-        elif event.type == KEYDOWN and event.key == K_DOWN:
-            mody = 1
-        elif event.type == KEYUP:
-            if event.key == K_LEFT or event.key == K_RIGHT:
-                modx = 0
-            elif event.key == K_DOWN or event.key == K_UP:
-                mody = 0
-    
-    # Update
-    position[0] += modx
-    position[1] += mody
-    
-    # Draw
-    screen.fill((0,0,0))
-    
-    for i in range(0, len(area)):
-        line = area[i]
-        for j in range(0, len(line)):
-            #print(len(area))
-            #print(len(line))
-            #print(i,j,line[j])
-            #raw_input()
-            #exit()
-            rx = j * 10 + 200
-            ry = i * 10 + 200
-            if line[j] == 1:
-                color = (0,255,0)
-            else:
-                color = (255,255,255)
-            pygame.draw.rect(screen, color, (rx,ry,10,10), 0)
-    
-    screen.set_at(position, (255,0,0))
-    
-    pygame.display.flip()
-    
-    # Limit to 60 fps maximum
-    clock.tick(60) 
+        for i in range(0, len(area)):
+            line = area[i]
+            for j in range(0, len(line)):
+                rx = j * SIZE + MOD
+                ry = i * SIZE + MOD
+                if line[j] == 1:
+                    color = (0,255,0)
+                else:
+                    color = (255,255,255)
+                self.rect(rx, ry, SIZE, SIZE, color)
+
+        self.rect(position[0] * SIZE + MOD, position[1] * SIZE + MOD, SIZE, SIZE, (255, 0, 0))
+
+Test().run()
