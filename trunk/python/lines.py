@@ -143,7 +143,7 @@ root = Block(None)
 current = root
 
 while not escape:
-  r = raw_input(prompt)
+  r = input(prompt)
   if r != 'exit':
     l=Line(r)
     lines.append(l)
@@ -164,8 +164,8 @@ while not escape:
   else:
     escape = True
 
-print
-print '%d lines:' % (len(lines),)
+print()
+print('%d lines:' % (len(lines),))
 root.display()
 
 #for l in lines:
