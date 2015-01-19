@@ -1,0 +1,162 @@
+h1. Le Compagnon du Talisman
+
+_Damien Gouteux_, 2015
+
+h2. Sur le livre
+
+p<>. _Le Talisman de la Mort_ fait parti des _Livres dont on est le héros_, où on navigue de chapitre en chapitre numérotés suivant nos choix. Il a été écrit par Jamie Thomson et Mark Smith, illustré par Bob Harvey, et édité en 1985. Il comporte 400 chapitres numérotés. Le _Compagnon du Talisman_ a été réalisé à partir d'une édition imprimée le 16 janvier 1986.
+
+Ce guide a été fait avec "Textile":http://txstyle.org/ et "VUE":http://vue.tufts.edu/.
+
+Webographie de ce livre :
+
+* "Dans _La bibliothèque des aventuriers_":http://www.bibliotheque-des-aventuriers.com/serie/defis_fantastiques/11_talisman_mort.htm
+* "Sur _Planète LDVELH_":http://planete-ldvelh.com/page/defi11.html
+* "Dans _La Taverne des aventuriers_":http://www.la-taverne-des-aventuriers.com/t2602-11-le-talisman-de-la-mort
+* "Dans le catalogue de l'éditeur, _Gallimard_":http://www.gallimard-jeunesse.fr/Catalogue/GALLIMARD-JEUNESSE/Un-Livre-dont-vous-etes-le-Heros/Defis-Fantastiques-nouvelle-presentation/Le-Talisman-de-la-Mort
+
+h3. Dessins
+
+h4. Dessins pleine page
+
+|_. Chapitre |_. Description |
+|  39 | Elfes noirs pointant du doigt |
+|  52 | Druide et sa louve |
+|  78 | Grande prêtresse riant |
+|  91 | Chevalier noir |
+| 104 | Figure encapuchonnée |
+| 117 | Prêtresse |
+| 130 | Squelette avec corbillard |
+| 169 | Voleuse assise |
+| 195 | Cerf démoniaque |
+| 222 | Autel et prêtresse |
+| 261 | Moine et carriole |
+| 274 | Mort-vivant et cimetière |
+| 300 | Personnage drapé au bord d'une falaise |
+| 313 | Griffon |
+| 339 | Idole maléfique |
+| 352 | Momie dans sarcophage |
+| 365 | Chef homme-sanglier |
+| 378 | Dragon et trésor |
+
+h4. Dessins intermédiaires
+
+|_. Chapitre |_. Description |
+|   2 | Corbeau tenant un os |
+|  10 | Corbeau tenant un os |
+|  21 | Épée et fléau |
+|  28 | Tête de squelette et hache, verticales (!) |
+|  32 | Corbeau tenant un os |
+|  44 | Trois sales types |
+|  59 | Corbeau tenant un os |
+|  63 | Main griffue tenant un talisman |
+|  64 | Corbeau tenant un os|
+|  68 | Épée et fléau |
+|  77 | Corbeau tenant un os|
+|  90 | Tête de squelette et hache, verticales (!) |
+| 107 | Trois sales types |
+| 114 | Corbeau tenant un os |
+| 137 | Corbeau tenant un os |
+| 141 | Corbeau tenant un os |
+| 146 | Main griffue tenant un talisman |
+| 147 | Corbeau tenant un os |
+| 150 | Corbeau tenant un os |
+| 158 | Main griffue tenant un talisman |
+| 166 | Tête de squelette et hache, verticales (!) |
+| 213 | Main griffue tenant un talisman |
+| 216 | Corbeau tenant un os |
+| 218 | Corbeau tenant un os |
+| 220 | Trois sales types |
+| 238 | Épée et fléau |
+| 247 | Corbeau tenant un os |
+| 254 | Épée et fléau |
+| 264 | Corbeau tenant un os |
+| 265 | Trois sales types |
+| 267 | Épée et fléau |
+| 269 | Corbeau tenant un os |
+| 276 | Corbeau tenant un os |
+| 300 | Trois sales types (grand) |
+| 302 | Main griffue tenant un talisman |
+| 311 | Épée et fléau |
+| 327 | Tête de squelette et hache, verticales (!) |
+| 331 | Épée et fléau (avec rotation) |
+| 335 | Corbeau tenant un os |
+| 345 | Corbeau tenant un os |
+| 348 | Main griffue tenant un talisman |
+| 354 | Tête de squelette et hache, verticales (!) |
+| 373 | Épée et fléau (nouvelle rotation) |
+| 375 | Corbeau tenant un os |
+| 376 | Trois sales types |
+| 392 | Main griffue tenant un talisman (grand) |
+| 393 | Corbeau tenant un os |
+
+h2. Sur le jeu
+
+h3. Description des personnages
+
+|_. Caractéristique |_. Score initial/max |_. Abbrv. |_. Desc. |
+| Habilité | D6 +  6 | HAB | Adresse au combat |
+| Endurance | 2D6 + 12 | END | Force, résistance et point de vie |
+| Chance | D6 +  6 | CHA | Chance |
+
+Équipement de base :
+
+* Provisions pour 10 repas. Repas possible seulement si proposé par le livre. 1 repas = +4 END.
+* Épée, armure de cuir, sac à dos.
+* Une bouteille à choisir parmi (buvable à tout moment, 2 mesures par bouteille):
+** Potion d'adresse (rétablit HAB)
+** Potion de vigueur (rétablit END)
+** Potion de bonne fortune (rétablit CHA et +1 : c'est un des rares cas où l'on peut dépasser le score initial)
+* Silex, mèche d'amadou, 5 torches
+   
+h3. Résolution des combats
+
+Un combat se déroule en plusieurs ASSAUT. À chaque assaut, on calcule la Force d'Attaque (FA) du joueur et celle de la créature attaquée en additionnant l’habilité du joueur à 2D6 et celle de la créature à 2D6 également. On retiendra donc que pour calculer une Force d'Attaque, il suffit de faire :
+
+bq. Force d'Attaque = 2D6 + HAB
+
+Puis on compare les deux Forces d'Attaque, celle du joueur et celle de la créature :
+
+* Si Joueur > Créature alors -2 END* à la créature (-4 si chanceux, -1 si malchanceux).
+* Si Joueur < Créature alors -2 END* au joueur (-3 si malchanceux, -1 si chanceux).
+* Si Joueur = Créature alors il ne passe rien.
+
+Si la créature à une END qui est égale à 0 à la fin d'un assaut, elle meurt et le joueur est vainqueur et peut continuer son chemin.
+Si le joueur à une END qui égale à 0 à la fin d'un assaut, il meurt et son aventure se termine ici.
+
+* Si le jeu propose au joueur de fuir => -2 END* "en fuyant"
+* Si X créatures : on en choisit 1 et 1 seule qu'on combat. Les autres, si J.FA > C.FA, on ne fait rien.
+
+On peut tenter sa chance à chaque * et en cas de sollicitation du livre :
+2D6 <= CHA => chanceux
+2D6 > CHA => malchanceux
+Chaque tentative fait -1 CHA après la tentative.
+En attaque ou défense, cela peut transformer le coup en blessure grave ou écorchure.
+
+h3. Les combats
+
+|_. Chapitre |_. Description |_. Caractéristique |
+| 96 |  |  |
+| 286 |  |  |
+| 11 |  |  |
+| 210 |  |  |
+| 189 |  |  |
+| 144 |  |  |
+| 140 |  |  |
+| 59 |  |  |
+| 265 |  |  |
+| 313 |  |  |
+| 86 |  |  |
+| 4 |  |  |
+| 25 |  |  |
+| 116 |  |  |
+| 387 |  |  |
+| 51 |  |  |
+
+h3. Vocabulaire
+
+Tunique à fronce
+mordoré
+Classes : Paladin, Sorcier, Prêtre
+Races : Trolls, Elfes noirs
+Lieux : Cité des runes de la malédiction (322), Sérakub (322), Les Tours de l'Augure (322), Griseguilde (268)
