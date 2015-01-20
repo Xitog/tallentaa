@@ -19,3 +19,9 @@ Talisman_big.png            (***) Fichier produit par VUE à partir de Talisman.v
 Talisman_chapites.html      Fichier produit par VUE carte interactive des nœuds mais seulement des chapitres.
 Talisman_chapitres.png      Fichier produit par VUE carte nécessaire au fichier html.
 Talisman_chapitres.vue      Le fichier des nœuds chapitres seulement (pas de notes, pas de groupement).
+
+-------------------------------------------------------------------------------
+Historique
+-------------------------------------------------------------------------------
+
+Mise en ligne le 20 janvier 2015.
