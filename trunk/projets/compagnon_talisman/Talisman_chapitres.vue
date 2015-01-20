@@ -1,18 +1,18 @@
-<!-- Tufts VUE 3.2.2 concept-map (Talisman_chapitres.vue) 2015-01-19 -->
+<!-- Tufts VUE 3.2.2 concept-map (Talisman_chapitres.vue) 2015-01-20 -->
 <!-- Tufts VUE: http://vue.tufts.edu/ -->
 <!-- Do Not Remove: VUE mapping @version(1.1) jar:file:/C:/Dev/VUE/VUE.jar!/tufts/vue/resources/lw_mapping_1_1.xml -->
-<!-- Do Not Remove: Saved date Mon Jan 19 23:22:00 CET 2015 by Géraud on platform Windows 7 6.1 in JVM 1.7.0_21-b11 -->
+<!-- Do Not Remove: Saved date Tue Jan 20 22:50:37 CET 2015 by Géraud on platform Windows 7 6.1 in JVM 1.7.0_21-b11 -->
 <!-- Do Not Remove: Saving version @(#)VUE: built May 23 2013 at 2146 by tomadm on Linux 2.6.18-348.2.1.el5 i386 JVM 1.7.0_21-b11(bits=32) -->
 <?xml version="1.0" encoding="US-ASCII"?>
 <LW-MAP xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="none" ID="0"
     label="Talisman_chapitres.vue" created="1419810643477" x="0.0"
-    y="0.0" width="2150.2615" height="8851.5" strokeWidth="0.0" autoSized="false">
-    <resource referenceCreated="1421706120865" size="814576"
-        spec="C:\Users\G&#xe9;raud\Downloads\Projet Talisman\Talisman_chapitres.vue"
+    y="0.0" width="2000.9823" height="8752.666" strokeWidth="0.0" autoSized="false">
+    <resource referenceCreated="1421790637903" size="628606"
+        spec="C:\Dev\Tallentaa\projets\compagnon_talisman\Talisman_chapitres.vue"
         type="1" xsi:type="URLResource">
         <title>Talisman_chapitres.vue</title>
-        <property key="File" value="C:\Users\G&#xe9;raud\Downloads\Projet Talisman\Talisman_chapitres.vue"/>
+        <property key="File" value="C:\Dev\Tallentaa\projets\compagnon_talisman\Talisman_chapitres.vue"/>
     </resource>
     <fillColor>#FFFFFF</fillColor>
     <strokeColor>#404040</strokeColor>
@@ -5444,7 +5444,7 @@
     <child ID="580" label="10" layerID="1" created="1419931428873"
         x="987.2001" y="8640.866" width="40.0" height="39.0"
         strokeWidth="1.0" autoSized="false" xsi:type="node">
-        <fillColor>#F1A83E</fillColor>
+        <fillColor>#EA2218</fillColor>
         <strokeColor>#000000</strokeColor>
         <textColor>#000000</textColor>
         <font>Arial-plain-12</font>
@@ -12413,12 +12413,25 @@
         <ID1 xsi:type="node">41</ID1>
         <ID2 xsi:type="node">1393</ID2>
     </child>
+    <child ID="1402" layerID="1" created="1421790598067" x="951.80457"
+        y="8671.821" width="36.391052" height="22.691406"
+        strokeWidth="1.0" autoSized="false" controlCount="0"
+        arrowState="2" xsi:type="link">
+        <strokeColor>#404040</strokeColor>
+        <textColor>#404040</textColor>
+        <font>Arial-plain-11</font>
+        <URIString>http://vue.tufts.edu/rdf/resource/0952e384c0a80110008989b9d5d53b1c</URIString>
+        <point1 x="987.6957" y="8672.321"/>
+        <point2 x="952.3046" y="8694.013"/>
+        <ID1 xsi:type="node">580</ID1>
+        <ID2 xsi:type="node">581</ID2>
+    </child>
     <layer ID="1" label="Layer 1" created="1419810643481" x="0.0"
         y="0.0" width="1.4E-45" height="1.4E-45" strokeWidth="0.0" autoSized="false">
         <URIString>http://vue.tufts.edu/rdf/resource/9367e0f3c0a801670048e4e80b7e9de7</URIString>
     </layer>
-    <userZoom>0.75</userZoom>
-    <userOrigin x="-219.70657" y="-8.125"/>
+    <userZoom>1.25</userZoom>
+    <userOrigin x="-172.91214" y="110.625"/>
     <presentationBackground>#202020</presentationBackground>
     <PathwayList currentPathway="0" revealerIndex="-1">
         <pathway ID="0" label="Chemin sans nom" created="1419810643476"
@@ -12470,6 +12483,6 @@
     </PathwayList>
     <date>2014-12-29</date>
     <modelVersion>6</modelVersion>
-    <saveLocation>C:\Users\G&#xe9;raud\Downloads\Projet Talisman</saveLocation>
-    <saveFile>C:\Users\G&#xe9;raud\Downloads\Projet Talisman\Talisman_chapitres.vue</saveFile>
+    <saveLocation>C:\Dev\Tallentaa\projets\compagnon_talisman</saveLocation>
+    <saveFile>C:\Dev\Tallentaa\projets\compagnon_talisman\Talisman_chapitres.vue</saveFile>
 </LW-MAP>
