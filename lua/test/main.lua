@@ -11,6 +11,12 @@ function love.load(arg)
     print("Hello")
     print(type(map))
     print(#map)
+    
+    -- 10h03 16/02/2015 la musique marche !
+    src1 = love.audio.newSource("Town.ogg")
+    src1:setVolume(0.8)
+    src1:play()
+    
 end
 
 -- Mettre local pour une variable locale ! Global scope by default!
