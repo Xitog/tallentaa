@@ -1,0 +1,329 @@
+h1(#syntax). Syntaxe Ruby
+
+p<>(#intro). Ceci est une fiche de la syntaxe du langage de programmation RUBY, créé par Yukihiro "Matz" Matsumoto en 1995. Elle n'est pas destiné à quelqu'un qui voudrait apprendre le langage sans expérience préalable, mais peut convenir à quelqu'un connaissant les concepts et/ou un autre langage.
+
+h2(#sommaire). Sommaire
+
+* "Sites web":#sites
+* "Types de base":#types
+** "Entiers":#int
+** "Réels":#float
+** "Chaînes de caractères":#string
+** "Booléens":#bool
+** "Type vide":#void
+** "Type liste":#list
+** "Type dictionnaire":#dict
+** "Type objet":#objet
+* "Opérateurs":#op
+** "Opérateurs binaires":#op_bin
+** "Opérateurs unaires":#op_una
+** "Opérateur ternaire":#op_ter
+* "Contrôle du flux":#flux
+** "Séquence":#seq
+** "Conditions":#cond
+** "Répétitions":#loop
+* "Définitions des éléments":#elem
+** "Fonctions":#fun
+** "Classes":#cls
+** "Modules":#mod
+* "Gestion des exceptions":#spe
+** "Exceptions":#exp
+* "Utiles":#utiles
+
+h2(#sites). Sites web
+
+"Site de référence":https://www.ruby-lang.org
+"Fiche Wikipedia":http://fr.wikipedia.org/wiki/Ruby [ "en":http://en.wikipedia.org/wiki/Ruby_%28programming_language%29 ]
+"Try ruby online":http://tryruby.org
+"Tutorialspoint":http://www.tutorialspoint.com/ruby/
+
+"Retour sommaire":#syntax
+
+h2(#types). Types de base
+
+h3(#int). Entiers
+
+|_. Nom |_. Littéral |
+| Fixnum, Bignum | 0b1 07 0xf 10 1_000 |
+
+h3(#float). Réels
+
+|_. Nom |_. Littéral |
+| Float | 1000.0 1E3 |
+
+Listes des fonctions principales :
+
+|_. Fonction |_. Description |
+| floor to_s | entier inférieur immédiat (troncation) |
+| ceil | entier supérieur immédiat |
+| round | arrondi |
+
+h3(#string). Chaînes de caractères
+
+|_. Nom |_. Littéral |
+| String | "abcde" |
+
+Listes des fonctions principales :
+
+|_. Fonction |_. Description |
+| to_s | produit une chaîne |
+| equal? | égalité entre deux chaînes |
+| size | longueur de la chaîne |
+| + | concaténation de 2 chaînes |
+| * | duplique n fois |
+| upcase | mise en majuscule |
+| downcase | mise en minuscule |
+| s[i] | accès au caractère à l'index i |
+| s[n..m] | extrait une sous-chaîne |
+| s[n, longueur] | extrait une sous-chaîne |
+| index(s) | cherche l'index d'une sous-chaîne |
+| rindex(s) | cherche l'index d'une sous-chaîne en partant de la fin |
+
+h3(#bool). Booléens
+
+|_. Nom |_. Littéral |
+| FalseClass | *false* |
+| TrueClass | *true* |
+
+* Dans les tests, toutes les valeurs autres que *false* et *nil* sont vraies (dont *0*).
+
+h3(#void). Type "vide"
+
+|_. Nom |_. Littéral |
+| NilClass | *nil* |
+
+h3(#list). Type liste
+
+|_. Nom |_. Littéral |
+| Array | [ 1, 2, 3] <br> 1, 2, 3 <br> %w(abc def) |
+
+Listes des fonctions principales ("Array":http://ruby-doc.org/core-2.2.0/Array.html, "Enumerable":http://ruby-doc.org/core-2.2.0/Enumerable.html) :
+
+|_. Fonction |_. Description |
+| l[ _index_ ] | accès à la valeur à l'_index_ |
+| l[ -1 ] | accès au dernier élément |
+| + | concaténation entre deux listes |
+| << | ajout d'un élément |
+| insert | insère à l'index l'élément |
+| shift | retourne le premier élément et l'enlève |
+| pop | retourne le dernier élément et l'enlève |
+| member? *in* include? | contient l'élément |
+| any? | vrai si au moins 1 élément correspond |
+| all? | vrai si tous les éléments correspondent |
+| min | élément minimal |
+| max | élément maximal |
+| size length | taille de la liste |
+| reverse | donne la liste inversée |
+| flatten | si la liste contient des listes, elles seront toutes fusionnées en une seule liste |
+| slice | renvoie une partie de la liste |
+| unshift | ajoute un ou plusieurs éléments au début de la liste |
+| push | ajoute à la fin de la liste |
+| each | parcours chaque élément de la liste |
+| map collect | invoque le bloc pour chaque élément et collecte le résultat dans une nouvelle liste |
+| find detect indexOf index search | Retourne l'index du premier élément pour lequel le bloc est vrai ou qui est égal à la valeur passer en paramètre |
+| find_all select | sélectionne tous les éléments selon le résultat d'un bloc |
+| partition | partitionne en deux listes selon le résultat d'un bloc |
+| l.join(s) | fusionne tous les éléments en y intercalant la chaîne s |
+| size length | taille de la liste|
+| each_with_index | parcours la liste avec un bloc recevant l'élément et un index |
+| uniq uniq! | enlève les éléments en double |
+| sort! sort_by | trie la liste |
+| zip transpose | combine des listes entres-elles |
+| assoc | regarde s'il trouve un élément dans une liste de listes et retourne la liste le contenant si elle existe |
+| to_a | renvoie la liste elle-même |
+| inject | exécute un bloc sur chaque élément en passant le résultat à l'exécution suivante |
+
+h3(#dict). Type dictionnaire
+
+|_. Nom |_. Littéral |
+| Hash | { 1 => 'a' , 2 => 'b' , 3 => 'c' } |
+
+Listes des fonctions principales :
+
+|_. Fonction |_. Description |
+| h[ _key_ ] ou fetch | accès à la valeur de la clé _key_ |
+| has_key? include? key? member? | test si la clé est définie |
+| delete | enlève l'élément avec cette clé |
+| keys | liste des clés |
+| values | liste des valeurs |
+| update merge | ajoute ou change les couples en paramètres |
+| store(_k_, _v_) | stocke la valeur à la clé |
+
+"Retour sommaire":#syntax
+
+h3(#objet). Type objet
+
+|_. Fonction |_. Description |
+| object.method(id) | renvoie s'il existe un objet Method correspondant à l'id |
+| identifiant.new | crée une nouvelle instance |
+| identifiant.clone | clone l'objet |
+| identifiant.is_a? ou kind_of? | renvoie vrai s'il est de cette classe |
+| identifiant.class | donne la classe de l'objet |
+| identifiant.methods | liste de chaînes de symboles de toutes les méthodes de l'objet |
+| identifiant.respond_to? | l'objet répond-t-il au message ? (= s'il a une méthode correspondante) |
+
+"Retour sommaire":#syntax
+
+h2(#op). Opérateurs
+
+h3(#op_bin). Opérateurs binaires
+
+|_. Type |_. Syntaxe |
+| Mathématiques | + - * / % ** |
+| Comparaison | < <= > >= <=> |
+| Égalité | == != !== ===|
+| Affectation | = += -= *= /= %= **= |
+| Bit à bit | & &#124; ^ ~ << >> |
+| Logique | and or && |
+| Ensemble | _borne_inf_.._borne_sup_ (inclusive) _borne_inf_..._borne_sup_ (exclusive) |
+| Appel de méthode | _objet_._message_ |
+
+h3(#op_una). Opérateurs unaires
+
+|_. Type |_. Syntaxe |
+| Mathématique | - |
+| Logique | ! not |
+| Définition | defined? _identifiant_ |
+
+h3(#op_ter). Opérateur ternaire
+
+|_. Type |_. Syntaxe |
+| Opérateur ternaire | _expression_ *?* _action si vrai_ *:* _action si faux_ |
+
+"Retour sommaire":#syntax
+
+h2(#flux). Contrôle du flux
+
+h3(#seq). Séquence
+
+Nouvelle ligne ou point-virgule *;*
+
+* En Ruby, chaque instruction (notée _action_) est une expression évaluable.
+
+h3(#cond). Conditions
+
+bq. *if* _condition_ [ *then* ]
+&nbsp;&nbsp; action
+[ *elsif* _condition_ [ *then* ]
+&nbsp;&nbsp; _action_ ] *&#42;*
+[ *else*
+&nbsp;&nbsp; _action_ ] *?*
+*end*
+
+action [ *if* _condition_ ]
+
+bq. *unless* _condition_ [ *then* ]
+&nbsp;&nbsp; action
+[ *else*
+&nbsp;&nbsp; _action_ ] *?*
+*end*
+
+action [ *unless* _condition_ ]
+
+h3(#loop). Répétitions
+
+bq. *while* _condition_ [ *do* ]
+&nbsp;&nbsp; _action_
+*end*
+
+action [ *while* _condition_ ]
+
+bq. *until* _condition_ [ *do* ]
+&nbsp;&nbsp; _action_
+*end*
+
+action [ *until* _condition_ ]
+
+bq. *for* _identifiant_ *in* _expression_ [ *do* ]
+&nbsp;&nbsp; _action_
+*end*
+
+|_. Mot-clé |_. Description |
+| *next* | passage à l'itération suivante |
+| *break* | quitte la boucle |
+
+On peut aussi faire des boules avec les fonctions des objets :
+
+|_. Autres exemples de boucles |
+| (1..10).each { &#124;i&#124; _action_ } |
+| 1.upto(10) { &#124;i&#124; _action_ } |
+| 10.downto(1) { &#124;i&#124; _action_ } |
+| (1..10).step(2) { &#124;i&#124; _action_ } |
+
+"Retour sommaire":#syntax
+
+h2(#elem). Définitions des éléments
+
+h3(#fun). Fonctions
+
+bq. *def* _identifiant_ [ ( _par_ [, _par_] *&#42;* ) ]
+&nbsp;&nbsp; _action_
+*end*
+
+|_. Mot-clé |_. Description |
+| *return* [ _expression_ ] | quitte la fonction |
+
+Appel de fonction : 
+
+bq. [ objet *.* ] _identifiant_ [ ( _paramètres_ ) ]
+
+Fracturation d'un tuple pour passage différents en arguments :
+
+bq. * _tuple_
+
+h3(#cls). Classes
+
+bq. *class* _identifiant_ [ < _parent_ ]
+&nbsp;&nbsp; _action_
+*end*
+
+|_. Mot-clé |_. Description |
+| *self* | l'instance elle-même |
+| *super* | pour accéder aux fonctions du parent |
+
+Création d'une instance :
+
+bq. _nom_classe_ *.* new [ ( _paramètres_ ) ]
+
+h3(#mod). Modules
+
+bq. *module* _identifiant_
+&nbsp;&nbsp; _action_
+*end*
+
+|_. Mot-clé |_. Description |
+| *require* | réclame un module |
+| *include* | inclus les éléments du module dans l'espace de nom actuel |
+
+"Retour sommaire":#syntax
+
+h2(#spe). Gestion des exceptions
+
+h3(#exp). Exceptions
+
+bq. *try*
+&nbsp;&nbsp; _action_
+*rescue* [ _identifiant_ ]
+&nbsp;&nbsp; _action_
+[ *ensure*
+&nbsp;&nbsp; _action_ ]
+end
+
+|_. Mot-clé |_. Description |
+| *raise* | lève une exception |
+| *rety* | reprend l'exécution à partir du *try* |
+
+"Retour sommaire":#syntax
+
+h2(#utiles). Utiles
+
+Nombres aléatoires (min et max inclus) :
+
+bq. Randow.new(min..max)
+
+Sérialisation ("doc":http://ruby-doc.org/core-2.2.0/Marshal.html) :
+
+bq. data = Marshal.dump(o) _# sérialise dans une chaîne_
+obj = Marshal.load(data) _# charge la chaîne_
+
+"Retour sommaire":#syntax
