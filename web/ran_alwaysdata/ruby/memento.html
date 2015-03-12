@@ -11,6 +11,17 @@
     <!--<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>-->
     <link href="../zlib/simplex.bootstrap.css" rel="stylesheet">
     <style type="text/css">
+
+        div.flux {
+            -webkit-column-count: 2; /* Chrome, Safari, Opera */
+            -moz-column-count: 2; /* Firefox */
+            column-count: 2;
+        }
+        
+        blockquote {
+            background-color: #efefef;
+        }
+
         div.container {
             margin-top: 8px;
         }
@@ -224,7 +235,7 @@
         <h1>Aide-mémoire Ruby</h1>
         <hr>
         <p class="n">Une fiche synthétique sur le langage de programmation <a href="https://www.ruby-lang.org/en/">Ruby</a> pour rafraîchir sa mémoire ou découvrir ce langage si vous connaissez déjà un langage similaire.</p>
-        <p class="n">Version 0.1, 10 mars 2015</p>
+        <p class="n">Version 0.2, 10 mars 2015</p>
         <p class="sign">Damien Gouteux &#x2318; </p>
       </div>
    
@@ -267,6 +278,7 @@
 		<li><a href="#exp">Exceptions</a></li>
 	</ul></li>
 	<li><a href="#utiles">Utiles</a></li>
+    <li><a href="#historique">Historique</a></li>
 </ul>
 <h2 id="sites">Sites web</h2>
 <p><a href="https://www.ruby-lang.org">Site de référence</a><br />
@@ -711,190 +723,192 @@
 	</tr>
 </table>
 <p><a href="#syntax">Retour sommaire</a></p>
-<h2 id="flux">Contrôle du flux</h2>
-<h3 id="seq">Séquence</h3>
-<p>Nouvelle ligne ou point-virgule <strong>;</strong></p>
-<ul>
-	<li>En Ruby, chaque instruction (notée <em>action</em>) est une expression évaluable.</li>
-</ul>
-<h3 id="cond">Conditions</h3>
-<blockquote>
-<p><strong>if</strong> <em>condition</em> [ <strong>then</strong> ]<br />
-&nbsp;&nbsp; action<br />
-[ <strong>elsif</strong> <em>condition</em> [ <strong>then</strong> ]<br />
-&nbsp;&nbsp; <em>action</em> ] <strong>&#42;</strong><br />
-[ <strong>else</strong><br />
-&nbsp;&nbsp; <em>action</em> ] <strong>?</strong><br />
-<strong>end</strong></p>
-</blockquote>
-<p>action [ <strong>if</strong> <em>condition</em> ]</p>
-<blockquote>
-<p><strong>unless</strong> <em>condition</em> [ <strong>then</strong> ]<br />
-&nbsp;&nbsp; action<br />
-[ <strong>else</strong><br />
-&nbsp;&nbsp; <em>action</em> ] <strong>?</strong><br />
-<strong>end</strong></p>
-</blockquote>
-<p>action [ <strong>unless</strong> <em>condition</em> ]</p>
-<h3 id="loop">Répétitions</h3>
-<blockquote>
-<p><strong>while</strong> <em>condition</em> [ <strong>do</strong> ]<br />
-&nbsp;&nbsp; <em>action</em><br />
-<strong>end</strong></p>
-</blockquote>
-<p>action [ <strong>while</strong> <em>condition</em> ]</p>
-<blockquote>
-<p><strong>until</strong> <em>condition</em> [ <strong>do</strong> ]<br />
-&nbsp;&nbsp; <em>action</em><br />
-<strong>end</strong></p>
-</blockquote>
-<p>action [ <strong>until</strong> <em>condition</em> ]</p>
-<blockquote>
-<p><strong>for</strong> <em>identifiant</em> <strong>in</strong> <em>expression</em> [ <strong>do</strong> ]<br />
-&nbsp;&nbsp; <em>action</em><br />
-<strong>end</strong></p>
-</blockquote>
-<table>
-	<tr>
-		<th>Mot-clé </th>
-		<th>Description </th>
-	</tr>
-	<tr>
-		<td> <strong>next</strong> </td>
-		<td> passage à l&#8217;itération suivante </td>
-	</tr>
-	<tr>
-		<td> <strong>break</strong> </td>
-		<td> quitte la boucle </td>
-	</tr>
-</table>
-<p>On peut aussi faire des boules avec les fonctions des objets :</p>
-<table>
-	<tr>
-		<th>Autres exemples de boucles </th>
-	</tr>
-	<tr>
-		<td> (1..10).each { &#124;i&#124; <em>action</em> } </td>
-	</tr>
-	<tr>
-		<td> 1.upto(10) { &#124;i&#124; <em>action</em> } </td>
-	</tr>
-	<tr>
-		<td> 10.downto(1) { &#124;i&#124; <em>action</em> } </td>
-	</tr>
-	<tr>
-		<td> (1..10).step(2) { &#124;i&#124; <em>action</em> } </td>
-	</tr>
-</table>
-<p><a href="#syntax">Retour sommaire</a></p>
-<h2 id="elem">Définitions des éléments</h2>
-<h3 id="fun">Fonctions</h3>
-<blockquote>
-<p><strong>def</strong> <em>identifiant</em> [ ( <em>par</em> [, _par_] <strong>&#42;</strong> ) ]<br />
-&nbsp;&nbsp; <em>action</em><br />
-<strong>end</strong></p>
-</blockquote>
-<table>
-	<tr>
-		<th>Mot-clé </th>
-		<th>Description </th>
-	</tr>
-	<tr>
-		<td> <strong>return</strong> [ <em>expression</em> ] </td>
-		<td> quitte la fonction </td>
-	</tr>
-</table>
-<p>Appel de fonction : </p>
-<blockquote>
-<p>[ objet <strong>.</strong> ] <em>identifiant</em> [ ( <em>paramètres</em> ) ]</p>
-</blockquote>
-<p>Fracturation d&#8217;un tuple pour passage différents en arguments :</p>
-<blockquote>
-<p>* <em>tuple</em></p>
-</blockquote>
-<h3 id="cls">Classes</h3>
-<blockquote>
-<p><strong>class</strong> <em>identifiant</em> [ &lt; <em>parent</em> ]<br />
-&nbsp;&nbsp; <em>action</em><br />
-<strong>end</strong></p>
-</blockquote>
-<table>
-	<tr>
-		<th>Mot-clé </th>
-		<th>Description </th>
-	</tr>
-	<tr>
-		<td> <strong>self</strong> </td>
-		<td> l&#8217;instance elle-même </td>
-	</tr>
-	<tr>
-		<td> <strong>super</strong> </td>
-		<td> pour accéder aux fonctions du parent </td>
-	</tr>
-</table>
-<p>Création d&#8217;une instance :</p>
-<blockquote>
-<p><em>nom_classe</em> <strong>.</strong> new [ ( <em>paramètres</em> ) ]</p>
-</blockquote>
-<h3 id="mod">Modules</h3>
-<blockquote>
-<p><strong>module</strong> <em>identifiant</em><br />
-&nbsp;&nbsp; <em>action</em><br />
-<strong>end</strong></p>
-</blockquote>
-<table>
-	<tr>
-		<th>Mot-clé </th>
-		<th>Description </th>
-	</tr>
-	<tr>
-		<td> <strong>require</strong> </td>
-		<td> réclame un module </td>
-	</tr>
-	<tr>
-		<td> <strong>include</strong> </td>
-		<td> inclus les éléments du module dans l&#8217;espace de nom actuel </td>
-	</tr>
-</table>
-<p><a href="#syntax">Retour sommaire</a></p>
-<h2 id="spe">Gestion des exceptions</h2>
-<h3 id="exp">Exceptions</h3>
-<blockquote>
-<p><strong>try</strong><br />
-&nbsp;&nbsp; <em>action</em><br />
-<strong>rescue</strong> [ <em>identifiant</em> ]<br />
-&nbsp;&nbsp; <em>action</em><br />
-[ <strong>ensure</strong><br />
-&nbsp;&nbsp; <em>action</em> ]<br />
-end</p>
-</blockquote>
-<table>
-	<tr>
-		<th>Mot-clé </th>
-		<th>Description </th>
-	</tr>
-	<tr>
-		<td> <strong>raise</strong> </td>
-		<td> lève une exception </td>
-	</tr>
-	<tr>
-		<td> <strong>rety</strong> </td>
-		<td> reprend l&#8217;exécution à partir du <strong>try</strong> </td>
-	</tr>
-</table>
-<p><a href="#syntax">Retour sommaire</a></p>
-<h2 id="utiles">Utiles</h2>
-<p>Nombres aléatoires (min et max inclus) :</p>
-<blockquote>
-<p>Randow.new(min..max)</p>
-</blockquote>
-<p>Sérialisation (<a href="http://ruby-doc.org/core-2.2.0/Marshal.html">doc</a>) :</p>
-<blockquote>
-<p>data = Marshal.dump(o) <em># sérialise dans une chaîne</em><br />
-obj = Marshal.load(data) <em># charge la chaîne</em></p>
-</blockquote>
-<p><a href="#syntax">Retour sommaire</a></p>
-   
+    
+    <h2 id="flux">Contrôle du flux</h2>
+
+    <div class="flux">
+
+        <h3 id="seq">Séquence</h3>
+
+        <blockquote>
+            action  <i># En Ruby, chaque instruction est une expression évaluable</i>
+            action  <i># Il suffit de passer à la ligne pour les faire suivre</i>
+        </blockquote>
+        <blockquote>
+            action ; action  <i># Sur un même ligne, on sépare les actions par un ;</i>
+        </blockquote>
+
+        <h3 id="cond">Conditions</h3>
+    
+        <blockquote>
+            <p><strong>if</strong> condition [ <strong>then</strong> ]<br />
+            &nbsp;&nbsp; actions<br />
+            [ <strong>elsif</strong> condition [ <strong>then</strong> ]<br />
+            &nbsp;&nbsp; actions ] <strong>&#42;</strong><br />
+            [ <strong>else</strong><br />
+            &nbsp;&nbsp; actions ] <strong>?</strong><br />
+            <strong>end</strong></p>
+        </blockquote>
+        <blockquote>
+            <p>action [ <strong>if</strong> condition ]</p>
+        </blockquote>
+        <blockquote>
+            <p><strong>unless</strong> condition< [ <strong>then</strong> ]<br />
+            &nbsp;&nbsp; actions<br />
+            [ <strong>else</strong><br />
+            &nbsp;&nbsp; actions ] <strong>?</strong><br />
+            <strong>end</strong></p>
+        </blockquote>
+        <blockquote>
+            <p>action [ <strong>unless</strong> condition ]</p>
+        </blockquote>
+        <br>
+        
+        <h3 id="loop">Répétitions</h3>
+
+        <blockquote>
+            <p><strong>while</strong> condition [ <strong>do</strong> ]<br />
+            &nbsp;&nbsp; actions<br />
+            <strong>end</strong></p>
+        </blockquote>
+        <blockquote>
+            <p>action [ <strong>while</strong> condition ]</p>
+        </blockquote>
+        <blockquote>
+            <p><strong>until</strong> condition [ <strong>do</strong> ]<br />
+            &nbsp;&nbsp; actions<br />
+            <strong>end</strong></p>
+        </blockquote>
+        <blockquote>
+            <p>action [ <strong>until</strong> condition ]</p>
+        </blockquote>
+        <blockquote>
+            <p><strong>for</strong> identifiant <strong>in</strong> expression [ <strong>do</strong> ]<br />
+            &nbsp;&nbsp; actions<br />
+            <strong>end</strong></p>
+        </blockquote>
+        <blockquote>
+            <strong>next</strong>  <i># Passage à l&#8217;itération suivante</i>
+        </blockquote>
+        <blockquote>
+            <strong>break</strong>  <i># Quitte la boucle</i>
+        </blockquote>
+        <blockquote>
+            <i># Ruby propose des méthodes pour itérer sur un objet</i><br>
+            (1..10).each { &#124;i&#124; actions }<br>
+            1.upto(10) { &#124;i&#124; actions }<br>
+            10.downto(1) { &#124;i&#124; actions }<br>
+            (1..10).step(2) { &#124;i&#124; actions }<br>
+            ['a', 'b'].each_with_index { &#124;v, i&#124; actions }<br>
+        </blockquote>
+        
+    </div>
+    <br>
+    <center><p><a href="#syntax">Retour sommaire</a></p></center>
+    
+    <h2 id="elem">Définitions des éléments</h2>
+    
+    <div class="flux">
+    
+        <h3 id="fun">Fonctions</h3>
+        
+        <blockquote>
+            <p><strong>def</strong> identifiant [ ( par [, _par_] <strong>&#42;</strong> ) ]<br />
+            &nbsp;&nbsp; actions<br />
+            <strong>end</strong></p>
+        </blockquote>
+        <blockquote>
+            <strong>return</strong> [ expression ]  <i># Quitte la fonction</i>
+        </blockquote>
+        <blockquote>
+            [ objet <strong>.</strong> ] identifiant [ ( paramètres ) ]  <i># Appel de fonction</i>
+        </blockquote>
+        <blockquote>
+            * tuple  <i># Fracturation d&#8217;un tuple pour passage différents en arguments</i>
+        </blockquote>
+
+        <h3 id="cls">Classes</h3>
+        
+        <blockquote>
+            <strong>class</strong> identifiant [ &lt; parent ]<br>
+            &nbsp;&nbsp; actions<br>
+            <strong>end</strong>
+        </blockquote>
+        <blockquote>
+            <strong>self</strong>  <i># L&#8217;instance elle-même</i>
+        </blockquote>
+        <blockquote>
+            <strong>super</strong>  <i># Pour accéder aux fonctions du parent</i>
+        </blockquote>
+        <blockquote>
+            nom_classe <strong>.</strong> new [ ( paramètres ) ]  <i>Création d&#8217;une instance</i>
+        </blockquote>
+        
+        <h3 id="mod">Modules</h3>
+        
+        <blockquote>
+            <strong>module</strong> identifiant<br>
+            &nbsp;&nbsp; actions<br>
+            <strong>end</strong>
+        </blockquote>
+        <blockquote>
+            <strong>require</strong>  <i># Exige un module</i>
+        </blockquote>
+        <blockquote>
+            <strong>include</strong>  <i># Inclus les éléments du module dans l&#8217;espace de nom actuel</i>
+        </blockquote>
+        
+    </div>
+    <br>
+    <center><p><a href="#syntax">Retour sommaire</a></p></center>
+    
+    <h2 id="spe">Gestion des exceptions</h2>
+    
+    <div class="flux">
+
+        <h3 id="exp">Exceptions</h3>
+
+        <blockquote>
+            <strong>try</strong><br>
+            &nbsp;&nbsp; actions<br>
+            <strong>rescue</strong> [ identifiant ]<br>
+            &nbsp;&nbsp; actions<br>
+            [ <strong>ensure</strong><br>
+            &nbsp;&nbsp; actions ]<br>
+            <strong>end</strong>
+        </blockquote>
+        <blockquote>
+            <strong>raise</strong> [ expression ]  <i># Lève une exception</i>
+        </blockquote>
+        <blockquote>
+            <strong>retry</strong>  <i># Reprend l&#8217;exécution à partir du <strong>try</strong></i>
+        </blockquote>
+
+    </div>
+    <br>
+    <center><p><a href="#syntax">Retour sommaire</a></p></center>
+    
+    <h2 id="utiles">Utiles</h2>
+
+    <blockquote>
+        Randow.new(min..max)  <i># Nombres aléatoires (min et max inclus)</i>
+    </blockquote>
+    
+    <p>Sérialisation (<a href="http://ruby-doc.org/core-2.2.0/Marshal.html">doc</a>) :</p>
+    <blockquote>
+        data = Marshal.dump(o) <i># sérialise dans une chaîne</i><br>
+        obj = Marshal.load(data) <i># charge la chaîne</i>
+    </blockquote>
+    <br>
+    <center><p><a href="#syntax">Retour sommaire</a></p></center>
+    
+    <h2 id="historique">Historique</h2>
+    
+    <ul>
+        <li>12 mars 2015, version 0.2 : refait le layout de Utiles, Exceptions, Définition, Contrôle. Plus de blockquote. Correction d'erreurs : ret(r)y et end pas en gras.
+        <li>10 mars 2015, version 0.1 : lancement.
+    </ul>
+    
 <!--
       <span class="title">Juste un titre</span>
       <div class="block">
