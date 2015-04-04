@@ -8,9 +8,10 @@ __version__ = "$Revision: 1 $"
 # div X and Y by 32 + math.trunc -> give the square where we are
 # multiply by 32 -> give where we start to display
 
-import pygame, sys, math
+import pygame, sys, math, os
 from pygame.locals import *
-
+os.environ['SDL_VIDEO_CENTERED'] = '1' # only use of os
+DEBUG = False
 
 class Camera:
 
@@ -43,6 +44,7 @@ class Particles:
 
 
 class Particle:
+    
     def __init__(self, pos, dir, target, ttl, guided=False):
         self.x = pos[0]
         self.y = pos[1]
@@ -276,7 +278,7 @@ def select_zone(x, y, w, h):
     else:  # a zone
         for i in range(x, w):
             for j in range(y, h):
-                print(i,j)
+                if DEBUG: print(i,j)
                 if w1.unit_map[i][j] != 0:
                     ul.append(w1.unit_map[i][j])
     return ul
@@ -327,8 +329,8 @@ my_map = [
     [0, 0, 0, 0, 0, 0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0],
 ]
 
-print('mapX :', len(my_map[0]))
-print('mapY :', len(my_map))
+if DEBUG: print('mapX :', len(my_map[0]))
+if DEBUG: print('mapY :', len(my_map))
 
 
 def main_loop():
@@ -364,7 +366,8 @@ def main_loop():
 
     INTERFACE_Y = 480
 
-    while 1:
+    stop = False
+    while not stop:
 
         mx, my = pygame.mouse.get_pos()
         mx32 = math.trunc((mx-X) / 32)
@@ -372,10 +375,12 @@ def main_loop():
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                exit()
+                stop = True
+                break # stop event loop
             elif event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
-                    exit()
+                    stop = True
+                    break # stop event loop
                 elif event.key == K_DOWN:
                     down = True
                 elif event.key == K_UP:
@@ -385,7 +390,7 @@ def main_loop():
                 elif event.key == K_RIGHT:
                     right = True
                 elif event.key == K_LSHIFT:
-                    print('add_mod!')
+                    if DEBUG: print('add_mod!')
                     add_mod = True
             elif event.type == KEYUP:
                 if event.key == K_DOWN:
@@ -398,7 +403,7 @@ def main_loop():
                     right = False
                 elif event.key == K_LSHIFT:
                     add_mod = False
-                    print('stop add mod!')
+                    if DEBUG: print('stop add mod!')
                 elif event.key == K_SPACE:
                     SCROLL_MOD += 1
             elif event.type == MOUSEBUTTONDOWN:
@@ -413,7 +418,7 @@ def main_loop():
                     if mx32 in range(0, MAP_X) and my32 in range(0, MAP_Y):
                         pass
                         # print('map=', my_map[mx32][my32])
-                    print(SELECT_X, SELECT_Y, mx-X, my-Y)
+                    if DEBUG: print(SELECT_X, SELECT_Y, mx-X, my-Y)
                     deb_x = min(SELECT_X, mx-X)
                     fin_x = max(SELECT_X, mx-X)
                     deb_y = min(SELECT_Y, my-Y)
@@ -431,19 +436,19 @@ def main_loop():
                     else:
                         selected = []
                 elif event.button == 3:  # Right
-                    print('button right')
+                    if DEBUG: print('button right')
                     s = select(mx-X, my-Y)
                     if not s:
                         for u in selected:
                             if not add_mod:
-                                print('set order!')
+                                if DEBUG: print('set order!')
                                 u.order(Order('go', math.trunc((mx-X)/32), math.trunc((my-Y)/32)))
-                                print('go order at ', math.trunc((mx-X)/32), math.trunc((my-Y)/32))
+                                if DEBUG: print('go order at ', math.trunc((mx-X)/32), math.trunc((my-Y)/32))
                             else:
-                                print('add order!')
-                                print(len(u.orders))
+                                if DEBUG: print('add order!')
+                                if DEBUG: print(len(u.orders))
                                 u.add_order(Order('go', mx-X, my-Y))
-                                print(len(u.orders))
+                                if DEBUG: print(len(u.orders))
                     elif s.side != SIDE_PLAYER:
                         for u in selected:
                             if not add_mod:
@@ -451,8 +456,10 @@ def main_loop():
                             else:
                                 u.add_order(Order('attack', target=s))
                 elif event.button == 2:
-                    print('button 3')
-
+                    if DEBUG: print('button 3')
+        if stop:
+            break # stop main loop
+        
     # -----------------------------------------------------------------------------
     # Update
 
@@ -527,6 +534,19 @@ def main_loop():
         pygame.draw.line(camera.screen, Color(0, 0, 255), (703, INTERFACE_Y), (703, INTERFACE_Y+96), 1)
         pygame.draw.line(camera.screen, Color(0, 0, 255), (703, INTERFACE_Y+96), (799, INTERFACE_Y+96), 1)
 
+        # Minimap rendering
+        for xx in range(0, len(my_map[0])):
+            for yy in range(0, len(my_map)):
+                r = my_map[yy][xx]
+                if r == 1:
+                    color = Color(255, 0, 0, 128)
+                else:
+                    color = Color(0, 255, 0, 128)
+                if w1.unit_map[xx][yy] != 0:
+                    color = Color(0, 0, 255, 128)
+                #camera.screen.set_at((703+(xx*3), INTERFACE_Y+(yy*3)+1), color)
+                pygame.draw.rect(camera.screen, color, ( 704+(xx*3),INTERFACE_Y+(yy*3)+1, 3, 3), 0)
+                
         # fin Interface
 
         # screen.blit(ball, ballrect)
@@ -536,4 +556,11 @@ def main_loop():
 
 
 if __name__ == '__main__':
-    main_loop()
+    try:
+        main_loop()
+    except:
+        print("Unexpected error:", sys.exc_info()[0])
+    finally:
+        pygame.quit() # Keep this IDLE friendly from https://www.pygame.org/wiki/FrequentlyAskedQuestions
+        print('Goodbye')
+
