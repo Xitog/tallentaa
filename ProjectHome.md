@@ -1,0 +1,1 @@
+Tallentaa means to record, to save in Finnish, and it's what it does.
