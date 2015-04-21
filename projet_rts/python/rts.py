@@ -13,10 +13,14 @@ from pygame.locals import *
 
 
 class Camera:
-    def __init__(self, width, height):
+    def __init__(self, width, height, scroll, player):
         self.width = width
         self.height = height
         self.size = width, height
+        self.scroll = scroll
+        self.player = player
+        self.x = 0
+        self.y = 0
         pygame.init()
         self.screen = pygame.display.set_mode(self.size)  # , pygame.FULLSCREEN | pygame.HWSURFACE)
 
@@ -71,7 +75,10 @@ class Particle:
 class World:
     def __init__(self, world_map):
         self.particles = Particles()
-        self.unit_map = World.create_map(32, 32, 0)
+        if len(world_map) == 0:
+            raise Exception("Empty map detected")
+        self.size32 = Pair(len(world_map[0]), len(world_map))
+        self.unit_map = World.create_map(self.size32.x, self.size32.y, 0)
         self.world_map = world_map
 
     @staticmethod
@@ -172,7 +179,7 @@ class Unit:
                         self.x - 16) % 32 != 0 or (self.y - 16) % 32 != 0:
                     self.go(o.target.x, o.target.y)
                 elif self.cpt <= 0:
-                    world.particles.add(
+                    self.player.world.particles.add(
                         Particle([self.x, self.y], [1, 1, 4], [o.target.x, o.target.y], self.range + 10, False))
                     o.target.life -= self.dom
                     self.cpt = self.reload
@@ -313,8 +320,8 @@ my_map = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 ]
 
-print('mapX :', len(my_map[0]))
-print('mapY :', len(my_map))
+print('map x :', len(my_map[0]))
+print('map y :', len(my_map))
 
 w1 = World(my_map)
 j1 = Player(w1, Color(255, 255, 0))
@@ -324,9 +331,7 @@ units = [Unit(j1, 1, 1, size=10, range=100, life=100, dom=5),
          Unit(j1, 3, 3, size=10, range=150, life=100, dom=10),
          Unit(j2, 12, 12, size=20, range=30, life=300, dom=20)]
 
-camera = Camera(800, 600)
-
-# -----------------------------------------------------------------------------
+camera = Camera(800, 600, 5, j1)  # x, y, scroll, player
 
 # -----------------------------------------------------------------------------
 # Tools
@@ -350,7 +355,7 @@ def select(x, y):
     global w1
     x = math.trunc(x / 32)
     y = math.trunc(y / 32)
-    if w1.unit_map[x][y] != 0:
+    if w1.unit_map[x][y] != 0 and w1.unit_map[i][j] != -1:
         return w1.unit_map[x][y]
     else:
         return False
@@ -375,34 +380,20 @@ def select_zone(x, y, w, h):
         for i in range(x, w):
             for j in range(y, h):
                 print(i, j)
-                if w1.unit_map[i][j] != 0:
+                if w1.unit_map[i][j] != 0 and w1.unit_map[i][j] != -1:
                     ul.append(w1.unit_map[i][j])
     return ul
 
 
 def x2r(x, X):
-    return x * 32 + X + 16
+    return x * 32 + camera.x + 16
 
 
 def y2r(y, Y):
-    return y * 32 + Y + 16
+    return y * 32 + camera.y + 16
 
-# -----------------------------------------------------------------------------
-# Current setting
 
 def main_loop():
-    MAP_X = 32  # need ?
-    MAP_Y = 32  # need ?
-
-    SIDE_PLAYER = j1  # need ?
-
-    # -----------------------------------------------------------------------------
-    # Scrolling
-
-    X = 0
-    Y = 0
-
-    SCROLL_MOD = 5
 
     # -----------------------------------------------------------------------------
     # Selection
@@ -425,8 +416,8 @@ def main_loop():
     while 1:
 
         mx, my = pygame.mouse.get_pos()
-        mx32 = math.trunc((mx - X) / 32)
-        my32 = math.trunc((my - Y) / 32)
+        mx32 = math.trunc((mx - camera.x) / 32)
+        my32 = math.trunc((my - camera.y) / 32)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -458,28 +449,28 @@ def main_loop():
                     add_mod = False
                     print('stop add mod!')
                 elif event.key == K_SPACE:
-                    SCROLL_MOD += 1
+                    camera.scroll += 1
             elif event.type == MOUSEBUTTONDOWN:
                 if event.button == 1:
                     if not SELECT_R:
                         SELECT_R = True
-                        SELECT_X = mx - X
-                        SELECT_Y = my - Y
+                        SELECT_X = mx - camera.x
+                        SELECT_Y = my - camera.y
             elif event.type == MOUSEBUTTONUP:
                 SELECT_R = False
                 if event.button == 1:  # Left
-                    if mx32 in range(0, MAP_X) and my32 in range(0, MAP_Y):
+                    if mx32 in range(0, w1.size32.x) and my32 in range(0, w1.size32.y):
                         pass
                         # print('map=', my_map[mx32][my32])
-                    print(SELECT_X, SELECT_Y, mx - X, my - Y)
-                    deb_x = min(SELECT_X, mx - X)
-                    fin_x = max(SELECT_X, mx - X)
-                    deb_y = min(SELECT_Y, my - Y)
-                    fin_y = max(SELECT_Y, my - Y)
+                    print(SELECT_X, SELECT_Y, mx - camera.x, my - camera.y)
+                    deb_x = min(SELECT_X, mx - camera.x)
+                    fin_x = max(SELECT_X, mx - camera.x)
+                    deb_y = min(SELECT_Y, my - camera.y)
+                    fin_y = max(SELECT_Y, my - camera.y)
                     ul = select_zone(deb_x, deb_y, fin_x, fin_y)
-                    # if select(mx-X, my-Y):
+                    # if select(mx-camera.x, my-camera.y):
                     if ul:
-                        # u = select(mx-X, my-Y)
+                        # u = select(mx-camera.x, my-camera.y)
                         if add_mod:
                             # print('add unit to selection', u, ' (', u.life, ') at [', my_map[mx32][my32], ']')
                             selected += ul  # selected.append(u)
@@ -490,19 +481,20 @@ def main_loop():
                         selected = []
                 elif event.button == 3:  # Right
                     print('button right')
-                    s = select(mx - X, my - Y)
+                    s = select(mx - camera.x, my - camera.y)
                     if not s:
                         for u in selected:
+                            print(u, u.__class__)
                             if not add_mod:
                                 print('set order!')
-                                u.order(Order('go', math.trunc((mx - X) / 32), math.trunc((my - Y) / 32)))
-                                print('go order at ', math.trunc((mx - X) / 32), math.trunc((my - Y) / 32))
+                                u.order(Order('go', math.trunc((mx - camera.x) / 32), math.trunc((my - camera.y) / 32)))
+                                print('go order at ', math.trunc((mx - camera.x) / 32), math.trunc((my - camera.y) / 32))
                             else:
                                 print('add order!')
                                 print(len(u.orders))
-                                u.add_order(Order('go', mx - X, my - Y))
+                                u.add_order(Order('go', mx - camera.x, my - camera.y))
                                 print(len(u.orders))
-                    elif s.side != SIDE_PLAYER:
+                    elif s.side != camera.player:
                         for u in selected:
                             if not add_mod:
                                 u.order(Order('attack', target=s))
@@ -515,72 +507,70 @@ def main_loop():
                     # Update
 
         if left:
-            X += SCROLL_MOD
+            camera.x += camera.scroll
         if right:
-            X -= SCROLL_MOD
+            camera.x -= camera.scroll
         if down:
-            Y -= SCROLL_MOD
+            camera.y -= camera.scroll
         if up:
-            Y += SCROLL_MOD
+            camera.y += camera.scroll
 
         for u in units:
             if not u.update():
                 units.remove(u)
                 del u
 
-        # for p in world.particles.core:
-        # p.update()
         w1.particles.update()
 
         # -----------------------------------------------------------------------------
         # Render
 
-        # print X, Y
+        # print camera.x, camera.y
 
         camera.screen.fill(Color(0, 0, 0, 255))
 
-        for yy in range(0, MAP_Y):
-            for xx in range(0, MAP_X):
+        for yy in range(0, w1.size32.y):
+            for xx in range(0, w1.size32.x):
                 # sys.stdout.write(str(my_map[yy][xx]))
                 r = my_map[yy][xx]
                 if r == 1:
-                    pygame.draw.rect(camera.screen, Color(255, 0, 0, 128), (xx * 32 + X, yy * 32 + Y, 32, 32), 1)
+                    pygame.draw.rect(camera.screen, Color(255, 0, 0, 128), (xx * 32 + camera.x, yy * 32 + camera.y, 32, 32), 1)
                 else:
-                    pygame.draw.rect(camera.screen, Color(0, 255, 0, 128), (xx * 32 + X, yy * 32 + Y, 32, 32), 1)
+                    pygame.draw.rect(camera.screen, Color(0, 255, 0, 128), (xx * 32 + camera.x, yy * 32 + camera.y, 32, 32), 1)
                 u = w1.unit_map[xx][yy]
                 if u == -1:
-                    pygame.draw.rect(camera.screen, Color(128, 0, 0, 8), (xx * 32 + X, yy * 32 + Y, 32, 32), 0)
+                    pygame.draw.rect(camera.screen, Color(128, 0, 0, 8), (xx * 32 + camera.x, yy * 32 + camera.y, 32, 32), 0)
                 elif u != 0:
-                    pygame.draw.rect(camera.screen, Color(0, 0, 128, 8), (xx * 32 + X, yy * 32 + Y, 32, 32), 0)
+                    pygame.draw.rect(camera.screen, Color(0, 0, 128, 8), (xx * 32 + camera.x, yy * 32 + camera.y, 32, 32), 0)
 
         if SELECT_R:
-            r = xrect(SELECT_X + X, SELECT_Y + Y, mx, my)
+            r = xrect(SELECT_X + camera.x, SELECT_Y + camera.y, mx, my)
             pygame.draw.rect(camera.screen, Color(255, 255, 255, 255), r, 1)
 
         for u in units:
             if u in selected:
                 c = Color(0, 0, 255, 255)
                 if len(u.orders) > 0:
-                    lx = u.real_x  # x2r(u.x, X)
-                    ly = u.real_y  # y2r(u.y, Y)
+                    lx = u.real_x  # x2r(u.x, camera.x)
+                    ly = u.real_y  # y2r(u.y, camera.y)
                     for o in u.orders:
                         if o.kind == 'go':
-                            pygame.draw.circle(camera.screen, c, (x2r(o.x, X), y2r(o.y, Y)), 5, 0)
-                            pygame.draw.line(camera.screen, c, (lx + X, ly + Y), (x2r(o.x, X), y2r(o.y, Y)), 1)
+                            pygame.draw.circle(camera.screen, c, (x2r(o.x, camera.x), y2r(o.y, camera.y)), 5, 0)
+                            pygame.draw.line(camera.screen, c, (lx + camera.x, ly + camera.y), (x2r(o.x, camera.x), y2r(o.y, camera.y)), 1)
                             lx = o.x
                             ly = o.y
                         elif o.kind == 'attack':
-                            pygame.draw.circle(camera.screen, Color(255, 0, 0), (o.target.x + X, o.target.y + Y), 5, 0)
-                            pygame.draw.line(camera.screen, Color(255, 0, 0), (lx + X, ly + Y),
-                                             (o.target.x + X, o.target.y + Y), 1)
+                            pygame.draw.circle(camera.screen, Color(255, 0, 0), (o.target.x + camera.x, o.target.y + camera.y), 5, 0)
+                            pygame.draw.line(camera.screen, Color(255, 0, 0), (lx + camera.x, ly + camera.y),
+                                             (o.target.x + camera.x, o.target.y + camera.y), 1)
                             lx = o.target.x
                             ly = o.target.y
             else:
                 c = u.player.color
-            pygame.draw.circle(camera.screen, c, (u.real_x + X, u.real_y + Y), u.size, 0)
+            pygame.draw.circle(camera.screen, c, (u.real_x + camera.x, u.real_y + camera.y), u.size, 0)
 
         for p in w1.particles.core:
-            pygame.draw.circle(camera.screen, Color(255, 0, 0), (p.x + X, p.y + Y), 3, 0)
+            pygame.draw.circle(camera.screen, Color(255, 0, 0), (p.x + camera.x, p.y + camera.y), 3, 0)
 
         # Interface
         pygame.draw.rect(camera.screen, Color(200, 200, 200), (0, INTERFACE_Y, 799, 200), 0)
