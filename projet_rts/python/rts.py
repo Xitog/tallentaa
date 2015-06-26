@@ -24,7 +24,7 @@ SKY_BLUE = Color(0, 255, 255)
 HALF_RED = Color(128, 0, 0)
 HALF_BLUE = Color(0, 0, 128)
 
-UnitType = namedtuple("UnitType", "size range life dom")  # or ['size', 'range', 'life', 'dom']
+UnitType = namedtuple("UnitType", "size range life dom speed")  # or ['size', 'range', 'life', 'dom']
 
 
 class Camera:
@@ -402,9 +402,9 @@ class Game:
         self.name = name
         self.world = world
         self.players = {}
-        self.unit_type = {"soldier": UnitType(size=10, range=100, life=100, dom=5),
-                          "elite": UnitType(size=10, range=150, life=100, dom=10),
-                          "big": UnitType(size=20, range=30, life=300, dom=20)}
+        self.unit_type = {"soldier": UnitType(size=10, range=100, life=100, dom=5, speed=8),
+                          "elite": UnitType(size=10, range=150, life=100, dom=10, speed=8),
+                          "big": UnitType(size=20, range=30, life=300, dom=20, speed=8)}
 
     def create_player(self, name, player_color):
         if name in self.players:
@@ -416,7 +416,7 @@ class Game:
         ut = self.unit_type_by_name(unit_type_name)
         if not self.world.is_valid(x, y):
             raise Exception("False coordinates : " + x + ", " + y)
-        self.world.units.append(Unit(p, x, y, ut.size, ut.range, ut.life, ut.dom))
+        self.world.units.append(Unit(p, x, y, ut.size, ut.range, ut.life, ut.dom, ut.speed))
 
     def get_player_by_name(self, player_name):
         if player_name not in self.players:
@@ -476,7 +476,7 @@ class Pair:
 
 
 class Unit:
-    def __init__(self, player, x, y, size, u_range, life, dom, reload=50):
+    def __init__(self, player, x, y, size, u_range, life, dom, speed, reload=50):
         self.player = player
         self.real_x = x * 32 + 16
         self.real_y = y * 32 + 16
@@ -491,7 +491,9 @@ class Unit:
         self.cpt = 0
         self.cpt_move = 0
         self.speed_move = 1
-        self.speed_step = 2  # must be 1 or a multiple of 2
+        self.speed_step = speed  # must be 1 or a multiple of 2 - 2 before
+        self.old_x = x
+        self.old_y = y
 
         # Transitional movement system (TMS)
         self.transition = None
@@ -556,18 +558,56 @@ class Unit:
 
             n_x = -1
             n_y = -1
+            going_x = 0
+            going_y = 0
             if to_x > from_x:
                 n_x = from_x + 1
+                going_x = 1
             elif to_x < from_x:
                 n_x = from_x - 1
+                going_x = -1
             elif to_x == from_x:
                 n_x = from_x
             if to_y > from_y:
                 n_y = from_y + 1
+                going_y = 1
             elif to_y < from_y:
                 n_y = from_y - 1
+                going_y = -1
             elif to_y == from_y:
                 n_y = from_y
+
+            if not self.player.world.is_empty(n_x, n_y):
+                print("blocked!")
+                if going_x == 1 and going_y == 1:
+                    test = (from_x, n_y, n_x, from_y)
+                elif going_x == 1 and going_y == 0:
+                    test = (n_x, n_y + 1, n_x, n_y - 1)
+                elif going_x == 1 and going_y == -1:
+                    test = (from_x, n_y, n_x, from_y)
+                elif going_x == 0 and going_y == 1:
+                    test = (from_x - 1, n_y, from_x + 1, n_y)
+                elif going_x == 0 and going_y == 0:
+                    pass  # not a move
+                elif going_x == 0 and going_y == -1:
+                    test = (from_x - 1, n_y, from_x + 1, n_y)
+                elif going_x == -1 and going_y == 1:
+                    test = (from_x, n_y, n_x, from_y)
+                elif going_x == -1 and going_y == 0:
+                    test = (n_x, n_y + 1, n_x, n_y - 1)
+                elif going_x == -1 and going_y == -1:
+                    test = (from_x, n_y, n_x, from_y)
+
+                if self.player.world.is_empty(test[0], test[1]):
+                    print("trying : " + str(test[0]) + ", " + str(test[1]))
+                    n_x = test[0]
+                    n_y = test[1]
+                elif self.player.world.is_empty(test[2], test[3]):
+                    print("trying : " + str(test[2]) + ", " + str(test[3]))
+                    n_x = test[2]
+                    n_y = test[3]
+                if n_x == self.old_x and n_y == self.old_y:
+                    return True  # no loop !
 
             if self.player.world.is_empty(n_x, n_y):
                 self.destination = Pair(n_x * 32 + 16, n_y * 32 + 16)
@@ -594,6 +634,8 @@ class Unit:
             self.real_y = self.y * 32 + 16
 
         if self.destination == self.transition and self.destination is not None:
+            self.old_x = self.x
+            self.old_y = self.y
             self.x = int((self.destination.x - 16) / 32)
             self.y = int((self.destination.y - 16) / 32)
             self.destination = None
