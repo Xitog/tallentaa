@@ -68,7 +68,7 @@ print_matrix(es2)
 
 # Texture Generator
 
-buffer = pygame.Surface((screenHeight, screenWidth))
+sbuffer = pygame.Surface((screenHeight, screenWidth))
 
 tex = area(8, None)
 for i in range(0,8):
@@ -78,7 +78,7 @@ for i in range(0,8):
 
 for x in range(0, texWidth):
     for y in range(0, texHeight):
-        c_xor = (x * 256 / texWidth) ^ (y * 256 / texHeight)
+        c_xor = int(x * 256 / texWidth) ^ int(y * 256 / texHeight)
         c_y = y * 256 / texHeight
         c_xy = y * 128 / texHeight + x * 128 / texWidth
         # flat red texture with black cross        
@@ -132,7 +132,7 @@ pygame.init()
 pygame.display.set_caption('Woolfie 3D')
 
 resolution = (640, 480)
-flags = pygame.DOUBLEBUF | pygame.FULLSCREEN
+flags = pygame.DOUBLEBUF # | pygame.FULLSCREEN
 
 print(pygame.display.mode_ok(resolution))
 # 0 : not ok
@@ -275,7 +275,7 @@ while not escape:
         except Exception as e:
             print(int(position[0] + direction[0] * moveSpeed))
             print(int(position[1] + direction[1] * moveSpeed))
-            print e
+            print(e)
     if down:
         if area[int(position[0] - direction[0] * moveSpeed)][int(position[1])] == False: position[0] -= direction[0] * moveSpeed
         if area[int(position[0])][int(position[1] - direction[1] * moveSpeed)] == False: position[1] -= direction[1] * moveSpeed
@@ -417,11 +417,13 @@ while not escape:
             
             # ME BICOLOR TEXTURE
             # if texX > 32: color = ((color[0]+100)%255,color[1],color[2])
-        
+
+            buffer = pygame.PixelArray(sbuffer)  ##
+
             ## ME Now y
-            for yy in range(drawStart, drawEnd):
+            for yy in range(int(drawStart), int(drawEnd)):
                 dd = yy * 256 - height * 128 + lineHeight * 128 # 256 and 128 factors to avoid floats
-                texY = ((dd * texHeight) / lineHeight) / 256
+                texY = int(((dd * texHeight) / lineHeight) / 256) # Py3.0 L'erreur etait la! Il doit restait int, il devenait float!
                 # ME Hum... Normalement les textures font 64 !!!
                 if texY < 0 or texY > 63:
                     if texY < 0:
@@ -430,10 +432,18 @@ while not escape:
                         texY = texY % 64
                 # get pixel color from texture
                 # make color darker for y-sides: R, G and B byte each divided through two with a "shift" and an "and"              
-                pixel = tex[texNum][texHeight * texY + texX]
-                if side == 1: pixel = (pixel >> 1) & 8355711
-                buffer.set_at((s,yy), pixel)
-            
+                try:
+                    pixel = tex[texNum][int(texHeight * texY + texX)]
+                except IndexError: # Py3.0 no need now
+                    print("Texture error")
+                    print("index = " + str(texNum) + " on " + str(len(tex)))
+                    print("index = " + str(int(texHeight * texY + texX)) + " on " + str(len(tex[texNum])))
+                    print("texX = " + str(texX) + " texY = " + str(texY))
+                if side == 1: pixel = (int(pixel) >> 1) & 8355711
+                try:
+                    buffer[s, yy] = int(pixel)  # buffer.set_at((s,yy), int(pixel)) # Py3.0 pixel was promoted to float. It must be int!
+                except TypeError: # Py3.0 no need now
+                    print("Color ERROR : " + str(pixel))
             ##DEB FLOOR
                 
             # FLOOR CASTING
@@ -464,7 +474,7 @@ while not escape:
             if drawEnd < 0: drawEnd = height  #becomes < 0 when the integer overflows
       
             # draw the floor from drawEnd to the bottom of the screen
-            for yyy in range(drawEnd + 1, height):
+            for yyy in range(int(drawEnd + 1), height):
                 currentDist = height / (2.0 * yyy - height) # you could make a small lookup table for this instead
 
                 weight = (currentDist - distPlayer) / (distWall - distPlayer)
@@ -486,8 +496,8 @@ while not escape:
                 ##
                 
                 # floor and celing (symmetrical)
-                buffer.set_at((s,yyy), (tex[floorTexture][texWidth * floorTexY + floorTexX] >> 1) & 8355711)
-                buffer.set_at((s, height-yyy), tex[floorTexture][texWidth * floorTexY + floorTexX])
+                buffer[s,yyy] =  (tex[floorTexture][texWidth * floorTexY + floorTexX] >> 1) & 8355711  # buffer.set_at((s,yyy), (tex[floorTexture][texWidth * floorTexY + floorTexX] >> 1) & 8355711)
+                buffer[s, height-yyy] = tex[floorTexture][texWidth * floorTexY + floorTexX]  # buffer.set_at((s, height-yyy), tex[floorTexture][texWidth * floorTexY + floorTexX])
 
             ##END FLOOR 15h22 Mais il y a une petite barre grise.
                 
@@ -495,10 +505,11 @@ while not escape:
         
         #UNTEX
         else:
-            pygame.draw.line(buffer, color, (s,drawStart), (s,drawEnd), 1)
-    
-    screen.blit(buffer, (0,0))
-    buffer.fill((0,0,0))
+            pygame.draw.line(buffer.surface, color, (s,drawStart), (s,drawEnd), 1)  ##
+
+    del buffer ##
+    screen.blit(sbuffer, (0,0))  ##
+    sbuffer.fill((0,0,0))  ##
     ##ENDTEXT
     
     pygame.display.flip()
