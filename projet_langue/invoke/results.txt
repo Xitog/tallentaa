@@ -275,117 +275,135 @@ Tous les verbes français
 68. #87 essayer
 69. #84 faire
 70. #83 fermer
-71. #82 finir
-72. #81 gagner
-73. #168 glisser
-74. #80 goûter
-75. #167 gémir
-76. #79 habiller (s)
-77. #78 habiter
-78. #169 intéresser
-79. #77 inviter
-80. #76 jeter
-81. #75 jouer
-82. #186 lancer
-83. #74 laver
-84. #170 lever
-85. #73 lever (se)
-86. #72 lire
-87. #171 louer
-88. #71 manger
-89. #70 manquer
-90. #69 marcher
-91. #47 mettre
-92. #147 monter
-93. #48 montrer
-94. #49 mourir
-95. #50 nager
-96. #51 naître
-97. #172 nourrir
-98. #36 occuper (s)
-99. #52 oublier
-100. #1 ouvrir
-101. #53 pardonner
-102. #54 parler
-103. #173 partager
-104. #55 partir
-105. #56 passer
-106. #57 payer
-107. #174 pendre
-108. #58 penser
-109. #59 perdre
-110. #60 permettre
-111. #61 plaire
-112. #62 pleurer
-113. #175 plier
-114. #176 plonger
-115. #63 porter
-116. #144 poser
-117. #177 pousser
-118. #64 pouvoir
-119. #65 prendre
-120. #179 produire
-121. #67 promettre
-122. #142 proposer
-123. #66 présenter (se)
-124. #178 prêter
-125. #68 quitter
-126. #26 raconter
-127. #27 recevoir
-128. #28 regarder
-129. #29 remercier
-130. #146 remplir
-131. #30 rencontrer
-132. #39 reposer (se)
-133. #32 rester
-134. #181 retenir
-135. #136 revenir
-136. #35 rire
-137. #145 réduire
-138. #180 réfléchir
-139. #31 répondre
-140. #33 réussir
-141. #34 réveiller (se)
-142. #182 rêver
-143. #37 sauter
-144. #38 savoir
-145. #41 sentir
-146. #138 sortir
-147. #42 souffrir
-148. #43 souhaiter
-149. #40 souvenir (se)
-150. #44 suivre
-151. #45 tenir
-152. #46 tirer
-153. #17 tomber
-154. #16 toucher
-155. #15 tourner
-156. #14 traduire
-157. #13 travailler
-158. #12 trouver
-159. #11 utiliser
-160. #183 valoir
-161. #10 vendre
-162. #9 venir
-163. #184 vider
-164. #8 visiter
-165. #7 vivre
-166. #6 voir
-167. #5 voler
-168. #3 vouloir
-169. #2 voyager
-170. #93 écouter
-171. #92 écrire
-172. #141 éteindre
-173. #85 étudier
-174. #86 être
-175. #166 être daccord
+71. #21007 fille
+72. #21006 fils
+73. #82 finir
+74. #21004 frère
+75. #81 gagner
+76. #21008 garçon
+77. #168 glisser
+78. #80 goûter
+79. #167 gémir
+80. #79 habiller (s)
+81. #78 habiter
+82. #169 intéresser
+83. #77 inviter
+84. #76 jeter
+85. #75 jouer
+86. #186 lancer
+87. #74 laver
+88. #170 lever
+89. #73 lever (se)
+90. #72 lire
+91. #21001 lit
+92. #21000 livre
+93. #171 louer
+94. #71 manger
+95. #70 manquer
+96. #69 marcher
+97. #47 mettre
+98. #147 monter
+99. #48 montrer
+100. #49 mourir
+101. #21003 mère
+102. #50 nager
+103. #51 naître
+104. #172 nourrir
+105. #36 occuper (s)
+106. #52 oublier
+107. #1 ouvrir
+108. #53 pardonner
+109. #54 parler
+110. #173 partager
+111. #55 partir
+112. #56 passer
+113. #57 payer
+114. #174 pendre
+115. #58 penser
+116. #59 perdre
+117. #60 permettre
+118. #61 plaire
+119. #62 pleurer
+120. #175 plier
+121. #176 plonger
+122. #63 porter
+123. #144 poser
+124. #177 pousser
+125. #64 pouvoir
+126. #65 prendre
+127. #179 produire
+128. #67 promettre
+129. #142 proposer
+130. #66 présenter (se)
+131. #178 prêter
+132. #21002 père
+133. #68 quitter
+134. #26 raconter
+135. #27 recevoir
+136. #28 regarder
+137. #29 remercier
+138. #146 remplir
+139. #30 rencontrer
+140. #39 reposer (se)
+141. #32 rester
+142. #181 retenir
+143. #136 revenir
+144. #35 rire
+145. #145 réduire
+146. #180 réfléchir
+147. #31 répondre
+148. #33 réussir
+149. #34 réveiller (se)
+150. #182 rêver
+151. #37 sauter
+152. #38 savoir
+153. #41 sentir
+154. #138 sortir
+155. #42 souffrir
+156. #43 souhaiter
+157. #40 souvenir (se)
+158. #44 suivre
+159. #21005 sœur
+160. #45 tenir
+161. #46 tirer
+162. #17 tomber
+163. #16 toucher
+164. #15 tourner
+165. #14 traduire
+166. #13 travailler
+167. #12 trouver
+168. #11 utiliser
+169. #183 valoir
+170. #10 vendre
+171. #9 venir
+172. #184 vider
+173. #8 visiter
+174. #7 vivre
+175. #6 voir
+176. #5 voler
+177. #3 vouloir
+178. #2 voyager
+179. #93 écouter
+180. #92 écrire
+181. #141 éteindre
+182. #85 étudier
+183. #86 être
+184. #166 être daccord
 
 
 
 ------------------------------------------------------------------------
 Verbes non traduits
 ------------------------------------------------------------------------
+1. #21007 fille
+2. #21006 fils
+3. #21004 frère
+4. #21008 garçon
+5. #21001 lit
+6. #21000 livre
+7. #21003 mère
+8. #21002 père
+9. #21005 sœur
 
 
-Last edit on 2015-08-15 19:18:57
+Last edit on 2015-08-19 19:36:56
