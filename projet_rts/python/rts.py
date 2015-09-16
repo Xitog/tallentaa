@@ -24,8 +24,8 @@ SKY_BLUE = Color(0, 255, 255)
 HALF_RED = Color(128, 0, 0)
 HALF_BLUE = Color(0, 0, 128)
 
-UnitType = namedtuple("UnitType", "size range life dom speed")  # or ['size', 'range', 'life', 'dom']
-
+UnitType = namedtuple("UnitType", "size range life dom speed reload")  # or ['size', 'range', 'life', 'dom']
+BuildingType = namedtuple("BuildingType", "size range life dom speed reload type")
 
 class Camera:
     def __init__(self, width, height, scroll, player):
@@ -210,6 +210,7 @@ class Camera:
         for u in self.player.world.units:
             if not u.update():
                 self.player.world.units.remove(u)
+                print("deleting unit")
                 del u
 
         self.player.world.particles.update()
@@ -223,18 +224,24 @@ class Camera:
             for xx in range(0, self.player.world.size32.x):
                 r = self.player.world.world_map[xx][yy]
                 if r == 1:
-                    pygame.draw.rect(self.screen, RED, (xx * 32 + self.x, yy * 32 + self.y, 32, 32), 1)
-                else:
-                    pygame.draw.rect(self.screen, GREEN, (xx * 32 + self.x, yy * 32 + self.y, 32, 32), 1)
+                    pygame.draw.rect(self.screen, RED, (xx * 32 + self.x +1, yy * 32 + self.y +1, 32-1, 32-1), 1)
+                    pygame.draw.line(self.screen, RED, (xx * 32 + self.x, yy * 32 + self.y), (xx * 32 + self.x + 31, yy * 32 + self.y + 31)),
+                    pygame.draw.line(self.screen, RED, (xx * 32 + self.x, yy * 32 + self.y + 31), (xx * 32 + self.x + 31, yy * 32 + self.y)),
+                # else:
+                    # pygame.draw.rect(self.screen, GREEN, (xx * 32 + self.x, yy * 32 + self.y, 32+1, 32+1), 1)
+                pygame.draw.line(self.screen, GREEN, (xx * 32 + self.x, yy * 32 + self.y), (xx * 32 + self.x + 32, yy * 32 + self.y)),
+                pygame.draw.line(self.screen, GREEN, (xx * 32 + self.x, yy * 32 + self.y), (xx * 32 + self.x, yy * 32 + self.y + 32)),
                 u = self.player.world.unit_map[xx][yy]
                 if u == 0:
-                    pass
+                    pass # Empty
                 elif u[0] == -1:
-                    pygame.draw.rect(self.screen, HALF_RED, (xx * 32 + self.x, yy * 32 + self.y, 32, 32), 0)
-                else:
-                    pygame.draw.rect(self.screen, HALF_BLUE, (xx * 32 + self.x, yy * 32 + self.y, 32, 32), 0)
-                label = self.font.render(str(xx) + ", " + str(yy), 1, (255, 255, 0))
-                self.screen.blit(label, (int(xx * 32 + self.x), int(yy * 32 + self.y)))
+                    pygame.draw.rect(self.screen, HALF_RED, (xx * 32 + self.x +1, yy * 32 + self.y +1, 32-1, 32-1), 0)
+                elif u[1] == 1:
+                    pygame.draw.rect(self.screen, HALF_BLUE, (xx * 32 + self.x +1, yy * 32 + self.y +1, 32-1, 32-1), 0)
+                elif u[1] == 2:
+                    pass # Building
+                # label = self.font.render(str(xx) + ", " + str(yy), 1, (255, 255, 0))
+                # self.screen.blit(label, (int(xx * 32 + self.x), int(yy * 32 + self.y)))
 
         if self.mode == 'normal':
             if self.SELECT_R:
@@ -256,31 +263,40 @@ class Camera:
                                               self.build_size.y*32), 0)
 
         for u in self.player.world.units:
-            if u in self.selected:
-                c = BLUE
-                if u.player != self.player:
-                    c = RED
-                if len(u.orders) > 0:
-                    lx = u.real_x
-                    ly = u.real_y
-                    for o in u.orders:
-                        if o.kind == 'go':
-                            pygame.draw.circle(self.screen, c, (self.x2r(o.x), self.y2r(o.y)), 5, 0)
-                            pygame.draw.line(self.screen, c, (lx + self.x, ly + self.y), (self.x2r(o.x), self.y2r(o.y)),
-                                             1)
-                            lx = o.x
-                            ly = o.y
-                        elif o.kind == 'attack':
-                            pygame.draw.circle(self.screen, RED, (o.target.x*32+16 + self.x, o.target.y*32+16 + self.y),
-                                               5, 0)
-                            pygame.draw.line(self.screen, RED, (lx + self.x, ly + self.y),
-                                             (o.target.x*32+16 + self.x, o.target.y*32+16 + self.y), 1)
-                            lx = o.target.x
-                            ly = o.target.y
+            if type(u).__name__ == 'Building':
+                for ix in range(u.x, u.x+u.w):
+                    for iy in range(u.y, u.y+u.h):
+                        #print(ix, iy, ix * 32 + self.x, iy * 32 + self.y)
+                        if u in self.selected:
+                            pygame.draw.rect(self.screen, Color(255, 0, 0), (ix * 32 + self.x, iy * 32 + self.y, 32, 32), 0)
+                        else:
+                            pygame.draw.rect(self.screen, Color(0, 0, 255), (ix * 32 + self.x, iy * 32 + self.y, 32, 32), 0)
             else:
-                c = u.player.color
-            pygame.draw.circle(self.screen, c, (u.real_x + self.x, u.real_y + self.y), u.size, 0)
-
+                if u in self.selected:
+                    c = GREEN
+                    # if u.player != self.player:
+                    #     c = RED
+                    if len(u.orders) > 0:
+                        lx = u.real_x
+                        ly = u.real_y
+                        for o in u.orders:
+                            if o.kind == 'go':
+                                pygame.draw.circle(self.screen, c, (self.x2r(o.x), self.y2r(o.y)), 5, 0)
+                                pygame.draw.line(self.screen, c, (lx + self.x, ly + self.y), (self.x2r(o.x), self.y2r(o.y)),
+                                                 1)
+                                lx = o.x
+                                ly = o.y
+                            elif o.kind == 'attack':
+                                pygame.draw.circle(self.screen, RED, (o.target.x*32+16 + self.x, o.target.y*32+16 + self.y),
+                                                   5, 0)
+                                pygame.draw.line(self.screen, RED, (lx + self.x, ly + self.y),
+                                                 (o.target.x*32+16 + self.x, o.target.y*32+16 + self.y), 1)
+                                lx = o.target.x
+                                ly = o.target.y
+                else:
+                    c = u.player.color
+                pygame.draw.circle(self.screen, c, (u.real_x + self.x, u.real_y + self.y), u.size, 0)
+        
         for p in self.player.world.particles.core:
             pygame.draw.circle(self.screen, RED, (p.x + self.x, p.y + self.y), 3, 0)
 
@@ -358,7 +374,7 @@ class World:
         self.unit_map = World.create_map(self.size32.x, self.size32.y, 0)
         self.world_map = world_map
         self.units = []
-
+    
     def is_valid(self, x, y):
         return 0 <= x < self.size32.x and 0 <= y < self.size32.y
 
@@ -402,31 +418,47 @@ class Game:
         self.name = name
         self.world = world
         self.players = {}
-        self.unit_type = {"soldier": UnitType(size=10, range=100, life=100, dom=5, speed=8),
-                          "elite": UnitType(size=10, range=150, life=100, dom=10, speed=8),
-                          "big": UnitType(size=20, range=30, life=300, dom=20, speed=8)}
-
+        self.unit_type = {"soldier": UnitType(size=10, range=100, life=100, dom=5, speed=8, reload=50),
+                          "elite": UnitType(size=10, range=150, life=100, dom=10, speed=8, reload=50),
+                          "big": UnitType(size=20, range=30, life=300, dom=20, speed=8, reload=50)}
+        self.building_type = {"mine": BuildingType(size=(2,2), range=20, life=300, dom=0, speed=0, reload=0, type=1)}
+    
     def create_player(self, name, player_color):
+        print("creating player")
         if name in self.players:
             raise Exception("Already a player with this name")
         self.players[name] = Player(self, name, player_color)
 
     def create_unit(self, player_name, x, y, unit_type_name):
+        print("creating unit")
         p = self.get_player_by_name(player_name)
-        ut = self.unit_type_by_name(unit_type_name)
-        if not self.world.is_valid(x, y):
-            raise Exception("False coordinates : " + x + ", " + y)
-        self.world.units.append(Unit(p, x, y, ut.size, ut.range, ut.life, ut.dom, ut.speed))
-
+        ut = self.get_unit_type_by_name(unit_type_name)
+        if not self.world.is_valid(x, y) or not self.world.is_empty(x,y):
+            raise Exception("False or not empty coordinates : " + x + ", " + y)
+        self.world.units.append(Unit(unit_type_name, p, x, y, ut.size, ut.range, ut.life, ut.dom, ut.speed))
+    
+    def create_building(self, player_name, x, y, building_type_name):
+        print("creating building")
+        p = self.get_player_by_name(player_name)
+        bt = self.get_building_type_by_name(building_type_name)
+        if not self.world.is_valid_zone(x, y, bt.size[0], bt.size[1]) or not self.world.is_empty_zone(x, y, bt.size[0], bt.size[1]):
+            raise Exception("False or not empty coordinates : " + x + ", " + y)
+        self.world.units.append(Building(building_type_name, p, x, y, bt.size[1], bt.size[0], bt.range, bt.life, bt.dom, bt.speed, bt.reload)) 
+        
     def get_player_by_name(self, player_name):
         if player_name not in self.players:
             raise Exception("Unknown player : " + player_name)
         return self.players[player_name]
 
-    def unit_type_by_name(self, unit_type_name):  # TODO get_ ?
+    def get_unit_type_by_name(self, unit_type_name):
         if unit_type_name not in self.unit_type:
             raise Exception("Unknown unit type : " + unit_type_name)
         return self.unit_type[unit_type_name]
+        
+    def get_building_type_by_name(self, building_type_name):
+        if building_type_name not in self.building_type:
+            raise Exception("Unknown building type : " + building_type_name)
+        return self.building_type[building_type_name]
 
 
 class Player:
@@ -475,19 +507,55 @@ class Pair:
         return "[" + str(self.x) + ", " + str(self.y) + "]"
 
 
+class Building:
+
+    def __init__(self, bname, player, x, y, h, w, b_range, life, dom, speed, reload=50):
+        self.bname = bname
+        self.player = player
+        self.x = x
+        self.y = y
+        self.h = h
+        self.w = w
+        self.b_range = b_range
+        self.life = life
+        self.dom = dom
+        self.speed = speed
+        self.reload = reload
+        
+        self.orders = []
+        for i in range(x, x+w):
+            for j in range(y, y+h):
+                self.player.world.unit_map[i][j] = (2, self) # STILL, BUILDING
+    
+    def __str__(self):
+        return str(id(self)) + ' (' + self.bname + ')'
+    
+    def update(self):
+        return True # Very Important
+    
+    def order(self, o):
+        self.orders = [o]
+
+    def add_order(self, o):
+        self.orders.append(o)
+
+
 class Unit:
-    def __init__(self, player, x, y, size, u_range, life, dom, speed, reload=50):
+    
+    def __init__(self, uname, player, x, y, size, u_range, life, dom, speed, reload=50):
+        self.uname = uname
         self.player = player
         self.real_x = x * 32 + 16
         self.real_y = y * 32 + 16
         self.x = x
         self.y = y
         self.size = size
-        self.orders = []
         self.range = u_range
         self.life = life
         self.dom = dom
         self.reload = reload
+        
+        self.orders = []
         self.cpt = 0
         self.cpt_move = 0
         self.speed_move = 1
@@ -501,7 +569,7 @@ class Unit:
         self.previous32 = None
 
     def __str__(self):
-        return str(id(self))
+        return str(id(self)) + ' (' + self.uname + ')'
 
     def update(self):
         self.player.world.unit_map[self.x][self.y] = 0
@@ -529,7 +597,7 @@ class Unit:
                         del self.orders[0]
                 else:
                     self.cpt -= 1
-        self.player.world.unit_map[self.x][self.y] = (1, self)
+        self.player.world.unit_map[self.x][self.y] = (1, self) # CODE: STILL, UNIT
         return True
 
     def order(self, o):
@@ -611,7 +679,7 @@ class Unit:
 
             if self.player.world.is_empty(n_x, n_y):
                 self.destination = Pair(n_x * 32 + 16, n_y * 32 + 16)
-                self.player.world.unit_map[n_x][n_y] = (-1, self)
+                self.player.world.unit_map[n_x][n_y] = (-1, self) # CODE: IN MOVEMENT
 
         if self.destination is not None and self.transition is None:
             self.transition = Pair(self.x * 32 + 16, self.y * 32 + 16)
@@ -718,7 +786,8 @@ def configure():
     g.create_unit("Bob", 1, 1, "soldier")
     g.create_unit("Bob", 3, 3, "elite")
     g.create_unit("Henry", 12, 12, "big")
-
+    g.create_building("Bob", 5, 5, "mine")
+    
     return Camera(800, 600, 5, g.get_player_by_name("Bob"))  # x, y, scroll, player
 
 
