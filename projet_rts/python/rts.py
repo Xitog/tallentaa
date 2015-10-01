@@ -25,7 +25,7 @@ HALF_RED = Color(128, 0, 0)
 HALF_BLUE = Color(0, 0, 128)
 
 UnitType = namedtuple("UnitType", "size range life dom speed reload")  # or ['size', 'range', 'life', 'dom']
-BuildingType = namedtuple("BuildingType", "size range life dom speed reload type")
+#BuildingType = namedtuple("BuildingType", "size range life dom speed reload type")
 
 class Camera:
     def __init__(self, width, height, scroll, player):
@@ -83,6 +83,8 @@ class Camera:
         return y * 32 + self.y + 16
 
     def update(self):
+        self.player.game.update() # here
+        
         mx, my = pygame.mouse.get_pos()
 
         for event in pygame.event.get():
@@ -131,14 +133,37 @@ class Camera:
             elif event.type == MOUSEBUTTONUP:
                 self.SELECT_R = False
                 if event.button == 1:  # Left Button
-                    if my > self.INTERFACE_Y and self.SELECT_Y > self.INTERFACE_Y:
-                        if self.mode == 'normal':
-                            a = mx // 32
-                            b = (my-self.INTERFACE_Y) // 32
-                            if a == 0 and b == 0:
-                                self.mode = 'build'
-                        elif self.mode == 'build':
-                            pass
+                    if my > self.INTERFACE_Y and self.SELECT_Y > self.INTERFACE_Y: # Interface click
+                        #if self.mode == 'normal':
+                        a = mx // 32
+                        b = (my-self.INTERFACE_Y) // 32
+                        # print(a,b)
+                        if a == 0 and b == 0: # 100 000 000
+                            self.mode = 'build'
+                            self.build_type = 'mine'
+                            self.build_size = Pair(2, 2)
+                        elif a == 1 and b == 0: # 010 000 000
+                            self.mode = 'build'
+                            self.build_type = 'solar'
+                            self.build_size = Pair(2, 1)
+                        elif a == 2 and b == 0: # 001 000 000
+                            self.mode = 'build'
+                            self.build_type = 'radar'
+                            self.build_size = Pair(1, 1)
+                        elif a == 0 and b == 1: # 000 100 000
+                            self.mode = 'build'
+                            self.build_type = 'barracks'
+                            self.build_size = Pair(2, 3)
+                        elif a == 1 and b == 1: # 000 010 000
+                            self.mode = 'build'
+                            self.build_type = 'factory'
+                            self.build_size = Pair(2, 3)
+                        elif a == 2 and b == 1: # 000 001 000
+                            self.mode = 'build'
+                            self.build_type = 'laboratory'
+                            self.build_size = Pair(2, 2)
+                        #elif self.mode == 'build':
+                        #    pass
                     elif self.mode == 'normal':
                         deb_x = min(self.SELECT_X, mx - self.x)
                         fin_x = max(self.SELECT_X, mx - self.x)
@@ -168,7 +193,10 @@ class Camera:
                         # test if ok
                         v = self.player.world.is_empty_zone(xx-cw, yy-ch, self.build_size.x, self.build_size.y)
                         if v:
-                            pass  # TODO Build Here. And Put in  Unit Map (-1, id) ? dans Game create_bat
+                            # Final Building Here
+                            self.player.game.create_building(self.player.name, xx-cw, yy-ch, self.build_type)
+                        if not self.add_mod: # multiple construction orders
+                            self.mode = 'normal'
                 elif event.button == 3:  # Right Button
                     if self.mode == 'build':
                         self.mode = 'normal'
@@ -220,6 +248,7 @@ class Camera:
         mx, my = pygame.mouse.get_pos()  # repeat from main_loop
         self.screen.fill(BLACK)
 
+        # Sol
         for yy in range(0, self.player.world.size32.y):
             for xx in range(0, self.player.world.size32.x):
                 r = self.player.world.world_map[xx][yy]
@@ -242,12 +271,13 @@ class Camera:
                     pass # Building
                 # label = self.font.render(str(xx) + ", " + str(yy), 1, (255, 255, 0))
                 # self.screen.blit(label, (int(xx * 32 + self.x), int(yy * 32 + self.y)))
-
+        
+        # Cursor
         if self.mode == 'normal':
             if self.SELECT_R:
                 r = xrect(self.SELECT_X + self.x, self.SELECT_Y + self.y, mx, my)
                 pygame.draw.rect(self.screen, WHITE, r, 1)
-        else:
+        elif self.mode == 'build':
             xx = (mx - self.x) // 32
             yy = (my - self.y) // 32
             # center the thing
@@ -262,15 +292,16 @@ class Camera:
             pygame.draw.rect(self.screen, c, ((xx-cw)*32+self.x, (yy-ch)*32+self.y, self.build_size.x*32,
                                               self.build_size.y*32), 0)
 
+        # Unit
         for u in self.player.world.units:
             if type(u).__name__ == 'Building':
-                for ix in range(u.x, u.x+u.w):
-                    for iy in range(u.y, u.y+u.h):
+                for ix in range(u.grid_x, u.grid_x+u.type.grid_w):
+                    for iy in range(u.grid_y, u.grid_y+u.type.grid_h):
                         #print(ix, iy, ix * 32 + self.x, iy * 32 + self.y)
                         if u in self.selected:
-                            pygame.draw.rect(self.screen, Color(255, 0, 0), (ix * 32 + self.x, iy * 32 + self.y, 32, 32), 0)
+                            pygame.draw.rect(self.screen, Color(0, 255, 0), (ix * 32 + self.x, iy * 32 + self.y, 32, 32), 0)
                         else:
-                            pygame.draw.rect(self.screen, Color(0, 0, 255), (ix * 32 + self.x, iy * 32 + self.y, 32, 32), 0)
+                            pygame.draw.rect(self.screen, u.player.color, (ix * 32 + self.x, iy * 32 + self.y, 32, 32), 0)
             else:
                 if u in self.selected:
                     c = GREEN
@@ -309,9 +340,21 @@ class Camera:
         pygame.draw.line(self.screen, BLUE, (703, self.INTERFACE_Y), (703, self.INTERFACE_Y + 96), 1)
         pygame.draw.line(self.screen, BLUE, (703, self.INTERFACE_Y + 96), (799, self.INTERFACE_Y + 96), 1)
 
-        label = self.font.render('B', 1, (0, 0, 0))
-        self.screen.blit(label, (10, self.INTERFACE_Y+10))
-
+        label = self.font.render('Min', 1, (0, 0, 0))
+        self.screen.blit(label, (8, self.INTERFACE_Y+8))
+        label = self.font.render('Sol', 1, (0, 0, 0))
+        self.screen.blit(label, (40, self.INTERFACE_Y+8))
+        label = self.font.render('Rad', 1, (0, 0, 0))
+        self.screen.blit(label, (72, self.INTERFACE_Y+8))
+        
+        label = self.font.render('Cas', 1, (0, 0, 0))
+        self.screen.blit(label, (8, self.INTERFACE_Y+40))
+        label = self.font.render('Fac', 1, (0, 0, 0))
+        self.screen.blit(label, (40, self.INTERFACE_Y+40))
+        label = self.font.render('Lab', 1, (0, 0, 0))
+        self.screen.blit(label, (72, self.INTERFACE_Y+40))
+        
+        
         # fin Interface
 
         pygame.display.flip()
@@ -421,7 +464,14 @@ class Game:
         self.unit_type = {"soldier": UnitType(size=10, range=100, life=100, dom=5, speed=8, reload=50),
                           "elite": UnitType(size=10, range=150, life=100, dom=10, speed=8, reload=50),
                           "big": UnitType(size=20, range=30, life=300, dom=20, speed=8, reload=50)}
-        self.building_type = {"mine": BuildingType(size=(2,2), range=20, life=300, dom=0, speed=0, reload=0, type=1)}
+        # self.building_type = {"mine": BuildingType(size=(2,2), range=20, life=300, dom=0, speed=0, reload=0, type=1)}
+        self.all_building_types = {"mine" : BuildingType("Mine", 2, 2, 100),
+                                   "solar" : BuildingType("Solar", 1, 2, 80),
+                                   "barracks" : BuildingType("Barracks", 3, 2, 300),
+                                   "factory" : BuildingType("Factory", 3, 2, 500),
+                                   "radar" : BuildingType("Radar", 1, 1, 80),
+                                   "laboratory" : BuildingType("Laboratory", 2, 2, 250),
+                                  }
     
     def create_player(self, name, player_color):
         print("creating player")
@@ -435,15 +485,19 @@ class Game:
         ut = self.get_unit_type_by_name(unit_type_name)
         if not self.world.is_valid(x, y) or not self.world.is_empty(x,y):
             raise Exception("False or not empty coordinates : " + x + ", " + y)
-        self.world.units.append(Unit(unit_type_name, p, x, y, ut.size, ut.range, ut.life, ut.dom, ut.speed))
-    
+        u = Unit(unit_type_name, p, x, y, ut.size, ut.range, ut.life, ut.dom, ut.speed)
+        self.world.units.append(u)
+        p.units.append(u)
+        
     def create_building(self, player_name, x, y, building_type_name):
         print("creating building")
         p = self.get_player_by_name(player_name)
         bt = self.get_building_type_by_name(building_type_name)
-        if not self.world.is_valid_zone(x, y, bt.size[0], bt.size[1]) or not self.world.is_empty_zone(x, y, bt.size[0], bt.size[1]):
+        if not self.world.is_valid_zone(x, y, bt.grid_w, bt.grid_h) or not self.world.is_empty_zone(x, y, bt.grid_w, bt.grid_h):
             raise Exception("False or not empty coordinates : " + x + ", " + y)
-        self.world.units.append(Building(building_type_name, p, x, y, bt.size[1], bt.size[0], bt.range, bt.life, bt.dom, bt.speed, bt.reload)) 
+        b = Building(p, bt, x, y)
+        self.world.units.append(b) 
+        p.buildings.append(b)
         
     def get_player_by_name(self, player_name):
         if player_name not in self.players:
@@ -456,9 +510,13 @@ class Game:
         return self.unit_type[unit_type_name]
         
     def get_building_type_by_name(self, building_type_name):
-        if building_type_name not in self.building_type:
+        if building_type_name not in self.all_building_types:
             raise Exception("Unknown building type : " + building_type_name)
-        return self.building_type[building_type_name]
+        return self.all_building_types[building_type_name]
+    
+    def update(self):
+        for key, value in self.players.items():
+            value.update()
 
 
 class Player:
@@ -467,7 +525,17 @@ class Player:
         self.name = name
         self.world = game.world
         self.color = player_color
-
+        self.units = []
+        self.buildings = []
+        self.min = 0
+        self.sol = 0
+    
+    def update(self):
+        for b in self.buildings:
+            if b.type.name == "Mine":
+                self.min += 1
+            elif b.type.name == "Solar":
+                self.sol += 1
 
 class Order:
     def __init__(self, kind=None, x=0, y=0, target=None):
@@ -507,28 +575,46 @@ class Pair:
         return "[" + str(self.x) + ", " + str(self.y) + "]"
 
 
+class BuildLoad:
+
+    def __init__(self):
+        pass
+
+
+class WeaponType:
+
+    def __init__(self, name : str, range : int, reload : int):
+        self.name = name
+        self.range = range
+        self.reload = reload
+
+
+class BuildingType:
+
+    def __init__(self, name : str, grid_h : int, grid_w : int, life : int, build_load : BuildLoad = None, weapon_type : WeaponType = None):
+        self.name = name
+        self.grid_h = grid_h
+        self.grid_w = grid_w
+        self.life = life
+        self.build_load = build_load
+        self.weapon_type = weapon_type
+
+
 class Building:
 
-    def __init__(self, bname, player, x, y, h, w, b_range, life, dom, speed, reload=50):
-        self.bname = bname
+    def __init__(self, player : Player, type : BuildingType, grid_x : int, grid_y : int):
         self.player = player
-        self.x = x
-        self.y = y
-        self.h = h
-        self.w = w
-        self.b_range = b_range
-        self.life = life
-        self.dom = dom
-        self.speed = speed
-        self.reload = reload
+        self.type = type
+        self.grid_x = grid_x
+        self.grid_y = grid_y
         
         self.orders = []
-        for i in range(x, x+w):
-            for j in range(y, y+h):
+        for i in range(grid_x, grid_x + type.grid_w):
+            for j in range(grid_y, grid_y + type.grid_h):
                 self.player.world.unit_map[i][j] = (2, self) # STILL, BUILDING
     
     def __str__(self):
-        return str(id(self)) + ' (' + self.bname + ')'
+        return str(id(self)) + ' (' + self.type.name + ')'
     
     def update(self):
         return True # Very Important
@@ -600,13 +686,13 @@ class Unit:
         self.player.world.unit_map[self.x][self.y] = (1, self) # CODE: STILL, UNIT
         return True
 
-    def order(self, o):
+    def order(self, o : Order):
         self.orders = [o]
 
     def add_order(self, o):
         self.orders.append(o)
 
-    def go(self, x, y):
+    def go(self, x : int, y : int):
 
         if self.cpt_move > 0:
             self.cpt_move -= 1
@@ -740,7 +826,8 @@ def main_loop(camera):
             break
 
         pygame.time.Clock().tick(30)
-
+    print("Metal = " + str(camera.player.min))
+    print("Energy = " + str(camera.player.sol))
 
 def configure():
     my_map = [
@@ -795,6 +882,9 @@ def start():
     c = configure()
     main_loop(c)
 
-if __name__ == '__main__':
+if __name__ == '__main__': 
+    import sys
+    _maj, _min = sys.version_info[:2]
+    print('Starting on Python ' + str(_maj) + "." + str(_min) + " with pygame " + pygame.version.ver)
     start()
     exit()
