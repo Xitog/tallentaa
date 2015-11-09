@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>Hash Navigation with JavaScript</title>
+    <style type="text/css">
+        a               { color: #00FF00; background-color: #000000; }
+        a:hover         { color: White; background-color: #FF0000; }
+    </style>
+    <script type="text/javascript">
+        function init() {
+            window.onhashchange = dispatch;
+            dispatch(); /* if the page is loaded already with a hash set */
+        }
+        function dispatch() {
+            var h = window.location.hash;
+            var p = document.getElementById("para");
+            if (h == "#hello" || !h || 0 === h.length) {
+                p.innerHTML = "Hello everyone! You can do : <ul><li><a href='#text1'>Text 1</a></li><li><a href='#text2'>Text 2</a></li></ul>";
+            } else if (h == "#text1") {
+                p.innerHTML = "Bla bla (text 1). Return to <a href='#hello'>start</a>.";
+            } else if (h == "#text2") {
+                p.innerHTML = "Arf arf (text 2). Return to <a href='#hello'>start</a>.";
+            } else {
+                alert("Unknown hash : " + h);
+            }
+        }
+    </script>
+</head>
+<body onload="init()">
+    <div id="main">
+        <p>Tutoriel créé le 9 novembre 2015 à partir d'une technique déjà utilisée pour Ran et avant.</p>
+        <p id="para"></p>
+    </div>
+</body>
+</html>
