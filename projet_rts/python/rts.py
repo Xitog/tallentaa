@@ -27,6 +27,11 @@ HALF_BLUE = Color(0, 0, 128)
 UnitType = namedtuple("UnitType", "size range life dom speed reload")  # or ['size', 'range', 'life', 'dom']
 #BuildingType = namedtuple("BuildingType", "size range life dom speed reload type")
 
+TEXTURES = {
+    'ground' : pygame.image.load('../../assets/tiles32x32/ground.png'),
+    'rock' : pygame.image.load('../../assets/tiles32x32/rock.png')
+}
+
 class Camera:
     def __init__(self, width, height, scroll, player):
         self.width = width
@@ -209,14 +214,14 @@ class Camera:
                             for u in self.selected:
                                 print(u, u.__class__)
                                 if not self.add_mod:
-                                    print('set order!')
+                                    #print('set order!')
                                     u.order(Order('go', (mx - self.x) // 32, (my - self.y) // 32))
-                                    print('go at ', (mx - self.x) // 32, (my - self.y) // 32)
+                                    #print('go at ', (mx - self.x) // 32, (my - self.y) // 32)
                                 else:
-                                    print('add order!')
-                                    print(len(u.orders))
-                                    u.add_order(Order('go', mx - self.x, my - self.y))
-                                    print(len(u.orders))
+                                    #print('add order!')
+                                    #print(len(u.orders))
+                                    u.add_order(Order('go', (mx - self.x) // 32, (my - self.y) // 32))
+                                    #print(len(u.orders))
                         elif s[1].player != self.player:
                             for u in self.selected:
                                 if not self.add_mod:
@@ -252,14 +257,19 @@ class Camera:
         for yy in range(0, self.player.world.size32.y):
             for xx in range(0, self.player.world.size32.x):
                 r = self.player.world.world_map[xx][yy]
-                if r == 1:
-                    pygame.draw.rect(self.screen, RED, (xx * 32 + self.x +1, yy * 32 + self.y +1, 32-1, 32-1), 1)
-                    pygame.draw.line(self.screen, RED, (xx * 32 + self.x, yy * 32 + self.y), (xx * 32 + self.x + 31, yy * 32 + self.y + 31)),
-                    pygame.draw.line(self.screen, RED, (xx * 32 + self.x, yy * 32 + self.y + 31), (xx * 32 + self.x + 31, yy * 32 + self.y)),
+                # base obstrusive
+                ##if r == 1:
+                ##    pygame.draw.rect(self.screen, RED, (xx * 32 + self.x +1, yy * 32 + self.y +1, 32-1, 32-1), 1)
+                ##    pygame.draw.line(self.screen, RED, (xx * 32 + self.x, yy * 32 + self.y), (xx * 32 + self.x + 31, yy * 32 + self.y + 31)),
+                ##    pygame.draw.line(self.screen, RED, (xx * 32 + self.x, yy * 32 + self.y + 31), (xx * 32 + self.x + 31, yy * 32 + self.y)),
                 # else:
                     # pygame.draw.rect(self.screen, GREEN, (xx * 32 + self.x, yy * 32 + self.y, 32+1, 32+1), 1)
-                pygame.draw.line(self.screen, GREEN, (xx * 32 + self.x, yy * 32 + self.y), (xx * 32 + self.x + 32, yy * 32 + self.y)),
-                pygame.draw.line(self.screen, GREEN, (xx * 32 + self.x, yy * 32 + self.y), (xx * 32 + self.x, yy * 32 + self.y + 32)),
+                # base ground
+                ## pygame.draw.line(self.screen, GREEN, (xx * 32 + self.x, yy * 32 + self.y), (xx * 32 + self.x + 32, yy * 32 + self.y))
+                ## pygame.draw.line(self.screen, GREEN, (xx * 32 + self.x, yy * 32 + self.y), (xx * 32 + self.x, yy * 32 + self.y + 32))
+                self.screen.blit(TEXTURES['ground'], (xx * 32 + self.x, yy * 32 + self.y, xx * 32 + self.x + 32, yy * 32 + self.y))
+                if r == 1:
+                    self.screen.blit(TEXTURES['rock'], (xx * 32 + self.x, yy * 32 + self.y, xx * 32 + self.x + 32, yy * 32 + self.y))
                 u = self.player.world.unit_map[xx][yy]
                 if u == 0:
                     pass # Empty
@@ -311,17 +321,14 @@ class Camera:
                         lx = u.real_x
                         ly = u.real_y
                         for o in u.orders:
-                            if o.kind == 'go':
+                            if o.kind == 'go': # x2r => return x * 32 + self.x + 16
                                 pygame.draw.circle(self.screen, c, (self.x2r(o.x), self.y2r(o.y)), 5, 0)
-                                pygame.draw.line(self.screen, c, (lx + self.x, ly + self.y), (self.x2r(o.x), self.y2r(o.y)),
-                                                 1)
-                                lx = o.x
-                                ly = o.y
+                                pygame.draw.line(self.screen, c, (lx + self.x, ly + self.y), (self.x2r(o.x), self.y2r(o.y)), 1)
+                                lx = self.x2r(o.x) - self.x
+                                ly = self.y2r(o.y) - self.y
                             elif o.kind == 'attack':
-                                pygame.draw.circle(self.screen, RED, (o.target.x*32+16 + self.x, o.target.y*32+16 + self.y),
-                                                   5, 0)
-                                pygame.draw.line(self.screen, RED, (lx + self.x, ly + self.y),
-                                                 (o.target.x*32+16 + self.x, o.target.y*32+16 + self.y), 1)
+                                pygame.draw.circle(self.screen, RED, (o.target.x*32+16 + self.x, o.target.y*32+16 + self.y), 5, 0)
+                                pygame.draw.line(self.screen, RED, (lx + self.x, ly + self.y), (o.target.x*32+16 + self.x, o.target.y*32+16 + self.y), 1)
                                 lx = o.target.x
                                 ly = o.target.y
                 else:
