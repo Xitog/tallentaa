@@ -7,9 +7,9 @@ import os
 import sys
 import sqlite3
 
-print("Current working dir : " + os.getcwd())
-os.chdir("C:\\Users\\damie_000\\Documents\GitHub\\tallentaa\\projet_langue\\invoke")
-print("Current working dir : " + os.getcwd())
+# print("Current working dir : " + os.getcwd())
+# os.chdir("C:\\Users\\damie_000\\Documents\GitHub\\tallentaa\\projet_langue\\invoke")
+# print("Current working dir : " + os.getcwd())
 
 
 def create():
@@ -1440,6 +1440,37 @@ def exec_cmd(p_main, p_lang, p_order, p_auto=False, p_to=None, p_debug=False):
     p_conn.close()
     return nb
 
+
+# Il faudrait faire une option qui génère tout cela dans un fichier texte plutôt qu'en sortie console.
+# Aucun test, cela ne marche que pour les verbes du 1er groupe se conjuguant avec avoir.
+def conjugate(verb):
+    pronoms = ['je', 'tu', 'elle, il', 'nous', 'vous', 'elles, ils']
+    espace_pro = ['\t\t', '\t\t', '\t', '\t\t', '\t\t', '\t']
+    root = verb[:-2]
+    
+    print('\n1. Indicatif présent')
+    suffix = ['e', 'es', 'e', 'ons', 'ez', 'ont']
+    for i, v in enumerate(suffix):
+        print(pronoms[i] + espace_pro[i] + root + v)
+    
+    print('\n2. Indicatif imparfait')
+    suffix = ['ais', 'ais', 'ait', 'ions', 'iez', 'aient']
+    for i, v in enumerate(suffix):
+        print(pronoms[i] + espace_pro[i] + root + v)
+    
+    print('\n3. Indicatif futur')
+    suffix = ['ai', 'as', 'a', 'ons', 'ez', 'ont']
+    for i, v in enumerate(suffix):
+        print(pronoms[i] + espace_pro[i] + verb + v)
+    
+    print('\n4. Indicatif passé composé')
+    pronoms = ["j'", 'tu', 'elle, il', 'nous', 'vous', 'elles, ils']
+    prefix = ['ai', 'as', 'a', 'avons', 'avez', 'ont']
+    for i, v in enumerate(prefix):
+        print(pronoms[i] + espace_pro[i] + v + '\t' + root + 'é')
+    
+    print()
+    
 # Mainloop
 
 escape = False
@@ -1465,6 +1496,7 @@ while not escape:
         print("    select - select all the verbs for the default language in the default order")
         print("    select ... - select all the verbs for a given language : fr")
         print("    stats - make various stats over the database")
+        print("    conjugate ... - conjugate the given verb")
         print("  Parameter settings:")
         print("    order ... - set the order of the returned results")
         print("    lang ... - set the lang of the returned results (for select and trans")
@@ -1518,5 +1550,9 @@ while not escape:
                 cmd_to = c_tab[1]
             else:
                 raise Exception("Unknown lang : " + c_tab[1])
+        elif c_tab[0] == 'conjugate':
+            conjugate(c_tab[1])
+        else:
+            print("! Unknown command with parameters : " + cmd)
     else:
         print("! Unknown command : " + cmd)
