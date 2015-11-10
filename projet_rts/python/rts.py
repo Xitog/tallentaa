@@ -39,6 +39,7 @@ class Camera:
         self.size = width, height
         self.scroll = scroll
         self.player = player
+        self.game = player.game
         self.x = 0
         self.y = 0
         pygame.init()
@@ -211,17 +212,18 @@ class Camera:
                         print('button right')
                         s = self.player.world.unit_map[int((mx - self.x)/32)][int((my - self.y)/32)]
                         if s == 0:  # nothing at the square clicked
-                            for u in self.selected:
-                                print(u, u.__class__)
-                                if not self.add_mod:
-                                    #print('set order!')
-                                    u.order(Order('go', (mx - self.x) // 32, (my - self.y) // 32))
-                                    #print('go at ', (mx - self.x) // 32, (my - self.y) // 32)
-                                else:
-                                    #print('add order!')
-                                    #print(len(u.orders))
-                                    u.add_order(Order('go', (mx - self.x) // 32, (my - self.y) // 32))
-                                    #print(len(u.orders))
+                            self.game.order_move(self.selected, (mx - self.x) // 32, (my - self.y) // 32, self.add_mod)
+                            #for u in self.selected:
+                            #    print(u, u.__class__)
+                            #    if not self.add_mod:
+                            #        #print('set order!')
+                            #        u.order(Order('go', (mx - self.x) // 32, (my - self.y) // 32))
+                            #        #print('go at ', (mx - self.x) // 32, (my - self.y) // 32)
+                            #    else:
+                            #        #print('add order!')
+                            #        #print(len(u.orders))
+                            #        u.add_order(Order('go', (mx - self.x) // 32, (my - self.y) // 32))
+                            #        #print(len(u.orders))
                         elif s[1].player != self.player:
                             for u in self.selected:
                                 if not self.add_mod:
@@ -361,7 +363,17 @@ class Camera:
         label = self.font.render('Lab', 1, (0, 0, 0))
         self.screen.blit(label, (72, self.INTERFACE_Y+40))
         
-        
+        # Minimap
+        for yy in range(0, self.player.world.size32.y):
+            for xx in range(0, self.player.world.size32.x):
+                r = self.player.world.world_map[xx][yy]
+                if r == 1:
+                    pygame.draw.rect(self.screen, RED, (xx * 3 + 22 * 32, yy * 3 + self.INTERFACE_Y +1, 3, 3), 0)
+                else:
+                    pygame.draw.rect(self.screen, GREEN, (xx * 3 + 22 * 32, yy * 3 + self.INTERFACE_Y +1, 3, 3), 0)
+                u = self.player.world.unit_map[xx][yy]
+                if u != 0 and u[0] == 1:
+                    pygame.draw.rect(self.screen, BLUE, (xx * 3 + 22 * 32, yy * 3 + self.INTERFACE_Y +1, 3, 3), 0)
         # fin Interface
 
         pygame.display.flip()
@@ -506,6 +518,16 @@ class Game:
         self.world.units.append(b) 
         p.buildings.append(b)
         
+    def order_move(self, units, x : int, y : int, add : bool):
+        sys.stdout.write('Move ')
+        for u in units:
+            sys.stdout.write(str(u) + ' ')
+            if add:
+                u.add_order(Order('go', x, y))
+            else:
+                u.order(Order('go', x, y))
+        sys.stdout.write('to ' + str(x) + ', ' + str(y) + '\n')
+    
     def get_player_by_name(self, player_name):
         if player_name not in self.players:
             raise Exception("Unknown player : " + player_name)
