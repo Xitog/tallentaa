@@ -499,7 +499,7 @@ class Game:
         self.players[name] = Player(self, name, player_color)
 
     def create_unit(self, player_name, x, y, unit_type_name):
-        print("creating unit")
+        sys.stdout.write("creating unit")
         p = self.get_player_by_name(player_name)
         ut = self.get_unit_type_by_name(unit_type_name)
         if not self.world.is_valid(x, y) or not self.world.is_empty(x,y):
@@ -507,9 +507,11 @@ class Game:
         u = Unit(unit_type_name, p, x, y, ut.size, ut.range, ut.life, ut.dom, ut.speed)
         self.world.units.append(u)
         p.units.append(u)
+        sys.stdout.write(' :: unit #' + str(u.id) + ' created\n')
+        return u.id
         
     def create_building(self, player_name, x, y, building_type_name):
-        print("creating building")
+        sys.stdout.write("creating building")
         p = self.get_player_by_name(player_name)
         bt = self.get_building_type_by_name(building_type_name)
         if not self.world.is_valid_zone(x, y, bt.grid_w, bt.grid_h) or not self.world.is_empty_zone(x, y, bt.grid_w, bt.grid_h):
@@ -517,6 +519,8 @@ class Game:
         b = Building(p, bt, x, y)
         self.world.units.append(b) 
         p.buildings.append(b)
+        sys.stdout.write(' :: building #' + str(b.id) + ' created\n')
+        return b.id
         
     def order_move(self, units, x : int, y : int, add : bool):
         sys.stdout.write('Move ')
@@ -629,9 +633,19 @@ class BuildingType:
         self.weapon_type = weapon_type
 
 
-class Building:
+class GameObject:
+ 
+    seed = 0
+    
+    def __init__(self):
+        self.id = GameObject.seed + 1
+        GameObject.seed = self.id
+
+
+class Building(GameObject):
 
     def __init__(self, player : Player, type : BuildingType, grid_x : int, grid_y : int):
+        GameObject.__init__(self)
         self.player = player
         self.type = type
         self.grid_x = grid_x
@@ -655,9 +669,10 @@ class Building:
         self.orders.append(o)
 
 
-class Unit:
+class Unit(GameObject):
     
     def __init__(self, uname, player, x, y, size, u_range, life, dom, speed, reload=50):
+        GameObject.__init__(self)
         self.uname = uname
         self.player = player
         self.real_x = x * 32 + 16

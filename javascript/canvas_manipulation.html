@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <head>
+    <!-- http://www.w3schools.com/html/html5_canvas.asp 6 janvier 2015 a simple canvas for a RPG project with Flare assets-->
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <title>Canvas Manipulation with JavaScript</title>
     <style type="text/css">
@@ -8,6 +9,9 @@
         }
     </style>
     <script type="text/javascript">
+        var width = 800; /* 640 mettre le canvas html à cette largeur ! */
+        var height = 600; /* 480 mettre le canvas html à cette hauteur ! */
+        
         var x = 32;
         var y = 32;
       
@@ -28,14 +32,19 @@
         function refresh() {
             var can = document.getElementById("screen");
             window.addEventListener( "keydown", move, true);
-            var ctx = can.getContext("2d");
+            var context = can.getContext("2d");
             
-            ctx.rect(0,0,639,479);
-            ctx.fillStyle = "rgb(160, 160, 160)";
-            ctx.fill();
+            context.rect(0, 0, width-1, height-1);
+            context.fillStyle = "rgb(160, 160, 160)";
+            context.fill();
+            
+            /* ou */
+            
+            context.fillStyle = "#FF0000";
+            context.fillRect(0, 0, width-1, height-1);
             
             var img = document.getElementById("greenblob");
-            ctx.drawImage(img, x, y);
+            context.drawImage(img, x, y);
         }
         
         function init() {
@@ -56,7 +65,7 @@
 <body onload="init()">
     <div id="main">
         <p>Tutoriel créé le 9 novembre 2015 à partir de tutoriels fait auparavant.</p>
-        <canvas id="screen" width="640" height="480" onkeydown="move"> 
+        <canvas id="screen" width="800" height="600" onkeydown="move"> 
             Votre navigateur ne supporte pas la balise <i>canvas</i>, désolé.
         </canvas>
         
