@@ -1440,10 +1440,13 @@ def exec_cmd(p_main, p_lang, p_order, p_auto=False, p_to=None, p_debug=False):
     p_conn.close()
     return nb
 
-
+# Conjugate : new from 2/11/2015
 # Il faudrait faire une option qui génère tout cela dans un fichier texte plutôt qu'en sortie console.
 # Aucun test, cela ne marche que pour les verbes du 1er groupe se conjuguant avec avoir.
-def conjugate(verb):
+def conjugate(verb, file=False):
+    if file:
+        f = open(verb+'.txt', 'w')
+        f.write('1. Indicatif présent\n')
     pronoms = ['je', 'tu', 'elle, il', 'nous', 'vous', 'elles, ils']
     espace_pro = ['\t\t', '\t\t', '\t', '\t\t', '\t\t', '\t']
     root = verb[:-2]
@@ -1452,107 +1455,144 @@ def conjugate(verb):
     suffix = ['e', 'es', 'e', 'ons', 'ez', 'ont']
     for i, v in enumerate(suffix):
         print(pronoms[i] + espace_pro[i] + root + v)
-    
+        if file:
+            f.write(pronoms[i] + espace_pro[i] + root + v + '\n')
+    if file:
+        f.write('\n2. Indicatif imparfait\n')
+
     print('\n2. Indicatif imparfait')
     suffix = ['ais', 'ais', 'ait', 'ions', 'iez', 'aient']
     for i, v in enumerate(suffix):
         print(pronoms[i] + espace_pro[i] + root + v)
-    
+        if file:
+            f.write(pronoms[i] + espace_pro[i] + root + v + '\n')
+    if file:
+        f.write('\n3. Indicatif futur\n')
+
     print('\n3. Indicatif futur')
     suffix = ['ai', 'as', 'a', 'ons', 'ez', 'ont']
     for i, v in enumerate(suffix):
         print(pronoms[i] + espace_pro[i] + verb + v)
+        if file:
+            f.write(pronoms[i] + espace_pro[i] + verb + v + '\n')
+    if file:
+        f.write('\n4. Indicatif passé composé\n')
     
     print('\n4. Indicatif passé composé')
     pronoms = ["j'", 'tu', 'elle, il', 'nous', 'vous', 'elles, ils']
     prefix = ['ai', 'as', 'a', 'avons', 'avez', 'ont']
     for i, v in enumerate(prefix):
         print(pronoms[i] + espace_pro[i] + v + '\t' + root + 'é')
+        if file:
+            f.write(pronoms[i] + espace_pro[i] + v + '\t' + root + 'é' + '\n')
     
     print()
+    if file:
+        f.close()
+
+    #f.write('4. Participe passé\n')
+    #suffix_partpast = ['é', 'ée', 'és', 'ées']
+    #root_pp = root
+    #for index, value in enumerate(suffix_partpast):
+    #    f.write('\t\t' + root_pp + value + '\n')
+    #f.write('\n')
+    
+    #f.write('5. Participe présent\n')
+    #suffix_partpresent = ['ant']
+    #root_pp = root
+    #f.write('\t\t' + root_pp + suffix_partpresent[0] + '\n')
+    #f.write('\n')
     
 # Mainloop
 
-escape = False
-cmd_lang = "fr"
-cmd_order = cmd_lang + ".lang, " + cmd_lang + ".base"
-cmd_to = "en"
-cmd_auto = False
-cmd_debug = True
-print("i Welcome to Invoke v1.2")
-print("i Type 'help' for help")
-while not escape:
-    cmd = input('>>> ')
-    if cmd == 'exit':
-        print('i Goodbye!')
-        exit(0)
-    elif cmd == 'help':
-        print("i Commands :")
-        print("  Main commands:")
-        print("    help - print this help")
-        print("    exit - exit")
-        print("    create - recreate the database entirely")
-        print("    count - count the number of returned results")
-        print("    select - select all the verbs for the default language in the default order")
-        print("    select ... - select all the verbs for a given language : fr")
-        print("    stats - make various stats over the database")
-        print("    conjugate ... - conjugate the given verb")
-        print("  Parameter settings:")
-        print("    order ... - set the order of the returned results")
-        print("    lang ... - set the lang of the returned results (for select and trans")
-        print("    lang - get the current lang of the returned results and translation")
-        print("    to ... - set the translation of the returned results (for trans)")
-        print("    auto - switch to wait for a key or not before executing the command")
-    elif cmd == 'create':
-        print("i Recreating the database")
-        create()
-        print("i Database recreated")
-    elif cmd == 'select':
-        exec_cmd('select', cmd_lang, cmd_order, cmd_auto, None, cmd_debug)
-    elif cmd == 'trans':
-        exec_cmd('trans', cmd_lang, cmd_order, cmd_auto, cmd_to, cmd_debug)
-    elif cmd == 'count':
-        print("i Returned results for lang [" + cmd_lang + "] = " + str(exec_cmd('count', cmd_lang, cmd_order, cmd_auto)))
-    elif cmd == 'auto':
-        if cmd_auto:
-            cmd_auto = False
-        else:
-            cmd_auto = True
-        print("i Auto switch to " + str(cmd_auto))
-    elif cmd == 'debug':
-        if cmd_debug:
-            cmd_debug = False
-            cmd_auto = True
-        else:
-            cmd_debug = True
-            cmd_auto = False
-        print("i Debug switch to " + str(cmd_debug))
-        print("i Auto switch to " + str(cmd_auto))
-    elif cmd == 'lang':
-        print("i Current language is [" + cmd_lang + "], current translation is [" + cmd_to + "]")
-    elif cmd == 'stats':
-        exec_stat(cmd_auto, cmd_debug)
-    elif len(cmd.split(' ')) > 1:
-        c_tab = cmd.split(' ')
-        if c_tab[0] == 'select':
-            if c_tab[1] == 'fr':
-                exec_cmd('select', 'fr', cmd_order)
-        elif c_tab[0] == 'order':
-            cmd_order = c_tab[1]
-        elif c_tab[0] == 'lang':
-            if c_tab[1] in ['fr', 'it', 'eo', 'en', 'de']:
-                cmd_lang = c_tab[1]
-                cmd_order = cmd_lang + ".lang, " + cmd_lang + ".base"
+def mainloop():
+    escape = False
+    cmd_lang = "fr"
+    cmd_order = cmd_lang + ".lang, " + cmd_lang + ".base"
+    cmd_to = "en"
+    cmd_auto = False
+    cmd_debug = True
+    print("i Welcome to Invoke v1.2")
+    print("i Type 'help' for help")
+    while not escape:
+        cmd = input('>>> ')
+        if cmd == 'exit':
+            print('i Goodbye!')
+            exit(0)
+        elif cmd == 'help':
+            print("i Commands :")
+            print("  Main commands:")
+            print("    help - print this help")
+            print("    exit - exit")
+            print("    create - recreate the database entirely")
+            print("    count - count the number of returned results")
+            print("    select - select all the verbs for the default language in the default order")
+            print("    select ... - select all the verbs for a given language : fr")
+            print("    stats - make various stats over the database")
+            print("    conjugate ... - conjugate the given verb (only ion French)")
+            print("  Parameter settings:")
+            print("    order ... - set the order of the returned results")
+            print("    lang ... - set the lang of the returned results (for select and trans")
+            print("    lang - get the current lang of the returned results and translation")
+            print("    to ... - set the translation of the returned results (for trans)")
+            print("    auto - switch to wait for a key or not before executing the command")
+        elif cmd == 'create':
+            print("i Recreating the database")
+            create()
+            print("i Database recreated")
+        elif cmd == 'select':
+            exec_cmd('select', cmd_lang, cmd_order, cmd_auto, None, cmd_debug)
+        elif cmd == 'trans':
+            exec_cmd('trans', cmd_lang, cmd_order, cmd_auto, cmd_to, cmd_debug)
+        elif cmd == 'count':
+            print("i Returned results for lang [" + cmd_lang + "] = " + str(exec_cmd('count', cmd_lang, cmd_order, cmd_auto)))
+        elif cmd == 'auto':
+            if cmd_auto:
+                cmd_auto = False
             else:
-                raise Exception("Unknown lang : " + c_tab[1])
-        elif c_tab[0] == 'to':
-            if c_tab[1] in ['fr', 'it', 'eo', 'en', 'de']:
-                cmd_to = c_tab[1]
+                cmd_auto = True
+            print("i Auto switch to " + str(cmd_auto))
+        elif cmd == 'debug':
+            if cmd_debug:
+                cmd_debug = False
+                cmd_auto = True
             else:
-                raise Exception("Unknown lang : " + c_tab[1])
-        elif c_tab[0] == 'conjugate':
-            conjugate(c_tab[1])
+                cmd_debug = True
+                cmd_auto = False
+            print("i Debug switch to " + str(cmd_debug))
+            print("i Auto switch to " + str(cmd_auto))
+        elif cmd == 'lang':
+            print("i Current language is [" + cmd_lang + "], current translation is [" + cmd_to + "]")
+        elif cmd == 'stats':
+            exec_stat(cmd_auto, cmd_debug)
+        elif cmd == 'conjugate':
+            s = input('Enter a verb : ')
+            conjugate(s, True)
+            print("i Verb " + s + " conjugated. Results can be found in " + s.lower() + ".txt")
+        elif len(cmd.split(' ')) > 1:
+            c_tab = cmd.split(' ')
+            if c_tab[0] == 'select':
+                if c_tab[1] == 'fr':
+                    exec_cmd('select', 'fr', cmd_order)
+            elif c_tab[0] == 'order':
+                cmd_order = c_tab[1]
+            elif c_tab[0] == 'lang':
+                if c_tab[1] in ['fr', 'it', 'eo', 'en', 'de']:
+                    cmd_lang = c_tab[1]
+                    cmd_order = cmd_lang + ".lang, " + cmd_lang + ".base"
+                else:
+                    raise Exception("Unknown lang : " + c_tab[1])
+            elif c_tab[0] == 'to':
+                if c_tab[1] in ['fr', 'it', 'eo', 'en', 'de']:
+                    cmd_to = c_tab[1]
+                else:
+                    raise Exception("Unknown lang : " + c_tab[1])
+            elif c_tab[0] == 'conjugate':
+                conjugate(c_tab[1])
+                # print("i Verb " + c_tab[1] + " conjugated. Results can be found in " + c_tab[1].lower() + ".txt")
+            else:
+                print("! Unknown command with parameters : " + cmd)
         else:
-            print("! Unknown command with parameters : " + cmd)
-    else:
-        print("! Unknown command : " + cmd)
+            print("! Unknown command : " + cmd)
+
+mainloop()

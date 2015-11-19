@@ -10,6 +10,8 @@ __version__ = "$Revision: 1 $"
 
 import pygame
 import math
+import sys
+
 from pygame.locals import *
 from collections import namedtuple
 
@@ -24,12 +26,12 @@ SKY_BLUE = Color(0, 255, 255)
 HALF_RED = Color(128, 0, 0)
 HALF_BLUE = Color(0, 0, 128)
 
-UnitType = namedtuple("UnitType", "size range life dom speed reload")  # or ['size', 'range', 'life', 'dom']
+#UnitType = namedtuple("UnitType", "size range life dom speed reload")  # or ['size', 'range', 'life', 'dom']
 #BuildingType = namedtuple("BuildingType", "size range life dom speed reload type")
 
 TEXTURES = {
     'ground' : pygame.image.load('../../assets/tiles32x32/ground.png'),
-    'rock' : pygame.image.load('../../assets/tiles32x32/rock.png')
+    'rock' : pygame.image.load('../../assets/tiles32x32/rock_brown.png')
 }
 
 class Camera:
@@ -39,6 +41,7 @@ class Camera:
         self.size = width, height
         self.scroll = scroll
         self.player = player
+        self.auto_scroll_zone = 10
         self.game = player.game
         self.x = 0
         self.y = 0
@@ -212,6 +215,7 @@ class Camera:
                         print('button right')
                         s = self.player.world.unit_map[int((mx - self.x)/32)][int((my - self.y)/32)]
                         if s == 0:  # nothing at the square clicked
+                            # faut-il faire un for u in self.selected?
                             self.game.order_move(self.selected, (mx - self.x) // 32, (my - self.y) // 32, self.add_mod)
                             #for u in self.selected:
                             #    print(u, u.__class__)
@@ -233,13 +237,14 @@ class Camera:
                 elif event.button == 2:  # Middle Button
                     print('button 3')
 
-        if self.left:
+        # Scroll on border with the mouse
+        if self.left or mx < self.auto_scroll_zone:
             self.x += self.scroll
-        if self.right:
+        if self.right or mx > self.width - self.auto_scroll_zone:
             self.x -= self.scroll
-        if self.down:
+        if self.down or my > self.height - self.auto_scroll_zone:
             self.y -= self.scroll
-        if self.up:
+        if self.up or my < self.auto_scroll_zone:
             self.y += self.scroll
 
         for u in self.player.world.units:
@@ -320,14 +325,14 @@ class Camera:
                     # if u.player != self.player:
                     #     c = RED
                     if len(u.orders) > 0:
-                        lx = u.real_x
-                        ly = u.real_y
+                        lx = u.real_x + self.x
+                        ly = u.real_y + self.y
                         for o in u.orders:
                             if o.kind == 'go': # x2r => return x * 32 + self.x + 16
                                 pygame.draw.circle(self.screen, c, (self.x2r(o.x), self.y2r(o.y)), 5, 0)
-                                pygame.draw.line(self.screen, c, (lx + self.x, ly + self.y), (self.x2r(o.x), self.y2r(o.y)), 1)
-                                lx = self.x2r(o.x) - self.x
-                                ly = self.y2r(o.y) - self.y
+                                pygame.draw.line(self.screen, c, (lx, ly), (self.x2r(o.x), self.y2r(o.y)), 1)
+                                lx = self.x2r(o.x)
+                                ly = self.y2r(o.y)
                             elif o.kind == 'attack':
                                 pygame.draw.circle(self.screen, RED, (o.target.x*32+16 + self.x, o.target.y*32+16 + self.y), 5, 0)
                                 pygame.draw.line(self.screen, RED, (lx + self.x, ly + self.y), (o.target.x*32+16 + self.x, o.target.y*32+16 + self.y), 1)
@@ -341,7 +346,7 @@ class Camera:
             pygame.draw.circle(self.screen, RED, (p.x + self.x, p.y + self.y), 3, 0)
 
         # Interface
-        pygame.draw.rect(self.screen, GREY, (0, self.INTERFACE_Y, 799, 200), 0)
+        pygame.draw.rect(self.screen, GREY, (0, self.INTERFACE_Y, 799, 200), 0) # fond
         pygame.draw.line(self.screen, BLUE, (0, self.INTERFACE_Y), (799, self.INTERFACE_Y), 1)
         for xx in range(0, 3):
             for yy in range(0, 3):
@@ -349,6 +354,7 @@ class Camera:
         pygame.draw.line(self.screen, BLUE, (703, self.INTERFACE_Y), (703, self.INTERFACE_Y + 96), 1)
         pygame.draw.line(self.screen, BLUE, (703, self.INTERFACE_Y + 96), (799, self.INTERFACE_Y + 96), 1)
 
+        # Build menu
         label = self.font.render('Min', 1, (0, 0, 0))
         self.screen.blit(label, (8, self.INTERFACE_Y+8))
         label = self.font.render('Sol', 1, (0, 0, 0))
@@ -480,9 +486,9 @@ class Game:
         self.name = name
         self.world = world
         self.players = {}
-        self.unit_type = {"soldier": UnitType(size=10, range=100, life=100, dom=5, speed=8, reload=50),
-                          "elite": UnitType(size=10, range=150, life=100, dom=10, speed=8, reload=50),
-                          "big": UnitType(size=20, range=30, life=300, dom=20, speed=8, reload=50)}
+        self.unit_type = {"soldier": UnitType("Soldier", size=10, range=100, life=100, dom=5, speed=8, reload=50),
+                          "elite": UnitType("Elite", size=10, range=150, life=100, dom=10, speed=8, reload=50),
+                          "big": UnitType("Big", size=20, range=30, life=300, dom=20, speed=8, reload=50)}
         # self.building_type = {"mine": BuildingType(size=(2,2), range=20, life=300, dom=0, speed=0, reload=0, type=1)}
         self.all_building_types = {"mine" : BuildingType("Mine", 2, 2, 100),
                                    "solar" : BuildingType("Solar", 1, 2, 80),
@@ -504,7 +510,7 @@ class Game:
         ut = self.get_unit_type_by_name(unit_type_name)
         if not self.world.is_valid(x, y) or not self.world.is_empty(x,y):
             raise Exception("False or not empty coordinates : " + x + ", " + y)
-        u = Unit(unit_type_name, p, x, y, ut.size, ut.range, ut.life, ut.dom, ut.speed)
+        u = Unit(ut, p, x, y)
         self.world.units.append(u)
         p.units.append(u)
         sys.stdout.write(' :: unit #' + str(u.id) + ' created\n')
@@ -527,6 +533,7 @@ class Game:
         for u in units:
             sys.stdout.write(str(u) + ' ')
             if add:
+                sys.stdout.write('(delayed) ')
                 u.add_order(Order('go', x, y))
             else:
                 u.order(Order('go', x, y))
@@ -546,6 +553,17 @@ class Game:
         if building_type_name not in self.all_building_types:
             raise Exception("Unknown building type : " + building_type_name)
         return self.all_building_types[building_type_name]
+
+    #def get_units_by_id(self, ids):
+    #    units = []
+    #    cpt = 0
+    #    for u in self.world.units:
+    #        if u.uid in ids:
+    #            units.append(u)
+    #            cpt += 1
+    #    if cpt != len(ids):
+    #        raise Exception("ID of unit unknown detected !!!")
+    #    return units
     
     def update(self):
         for key, value in self.players.items():
@@ -669,27 +687,39 @@ class Building(GameObject):
         self.orders.append(o)
 
 
+class UnitType:
+
+    def __init__(self, name, size, range, life, dom, speed, reload):
+        self.name = name
+        self.size = size
+        self.range = range
+        self.life = life
+        self.dom = dom
+        self.speed = speed
+        self.reload = reload
+
+
 class Unit(GameObject):
     
-    def __init__(self, uname, player, x, y, size, u_range, life, dom, speed, reload=50):
+    def __init__(self, type, player, x, y):
         GameObject.__init__(self)
-        self.uname = uname
+        self.type = type
         self.player = player
         self.real_x = x * 32 + 16
         self.real_y = y * 32 + 16
         self.x = x
         self.y = y
-        self.size = size
-        self.range = u_range
-        self.life = life
-        self.dom = dom
-        self.reload = reload
+        self.size = type.size
+        self.range = type.range
+        self.life = type.life
+        self.dom = type.dom
+        self.reload = type.reload
         
         self.orders = []
         self.cpt = 0
         self.cpt_move = 0
         self.speed_move = 1
-        self.speed_step = speed  # must be 1 or a multiple of 2 - 2 before
+        self.speed_step = type.speed  # must be 1 or a multiple of 2 - 2 before
         self.old_x = x
         self.old_y = y
 
@@ -699,7 +729,8 @@ class Unit(GameObject):
         self.previous32 = None
 
     def __str__(self):
-        return str(id(self)) + ' (' + self.uname + ')'
+        return 'Unit #' + str(self.id) + ' (' + self.type.name + ')'
+        #return str(id(self)) + ' (' + self.uname + ')'
 
     def update(self):
         self.player.world.unit_map[self.x][self.y] = 0
@@ -839,7 +870,7 @@ class Unit(GameObject):
             self.destination = None
             self.transition = None
 
-        print(self.x, self.y, "tr= ", self.transition, "dst= ", self.destination)
+        print(self.x, self.y, "tr= ", self.transition, "dst= ", self.destination) # Add details on pathfinding (verbose)
         return self.x == x and self.y == y
 
 
