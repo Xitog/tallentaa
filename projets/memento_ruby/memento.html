@@ -1,14 +1,12 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
   <head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Guides Gouteux</title>
-
-    <!-- Bootstrap -->
-    <!-- <link href="css/bootstrap.min.css" rel="stylesheet"> -->
-    <!--<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>-->
+    <title>Memento Ruby</title>
+	
     <link href="../zlib/simplex.bootstrap.css" rel="stylesheet">
     <style type="text/css">
 
@@ -88,7 +86,7 @@
         .navbar-default .navbar-nav > .open > a:focus {
             color: #CC6714;
         }
-        /* spans */
+        
         span.blue {
             border: 1px solid #9999CC;
             color: #9999CC;
@@ -112,13 +110,13 @@
         span.title {
             border-bottom: 1px solid #EEEEEE; /* #AAAAAA; */
         }
-        /* Div */
+        
         div.block {
-	    margin-left: 10px;
-	    border-left: 3px solid #EEEEEE;
-	    padding-left: 3px;
-	}
-        /* b */
+            margin-left: 10px;
+            border-left: 3px solid #EEEEEE;
+            padding-left: 3px;
+        }
+        
         b.green {
             color: #55AA55;
         }
@@ -128,7 +126,7 @@
         b.orange {
             color: #FF6600;
         }
-        /* pre */
+        
         div.code {
             padding: 0 0 0 0;
             margin: 0 0 0 0;
@@ -143,6 +141,10 @@
             border: 1px solid #AAA;
             padding: 2px;
             font-family: "Consolas";
+        }
+        
+        #intro {
+            style="text-align:justify";
         }
     </style>
     
@@ -240,7 +242,7 @@
       </div>
    
 <h1 id="syntax">Syntaxe Ruby</h1>
-<p style="text-align:justify" id="intro">Ceci est une fiche de la syntaxe du langage de programmation <span class="caps">RUBY</span>, créé par Yukihiro &#8220;Matz&#8221; Matsumoto en 1995. Elle n&#8217;est pas destiné à quelqu&#8217;un qui voudrait apprendre le langage sans expérience préalable, mais peut convenir à quelqu&#8217;un connaissant les concepts et/ou un autre langage.</p>
+<p id="intro">Ceci est une fiche de la syntaxe du langage de programmation <span class="caps">RUBY</span>, créé par Yukihiro "Matz" Matsumoto en 1995. Elle n'est pas destiné à quelqu'un qui voudrait apprendre le langage sans expérience préalable, mais peut convenir à quelqu'un connaissant les concepts et/ou un autre langage.</p>
 <h2 id="sommaire">Sommaire</h2>
 <ul>
 	<li><a href="#sites">Sites web</a></li>
@@ -289,6 +291,7 @@
 <h2 id="types">Types de base</h2>
 <h3 id="int">Entiers</h3>
 <table>
+<tbody>
 	<tr>
 		<th>Nom </th>
 		<th>Littéral </th>
@@ -297,9 +300,11 @@
 		<td> Fixnum, Bignum </td>
 		<td> 0b1 07 0xf 10 1_000 </td>
 	</tr>
+</tbody>
 </table>
 <h3 id="float">Réels</h3>
 <table>
+<tbody>
 	<tr>
 		<th>Nom </th>
 		<th>Littéral </th>
@@ -308,9 +313,11 @@
 		<td> Float </td>
 		<td> 1000.0 1E3 </td>
 	</tr>
+</tbody>
 </table>
 <p>Listes des fonctions principales :</p>
 <table>
+<tbody>
 	<tr>
 		<th>Fonction </th>
 		<th>Description </th>
@@ -327,20 +334,24 @@
 		<td> round </td>
 		<td> arrondi </td>
 	</tr>
+</tbody>
 </table>
 <h3 id="string">Chaînes de caractères</h3>
 <table>
+<tbody>
 	<tr>
 		<th>Nom </th>
 		<th>Littéral </th>
 	</tr>
 	<tr>
 		<td> String </td>
-		<td> &#8220;abcde&#8221; </td>
+		<td> "abcde" </td>
 	</tr>
+</tbody>
 </table>
 <p>Listes des fonctions principales :</p>
 <table>
+<tbody>
 	<tr>
 		<th>Fonction </th>
 		<th>Description </th>
@@ -375,7 +386,7 @@
 	</tr>
 	<tr>
 		<td> s[i] </td>
-		<td> accès au caractère à l&#8217;index i </td>
+		<td> accès au caractère à l'index i </td>
 	</tr>
 	<tr>
 		<td> s[n..m] </td>
@@ -387,15 +398,17 @@
 	</tr>
 	<tr>
 		<td> index(s) </td>
-		<td> cherche l&#8217;index d&#8217;une sous-chaîne </td>
+		<td> cherche l'index d'une sous-chaîne </td>
 	</tr>
 	<tr>
 		<td> rindex(s) </td>
-		<td> cherche l&#8217;index d&#8217;une sous-chaîne en partant de la fin </td>
+		<td> cherche l'index d'une sous-chaîne en partant de la fin </td>
 	</tr>
+</tbody>
 </table>
 <h3 id="bool">Booléens</h3>
 <table>
+<tbody>
 	<tr>
 		<th>Nom </th>
 		<th>Littéral </th>
@@ -408,12 +421,14 @@
 		<td> TrueClass </td>
 		<td> <strong>true</strong> </td>
 	</tr>
+</tbody>
 </table>
 <ul>
 	<li>Dans les tests, toutes les valeurs autres que <strong>false</strong> et <strong>nil</strong> sont vraies (dont <strong>0</strong>).</li>
 </ul>
-<h3 id="void">Type &#8220;vide&#8221;</h3>
+<h3 id="void">Type "vide"</h3>
 <table>
+<tbody>
 	<tr>
 		<th>Nom </th>
 		<th>Littéral </th>
@@ -422,27 +437,31 @@
 		<td> NilClass </td>
 		<td> <strong>nil</strong> </td>
 	</tr>
+</tbody>
 </table>
 <h3 id="list">Type liste</h3>
 <table>
+<tbody>
 	<tr>
 		<th>Nom </th>
 		<th>Littéral </th>
 	</tr>
 	<tr>
 		<td> Array </td>
-		<td> [ 1, 2, 3] <br /> 1, 2, 3 <br /> %w(abc def) </td>
+		<td> [ 1, 2, 3] <br> 1, 2, 3 <br> %w(abc def) </td>
 	</tr>
+</tbody>
 </table>
 <p>Listes des fonctions principales (<a href="http://ruby-doc.org/core-2.2.0/Array.html">Array</a>, <a href="http://ruby-doc.org/core-2.2.0/Enumerable.html">Enumerable</a>) :</p>
 <table>
+<tbody>
 	<tr>
 		<th>Fonction </th>
 		<th>Description </th>
 	</tr>
 	<tr>
 		<td> l[ <em>index</em> ] </td>
-		<td> accès à la valeur à l&#8217;<em>index</em> </td>
+		<td> accès à la valeur à l'<em>index</em> </td>
 	</tr>
 	<tr>
 		<td> l[ -1 ] </td>
@@ -454,23 +473,23 @@
 	</tr>
 	<tr>
 		<td> &lt;&lt; </td>
-		<td> ajout d&#8217;un élément </td>
+		<td> ajout d'un élément </td>
 	</tr>
 	<tr>
 		<td> insert </td>
-		<td> insère à l&#8217;index l&#8216;élément </td>
+		<td> insère à l'index l'élément </td>
 	</tr>
 	<tr>
 		<td> shift </td>
-		<td> retourne le premier élément et l&#8217;enlève </td>
+		<td> retourne le premier élément et l'enlève </td>
 	</tr>
 	<tr>
 		<td> pop </td>
-		<td> retourne le dernier élément et l&#8217;enlève </td>
+		<td> retourne le dernier élément et l'enlève </td>
 	</tr>
 	<tr>
 		<td> member? <strong>in</strong> include? </td>
-		<td> contient l&#8216;élément </td>
+		<td> contient l'élément </td>
 	</tr>
 	<tr>
 		<td> any? </td>
@@ -522,15 +541,15 @@
 	</tr>
 	<tr>
 		<td> find detect indexOf index search </td>
-		<td> Retourne l&#8217;index du premier élément pour lequel le bloc est vrai ou qui est égal à la valeur passer en paramètre </td>
+		<td> Retourne l'index du premier élément pour lequel le bloc est vrai ou qui est égal à la valeur passer en paramètre </td>
 	</tr>
 	<tr>
 		<td> find_all select </td>
-		<td> sélectionne tous les éléments selon le résultat d&#8217;un bloc </td>
+		<td> sélectionne tous les éléments selon le résultat d'un bloc </td>
 	</tr>
 	<tr>
 		<td> partition </td>
-		<td> partitionne en deux listes selon le résultat d&#8217;un bloc </td>
+		<td> partitionne en deux listes selon le résultat d'un bloc </td>
 	</tr>
 	<tr>
 		<td> l.join(s) </td>
@@ -542,7 +561,7 @@
 	</tr>
 	<tr>
 		<td> each_with_index </td>
-		<td> parcours la liste avec un bloc recevant l&#8216;élément et un index </td>
+		<td> parcours la liste avec un bloc recevant l'élément et un index </td>
 	</tr>
 	<tr>
 		<td> uniq uniq! </td>
@@ -558,7 +577,7 @@
 	</tr>
 	<tr>
 		<td> assoc </td>
-		<td> regarde s&#8217;il trouve un élément dans une liste de listes et retourne la liste le contenant si elle existe </td>
+		<td> regarde s'il trouve un élément dans une liste de listes et retourne la liste le contenant si elle existe </td>
 	</tr>
 	<tr>
 		<td> to_a </td>
@@ -566,22 +585,26 @@
 	</tr>
 	<tr>
 		<td> inject </td>
-		<td> exécute un bloc sur chaque élément en passant le résultat à l&#8217;exécution suivante </td>
+		<td> exécute un bloc sur chaque élément en passant le résultat à l'exécution suivante </td>
 	</tr>
+</tbody>
 </table>
 <h3 id="dict">Type dictionnaire</h3>
 <table>
+<tbody>
 	<tr>
 		<th>Nom </th>
 		<th>Littéral </th>
 	</tr>
 	<tr>
 		<td> Hash </td>
-		<td> { 1 =&gt; &#8216;a&#8217; , 2 =&gt; &#8216;b&#8217; , 3 =&gt; &#8216;c&#8217; } </td>
+		<td> { 1 =&gt; 'a' , 2 =&gt; 'b' , 3 =&gt; 'c' } </td>
 	</tr>
+</tbody>
 </table>
 <p>Listes des fonctions principales :</p>
 <table>
+<tbody>
 	<tr>
 		<th>Fonction </th>
 		<th>Description </th>
@@ -596,7 +619,7 @@
 	</tr>
 	<tr>
 		<td> delete </td>
-		<td> enlève l&#8216;élément avec cette clé </td>
+		<td> enlève l'élément avec cette clé </td>
 	</tr>
 	<tr>
 		<td> keys </td>
@@ -614,17 +637,19 @@
 		<td> store(<em>k</em>, <em>v</em>) </td>
 		<td> stocke la valeur à la clé </td>
 	</tr>
+</tbody>
 </table>
 <p><a href="#syntax">Retour sommaire</a></p>
 <h3 id="objet">Type objet</h3>
 <table>
+<tbody>
 	<tr>
 		<th>Fonction </th>
 		<th>Description </th>
 	</tr>
 	<tr>
 		<td> object.method(id) </td>
-		<td> renvoie s&#8217;il existe un objet Method correspondant à l&#8217;id </td>
+		<td> renvoie s'il existe un objet Method correspondant à l'id </td>
 	</tr>
 	<tr>
 		<td> identifiant.new </td>
@@ -632,36 +657,38 @@
 	</tr>
 	<tr>
 		<td> identifiant.clone </td>
-		<td> clone l&#8217;objet </td>
+		<td> clone l'objet </td>
 	</tr>
 	<tr>
 		<td> identifiant.is_a? ou kind_of? </td>
-		<td> renvoie vrai s&#8217;il est de cette classe </td>
+		<td> renvoie vrai s'il est de cette classe </td>
 	</tr>
 	<tr>
 		<td> identifiant.class </td>
-		<td> donne la classe de l&#8217;objet </td>
+		<td> donne la classe de l'objet </td>
 	</tr>
 	<tr>
 		<td> identifiant.methods </td>
-		<td> liste de chaînes de symboles de toutes les méthodes de l&#8217;objet </td>
+		<td> liste de chaînes de symboles de toutes les méthodes de l'objet </td>
 	</tr>
 	<tr>
 		<td> identifiant.respond_to? </td>
-		<td> l&#8217;objet répond-t-il au message ? (= s&#8217;il a une méthode correspondante) </td>
+		<td> l'objet répond-t-il au message ? (= s'il a une méthode correspondante) </td>
 	</tr>
+</tbody>
 </table>
 <p><a href="#syntax">Retour sommaire</a></p>
 <h2 id="op">Opérateurs</h2>
 <h3 id="op_bin">Opérateurs binaires</h3>
 <table>
+<tbody>
 	<tr>
 		<th>Type </th>
 		<th>Syntaxe </th>
 	</tr>
 	<tr>
 		<td> Mathématiques </td>
-		<td> + &#8211; * / % ** </td>
+		<td> + - * / % ** </td>
 	</tr>
 	<tr>
 		<td> Comparaison </td>
@@ -677,7 +704,7 @@
 	</tr>
 	<tr>
 		<td> Bit à bit </td>
-		<td> &amp; &#124; ^ ~ &lt;&lt; &gt;&gt; </td>
+		<td> &amp; | ^ ~ &lt;&lt; &gt;&gt; </td>
 	</tr>
 	<tr>
 		<td> Logique </td>
@@ -685,22 +712,24 @@
 	</tr>
 	<tr>
 		<td> Ensemble </td>
-		<td> <em>borne_inf</em>..<em>borne_sup</em> (inclusive) <em>borne_inf</em>&#8230;<em>borne_sup</em> (exclusive) </td>
+		<td> <em>borne_inf</em>…<em>borne_sup</em> (inclusive) <em>borne_inf</em>…<em>borne_sup</em> (exclusive) </td>
 	</tr>
 	<tr>
 		<td> Appel de méthode </td>
 		<td> <em>objet</em>.<em>message</em> </td>
 	</tr>
+</tbody>
 </table>
 <h3 id="op_una">Opérateurs unaires</h3>
 <table>
+<tbody>
 	<tr>
 		<th>Type </th>
 		<th>Syntaxe </th>
 	</tr>
 	<tr>
 		<td> Mathématique </td>
-		<td> &#8211; </td>
+		<td> - </td>
 	</tr>
 	<tr>
 		<td> Logique </td>
@@ -710,9 +739,11 @@
 		<td> Définition </td>
 		<td> defined? <em>identifiant</em> </td>
 	</tr>
+</tbody>
 </table>
 <h3 id="op_ter">Opérateur ternaire</h3>
 <table>
+<tbody>
 	<tr>
 		<th>Type </th>
 		<th>Syntaxe </th>
@@ -721,6 +752,7 @@
 		<td> Opérateur ternaire </td>
 		<td> <em>expression</em> <strong>?</strong> <em>action si vrai</em> <strong>:</strong> <em>action si faux</em> </td>
 	</tr>
+</tbody>
 </table>
 <p><a href="#syntax">Retour sommaire</a></p>
     
@@ -744,7 +776,7 @@
             <p><strong>if</strong> condition [ <strong>then</strong> ]<br />
             &nbsp;&nbsp; actions<br />
             [ <strong>elsif</strong> condition [ <strong>then</strong> ]<br />
-            &nbsp;&nbsp; actions ] <strong>&#42;</strong><br />
+            &nbsp;&nbsp; actions ] <strong>*</strong><br />
             [ <strong>else</strong><br />
             &nbsp;&nbsp; actions ] <strong>?</strong><br />
             <strong>end</strong></p>
@@ -753,7 +785,7 @@
             <p>action [ <strong>if</strong> condition ]</p>
         </blockquote>
         <blockquote>
-            <p><strong>unless</strong> condition< [ <strong>then</strong> ]<br />
+            <p><strong>unless</strong> condition [ <strong>then</strong> ]<br />
             &nbsp;&nbsp; actions<br />
             [ <strong>else</strong><br />
             &nbsp;&nbsp; actions ] <strong>?</strong><br />
@@ -788,18 +820,18 @@
             <strong>end</strong></p>
         </blockquote>
         <blockquote>
-            <strong>next</strong>  <i># Passage à l&#8217;itération suivante</i>
+            <strong>next</strong>  <i># Passage à l'itération suivante</i>
         </blockquote>
         <blockquote>
             <strong>break</strong>  <i># Quitte la boucle</i>
         </blockquote>
         <blockquote>
             <i># Ruby propose des méthodes pour itérer sur un objet</i><br>
-            (1..10).each { &#124;i&#124; actions }<br>
-            1.upto(10) { &#124;i&#124; actions }<br>
-            10.downto(1) { &#124;i&#124; actions }<br>
-            (1..10).step(2) { &#124;i&#124; actions }<br>
-            ['a', 'b'].each_with_index { &#124;v, i&#124; actions }<br>
+            (1..10).each { |i| actions }<br>
+            1.upto(10) { |i| actions }<br>
+            10.downto(1) { |i| actions }<br>
+            (1..10).step(2) { |i| actions }<br>
+            ['a', 'b'].each_with_index { |v, i| actions }<br>
         </blockquote>
         
     </div>
@@ -813,7 +845,7 @@
         <h3 id="fun">Fonctions</h3>
         
         <blockquote>
-            <p><strong>def</strong> identifiant [ ( par [, _par_] <strong>&#42;</strong> ) ]<br />
+            <p><strong>def</strong> identifiant [ ( par [, _par_] <strong>*</strong> ) ]<br />
             &nbsp;&nbsp; actions<br />
             <strong>end</strong></p>
         </blockquote>
@@ -824,7 +856,7 @@
             [ objet <strong>.</strong> ] identifiant [ ( paramètres ) ]  <i># Appel de fonction</i>
         </blockquote>
         <blockquote>
-            * tuple  <i># Fracturation d&#8217;un tuple pour passage différents en arguments</i>
+            * tuple  <i># Fracturation d'un tuple pour passage différents en arguments</i>
         </blockquote>
 
         <h3 id="cls">Classes</h3>
@@ -835,13 +867,13 @@
             <strong>end</strong>
         </blockquote>
         <blockquote>
-            <strong>self</strong>  <i># L&#8217;instance elle-même</i>
+            <strong>self</strong>  <i># L'instance elle-même</i>
         </blockquote>
         <blockquote>
             <strong>super</strong>  <i># Pour accéder aux fonctions du parent</i>
         </blockquote>
         <blockquote>
-            nom_classe <strong>.</strong> new [ ( paramètres ) ]  <i>Création d&#8217;une instance</i>
+            nom_classe <strong>.</strong> new [ ( paramètres ) ]  <i>Création d'une instance</i>
         </blockquote>
         
         <h3 id="mod">Modules</h3>
@@ -855,7 +887,7 @@
             <strong>require</strong>  <i># Exige un module</i>
         </blockquote>
         <blockquote>
-            <strong>include</strong>  <i># Inclus les éléments du module dans l&#8217;espace de nom actuel</i>
+            <strong>include</strong>  <i># Inclus les éléments du module dans l'espace de nom actuel</i>
         </blockquote>
         
     </div>
@@ -881,7 +913,7 @@
             <strong>raise</strong> [ expression ]  <i># Lève une exception</i>
         </blockquote>
         <blockquote>
-            <strong>retry</strong>  <i># Reprend l&#8217;exécution à partir du <strong>try</strong></i>
+            <strong>retry</strong>  <i># Reprend l'exécution à partir du <strong>try</strong></i>
         </blockquote>
 
     </div>
@@ -905,8 +937,8 @@
     <h2 id="historique">Historique</h2>
     
     <ul>
-        <li>12 mars 2015, version 0.2 : refait le layout de Utiles, Exceptions, Définition, Contrôle. Plus de blockquote. Correction d'erreurs : ret(r)y et end pas en gras.
-        <li>10 mars 2015, version 0.1 : lancement.
+        <li>12 mars 2015, version 0.2 : refait le layout de Utiles, Exceptions, Définition, Contrôle. Plus de blockquote. Correction d'erreurs : ret(r)y et end pas en gras.</li>
+        <li>10 mars 2015, version 0.1 : lancement.</li>
     </ul>
     
 <!--
