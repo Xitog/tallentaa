@@ -1,28 +1,14 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Memento Ruby</title>
-	
+    <title>Aide-mémoire Ruby</title>
     <link href="../zlib/simplex.bootstrap.css" rel="stylesheet">
     <style type="text/css">
-
-        div.flux {
-            -webkit-column-count: 2; /* Chrome, Safari, Opera */
-            -moz-column-count: 2; /* Firefox */
-            column-count: 2;
-        }
         
-        blockquote {
-            background-color: #efefef;
-        }
-
-        div.container {
-            margin-top: 8px;
-        }
         div.jumbotron p {
             font-family: "Palatino Linotype";
             font-size: 18px; /* de base 20px */
@@ -30,9 +16,6 @@
         div.jumbotron p.n {
             text-align: justify;
         }    
-        div.jumbotron p.n:before {
-            content: "» ";
-        }
         div.jumbotron p.sign {
             text-align: right;
         }
@@ -40,51 +23,57 @@
             color: #CC6714;
             font-family: "Palatino Linotype";
         }
-        body {
+        
+        h2 {
+            color: #14cc67;
+            font-family: "Palatino Linotype";
+            font-size: 22px;
         }
-        // Sticky footer style
-        html {
-            position: relative;
-            min-height: 100%;
+        h3 {
+            color: #6714cc;
+            font-family: "Palatino Linotype";
+            font-size: 18px;
+            font-style: italic;
         }
-        body {
-            /* Margin bottom by footer height */
-            margin-bottom: 30px;
+        
+        a {
+            color: #6714cc;
         }
-        .footer {
-            position: absolute;
-            bottom: 5px;
-            /* width: 100%; */
-            /* Set the fixed height of the footer here */
-            height: 30px;
-            background-color: #f5f5f5;
+        
+        table {
+            border: 1px solid #AAA;
+            border-collapse: collapse; 
+            border-spacing: 0;
         }
-        footer div p {
+        th {
+            border-bottom: 1px solid #AAA;
+        }
+        tr:nth-child(odd) {
+            background: #DDDDDD;
+        }
+        
+        p.back {
             text-align: center;
         }
-        /* Liens */
-        /* Les liens dans la barre de base */
-        .navbar-default .navbar-nav > li > a:hover,
-        .navbar-default .navbar-nav > li > a:focus {
-            color: #CC6714;
+        
+        div.code {
+            background-color: #F9F9F9; /* #efefef; */
+            border: 1px solid #AAA;
+            padding-left: 3px;
+            padding-right: 3px;
+            padding-top : 2px;
+            padding-bottom : 2px;
+            font-family: "Consolas"; 
         }
-        /* Dans le menu descendant, ouvert */
-        .dropdown-menu > li > a:hover,
-        .dropdown-menu > li > a:focus {
-          text-decoration: none;
-          color: #ffffff;
-          background-color: #CC6714;
-        }
-        /* Nom du projet "brand" */
-        .navbar-default .navbar-brand:hover,
-        .navbar-default .navbar-brand:focus {
-            color: #CC6714;
-        }
-        /* Menu descendant ouvert le menu en lui-même */
-        .navbar-default .navbar-nav > .open > a,
-        .navbar-default .navbar-nav > .open > a:hover,
-        .navbar-default .navbar-nav > .open > a:focus {
-            color: #CC6714;
+        
+        span {
+            background-color: #F9F9F9; /* #efefef; */
+            border: 1px solid #AAA;
+            padding-left: 3px;
+            padding-right: 3px;
+            padding-top : 2px;
+            padding-bottom : 2px;
+            font-family: "Consolas";
         }
         
         span.blue {
@@ -101,20 +90,11 @@
         }
         span.grey , span.green , span.blue {
             font-family: "Consolas";
-	    font-style: normal;
-	    font-size: 12px;
-	    background-color: #F9F9F9;
-	    padding-left: 2px;
-	    padding-right: 2px;
-        }
-        span.title {
-            border-bottom: 1px solid #EEEEEE; /* #AAAAAA; */
-        }
-        
-        div.block {
-            margin-left: 10px;
-            border-left: 3px solid #EEEEEE;
-            padding-left: 3px;
+            font-style: normal;
+            font-size: 12px;
+            background-color: #F9F9F9;
+            padding-left: 2px;
+            padding-right: 2px;
         }
         
         b.green {
@@ -127,25 +107,6 @@
             color: #FF6600;
         }
         
-        div.code {
-            padding: 0 0 0 0;
-            margin: 0 0 0 0;
-            -moz-box-shadow: 10px 10px 5px 0px #c0c0c0;
-            -webkit-box-shadow: 10px 10px 5px 0px #c0c0c0;
-            -o-box-shadow: 10px 10px 5px 0px #c0c0c0;
-            box-shadow: 10px 10px 5px 0px #c0c0c0;    
-            filter:progid:DXImageTransform.Microsoft.Shadow(color=#c0c0c0, Direction=134, Strength=5);
-        }
-        pre.code {
-            background-color: #F9F9F9;
-            border: 1px solid #AAA;
-            padding: 2px;
-            font-family: "Consolas";
-        }
-        
-        #intro {
-            style="text-align:justify";
-        }
     </style>
     
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -154,625 +115,670 @@
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
-  </head>
-  <body>
+</head>
+<body>
     
     <div id="main" class="container">
 
-        <!-- Static navbar -->
-        <nav class="navbar navbar-default" role="navigation">
-            <div class="container-fluid">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="#">Guides Gouteux</a>
-                </div>
-                <div id="navbar" class="navbar-collapse collapse">
-                    <ul class="nav navbar-nav">
-                        <!--<li class="active"><a href="#">Accueil</a></li>-->
-                        <li><a href="xxx">Linguistique</a></li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Italien <span class="caret"></span></a>
-                            <ul class="dropdown-menu" role="menu">
-                                <li><a href="http://ran.alwaysdata.net/beatrice/index.html">Tout-en-un</a></li>
-                                <li><a href="http://ran.alwaysdata.net/beatrice/beatrice3.html">Tout-en-un mobile</a></li>
-                                <li><a href="http://ran.alwaysdata.net/invoque/">Vocabulaire</a></li>
-                                <!--<li class="divider"></li>
-                                <li class="dropdown-header">Nav header</li>
-                                <li><a href="#">Separated link</a></li>
-                                <li><a href="#">One more separated link</a></li>-->
-                            </ul>
-                        </li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Français <span class="caret"></span></a>
-                            <ul class="dropdown-menu" role="menu">
-                                <li><a href="http://ran.alwaysdata.net/cristina/index.html">Tout-en-un</a></li>
-                                <li><a href="http://ran.alwaysdata.net/invoque/">Vocabulaire</a></li>
-                            </ul>
-                        </li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Histoire <span class="caret"></span></a>
-                            <ul class="dropdown-menu" role="menu">
-                                <li><a href="http://ran.alwaysdata.net/histoire/methode.html">Méthode</a></li>
-                                <li><a href="http://ran.alwaysdata.net/histoire/bibliographie.html">Bibliographie</a></li>
-                                <li><a href="http://ran.alwaysdata.net/histoire/france19eme.html">France au XIXe</a></li>
-                            </ul>
-                        </li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Programmation <span class="caret"></span></a>
-                            <ul class="dropdown-menu" role="menu">
-                                <li><a href="http://ran.alwaysdata.net/ruby/index.html">Ruby</a></li>
-                                <li><a href="xxx">Python</a></li>
-                                <li><a href="http://ran.alwaysdata.net/calcoolette/index.html">Calcoolette</a></li>
-                                <li class="divider"></li>
-                                <li><a href="http://ran.alwatsdata.net/ruby/memento.html">Mémento Ruby</a></li>
-                            </ul>
-                        </li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Jeux de rôles <span class="caret"></span></a>
-                            <ul class="dropdown-menu" role="menu">
-                                <li><a href="#">Règles</a></li>
-                                <li><a href="#">Univers</a></li>
-                                <li class="divider"></li>
-                                <li><a href="http://ran.alwaysdata.net/jdr/doc_talisman.html">Le Compagnon du Talisman</a></li>
-                            </ul>
-                        </li>
-                        <li><a href="xxx">Jeux vidéo</a></li>
-                        <li><a href="http://ran.alwaysdata.net/citations/dicocit.rb">Citations</a></li>
-                        <li><a href="http://ran.alwaysdata.net/liens.html">Liens</a></li>
-                    </ul>
-                    <ul class="nav navbar-nav navbar-right">
-                        <li><a href="a_propos.html">À propos</a></li>
-                    </ul>
-                </div><!--/.nav-collapse -->
-            </div><!--/.container-fluid -->
-        </nav>
+        <div class="jumbotron">
+            <h1>Aide-mémoire Ruby</h1>
+            <hr>
+            <p class="n">Une fiche synthétique sur le langage de programmation Ruby pour rafraîchir sa mémoire ou découvrir ce langage si vous connaissez déjà un langage similaire (Python, PHP). Cette fiche n'est pas recommandée pour quelqu'un souhaitant découvrir la programmation.</p>
+            <p class="sign">Damien Gouteux</p>
+        </div>
 
-      <!-- Main component for a primary marketing message or call to action -->
-      <div class="jumbotron">
-        <h1>Aide-mémoire Ruby</h1>
-        <hr>
-        <p class="n">Une fiche synthétique sur le langage de programmation <a href="https://www.ruby-lang.org/en/">Ruby</a> pour rafraîchir sa mémoire ou découvrir ce langage si vous connaissez déjà un langage similaire.</p>
-        <p class="n">Version 0.2, 10 mars 2015</p>
-        <p class="sign">Damien Gouteux &#x2318; </p>
-      </div>
-   
-<h1 id="syntax">Syntaxe Ruby</h1>
-<p id="intro">Ceci est une fiche de la syntaxe du langage de programmation <span class="caps">RUBY</span>, créé par Yukihiro "Matz" Matsumoto en 1995. Elle n'est pas destiné à quelqu'un qui voudrait apprendre le langage sans expérience préalable, mais peut convenir à quelqu'un connaissant les concepts et/ou un autre langage.</p>
-<h2 id="sommaire">Sommaire</h2>
-<ul>
-	<li><a href="#sites">Sites web</a></li>
-	<li><a href="#types">Types de base</a>
-	<ul>
-		<li><a href="#int">Entiers</a></li>
-		<li><a href="#float">Réels</a></li>
-		<li><a href="#string">Chaînes de caractères</a></li>
-		<li><a href="#bool">Booléens</a></li>
-		<li><a href="#void">Type vide</a></li>
-		<li><a href="#list">Type liste</a></li>
-		<li><a href="#dict">Type dictionnaire</a></li>
-		<li><a href="#objet">Type objet</a></li>
-	</ul></li>
-	<li><a href="#op">Opérateurs</a>
-	<ul>
-		<li><a href="#op_bin">Opérateurs binaires</a></li>
-		<li><a href="#op_una">Opérateurs unaires</a></li>
-		<li><a href="#op_ter">Opérateur ternaire</a></li>
-	</ul></li>
-	<li><a href="#flux">Contrôle du flux</a>
-	<ul>
-		<li><a href="#seq">Séquence</a></li>
-		<li><a href="#cond">Conditions</a></li>
-		<li><a href="#loop">Répétitions</a></li>
-	</ul></li>
-	<li><a href="#elem">Définitions des éléments</a>
-	<ul>
-		<li><a href="#fun">Fonctions</a></li>
-		<li><a href="#cls">Classes</a></li>
-		<li><a href="#mod">Modules</a></li>
-	</ul></li>
-	<li><a href="#spe">Gestion des exceptions</a>
-	<ul>
-		<li><a href="#exp">Exceptions</a></li>
-	</ul></li>
-	<li><a href="#utiles">Utiles</a></li>
-    <li><a href="#historique">Historique</a></li>
-</ul>
-<h2 id="sites">Sites web</h2>
-<p><a href="https://www.ruby-lang.org">Site de référence</a><br />
-<a href="http://fr.wikipedia.org/wiki/Ruby">Fiche Wikipedia</a> [ <a href="http://en.wikipedia.org/wiki/Ruby_%28programming_language%29">en</a> ]<br />
-<a href="http://tryruby.org">Try ruby online</a><br />
-<a href="http://www.tutorialspoint.com/ruby/">Tutorialspoint</a></p>
-<p><a href="#syntax">Retour sommaire</a></p>
-<h2 id="types">Types de base</h2>
-<h3 id="int">Entiers</h3>
-<table>
-<tbody>
-	<tr>
-		<th>Nom </th>
-		<th>Littéral </th>
-	</tr>
-	<tr>
-		<td> Fixnum, Bignum </td>
-		<td> 0b1 07 0xf 10 1_000 </td>
-	</tr>
-</tbody>
-</table>
-<h3 id="float">Réels</h3>
-<table>
-<tbody>
-	<tr>
-		<th>Nom </th>
-		<th>Littéral </th>
-	</tr>
-	<tr>
-		<td> Float </td>
-		<td> 1000.0 1E3 </td>
-	</tr>
-</tbody>
-</table>
-<p>Listes des fonctions principales :</p>
-<table>
-<tbody>
-	<tr>
-		<th>Fonction </th>
-		<th>Description </th>
-	</tr>
-	<tr>
-		<td> floor to_s </td>
-		<td> entier inférieur immédiat (troncation) </td>
-	</tr>
-	<tr>
-		<td> ceil </td>
-		<td> entier supérieur immédiat </td>
-	</tr>
-	<tr>
-		<td> round </td>
-		<td> arrondi </td>
-	</tr>
-</tbody>
-</table>
-<h3 id="string">Chaînes de caractères</h3>
-<table>
-<tbody>
-	<tr>
-		<th>Nom </th>
-		<th>Littéral </th>
-	</tr>
-	<tr>
-		<td> String </td>
-		<td> "abcde" </td>
-	</tr>
-</tbody>
-</table>
-<p>Listes des fonctions principales :</p>
-<table>
-<tbody>
-	<tr>
-		<th>Fonction </th>
-		<th>Description </th>
-	</tr>
-	<tr>
-		<td> to_s </td>
-		<td> produit une chaîne </td>
-	</tr>
-	<tr>
-		<td> equal? </td>
-		<td> égalité entre deux chaînes </td>
-	</tr>
-	<tr>
-		<td> size </td>
-		<td> longueur de la chaîne </td>
-	</tr>
-	<tr>
-		<td> + </td>
-		<td> concaténation de 2 chaînes </td>
-	</tr>
-	<tr>
-		<td> * </td>
-		<td> duplique n fois </td>
-	</tr>
-	<tr>
-		<td> upcase </td>
-		<td> mise en majuscule </td>
-	</tr>
-	<tr>
-		<td> downcase </td>
-		<td> mise en minuscule </td>
-	</tr>
-	<tr>
-		<td> s[i] </td>
-		<td> accès au caractère à l'index i </td>
-	</tr>
-	<tr>
-		<td> s[n..m] </td>
-		<td> extrait une sous-chaîne </td>
-	</tr>
-	<tr>
-		<td> s[n, longueur] </td>
-		<td> extrait une sous-chaîne </td>
-	</tr>
-	<tr>
-		<td> index(s) </td>
-		<td> cherche l'index d'une sous-chaîne </td>
-	</tr>
-	<tr>
-		<td> rindex(s) </td>
-		<td> cherche l'index d'une sous-chaîne en partant de la fin </td>
-	</tr>
-</tbody>
-</table>
-<h3 id="bool">Booléens</h3>
-<table>
-<tbody>
-	<tr>
-		<th>Nom </th>
-		<th>Littéral </th>
-	</tr>
-	<tr>
-		<td> FalseClass </td>
-		<td> <strong>false</strong> </td>
-	</tr>
-	<tr>
-		<td> TrueClass </td>
-		<td> <strong>true</strong> </td>
-	</tr>
-</tbody>
-</table>
-<ul>
-	<li>Dans les tests, toutes les valeurs autres que <strong>false</strong> et <strong>nil</strong> sont vraies (dont <strong>0</strong>).</li>
-</ul>
-<h3 id="void">Type "vide"</h3>
-<table>
-<tbody>
-	<tr>
-		<th>Nom </th>
-		<th>Littéral </th>
-	</tr>
-	<tr>
-		<td> NilClass </td>
-		<td> <strong>nil</strong> </td>
-	</tr>
-</tbody>
-</table>
-<h3 id="list">Type liste</h3>
-<table>
-<tbody>
-	<tr>
-		<th>Nom </th>
-		<th>Littéral </th>
-	</tr>
-	<tr>
-		<td> Array </td>
-		<td> [ 1, 2, 3] <br> 1, 2, 3 <br> %w(abc def) </td>
-	</tr>
-</tbody>
-</table>
-<p>Listes des fonctions principales (<a href="http://ruby-doc.org/core-2.2.0/Array.html">Array</a>, <a href="http://ruby-doc.org/core-2.2.0/Enumerable.html">Enumerable</a>) :</p>
-<table>
-<tbody>
-	<tr>
-		<th>Fonction </th>
-		<th>Description </th>
-	</tr>
-	<tr>
-		<td> l[ <em>index</em> ] </td>
-		<td> accès à la valeur à l'<em>index</em> </td>
-	</tr>
-	<tr>
-		<td> l[ -1 ] </td>
-		<td> accès au dernier élément </td>
-	</tr>
-	<tr>
-		<td> + </td>
-		<td> concaténation entre deux listes </td>
-	</tr>
-	<tr>
-		<td> &lt;&lt; </td>
-		<td> ajout d'un élément </td>
-	</tr>
-	<tr>
-		<td> insert </td>
-		<td> insère à l'index l'élément </td>
-	</tr>
-	<tr>
-		<td> shift </td>
-		<td> retourne le premier élément et l'enlève </td>
-	</tr>
-	<tr>
-		<td> pop </td>
-		<td> retourne le dernier élément et l'enlève </td>
-	</tr>
-	<tr>
-		<td> member? <strong>in</strong> include? </td>
-		<td> contient l'élément </td>
-	</tr>
-	<tr>
-		<td> any? </td>
-		<td> vrai si au moins 1 élément correspond </td>
-	</tr>
-	<tr>
-		<td> all? </td>
-		<td> vrai si tous les éléments correspondent </td>
-	</tr>
-	<tr>
-		<td> min </td>
-		<td> élément minimal </td>
-	</tr>
-	<tr>
-		<td> max </td>
-		<td> élément maximal </td>
-	</tr>
-	<tr>
-		<td> size length </td>
-		<td> taille de la liste </td>
-	</tr>
-	<tr>
-		<td> reverse </td>
-		<td> donne la liste inversée </td>
-	</tr>
-	<tr>
-		<td> flatten </td>
-		<td> si la liste contient des listes, elles seront toutes fusionnées en une seule liste </td>
-	</tr>
-	<tr>
-		<td> slice </td>
-		<td> renvoie une partie de la liste </td>
-	</tr>
-	<tr>
-		<td> unshift </td>
-		<td> ajoute un ou plusieurs éléments au début de la liste </td>
-	</tr>
-	<tr>
-		<td> push </td>
-		<td> ajoute à la fin de la liste </td>
-	</tr>
-	<tr>
-		<td> each </td>
-		<td> parcours chaque élément de la liste </td>
-	</tr>
-	<tr>
-		<td> map collect </td>
-		<td> invoque le bloc pour chaque élément et collecte le résultat dans une nouvelle liste </td>
-	</tr>
-	<tr>
-		<td> find detect indexOf index search </td>
-		<td> Retourne l'index du premier élément pour lequel le bloc est vrai ou qui est égal à la valeur passer en paramètre </td>
-	</tr>
-	<tr>
-		<td> find_all select </td>
-		<td> sélectionne tous les éléments selon le résultat d'un bloc </td>
-	</tr>
-	<tr>
-		<td> partition </td>
-		<td> partitionne en deux listes selon le résultat d'un bloc </td>
-	</tr>
-	<tr>
-		<td> l.join(s) </td>
-		<td> fusionne tous les éléments en y intercalant la chaîne s </td>
-	</tr>
-	<tr>
-		<td> size length </td>
-		<td> taille de la liste</td>
-	</tr>
-	<tr>
-		<td> each_with_index </td>
-		<td> parcours la liste avec un bloc recevant l'élément et un index </td>
-	</tr>
-	<tr>
-		<td> uniq uniq! </td>
-		<td> enlève les éléments en double </td>
-	</tr>
-	<tr>
-		<td> sort! sort_by </td>
-		<td> trie la liste </td>
-	</tr>
-	<tr>
-		<td> zip transpose </td>
-		<td> combine des listes entres-elles </td>
-	</tr>
-	<tr>
-		<td> assoc </td>
-		<td> regarde s'il trouve un élément dans une liste de listes et retourne la liste le contenant si elle existe </td>
-	</tr>
-	<tr>
-		<td> to_a </td>
-		<td> renvoie la liste elle-même </td>
-	</tr>
-	<tr>
-		<td> inject </td>
-		<td> exécute un bloc sur chaque élément en passant le résultat à l'exécution suivante </td>
-	</tr>
-</tbody>
-</table>
-<h3 id="dict">Type dictionnaire</h3>
-<table>
-<tbody>
-	<tr>
-		<th>Nom </th>
-		<th>Littéral </th>
-	</tr>
-	<tr>
-		<td> Hash </td>
-		<td> { 1 =&gt; 'a' , 2 =&gt; 'b' , 3 =&gt; 'c' } </td>
-	</tr>
-</tbody>
-</table>
-<p>Listes des fonctions principales :</p>
-<table>
-<tbody>
-	<tr>
-		<th>Fonction </th>
-		<th>Description </th>
-	</tr>
-	<tr>
-		<td> h[ <em>key</em> ] ou fetch </td>
-		<td> accès à la valeur de la clé <em>key</em> </td>
-	</tr>
-	<tr>
-		<td> has_key? include? key? member? </td>
-		<td> test si la clé est définie </td>
-	</tr>
-	<tr>
-		<td> delete </td>
-		<td> enlève l'élément avec cette clé </td>
-	</tr>
-	<tr>
-		<td> keys </td>
-		<td> liste des clés </td>
-	</tr>
-	<tr>
-		<td> values </td>
-		<td> liste des valeurs </td>
-	</tr>
-	<tr>
-		<td> update merge </td>
-		<td> ajoute ou change les couples en paramètres </td>
-	</tr>
-	<tr>
-		<td> store(<em>k</em>, <em>v</em>) </td>
-		<td> stocke la valeur à la clé </td>
-	</tr>
-</tbody>
-</table>
-<p><a href="#syntax">Retour sommaire</a></p>
-<h3 id="objet">Type objet</h3>
-<table>
-<tbody>
-	<tr>
-		<th>Fonction </th>
-		<th>Description </th>
-	</tr>
-	<tr>
-		<td> object.method(id) </td>
-		<td> renvoie s'il existe un objet Method correspondant à l'id </td>
-	</tr>
-	<tr>
-		<td> identifiant.new </td>
-		<td> crée une nouvelle instance </td>
-	</tr>
-	<tr>
-		<td> identifiant.clone </td>
-		<td> clone l'objet </td>
-	</tr>
-	<tr>
-		<td> identifiant.is_a? ou kind_of? </td>
-		<td> renvoie vrai s'il est de cette classe </td>
-	</tr>
-	<tr>
-		<td> identifiant.class </td>
-		<td> donne la classe de l'objet </td>
-	</tr>
-	<tr>
-		<td> identifiant.methods </td>
-		<td> liste de chaînes de symboles de toutes les méthodes de l'objet </td>
-	</tr>
-	<tr>
-		<td> identifiant.respond_to? </td>
-		<td> l'objet répond-t-il au message ? (= s'il a une méthode correspondante) </td>
-	</tr>
-</tbody>
-</table>
-<p><a href="#syntax">Retour sommaire</a></p>
-<h2 id="op">Opérateurs</h2>
-<h3 id="op_bin">Opérateurs binaires</h3>
-<table>
-<tbody>
-	<tr>
-		<th>Type </th>
-		<th>Syntaxe </th>
-	</tr>
-	<tr>
-		<td> Mathématiques </td>
-		<td> + - * / % ** </td>
-	</tr>
-	<tr>
-		<td> Comparaison </td>
-		<td> &lt; &lt;= &gt; &gt;= &lt;=&gt; </td>
-	</tr>
-	<tr>
-		<td> Égalité </td>
-		<td>  != ! ===</td>
-	</tr>
-	<tr>
-		<td> Affectation </td>
-		<td> = += -= *= /= %= **= </td>
-	</tr>
-	<tr>
-		<td> Bit à bit </td>
-		<td> &amp; | ^ ~ &lt;&lt; &gt;&gt; </td>
-	</tr>
-	<tr>
-		<td> Logique </td>
-		<td> and or &amp;&amp; </td>
-	</tr>
-	<tr>
-		<td> Ensemble </td>
-		<td> <em>borne_inf</em>…<em>borne_sup</em> (inclusive) <em>borne_inf</em>…<em>borne_sup</em> (exclusive) </td>
-	</tr>
-	<tr>
-		<td> Appel de méthode </td>
-		<td> <em>objet</em>.<em>message</em> </td>
-	</tr>
-</tbody>
-</table>
-<h3 id="op_una">Opérateurs unaires</h3>
-<table>
-<tbody>
-	<tr>
-		<th>Type </th>
-		<th>Syntaxe </th>
-	</tr>
-	<tr>
-		<td> Mathématique </td>
-		<td> - </td>
-	</tr>
-	<tr>
-		<td> Logique </td>
-		<td> ! not </td>
-	</tr>
-	<tr>
-		<td> Définition </td>
-		<td> defined? <em>identifiant</em> </td>
-	</tr>
-</tbody>
-</table>
-<h3 id="op_ter">Opérateur ternaire</h3>
-<table>
-<tbody>
-	<tr>
-		<th>Type </th>
-		<th>Syntaxe </th>
-	</tr>
-	<tr>
-		<td> Opérateur ternaire </td>
-		<td> <em>expression</em> <strong>?</strong> <em>action si vrai</em> <strong>:</strong> <em>action si faux</em> </td>
-	</tr>
-</tbody>
-</table>
-<p><a href="#syntax">Retour sommaire</a></p>
-    
-    <h2 id="flux">Contrôle du flux</h2>
+        <h2 id="sommaire">Sommaire</h2>
+        <ol>
+            <li><a href="#bases">Bases</a></li>
+            <li><a href="#sites">Autres ressources</a></li>
+            <li><a href="#variables">Variables, constantes et globales</a></li>
+            <li><a href="#types">Types de base</a>
+            <ol>
+                <li><a href="#int">Entiers</a></li>
+                <li><a href="#float">Réels</a></li>
+                <li><a href="#string">Chaînes de caractères</a></li>
+                <li><a href="#bool">Booléens</a></li>
+                <li><a href="#range">Type intervalle</a></li>
+                <li><a href="#void">Type "vide"</a></li>
+                <li><a href="#list">Liste</a></li>
+                <li><a href="#dict">Dictionnaire</a></li>
+                <li><a href="#objet">Objet</a></li>
+            </ol></li>
+            <li><a href="#op">Opérateurs</a>
+            <ol>
+                <li><a href="#op_bin">Opérateurs binaires</a></li>
+                <li><a href="#op_una">Opérateurs unaires</a></li>
+                <li><a href="#op_ter">Opérateur ternaire</a></li>
+            </ol></li>
+            <li><a href="#flux">Contrôle du flux</a>
+            <ol>
+                <li><a href="#seq">Séquence</a></li>
+                <li><a href="#cond">Conditions</a></li>
+                <li><a href="#loop">Répétitions</a></li>
+            </ol></li>
+            <li><a href="#elem">Définitions des éléments</a>
+            <ol>
+                <li><a href="#fun">Fonctions</a></li>
+                <li><a href="#cls">Classes</a></li>
+                <li><a href="#mod">Modules</a></li>
+            </ol></li>
+            <li><a href="#spe">Gestion des exceptions</a>
+            <ol>
+                <li><a href="#exp">Exceptions</a></li>
+            </ol></li>
+            <li><a href="#utiles">Utiles</a></li>
+        </ol>
 
-    <div class="flux">
+        <h2 id="bases">1. Bases</h2>
+
+        <p>Date d'apparition du langage : 1995</p>
+        <p>Créateur : Yukihiro "Matz" Matsumoto (Japon)</p>
+        <p>Version actuelle à la date d'écriture : 2.2.3 (2015)</p>
+        <p>Extension d'un fichier Ruby : <span>rb</span></p>
+        <p>Exécuter mon_fichier.rb : <span><b>ruby</b> </i>mon_fichier.rb</i></span></p>
+        <p>Première ligne d'un fichier sous Linux : <span>#!/usr/bin/ruby</span></p>
+        <p>Accéder à la console interactive : <span><b>irb</b></span></p>
+        <p>IRb signifie <i>Interactive Ruby</i>.</p>
+
+        <h3>Affichage</h3>
+        <p>Affichage sur la sortie standard (console) : <span>puts</span>
+        <p>Le programme le plus simple en Ruby : <span>puts "Hello World!"</span></p>
+        <p>Interprétation de code dans une chaîne : <span> puts "#{a+1}"</span></p>
+
+        <h3>Mots réservés</h3>
+        <p>Mots réservés (39) : BEGIN, END, alias, and, begin, break, case, class, def, defined?, do, else, elsif, end, ensure, false, for, if, in, module, next, nil, not, or, redo, rescue, retry, return, self, super, then, true, undef, unless, until, when, while, __FILE__, __LINE__</p>
+
+        <h3>Commentaires</h3>
+        <p>Commentaires en Ruby : <span><i># mon commentaire jusqu'à la fin de la ligne</i></span></p>
+        <p>Commentaires sur plusieurs lignes : <span>=begin <i>vos lignes</i> =end</span></p>
+
+        <h3>BEGIN et END</h3>
+        <p>Déclarer un bloc de code exécuté avant l'exécution du programme : <span><b>BEGIN</b> { <i>code</i> }</span></p>
+        <p>Déclarer un bloc de code exécuté après l'exécution du programme : <span><b>END</b> { <i>code</i> }</span></p>
+
+        <p class="back"><a href="#sommaire">Retour sommaire</a></p>
+
+        <h2 id="sites">2. Autres ressources</h2> 
+        <ul>
+          <li>Site officiel du langage : <a href="https://www.ruby-lang.org">https://www.ruby-lang.org</a></li>
+          <li>Installer Ruby sur Windows : <a href="http://rubyinstaller.org/">http://rubyinstaller.org/</a></li>
+          <li>Télécharger le code source de Ruby : <a href="https://www.ruby-lang.org/fr/downloads/">https://www.ruby-lang.org/fr/downloads/</a></li>
+          <li>Liste des bibliothèques disponibles : <a href="https://www.ruby-toolbox.com/">https://www.ruby-toolbox.com/</a></li>
+          <li>Fiche Wikipédia française : <a href="http://fr.wikipedia.org/wiki/Ruby">http://fr.wikipedia.org/wiki/Ruby</a></li>
+          <li>Fiche Wikipédia anglaise : <a href="http://en.wikipedia.org/wiki/Ruby_%28programming_language%29">http://en.wikipedia.org/wiki/Ruby_%28programming_language%29</a></li>
+          <li>Console Ruby en ligne : <a href="http://tryruby.org">http://tryruby.org</a></li>
+          <li>Une autre console Ruby en ligne : <a href="https://repl.it/languages/ruby">https://repl.it/languages/ruby</a></li>
+          <li>Le "Pickaxe", livre de référence sur Ruby : <a href="http://ruby-doc.com/docs/ProgrammingRuby/">Programming Ruby</a></li>
+          <li>Livre sur Wikibooks : <a href="https://en.wikibooks.org/wiki/Ruby_Programming">https://en.wikibooks.org/wiki/Ruby_Programming</a></li>
+          <li>Site de tutoriels : <a href="http://www.tutorialspoint.com/ruby/">http://www.tutorialspoint.com/ruby/</a></li>
+          <li>Ruby Inside, actualités et tutoriels (jusqu'à 2014): <a href="http://www.rubyinside.com/">http://www.rubyinside.com/</a></li>
+          <li>Ruby On Rails, le framework qui a fait connaître Ruby : <a href="http://rubyonrails.org/">http://rubyonrails.org/</a></li>
+        </ul>
+        <p class="back"><a href="#sommaire">Retour sommaire</a></p>
+
+        <h2 id="variables">3. Variables, constantes et globales</h2>
+
+        <h3>Variables</h3>
+        <p>Déclaration d'une variable locale : <span>mon_identifiant = expression</span></p>
+        <p>Les caractères autorisés pour constituer mon_identifiant sont les chiffres, les lettres et le caractère souligné _.</p>
+        <p>Un identifiant <b>NE PEUT PAS</b> commencer par un chiffre néanmoins.</p>
+        <p>Un identifiant <b>NE PEUT PAS</b> être un des mots réservés.</p>
+        <p>Une variable ne durera que jusqu'à la fin de son bloc où elle définit (classe, fonction, module, begin/end {}.</p>
+
+        <h3>Constantes</h3>
+        <p>Déclaration d'une constante : <span>Mon_identifiant = expression</span></p>
+        <p>En Ruby, une constante commence par une majuscule et <b>EST</b> modifiable mais un message d'avertissement sera généré : <br>
+        <p><span>warning: already initialized constant Mon_identifiant</span></p>
+        <p><span>warning: previous definition of Mon_identifiant was here</span></p>
+        <p>Les noms de classe en Ruby doivent être des constantes (et donc commencer par une majuscule).</p>
+        <p>La constance en Ruby est une constance de <b>référence</b>. Mon_identifiant réfèrera toujours le même objet. Mais cet objet peut-être changé lui. Pour geler l'état d'un objet, il faut utiliser sa méthode <span>freeze</span>.
+
+        <h3>Globales</h3>
+        <p>Déclaration d'une variable globale (elle sera accessible partout) : <span>$mon_identifiant = expression</span></p>
+
+        <h3>Variables d'instance</h3>
+        <p>Une variable d'instance commence par le signe @ : <span>@a</span></p>
+        <p>Elles se déclarent dans le corps des méthodes.</p>
+
+        <h3>Variables de classe</h3>
+        <p>Une variable d'instance commence par le signe @@ : <span>@@a</span></p>
+        <p>Elle se déclarent dans le corps de la classe.</p>
+
+        <h3>Pseudo-variables</h3>
+        <p>Ce sont des variables fondamentales utilisées par Ruby que l'on ne peut assigner à nouveau :</p>
+        <p>Les booléens <span>true</span> et <span>false</span>.</p>
+        <p>La "valeur vide" : <span>nil</span>.</p>
+        <p>Une référence vers l'objet courant : <span>self</span>.</p>
+        <p>Le nom du fichier courant : <span>__FILE__</span>.</p>
+        <p>Le numéro de la ligne courante : <span>__LINE__</span>.</p>
+
+        <p class="back"><a href="#sommaire">Retour sommaire</a></p>
+
+        <h2 id="types">Types de base</h2>
+
+        <p>Pour chaque type, on présentera son nom et les formes possibles pour ses littéraux. On complétera par une liste de leurs principales méthodes.</p>
+
+        <h3 id="int">Entiers</h3>
+        <table>
+        <tbody>
+            <tr>
+                <th>Nom </th>
+                <th>Littéral </th>
+            </tr>
+            <tr>
+                <td> Fixnum, Bignum </td>
+                <td> 0b1 (binaire)<br>07 (octal)<br>0xf (hexadécimal)<br>10 (décimal)<br>1_000 (1000 en format plus lisible)</td>
+            </tr>
+        </tbody>
+        </table>
+        <p>Ruby transforme automatiquement un Fixnum en Bignum quand c'est nécessaire.</p>
+
+        <h3 id="float">Réels</h3>
+        <table>
+        <tbody>
+            <tr>
+                <th>Nom </th>
+                <th>Littéral </th>
+            </tr>
+            <tr>
+                <td> Float </td>
+                <td> 1000.0<br>1E3<br>1.0e8<br> </td>
+            </tr>
+        </tbody>
+        </table>
+        <p>Listes des fonctions principales :</p>
+        <table>
+        <tbody>
+            <tr>
+                <th>Fonction </th>
+                <th>Description </th>
+            </tr>
+            <tr>
+                <td> floor to_s </td>
+                <td> entier inférieur immédiat (troncation) </td>
+            </tr>
+            <tr>
+                <td> ceil </td>
+                <td> entier supérieur immédiat </td>
+            </tr>
+            <tr>
+                <td> round </td>
+                <td> arrondi </td>
+            </tr>
+        </tbody>
+        </table>
+
+        <h3 id="string">Chaînes de caractères</h3>
+        <table>
+        <tbody>
+            <tr>
+                <th>Nom </th>
+                <th>Littéral </th>
+            </tr>
+            <tr>
+                <td> String </td>
+                <td> "abcde"<br>'abcde' </td>
+            </tr>
+        </tbody>
+        </table>
+        <p>Les chaînes avec des guillemets doubles interprètent les caractères spéciaux précédés d'un antislash. Les chaînes avec les guillemets simples n'interprètent que les caractères spéciaux <span>\'</span> et <span>\\</span>, produisant ' et \ respectivement. Le caractère spécial le plus utilisé est <span>\n</span> pour faire une nouvelle ligne.</p>
+        <p>On peut insérer du code dans n'importe quel chaîne en utilisant <span>#{<i>code</i>}</span>, il sera exécuté une fois à la création de l'objet.</p>
+        <p>Listes des fonctions principales :</p>
+        <table>
+        <tbody>
+            <tr>
+                <th>Fonction </th>
+                <th>Description </th>
+            </tr>
+            <tr>
+                <td> to_s </td>
+                <td> produit une chaîne </td>
+            </tr>
+            <tr>
+                <td> equal? </td>
+                <td> égalité entre deux chaînes </td>
+            </tr>
+            <tr>
+                <td> size </td>
+                <td> longueur de la chaîne </td>
+            </tr>
+            <tr>
+                <td> + </td>
+                <td> concaténation de 2 chaînes </td>
+            </tr>
+            <tr>
+                <td> * </td>
+                <td> duplique n fois </td>
+            </tr>
+            <tr>
+                <td> upcase </td>
+                <td> mise en majuscule </td>
+            </tr>
+            <tr>
+                <td> downcase </td>
+                <td> mise en minuscule </td>
+            </tr>
+            <tr>
+                <td> s[i] </td>
+                <td> accès au caractère à l'index i </td>
+            </tr>
+            <tr>
+                <td> s[n..m] </td>
+                <td> extrait une sous-chaîne </td>
+            </tr>
+            <tr>
+                <td> s[n, longueur] </td>
+                <td> extrait une sous-chaîne </td>
+            </tr>
+            <tr>
+                <td> index(s) </td>
+                <td> cherche l'index d'une sous-chaîne </td>
+            </tr>
+            <tr>
+                <td> rindex(s) </td>
+                <td> cherche l'index d'une sous-chaîne en partant de la fin </td>
+            </tr>
+        </tbody>
+        </table>
+
+        <h3 id="bool">Booléens</h3>
+        <table>
+        <tbody>
+            <tr>
+                <th>Nom </th>
+                <th>Classe </th>
+                <th>Littéral </th>
+            </tr>
+            <tr>
+                <td> Faux </td>
+                <td> FalseClass </td>
+                <td> <strong>false</strong> </td>
+            </tr>
+            <tr>
+                <td> Vrai </td>
+                <td> TrueClass </td>
+                <td> <strong>true</strong> </td>
+            </tr>
+        </tbody>
+        </table>
+        <ul>
+            <li>Dans les tests, toutes les valeurs autres que <strong>false</strong> et <strong>nil</strong> sont vraies (dont <strong>0</strong>).</li>
+        </ul>
+
+        <h3 id="range">Type intervalle</h3>
+        <table>
+        <tbody>
+            <tr>
+                <th>Nom </th>
+                <th>Littéral </th>
+            </tr>
+            <tr>
+                <td> Range </td>
+                <td> a..b <br> a...b </td>
+            </tr>
+        </tbody>
+        </table>
+        <p>Cela produit un intervalle comprenant les valeurs entières de a à b.</p>
+        <p>En utilisant trois points, la valeur b est exclue.</p>
+
+        <h3 id="void">Type "vide"</h3>
+        <table>
+        <tbody>
+            <tr>
+                <th>Nom </th>
+                <th>Classe </th>
+                <th>Littéral </th>
+            </tr>
+            <tr>
+                <td> Vide / nul </td>
+                <td> NilClass </td>
+                <td> <strong>nil</strong> </td>
+            </tr>
+        </tbody>
+        </table>
+
+        <h3 id="list">Type liste</h3>
+        <table>
+        <tbody>
+            <tr>
+                <th>Nom </th>
+                <th>Littéral </th>
+            </tr>
+            <tr>
+                <td> Array </td>
+                <td> [ 1, 2, 3] <br> 1, 2, 3 <br> %w(abc def) </td>
+            </tr>
+        </tbody>
+        </table>
+        <p>Listes des fonctions principales (<a href="http://ruby-doc.org/core-2.2.0/Array.html">Array</a>, <a href="http://ruby-doc.org/core-2.2.0/Enumerable.html">Enumerable</a>) :</p>
+        <table>
+        <tbody>
+            <tr>
+                <th>Fonction </th>
+                <th>Description </th>
+            </tr>
+            <tr>
+                <td> l[ <em>index</em> ] </td>
+                <td> accès à la valeur à l'<em>index</em> </td>
+            </tr>
+            <tr>
+                <td> l[ -1 ] </td>
+                <td> accès au dernier élément </td>
+            </tr>
+            <tr>
+                <td> + </td>
+                <td> concaténation entre deux listes </td>
+            </tr>
+            <tr>
+                <td> &lt;&lt; </td>
+                <td> ajout d'un élément </td>
+            </tr>
+            <tr>
+                <td> insert </td>
+                <td> insère à l'index l'élément </td>
+            </tr>
+            <tr>
+                <td> shift </td>
+                <td> retourne le premier élément et l'enlève </td>
+            </tr>
+            <tr>
+                <td> pop </td>
+                <td> retourne le dernier élément et l'enlève </td>
+            </tr>
+            <tr>
+                <td> member? <strong>in</strong> include? </td>
+                <td> contient l'élément </td>
+            </tr>
+            <tr>
+                <td> any? </td>
+                <td> vrai si au moins 1 élément correspond </td>
+            </tr>
+            <tr>
+                <td> all? </td>
+                <td> vrai si tous les éléments correspondent </td>
+            </tr>
+            <tr>
+                <td> min </td>
+                <td> élément minimal </td>
+            </tr>
+            <tr>
+                <td> max </td>
+                <td> élément maximal </td>
+            </tr>
+            <tr>
+                <td> size length </td>
+                <td> taille de la liste </td>
+            </tr>
+            <tr>
+                <td> reverse </td>
+                <td> donne la liste inversée </td>
+            </tr>
+            <tr>
+                <td> flatten </td>
+                <td> si la liste contient des listes, elles seront toutes fusionnées en une seule liste </td>
+            </tr>
+            <tr>
+                <td> slice </td>
+                <td> renvoie une partie de la liste </td>
+            </tr>
+            <tr>
+                <td> unshift </td>
+                <td> ajoute un ou plusieurs éléments au début de la liste </td>
+            </tr>
+            <tr>
+                <td> push </td>
+                <td> ajoute à la fin de la liste </td>
+            </tr>
+            <tr>
+                <td> each </td>
+                <td> parcours chaque élément de la liste </td>
+            </tr>
+            <tr>
+                <td> map collect </td>
+                <td> invoque le bloc pour chaque élément et collecte le résultat dans une nouvelle liste </td>
+            </tr>
+            <tr>
+                <td> find detect indexOf index search </td>
+                <td> Retourne l'index du premier élément pour lequel le bloc est vrai ou qui est égal à la valeur passer en paramètre </td>
+            </tr>
+            <tr>
+                <td> find_all select </td>
+                <td> sélectionne tous les éléments selon le résultat d'un bloc </td>
+            </tr>
+            <tr>
+                <td> partition </td>
+                <td> partitionne en deux listes selon le résultat d'un bloc </td>
+            </tr>
+            <tr>
+                <td> l.join(s) </td>
+                <td> fusionne tous les éléments en y intercalant la chaîne s </td>
+            </tr>
+            <tr>
+                <td> size length </td>
+                <td> taille de la liste</td>
+            </tr>
+            <tr>
+                <td> each_with_index </td>
+                <td> parcours la liste avec un bloc recevant l'élément et un index </td>
+            </tr>
+            <tr>
+                <td> uniq uniq! </td>
+                <td> enlève les éléments en double </td>
+            </tr>
+            <tr>
+                <td> sort! sort_by </td>
+                <td> trie la liste </td>
+            </tr>
+            <tr>
+                <td> zip transpose </td>
+                <td> combine des listes entres-elles </td>
+            </tr>
+            <tr>
+                <td> assoc </td>
+                <td> regarde s'il trouve un élément dans une liste de listes et retourne la liste le contenant si elle existe </td>
+            </tr>
+            <tr>
+                <td> to_a </td>
+                <td> renvoie la liste elle-même </td>
+            </tr>
+            <tr>
+                <td> inject </td>
+                <td> exécute un bloc sur chaque élément en passant le résultat à l'exécution suivante </td>
+            </tr>
+        </tbody>
+        </table>
+
+        <h3 id="dict">Type dictionnaire</h3>
+        <table>
+        <tbody>
+            <tr>
+                <th>Nom </th>
+                <th>Littéral </th>
+            </tr>
+            <tr>
+                <td> Hash </td>
+                <td> { 1 =&gt; 'a' , 2 =&gt; 'b' , 3 =&gt; 'c' } </td>
+            </tr>
+        </tbody>
+        </table>
+        <p>Listes des fonctions principales :</p>
+        <table>
+        <tbody>
+            <tr>
+                <th>Fonction </th>
+                <th>Description </th>
+            </tr>
+            <tr>
+                <td> h[ <em>key</em> ] ou fetch </td>
+                <td> accès à la valeur de la clé <em>key</em> </td>
+            </tr>
+            <tr>
+                <td> has_key? include? key? member? </td>
+                <td> test si la clé est définie </td>
+            </tr>
+            <tr>
+                <td> delete </td>
+                <td> enlève l'élément avec cette clé </td>
+            </tr>
+            <tr>
+                <td> keys </td>
+                <td> liste des clés </td>
+            </tr>
+            <tr>
+                <td> values </td>
+                <td> liste des valeurs </td>
+            </tr>
+            <tr>
+                <td> update merge </td>
+                <td> ajoute ou change les couples en paramètres </td>
+            </tr>
+            <tr>
+                <td> store(<em>k</em>, <em>v</em>) </td>
+                <td> stocke la valeur à la clé </td>
+            </tr>
+        </tbody>
+        </table>
+        <p class="back"><a href="#sommaire">Retour sommaire</a></p>
+
+        <h3 id="objet">Type objet</h3>
+        <table>
+        <tbody>
+            <tr>
+                <th>Fonction </th>
+                <th>Description </th>
+            </tr>
+            <tr>
+                <td> object.method(id) </td>
+                <td> renvoie s'il existe un objet Method correspondant à l'id </td>
+            </tr>
+            <tr>
+                <td> identifiant.new </td>
+                <td> crée une nouvelle instance </td>
+            </tr>
+            <tr>
+                <td> identifiant.clone </td>
+                <td> clone l'objet </td>
+            </tr>
+            <tr>
+                <td> identifiant.is_a? ou kind_of? </td>
+                <td> renvoie vrai s'il est de cette classe </td>
+            </tr>
+            <tr>
+                <td> identifiant.class </td>
+                <td> donne la classe de l'objet </td>
+            </tr>
+            <tr>
+                <td> identifiant.methods </td>
+                <td> liste de chaînes de symboles de toutes les méthodes de l'objet </td>
+            </tr>
+            <tr>
+                <td> identifiant.respond_to? </td>
+                <td> l'objet répond-t-il au message ? (= s'il a une méthode correspondante) </td>
+            </tr>
+        </tbody>
+        </table>
+        <p class="back"><a href="#sommaire">Retour sommaire</a></p>
+
+        <h2 id="op">Opérateurs</h2>
+
+        <h3 id="op_bin">Opérateurs binaires</h3>
+        <table>
+        <tbody>
+            <tr>
+                <th>Type </th>
+                <th>Syntaxe </th>
+            </tr>
+            <tr>
+                <td> Arithmétiques </td>
+                <td> + - * / % (modulo) ** (puissance)</td>
+            </tr>
+            <tr>
+                <td> Comparaison </td>
+                <td> &lt; &lt;= &gt; &gt;= <br>&lt;=&gt; (retourne 0 si égaux, 1 si le premier est le plus grand, -1 sinon)</td>
+            </tr>
+            <tr>
+                <td> Égalité </td>
+                <td>  == != <br> === (utilisé dans les clauses case)</td>
+            </tr>
+            <tr>
+                <td> Affectation </td>
+                <td> = += -= *= /= %= **= </td>
+            </tr>
+            <tr>
+                <td> Bit à bit </td>
+                <td> &amp; | ^ (ou exclusif) ~ (complément) <br> &lt;&lt; &gt;&gt; (décalages gauche et droit)</td>
+            </tr>
+            <tr>
+                <td> Logique </td>
+                <td> and or &amp;&amp; ||</td>
+            </tr>
+            <tr>
+                <td> Création d'intervalle </td>
+                <td> <em>borne_inf</em>..<em>borne_sup</em> (inclusif) <br> <em>borne_inf</em>...<em>borne_sup</em> (exclusif de borne_sup) </td>
+            </tr>
+            <tr>
+                <td> Appel de méthode </td>
+                <td> <em>objet</em>.<em>message</em> </td>
+            </tr>
+        </tbody>
+        </table>
+        <p>La méthode eql? teste à la fois la valeur et le type des 2 objets comparés. Ainsi <span>2.0 == 2</span> est vrai mais <span>2.0.eql?(2)</span> retournera faux.</p>
+        <p>La méthode equal? retourne vrai si et seulement les deux objets ont le même id.</p>
+        <p>Ruby permet des affectations parallèles : <span>x, y = 10, 20</span>. Cela est utilise pour échanger la valeur de deux variables sans passer par une troisième : <span>x, y = y, x</span>.
+        
+        <h3 id="op_una">Opérateurs unaires</h3>
+        <table>
+        <tbody>
+            <tr>
+                <th>Type </th>
+                <th>Syntaxe </th>
+            </tr>
+            <tr>
+                <td> Mathématique </td>
+                <td> - </td>
+            </tr>
+            <tr>
+                <td> Logique </td>
+                <td> ! not </td>
+            </tr>
+            <tr>
+                <td> Définition </td>
+                <td> defined? <em>identifiant</em> </td>
+            </tr>
+        </tbody>
+        </table>
+        <p>defined? retourne <span>nil</span> si l'identifiant ne correspond à aucune variable, la chaîne "local-variable" s'il correspond à une variable locale, "constant" s'il correspond à une constante, et "global-variable" s'il correspond à une variable globale.</p>
+        
+        <h3 id="op_ter">Opérateur ternaire</h3>
+        <table>
+        <tbody>
+            <tr>
+                <th>Type </th>
+                <th>Syntaxe </th>
+            </tr>
+            <tr>
+                <td> Opérateur ternaire </td>
+                <td> <em>expression</em> <strong>?</strong> <em>action si vrai</em> <strong>:</strong> <em>action si faux</em> </td>
+            </tr>
+        </tbody>
+        </table>
+        <p class="back"><a href="#sommaire">Retour sommaire</a></p>
+        
+        <h2 id="flux">Contrôle du flux</h2>
 
         <h3 id="seq">Séquence</h3>
 
-        <blockquote>
+        <div class="code">
             action  <i># En Ruby, chaque instruction est une expression évaluable</i>
             action  <i># Il suffit de passer à la ligne pour les faire suivre</i>
-        </blockquote>
-        <blockquote>
+        </div>
+        <div class="code">
             action ; action  <i># Sur un même ligne, on sépare les actions par un ;</i>
-        </blockquote>
+        </div>
 
         <h3 id="cond">Conditions</h3>
     
-        <blockquote>
+        <div class="code">
             <p><strong>if</strong> condition [ <strong>then</strong> ]<br />
             &nbsp;&nbsp; actions<br />
             [ <strong>elsif</strong> condition [ <strong>then</strong> ]<br />
@@ -780,187 +786,161 @@
             [ <strong>else</strong><br />
             &nbsp;&nbsp; actions ] <strong>?</strong><br />
             <strong>end</strong></p>
-        </blockquote>
-        <blockquote>
+        </div>
+        <div class="code">
             <p>action [ <strong>if</strong> condition ]</p>
-        </blockquote>
-        <blockquote>
+        </div>
+        <div class="code">
             <p><strong>unless</strong> condition [ <strong>then</strong> ]<br />
             &nbsp;&nbsp; actions<br />
             [ <strong>else</strong><br />
             &nbsp;&nbsp; actions ] <strong>?</strong><br />
             <strong>end</strong></p>
-        </blockquote>
-        <blockquote>
+        </div>
+        <div class="code">
             <p>action [ <strong>unless</strong> condition ]</p>
-        </blockquote>
+        </div>
         <br>
         
         <h3 id="loop">Répétitions</h3>
 
-        <blockquote>
+        <div class="code">
             <p><strong>while</strong> condition [ <strong>do</strong> ]<br />
             &nbsp;&nbsp; actions<br />
             <strong>end</strong></p>
-        </blockquote>
-        <blockquote>
+        </div>
+        <div class="code">
             <p>action [ <strong>while</strong> condition ]</p>
-        </blockquote>
-        <blockquote>
+        </div>
+        <div class="code">
             <p><strong>until</strong> condition [ <strong>do</strong> ]<br />
             &nbsp;&nbsp; actions<br />
             <strong>end</strong></p>
-        </blockquote>
-        <blockquote>
+        </div>
+        <div class="code">
             <p>action [ <strong>until</strong> condition ]</p>
-        </blockquote>
-        <blockquote>
+        </div>
+        <div class="code">
             <p><strong>for</strong> identifiant <strong>in</strong> expression [ <strong>do</strong> ]<br />
             &nbsp;&nbsp; actions<br />
             <strong>end</strong></p>
-        </blockquote>
-        <blockquote>
+        </div>
+        <div class="code">
             <strong>next</strong>  <i># Passage à l'itération suivante</i>
-        </blockquote>
-        <blockquote>
+        </div>
+        <div class="code">
             <strong>break</strong>  <i># Quitte la boucle</i>
-        </blockquote>
-        <blockquote>
+        </div>
+        <div class="code">
             <i># Ruby propose des méthodes pour itérer sur un objet</i><br>
             (1..10).each { |i| actions }<br>
             1.upto(10) { |i| actions }<br>
             10.downto(1) { |i| actions }<br>
             (1..10).step(2) { |i| actions }<br>
             ['a', 'b'].each_with_index { |v, i| actions }<br>
-        </blockquote>
+        </div>
         
-    </div>
-    <br>
-    <center><p><a href="#syntax">Retour sommaire</a></p></center>
-    
-    <h2 id="elem">Définitions des éléments</h2>
-    
-    <div class="flux">
-    
+        <br>
+        <p class="back"><a href="#sommaire">Retour sommaire</a></p>
+        
+        <h2 id="elem">Définitions des éléments</h2>
+
         <h3 id="fun">Fonctions</h3>
         
-        <blockquote>
+        <div class="code">
             <p><strong>def</strong> identifiant [ ( par [, _par_] <strong>*</strong> ) ]<br />
             &nbsp;&nbsp; actions<br />
             <strong>end</strong></p>
-        </blockquote>
-        <blockquote>
+        </div>
+        <div class="code">
             <strong>return</strong> [ expression ]  <i># Quitte la fonction</i>
-        </blockquote>
-        <blockquote>
+        </div>
+        <div class="code">
             [ objet <strong>.</strong> ] identifiant [ ( paramètres ) ]  <i># Appel de fonction</i>
-        </blockquote>
-        <blockquote>
+        </div>
+        <div class="code">
             * tuple  <i># Fracturation d'un tuple pour passage différents en arguments</i>
-        </blockquote>
+        </div>
 
         <h3 id="cls">Classes</h3>
         
-        <blockquote>
+        <div class="code">
             <strong>class</strong> identifiant [ &lt; parent ]<br>
             &nbsp;&nbsp; actions<br>
             <strong>end</strong>
-        </blockquote>
-        <blockquote>
+        </div>
+        <div class="code">
             <strong>self</strong>  <i># L'instance elle-même</i>
-        </blockquote>
-        <blockquote>
+        </div>
+        <div class="code">
             <strong>super</strong>  <i># Pour accéder aux fonctions du parent</i>
-        </blockquote>
-        <blockquote>
+        </div>
+        <div class="code">
             nom_classe <strong>.</strong> new [ ( paramètres ) ]  <i>Création d'une instance</i>
-        </blockquote>
+        </div>
         
         <h3 id="mod">Modules</h3>
         
-        <blockquote>
+        <div class="code">
             <strong>module</strong> identifiant<br>
             &nbsp;&nbsp; actions<br>
             <strong>end</strong>
-        </blockquote>
-        <blockquote>
+        </div>
+        <div class="code">
             <strong>require</strong>  <i># Exige un module</i>
-        </blockquote>
-        <blockquote>
+        </div>
+        <div class="code">
             <strong>include</strong>  <i># Inclus les éléments du module dans l'espace de nom actuel</i>
-        </blockquote>
+        </div>
+        <p class="back"><a href="#sommaire">Retour sommaire</a></p>
         
-    </div>
-    <br>
-    <center><p><a href="#syntax">Retour sommaire</a></p></center>
-    
-    <h2 id="spe">Gestion des exceptions</h2>
-    
-    <div class="flux">
+        <h2 id="spe">Gestion des exceptions</h2>
 
         <h3 id="exp">Exceptions</h3>
-
-        <blockquote>
-            <strong>try</strong><br>
+        
+        <p>Pour gérer une exception il suffit d'ajouter un ou plusieurs blocs <span>rescue</span> à un bloc <span>begin / end</span>.</p>
+        <div class="code">
+            <strong>begin</strong><br>
             &nbsp;&nbsp; actions<br>
-            <strong>rescue</strong> [ identifiant ]<br>
+            <strong>rescue</strong> [ identifiant_type [=> identifiant_variable] ]<br>
             &nbsp;&nbsp; actions<br>
+            [ <strong>else</strong>
+            &nbsp;&nbsp; actions ]<br>
             [ <strong>ensure</strong><br>
             &nbsp;&nbsp; actions ]<br>
             <strong>end</strong>
-        </blockquote>
-        <blockquote>
-            <strong>raise</strong> [ expression ]  <i># Lève une exception</i>
-        </blockquote>
-        <blockquote>
-            <strong>retry</strong>  <i># Reprend l'exécution à partir du <strong>try</strong></i>
-        </blockquote>
+        </div>
+        <p>L'identifiant passé en paramètre du <span>rescue</span> indique le type d'exception capturée (ainsi que ses sous-classes) par la clause rescue.</p>
+        <p>Si l'exception ne correspond pas à un des identifiants attendus par les clauses rescue, le code dans la clause <span>else</span> sera exécuté.</p>
+        <p>La clause <span>ensure</span>indique du code qui sera toujours exécuté à la fin, qu'il y ait eu une exception ou pas, et même s'il y a un <span>return</span> dans le bloc initial.</p>
+        <p>Pour lever une exception :</p>
+        <div class="code">
+            <strong>raise</strong><br>
+            <strong>raise</strong> <i>chaîne</i><br>
+            <strong>raise</strong> <i>Type, chaîne</i>
+        </div>
+        <p>Le type de base des exceptions dans les cas 1 et 2 est <span>RuntimeError</span>.
+        <p>La variable globale <span>$!</span> contient le message de la dernière exception levée ou <span>nil</span> s'il n'y en avait pas.</p>
+        <p>Ruby permet aussi dans une clause <span>rescue</span> de reprendre l'exécution à partir du begin avec le mot clé <span>retry</span> :
+        <div class="code">
+            <strong>retry</strong>
+        </div>
+        <p>Attention aux boucles infinies avec <span>retry</span>! La puissance vient avec son prix !</p>
+        <p class="back"><a href="#sommaire">Retour sommaire</a></p>
+        
+        <h2 id="utiles">Utiles</h2>
 
-    </div>
-    <br>
-    <center><p><a href="#syntax">Retour sommaire</a></p></center>
+        <div class="code">
+            Randow.new(min..max)  <i># Nombres aléatoires (min et max inclus)</i>
+        </div>
+        
+        <p>Sérialisation (<a href="http://ruby-doc.org/core-2.2.0/Marshal.html">doc</a>) :</p>
+        <div class="code">
+            data = Marshal.dump(o) <i># sérialise dans une chaîne</i><br>
+            obj = Marshal.load(data) <i># charge la chaîne</i>
+        </div>
+        <p class="back"><a href="#sommaire">Retour sommaire</a></p>
     
-    <h2 id="utiles">Utiles</h2>
-
-    <blockquote>
-        Randow.new(min..max)  <i># Nombres aléatoires (min et max inclus)</i>
-    </blockquote>
-    
-    <p>Sérialisation (<a href="http://ruby-doc.org/core-2.2.0/Marshal.html">doc</a>) :</p>
-    <blockquote>
-        data = Marshal.dump(o) <i># sérialise dans une chaîne</i><br>
-        obj = Marshal.load(data) <i># charge la chaîne</i>
-    </blockquote>
-    <br>
-    <center><p><a href="#syntax">Retour sommaire</a></p></center>
-    
-    <h2 id="historique">Historique</h2>
-    
-    <ul>
-        <li>12 mars 2015, version 0.2 : refait le layout de Utiles, Exceptions, Définition, Contrôle. Plus de blockquote. Correction d'erreurs : ret(r)y et end pas en gras.</li>
-        <li>10 mars 2015, version 0.1 : lancement.</li>
-    </ul>
-    
-<!--
-      <span class="title">Juste un titre</span>
-      <div class="block">
-        <p>Juste un test.<br>
-        Un petit test.<br></p>
-      </div>
-
-      <div class="code">
-          <pre>
-              Exemple de code <b>if</b> pipo
-          </pre>
-      </div>
-    
-      <footer class="footer">
-          <div class="container">
-              <p class="text-muted">2011-2014</p>
-          </div>
-      </footer>
--->  
-
     </div> <!-- /container -->
     
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
