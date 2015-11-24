@@ -76,6 +76,18 @@
             font-family: "Consolas";
         }
         
+        strong {
+            color: #1479cc;
+        }
+        /* on utilise b et i uniquement pour le code, strong et em sinon */
+        b {
+            color: #1479cc;
+            font-family: "Consolas";
+        }
+        i {
+            color: #AAA;
+        }
+        
         span.blue {
             border: 1px solid #9999CC;
             color: #9999CC;
@@ -149,6 +161,8 @@
                 <li><a href="#op_bin">Opérateurs binaires</a></li>
                 <li><a href="#op_una">Opérateurs unaires</a></li>
                 <li><a href="#op_ter">Opérateur ternaire</a></li>
+                <li><a href="#op_precedence">Précédence des opérateurs</a></li>
+                <li><a href="#op_redef">Redéfinition d'opérateur</a></li>
             </ol></li>
             <li><a href="#flux">Contrôle du flux</a>
             <ol>
@@ -165,6 +179,8 @@
             <li><a href="#spe">Gestion des exceptions</a>
             <ol>
                 <li><a href="#exp">Exceptions</a></li>
+                <li><a href="#exp_type">Type d'exceptions</a></li>
+                <li><a href="#exp_throw">Catch et throw</a></li>
             </ol></li>
             <li><a href="#utiles">Utiles</a></li>
         </ol>
@@ -221,17 +237,17 @@
         <h3>Variables</h3>
         <p>Déclaration d'une variable locale : <span>mon_identifiant = expression</span></p>
         <p>Les caractères autorisés pour constituer mon_identifiant sont les chiffres, les lettres et le caractère souligné _.</p>
-        <p>Un identifiant <b>NE PEUT PAS</b> commencer par un chiffre néanmoins.</p>
-        <p>Un identifiant <b>NE PEUT PAS</b> être un des mots réservés.</p>
+        <p>Un identifiant <strong>NE PEUT PAS</strong> commencer par un chiffre néanmoins.</p>
+        <p>Un identifiant <strong>NE PEUT PAS</strong> être un des mots réservés.</p>
         <p>Une variable ne durera que jusqu'à la fin de son bloc où elle définit (classe, fonction, module, begin/end {}.</p>
 
         <h3>Constantes</h3>
         <p>Déclaration d'une constante : <span>Mon_identifiant = expression</span></p>
-        <p>En Ruby, une constante commence par une majuscule et <b>EST</b> modifiable mais un message d'avertissement sera généré : <br>
+        <p>En Ruby, une constante commence par une majuscule et <strong>EST</strong> modifiable mais un message d'avertissement sera généré : <br>
         <p><span>warning: already initialized constant Mon_identifiant</span></p>
         <p><span>warning: previous definition of Mon_identifiant was here</span></p>
         <p>Les noms de classe en Ruby doivent être des constantes (et donc commencer par une majuscule).</p>
-        <p>La constance en Ruby est une constance de <b>référence</b>. Mon_identifiant réfèrera toujours le même objet. Mais cet objet peut-être changé lui. Pour geler l'état d'un objet, il faut utiliser sa méthode <span>freeze</span>.
+        <p>La constance en Ruby est une constance de <strong>référence</strong>. Mon_identifiant réfèrera toujours le même objet. Mais cet objet peut-être changé lui. Pour geler l'état d'un objet, il faut utiliser sa méthode <span>freeze</span>.
 
         <h3>Globales</h3>
         <p>Déclaration d'une variable globale (elle sera accessible partout) : <span>$mon_identifiant = expression</span></p>
@@ -246,11 +262,11 @@
 
         <h3>Pseudo-variables</h3>
         <p>Ce sont des variables fondamentales utilisées par Ruby que l'on ne peut assigner à nouveau :</p>
-        <p>Les booléens <span>true</span> et <span>false</span>.</p>
-        <p>La "valeur vide" : <span>nil</span>.</p>
-        <p>Une référence vers l'objet courant : <span>self</span>.</p>
-        <p>Le nom du fichier courant : <span>__FILE__</span>.</p>
-        <p>Le numéro de la ligne courante : <span>__LINE__</span>.</p>
+        <p>Les booléens <span><b>true</b></span> et <span><b>false</b></span>.</p>
+        <p>La "valeur vide" : <span><b>nil</b></span>.</p>
+        <p>Une référence vers l'objet courant : <span><b>self</b></span>.</p>
+        <p>Le nom du fichier courant : <span><b>__FILE__</b></span>.</p>
+        <p>Le numéro de la ligne courante : <span><b>__LINE__</b></span>.</p>
 
         <p class="back"><a href="#sommaire">Retour sommaire</a></p>
 
@@ -392,17 +408,17 @@
             <tr>
                 <td> Faux </td>
                 <td> FalseClass </td>
-                <td> <strong>false</strong> </td>
+                <td> <b>false</b> </td>
             </tr>
             <tr>
                 <td> Vrai </td>
                 <td> TrueClass </td>
-                <td> <strong>true</strong> </td>
+                <td> <b>true</b> </td>
             </tr>
         </tbody>
         </table>
         <ul>
-            <li>Dans les tests, toutes les valeurs autres que <strong>false</strong> et <strong>nil</strong> sont vraies (dont <strong>0</strong>).</li>
+            <li>Dans les tests, toutes les valeurs autres que <b>false</b> et <b>nil</b> sont vraies (dont <b>0</b>).</li>
         </ul>
 
         <h3 id="range">Type intervalle</h3>
@@ -432,7 +448,7 @@
             <tr>
                 <td> Vide / nul </td>
                 <td> NilClass </td>
-                <td> <strong>nil</strong> </td>
+                <td> <b>nil</b> </td>
             </tr>
         </tbody>
         </table>
@@ -486,7 +502,7 @@
                 <td> retourne le dernier élément et l'enlève </td>
             </tr>
             <tr>
-                <td> member? <strong>in</strong> include? </td>
+                <td> member? <b>in</b> include? </td>
                 <td> contient l'élément </td>
             </tr>
             <tr>
@@ -720,6 +736,10 @@
                 <td> Appel de méthode </td>
                 <td> <em>objet</em>.<em>message</em> </td>
             </tr>
+            <tr>
+                <td> Accès à une constante définie dans un module ou une classe </td>
+                <td> <em>identifiant</em>::<em>constante</em> </td>
+            </tr>
         </tbody>
         </table>
         <p>La méthode eql? teste à la fois la valeur et le type des 2 objets comparés. Ainsi <span>2.0 == 2</span> est vrai mais <span>2.0.eql?(2)</span> retournera faux.</p>
@@ -735,7 +755,7 @@
             </tr>
             <tr>
                 <td> Mathématique </td>
-                <td> - </td>
+                <td> + - </td>
             </tr>
             <tr>
                 <td> Logique </td>
@@ -745,9 +765,22 @@
                 <td> Définition </td>
                 <td> defined? <em>identifiant</em> </td>
             </tr>
+            <tr>
+                <td> Résolution de portée </td>
+                <td> ::<em>identifiant</em> </td>
+            </tr>
         </tbody>
         </table>
-        <p>defined? retourne <span>nil</span> si l'identifiant ne correspond à aucune variable, la chaîne "local-variable" s'il correspond à une variable locale, "constant" s'il correspond à une constante, et "global-variable" s'il correspond à une variable globale.</p>
+        <p><span><b>defined?</b></span> retourne <span><b>nil</b></span> si l'identifiant ne correspond à aucune variable, la chaîne "local-variable" s'il correspond à une variable locale, "constant" s'il correspond à une constante, et "global-variable" s'il correspond à une variable globale.</p>
+        <p>L'opérateur de résolution de portée sert lorsqu'une constante à l'intérieur d'un module porte le même nom qu'une constante d'une plus grande portée. Pour pouvoir accéder à la constante qui a la portée la plus grande, on la précède de <span>::</span> :</p>
+        <div class="code">
+            Bonjour = 0<br>
+            <b>module</b> Cache<br>
+            &nbsp;&nbsp;Bonjour = 22<br>
+            &nbsp;&nbsp;puts Bonjour <i># affichera 22</i><br>
+            &nbsp;&nbsp;puts ::Bonjour <i># affichera 0</i><br>
+            <b>end</b><br>
+        </div>
         
         <h3 id="op_ter">Opérateur ternaire</h3>
         <table>
@@ -758,10 +791,47 @@
             </tr>
             <tr>
                 <td> Opérateur ternaire </td>
-                <td> <em>expression</em> <strong>?</strong> <em>action si vrai</em> <strong>:</strong> <em>action si faux</em> </td>
+                <td> <em>expression</em> <b>?</b> <em>action si vrai</em> <b>:</b> <em>action si faux</em> </td>
             </tr>
         </tbody>
         </table>
+        
+        <h3 id="op_precedence">Précédence des opérateurs</h3>
+        <p>Voici les opérateurs du plus prioritaire au moins prioritaire (les opérateurs sur la même ligne ont la même précédence) :</p>
+        <table>
+        <tbody>
+            <tr><td>::</td></tr>
+            <tr><td>[] []=</td></tr>
+            <tr><td>**</td></tr>
+            <tr><td>! ~ + (unaire) - (unaire)</td></tr>
+            <tr><td>* / %</td></tr>
+            <tr><td>+ -</td></tr>
+            <tr><td>&gt;&gt; &lt;&lt;</td></tr>
+            <tr><td>&amp;</td></tr>
+            <tr><td>^ |</td></tr>
+            <tr><td>&lt;= &lt; &gt; &gt;=</td></tr>
+            <tr><td>&lt;=&gt; == === != =~ !~</td></tr>
+            <tr><td>&&</td></tr>
+            <tr><td>||</td></tr>
+            <tr><td>.. ...</td></tr>
+            <tr><td>? : (ternaire)</td></tr>
+            <tr><td>= %= { /= -= += |= &= &gt;&gt;= &lt;&lt;= *= &&= ||= **=</td></tr>
+            <tr><td><b>defined?</b></td></tr>
+            <tr><td><b>not</b></td></tr>
+            <tr><td><b>or and</b></td></tr>
+        </tbody>
+        </table>
+        
+        <h3 id="op_redef">Redéfinition d'opérateur</h3>
+        <p>Les opérateurs ::, [], []=, **, !, ~, +, -, * / %,  >>, <<, &, |, ^, <=, <, >, >=, <=>, ==, ===, !=, =~, !~ sont des fonctions et peuvent donc être redéfinies, changeant ainsi le comportement des opérateurs :</p>
+        <div class="code">
+          <b>def</b> +(a)<br>
+          &nbsp;&nbsp;<i># votre code ici</i><br>
+          <b>end</b>
+        </div>
+        <p>Attention, rappelez vous que a + b et b + a ne sont pas équivalent. Le premier correspond à a.+(b) et le second à b.+(a). Si a et b ne sont pas du même type, vérifiez bien où vous redéfinissez l'opérateur.</p>
+        <p>Pour faire la différence entre les opérateurs unaires + et -, lorsque l'on redéfinit ceux-ci il faut employer +@ et -@</p>
+        
         <p class="back"><a href="#sommaire">Retour sommaire</a></p>
         
         <h2 id="flux">Contrôle du flux</h2>
@@ -779,57 +849,57 @@
         <h3 id="cond">Conditions</h3>
     
         <div class="code">
-            <p><strong>if</strong> condition [ <strong>then</strong> ]<br />
+            <p><b>if</b> condition [ <b>then</b> ]<br />
             &nbsp;&nbsp; actions<br />
-            [ <strong>elsif</strong> condition [ <strong>then</strong> ]<br />
-            &nbsp;&nbsp; actions ] <strong>*</strong><br />
-            [ <strong>else</strong><br />
-            &nbsp;&nbsp; actions ] <strong>?</strong><br />
-            <strong>end</strong></p>
+            [ <b>elsif</b> condition [ <b>then</b> ]<br />
+            &nbsp;&nbsp; actions ] <b>*</b><br />
+            [ <b>else</b><br />
+            &nbsp;&nbsp; actions ] <b>?</b><br />
+            <b>end</b></p>
         </div>
         <div class="code">
-            <p>action [ <strong>if</strong> condition ]</p>
+            <p>action [ <b>if</b> condition ]</p>
         </div>
         <div class="code">
-            <p><strong>unless</strong> condition [ <strong>then</strong> ]<br />
+            <p><b>unless</b> condition [ <b>then</b> ]<br />
             &nbsp;&nbsp; actions<br />
-            [ <strong>else</strong><br />
-            &nbsp;&nbsp; actions ] <strong>?</strong><br />
-            <strong>end</strong></p>
+            [ <b>else</b><br />
+            &nbsp;&nbsp; actions ] <b>?</b><br />
+            <b>end</b></p>
         </div>
         <div class="code">
-            <p>action [ <strong>unless</strong> condition ]</p>
+            <p>action [ <b>unless</b> condition ]</p>
         </div>
         <br>
         
         <h3 id="loop">Répétitions</h3>
 
         <div class="code">
-            <p><strong>while</strong> condition [ <strong>do</strong> ]<br />
+            <p><b>while</b> condition [ <b>do</b> ]<br />
             &nbsp;&nbsp; actions<br />
-            <strong>end</strong></p>
+            <b>end</b></p>
         </div>
         <div class="code">
-            <p>action [ <strong>while</strong> condition ]</p>
+            <p>action [ <b>while</b> condition ]</p>
         </div>
         <div class="code">
-            <p><strong>until</strong> condition [ <strong>do</strong> ]<br />
+            <p><b>until</b> condition [ <b>do</b> ]<br />
             &nbsp;&nbsp; actions<br />
-            <strong>end</strong></p>
+            <b>end</b></p>
         </div>
         <div class="code">
-            <p>action [ <strong>until</strong> condition ]</p>
+            <p>action [ <b>until</b> condition ]</p>
         </div>
         <div class="code">
-            <p><strong>for</strong> identifiant <strong>in</strong> expression [ <strong>do</strong> ]<br />
+            <p><b>for</b> identifiant <b>in</b> expression [ <b>do</b> ]<br />
             &nbsp;&nbsp; actions<br />
-            <strong>end</strong></p>
+            <b>end</b></p>
         </div>
         <div class="code">
-            <strong>next</strong>  <i># Passage à l'itération suivante</i>
+            <b>next</b>  <i># Passage à l'itération suivante</i>
         </div>
         <div class="code">
-            <strong>break</strong>  <i># Quitte la boucle</i>
+            <b>break</b>  <i># Quitte la boucle</i>
         </div>
         <div class="code">
             <i># Ruby propose des méthodes pour itérer sur un objet</i><br>
@@ -848,15 +918,15 @@
         <h3 id="fun">Fonctions</h3>
         
         <div class="code">
-            <p><strong>def</strong> identifiant [ ( par [, _par_] <strong>*</strong> ) ]<br />
+            <p><b>def</b> identifiant [ ( par [, _par_] <b>*</b> ) ]<br />
             &nbsp;&nbsp; actions<br />
-            <strong>end</strong></p>
+            <b>end</b></p>
         </div>
         <div class="code">
-            <strong>return</strong> [ expression ]  <i># Quitte la fonction</i>
+            <b>return</b> [ expression ]  <i># Quitte la fonction</i>
         </div>
         <div class="code">
-            [ objet <strong>.</strong> ] identifiant [ ( paramètres ) ]  <i># Appel de fonction</i>
+            [ objet <b>.</b> ] identifiant [ ( paramètres ) ]  <i># Appel de fonction</i>
         </div>
         <div class="code">
             * tuple  <i># Fracturation d'un tuple pour passage différents en arguments</i>
@@ -865,32 +935,32 @@
         <h3 id="cls">Classes</h3>
         
         <div class="code">
-            <strong>class</strong> identifiant [ &lt; parent ]<br>
+            <b>class</b> identifiant [ &lt; parent ]<br>
             &nbsp;&nbsp; actions<br>
-            <strong>end</strong>
+            <b>end</b>
         </div>
         <div class="code">
-            <strong>self</strong>  <i># L'instance elle-même</i>
+            <b>self</b>  <i># L'instance elle-même</i>
         </div>
         <div class="code">
-            <strong>super</strong>  <i># Pour accéder aux fonctions du parent</i>
+            <b>super</b>  <i># Pour accéder aux fonctions du parent</i>
         </div>
         <div class="code">
-            nom_classe <strong>.</strong> new [ ( paramètres ) ]  <i>Création d'une instance</i>
+            nom_classe <b>.</b> new [ ( paramètres ) ]  <i>Création d'une instance</i>
         </div>
         
         <h3 id="mod">Modules</h3>
         
         <div class="code">
-            <strong>module</strong> identifiant<br>
+            <b>module</b> identifiant<br>
             &nbsp;&nbsp; actions<br>
-            <strong>end</strong>
+            <b>end</b>
         </div>
         <div class="code">
-            <strong>require</strong>  <i># Exige un module</i>
+            <b>require</b>  <i># Exige un module</i>
         </div>
         <div class="code">
-            <strong>include</strong>  <i># Inclus les éléments du module dans l'espace de nom actuel</i>
+            <b>include</b>  <i># Inclus les éléments du module dans l'espace de nom actuel</i>
         </div>
         <p class="back"><a href="#sommaire">Retour sommaire</a></p>
         
@@ -900,32 +970,71 @@
         
         <p>Pour gérer une exception il suffit d'ajouter un ou plusieurs blocs <span>rescue</span> à un bloc <span>begin / end</span>.</p>
         <div class="code">
-            <strong>begin</strong><br>
+            <b>begin</b><br>
             &nbsp;&nbsp; actions<br>
-            <strong>rescue</strong> [ identifiant_type [=> identifiant_variable] ]<br>
+            <b>rescue</b> [ identifiant_type [=> identifiant_variable] ]<br>
             &nbsp;&nbsp; actions<br>
-            [ <strong>else</strong>
+            [ <b>else</b>
             &nbsp;&nbsp; actions ]<br>
-            [ <strong>ensure</strong><br>
+            [ <b>ensure</b><br>
             &nbsp;&nbsp; actions ]<br>
-            <strong>end</strong>
+            <b>end</b>
         </div>
-        <p>L'identifiant passé en paramètre du <span>rescue</span> indique le type d'exception capturée (ainsi que ses sous-classes) par la clause rescue.</p>
-        <p>Si l'exception ne correspond pas à un des identifiants attendus par les clauses rescue, le code dans la clause <span>else</span> sera exécuté.</p>
-        <p>La clause <span>ensure</span>indique du code qui sera toujours exécuté à la fin, qu'il y ait eu une exception ou pas, et même s'il y a un <span>return</span> dans le bloc initial.</p>
+        <p>L'identifiant passé en paramètre du <span><b>rescue</b></span> indique le type d'exception capturée (ainsi que ses sous-classes) par la clause rescue.</p>
+        <p>Si l'exception ne correspond pas à un des identifiants attendus par les clauses rescue, le code dans la clause <span><b>else</b></span> sera exécuté.</p>
+        <p>La clause <span><b>ensure</b></span>indique du code qui sera toujours exécuté à la fin, qu'il y ait eu une exception ou pas, et même s'il y a un <span><b>return</b></span> dans le bloc initial.</p>
         <p>Pour lever une exception :</p>
         <div class="code">
-            <strong>raise</strong><br>
-            <strong>raise</strong> <i>chaîne</i><br>
-            <strong>raise</strong> <i>Type, chaîne</i>
+            <b>raise</b><br>
+            <b>raise</b> <em>chaîne</em><br>
+            <b>raise</b> <em>Type, chaîne</em>
         </div>
         <p>Le type de base des exceptions dans les cas 1 et 2 est <span>RuntimeError</span>.
-        <p>La variable globale <span>$!</span> contient le message de la dernière exception levée ou <span>nil</span> s'il n'y en avait pas.</p>
-        <p>Ruby permet aussi dans une clause <span>rescue</span> de reprendre l'exécution à partir du begin avec le mot clé <span>retry</span> :
+        <p>La variable globale <span>$!</span> contient le message de la dernière exception levée ou <span><b>nil</b></span> s'il n'y en avait pas.</p>
+        <p>Ruby permet aussi dans une clause <span><b>rescue</b></span> de reprendre l'exécution à partir du begin avec le mot clé <span><b>retry</b></span> :
         <div class="code">
-            <strong>retry</strong>
+            <b>retry</b>
         </div>
-        <p>Attention aux boucles infinies avec <span>retry</span>! La puissance vient avec son prix !</p>
+        <p>Attention aux boucles infinies avec <span><b>retry</b></span>! La puissance vient avec son prix !</p>
+        
+        <h3 id="exp_type">Type d'exceptions</h3>
+        <p>Les classes d'exception descendent toutes de <span>Exception</span>. Elle a 7 classes filles : Interrupt, NoMemoryError, SignalException, ScriptError, StandardError, SystemExit. RuntimeError est une classe fille de StandardError.</p>
+        <p>On peut bien sûr définir nos propres classes d'exception :</p>
+        <div class="code">
+            <b>class</b> MonException &lt; StandardError<br>
+            &nbsp;&nbsp;<b>def</b> initialize(reason)<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;@reason = reason<br>
+            &nbsp;&nbsp;<b>end</b><br>
+            <b>end</b>
+        </div>
+        <p>On l'a lèvera en déclarant une nouvelle instance :</p>
+        <div class="code">
+            <b>raise</b> MonException.new(<em>"motif de l'erreur"</em>)
+        </div>
+        
+        <h3 id="exp_throw">Catch et throw</h3>
+        <p>En plus ce que nous venons de voir, Ruby propose un modèle pour dépiler la pile jusqu'à un point précis. On définit déjà une étiquette pour un bloc avec <span><b>catch</b></span>. Si on utilise <span><b>throw</b></span> dans ce bloc ou dans une fonction appelée dans ce bloc, Ruby interrompra l'exécution du bloc, dépilera jusqu'à son début et le sautera.</p>
+        <div class="code">
+            a = "abc"<br>
+            <b>catch</b> :reviens <b>do</b><br>
+            &nbsp;&nbsp;a.upcase!<br>
+            &nbsp;&nbsp;<b>throw</b> :reviens, 0<br>
+            &nbsp;&nbsp;<i># code jamais exécuté</i><br>
+            <b>end</b>
+        </div>
+        <p>Le second paramètre optionnel après le throw est la valeur qui sera retournée (comme toute instruction en Ruby est évaluable, le bloc catch l'est aussi). S'il n'est pas fourni, <span><b>nil</b></span> sera retourné.</p>
+        <div class="code">
+            <b>throw</b> <em>:symbole</em><br>
+            <b>throw</b> <em>"chaîne"</em><br>
+            <b>throw</b> <em>:symbole</em>, <em>expression</em><br>
+            <b>throw</b> <em>"chaîne"</em>, <em>expression</em>
+        </div>
+        <p>De même, <span><b>catch</b></span> peut s'utiliser avec un symbole ou une chaîne :</p>
+        <div class="code">
+            <b>catch</b> <em>:symbole</em><br>
+            <b>catch</b> <em>"chaîne"</em><br>
+        </div>
+        
         <p class="back"><a href="#sommaire">Retour sommaire</a></p>
         
         <h2 id="utiles">Utiles</h2>
