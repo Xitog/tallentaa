@@ -25,3 +25,33 @@ begin
     puts "hello"
     puts "world"
 end if a != 5
+
+$LOAD_PATH << '.'
+require "mod_rb"
+name = "mod_rb"
+require name
+puts Mod
+
+module Bob
+    ConsBob = 6
+end
+puts Bob::ConsBob
+include Bob
+puts ConsBob
+
+module Mix
+    def display
+        puts @val
+    end
+end
+
+class Test
+    include Mix
+    def initialize(val)
+        @val = val
+    end
+end
+
+t = Test.new(55)
+t.display
+Mix.display

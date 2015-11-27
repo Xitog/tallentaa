@@ -45,12 +45,17 @@
             border: 1px solid #AAA;
             border-collapse: collapse; 
             border-spacing: 0;
+            width: 100%;
         }
         th {
             border-bottom: 1px solid #AAA;
         }
         tr:nth-child(odd) {
             background: #DDDDDD;
+        }
+        td:nth-child(odd) {
+            font-family: "Consolas";
+            width: 30%;
         }
         
         p.back {
@@ -187,7 +192,12 @@
             </ol></li>
             <li><a href="#elem_fun">Fonctions</a></li>
             <li><a href="#elem_class">Classes</a></li>
-            <li><a href="#elem_mod">Modules</a></li>
+            <li><a href="#elem_mod">Modules</a>
+            <ol>
+                <li><a href="#mod_mod">Définition d'un module</a></li>
+                <li><a href="#mod_mod">Inclusion des éléments d'un module</a></li>
+                <li><a href="#mod_req">Code réparti sur plusieurs fichiers</a></li>
+            </ol></li>
             <li><a href="#spe">Gestion des exceptions</a>
             <ol>
                 <li><a href="#exp">Exceptions</a></li>
@@ -218,7 +228,12 @@
 
         <h3 id="bas_com">Commentaires</h3>
         <p>Commentaires en Ruby : <span><i># mon commentaire jusqu'à la fin de la ligne</i></span></p>
-        <p>Commentaires sur plusieurs lignes : <span>=begin <i>vos lignes</i> =end</span></p>
+        <p>Commentaires sur plusieurs lignes : 
+        <div class="code">
+            <b>=begin</b><br>
+            <i>&nbsp;&nbsp;vos lignes</i><br>
+            <b>=end</b>
+        </div>
 
         <h3 id="bas_beg">BEGIN et END</h3>
         <p>Déclarer un bloc de code exécuté avant l'exécution du programme : <span><b>BEGIN</b> { <i>code</i> }</span></p>
@@ -417,17 +432,14 @@
         <table>
         <tbody>
             <tr>
-                <th>Nom </th>
                 <th>Classe </th>
                 <th>Littéral </th>
             </tr>
             <tr>
-                <td> Faux </td>
                 <td> FalseClass </td>
                 <td> <b>false</b> </td>
             </tr>
             <tr>
-                <td> Vrai </td>
                 <td> TrueClass </td>
                 <td> <b>true</b> </td>
             </tr>
@@ -454,15 +466,14 @@
         <p>En utilisant trois points, la valeur b est exclue.</p>
 
         <h3 id="void">Type "vide"</h3>
+        <p>Il représente l'absence de référence. Une variable qui est égale à <span>nil</span> ne référence rien.</p>
         <table>
         <tbody>
             <tr>
-                <th>Nom </th>
                 <th>Classe </th>
                 <th>Littéral </th>
             </tr>
             <tr>
-                <td> Vide / nul </td>
                 <td> NilClass </td>
                 <td> <b>nil</b> </td>
             </tr>
@@ -470,6 +481,9 @@
         </table>
 
         <h3 id="list">Type liste</h3>
+        <p>Le premier élément d'une liste en Ruby a 0 pour indice.</p>
+        <p>Le dernier élément d'une liste en Ruby à n-1 pour indice, où n est le nombre d'élément de la liste.</p>
+        <p>Un indice négatif signifie que l'on part de la fin : -1 désigne le dernier élément dans ce cas et -n, le premier élément de la liste, où n est le nombre d'élément de la liste.</p>
         <table>
         <tbody>
             <tr>
@@ -482,7 +496,23 @@
             </tr>
         </tbody>
         </table>
-        <p>Listes des fonctions principales (<a href="http://ruby-doc.org/core-2.2.0/Array.html">Array</a>, <a href="http://ruby-doc.org/core-2.2.0/Enumerable.html">Enumerable</a>) :</p>
+        <p>La méthode de classe <span>new</span> permet de créer une nouvelle liste :</p>
+        <div class="code">
+            liste1 = Array.new <i># liste1 aura 0 élément</i><br>
+            liste2 = Array.new(5) <i># liste2 aura 5 éléments nil</i><br>
+            liste3 = Array.new(3, "a") <i># liste3 aura 3 éléments "a"</i><br>
+            liste4 = Array.[]("a", "b", "c") <i># liste4 aura 3 éléments</i><br>
+            liste5 = Array["a", "b", "c"] <i># liste5 aura 3 éléments</i><br>
+            liste6 = Array(0..2) <i># liste6 aura 3 éléments : 0, 1, 2</i><br>
+            <i># liste7 aura 4 éléments égaux à 0, 3, 6, 9. i est l'indice qui sera donné en paramètre au bloc :</i><br>
+            liste7 = Array.new(4) { |i| i = i * 3 }<br> 
+        </div>
+        <p>La classe <span>Array</span> inclut le module <span>Enumerable</span></p>
+        <p>Fonctions d'accès : </p>
+        <!--
+        <a href="http://ruby-doc.org/core-2.2.0/Array.html">Array</a>
+        <a href="http://ruby-doc.org/core-2.2.0/Enumerable.html">Enumerable</a>
+        -->
         <table>
         <tbody>
             <tr>
@@ -490,132 +520,369 @@
                 <th>Description </th>
             </tr>
             <tr>
-                <td> l[ <em>index</em> ] </td>
-                <td> accès à la valeur à l'<em>index</em> </td>
+                <td> a[i], a.slice(i), a.at(i)</td>
+                <td> accès à la valeur à l'indice i. Si l'indice ne correspond à aucun élément, nil est retourné. </td>
             </tr>
             <tr>
-                <td> l[ -1 ] </td>
-                <td> accès au dernier élément </td>
+                <td> a.fetch(i) </td>
+                <td> accès à l'objet référencé par l'indice i. Si l'indice n'est pas valide, une exception de type IndexError est levée </td>
             </tr>
             <tr>
-                <td> + </td>
-                <td> concaténation entre deux listes </td>
+                <td> a.fetch(i, v) </td>
+                <td> accès à l'objet référencé par l'indice i. Si l'indice n'est pas valide, v est retournée </td>
             </tr>
             <tr>
-                <td> &lt;&lt; </td>
-                <td> ajout d'un élément </td>
+                <td> a.fetch(i) { |i| actions } </td>
+                <td> accès à l'objet référencé par l'indice i. Si l'indice n'est pas valide, le résultat du bloc, auquel est passé l'indice en paramètre, est retourné </td>
+            </tr>
+            
+            <tr>
+                <td> a[-1] </td>
+                <td> accès au dernier élément. Si l'indice ne correspond à aucun élément, nil est retourné. </td>
             </tr>
             <tr>
-                <td> insert </td>
-                <td> insère à l'index l'élément </td>
+                <td> a.first </td>
+                <td> retourne le premier élément de la liste a ou nil si la liste est vide </td>
             </tr>
             <tr>
-                <td> shift </td>
-                <td> retourne le premier élément et l'enlève </td>
+                <td> a.first(n) </td>
+                <td> retourne les n premiers éléments de la liste a </td>
             </tr>
             <tr>
-                <td> pop </td>
+                <td> a.last </td>
+                <td> retourne le dernier élément de la liste a ou nil si la liste est vide </td>
+            </tr>
+            <tr>
+                <td> a.first(n) </td>
+                <td> retourne les n derniers éléments de la liste a </td>
+            </tr>
+            <tr>
+                <td> a.slice(s, n), a[s, n] </td>
+                <td> renvoie une nouvelle liste constituée des éléments de la liste a à partir de l'indice s jusqu'à (s+n)-1. </td>
+            </tr>
+            <tr>
+                <td> a.slice(x..y), a[x..y] </td>
+                <td> renvoie nouvelle liste constituée des éléments d'indice x à y dans a </td>
+            </tr>
+            <tr>
+                <td> a.slice(x...y), a[x...y] </td>
+                <td> renvoie nouvelle liste constituée des éléments d'indice x à y-1 dans a </td>
+            </tr>
+            <tr>
+                <td> a.find(o), a.detect(o), a.indexOf(o), a.index(o), a.search(o) </td>
+                <td> retourne le premier indice référençant l'objet o dans la liste a </td>
+            </tr>
+            <tr>
+                <td> a.rindex(o) </td>
+                <td> retourne le dernier indice référençant l'objet o dans la liste a </td>
+            </tr>
+            <tr>
+                <td> a.find_all { |o| actions }, a.select { |o| actions } </td>
+                <td> retourne une nouvelle liste avec tous les éléments pour lesquels le bloc, auquel on passe l'élément, retourne vrai </td>
+            </tr>
+            <tr>
+                <td> a.reject {|o| block } </td>
+                <td> retourne une nouvelle liste contenant chaque élément de a pour lequel le bloc qui le prend en paramètre est faux </td>
+            </tr>
+            <tr>
+                <td> a.values_at(filter, ...) </td>
+                <td> retourne les éléments de a correspondant au filtre filter qui peut être des indices ou des objets Range.</td>
+            </tr>
+        </tbody>
+        </table>
+        <p>Fonctions d'affectation et d'insertion : </p>
+        <table>
+        <tbody>
+            <tr>
+                <th>Fonction </th>
+                <th>Description </th>
+            </tr>
+            <tr>
+                <td> a[i] = e </td>
+                <td> l'indice i de la liste référencera à présent l'objet e </td>
+            </tr>
+            <tr>
+                <td> a[i, n] = e</td>
+                <td> tous les indices entre i et (i+n)-1 référenceront à présent l'objet e.<br> Si n est égal à zéro, un indice référençant l'élément e sera ajouté à la liste (comme insert) </td>
+            </tr>
+            <tr>
+                <td> a[i, n] = b </td>
+                <td> tous les indices entre i et (i+n)-1 référenceront à présent l'objet de même indice dans la liste b.<br> Si la liste b est trop petite, <strong>la liste a sera raccourcie</strong> </td>
+            </tr>
+            <tr>
+                <td> a.insert(i, o) </td>
+                <td> insère dans la liste juste avant l'indice i un nouvel indice qui référencera l'objet o et deviendra le nouvel indice i </td>
+            </tr>
+            <tr>
+                <td> a.fill(o) </td>
+                <td> tous les indices de la liste a référenceront l'objet o </td>
+            </tr>
+            <tr>
+                <td> a.fill(o, s), a.fill(o, s, n) </td>
+                <td> les indices de la liste a de s à la fin, ou de s à (s+n)-1 si n est spécifié, référenceront l'objet o </td>
+            </tr>
+            <tr>
+                <td> a.fill(o, x..y) </td>
+                <td> les indices de x à y de la liste a référenceront l'objet o </td>
+            </tr>
+            <tr>
+                <td> a.fill { |i| actions }, a.fill(s) { |i| actions }, a.fill(s, n) { |i| actions }, a.fill(x..y) { |i| actions } </td>
+                <td> les indices spécifiés référenceront le résultat du bloc auquel l'indice sera passé en paramètre </td>
+            </tr>
+            <tr>
+                <td> a.replace(b) </td>
+                <td> remplace les éléments de a par ceux de b (cela réaffecte a une nouvelle liste) </td>
+            </tr>
+            <tr>
+                <td> a.unshift(o, ...) </td>
+                <td> ajoute un ou plusieurs éléments au début de la liste et retourne la liste </td>
+            </tr>
+            <tr>
+                <td> a.push(o, ...) </td>
+                <td> ajoute un ou plusieurs éléments à la fin de la liste et retourne la liste </td>
+            </tr>
+        </tbody>
+        </table>
+        <p>Fonctions de suppression :</p>
+        <table>
+        <tbody>
+            <tr>
+                <td> a.clear </td>
+                <td> efface toute la liste, sa longueur sera égale à 0 après.  Cette fonction modifie a, même si elle n'a pas de ! </td>
+            </tr>
+            <tr>
+                <td> a.delete_at(i) </td>
+                <td> supprime l'indice i en retournant l'objet à qui il faisait référence. Si l'indice est invalide, nil est retourné.  Cette fonction modifie a, même si elle n'a pas de ! </td>
+            </tr>
+            <tr>
+                <td> a.delete(o) </td>
+                <td> supprime tous les indices référençant o. <strong>Si aucun n'est trouvé, retourne nil. Cette fonction modifie a, même si elle n'a pas de !</strong> </td>
+            </tr>
+            <tr>
+                <td> a.delete(o) { actions } </td>
+                <td> supprime tous les indices référençant o. <strong>Si aucun n'est trouvé, retourne le résultat du bloc qui n'est pas exécuté sinon. Cette fonction modifie a, même si elle n'a pas de !</strong> </td>
+            </tr>
+            <tr>
+                <td> a.delete_if { |o| actions } </td>
+                <td> supprime tous les indices pour lequel le bloc, auquel on passe l'objet référencé par l'indice, retourne vrai. Cette fonction modifie a, même si elle n'a pas de ! </td>
+            </tr>
+            <tr>
+                <td> a.reject! {|o| block } </td>
+                <td> supprime dans a chaque élément pour lequel le bloc qui le prend en paramètre est vrai, équivalent à delete_if </td>
+            </tr>
+            <tr>
+                <td> array.slice!(index), array.slice!(s, n), array.slice!(x..y), array.slice!(x...y)</td>
+                <td> supprime les éléments spécifiés </td>
+            </tr>
+        </tbody>
+        </table>
+        <p>Fonctions de tests et d'information :</p>
+        <table>
+        <tbody>
+            <tr>
+                <td> a == b </td>
+                <td> vrai si a et b ont la même longueur et a[i] == b[i] pour i compris entre 0 et la longueur-1.</td>
+            </tr>
+            <tr>
+                <td> a.member?(o), o <b>in</b> a, a.include?(o) </td>
+                <td> vrai si a contient un indice référençant l'objet o </td>
+            </tr>
+            <tr>
+                <td> a.any? </td>
+                <td> vrai si a contient au moins 1 indice référençant un objet <strong>autre que nil</strong></td>
+            </tr>
+            <tr>
+                <td> a.all?(o) </td>
+                <td> vrai si tous les indices de a référencent l'objet o </td>
+            </tr>
+            <tr>
+                <td> a.empty? </td>
+                <td> vrai si la longueur de la liste a est égale à 0 </td>
+            </tr>
+            <tr>
+                <td> a.eql?(b) </td>
+                <td> vrai si a et b sont le même objet ou sont deux listes contenant les mêmes références </td>
+            </tr>
+            <tr>
+                <td> a.size, a.length </td>
+                <td> retourne la taille de la liste a </td>
+            </tr>
+            <tr>
+                <td> a.nitems </td>
+                <td> retourne le nombre d'éléments non égal à nil dans la liste a </td>
+            </tr>
+            <tr>
+                <td> a.min </td>
+                <td> retourne l'élément minimal de la liste a (tous les éléments doivent pouvoir être comparés) </td>
+            </tr>
+            <tr>
+                <td> a.max </td>
+                <td> retourne l'élément maximal de la liste a (tous les éléments doivent pouvoir être comparés)  </td>
+            </tr>
+        </tbody>
+        </table>
+        <p>Liste des autres fonctions principales :</p>
+        <table>
+        <tbody>
+            <tr>
+                <th>Fonction </th>
+                <th>Description </th>
+            </tr>
+            <tr>
+                <td> a + b, a | b, a.concat(b) </td>
+                <td> retourne une nouvelle liste qui est la concaténation de a et b </td>
+            </tr>
+            <tr>
+                <td> a - b </td>
+                <td> retourne une nouvelle liste qui contient les éléments de a ne figurant pas dans b </td>
+            </tr>
+            <tr>
+                <td> a * i </td>
+                <td> si i est un entier, retourne une nouvelle liste qui est la concaténation de i fois a </td>
+            </tr>
+            <tr>
+                <td> a * abc </td>
+                <td> si abc est une chaîne, retourne une nouvelle chaîne qui est la concaténation des éléments de a séparés par abc. Équivalent de join.</td>
+            </tr>
+            <tr>
+                <td> a & b</td>
+                <td> renvoie une nouvelle liste contenant les éléments communs à a et b</td>
+            </tr>
+            <tr>
+                <td> a &lt;&lt; e </td>
+                <td> ajout d'un élément e dans l1 </td>
+            </tr>
+            <tr>
+                <td> a &lt;=&gt; b </td>
+                <td> passe les éléments a et b à l'opérateur <=> un à un. S'arrête dès que le résultat est différent de 0 (donc à la première différence) et retourne le résultat </td>
+            </tr>
+            <tr>
+                <td> a.shift </td>
+                <td> retourne le premier élément et l'enlève. retourne nil si la liste a est vide </td>
+            </tr>
+            <tr>
+                <td> a.pop </td>
                 <td> retourne le dernier élément et l'enlève </td>
             </tr>
             <tr>
-                <td> member? <b>in</b> include? </td>
-                <td> contient l'élément </td>
-            </tr>
-            <tr>
-                <td> any? </td>
-                <td> vrai si au moins 1 élément correspond </td>
-            </tr>
-            <tr>
-                <td> all? </td>
-                <td> vrai si tous les éléments correspondent </td>
-            </tr>
-            <tr>
-                <td> min </td>
-                <td> élément minimal </td>
-            </tr>
-            <tr>
-                <td> max </td>
-                <td> élément maximal </td>
-            </tr>
-            <tr>
-                <td> size length </td>
-                <td> taille de la liste </td>
-            </tr>
-            <tr>
-                <td> reverse </td>
+                <td> a.reverse </td>
                 <td> donne la liste inversée </td>
             </tr>
             <tr>
-                <td> flatten </td>
-                <td> si la liste contient des listes, elles seront toutes fusionnées en une seule liste </td>
+                <td> a.reverse! </td>
+                <td> inverse l'ordre des éléments de a </td>
             </tr>
             <tr>
-                <td> slice </td>
-                <td> renvoie une partie de la liste </td>
+                <td> a.flatten </td>
+                <td> si la liste contient des listes, elles seront toutes fusionnées en la seule liste qui sera retournée </td>
             </tr>
             <tr>
-                <td> unshift </td>
-                <td> ajoute un ou plusieurs éléments au début de la liste </td>
+                <td> a.flatten! </td>
+                <td> si la liste contient des listes, elles seront toutes fusionnées au sein de la liste a. Retourne nil si aucune modification n'est faite </td>
             </tr>
             <tr>
-                <td> push </td>
-                <td> ajoute à la fin de la liste </td>
+                <td> a.frozen? </td>
+                <td> retourne vrai si la liste ne peut être modifiée (soit par l'appel de la fonction freeze, soit durant un tri de façon temporaire) </td>
             </tr>
             <tr>
-                <td> each </td>
-                <td> parcours chaque élément de la liste </td>
+                <td> a.hash </td>
+                <td> retourne une valeur unique selon le contenu de la liste. Deux listes avec le même contenu auront la même valeur </td>
             </tr>
             <tr>
-                <td> map collect </td>
-                <td> invoque le bloc pour chaque élément et collecte le résultat dans une nouvelle liste </td>
+                <td> a.each { |o| actions } </td>
+                <td> parcours chaque élément de la liste a en le passant en paramètre du bloc </td>
             </tr>
             <tr>
-                <td> find detect indexOf index search </td>
-                <td> Retourne l'index du premier élément pour lequel le bloc est vrai ou qui est égal à la valeur passer en paramètre </td>
+                <td> a.reverse_each { |o| actions } </td>
+                <td> parcours chaque élément de la liste a en ordre inverse en le passant en paramètre du bloc </td>
             </tr>
             <tr>
-                <td> find_all select </td>
-                <td> sélectionne tous les éléments selon le résultat d'un bloc </td>
+                <td> a.each_index { |i| actions } </td>
+                <td> parcours chaque élément de la liste a en passant son indice en paramètre du bloc </td>
+            </tr>
+            <tr>
+                <td> a.compact </td>
+                <td> retourne une nouvelle liste à partir de a en ne reprenant pas les indices qui référencent nil</td>
+            </tr>
+            <tr>
+                <td> a.compact! </td>
+                <td> supprime dans la liste a les indices qui référencent nil. <strong>Retourne nil si aucun n'a été trouvé</strong>, a sinon</td>
+            </tr>
+            <tr>
+                <td> a.map {|o| actions} a.collect {|o| actions} </td>
+                <td> invoque le bloc pour chaque élément de la liste a et collecte les résultats dans une nouvelle liste retournée </td>
+            </tr>
+            <tr>
+                <td> a.map! {|o| actions} a.collect! {|o| actions} </td>
+                <td> remplace chaque élément de la liste a par l'élément retourné par le bloc appelé avec l'objet que référence l'indice en paramètre </td>
             </tr>
             <tr>
                 <td> partition </td>
                 <td> partitionne en deux listes selon le résultat d'un bloc </td>
             </tr>
             <tr>
-                <td> l.join(s) </td>
-                <td> fusionne tous les éléments en y intercalant la chaîne s </td>
-            </tr>
-            <tr>
-                <td> size length </td>
-                <td> taille de la liste</td>
+                <td> a.join(sep) </td>
+                <td> fusionne tous les éléments de la liste a en y intercalant la chaîne sep (pareil que l'opérateur * avec une chaîne) </td>
             </tr>
             <tr>
                 <td> each_with_index </td>
                 <td> parcours la liste avec un bloc recevant l'élément et un index </td>
             </tr>
             <tr>
-                <td> uniq uniq! </td>
-                <td> enlève les éléments en double </td>
+                <td> a.uniq </td>
+                <td> retourne une nouvelle liste en supprimant les éléments en double </td>
             </tr>
             <tr>
-                <td> sort! sort_by </td>
-                <td> trie la liste </td>
+                <td> a.uniq! </td>
+                <td> enlève les éléments en double dans a</td>
             </tr>
             <tr>
-                <td> zip transpose </td>
-                <td> combine des listes entres-elles </td>
+                <td> a.sort, a.sort { |a, b| actions } </td>
+                <td> retourne une nouvelle liste en triant les éléments de la liste a </td>
+            </td>
+            <tr>
+                <td> a.sort, a.sort { |a, b| actions } </td>
+                <td> trie la liste a </td>
+            </td>
+            <tr>
+                <td> a.zip(p, ...), a.zip(p, ...) { |arr| actions } </td>
+                <td> p doit répondre à la méthode each. Associe chaque élément de p à un élément de a et retourne la nouvelle liste ainsi constituée. Si un bloc est fourni, chaque élément ainsi créé sera passé en paramètre au bloc mais la méthode retournera nil </td>
             </tr>
             <tr>
-                <td> assoc </td>
-                <td> regarde s'il trouve un élément dans une liste de listes et retourne la liste le contenant si elle existe </td>
+                <td> a.assoc(o) </td>
+                <td> la liste a doit être une liste de liste. Retourne la première liste (par ordre d'indice) qui se trouve dans a dont le premier élément est une référence vers o. </td>
             </tr>
             <tr>
-                <td> to_a </td>
-                <td> renvoie la liste elle-même </td>
+                <td> a.rassoc(o) </td>
+                <td> la liste a doit être une liste de liste. Retourne la première liste (par ordre d'indice) qui se trouve dans a dont le second élément est une référence vers o. </td>
+            </tr>
+            <tr>
+                <td> a.to_a </td>
+                <td> renvoie la liste elle-même. si cette méthode est appelée sur une instance d'une sous-classe de Array, le résultat sera une instance d'Array (la classe-mère) </td>
+            </tr>
+            <tr>
+                <td> a.to_ary </td>
+                <td> retourne a </td>
+            </tr>
+            <tr>
+                <td> a.to_s </td>
+                <td> retourne a.join (c'est-à-dire une chaîne des éléments de la liste concaténés sans séparateur) </td>
+            </tr>
+            <tr>
+                <td> a.inspect </td>
+                <td> renvoie une version affichable de la liste </td>
             </tr>
             <tr>
                 <td> inject </td>
                 <td> exécute un bloc sur chaque élément en passant le résultat à l'exécution suivante </td>
+            </tr>
+            <tr>
+                <td> a.pack(template) </td>
+                <td> transforme le tableau en une séquence binaire (sous la forme d'une chaîne) selon le format template </td>
+            </tr>
+            <tr>
+                <td> a.transpose </td>
+                <td> ne marche qui a est une liste de liste. inverse les lignes et les colonnes </td>
             </tr>
         </tbody>
         </table>
@@ -972,8 +1239,6 @@
         <p class="back"><a href="#sommaire">Retour sommaire</a></p>
         
         <h2 id="elem_fun">7. Fonctions</h2>
-        <h2 id="elem_class">8. Classes</h2>
-        <h2 id="elem_mod">9. Modules</h2>
         
         <h3 id="fun">Fonctions</h3>
         
@@ -991,7 +1256,10 @@
         <div class="code">
             * tuple  <i># Fracturation d'un tuple pour passage différents en arguments</i>
         </div>
-
+        <p class="back"><a href="#sommaire">Retour sommaire</a></p>
+        
+        <h2 id="elem_class">8. Classes</h2>
+        
         <h3 id="cls">Classes</h3>
         
         <div class="code">
@@ -1007,21 +1275,72 @@
         </div>
         <div class="code">
             nom_classe <b>.</b> new [ ( paramètres ) ]  <i>Création d'une instance</i>
-        </div>
+        </div> 
+        <p class="back"><a href="#sommaire">Retour sommaire</a></p>
         
-        <h3 id="mod">Modules</h3>
+        <h2 id="elem_mod">9. Modules et fichiers</h2>
         
+        <h3 id="mod_mod">Définition d'un module</h3>
+        
+        <p>Un module en Ruby est un espace de nom dans lequel vous pouvez déclarer des constantes, des fonctions et des classes. De base, des éléments portant le même nom mais déclarés dans des modules différents sont des objets différents.</p>
         <div class="code">
             <b>module</b> identifiant<br>
             &nbsp;&nbsp; actions<br>
             <b>end</b>
         </div>
+        <p>Les fonctions de module se déclarent comme les fonctions de classe, en précédant l'identifiant de la fonction par celui du module suivi d'un point : <span><b>def</b> mon_module.ma_fonction</span>.</p>
+        
+        <h3 id="mod_mod">Inclusion des éléments d'un module</h3>
+        
+        <p>On peut en Ruby importer tous les éléments définis dans un module dans l'espace de nom courant à l'aide de <span><b>include</b></span> :</p>
         <div class="code">
-            <b>require</b>  <i># Exige un module</i>
+            <b>include</b> identifiant_module
         </div>
+        <p>On aura plus alors à précéder les éléments déclarés dans le module par son nom et :: (pour les constantes) ou . (pour les fonctions).</p>
         <div class="code">
-            <b>include</b>  <i># Inclus les éléments du module dans l'espace de nom actuel</i>
+            <b>module</b> Bob<br>
+            &nbsp;&nbsp;&nbsp; ConsBob = 6<br>
+            <b>end</b><br>
+            puts Bob::ConsBob <i># Bob:: est requis</i><br>
+            <b>include</B> Bob<br>
+            puts ConsBob <i># Plus besoin de Bob::</i><br>
         </div>
+        <p>Ruby ne supporte pas l'héritage multiple (le fait pour une classe d'avoir plusieurs classes mères). En incluant un module dans une classe, les instances de cette classe auront accès aux fonctions définies dans le module comme des méthodes d'instance. On appelle cette technique d'émulation de l'héritage multiple des <em>mixins</em>.</p>
+        <p>Les fonctions définies dans le module peuvent utiliser des variables d'instance (@) comme si elles avaient été définies dans la classe.</p>
+        <div class="code">
+            <b>module</b> Mix<br>
+            &nbsp;&nbsp;&nbsp; <b>def</b> display<br>
+            &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; puts @val<br>
+            &nbsp;&nbsp;&nbsp; <b>end</b><br>
+            <b>end</b><br>
+            <br>
+            <b>class</b> Test<br>
+            &nbsp;&nbsp;&nbsp; <b>include</b> Mix<br>
+            &nbsp;&nbsp;&nbsp; <b>def</b> initialize(val)<br>
+            &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; @val = val<br>
+            &nbsp;&nbsp;&nbsp; <b>end</b><br>
+            <b>end</b><br>
+            <br>
+            t = Test.new(55)<br>
+            t.display<br>
+        </div>
+        
+        <h3 id="mod_req">Code réparti sur plusieurs fichiers</h3>
+        
+        <p>Quand on a du code dans plusieurs fichiers, si on veut qu'un fichier A utilise du code du fichier B, il faut utiliser l'instruction <span><b>require</b></span> :</p>
+        <div class="code">
+            <i># Exige la présence d'un fichier</i><br>
+            <b>require</b> "nom_du_fichier" <br>
+            <b>require</b> "nom_du_fichier.rb" <br>
+            <b>require</b> a <i>#a est convertible en chaîne</i><br>
+        </div>
+        <p>Si le fichier ne peut pas être chargé, une exception <span>LoadError</span> sera levée.</p>
+        <p>Le fichier sera cherché dans tous les dossiers listés dans la variable globale <span>$LOAD_PATH</span>.</p>
+        <p>De base, le dossier du script courant <strong>n'est pas</strong> dans <span>$LOAD_PATH</span>, il faut le rajouter manuellement <strong>avant</strong> de faire le <span><b>require</b></span> ainsi : <span>$LOAD_PATH &lt;&lt; '.'</span></p>        
+        
+        
+
+        
         <p class="back"><a href="#sommaire">Retour sommaire</a></p>
         
         <h2 id="spe">10. Gestion des exceptions</h2>
