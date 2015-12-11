@@ -188,6 +188,11 @@
             </ol></li>
             <li><a href="#dict">Dictionnaires</a><ol>
                 <li><a href="#dict_create">Création</a></li>
+                <li><a href="#dict_read">Fonctions d'accès</a></li>
+                <li><a href="#dict_update">Fonctions d'affectation et d'insertion</a></li>
+                <li><a href="#dict_delete">Fonctions de suppression</a></li>
+                <li><a href="#dict_test">Fonctions de tests et d'information</a></li>
+                <li><a href="#dict_others">Autres fonctions principales</a></li>
             </ol></li>
             <li><a href="#op">Opérateurs</a>
             <ol>
@@ -952,6 +957,10 @@
             dico2 = Hash.new(23) <i># 0 élément et 23 comme valeur par défaut</i><br>
             dico3 = Hash.new[1 => 'a', 2 => 'b'] <i># dico3 aura 2 éléments</i><br>
         </div>
+        <p>On peut changer plus tard le hash en utilisant :</p>
+        <div class="code">
+            dico2.default = nouvelle_valeur
+        </div>
         
         <h3 id="dict_read">Fonctions d'accès</h3>
         
@@ -962,8 +971,32 @@
                 <th>Description </th>
             </tr>
             <tr>
-                <td> d[key] ou d.fetch(key) </td>
-                <td> accès à la valeur de la clé <em>key</em> </td>
+                <td> d[key] <br> d.fetch(key) </td>
+                <td> retourne la valeur de la paire avec la clé correspondante. Si elle n'existe pas, retourne la valeur par défaut dictionnaire </td>
+            </tr>
+            <tr>
+                <td> d.key(value) <br> d.index(value) <i># ne plus utiliser</i> </td>
+                <td> retourne une des clés correspondant à la valeur value, ou nil si la valeur n'a pas été trouvée (indépendamment de la valeur de d.default) </td>
+            </tr>
+            <tr>
+                <td> d.select { |key, value| block } </td>
+                <td> retourne un dictionnaire constitué des paires de d pour lesquelles le block, auquel on passe la clé et sa valeur correspondante, retourne vrai </td>
+            </tr>
+            <tr>
+                <td> values_at(key1, key2, ...) </td>
+                <td> retourune une liste contenant les valeurs correspondant aux clés données en paramètres </td>
+            </tr>
+            <tr>
+                <td> d.each { |key, value| block } <br> d.each_pair { |key, value| block } </td>
+                <td> parcours l'ensemble du dictionnaire, exécutant à chaque fois le block qui reçoit en paramètre la paire clé-valeur </td>
+            </tr>
+            <tr>
+                <td> d.each_key { |key| block } </td>
+                <td> parcours l'ensemble du dictionnaire, exécutant à chaque fois le block qui reçoit en paramètre la clé de la paire </td>
+            </tr>
+            <tr>
+                <td> d.each_value { |key| block } </td>
+                <td> parcours l'ensemble du dictionnaire, exécutant à chaque fois le block qui reçoit en paramètre la valeur de la paire </td>
             </tr>
         </tbody>
         </table>
@@ -977,12 +1010,20 @@
                 <th>Description </th>
             </tr>
             <tr>
+                <td> d.[key] = value </td>
+                <td> stocke une nouvelle paire (key, value) dans d ou met à jour la valeur pour la paire ayant la clé key </td>
+            </tr>
+            <tr>
                 <td> d1.update(d2)<br>d1.merge(d2) </td>
                 <td> met à jour d1 selon d2 : ajoute les paires clé-valeur existant dans d2 et non d1, met à jour les clés de d1 contenues aussi dans d2 en prenant la valeur de d2 </td>
             </tr>
             <tr>
                 <td> d.store(key, value) </td>
                 <td> stocke la valeur value à la clé key dans d ou si key existe déjà dans d, met à jour la valeur. Retourne value </td>
+            </tr>
+            <tr>
+                <td> d.shift </td>
+                <td> retourne une paire sous la forme d'un tableau [clé, valeur] en l'enlevant de d </td>
             </tr>
         </tbody>
         </table>
@@ -997,7 +1038,19 @@
             </tr>
             <tr>
                 <td> d.delete(key) </td>
-                <td> enlève l'élément avec cette clé key</td>
+                <td> enlève la paire correspondant à la clé key</td>
+            </tr>
+            <tr>
+                <td> d.delete(key) { |k| block } </td>
+                <td> enlève la paire correspondant à la clé key. Si la clé n'est pas trouvée, retourne le résultat du bloc auquel la clé key est passé en paramètre </td>
+            </tr>
+            <tr>
+                <td> d.clear </td>
+                <td> enlève toutes les paires du dictionnaire </td>
+            </tr>
+            <tr>
+                <td> d.delete_if { |key,value| block } </td>
+                <td> enlève toutes les paires du dictionnaire pour lequel le bloc, auquel la paire est passée en paramètre, retourne vrai </td>
             </tr>
         </tbody>
         </table>
@@ -1011,179 +1064,63 @@
                 <th>Description </th>
             </tr>
             <tr>
-                <td> d.has_key?(key)<br>d.include?(key)<br>d.key?(key)<br>d.member?(key) </td>
-                <td> test si la clé <em>key</em> est définie </td>
+                <td> d1 == d2 </td>
+                <td> retourne vrai si les deux dictionnaires ont le même nombre de paires et qu'elles sont égales </td>
+            </tr>
+            <tr>
+                <td> d.has_key?(key) <br> d.include?(key) <br> d.key?(key) <br>d.member?(key) </td>
+                <td> retourne vrai si le dictionnaire contient une paire avec la clé <em>key</em> </td>
+            </tr>
+            <tr>
+                <td> d.value?(value) <br> d.has_value?(value) </td>
+                <td> retourne vrai si le dictionnaire contient une paire avec la valeur <em>value</em> </td>
+            </tr>
+            <tr>
+                <td> d.empty? </td>
+                <td> retourne vrai si le dictionnaire ne contient pas de paires </td>
+            </tr>
+            <tr>
+                <td> d.size <br> d.length </td>
+                <td> retourne le nombre de paires dans le dictionnaire </td>
+            </tr>
+            <tr>
+                <td> d.default(p = nil) </td>
+                <td> retourne la valeur par défaut qui est retournée lorsque l'on tente d'accéder à la valeur d'une clé qui n'existe pas </td> <!-- le paramètre est un mystère -->
             </tr>
             <tr>
                 <td> d.keys </td>
-                <td> fournit une liste de toutes les clés </td>
+                <td> fournit une liste de toutes les clés des paires du dictionnaire </td>
             </tr>
             <tr>
                 <td> d.values </td>
-                <td> fournit une liste de toutes les valeurs </td>
+                <td> fournit une liste de toutes les valeurs des paires du dictionnaire </td>
             </tr>
         </tbody>
         </table>
         
         <h3 id="dict_others">Autres fonctions principales</h3>
         
-        <!--
-        hash == other_hash
-        Tests whether two hashes are equal, based on whether they have the same number of key-value pairs, and whether the key-value pairs match the corresponding pair in each hash.
-
-        2	hash.[key]
-        Using a key, references a value from hash. If the key is not found, returns a default value.
-
-        3	hash.[key]=value
-        Associates the value given by value with the key given by key.
-
-        4	hash.clear
-        Removes all key-value pairs from hash.
-
-        5	hash.default(key = nil)
-        Returns the default value for hash, nil if not set by default=. ([] returns a default value if the key does not exist in hash.)
-
-        6	hash.default = obj
-        Sets a default value for hash.
-
-        7	hash.default_proc
-        Returns a block if hash was created by a block.
-
-        8	
-        hash.delete(key) [or]
-
-        array.delete(key) { |key| block }
-
-        Deletes a key-value pair from hash by key. If block is used, returns the result of a block if pair is not found. Compare delete_if.
-
-        9	hash.delete_if { |key,value| block }
-        Deletes a key-value pair from hash for every pair the block evaluates to true.
-
-        10	hash.each { |key,value| block }
-        Iterates over hash, calling the block once for each key, passing the key-value as a two-element array.
-
-        11	hash.each_key { |key| block }
-        Iterates over hash, calling the block once for each key, passing key as a parameter.
-
-        12	hash.each_key { |key_value_array| block }
-        Iterates over hash, calling the block once for each key, passing the key and value as parameters.
-
-        13	hash.each_key { |value| block }
-        Iterates over hash, calling the block once for each key, passing value as a parameter.
-
-        14	hash.empty?
-        Tests whether hash is empty (contains no key-value pairs), returning true or false.
-
-        15	
-        hash.fetch(key [, default] ) [or]
-
-        hash.fetch(key) { | key | block }
-
-        Returns a value from hash for the given key. If the key can't be found, and there are no other arguments, it raises an IndexError exception; if default is given, it is returned; if the optional block is specified, its result is returned.
-
-        16	
-        hash.has_key?(key) [or] hash.include?(key) [or]
-
-        hash.key?(key) [or] hash.member?(key)
-
-        Tests whether a given key is present in hash, returning true or false.
-
-        17	hash.has_value?(value)
-        Tests whether hash contains the given value.
-
-        18	hash.index(value)
-        Returns the key for the given value in hash, nil if no matching value is found.
-
-        19	hash.indexes(keys)
-        Returns a new array consisting of values for the given key(s). Will insert the default value for keys that are not found. This method is deprecated. Use select.
-
-        20	hash.indices(keys)
-        Returns a new array consisting of values for the given key(s). Will insert the default value for keys that are not found. This method is deprecated. Use select.
-
-        21	hash.inspect
-        Returns a pretty print string version of hash.
-
-        22	hash.invert
-        Creates a new hash, inverting keys and values from hash; that is, in the new hash, the keys from hash become values and values become keys.
-
-        23	hash.keys
-        Creates a new array with keys from hash.
-
-        24	hash.length
-        Returns the size or length of hash as an integer.
-
-        25	
-        hash.merge(other_hash) [or]
-
-        hash.merge(other_hash) { |key, oldval, newval| block }
-
-        Returns a new hash containing the contents of hash and other_hash, overwriting pairs in hash with duplicate keys with those from other_hash.
-
-        26	
-        hash.merge!(other_hash) [or]
-
-        hash.merge!(other_hash) { |key, oldval, newval| block }
-
-        Same as merge, but changes are done in place.
-
-        27	hash.rehash
-        Rebuilds hash based on the current values for each key. If values have changed since they were inserted, this method reindexes hash.
-
-        28	hash.reject { |key, value| block }
-        Creates a new hash for every pair the block evaluates to true
-
-        29	hash.reject! { |key, value| block }
-        Same as reject, but changes are made in place.
-
-        30	hash.replace(other_hash)
-        Replaces the contents of hash with the contents of other_hash.
-
-        31	hash.select { |key, value| block }
-        Returns a new array consisting of key-value pairs from hash for which the block returns true.
-
-        32	hash.shift
-        Removes a key-value pair from hash, returning it as a two-element array.
-
-        33	hash.size
-        Returns the size or length of hash as an integer.
-
-        34	hash.sort
-        Converts hash to a two-dimensional array containing arrays of key-value pairs, then sorts it as an array.
-
-        35	hash.store(key, value)
-        Stores a key-value pair in hash.
-
-        36	hash.to_a
-        Creates a two-dimensional array from hash. Each key/value pair is converted to an array, and all these arrays are stored in a containing array.
-
-        37	hash.to_hash
-        Returns hash (self).
-
-        38	hash.to_s
-        Converts hash to an array, then converts that array to a string.
-
-        39	
-        hash.update(other_hash) [or]
-
-        hash.update(other_hash) {|key, oldval, newval| block}
-
-        Returns a new hash containing the contents of hash and other_hash, overwriting pairs in hash with duplicate keys with those from other_hash.
-
-        40	hash.value?(value)
-        Tests whether hash contains the given value.
-
-        41	hash.values
-        Returns a new array containing all the values of hash.
-
-        42	hash.values_at(obj, ...)
-        Returns a new array containing the values from hash that are associated with the given key or keys.
-        -->
-        
         <table>
         <tbody>
             <tr>
                 <th>Fonction </th>
                 <th>Description </th>
+            </tr>
+            <tr>
+                <td> d.to_a </td>
+                <td> retourne un tableau contenant autant de tableaux qu'il y a de paires dans d. Chaque tableau contient deux éléments : en premier la clé et ensuite sa valeur correspondante </td>
+            </tr>
+            <tr>
+                <td> d.to_hash </td>
+                <td> retourne le dictionnaire lui-même </td>
+            </tr>
+            <tr>
+                <td> d.inspect <br> d.to_s </td>
+                <td> traduit le dictionnaire en une chaîne lisible et la retourne </td>
+            </tr>
+            <tr>
+                <td> d.invert </td>
+                <td> renvoi un nouveau dictionnaire où, pour chaque paire (clé, valeur) de d, on aura une paire (valeur, clé) </td>
             </tr>
         </tbody>
         </table>
