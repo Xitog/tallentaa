@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <style type="text/css">
+        img.unseen {
+            display: none;
+        }
+    </style>
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script type='text/javascript'>
+    
+    function dispatch() {
+        var last = document.getElementById('last');
+        last.innerHTML = window.location.hash;
+    }
+    
+    function init() {
+        var dlg = {
+            "id1" : [
+                {"text" : "Bonjour l'ami, vous passez souvent par ici ?"},
+                {"text" : "Bonjour l'ami, je cherche Dal."},
+                {"text" : "Manant, où puis-je trouver Dal ?"},
+                {"text" : "Tu vas mourir."}
+            ]
+        };
+        var listElement = document.createElement("ol");
+        for (var i = 0; i < dlg.id1.length; i++) {
+            var listItem = document.createElement("li");
+            var itemLink = document.createElement("a");
+            itemLink.setAttribute('href',"#id1_" + i);
+            itemLink.innerHTML = dlg.id1[i].text;
+            listItem.appendChild(itemLink);
+            listElement.appendChild(listItem);
+        }
+        var talk = document.getElementById('talk');
+        talk.appendChild(listElement);
+        
+        window.onhashchange = dispatch;  
+        
+        var screen = document.getElementById('screen');
+        var context = screen.getContext('2d');
+        context.fillStyle = "rgba(128,128,128,0.5)";
+        context.fillRect(0, 0, 639, 479);
+        /*
+        var sprite = new Image();
+        sprite.src = "pipo.png";
+        sprite.onload = function() {
+        
+            context.drawImage(sprite, 32, 32);
+            
+            var imageData = context.getImageData(32, 32, 32, 32);
+            => The canvas has been tainted by cross-origin data.
+            var data = imageData.data;
+            // iterate over all pixels
+            for(var i = 0, n = data.length; i < n; i += 4) {
+                if (data[i] == 255 && data[i+1] == 0 && data[i+2] == 255) {
+                    data[i + 3] = 0;
+                }
+            }
+            context.putImageData(imageData, 0, 0);
+        
+        };*/
+        var sprite = document.getElementById("greenblob");
+        context.drawImage(sprite, 32, 32);
+        
+    }
+    
+    </script>
+  </head>
+  <body onload="init()">
+    <div id='talk'></div>
+    <div id='last'></div>
+    <canvas id="screen" width="640" height="480">
+        Affichage d'un texte pour les navigateurs qui ne supportent pas canvas.
+    </canvas>
+    
+    <img id="greenblob" class="unseen" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAFVBMVEUAAAATDhMAKQgAUhgQlFJazXPm1bSeA+CYAAAAAXRSTlMAQObYZgAAAKBJREFUeJzt0kkSgzAMBEBGS/7/5GhBRgY7B86ZU0rTyK7AcfzzJrD8rEVVtsTrj2VHwNknWfeWBAthvYTIU5Rx7w3kjozMInqtJX4JmYUfoAE8+gDnAr4EzyKBFGDHHVgf3QAcmIcIEEKGiNEFqEi0HI/bsG2gJC0+6UeQDagY5S9qt/QB3dP/CCzq+W0AfYUd/3zhAOqC2+8OZ9bt23wBLGAE71cB06cAAAAASUVORK5CYII="/>
+    
+  </body>
+</html>

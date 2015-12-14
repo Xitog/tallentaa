@@ -373,7 +373,7 @@
         <tbody>
             <tr>
                 <th>Fonction </th>
-                <th>Retourne </th>
+                <th>Type retourné </th>
                 <th>Description </th>
             </tr>
             <tr>
@@ -572,7 +572,7 @@
         <tbody>
             <tr>
                 <th>Fonction </th>
-                <th>Retourne </th>
+                <th>Type retourné </th>
                 <th>Description </th>
             </tr>
             <tr>
@@ -670,7 +670,7 @@
         <tbody>
             <tr>
                 <th>Fonction </th>
-                <th>Retourne </th>
+                <th>Type retourné </th>
                 <th>Description </th>
             </tr>
             <tr>
@@ -737,7 +737,7 @@
         <tbody>
             <tr>
                 <th>Fonction </th>
-                <th>Retourne </th>
+                <th>Type retourné </th>
                 <th>Description </th>
             </tr>
             <tr>
@@ -784,7 +784,7 @@
         <tbody>
             <tr>
                 <th>Fonction </th>
-                <th>Retourne </th>
+                <th>Type retourné </th>
                 <th>Description </th>
             </tr>
             <tr>
@@ -846,7 +846,7 @@
         <tbody>
             <tr>
                 <th>Fonction </th>
-                <th>Retourne </th>
+                <th>Type retourné </th>
                 <th>Description </th>
             </tr>
             <tr>
@@ -1088,43 +1088,53 @@
         <tbody>
             <tr>
                 <th>Fonction </th>
-                <th>Retourne </th>
+                <th>Type retourné </th>
                 <th>Description </th>
             </tr>
             <tr>
-                <td> d[key] <br> d.fetch(key) </td>
-                <td></td>
+                <td> d[key] </td>
+                <td> d[key].class </td>
                 <td> retourne la valeur de la paire avec la clé correspondante. Si elle n'existe pas, retourne la valeur par défaut dictionnaire </td>
             </tr>
             <tr>
+                <td> d.fetch(key) <br> d.fetch(key, default) </td>
+                <td> d[key].class | default.class </td>
+                <td> retourne la valeur de la paire avec la clé correspondante. Si elle n'existe pas et qu'un paramètre default a été spécifié il est retourné. Sinon une exception KeyError est levée. <b>la valeur par défaut du dictionnaire n'est pas utilisée</b> </td>
+            </tr>
+            <tr>
+                <td> d.fetch(key) { | key | block } </td>
+                <td> d[key].class | selon bloc</td>
+                <td> retourne la valeur de la paire avec la clé correspondante. Si elle n'existe pas, le bloc auquel on passe la clé demandée en paramètre est exécuté et son résultat retourné. <b>Il ne sert à rien de passer un second paramètre defaut si on utilise un bloc car le paramètre sera ignoré </td>
+            </tr>
+            <tr>
                 <td> d.key(value) <br> d.index(value) <i># ne plus utiliser</i> </td>
-                <td></td>
+                <td> selon la clé trouvée </td>
                 <td> retourne une des clés correspondant à la valeur value, ou nil si la valeur n'a pas été trouvée (indépendamment de la valeur de d.default) </td>
             </tr>
             <tr>
-                <td> d.select { |key, value| block } </td>
-                <td></td>
-                <td> retourne un dictionnaire constitué des paires de d pour lesquelles le block, auquel on passe la clé et sa valeur correspondante, retourne vrai </td>
-            </tr>
-            <tr>
-                <td> values_at(key1, key2, ...) </td>
-                <td></td>
-                <td> retourune une liste contenant les valeurs correspondant aux clés données en paramètres </td>
-            </tr>
-            <tr>
                 <td> d.each { |key, value| block } <br> d.each_pair { |key, value| block } </td>
-                <td></td>
+                <td> Hash (d) </td>
                 <td> parcours l'ensemble du dictionnaire, exécutant à chaque fois le block qui reçoit en paramètre la paire clé-valeur </td>
             </tr>
             <tr>
                 <td> d.each_key { |key| block } </td>
-                <td></td>
+                <td> Hash (d) </td>
                 <td> parcours l'ensemble du dictionnaire, exécutant à chaque fois le block qui reçoit en paramètre la clé de la paire </td>
             </tr>
             <tr>
                 <td> d.each_value { |key| block } </td>
-                <td></td>
+                <td> Hash (d) </td>
                 <td> parcours l'ensemble du dictionnaire, exécutant à chaque fois le block qui reçoit en paramètre la valeur de la paire </td>
+            </tr>
+            <tr>
+                <td> d.select { |key, value| block } </td>
+                <td> Hash </td>
+                <td> retourne un dictionnaire constitué des paires de d pour lesquelles le block, auquel on passe la clé et sa valeur correspondante, retourne vrai </td>
+            </tr>
+            <tr>
+                <td> d.values_at(key1, key2, ...) </td>
+                <td> Array </td>
+                <td> retourne une liste contenant les valeurs correspondant aux clés données en paramètres </td>
             </tr>
         </tbody>
         </table>
@@ -1135,29 +1145,54 @@
         <tbody>
             <tr>
                 <th>Fonction </th>
-                <th>Retourne </th>
+                <th>Type retourné </th>
                 <th>Description </th>
             </tr>
             <tr>
-                <td> d.[key] = value </td>
-                <td></td>
+                <td> d[key] = value </td>
+                <td> value.class </td>
                 <td> stocke une nouvelle paire (key, value) dans d ou met à jour la valeur pour la paire ayant la clé key </td>
             </tr>
             <tr>
-                <td> d1.update(d2)<br>d1.merge(d2) </td>
-                <td></td>
+                <td> d1.merge(d2) </td>
+                <td> Hash (d1) </td>
+                <td> retourne un nouveau dictionnaire, résultant de la fusion de d1 et d2. Si une clé existe à la fois dans d1 et d2, la valeur correspondante dans d2 est prise </td>
+            </tr>
+            <tr>
+                <td> d1.merge(d2) {|key, d1val, d2val| block} </td>
+                <td> Hash (d1) </td>
+                <td> retourne un nouveau dictionnaire, résultant de la fusion de d1 et d2. Si une clé existe à la fois dans d1 et d2, la valeur finale sera déterminée par le block auquel la clé, la valeur correspondante dans d1 et la valeur correspondante dans d2 sont passées </td>
+            </tr>
+            <tr>
+                <td> d1.merge!(d2) <br> d1.update(d2) </td>
+                <td> Hash (d1) </td>
                 <td> met à jour d1 selon d2 : ajoute les paires clé-valeur existant dans d2 et non d1, met à jour les clés de d1 contenues aussi dans d2 en prenant la valeur de d2 </td>
             </tr>
             <tr>
+                <td> d1.merge!(d2) {|key, d1val, d2val| block} <br> d1.update(d2) {|key, d1val, d2val| block} </td>
+                <td> Hash (d1) </td>
+                <td> met à jour d1 selon d2 : ajoute les paires clé-valeur existant dans d2 et non d1. Si un clé existe de d2 existe déjà dans d1, la valeur finale sera déterminée par le block auquel la clé, la valeur correspondante dans d1 et la valeur correspondante dans d2 sont passées </td>
+            </tr>
+            <tr>
+                <td> d1.replace(d2) </td>
+                <td> Hash (d2)</td>
+                <td> remplace le contenu de d1 par celui de d2 </td>
+            </tr>
+            <tr>
                 <td> d.store(key, value) </td>
-                <td></td>
+                <td> value.class </td>
                 <td> stocke la valeur value à la clé key dans d ou si key existe déjà dans d, met à jour la valeur. Retourne value </td>
             </tr>
             <tr>
                 <td> d.shift </td>
-                <td></td>
+                <td> Array </td>
                 <td> retourne une paire sous la forme d'un tableau [clé, valeur] en l'enlevant de d </td>
             </tr>
+            <!--<tr>
+                <td> d1.update(d2) </td>
+                <td></td>
+                <td><i>voir la fonction merge</i></td>
+            </tr>-->
         </tbody>
         </table>
         
@@ -1167,27 +1202,27 @@
         <tbody>
             <tr>
                 <th>Fonction </th>
-                <th>Retourne </th>
+                <th>Type retourné </th>
                 <th>Description </th>
             </tr>
             <tr>
+                <td> d.clear </td>
+                <td> Hash (d) </td>
+                <td> enlève toutes les paires du dictionnaire </td>
+            </tr>
+            <tr>
                 <td> d.delete(key) </td>
-                <td></td>
+                <td> d[key].class </td>
                 <td> enlève la paire correspondant à la clé key</td>
             </tr>
             <tr>
                 <td> d.delete(key) { |k| block } </td>
-                <td></td>
+                <td> d[key].class ou selon bloc</td>
                 <td> enlève la paire correspondant à la clé key. Si la clé n'est pas trouvée, retourne le résultat du bloc auquel la clé key est passé en paramètre </td>
             </tr>
             <tr>
-                <td> d.clear </td>
-                <td></td>
-                <td> enlève toutes les paires du dictionnaire </td>
-            </tr>
-            <tr>
                 <td> d.delete_if { |key,value| block } </td>
-                <td></td>
+                <td> Hash (d) </td>
                 <td> enlève toutes les paires du dictionnaire pour lequel le bloc, auquel la paire est passée en paramètre, retourne vrai </td>
             </tr>
         </tbody>
@@ -1199,7 +1234,7 @@
         <tbody>
             <tr>
                 <th>Fonction </th>
-                <th>Retourne </th>
+                <th>Type retourné </th>
                 <th>Description </th>
             </tr>
             <tr>
@@ -1208,24 +1243,9 @@
                 <td> retourne vrai si les deux dictionnaires ont le même nombre de paires et qu'elles sont égales </td>
             </tr>
             <tr>
-                <td> d.has_key?(key) <br> d.include?(key) <br> d.key?(key) <br>d.member?(key) </td>
-                <td>TrueClass | FalseClass</td>
-                <td> retourne vrai si le dictionnaire contient une paire avec la clé <em>key</em> </td>
-            </tr>
-            <tr>
-                <td> d.value?(value) <br> d.has_value?(value) </td>
-                <td>TrueClass | FalseClass</td>
-                <td> retourne vrai si le dictionnaire contient une paire avec la valeur <em>value</em> </td>
-            </tr>
-            <tr>
                 <td> d.empty? </td>
                 <td>TrueClass | FalseClass</td>
                 <td> retourne vrai si le dictionnaire ne contient pas de paires </td>
-            </tr>
-            <tr>
-                <td> d.size <br> d.length </td>
-                <td> Fixnum | Bignum </td>
-                <td> retourne le nombre de paires dans le dictionnaire </td>
             </tr>
             <tr>
                 <td> d.default(p = nil) </td>
@@ -1238,9 +1258,24 @@
                 <td> retourne la procédure par défaut lorsqu'une clé n'existe pas, si un bloc a été passé à la création du dictionnaire, sinon retourne <strong>nil</strong> </td>
             </tr>
             <tr>
+                <td> d.has_key?(key) <br> d.include?(key) <br> d.key?(key) <br>d.member?(key) </td>
+                <td>TrueClass | FalseClass</td>
+                <td> retourne vrai si le dictionnaire contient une paire avec la clé <em>key</em> </td>
+            </tr>
+            <tr>
+                <td> d.has_value?(value) <br> d.value?(value) </td>
+                <td>TrueClass | FalseClass</td>
+                <td> retourne vrai si le dictionnaire contient une paire avec la valeur <em>value</em> </td>
+            </tr>
+            <tr>
                 <td> d.keys </td>
                 <td> Array </td>
                 <td> fournit une liste de toutes les clés des paires du dictionnaire </td>
+            </tr>
+            <tr>
+                <td> d.size <br> d.length </td>
+                <td> Fixnum | Bignum </td>
+                <td> retourne le nombre de paires dans le dictionnaire </td>
             </tr>
             <tr>
                 <td> d.values </td>
@@ -1256,8 +1291,13 @@
         <tbody>
             <tr>
                 <th>Fonction </th>
-                <th>Retourne </th>
+                <th>Type retourné </th>
                 <th>Description </th>
+            </tr>
+            <tr>
+                <td> d.invert </td>
+                <td> Hash </td>
+                <td> renvoi un nouveau dictionnaire où, pour chaque paire (clé, valeur) de d, on aura une paire (valeur, clé) </td>
             </tr>
             <tr>
                 <td> d.to_a </td>
@@ -1270,14 +1310,9 @@
                 <td> retourne le dictionnaire lui-même </td>
             </tr>
             <tr>
-                <td> d.inspect <br> d.to_s </td>
+                <td> d.to_s <br> d.inspect </td>
                 <td> String </td>
                 <td> traduit le dictionnaire en une chaîne lisible et la retourne </td>
-            </tr>
-            <tr>
-                <td> d.invert </td>
-                <td> Hash </td>
-                <td> renvoi un nouveau dictionnaire où, pour chaque paire (clé, valeur) de d, on aura une paire (valeur, clé) </td>
             </tr>
         </tbody>
         </table>
@@ -1579,7 +1614,7 @@
         <tbody>
             <tr>
                 <th>Fonction </th>
-                <th>Retourne </th>
+                <th>Type retourné </th>
                 <th>Description </th>
             </tr>
             <tr>
