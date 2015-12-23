@@ -191,7 +191,7 @@ class Camera:
                                 self.selected.append(ul[0])
                             else:
                                 if not self.add_mod:
-                                    self.selected = ul
+                                    self.selected = ul # on peut selectionner une et une seule unite ennemie
                     elif self.mode == 'build':
                         # repeated code in render
                         xx = (mx - self.x) // 32
@@ -246,12 +246,6 @@ class Camera:
             self.y -= self.scroll
         if self.up or my < self.auto_scroll_zone:
             self.y += self.scroll
-
-        for u in self.player.world.units:
-            if not u.update():
-                self.player.world.units.remove(u)
-                print("deleting unit")
-                del u
 
         self.player.world.particles.update()
         return True
@@ -315,13 +309,11 @@ class Camera:
                 for ix in range(u.grid_x, u.grid_x+u.type.grid_w):
                     for iy in range(u.grid_y, u.grid_y+u.type.grid_h):
                         #print(ix, iy, ix * 32 + self.x, iy * 32 + self.y)
-                        if u in self.selected:
-                            pygame.draw.rect(self.screen, Color(0, 255, 0), (ix * 32 + self.x, iy * 32 + self.y, 32, 32), 0)
-                        else:
-                            pygame.draw.rect(self.screen, u.player.color, (ix * 32 + self.x, iy * 32 + self.y, 32, 32), 0)
+                        pygame.draw.rect(self.screen, u.player.color, (ix * 32 + self.x, iy * 32 + self.y, 32, 32), 0)
+                        if u in self.selected: # and u.grid_x == ix and u.grid_y == iy:
+                            pygame.draw.rect(self.screen, GREEN, (u.grid_x * 32 + self.x, u.grid_y * 32 + self.y, u.type.grid_h * 32, u.type.grid_w * 32), 2)
             else:
                 if u in self.selected:
-                    c = GREEN
                     # if u.player != self.player:
                     #     c = RED
                     if len(u.orders) > 0:
@@ -329,8 +321,8 @@ class Camera:
                         ly = u.real_y + self.y
                         for o in u.orders:
                             if o.kind == 'go': # x2r => return x * 32 + self.x + 16
-                                pygame.draw.circle(self.screen, c, (self.x2r(o.x), self.y2r(o.y)), 5, 0)
-                                pygame.draw.line(self.screen, c, (lx, ly), (self.x2r(o.x), self.y2r(o.y)), 1)
+                                pygame.draw.circle(self.screen, GREEN, (self.x2r(o.x), self.y2r(o.y)), 5, 0)
+                                pygame.draw.line(self.screen, GREEN, (lx, ly), (self.x2r(o.x), self.y2r(o.y)), 1)
                                 lx = self.x2r(o.x)
                                 ly = self.y2r(o.y)
                             elif o.kind == 'attack':
@@ -338,9 +330,13 @@ class Camera:
                                 pygame.draw.line(self.screen, RED, (lx + self.x, ly + self.y), (o.target.x*32+16 + self.x, o.target.y*32+16 + self.y), 1)
                                 lx = o.target.x
                                 ly = o.target.y
+                    pygame.draw.circle(self.screen, u.player.color, (u.real_x + self.x, u.real_y + self.y), u.size, 0)
+                    if u.player == self.player:
+                        pygame.draw.circle(self.screen, GREEN, (u.real_x + self.x, u.real_y + self.y), u.size+3, 2)
+                    else:
+                        pygame.draw.circle(self.screen, RED, (u.real_x + self.x, u.real_y + self.y), u.size+3, 2)
                 else:
-                    c = u.player.color
-                pygame.draw.circle(self.screen, c, (u.real_x + self.x, u.real_y + self.y), u.size, 0)
+                    pygame.draw.circle(self.screen, u.player.color, (u.real_x + self.x, u.real_y + self.y), u.size, 0)
         
         for p in self.player.world.particles.core:
             pygame.draw.circle(self.screen, RED, (p.x + self.x, p.y + self.y), 3, 0)
@@ -368,6 +364,10 @@ class Camera:
         self.screen.blit(label, (40, self.INTERFACE_Y+40))
         label = self.font.render('Lab', 1, (0, 0, 0))
         self.screen.blit(label, (72, self.INTERFACE_Y+40))
+        
+        # Metal (min) & Energie (sol)
+        label = self.font.render("M : " + str(int(self.player.min)) + " E : " + str(int(self.player.sol)), 1, (255, 255, 0))
+        self.screen.blit(label, (5, self.INTERFACE_Y+104))
         
         # Minimap
         for yy in range(0, self.player.world.size32.y):
@@ -582,11 +582,15 @@ class Player:
         self.sol = 0
     
     def update(self):
+            # Update for all units?
+        for u in self.units:
+            if not u.update():
+                self.player.world.units.remove(u)
+                print("deleting unit")
+                del u
         for b in self.buildings:
-            if b.type.name == "Mine":
-                self.min += 1
-            elif b.type.name == "Solar":
-                self.sol += 1
+            b.update()
+
 
 class Order:
     def __init__(self, kind=None, x=0, y=0, target=None):
@@ -678,6 +682,10 @@ class Building(GameObject):
         return str(id(self)) + ' (' + self.type.name + ')'
     
     def update(self):
+        if self.type.name == "Mine":
+            self.player.min += 0.2
+        elif self.type.name == "Solar":
+            self.player.sol += 0.2
         return True # Very Important
     
     def order(self, o):

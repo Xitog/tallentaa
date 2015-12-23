@@ -108,6 +108,11 @@
         i {
             color: #AAA;
         }
+        u {
+            color: #cc141d;
+            font-family: "Consolas";
+            text-decoration: none;
+        }
         
         span.blue {
             border: 1px solid #9999CC;
@@ -140,6 +145,17 @@
             color: #FF6600;
         }
         
+        ol { 
+            counter-reset: item 
+        }
+        li { 
+            display: block 
+        }
+        li:before { 
+            content: counters(item, ".") " "; 
+            counter-increment: item 
+        }
+
     </style>
     
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -165,78 +181,94 @@
         <h2 id="sommaire">Sommaire</h2>
         <ol>
             <li><a href="#bases">Bases</a>
-            <ol>
-                <li><a href="#bas_aff">Affichage</a></li>
-                <li><a href="#bas_key">Mots réservés</a></li>
-                <li><a href="#bas_com">Commentaires</a></li>
-                <li><a href="#bas_beg">BEGIN et END</a></li>
-            </ol></li>
+                <ol>
+                    <li><a href="#bas_aff">Affichage</a></li>
+                    <li><a href="#bas_key">Mots réservés</a></li>
+                    <li><a href="#bas_com">Commentaires</a></li>
+                    <li><a href="#bas_beg">BEGIN et END</a></li>
+                </ol>
+            </li>
             <li><a href="#sites">Autres ressources</a></li>
             <li><a href="#variables">Variables, constantes et globales</a>
-            <ol>
-                <li><a href="#var_var">Variables</a></li>
-                <li><a href="#var_con">Constantes</a></li>
-                <li><a href="#var_glo">Globales</a></li>
-                <li><a href="#var_ins">Variables d'instance</a></li>
-                <li><a href="#var_cls">Variables de classe</a></li>
-                <li><a href="#var_psd">Pseudo-variables</a></li>
-            </ol></li>
+                <ol>
+                    <li><a href="#var_var">Variables</a></li>
+                    <li><a href="#var_con">Constantes</a></li>
+                    <li><a href="#var_glo">Globales</a></li>
+                    <li><a href="#var_ins">Variables d'instance</a></li>
+                    <li><a href="#var_cls">Variables de classe</a></li>
+                    <li><a href="#var_psd">Pseudo-variables</a></li>
+                </ol>
+            </li>
             <li><a href="#int_float">Entiers et Réels (Fixnum | Bignum, Float)</a>
-            <ol>
-                <li><a href="#int">Entiers</a></li>
-                <li><a href="#float">Réels</a></li>
-            </ol></li>
+                <ol>
+                    <li><a href="#int">Entiers</a></li>
+                    <li><a href="#float">Réels</a></li>
+                </ol>
+            </li>
             <li><a href="#string">Chaînes de caractères (String)</a></li>
             <li><a href="#bool_range_nil">Booléens, intervalles et type vide (TrueClass | FalseClass, Range, NilClass)</a>
-            <ol>
-                <li><a href="#bool">Booléens</a></li>
-                <li><a href="#range">Intervalles</a></li>
-                <li><a href="#void">Type "vide"</a></li>
-            </ol></li>
-            <li><a href="#list">Listes (Array)</a><ol>
-                <li><a href="#list_create">Création</a></li>
-                <li><a href="#list_read">Fonctions d'accès</a></li>
-                <li><a href="#list_update">Fonctions d'affectation et d'insertion</a></li>
-                <li><a href="#list_delete">Fonctions de suppression</a></li>
-                <li><a href="#list_test">Fonctions de tests et d'information</a></li>
-                <li><a href="#list_others">Autres fonctions principales</a></li>
-            </ol></li>
-            <li><a href="#dict">Dictionnaires (Hash)</a><ol>
-                <li><a href="#dict_create">Création</a></li>
-                <li><a href="#dict_read">Fonctions d'accès</a></li>
-                <li><a href="#dict_update">Fonctions d'affectation et d'insertion</a></li>
-                <li><a href="#dict_delete">Fonctions de suppression</a></li>
-                <li><a href="#dict_test">Fonctions de tests et d'information</a></li>
-                <li><a href="#dict_others">Autres fonctions principales</a></li>
-            </ol></li>
+                <ol>
+                    <li><a href="#bool">Booléens</a></li>
+                    <li><a href="#range">Intervalles</a></li>
+                    <li><a href="#void">Type "vide"</a></li>
+                </ol>
+            </li>
+            <li><a href="#list">Listes (Array)</a>
+                <ol>
+                    <li><a href="#list_create">Création</a></li>
+                    <li><a href="#list_read">Fonctions d'accès</a></li>
+                    <li><a href="#list_update">Fonctions d'affectation et d'insertion</a></li>
+                    <li><a href="#list_delete">Fonctions de suppression</a></li>
+                    <li><a href="#list_test">Fonctions de tests et d'information</a></li>
+                    <li><a href="#list_others">Autres fonctions principales</a></li>
+                </ol>
+            </li>
+            <li><a href="#dict">Dictionnaires (Hash)</a>
+                <ol>
+                    <li><a href="#dict_create">Création</a></li>
+                    <li><a href="#dict_read">Fonctions d'accès</a></li>
+                    <li><a href="#dict_update">Fonctions d'affectation et d'insertion</a></li>
+                    <li><a href="#dict_delete">Fonctions de suppression</a></li>
+                    <li><a href="#dict_test">Fonctions de tests et d'information</a></li>
+                    <li><a href="#dict_others">Autres fonctions principales</a></li>
+                </ol>
+            </li>
             <li><a href="#op">Opérateurs</a>
-            <ol>
-                <li><a href="#op_bin">Opérateurs binaires</a></li>
-                <li><a href="#op_una">Opérateurs unaires</a></li>
-                <li><a href="#op_ter">Opérateur ternaire</a></li>
-                <li><a href="#op_precedence">Précédence des opérateurs</a></li>
-                <li><a href="#op_redef">Redéfinition d'opérateur</a></li>
-            </ol></li>
+                <ol>
+                    <li><a href="#op_bin">Opérateurs binaires</a></li>
+                    <li><a href="#op_una">Opérateurs unaires</a></li>
+                    <li><a href="#op_ter">Opérateur ternaire</a></li>
+                    <li><a href="#op_precedence">Précédence des opérateurs</a></li>
+                    <li><a href="#op_redef">Redéfinition d'opérateur</a></li>
+                </ol>
+            </li>
             <li><a href="#flux">Contrôle du flux</a>
-            <ol>
-                <li><a href="#seq">Séquence</a></li>
-                <li><a href="#cond">Conditions</a></li>
-                <li><a href="#loop">Répétitions</a></li>
-            </ol></li>
+                <ol>
+                    <li><a href="#seq">Séquence</a></li>
+                    <li><a href="#cond">Conditions</a></li>
+                    <li><a href="#loop">Répétitions</a></li>
+                </ol>
+            </li>
             <li><a href="#elem_fun">Fonctions</a></li>
-            <li><a href="#elem_class">Classes et objets</a></li>
+            <li><a href="#elem_class">Classes et objets</a>
+                <ol>
+                    <li><a href="#class_create">Création d'une classe</a></li>
+                </ol>
+            </li>
             <li><a href="#elem_mod">Modules et fichiers</a>
-            <ol>
-                <li><a href="#mod_mod">Définition d'un module</a></li>
-                <li><a href="#mod_mod">Inclusion des éléments d'un module</a></li>
-                <li><a href="#mod_req">Code réparti sur plusieurs fichiers</a></li>
-            </ol></li>
+                <ol>
+                    <li><a href="#mod_mod">Définition d'un module</a></li>
+                    <li><a href="#mod_mod">Inclusion des éléments d'un module</a></li>
+                    <li><a href="#mod_req">Code réparti sur plusieurs fichiers</a></li>
+                </ol>
+            </li>
             <li><a href="#spe">Gestion des exceptions</a>
-            <ol>
-                <li><a href="#exp">Exceptions</a></li>
-                <li><a href="#exp_type">Type d'exceptions</a></li>
-                <li><a href="#exp_throw">Catch et throw</a></li>
-            </ol></li>
+                <ol>
+                    <li><a href="#exp">Exceptions</a></li>
+                    <li><a href="#exp_type">Type d'exceptions</a></li>
+                    <li><a href="#exp_throw">Catch et throw</a></li>
+                </ol>
+            </li>
             <li><a href="#utiles">Utiles</a></li>
         </ol>
 
@@ -578,7 +610,7 @@
             <tr>
                 <td> a[i], a.slice(i), a.at(i)</td>
                 <td> selon valeur </td>
-                <td> accès à la valeur à l'indice i. Si l'indice ne correspond à aucun élément, <strong>nil</strong> est retourné. </td>
+                <td> accès à la valeur à l'indice i. Si l'indice ne correspond à aucun élément, <b>nil</b> est retourné. </td>
             </tr>
             <tr>
                 <td> a.fetch(i) </td>
@@ -685,47 +717,47 @@
             </tr>
             <tr>
                 <td> a[i, n] = b <i># b est une liste</i></td>
-                <td> Array </td>
-                <td> tous les indices entre i et (i+n)-1 référenceront à présent l'objet de même indice dans la liste b.<br> Si la liste b est trop petite, <strong>la liste a sera raccourcie</strong> </td>
+                <td> Array (a) </td>
+                <td> tous les indices entre i et (i+n)-1 référenceront à présent l'objet de même indice dans la liste b.<br> Si la liste b est trop petite, <u>la liste a sera raccourcie</u> </td>
             </tr>
             <tr>
                 <td> a.insert(i, o) </td>
-                <td></td>
+                <td> Array (a) </td>
                 <td> insère dans la liste juste avant l'indice i un nouvel indice qui référencera l'objet o et deviendra le nouvel indice i </td>
             </tr>
             <tr>
                 <td> a.fill(o) </td>
-                <td></td>
+                <td> Array (a) </td>
                 <td> tous les indices de la liste a référenceront l'objet o </td>
             </tr>
             <tr>
                 <td> a.fill(o, s), a.fill(o, s, n) </td>
-                <td></td>
+                <td> Array (a) </td>
                 <td> les indices de la liste a de s à la fin, ou de s à (s+n)-1 si n est spécifié, référenceront l'objet o </td>
             </tr>
             <tr>
                 <td> a.fill(o, x..y) </td>
-                <td></td>
+                <td> Array (a) </td>
                 <td> les indices de x à y de la liste a référenceront l'objet o </td>
             </tr>
             <tr>
                 <td> a.fill { |i| actions }, a.fill(s) { |i| actions }, a.fill(s, n) { |i| actions }, a.fill(x..y) { |i| actions } </td>
-                <td></td>
+                <td> Array (a) </td>
                 <td> les indices spécifiés référenceront le résultat du bloc auquel l'indice sera passé en paramètre </td>
             </tr>
             <tr>
                 <td> a.replace(b) </td>
-                <td></td>
-                <td> remplace les éléments de a par ceux de b (cela réaffecte a une nouvelle liste) </td>
+                <td> Array (a == b) </td>
+                <td> remplace les éléments de a par ceux de b (cela réaffecte a à une nouvelle liste) </td>
             </tr>
             <tr>
                 <td> a.unshift(o, ...) </td>
-                <td></td>
+                <td> Array (a) </td>
                 <td> ajoute un ou plusieurs éléments au début de la liste et retourne la liste </td>
             </tr>
             <tr>
                 <td> a.push(o, ...) </td>
-                <td></td>
+                <td> Array (a) </td>
                 <td> ajoute un ou plusieurs éléments à la fin de la liste et retourne la liste </td>
             </tr>
         </tbody>
@@ -742,37 +774,37 @@
             </tr>
             <tr>
                 <td> a.clear </td>
-                <td></td>
+                <td> Array (a) </td>
                 <td> efface toute la liste, sa longueur sera égale à 0 après.  Cette fonction modifie a, même si elle n'a pas de ! </td>
             </tr>
             <tr>
                 <td> a.delete_at(i) </td>
-                <td></td>
+                <td> Array (a) </td>
                 <td> supprime l'indice i en retournant l'objet à qui il faisait référence. Si l'indice est invalide, nil est retourné.  Cette fonction modifie a, même si elle n'a pas de ! </td>
             </tr>
             <tr>
                 <td> a.delete(o) </td>
-                <td></td>
-                <td> supprime tous les indices référençant o. <strong>Si aucun n'est trouvé, retourne nil. Cette fonction modifie a, même si elle n'a pas de !</strong> </td>
+                <td> type de o (o) </td>
+                <td> supprime tous les indices référençant o. <u>Si aucun n'est trouvé, retourne nil. Cette fonction modifie a, même si elle n'a pas de !</u> </td>
             </tr>
             <tr>
                 <td> a.delete(o) { actions } </td>
-                <td></td>
-                <td> supprime tous les indices référençant o. <strong>Si aucun n'est trouvé, retourne le résultat du bloc qui n'est pas exécuté sinon. Cette fonction modifie a, même si elle n'a pas de !</strong> </td>
+                <td> type de o (o) | résultat du bloc </td>
+                <td> supprime tous les indices référençant o. <u>Si aucun n'est trouvé, retourne le résultat du bloc qui n'est pas exécuté sinon. Cette fonction modifie a, même si elle n'a pas de !</u> </td>
             </tr>
             <tr>
                 <td> a.delete_if { |o| actions } </td>
-                <td></td>
+                <td> Array (a) </td>
                 <td> supprime tous les indices pour lequel le bloc, auquel on passe l'objet référencé par l'indice, retourne vrai. Cette fonction modifie a, même si elle n'a pas de ! </td>
             </tr>
             <tr>
                 <td> a.reject! {|o| block } </td>
-                <td></td>
+                <td> Array (a) </td>
                 <td> supprime dans a chaque élément pour lequel le bloc qui le prend en paramètre est vrai, équivalent à delete_if </td>
             </tr>
             <tr>
                 <td> array.slice!(index), array.slice!(s, n), array.slice!(x..y), array.slice!(x...y)</td>
-                <td></td>
+                <td> type de l'élément supprimé | <br> Array des éléments supprimés </td>
                 <td> supprime les éléments spécifiés </td>
             </tr>
         </tbody>
@@ -789,52 +821,52 @@
             </tr>
             <tr>
                 <td> a == b </td>
-                <td></td>
+                <td> TrueClass | FalseClass </td>
                 <td> vrai si a et b ont la même longueur et a[i] == b[i] pour i compris entre 0 et la longueur-1.</td>
             </tr>
             <tr>
                 <td> a.member?(o), o <b>in</b> a, a.include?(o) </td>
-                <td></td>
+                <td> TrueClass | FalseClass </td>
                 <td> vrai si a contient un indice référençant l'objet o </td>
             </tr>
             <tr>
                 <td> a.any? </td>
-                <td></td>
-                <td> vrai si a contient au moins 1 indice référençant un objet <strong>autre que nil</strong></td>
+                <td> TrueClass | FalseClass </td>
+                <td> vrai si a contient au moins 1 indice référençant un objet <u>autre que nil</u></td>
             </tr>
             <tr>
                 <td> a.all?(o) </td>
-                <td></td>
+                <td> TrueClass | FalseClass </td>
                 <td> vrai si tous les indices de a référencent l'objet o </td>
             </tr>
             <tr>
                 <td> a.empty? </td>
-                <td></td>
+                <td> TrueClass | FalseClass </td>
                 <td> vrai si la longueur de la liste a est égale à 0 </td>
             </tr>
             <tr>
                 <td> a.eql?(b) </td>
-                <td></td>
+                <td> TrueClass | FalseClass </td>
                 <td> vrai si a et b sont le même objet ou sont deux listes contenant les mêmes références </td>
             </tr>
             <tr>
                 <td> a.size, a.length </td>
-                <td></td>
+                <td> Fixnum | Bignum </td>
                 <td> retourne la taille de la liste a </td>
             </tr>
             <tr>
                 <td> a.nitems </td>
-                <td></td>
+                <td> Fixnum | Bignum </td>
                 <td> retourne le nombre d'éléments non égal à nil dans la liste a </td>
             </tr>
             <tr>
                 <td> a.min </td>
-                <td></td>
+                <td> selon élément </td>
                 <td> retourne l'élément minimal de la liste a (tous les éléments doivent pouvoir être comparés) </td>
             </tr>
             <tr>
                 <td> a.max </td>
-                <td></td>
+                <td> selon élément </td>
                 <td> retourne l'élément maximal de la liste a (tous les éléments doivent pouvoir être comparés)  </td>
             </tr>
         </tbody>
@@ -851,198 +883,198 @@
             </tr>
             <tr>
                 <td> a + b, a | b, a.concat(b) </td>
-                <td></td>
+                <td> Array </td>
                 <td> retourne une nouvelle liste qui est la concaténation de a et b </td>
             </tr>
             <tr>
                 <td> a - b </td>
-                <td></td>
+                <td> Array </td>
                 <td> retourne une nouvelle liste qui contient les éléments de a ne figurant pas dans b </td>
             </tr>
             <tr>
                 <td> a * i </td>
-                <td></td>
+                <td> Array </td>
                 <td> si i est un entier, retourne une nouvelle liste qui est la concaténation de i fois a </td>
             </tr>
             <tr>
                 <td> a * abc </td>
-                <td></td>
+                <td> String </td>
                 <td> si abc est une chaîne, retourne une nouvelle chaîne qui est la concaténation des éléments de a séparés par abc. Équivalent de join.</td>
             </tr>
             <tr>
                 <td> a & b</td>
-                <td></td>
+                <td> Array </td>
                 <td> renvoie une nouvelle liste contenant les éléments communs à a et b</td>
             </tr>
             <tr>
                 <td> a &lt;&lt; e </td>
-                <td></td>
+                <td> Array (a) </td>
                 <td> ajout d'un élément e dans l1 </td>
             </tr>
             <tr>
                 <td> a &lt;=&gt; b </td>
-                <td></td>
+                <td> Fixnum (-1, 0 ou 1) </td>
                 <td> passe les éléments a et b à l'opérateur <=> un à un. S'arrête dès que le résultat est différent de 0 (donc à la première différence) et retourne le résultat </td>
             </tr>
             <tr>
                 <td> a.shift </td>
-                <td></td>
-                <td> retourne le premier élément et l'enlève. retourne nil si la liste a est vide </td>
+                <td> selon élément </td>
+                <td> retourne le premier élément et l'enlève. Retourne <b>nil</b> si la liste a est vide </td>
             </tr>
             <tr>
                 <td> a.pop </td>
-                <td></td>
-                <td> retourne le dernier élément et l'enlève </td>
+                <td> selon élément </td>
+                <td> retourne le dernier élément et l'enlève. Retourne <b>nil</b> si la liste a est vide </td>
             </tr>
             <tr>
                 <td> a.reverse </td>
-                <td></td>
+                <td> Array </td>
                 <td> donne la liste inversée </td>
             </tr>
             <tr>
                 <td> a.reverse! </td>
-                <td></td>
+                <td> Array </td>
                 <td> inverse l'ordre des éléments de a </td>
             </tr>
             <tr>
                 <td> a.flatten </td>
-                <td></td>
+                <td> Array </td>
                 <td> si la liste contient des listes, elles seront toutes fusionnées en la seule liste qui sera retournée </td>
             </tr>
             <tr>
                 <td> a.flatten! </td>
-                <td></td>
-                <td> si la liste contient des listes, elles seront toutes fusionnées au sein de la liste a. Retourne nil si aucune modification n'est faite </td>
+                <td> Array </td>
+                <td> si la liste contient des listes, elles seront toutes fusionnées au sein de la liste a. Retourne <b>nil</b> si aucune modification n'est faite </td>
             </tr>
             <tr>
                 <td> a.frozen? </td>
-                <td></td>
-                <td> retourne vrai si la liste ne peut être modifiée (soit par l'appel de la fonction freeze, soit durant un tri de façon temporaire) </td>
+                <td> TrueClass | FalseClass </td>
+                <td> retourne vrai si la liste ne peut être modifiée (soit par l'appel de la fonction <b>freeze</b>, soit durant un tri de façon temporaire) </td>
             </tr>
             <tr>
                 <td> a.hash </td>
-                <td></td>
+                <td> Fixnum </td>
                 <td> retourne une valeur unique selon le contenu de la liste. Deux listes avec le même contenu auront la même valeur </td>
             </tr>
             <tr>
                 <td> a.each { |o| actions } </td>
-                <td></td>
+                <td> Array (a) </td>
                 <td> parcours chaque élément de la liste a en le passant en paramètre du bloc </td>
             </tr>
             <tr>
                 <td> a.reverse_each { |o| actions } </td>
-                <td></td>
+                <td> Array (a) </td>
                 <td> parcours chaque élément de la liste a en ordre inverse en le passant en paramètre du bloc </td>
             </tr>
             <tr>
                 <td> a.each_index { |i| actions } </td>
-                <td></td>
+                <td> Array (a) </td>
                 <td> parcours chaque élément de la liste a en passant son indice en paramètre du bloc </td>
             </tr>
             <tr>
                 <td> a.compact </td>
-                <td></td>
-                <td> retourne une nouvelle liste à partir de a en ne reprenant pas les indices qui référencent nil</td>
+                <td> Array </td>
+                <td> retourne une nouvelle liste à partir de a en ne reprenant pas les indices qui référencent <b>nil</b></td>
             </tr>
             <tr>
                 <td> a.compact! </td>
-                <td></td>
-                <td> supprime dans la liste a les indices qui référencent nil. <strong>Retourne nil si aucun n'a été trouvé</strong>, a sinon</td>
+                <td> Array </td>
+                <td> supprime dans la liste a les indices qui référencent <b>nil</b>. <u>Retourne nil si aucun n'a été trouvé</u>, a sinon</td>
             </tr>
             <tr>
                 <td> a.map {|o| actions} a.collect {|o| actions} </td>
-                <td></td>
+                <td> Array </td>
                 <td> invoque le bloc pour chaque élément de la liste a et collecte les résultats dans une nouvelle liste retournée </td>
             </tr>
             <tr>
                 <td> a.map! {|o| actions} a.collect! {|o| actions} </td>
-                <td></td>
+                <td> Array (a) </td>
                 <td> remplace chaque élément de la liste a par l'élément retourné par le bloc appelé avec l'objet que référence l'indice en paramètre </td>
             </tr>
             <tr>
-                <td> partition </td>
-                <td></td>
-                <td> partitionne en deux listes selon le résultat d'un bloc </td>
+                <td> a.partition { |o| block } </td>
+                <td> Array </td>
+                <td> retourne une liste contenant deux listes. Dans la première sont les éléments pour lequel le bloc est vrai. Dans la seconde sont les éléments pour lequel le bloc est faux </td>
             </tr>
             <tr>
                 <td> a.join(sep) </td>
-                <td></td>
+                <td> String </td>
                 <td> fusionne tous les éléments de la liste a en y intercalant la chaîne sep (pareil que l'opérateur * avec une chaîne) </td>
             </tr>
             <tr>
-                <td> each_with_index </td>
-                <td></td>
+                <td> a.each_with_index { |o, i| block } </td>
+                <td> Array (a) </td>
                 <td> parcours la liste avec un bloc recevant l'élément et un index </td>
             </tr>
             <tr>
                 <td> a.uniq </td>
-                <td></td>
+                <td> Array </td>
                 <td> retourne une nouvelle liste en supprimant les éléments en double </td>
             </tr>
             <tr>
                 <td> a.uniq! </td>
-                <td></td>
+                <td> Array (a) </td>
                 <td> enlève les éléments en double dans a</td>
             </tr>
             <tr>
                 <td> a.sort, a.sort { |a, b| actions } </td>
-                <td></td>
+                <td> Array </td>
                 <td> retourne une nouvelle liste en triant les éléments de la liste a </td>
             </td>
             <tr>
-                <td> a.sort, a.sort { |a, b| actions } </td>
-                <td></td>
+                <td> a.sort!, a.sort! { |a, b| actions } </td>
+                <td> Array (a) </td>
                 <td> trie la liste a </td>
             </td>
             <tr>
                 <td> a.zip(p, ...), a.zip(p, ...) { |arr| actions } </td>
-                <td></td>
-                <td> p doit répondre à la méthode each. Associe chaque élément de p à un élément de a et retourne la nouvelle liste ainsi constituée. Si un bloc est fourni, chaque élément ainsi créé sera passé en paramètre au bloc mais la méthode retournera nil </td>
+                <td> Array | NilClass </td>
+                <td> p doit répondre à la méthode <b>each</b>. Associe chaque élément de p à un élément de a et retourne la nouvelle liste ainsi constituée. Si un bloc est fourni, chaque élément ainsi créé sera passé en paramètre au bloc mais la méthode retournera <b>nil</b> </td>
             </tr>
             <tr>
                 <td> a.assoc(o) </td>
-                <td></td>
+                <td> Array </td>
                 <td> la liste a doit être une liste de liste. Retourne la première liste (par ordre d'indice) qui se trouve dans a dont le premier élément est une référence vers o. </td>
             </tr>
             <tr>
                 <td> a.rassoc(o) </td>
-                <td></td>
+                <td> Array </td>
                 <td> la liste a doit être une liste de liste. Retourne la première liste (par ordre d'indice) qui se trouve dans a dont le second élément est une référence vers o. </td>
             </tr>
             <tr>
                 <td> a.to_a </td>
-                <td></td>
-                <td> renvoie la liste elle-même. si cette méthode est appelée sur une instance d'une sous-classe de Array, le résultat sera une instance d'Array (la classe-mère) </td>
+                <td> Array (a) </td>
+                <td> renvoie la liste elle-même. si cette méthode est appelée sur une instance d'une sous-classe de <b>Array</b>, le résultat sera une instance d'<b>Array</b> (la classe-mère) </td>
             </tr>
             <tr>
                 <td> a.to_ary </td>
-                <td></td>
+                <td> Array (a) </td>
                 <td> retourne a </td>
             </tr>
             <tr>
                 <td> a.to_s </td>
-                <td></td>
+                <td> String </td>
                 <td> retourne a.join (c'est-à-dire une chaîne des éléments de la liste concaténés sans séparateur) </td>
             </tr>
             <tr>
                 <td> a.inspect </td>
-                <td></td>
+                <td> String </td>
                 <td> renvoie une version affichable de la liste </td>
             </tr>
             <tr>
-                <td> inject </td>
-                <td></td>
-                <td> exécute un bloc sur chaque élément en passant le résultat à l'exécution suivante </td>
+                <td> a.inject(initial) { |r, o| block } </td>
+                <td> selon r </td>
+                <td> exécute un bloc sur chaque élément en passant le résultat à l'exécution suivante dans r. r est initialisé à a[0] et l'exécution du bloc commence à a[1] si initial n'est pas défini. Sinon r est égal à initial et l'exécution du bloc commence à a [0] </td>
             </tr>
             <tr>
                 <td> a.pack(template) </td>
-                <td></td>
+                <td> String </td>
                 <td> transforme le tableau en une séquence binaire (sous la forme d'une chaîne) selon le format template </td>
             </tr>
             <tr>
                 <td> a.transpose </td>
-                <td></td>
-                <td> ne marche qui a est une liste de liste. inverse les lignes et les colonnes </td>
+                <td> Array </td>
+                <td> ne marche que si a est une liste de liste. inverse les lignes et les colonnes </td>
             </tr>
         </tbody>
         </table>
@@ -1130,6 +1162,11 @@
                 <td> d.select { |key, value| block } </td>
                 <td> Hash </td>
                 <td> retourne un dictionnaire constitué des paires de d pour lesquelles le block, auquel on passe la clé et sa valeur correspondante, retourne vrai </td>
+            </tr>
+            <tr>
+                <td> d.reject { |key, value| block } </td>
+                <td> Hash </td>
+                <td> retourne un dictionnaire constitué des paires de d pour lesquelles le block, auquel on passe la clé et sa valeur correspondante, retourne faux </td>
             </tr>
             <tr>
                 <td> d.values_at(key1, key2, ...) </td>
@@ -1225,6 +1262,16 @@
                 <td> Hash (d) </td>
                 <td> enlève toutes les paires du dictionnaire pour lequel le bloc, auquel la paire est passée en paramètre, retourne vrai </td>
             </tr>
+            <tr>
+                <td> d.reject! { |key, value| block } </td>
+                <td> Hash (d) </td>
+                <td> ne garde que les paires pour laquelle le bloc, auquel on passe la clé et sa valeur, retourne faux </td>
+            </tr>
+            <tr>
+                <td> d.select! { |key, value| block } </td>
+                <td> Hash (d) </td>
+                <td> ne garde que les paires pour laquelle le bloc, auquel on passe la clé et sa valeur, retourne vrai </td>
+            </tr>
         </tbody>
         </table>
         
@@ -1255,7 +1302,7 @@
             <tr>
                 <td> d.default_proc </td>
                 <td> Proc </td>
-                <td> retourne la procédure par défaut lorsqu'une clé n'existe pas, si un bloc a été passé à la création du dictionnaire, sinon retourne <strong>nil</strong> </td>
+                <td> retourne la procédure par défaut lorsqu'une clé n'existe pas, si un bloc a été passé à la création du dictionnaire, sinon retourne <b>nil</b> </td>
             </tr>
             <tr>
                 <td> d.has_key?(key) <br> d.include?(key) <br> d.key?(key) <br>d.member?(key) </td>
@@ -1278,6 +1325,11 @@
                 <td> retourne le nombre de paires dans le dictionnaire </td>
             </tr>
             <tr>
+                <td> d.sort </td>
+                <td> Array </td>
+                <td> retourne une liste triée dont chaque élément est une sous-liste de 2 éléments : la clé et sa valeur </td>
+            </tr>
+            <tr>
                 <td> d.values </td>
                 <td> Array </td>
                 <td> fournit une liste de toutes les valeurs des paires du dictionnaire </td>
@@ -1298,6 +1350,11 @@
                 <td> d.invert </td>
                 <td> Hash </td>
                 <td> renvoi un nouveau dictionnaire où, pour chaque paire (clé, valeur) de d, on aura une paire (valeur, clé) </td>
+            </tr>
+            <tr>
+                <td> d.rehash </td>
+                <td> Hash (d) </td>
+                <td> Reconstruit le dictionnaire suivant ses différentes valeurs. Si un itérateur le parcours et que la fonction est appelée, une exception <b>RuntimeError</b> sera levée dans l'itérateur </td>
             </tr>
             <tr>
                 <td> d.to_a </td>
@@ -1609,6 +1666,14 @@
         <h2 id="elem_class">12. Classes et objets</h2>
         <!-- ---------------------------------------------------------------- -->
         
+        <h3 id="class_create">Création d'une classe</h3>
+        
+        <div class="code">
+            <b>class</b> identifiant [ &lt; parent ]<br>
+            &nbsp;&nbsp; actions<br>
+            <b>end</b>
+        </div>
+        
         <h3 id="objet">Type objet</h3>
         <table class="fun">
         <tbody>
@@ -1657,11 +1722,6 @@
         
         <h3 id="cls">Classes</h3>
         
-        <div class="code">
-            <b>class</b> identifiant [ &lt; parent ]<br>
-            &nbsp;&nbsp; actions<br>
-            <b>end</b>
-        </div>
         <div class="code">
             <b>self</b>  <i># L'instance elle-même</i>
         </div>
