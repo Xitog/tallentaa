@@ -25,13 +25,31 @@ YELLOW = Color(255, 255, 0)
 SKY_BLUE = Color(0, 255, 255)
 HALF_RED = Color(128, 0, 0)
 HALF_BLUE = Color(0, 0, 128)
+HALF_GREEN = Color(0, 128, 0)
+
+MINIMAP_GREEN_HALF = HALF_GREEN # terre verte
+MINIMAP_GREEN_LIGHT = Color(1,154,1) # terre verte claire
+MINIMAP_BROWN = Color(192,96,0) # terre marron claire
+MINIMAP_BROWN_DARK = Color(128,64,0) # terre marron sombre pas passable (rochers)
+MINIMAP_BLUE = BLUE # eau profonde pas passable
+MINIMAP_BLUE_LIGHT = Color(113,123,255) # eau claire peu profonde mais pas passable
 
 #UnitType = namedtuple("UnitType", "size range life dom speed reload")  # or ['size', 'range', 'life', 'dom']
 #BuildingType = namedtuple("BuildingType", "size range life dom speed reload type")
 
+class Texture:
+    def __init__(self, name, num, filename, minicolor, passable=True):
+        self.name = name
+        self.num = num
+        self.img = pygame.image.load('../../assets/tiles32x32/' + filename)
+        self.mini = minicolor
+        self.passable = passable
+
 TEXTURES = {
-    'ground' : pygame.image.load('../../assets/tiles32x32/ground.png'),
-    'rock' : pygame.image.load('../../assets/tiles32x32/rock_brown.png')
+    100 : Texture('ground', 100, 'ground.png', MINIMAP_BROWN),
+      1  : Texture('rock'  ,   1, 'rock_brown.png', MINIMAP_BROWN_DARK),
+    200 : Texture('grass' , 200, 'grass_two_leaves.png', MINIMAP_GREEN_LIGHT),
+    300 : Texture('water' , 300, 'water.png', MINIMAP_BLUE_LIGHT, False),
 }
 
 class Camera:
@@ -60,7 +78,8 @@ class Camera:
         self.add_mod = False
         self.mode = 'normal'  # or build
         self.build_size = Pair(3, 3)
-
+        self.not_enough_ress = 0
+    
     def select_zone(self, x, y, w, h):  # , player)
         x //= 32
         y //= 32
@@ -144,33 +163,42 @@ class Camera:
                 if event.button == 1:  # Left Button
                     if my > self.INTERFACE_Y and self.SELECT_Y > self.INTERFACE_Y: # Interface click
                         #if self.mode == 'normal':
+                        # CLICK FOR A BUILDING
                         a = mx // 32
                         b = (my-self.INTERFACE_Y) // 32
                         # print(a,b)
-                        if a == 0 and b == 0: # 100 000 000
+                        nb = a + b * 3
+                        if nb >= 0 and nb < len(self.player.game.all_building_types_ordered):
+                            btn = self.player.game.all_building_types_ordered[nb]
+                            bt = self.player.game.all_building_types[btn]
                             self.mode = 'build'
-                            self.build_type = 'mine'
-                            self.build_size = Pair(2, 2)
-                        elif a == 1 and b == 0: # 010 000 000
-                            self.mode = 'build'
-                            self.build_type = 'solar'
-                            self.build_size = Pair(2, 1)
-                        elif a == 2 and b == 0: # 001 000 000
-                            self.mode = 'build'
-                            self.build_type = 'radar'
-                            self.build_size = Pair(1, 1)
-                        elif a == 0 and b == 1: # 000 100 000
-                            self.mode = 'build'
-                            self.build_type = 'barracks'
-                            self.build_size = Pair(2, 3)
-                        elif a == 1 and b == 1: # 000 010 000
-                            self.mode = 'build'
-                            self.build_type = 'factory'
-                            self.build_size = Pair(2, 3)
-                        elif a == 2 and b == 1: # 000 001 000
-                            self.mode = 'build'
-                            self.build_type = 'laboratory'
-                            self.build_size = Pair(2, 2)
+                            self.build_type = btn
+                            self.build_size = Pair(bt.grid_w, bt.grid_h)
+                            
+                        #if a == 0 and b == 0: # 100 000 000
+                        #    self.mode = 'build'
+                        #    self.build_type = 'solar'
+                        #    self.build_size = Pair(2, 1)
+                        #elif a == 1 and b == 0: # 010 000 000
+                        #    self.mode = 'build'
+                        #    self.build_type = 'mine'
+                        #    self.build_size = Pair(2, 2)
+                        #elif a == 2 and b == 0: # 001 000 000
+                        #    self.mode = 'build'
+                        #    self.build_type = 'radar'
+                        #    self.build_size = Pair(1, 1)
+                        #elif a == 0 and b == 1: # 000 100 000
+                        #    self.mode = 'build'
+                        #    self.build_type = 'barracks'
+                        #    self.build_size = Pair(2, 3)
+                        #elif a == 1 and b == 1: # 000 010 000
+                        #    self.mode = 'build'
+                        #    self.build_type = 'factory'
+                        #    self.build_size = Pair(2, 3)
+                        #elif a == 2 and b == 1: # 000 001 000
+                        #    self.mode = 'build'
+                        #    self.build_type = 'laboratory'
+                        #    self.build_size = Pair(2, 2)
                         #elif self.mode == 'build':
                         #    pass
                     elif self.mode == 'normal':
@@ -203,7 +231,13 @@ class Camera:
                         v = self.player.world.is_empty_zone(xx-cw, yy-ch, self.build_size.x, self.build_size.y)
                         if v:
                             # Final Building Here
-                            self.player.game.create_building(self.player.name, xx-cw, yy-ch, self.build_type)
+                            bt = self.player.game.all_building_types[self.build_type]
+                            if self.player.min >= bt.cost[0] and self.player.sol >= bt.cost[1]:
+                                self.player.min -= bt.cost[0]
+                                self.player.sol -= bt.cost[1]
+                                self.player.game.create_building(self.player.name, xx-cw, yy-ch, self.build_type)
+                            else:
+                                self.not_enough_ress = 10
                         if not self.add_mod: # multiple construction orders
                             self.mode = 'normal'
                 elif event.button == 3:  # Right Button
@@ -257,31 +291,21 @@ class Camera:
         # Sol
         for yy in range(0, self.player.world.size32.y):
             for xx in range(0, self.player.world.size32.x):
-                r = self.player.world.world_map[xx][yy]
-                # base obstrusive
-                ##if r == 1:
-                ##    pygame.draw.rect(self.screen, RED, (xx * 32 + self.x +1, yy * 32 + self.y +1, 32-1, 32-1), 1)
-                ##    pygame.draw.line(self.screen, RED, (xx * 32 + self.x, yy * 32 + self.y), (xx * 32 + self.x + 31, yy * 32 + self.y + 31)),
-                ##    pygame.draw.line(self.screen, RED, (xx * 32 + self.x, yy * 32 + self.y + 31), (xx * 32 + self.x + 31, yy * 32 + self.y)),
-                # else:
-                    # pygame.draw.rect(self.screen, GREEN, (xx * 32 + self.x, yy * 32 + self.y, 32+1, 32+1), 1)
-                # base ground
-                ## pygame.draw.line(self.screen, GREEN, (xx * 32 + self.x, yy * 32 + self.y), (xx * 32 + self.x + 32, yy * 32 + self.y))
-                ## pygame.draw.line(self.screen, GREEN, (xx * 32 + self.x, yy * 32 + self.y), (xx * 32 + self.x, yy * 32 + self.y + 32))
-                self.screen.blit(TEXTURES['ground'], (xx * 32 + self.x, yy * 32 + self.y, xx * 32 + self.x + 32, yy * 32 + self.y))
-                if r == 1:
-                    self.screen.blit(TEXTURES['rock'], (xx * 32 + self.x, yy * 32 + self.y, xx * 32 + self.x + 32, yy * 32 + self.y))
+                t = self.player.world.world_map[xx][yy]
+                d = self.player.world.passable_map[xx][yy]
+                self.screen.blit(TEXTURES[t].img, (xx * 32 + self.x, yy * 32 + self.y, xx * 32 + self.x + 32, yy * 32 + self.y))
+                if d != 0 and d != 99:
+                    self.screen.blit(TEXTURES[d].img, (xx * 32 + self.x, yy * 32 + self.y, xx * 32 + self.x + 32, yy * 32 + self.y))
+                
                 u = self.player.world.unit_map[xx][yy]
                 if u == 0:
                     pass # Empty
-                elif u[0] == -1:
+                elif u[0] == -1: # en mouvement, carreau reserve
                     pygame.draw.rect(self.screen, HALF_RED, (xx * 32 + self.x +1, yy * 32 + self.y +1, 32-1, 32-1), 0)
-                elif u[1] == 1:
+                elif u[1] == 1: # en position
                     pygame.draw.rect(self.screen, HALF_BLUE, (xx * 32 + self.x +1, yy * 32 + self.y +1, 32-1, 32-1), 0)
                 elif u[1] == 2:
                     pass # Building
-                # label = self.font.render(str(xx) + ", " + str(yy), 1, (255, 255, 0))
-                # self.screen.blit(label, (int(xx * 32 + self.x), int(yy * 32 + self.y)))
         
         # Cursor
         if self.mode == 'normal':
@@ -297,7 +321,7 @@ class Camera:
             # test if ok
             v = self.player.world.is_empty_zone(xx-cw, yy-ch, self.build_size.x, self.build_size.y)
             if v:
-                c = BLUE
+                c = GREEN
             else:
                 c = RED
             pygame.draw.rect(self.screen, c, ((xx-cw)*32+self.x, (yy-ch)*32+self.y, self.build_size.x*32,
@@ -311,11 +335,9 @@ class Camera:
                         #print(ix, iy, ix * 32 + self.x, iy * 32 + self.y)
                         pygame.draw.rect(self.screen, u.player.color, (ix * 32 + self.x, iy * 32 + self.y, 32, 32), 0)
                         if u in self.selected: # and u.grid_x == ix and u.grid_y == iy:
-                            pygame.draw.rect(self.screen, GREEN, (u.grid_x * 32 + self.x, u.grid_y * 32 + self.y, u.type.grid_h * 32, u.type.grid_w * 32), 2)
+                            pygame.draw.rect(self.screen, GREEN, (u.grid_x * 32 + self.x, u.grid_y * 32 + self.y, u.type.grid_w * 32, u.type.grid_h * 32), 2)
             else:
                 if u in self.selected:
-                    # if u.player != self.player:
-                    #     c = RED
                     if len(u.orders) > 0:
                         lx = u.real_x + self.x
                         ly = u.real_y + self.y
@@ -326,10 +348,10 @@ class Camera:
                                 lx = self.x2r(o.x)
                                 ly = self.y2r(o.y)
                             elif o.kind == 'attack':
-                                pygame.draw.circle(self.screen, RED, (o.target.x*32+16 + self.x, o.target.y*32+16 + self.y), 5, 0)
-                                pygame.draw.line(self.screen, RED, (lx + self.x, ly + self.y), (o.target.x*32+16 + self.x, o.target.y*32+16 + self.y), 1)
-                                lx = o.target.x
-                                ly = o.target.y
+                                #pygame.draw.circle(self.screen, RED, (o.target.x*32+16 + self.x, o.target.y*32+16 + self.y), 5, 0)
+                                pygame.draw.line(self.screen, RED, (lx, ly), (self.x2r(o.target.x), self.y2r(o.target.y)), 1)
+                                lx = self.x2r(o.target.x)
+                                ly = self.y2r(o.target.y)
                     pygame.draw.circle(self.screen, u.player.color, (u.real_x + self.x, u.real_y + self.y), u.size, 0)
                     if u.player == self.player:
                         pygame.draw.circle(self.screen, GREEN, (u.real_x + self.x, u.real_y + self.y), u.size+3, 2)
@@ -351,35 +373,55 @@ class Camera:
         pygame.draw.line(self.screen, BLUE, (703, self.INTERFACE_Y + 96), (799, self.INTERFACE_Y + 96), 1)
 
         # Build menu
-        label = self.font.render('Min', 1, (0, 0, 0))
-        self.screen.blit(label, (8, self.INTERFACE_Y+8))
-        label = self.font.render('Sol', 1, (0, 0, 0))
-        self.screen.blit(label, (40, self.INTERFACE_Y+8))
-        label = self.font.render('Rad', 1, (0, 0, 0))
-        self.screen.blit(label, (72, self.INTERFACE_Y+8))
         
-        label = self.font.render('Cas', 1, (0, 0, 0))
-        self.screen.blit(label, (8, self.INTERFACE_Y+40))
-        label = self.font.render('Fac', 1, (0, 0, 0))
-        self.screen.blit(label, (40, self.INTERFACE_Y+40))
-        label = self.font.render('Lab', 1, (0, 0, 0))
-        self.screen.blit(label, (72, self.INTERFACE_Y+40))
+        xs = 8
+        ys = self.INTERFACE_Y + 8
+        for btn in self.player.game.all_building_types_ordered:
+            bt = self.player.game.all_building_types[btn]
+            label = self.font.render(bt.name[0:3], 1, (255, 255, 0))
+            self.screen.blit(label, (xs, ys))
+            xs += 32
+            if xs > 72:
+                xs = 8
+                ys += 32
+            
+        #label = self.font.render('Min', 1, (0, 0, 0))
+        #self.screen.blit(label, (8, self.INTERFACE_Y+8))
+        #label = self.font.render('Sol', 1, (0, 0, 0))
+        #self.screen.blit(label, (40, self.INTERFACE_Y+8))
+        #label = self.font.render('Rad', 1, (0, 0, 0))
+        #self.screen.blit(label, (72, self.INTERFACE_Y+8))
+        
+        #label = self.font.render('Cas', 1, (0, 0, 0))
+        #self.screen.blit(label, (8, self.INTERFACE_Y+40))
+        #label = self.font.render('Fac', 1, (0, 0, 0))
+        #self.screen.blit(label, (40, self.INTERFACE_Y+40))
+        #label = self.font.render('Lab', 1, (0, 0, 0))
+        #self.screen.blit(label, (72, self.INTERFACE_Y+40))
         
         # Metal (min) & Energie (sol)
-        label = self.font.render("M : " + str(int(self.player.min)) + " E : " + str(int(self.player.sol)), 1, (255, 255, 0))
+        min = int(self.player.min)
+        sol = int(self.player.sol)
+        if self.not_enough_ress > 0:
+            label = self.font.render("M : %(min)04d E : %(sol)04d NOT ENOUGH RESSOURCES!" % {"min" : min, "sol" : sol}, 1, (255, 0, 0))
+            self.not_enough_ress -= 1
+        else:
+            label = self.font.render("M : %(min)04d E : %(sol)04d" % {"min" : min, "sol" : sol}, 1, (255, 255, 0))
         self.screen.blit(label, (5, self.INTERFACE_Y+104))
         
         # Minimap
         for yy in range(0, self.player.world.size32.y):
             for xx in range(0, self.player.world.size32.x):
-                r = self.player.world.world_map[xx][yy]
-                if r == 1:
-                    pygame.draw.rect(self.screen, RED, (xx * 3 + 22 * 32, yy * 3 + self.INTERFACE_Y +1, 3, 3), 0)
+                t = self.player.world.world_map[xx][yy]
+                d = self.player.world.passable_map[xx][yy]
+                if d != 0 and d != 99:
+                    pygame.draw.rect(self.screen, TEXTURES[d].mini, (xx * 3 + 22 * 32, yy * 3 + self.INTERFACE_Y +1, 3, 3), 0)
                 else:
-                    pygame.draw.rect(self.screen, GREEN, (xx * 3 + 22 * 32, yy * 3 + self.INTERFACE_Y +1, 3, 3), 0)
+                    pygame.draw.rect(self.screen, TEXTURES[t].mini, (xx * 3 + 22 * 32, yy * 3 + self.INTERFACE_Y +1, 3, 3), 0)
                 u = self.player.world.unit_map[xx][yy]
-                if u != 0 and u[0] == 1:
-                    pygame.draw.rect(self.screen, BLUE, (xx * 3 + 22 * 32, yy * 3 + self.INTERFACE_Y +1, 3, 3), 0)
+                if u != 0:
+                    if u[0] == 1 or u[0] == 2:
+                        pygame.draw.rect(self.screen, u[1].player.color, (xx * 3 + 22 * 32, yy * 3 + self.INTERFACE_Y +1, 3, 3), 0)
         # fin Interface
 
         pygame.display.flip()
@@ -440,7 +482,22 @@ class World:
             raise Exception("Empty map detected")
         self.size32 = Pair(len(world_map[0]), len(world_map))
         self.unit_map = World.create_map(self.size32.x, self.size32.y, 0)
-        self.world_map = world_map
+        self.world_map = World.create_map(self.size32.x, self.size32.y, 0)
+        self.passable_map = World.create_map(self.size32.x, self.size32.y, 0)
+        # separate [128] => 100 (in world map) + 28 (in passable_map or 99 if texture not passable by default (and no doodad can be put on it))
+        for yy in range(0, self.size32.y):
+            for xx in range(0, self.size32.x):
+                r = world_map[xx][yy]
+                self.world_map[xx][yy] = (r // 100) * 100
+        
+        for yy in range(0, self.size32.y):
+            for xx in range(0, self.size32.x):
+                r = world_map[xx][yy] # 101, 228, 312
+                self.passable_map[xx][yy] = r % 100
+                r = self.world_map[xx][yy] # 100, 200, 300
+                if not TEXTURES[r].passable:
+                    self.passable_map[xx][yy] = 99
+        
         self.units = []
     
     def is_valid(self, x, y):
@@ -451,22 +508,20 @@ class World:
             if x + w < self.size32.x and y + h <= self.size32.y:
                 return True
         return False
-
+    
     def is_empty_zone(self, x, y, w, h):
         if not self.is_valid_zone(x, y, w, h):
             return False
         else:
             for i in range(x, x+w):
                 for j in range(y, y+h):
-                    if self.unit_map[i][j] != 0 or self.world_map[i][j] != 0:
+                    if self.passable_map[x][y] != 0 and self.unit_map[i][j] != 0:
                         return False
             return True
-
+    
     def is_empty(self, x, y):  # no unit, no blocking terrain
-        # print("EMPTY UNIT : ", self.unit_map[x][y])
-        # print("EMPTY WORLD : ", self.world_map[x][y])
-        return self.unit_map[x][y] == 0 and self.world_map[x][y] == 0
-
+        return self.passable_map[x][y] == 0 and self.unit_map[x][y] == 0
+    
     def is_unit(self, x, y):
         return self.unit_map[x][y] != 0
 
@@ -490,26 +545,27 @@ class Game:
                           "elite": UnitType("Elite", size=10, range=150, life=100, dom=10, speed=8, reload=50),
                           "big": UnitType("Big", size=20, range=30, life=300, dom=20, speed=8, reload=50)}
         # self.building_type = {"mine": BuildingType(size=(2,2), range=20, life=300, dom=0, speed=0, reload=0, type=1)}
-        self.all_building_types = {"mine" : BuildingType("Mine", 2, 2, 100),
-                                   "solar" : BuildingType("Solar", 1, 2, 80),
-                                   "barracks" : BuildingType("Barracks", 3, 2, 300),
-                                   "factory" : BuildingType("Factory", 3, 2, 500),
-                                   "radar" : BuildingType("Radar", 1, 1, 80),
-                                   "laboratory" : BuildingType("Laboratory", 2, 2, 250),
+        self.all_building_types = {"mine" : BuildingType("Mine", 2, 2, 100, (0,50)),
+                                   "solar" : BuildingType("Solar", 1, 2, 80, (0, 50)),
+                                   "radar" : BuildingType("Radar", 1, 1, 80, (50, 200)),
+                                   "barracks" : BuildingType("Barracks", 3, 2, 300, (50, 100)),
+                                   "factory" : BuildingType("Factory", 3, 2, 500, (200, 200)),
+                                   "laboratory" : BuildingType("Laboratory", 2, 2, 250, (100, 400)),
                                   }
-    
-    def create_player(self, name, player_color):
+        self.all_building_types_ordered = ["solar", "mine", "radar", "barracks", "factory", "laboratory"]
+        
+    def create_player(self, name, player_color, *ress):
         print("creating player")
         if name in self.players:
             raise Exception("Already a player with this name")
-        self.players[name] = Player(self, name, player_color)
+        self.players[name] = Player(self, name, player_color, ress)
 
     def create_unit(self, player_name, x, y, unit_type_name):
         sys.stdout.write("creating unit")
         p = self.get_player_by_name(player_name)
         ut = self.get_unit_type_by_name(unit_type_name)
         if not self.world.is_valid(x, y) or not self.world.is_empty(x,y):
-            raise Exception("False or not empty coordinates : " + x + ", " + y)
+            raise Exception("False or not empty coordinates : " + str(x) + ", " + str(y) + " p = " + str(self.world.passable_map[x][y]))
         u = Unit(ut, p, x, y)
         self.world.units.append(u)
         p.units.append(u)
@@ -521,7 +577,7 @@ class Game:
         p = self.get_player_by_name(player_name)
         bt = self.get_building_type_by_name(building_type_name)
         if not self.world.is_valid_zone(x, y, bt.grid_w, bt.grid_h) or not self.world.is_empty_zone(x, y, bt.grid_w, bt.grid_h):
-            raise Exception("False or not empty coordinates : " + x + ", " + y)
+            raise Exception("False or not empty coordinates : " + str(x) + ", " + str(y))
         b = Building(p, bt, x, y)
         self.world.units.append(b) 
         p.buildings.append(b)
@@ -571,15 +627,15 @@ class Game:
 
 
 class Player:
-    def __init__(self, game, name, player_color):
+    def __init__(self, game, name, player_color, ress):
         self.game = game
         self.name = name
         self.world = game.world
         self.color = player_color
         self.units = []
         self.buildings = []
-        self.min = 0
-        self.sol = 0
+        self.min = ress[0]
+        self.sol = ress[1]
     
     def update(self):
             # Update for all units?
@@ -646,11 +702,12 @@ class WeaponType:
 
 class BuildingType:
 
-    def __init__(self, name : str, grid_h : int, grid_w : int, life : int, build_load : BuildLoad = None, weapon_type : WeaponType = None):
+    def __init__(self, name : str, grid_h : int, grid_w : int, life : int, cost : int, build_load : BuildLoad = None, weapon_type : WeaponType = None):
         self.name = name
         self.grid_h = grid_h
         self.grid_w = grid_w
         self.life = life
+        self.cost = cost
         self.build_load = build_load
         self.weapon_type = weapon_type
 
@@ -684,8 +741,12 @@ class Building(GameObject):
     def update(self):
         if self.type.name == "Mine":
             self.player.min += 0.2
+            if self.player.min > 9999:
+                self.player.min = 9999
         elif self.type.name == "Solar":
             self.player.sol += 0.2
+            if self.player.sol > 9999:
+                self.player.sol = 9999
         return True # Very Important
     
     def order(self, o):
@@ -913,49 +974,53 @@ def main_loop(camera):
     print("Energy = " + str(camera.player.sol))
 
 def configure():
+    # 1 rock 0 ground 2 grass 3 water 
     my_map = [
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 200, 200, 200, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 200, 200, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 200, 200, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 101, 101, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 101, 100, 100, 100, 100, 300, 300, 300, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 300, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 300, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 300, 300, 300, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 300, 300, 300, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 300, 300, 300, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 101, 101, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 101, 100, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 101, 101, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
     ]
     # print('map x :', len(my_map[0]))
     # print('map y :', len(my_map))
 
     g = Game('Test 1', World(my_map))
-    g.create_player("Bob", YELLOW)
-    g.create_player("Henry", SKY_BLUE)
+    g.create_player("Bob", YELLOW, 100, 100)
+    g.create_player("Henry", SKY_BLUE, 0, 0)
     g.create_unit("Bob", 1, 1, "soldier")
     g.create_unit("Bob", 3, 3, "elite")
+    
     g.create_unit("Henry", 12, 12, "big")
+    g.create_unit("Henry", 17, 14, "soldier")
+    
     g.create_building("Bob", 5, 5, "mine")
     
     return Camera(800, 600, 5, g.get_player_by_name("Bob"))  # x, y, scroll, player
