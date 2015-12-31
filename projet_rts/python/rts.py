@@ -46,10 +46,23 @@ class Texture:
         self.passable = passable
 
 TEXTURES = {
-    100 : Texture('ground', 100, 'ground.png', MINIMAP_BROWN),
+    # Doodads
       1  : Texture('rock'  ,   1, 'rock_brown.png', MINIMAP_BROWN_DARK),
-    200 : Texture('grass' , 200, 'grass_two_leaves.png', MINIMAP_GREEN_LIGHT),
+    # Real textures
+    100 : Texture('grass' , 200, 'grass_two_leaves.png', MINIMAP_GREEN_LIGHT),
+    200 : Texture('ground', 100, 'ground.png', MINIMAP_BROWN),
     300 : Texture('water' , 300, 'water.png', MINIMAP_BLUE_LIGHT, False),
+    # Computed textures
+    # 1300 : Texture('grass_water_lm', 1200, 'grass_water_ml.png', MINIMAP_BLUE_LIGHT, False),
+    # minimap color depends !!!
+    91 : Texture('w1', 91, 'w1.png', MINIMAP_GREEN_LIGHT, False), 
+    92 : Texture('w2', 92, 'w2.png', MINIMAP_GREEN_LIGHT, False),
+    93 : Texture('w3', 93, 'w3.png', MINIMAP_GREEN_LIGHT, False),
+    94 : Texture('w4', 94, 'w4.png', MINIMAP_GREEN_LIGHT, False),
+    95 : Texture('w5', 95, 'w5.png', MINIMAP_GREEN_LIGHT, False),
+    96 : Texture('w6', 96, 'w6.png', MINIMAP_GREEN_LIGHT, False),
+    97 : Texture('w7', 97, 'w7.png', MINIMAP_GREEN_LIGHT, False),
+    98 : Texture('w8', 98, 'w8.png', MINIMAP_GREEN_LIGHT, False),
 }
 
 class Camera:
@@ -497,6 +510,32 @@ class World:
                 r = self.world_map[xx][yy] # 100, 200, 300
                 if not TEXTURES[r].passable:
                     self.passable_map[xx][yy] = 99
+        
+        # Computation of passage from tex to tex
+        for yy in range(0, self.size32.y):
+            for xx in range(0, self.size32.x):
+                r = world_map[xx][yy]
+                if xx < self.size32.x - 1:
+                    r_middle_right = world_map[xx+1][yy]
+                    if r_middle_right != r:
+                        if r_middle_right == 300:
+                            #self.world_map[xx][yy] = 1300
+                            self.passable_map[xx][yy] = 98
+                if xx > 1:
+                    r_middle_left = world_map[xx-1][yy]
+                    if r_middle_left != r:
+                        if r_middle_left == 300:
+                            self.passable_map[xx][yy] = 94
+                if yy > 1:
+                    r_top_center = world_map[xx][yy-1]
+                    if r_top_center != r:
+                        if r_top_center == 300:
+                            self.passable_map[xx][yy] = 96 # why?
+                if yy < self.size32.y - 1:
+                    r_bottom_center = world_map[xx][yy+1]
+                    if r_bottom_center != r:
+                        if r_bottom_center == 300:
+                            self.passable_map[xx][yy] = 92 #why?
         
         self.units = []
     
@@ -1019,7 +1058,7 @@ def configure():
     g.create_unit("Bob", 3, 3, "elite")
     
     g.create_unit("Henry", 12, 12, "big")
-    g.create_unit("Henry", 17, 14, "soldier")
+    g.create_unit("Henry", 18, 14, "soldier")
     
     g.create_building("Bob", 5, 5, "mine")
     
