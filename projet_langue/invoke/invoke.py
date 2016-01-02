@@ -6,6 +6,7 @@
 import os
 import sys
 import sqlite3
+import unicodedata
 
 # print("Current working dir : " + os.getcwd())
 # os.chdir("C:\\Users\\damie_000\\Documents\GitHub\\tallentaa\\projet_langue\\invoke")
@@ -1426,7 +1427,18 @@ def exec_cmd(p_main, p_lang, p_order, p_auto=False, p_to=None, p_debug=False):
     for p_row in p_cursor.execute(p_string):
         if display:
             if p_main == 'select':
-                print("#" + str(p_row[0]) + "  " + p_row[1])
+                try:
+                    print("#" + str(p_row[0]) + "  " + p_row[1])
+                except UnicodeEncodeError as e:
+                    word = p_row[1]
+                    word_modified = ''
+                    for letter in word:
+                        if letter == "\u0153":
+                            word_modified += 'oe'
+                        else:
+                            word_modified += letter
+                        #print('%04x' % ord(letter))
+                    print("#" + str(p_row[0]) + "  " + word_modified)
             elif p_main == 'trans':
                 sys.stdout.write("#" + str(p_row[5]) + "  " + p_row[1] + " (" + str(p_row[0]) + ")")
                 if p_row[4] is not None:
@@ -1514,6 +1526,7 @@ def mainloop():
     cmd_debug = True
     print("i Welcome to Invoke v1.2")
     print("i Type 'help' for help")
+    print("i DEBUG is set to", cmd_debug)
     while not escape:
         cmd = input('>>> ')
         if cmd == 'exit':
@@ -1532,10 +1545,11 @@ def mainloop():
             print("    conjugate ... - conjugate the given verb (only ion French)")
             print("  Parameter settings:")
             print("    order ... - set the order of the returned results")
-            print("    lang ... - set the lang of the returned results (for select and trans")
+            print("    lang ... - set the lang of the returned results (for select and trans)")
             print("    lang - get the current lang of the returned results and translation")
             print("    to ... - set the translation of the returned results (for trans)")
             print("    auto - switch to wait for a key or not before executing the command")
+            print("  Available languages are : fr, en, it, eo, de")
         elif cmd == 'create':
             print("i Recreating the database")
             create()
@@ -1572,8 +1586,13 @@ def mainloop():
         elif len(cmd.split(' ')) > 1:
             c_tab = cmd.split(' ')
             if c_tab[0] == 'select':
-                if c_tab[1] == 'fr':
-                    exec_cmd('select', 'fr', cmd_order)
+                if c_tab[1] in ['fr', 'it', 'eo', 'en', 'de']:
+                    if c_tab[1] != cmd_lang: # order must be set to the language we call
+                        exec_cmd('select', c_tab[1], c_tab[1] + ".lang, " + c_tab[1] + ".base", cmd_auto, None, cmd_debug)
+                    else:
+                        exec_cmd('select', c_tab[1], cmd_order, cmd_auto, None, cmd_debug)
+                else:
+                    print("! Unknown language : ", c_tab[1])
             elif c_tab[0] == 'order':
                 cmd_order = c_tab[1]
             elif c_tab[0] == 'lang':
