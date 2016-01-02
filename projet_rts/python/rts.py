@@ -41,7 +41,10 @@ class Texture:
     def __init__(self, name, num, filename, minicolor, passable=True):
         self.name = name
         self.num = num
-        self.img = pygame.image.load('../../assets/tiles32x32/' + filename)
+        if filename.__class__ == str:
+            self.img = pygame.image.load('../../assets/tiles32x32/' + filename)
+        elif filename.__class__ == pygame.Surface:
+            self.img = filename
         self.mini = minicolor
         self.passable = passable
 
@@ -52,18 +55,44 @@ TEXTURES = {
     100 : Texture('grass' , 200, 'grass_two_leaves.png', MINIMAP_GREEN_LIGHT),
     200 : Texture('ground', 100, 'ground.png', MINIMAP_BROWN),
     300 : Texture('water' , 300, 'water.png', MINIMAP_BLUE_LIGHT, False),
+    
+    9100 : Texture('w1', 9100, 'w1.png', MINIMAP_BLUE_LIGHT, False), 
+    9200 : Texture('w2', 9200, 'w2.png', MINIMAP_BLUE_LIGHT, False), 
+    9300 : Texture('w3', 9300, 'w3.png', MINIMAP_BLUE_LIGHT, False),
+    9400 : Texture('w4', 9400, 'w4.png', MINIMAP_BLUE_LIGHT, False), 
+    9500 : Texture('w5', 9500, 'w5.png', MINIMAP_BLUE_LIGHT, False), 
+    9600 : Texture('w6', 9600, 'w6.png', MINIMAP_BLUE_LIGHT, False), 
+    9700 : Texture('w7', 9700, 'w7.png', MINIMAP_BLUE_LIGHT, False), 
+    9800 : Texture('w8', 9800, 'w8.png', MINIMAP_BLUE_LIGHT, False), 
+    8200 : Texture('x2', 8200, 'x2.png', MINIMAP_BLUE_LIGHT, False), 
+    8400 : Texture('x4', 8400, 'x4.png', MINIMAP_BLUE_LIGHT, False),
+    8300 : Texture('x24', 8300, 'x24.png', MINIMAP_BLUE_LIGHT, False),
+    
     # Computed textures
     # 1300 : Texture('grass_water_lm', 1200, 'grass_water_ml.png', MINIMAP_BLUE_LIGHT, False),
     # minimap color depends !!!
-    91 : Texture('w1', 91, 'w1.png', MINIMAP_GREEN_LIGHT, False), 
-    92 : Texture('w2', 92, 'w2.png', MINIMAP_GREEN_LIGHT, False),
-    93 : Texture('w3', 93, 'w3.png', MINIMAP_GREEN_LIGHT, False),
-    94 : Texture('w4', 94, 'w4.png', MINIMAP_GREEN_LIGHT, False),
-    95 : Texture('w5', 95, 'w5.png', MINIMAP_GREEN_LIGHT, False),
-    96 : Texture('w6', 96, 'w6.png', MINIMAP_GREEN_LIGHT, False),
-    97 : Texture('w7', 97, 'w7.png', MINIMAP_GREEN_LIGHT, False),
-    98 : Texture('w8', 98, 'w8.png', MINIMAP_GREEN_LIGHT, False),
+    
+    #91 : Texture('w1', 91, 'w1.png', MINIMAP_GREEN_LIGHT, False), 
+    #92 : Texture('w2', 92, 'w2.png', MINIMAP_GREEN_LIGHT, False),
+    #93 : Texture('w3', 93, 'w3.png', MINIMAP_GREEN_LIGHT, False),
+    #94 : Texture('w4', 94, 'w4.png', MINIMAP_GREEN_LIGHT, False),
+    #95 : Texture('w5', 95, 'w5.png', MINIMAP_GREEN_LIGHT, False),
+    #96 : Texture('w6', 96, 'w6.png', MINIMAP_GREEN_LIGHT, False),
+    #97 : Texture('w7', 97, 'w7.png', MINIMAP_GREEN_LIGHT, False),
+    #98 : Texture('w8', 98, 'w8.png', MINIMAP_GREEN_LIGHT, False),
 }
+
+# Mixing Texture
+for a in [9100, 9200, 9300, 9400, 9500, 9600, 9700, 9800, 8200, 8400, 8300]:
+    for b in [100]:
+        s = pygame.Surface((32,32))
+        s.blit(TEXTURES[b].img, (0, 0))
+        s.blit(TEXTURES[a].img, (0, 0))
+        if a > 9000:
+            n = b*10+a-9000
+        else:
+            n = b*10+1000+a-8000
+        TEXTURES[n] = Texture(str(n), n, s, TEXTURES[a].mini, TEXTURES[a].passable)
 
 class Camera:
     def __init__(self, width, height, scroll, player):
@@ -100,7 +129,7 @@ class Camera:
         h //= 32
         ul = []
         if x == w and y == h:  # a square
-            t = self.player.world.unit_map[x][y]
+            t = self.player.world.unit_map[y][x]
             if self.player.world.is_unit(x, y):
                 # if t[1].player == player:
                 ul.append(t[1])
@@ -108,7 +137,7 @@ class Camera:
             for i in range(x, w):
                 for j in range(y, h):
                     # print(i, j)
-                    t = self.player.world.unit_map[i][j]
+                    t = self.player.world.unit_map[j][i]
                     if self.player.world.is_unit(i, j):
                         # if t[1].player == player:
                         ul.append(t[1])
@@ -260,7 +289,7 @@ class Camera:
                         pass
                     else:
                         print('button right')
-                        s = self.player.world.unit_map[int((mx - self.x)/32)][int((my - self.y)/32)]
+                        s = self.player.world.unit_map[int((my - self.y)/32)][int((mx - self.x)/32)]
                         if s == 0:  # nothing at the square clicked
                             # faut-il faire un for u in self.selected?
                             self.game.order_move(self.selected, (mx - self.x) // 32, (my - self.y) // 32, self.add_mod)
@@ -304,13 +333,13 @@ class Camera:
         # Sol
         for yy in range(0, self.player.world.size32.y):
             for xx in range(0, self.player.world.size32.x):
-                t = self.player.world.world_map[xx][yy]
-                d = self.player.world.passable_map[xx][yy]
+                t = self.player.world.world_map[yy][xx]
+                d = self.player.world.passable_map[yy][xx]
                 self.screen.blit(TEXTURES[t].img, (xx * 32 + self.x, yy * 32 + self.y, xx * 32 + self.x + 32, yy * 32 + self.y))
                 if d != 0 and d != 99:
                     self.screen.blit(TEXTURES[d].img, (xx * 32 + self.x, yy * 32 + self.y, xx * 32 + self.x + 32, yy * 32 + self.y))
                 
-                u = self.player.world.unit_map[xx][yy]
+                u = self.player.world.unit_map[yy][xx]
                 if u == 0:
                     pass # Empty
                 elif u[0] == -1: # en mouvement, carreau reserve
@@ -320,6 +349,10 @@ class Camera:
                 elif u[1] == 2:
                     pass # Building
         
+                # DEBUG
+                label = self.font.render("%(v)04d" % {"v" : self.player.world.debug_map[yy][xx]}, 1, (255, 0, 0))
+                self.screen.blit(label, (xx * 32 + self.x, yy * 32 + self.y))
+                
         # Cursor
         if self.mode == 'normal':
             if self.SELECT_R:
@@ -425,13 +458,13 @@ class Camera:
         # Minimap
         for yy in range(0, self.player.world.size32.y):
             for xx in range(0, self.player.world.size32.x):
-                t = self.player.world.world_map[xx][yy]
-                d = self.player.world.passable_map[xx][yy]
+                t = self.player.world.world_map[yy][xx]
+                d = self.player.world.passable_map[yy][xx]
                 if d != 0 and d != 99:
                     pygame.draw.rect(self.screen, TEXTURES[d].mini, (xx * 3 + 22 * 32, yy * 3 + self.INTERFACE_Y +1, 3, 3), 0)
                 else:
                     pygame.draw.rect(self.screen, TEXTURES[t].mini, (xx * 3 + 22 * 32, yy * 3 + self.INTERFACE_Y +1, 3, 3), 0)
-                u = self.player.world.unit_map[xx][yy]
+                u = self.player.world.unit_map[yy][xx]
                 if u != 0:
                     if u[0] == 1 or u[0] == 2:
                         pygame.draw.rect(self.screen, u[1].player.color, (xx * 3 + 22 * 32, yy * 3 + self.INTERFACE_Y +1, 3, 3), 0)
@@ -497,46 +530,141 @@ class World:
         self.unit_map = World.create_map(self.size32.x, self.size32.y, 0)
         self.world_map = World.create_map(self.size32.x, self.size32.y, 0)
         self.passable_map = World.create_map(self.size32.x, self.size32.y, 0)
+        self.debug_map = World.create_map(self.size32.x, self.size32.y, 0)
         # separate [128] => 100 (in world map) + 28 (in passable_map or 99 if texture not passable by default (and no doodad can be put on it))
         for yy in range(0, self.size32.y):
             for xx in range(0, self.size32.x):
-                r = world_map[xx][yy]
-                self.world_map[xx][yy] = (r // 100) * 100
+                r = world_map[yy][xx]
+                self.world_map[yy][xx] = (r // 100) * 100
         
         for yy in range(0, self.size32.y):
             for xx in range(0, self.size32.x):
-                r = world_map[xx][yy] # 101, 228, 312
-                self.passable_map[xx][yy] = r % 100
-                r = self.world_map[xx][yy] # 100, 200, 300
+                r = world_map[yy][xx] # 101, 228, 312
+                self.passable_map[yy][xx] = r % 100
+                r = self.world_map[yy][xx] # 100, 200, 300
                 if not TEXTURES[r].passable:
-                    self.passable_map[xx][yy] = 99
+                    self.passable_map[yy][xx] = 99
         
         # Computation of passage from tex to tex
+        world_map2 = World.create_map(self.size32.x, self.size32.y, 0)
         for yy in range(0, self.size32.y):
             for xx in range(0, self.size32.x):
-                r = world_map[xx][yy]
-                if xx < self.size32.x - 1:
-                    r_middle_right = world_map[xx+1][yy]
-                    if r_middle_right != r:
-                        if r_middle_right == 300:
-                            #self.world_map[xx][yy] = 1300
-                            self.passable_map[xx][yy] = 98
+                r = self.world_map[yy][xx]
+                
+                # On travaille ne base 3
+                b1 = 1
+                b2 = 3
+                b3 = 9
+                b4 = 27
+                b5 = 81
+                b6 = 243
+                b7 = 729
+                b8 = 2187
+                sum = 0
+                
+                # On commence en haut à gauche, puis on tourne dans le sens horaire
+                # 1 = différent 0 = égal 2 = bord
+                # ligne du haut
+                if yy > 1 and xx > 1:
+                    if self.world_map[yy-1][xx-1] != r:
+                        sum += 1 * b1 # sinon 0*b1 donc rien
+                else:
+                    sum += 2 * b1
                 if xx > 1:
-                    r_middle_left = world_map[xx-1][yy]
-                    if r_middle_left != r:
-                        if r_middle_left == 300:
-                            self.passable_map[xx][yy] = 94
-                if yy > 1:
-                    r_top_center = world_map[xx][yy-1]
-                    if r_top_center != r:
-                        if r_top_center == 300:
-                            self.passable_map[xx][yy] = 96 # why?
+                    if self.world_map[yy][xx-1] != r:
+                        sum += 1 * b2
+                else:
+                    sum += 2 * b2
+                if yy < self.size32.y - 1 and xx > 1:
+                    if self.world_map[yy+1][xx-1] != r:
+                        sum += 1 * b3
+                else:
+                    sum += 2 * b3
+                # ligne du milieu, gauche
                 if yy < self.size32.y - 1:
-                    r_bottom_center = world_map[xx][yy+1]
-                    if r_bottom_center != r:
-                        if r_bottom_center == 300:
-                            self.passable_map[xx][yy] = 92 #why?
+                    if self.world_map[yy+1][xx] != r:
+                        sum += 1 * b4
+                else:
+                    sum += 2 * b4
+                # ligne du bas, en partant de la gauche
+                if yy < self.size32.y - 1 and xx < self.size32.x - 1:
+                    if self.world_map[yy+1][xx+1] != r:
+                        sum += 1 * b5
+                else:
+                    sum += 2 * b5
+                if xx < self.size32.x - 1:
+                    if self.world_map[yy][xx+1] != r:
+                        sum += 1 * b6
+                else:
+                    sum += 2 * b6
+                if yy > 1 and xx < self.size32.x - 1:
+                    if self.world_map[yy-1][xx+1] != r:
+                        sum += 1 * b7
+                else:
+                    sum += 2 * b7
+                # ligne du milieu, droit
+                if yy > 1:
+                    if self.world_map[yy-1][xx] != r:
+                        sum += 1 * b8
+                else:
+                    sum += 2 * b8
+                
+                self.debug_map[yy][xx] = sum
+                
+                world_map2[yy][xx] = self.world_map[yy][xx]
+                if r == 300:
+                    # coin
+                    if sum == 2929 or sum == 2200 or sum == 2191: # coin haut gauche
+                        world_map2[yy][xx] = 1100
+                    elif sum == 3241: # coin haut droit
+                        world_map2[yy][xx] = 1300
+                    elif sum == 1089 or sum == 1080 or sum == 351: # coin bas droit
+                        world_map2[yy][xx] = 1500
+                    elif sum == 121: # coin bas gauche
+                        world_map2[yy][xx] = 1700
+                    # milieu
+                    elif sum == 2917: #2920: # milieu haut
+                        world_map2[yy][xx] = 1200
+                    elif sum == 1053 or sum == 324: #3240: # milieu droit
+                        world_map2[yy][xx] = 1400
+                        #print('modified! at', yy, xx, 'to', world_map2[yy][xx])
+                    elif sum == 117: #120: # milieu bas
+                        world_map2[yy][xx] = 1600
+                    elif sum == 13 or sum == 4: #2200: # milieu gauche
+                        world_map2[yy][xx] = 1800
+                    # les coins bizarres, entre deux diag /
+                    elif sum == 1:
+                        world_map2[yy][xx] = 2200
+                    elif sum == 81:
+                        world_map2[yy][xx] = 2400
+                    elif sum == 82:
+                        world_map2[yy][xx] = 2300
+                    else:
+                        print(sum)
+                
+                # if xx < self.size32.x - 1:
+                    # r_middle_right = world_map[xx+1][yy]
+                    # if r_middle_right != r:
+                        # if r_middle_right == 300:
+                            ## self.world_map[xx][yy] = 1300
+                            # self.passable_map[xx][yy] = 98
+                # if xx > 1:
+                    # r_middle_left = world_map[xx-1][yy]
+                    # if r_middle_left != r:
+                        # if r_middle_left == 300:
+                            # self.passable_map[xx][yy] = 94
+                # if yy > 1:
+                    # r_top_center = world_map[xx][yy-1]
+                    # if r_top_center != r:
+                        # if r_top_center == 300:
+                            # self.passable_map[xx][yy] = 96 # why?
+                # if yy < self.size32.y - 1:
+                    # r_bottom_center = world_map[xx][yy+1]
+                    # if r_bottom_center != r:
+                        # if r_bottom_center == 300:
+                            # self.passable_map[xx][yy] = 92 #why?
         
+        self.world_map = world_map2
         self.units = []
     
     def is_valid(self, x, y):
@@ -554,15 +682,15 @@ class World:
         else:
             for i in range(x, x+w):
                 for j in range(y, y+h):
-                    if self.passable_map[x][y] != 0 and self.unit_map[i][j] != 0:
+                    if self.passable_map[j][i] != 0 and self.unit_map[j][i] != 0:
                         return False
             return True
     
     def is_empty(self, x, y):  # no unit, no blocking terrain
-        return self.passable_map[x][y] == 0 and self.unit_map[x][y] == 0
+        return self.passable_map[y][x] == 0 and self.unit_map[y][x] == 0
     
     def is_unit(self, x, y):
-        return self.unit_map[x][y] != 0
+        return self.unit_map[y][x] != 0
 
     @staticmethod
     def create_map(lines, columns, value):
@@ -604,7 +732,7 @@ class Game:
         p = self.get_player_by_name(player_name)
         ut = self.get_unit_type_by_name(unit_type_name)
         if not self.world.is_valid(x, y) or not self.world.is_empty(x,y):
-            raise Exception("False or not empty coordinates : " + str(x) + ", " + str(y) + " p = " + str(self.world.passable_map[x][y]))
+            raise Exception("False or not empty coordinates : " + str(x) + ", " + str(y) + " p = " + str(self.world.passable_map[y][x]))
         u = Unit(ut, p, x, y)
         self.world.units.append(u)
         p.units.append(u)
@@ -772,7 +900,7 @@ class Building(GameObject):
         self.orders = []
         for i in range(grid_x, grid_x + type.grid_w):
             for j in range(grid_y, grid_y + type.grid_h):
-                self.player.world.unit_map[i][j] = (2, self) # STILL, BUILDING
+                self.player.world.unit_map[j][i] = (2, self) # STILL, BUILDING
     
     def __str__(self):
         return str(id(self)) + ' (' + self.type.name + ')'
@@ -841,7 +969,7 @@ class Unit(GameObject):
         #return str(id(self)) + ' (' + self.uname + ')'
 
     def update(self):
-        self.player.world.unit_map[self.x][self.y] = 0
+        self.player.world.unit_map[self.y][self.x] = 0
         # print 'update ', len(self.orders)
         if self.life <= 0:
             return False
@@ -866,7 +994,7 @@ class Unit(GameObject):
                         del self.orders[0]
                 else:
                     self.cpt -= 1
-        self.player.world.unit_map[self.x][self.y] = (1, self) # CODE: STILL, UNIT
+        self.player.world.unit_map[self.y][self.x] = (1, self) # CODE: STILL, UNIT
         return True
 
     def order(self, o : Order):
@@ -948,7 +1076,7 @@ class Unit(GameObject):
 
             if self.player.world.is_empty(n_x, n_y):
                 self.destination = Pair(n_x * 32 + 16, n_y * 32 + 16)
-                self.player.world.unit_map[n_x][n_y] = (-1, self) # CODE: IN MOVEMENT
+                self.player.world.unit_map[n_y][n_x] = (-1, self) # CODE: IN MOVEMENT
 
         if self.destination is not None and self.transition is None:
             self.transition = Pair(self.x * 32 + 16, self.y * 32 + 16)
@@ -1018,19 +1146,19 @@ def configure():
         [101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
         [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
         [100, 100, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
-        [100, 100, 100, 100, 100, 200, 200, 200, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
-        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
-        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 200, 200, 200, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 300, 300, 300, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 300, 300, 300, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 300, 300, 300, 100, 100, 100, 100, 100],
         [100, 100, 100, 200, 200, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
         [100, 100, 100, 200, 200, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
         [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
         [100, 100, 100, 100, 100, 100, 100, 100, 100, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
         [100, 100, 100, 100, 100, 100, 100, 100, 101, 101, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
         [100, 100, 100, 100, 100, 100, 100, 100, 100, 101, 100, 100, 100, 100, 300, 300, 300, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
-        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 300, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
-        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 300, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
-        [100, 100, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 300, 300, 300, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
-        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 300, 300, 300, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 300, 300, 300, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 300, 300, 300, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 300, 300, 300, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 300, 300, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 300, 300, 300, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 300, 300, 100, 100, 100, 100, 100],
         [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 300, 300, 300, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
         [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
         [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
@@ -1042,8 +1170,8 @@ def configure():
         [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
         [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
         [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
-        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
-        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 300, 300, 100, 100, 100, 300, 300, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 101, 100, 100, 100, 100, 300, 300, 100, 100, 100, 100, 100, 300, 300, 100, 100, 100, 100],
         [100, 100, 100, 100, 100, 100, 100, 100, 100, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
         [100, 100, 100, 100, 100, 100, 100, 100, 100, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
         [100, 100, 100, 100, 100, 100, 100, 100, 100, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
