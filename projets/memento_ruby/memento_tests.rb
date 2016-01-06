@@ -1,3 +1,36 @@
+# Orienté objets
+
+class A
+    def une_methode_publique 
+    end
+    protected
+    def une_methode_protegee 
+    end
+    private
+    def une_methode_privee 
+    end
+end
+
+# Visibilité générale
+a = A.new 
+a.une_methode_publique # marche
+##a.une_methode_protegee # lève une exception NoMethodError
+##a.une_methode_privee # lève une exception NoMethodError
+
+# Visibilité dans une classe fille
+class B < A
+   def une_methode 
+        une_methode_publique # marche
+        une_methode_protegee # marche
+        une_methode_privee # lève une exception NoMethodError
+    end
+end   
+
+b = B.new
+b.une_methode
+
+exit
+
 class Pipo
     attr_reader :a
     def initialize(a)

@@ -145,13 +145,13 @@
             color: #FF6600;
         }
         
-        ol { 
+        ol.menu { 
             counter-reset: item 
         }
-        li { 
+        ol.menu li { 
             display: block 
         }
-        li:before { 
+        ol.menu li:before { 
             content: counters(item, ".") " "; 
             counter-increment: item 
         }
@@ -179,9 +179,9 @@
         </div>
 
         <h2 id="sommaire">Sommaire</h2>
-        <ol>
+        <ol class="menu">
             <li><a href="#bases">Bases</a>
-                <ol>
+                <ol class="menu">
                     <li><a href="#bas_aff">Affichage</a></li>
                     <li><a href="#bas_key">Mots réservés</a></li>
                     <li><a href="#bas_com">Commentaires</a></li>
@@ -190,7 +190,7 @@
             </li>
             <li><a href="#sites">Autres ressources</a></li>
             <li><a href="#variables">Variables, constantes et globales</a>
-                <ol>
+                <ol class="menu">
                     <li><a href="#var_var">Variables</a></li>
                     <li><a href="#var_con">Constantes</a></li>
                     <li><a href="#var_glo">Globales</a></li>
@@ -200,21 +200,21 @@
                 </ol>
             </li>
             <li><a href="#int_float">Entiers et Réels (Fixnum | Bignum, Float)</a>
-                <ol>
+                <ol class="menu">
                     <li><a href="#int">Entiers</a></li>
                     <li><a href="#float">Réels</a></li>
                 </ol>
             </li>
             <li><a href="#string">Chaînes de caractères (String)</a></li>
             <li><a href="#bool_range_nil">Booléens, intervalles et type vide (TrueClass | FalseClass, Range, NilClass)</a>
-                <ol>
+                <ol class="menu">
                     <li><a href="#bool">Booléens</a></li>
                     <li><a href="#range">Intervalles</a></li>
                     <li><a href="#void">Type "vide"</a></li>
                 </ol>
             </li>
             <li><a href="#list">Listes (Array)</a>
-                <ol>
+                <ol class="menu">
                     <li><a href="#list_create">Création</a></li>
                     <li><a href="#list_read">Fonctions d'accès</a></li>
                     <li><a href="#list_update">Fonctions d'affectation et d'insertion</a></li>
@@ -224,7 +224,7 @@
                 </ol>
             </li>
             <li><a href="#dict">Dictionnaires (Hash)</a>
-                <ol>
+                <ol class="menu">
                     <li><a href="#dict_create">Création</a></li>
                     <li><a href="#dict_read">Fonctions d'accès</a></li>
                     <li><a href="#dict_update">Fonctions d'affectation et d'insertion</a></li>
@@ -234,7 +234,7 @@
                 </ol>
             </li>
             <li><a href="#op">Opérateurs</a>
-                <ol>
+                <ol class="menu">
                     <li><a href="#op_bin">Opérateurs binaires</a></li>
                     <li><a href="#op_una">Opérateurs unaires</a></li>
                     <li><a href="#op_ter">Opérateur ternaire</a></li>
@@ -243,7 +243,7 @@
                 </ol>
             </li>
             <li><a href="#flux">Contrôle du flux</a>
-                <ol>
+                <ol class="menu">
                     <li><a href="#seq">Séquence</a></li>
                     <li><a href="#cond">Conditions</a></li>
                     <li><a href="#loop">Répétitions</a></li>
@@ -251,19 +251,29 @@
             </li>
             <li><a href="#elem_fun">Fonctions</a></li>
             <li><a href="#elem_class">Classes et objets</a>
-                <ol>
-                    <li><a href="#class_create">Création d'une classe</a></li>
+                <ol class="menu">
+                    <li><a href="#oo_intro">L'orientée objet</a></li>
+                    <li><a href="#oo_class_create">Création d'une classe</a></li>
+                    <li><a href="#oo_instance">Création d'une instance</a></li>
+                    <li><a href="#oo_overriding">Redéfinition d'une méthode  d'instance</a></li>                
+                    <li><a href="#oo_class_method">Méthodes et variables de classe</a></li>
+                    <li><a href="#oo_class_update">Modifier la définition d'une classe</a></li>
+                    <li><a href="#oo_encapsulation">Encapsulation en Ruby</a></li>
+                    <li><a href="#oo_self">Le mot-clé self</a></li>
+                    <li><a href="#oo_super">Le mot-clé super</a></li>
+                    <li><a href="#oo_mutators">Les méthodes d'actualisation (mutators)</a></li>
+                    <li><a href="#oo_objet">Type objet</a></li>
                 </ol>
             </li>
             <li><a href="#elem_mod">Modules et fichiers</a>
-                <ol>
+                <ol class="menu">
                     <li><a href="#mod_mod">Définition d'un module</a></li>
                     <li><a href="#mod_mod">Inclusion des éléments d'un module</a></li>
                     <li><a href="#mod_req">Code réparti sur plusieurs fichiers</a></li>
                 </ol>
             </li>
             <li><a href="#spe">Gestion des exceptions</a>
-                <ol>
+                <ol class="menu">
                     <li><a href="#exp">Exceptions</a></li>
                     <li><a href="#exp_type">Type d'exceptions</a></li>
                     <li><a href="#exp_throw">Catch et throw</a></li>
@@ -1666,7 +1676,23 @@
         <h2 id="elem_class">12. Classes et objets</h2>
         <!-- ---------------------------------------------------------------- -->
         
-        <h3 id="class_create">Création d'une classe</h3>
+        <h3 id="oo_intro">L'orientée objet</h3>
+        
+        <p>En Ruby, tout est objet. Une <strong>classe</strong> est la définition générale d'un concept, qui possède des <strong>attributs</strong> et des <strong>méthodes</strong>. Par exemple, une voiture (classe) a une couleur et un propriétaire (deux attributs) et elle peut rouler et s'arrêter (deux méthodes). Les <strong>instances</strong> d'une classe, ou <strong>objets</strong>, sont des cas particuliers du concept, la voiture rouge de Marc, la voiture verte de Katia, qui ont à leur disposition toutes les méthodes définies dans la classe, ici rouler et s'arrêter.</p>
+        <p>Ruby est donc un langage <strong>orienté objet</strong>. De façon universitaire, on définit l'orientation objet d'un langage par le fait de pouvoir :
+            <ul>
+                <li>cacher certains attributs d'une classe aux autres, c'est <strong>l'encapsulation</strong>,</li>
+                <li>reprendre la définition générale d'une classe (la classe mère) dans une nouvelle (la classe fille) en ajoutant à cette dernière de nouveaux attributs et méthodes, c'est <strong>l'héritage</strong>,</li>
+                <li>pour une instance d'une classe fille, se faire passer à tout moment pour une instance d'une de ses classes mères, c'est <strong>le polymorphisme</strong>.</li>
+            </ul>
+        </p>
+        
+        <p>En Ruby, une classe ne peut avoir <strong>qu'une seule classe mère</strong>, c'est le <strong>mono-héritage</strong>.</p>
+        
+        <p>Enfin, et c'est là où la phrase <em>"en Ruby, tout est objet"</em> prend tout son sens, <strong>les classes sont des objets de la classe <span>Class</span></strong> ! Si cette dernière phrase provoque des migraines chez vous, ignorez la pour l'instant.</p>
+        <p>Notons que d'autres langages sont orientés objets mais n'utilise pas la division classe/instance. Un tel exemple est le langage JavaScript, qui utilise une notion appelée <strong>prototype</strong>.</p>
+        
+        <h3 id="oo_class_create">Création d'une classe</h3>
         
         <div class="code">
             <b>class</b> identifiant [ &lt; parent ]<br>
@@ -1674,7 +1700,184 @@
             <b>end</b>
         </div>
         
-        <h3 id="objet">Type objet</h3>
+        <p>A l'intérieur d'une classe, on définit des méthodes d'instances et à l'intérieur de celles-ci, des attributs des instances (appelés aussi variables d'instance).</p>
+        
+        <div class="code">
+            <b>class</b> UneClasse < UneAutreClasse<br>
+            &nbsp;&nbsp; <b>def</b> une_methode (paramètre1, paramètre2)<br>
+            &nbsp;&nbsp;&nbsp;&nbsp; b = 2 <i># cette variable b est une variable locale, définie seulement pour la méthode</i><br>
+            &nbsp;&nbsp;&nbsp;&nbsp; @a = 1 <i># une variable d'instance commence par le symbole @</i><br>
+            &nbsp;&nbsp; <b>end</b> <br>
+            <b>end</b>
+        </div>
+        
+        <p>Par convention, pour les noms des méthodes, on utilise des lettres minuscules et s'il y a plusieurs mots, on les sépare par un "_".</p>
+        <p>Pour les noms des classes, on utilise des mots accolés en les faisant commencer par une majuscule.</p>
+        
+        <h3 id="oo_overriding">Redéfinition d'une méthode d'instance</h3>
+        
+        <p>Si dans une classe fille on nomme une méthode d'instance du même nom qu'une méthode d'instance qui se trouve dans une ou plusieurs de ses classes mères, on dit que l'on redéfinit cette méthode d'instance, on parle de <strong>redéfinition</strong> (ou <em>overriding</em> en anglais, à ne pas confondre avec <em>overloading</em> ou surcharge qui est un autre concept non utilisé en Ruby).</p>
+        
+        <div class="code">
+            <b>class</b> UneClasse <br>
+            &nbsp;&nbsp; <b>def</b> une_methode <br>
+            &nbsp;&nbsp;&nbsp;&nbsp; puts "je suis une instance d'UneClasse"<br>
+            &nbsp;&nbsp; <b>end</b> <br>
+            <b>end</b> <br>
+            <br>
+            <b>class</b> UneClasseFille &lt; UneClasse <br>
+            &nbsp;&nbsp; <b>def</b> une_methode <i># on va redéfinir cette méthode</i><br>
+            &nbsp;&nbsp;&nbsp;&nbsp; puts "je suis une instance d'UneClasseFille"<br>
+            &nbsp;&nbsp; <b>end</b> <br>
+            <b>end</b>
+        </div>
+        
+        <h3 id="oo_class_method">Méthodes et variables de classe</h3>
+        
+        <p>On peut définir également des variables de classe. La valeur d'une variable de classe est la même pour toute les instances de la classe.</p>
+        
+        <div class="code">
+            <b>class</b> UneClasse < UneAutreClasse<br>
+            &nbsp;&nbsp; <b>def</b> une_methode (paramètre1, paramètre2)<br>
+            &nbsp;&nbsp;&nbsp;&nbsp; @@c = 3 <i># cette variable de classe commence par deux symboles @</i><br>
+            &nbsp;&nbsp; <b>end</b> <br>
+            &nbsp;&nbsp; @@c = 5 <i># on peut définir une variable de classe en dehors de toute méthode d'instance</i><br>
+            <b>end</b>
+        </div>
+        
+        <p>Les variables de classe ne sont néanmoins pas accessibles en dehors de leur classe. On utilisera une variable globale (commençant avec $) pour partager une valeur entre différentes classes.</p>
+        
+        <p>Il existe également des méthodes de classe. Il faut faire précéder leur nom par le nom de la classe suivi d'un point.</p>
+        
+        <div class="code">
+            <b>class</b> UneClasse < UneAutreClasse<br>
+            &nbsp;&nbsp; <b>def</b> UneClasse.une_methode (paramètre1) <i># ceci est une méthode de classe</i><br>
+            &nbsp;&nbsp;&nbsp;&nbsp; b = 2 <i># il ne peut y avoir que des variables locales ou</i><br>
+            &nbsp;&nbsp;&nbsp;&nbsp; @@c = 3 <i># des variables de classe dans son corps</i><br>
+            &nbsp;&nbsp; <b>end</b> <br>
+            <b>end</b>
+        </div>
+        
+        <h3 id="oo_class_update">Modifier la définition d'une classe</h3>
+        
+        <p>Pour ajouter une méthode d'instance ou de classe à une classe, ou remplacer le corps d'une méthode déjà définie, il suffit de réouvrir sa définition, sans répéter son éventuelle classe-mère.</p>
+        
+        <div class="code">
+            <b>class</b> UneClasse <br>
+            &nbsp;&nbsp; <b>def</b> une_nouvelle_methode <br>
+            &nbsp;&nbsp; <b>end</b> <br>
+            <b>end</b>
+        </div>
+        
+        <h3 id="oo_instance">Création d'une instance</h3>
+        
+        <p>Pour créer une instance, il faut appeler la méthode de classe <span>new</span> qui est disponible dans toutes les classes.</p>
+        
+        <div class="code">
+            <i># Code générique d'une création d'instance</i><br>
+            nom_classe <b>.</b> new [ ( paramètres ) ] <br>
+            <i># Exemple qui stocke une référence à l'objet créé dans mon_instance</i><br>
+            mon_instance = UneClasse.new
+        </div>
+        
+        <p>La méthode de classe new va créer l'objet puis appeler sa méthode <span>initialize</span> en lui passant ses paramètres. On peut redéfinir cette méthode d'instance pour contrôler l'initialisation de notre objet. Par analogie avec d'autres langages, on appelle cette fonction un <strong>constructeur</strong>, bien que dans le cas de Ruby il s'agisse plutôt d'une initilisation.</p>
+        
+        <div class="code">
+            <b>class</b> Voiture <br>
+            &nbsp;&nbsp; <b>def</b> initialize(col, proprietaire) <br>
+            &nbsp;&nbsp;&nbsp;&nbsp; @couleur = col <br>
+            &nbsp;&nbsp;&nbsp;&nbsp; @proprietaire = prop <br>
+            &nbsp;&nbsp; <b>end</b> <br>
+            <b>end</b> <br>
+            v1 = Voiture.new("rouge", "Marc") <br>
+            v2 = Voiture.new("verte", "Katia")
+        </div>
+        
+        <p>Pour appeler une méthode d'instance, on utilise la syntaxe suivante : <span>instance.methode(paramètres)</span></p>
+        
+        <h3 id="oo_encapsulation">Encapsulation en Ruby</h3>
+        
+        <p>En Ruby, les attributs d'instances sont <strong>protégés</strong>, ils ne sont accessibles que dans les instances de la classe où ils sont définis et dans ses sous-classes.</p>
+        <p>En Ruby, les méthodes d'instances sont <strong>publiques</strong> par défaut, accessibles par tous. On peut utiliser les méthodes <strong>protected</strong> et <strong>private</strong> avant le <strong>def</strong> pour changer cela.</p>
+        <p>Une méthode protégée ne peut être appelée que dans la classe et dans ses sous-classes.</p>
+        <p><strong>Contrairement aux autres langages orientés objets</strong>où une méthode privée ne peut être appelée que dans la classe même, en Ruby, une méthode privée peut-être appelée également dans ses sous-classes. La différence entre une méthode protégée et privée, et que cette dernière ne peut être appelée avec receveur explicite (notation receveur . méthode ). De ce fait, une fonction privée ne peut être appelée que par son objet.</p>
+        
+        <div class="code">
+            <b>class</b> A<br>
+            &nbsp;&nbsp; <b>def</b> une_methode_publique <br>
+            &nbsp;&nbsp; <b>end</b><br>
+            &nbsp;&nbsp; protected<br>
+            &nbsp;&nbsp; <b>def</b> une_methode_protegee <br>
+            &nbsp;&nbsp; <b>end</b><br>
+            &nbsp;&nbsp; private<br>
+            &nbsp;&nbsp; <b>def</b> une_methode_privee <br>
+            &nbsp;&nbsp; <b>end</b><br>
+            <b>end</b><br>
+            <br>
+            <i># Visibilité générale</i><br>
+            a = A.new <br>
+            a.une_methode_publique <i># marche</i><br>
+            a.une_methode_protegee <i># lève une exception NoMethodError</i><br>
+            a.une_methode_privee <i># lève une exception NoMethodError</i><br>
+            <br>
+            <i># Visibilité dans une classe fille</i><br>
+            <b>class</b> B &lt; A<br>
+            &nbsp;&nbsp; <b>def</b> une_methode <br>
+            &nbsp;&nbsp;&nbsp;&nbsp; une_methode_publique <i># marche</i><br>
+            &nbsp;&nbsp;&nbsp;&nbsp; une_methode_protegee <i># marche</i><br>
+            &nbsp;&nbsp;&nbsp;&nbsp; une_methode_privee <i># marche</i><br>
+            &nbsp;&nbsp; <b>end</b><br>
+            <b>end</b>
+        </div>
+        
+        <h3 id="oo_self">Le mot-clé self</h3>
+        
+        <p>Le mot-clé <span>self</span> contient une référence vers l'objet "en cours". Dans le corps d'une méthode d'instance, self désigne l'objet lui-même.</p>
+        
+        <p><strong>Dans le corps d'une classe, en-dehors des corps des méthodes d'instance, self désigne l'objet classe lui-même et non une instance !</strong>.</p>
+        
+        <div class="code">
+            <b>class</b> A<br>
+            &nbsp;&nbsp; <b>def</b> une_methode <br>
+            &nbsp;&nbsp;&nbsp;&nbsp; <b>self</b>  <i># L'instance elle-même</i><br>
+            &nbsp;&nbsp; <b>end</b><br>
+            &nbsp;&nbsp; <b>def</b> self.une_methode_de_classe <br>
+            &nbsp;&nbsp; <i># équivalent à A.une_methode_de_classe </i><br>
+            &nbsp;&nbsp; <b>end</b><br>
+            <b>end</b>
+        </div>
+        
+        <p>Pour accéder à une variable d'instance, on ne peut pas utiliser <span>self</span>.</p>
+        
+        <p>Pour accéder à une méthode d'instance dans le corps d'une méthode d'instance, faire précéder l'appel par <span>self.</span> n'est pas obligatoire (et résulte en une exception <span>NoMethodError</span> pour les méthodes d'instance privées). À quoi sert <span>self</span> alors ?</p>
+        
+        <p>On peut retourner une référence à l'objet lui-même. Cela permet de <strong>chaîner</strong> les appels : <span>mon_objet.methode1(a).methode2(b).methode3</span></p>
+        
+        <p>On peut faire la distinction dans une méthode entre un appel de méthode sans paramètre et une variable locale portant le même nom :</p>
+        
+        <div class="code">
+            <b>class</b> A<br>
+            &nbsp;&nbsp; <b>def</b> une_methode <br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<b>return</b> 2<br>
+            &nbsp;&nbsp; <b>end</b><br>
+            &nbsp;&nbsp; <br>
+            &nbsp;&nbsp; <b>def</b> une_autre_methode <br>
+            &nbsp;&nbsp;&nbsp;&nbsp;une_methode = 5<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;puts une_methode <i># affiche 5</i><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;puts self.une_methode <i># affiche 2</i><br>
+            &nbsp;&nbsp; <b>end</b><br>
+            <b>end</b>
+        </div>
+        
+        <h3 id="oo_super">Le mot-clé super</h3>
+         
+        <div class="code">
+            <b>super</b>  <i># Pour accéder aux fonctions du parent</i>
+        </div>
+        
+        <h3 id="oo_mutators">Les méthodes d'actualisation (mutators)</h3>
+        
+        <h3 id="oo_objet">Type objet</h3>
         <table class="fun">
         <tbody>
             <tr>
@@ -1719,18 +1922,7 @@
             </tr>
         </tbody>
         </table>
-        
-        <h3 id="cls">Classes</h3>
-        
-        <div class="code">
-            <b>self</b>  <i># L'instance elle-même</i>
-        </div>
-        <div class="code">
-            <b>super</b>  <i># Pour accéder aux fonctions du parent</i>
-        </div>
-        <div class="code">
-            nom_classe <b>.</b> new [ ( paramètres ) ]  <i>Création d'une instance</i>
-        </div> 
+
         <p class="back"><a href="#sommaire">Retour sommaire</a></p>
         
         <!-- ---------------------------------------------------------------- -->

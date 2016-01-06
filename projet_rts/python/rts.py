@@ -54,7 +54,7 @@ TEXTURES = {
     # Real textures
     100 : Texture('grass' , 200, 'grass_two_leaves.png', MINIMAP_GREEN_LIGHT),
     200 : Texture('ground', 100, 'ground.png', MINIMAP_BROWN),
-    300 : Texture('water' , 300, 'water.png', MINIMAP_BLUE_LIGHT, False),
+    300 : Texture('water' , 300, 'water0.png', MINIMAP_BLUE_LIGHT, False),
     
     9100 : Texture('w1', 9100, 'w1.png', MINIMAP_BLUE_LIGHT, False), 
     9200 : Texture('w2', 9200, 'w2.png', MINIMAP_BLUE_LIGHT, False), 
@@ -64,9 +64,13 @@ TEXTURES = {
     9600 : Texture('w6', 9600, 'w6.png', MINIMAP_BLUE_LIGHT, False), 
     9700 : Texture('w7', 9700, 'w7.png', MINIMAP_BLUE_LIGHT, False), 
     9800 : Texture('w8', 9800, 'w8.png', MINIMAP_BLUE_LIGHT, False), 
+    8100 : Texture('water741', 8100, 'water741.png', MINIMAP_BLUE_LIGHT, False),
     8200 : Texture('x2', 8200, 'x2.png', MINIMAP_BLUE_LIGHT, False), 
-    8400 : Texture('x4', 8400, 'x4.png', MINIMAP_BLUE_LIGHT, False),
     8300 : Texture('x24', 8300, 'x24.png', MINIMAP_BLUE_LIGHT, False),
+    8400 : Texture('x4', 8400, 'x4.png', MINIMAP_BLUE_LIGHT, False),
+    8500 : Texture('water85', 8500, 'water85.png', MINIMAP_BLUE_LIGHT, False),
+    8700 : Texture('water325', 8700, 'water325.png', MINIMAP_BLUE_LIGHT, False),
+    8900 : Texture('water981', 8900, 'water981.png', MINIMAP_BLUE_LIGHT, False),
     
     # Computed textures
     # 1300 : Texture('grass_water_lm', 1200, 'grass_water_ml.png', MINIMAP_BLUE_LIGHT, False),
@@ -83,7 +87,7 @@ TEXTURES = {
 }
 
 # Mixing Texture
-for a in [9100, 9200, 9300, 9400, 9500, 9600, 9700, 9800, 8200, 8400, 8300]:
+for a in [9100, 9200, 9300, 9400, 9500, 9600, 9700, 9800, 8100, 8200, 8300, 8400, 8500, 8700, 8900]:
     for b in [100]:
         s = pygame.Surface((32,32))
         s.blit(TEXTURES[b].img, (0, 0))
@@ -112,6 +116,7 @@ class Camera:
         self.SELECT_Y = 0
         self.SELECT_R = False
         self.INTERFACE_Y = 480
+        self.MINIMAP_X = 22 * 32
         self.selected = []
         self.left = False
         self.right = False
@@ -153,6 +158,7 @@ class Camera:
         return y * 32 + self.y + 16
 
     def update(self):
+        
         self.player.game.update() # here
         
         mx, my = pygame.mouse.get_pos()
@@ -203,20 +209,31 @@ class Camera:
             elif event.type == MOUSEBUTTONUP:
                 self.SELECT_R = False
                 if event.button == 1:  # Left Button
-                    if my > self.INTERFACE_Y and self.SELECT_Y > self.INTERFACE_Y: # Interface click
+                    #print(self.SELECT_Y, self.INTERFACE_Y)
+                    if my > self.INTERFACE_Y: # Interface click
                         #if self.mode == 'normal':
                         # CLICK FOR A BUILDING
-                        a = mx // 32
-                        b = (my-self.INTERFACE_Y) // 32
-                        # print(a,b)
-                        nb = a + b * 3
-                        if nb >= 0 and nb < len(self.player.game.all_building_types_ordered):
-                            btn = self.player.game.all_building_types_ordered[nb]
-                            bt = self.player.game.all_building_types[btn]
-                            self.mode = 'build'
-                            self.build_type = btn
-                            self.build_size = Pair(bt.grid_w, bt.grid_h)
-                            
+                        if self.SELECT_Y > self.INTERFACE_Y: # pour voir si on n'a pas "ripé" sur un bouton de construction
+                            a = mx // 32
+                            b = (my-self.INTERFACE_Y) // 32
+                            # print(a,b)
+                            nb = a + b * 3
+                            if nb >= 0 and nb < len(self.player.game.all_building_types_ordered):
+                                btn = self.player.game.all_building_types_ordered[nb]
+                                bt = self.player.game.all_building_types[btn]
+                                self.mode = 'build'
+                                self.build_type = btn
+                                self.build_size = Pair(bt.grid_w, bt.grid_h)
+                        if mx > self.MINIMAP_X: # Minimap click
+                            a = int((mx - self.MINIMAP_X) / 3)
+                            b = int((my - self.INTERFACE_Y) / 3)
+                            if a < self.player.world.size32.x and b < self.player.world.size32.y:
+                                #print("self x, y old", self.x, self.y)
+                                #print("minimap", a, b)
+                                self.x = -a * 32 + 384 # 12 * 32 (pour 800 px)
+                                self.y = -b * 32 + 224 + 24 #  9 * 32 + 24 (600%32) (pour 600px) TODO: make generic
+                                #print("self x, y new", self.x, self.y)
+                        
                         #if a == 0 and b == 0: # 100 000 000
                         #    self.mode = 'build'
                         #    self.build_type = 'solar'
@@ -410,14 +427,14 @@ class Camera:
             pygame.draw.circle(self.screen, RED, (p.x + self.x, p.y + self.y), 3, 0)
 
         # Interface
-        pygame.draw.rect(self.screen, GREY, (0, self.INTERFACE_Y, 799, 200), 0) # fond
-        pygame.draw.line(self.screen, BLUE, (0, self.INTERFACE_Y), (799, self.INTERFACE_Y), 1)
+        pygame.draw.rect(self.screen, GREY, (0, self.INTERFACE_Y, self.width-1, 200), 0) # fond
+        pygame.draw.line(self.screen, BLUE, (0, self.INTERFACE_Y), (self.width-1, self.INTERFACE_Y), 1)
         for xx in range(0, 3):
             for yy in range(0, 3):
                 pygame.draw.rect(self.screen, BLUE, (xx * 32, yy * 32 + self.INTERFACE_Y, 32, 32), 1)
-        pygame.draw.line(self.screen, BLUE, (703, self.INTERFACE_Y), (703, self.INTERFACE_Y + 96), 1)
-        pygame.draw.line(self.screen, BLUE, (703, self.INTERFACE_Y + 96), (799, self.INTERFACE_Y + 96), 1)
-
+        pygame.draw.line(self.screen, BLUE, (self.MINIMAP_X - 1, self.INTERFACE_Y), (self.MINIMAP_X - 1, self.INTERFACE_Y + 96), 1)
+        pygame.draw.line(self.screen, BLUE, (self.MINIMAP_X - 1, self.INTERFACE_Y + 96), (self.width-1, self.INTERFACE_Y + 96), 1)
+        
         # Build menu
         
         xs = 8
@@ -461,13 +478,13 @@ class Camera:
                 t = self.player.world.world_map[yy][xx]
                 d = self.player.world.passable_map[yy][xx]
                 if d != 0 and d != 99:
-                    pygame.draw.rect(self.screen, TEXTURES[d].mini, (xx * 3 + 22 * 32, yy * 3 + self.INTERFACE_Y +1, 3, 3), 0)
+                    pygame.draw.rect(self.screen, TEXTURES[d].mini, (xx * 3 + self.MINIMAP_X, yy * 3 + self.INTERFACE_Y +1, 3, 3), 0)
                 else:
-                    pygame.draw.rect(self.screen, TEXTURES[t].mini, (xx * 3 + 22 * 32, yy * 3 + self.INTERFACE_Y +1, 3, 3), 0)
+                    pygame.draw.rect(self.screen, TEXTURES[t].mini, (xx * 3 + self.MINIMAP_X, yy * 3 + self.INTERFACE_Y +1, 3, 3), 0)
                 u = self.player.world.unit_map[yy][xx]
                 if u != 0:
                     if u[0] == 1 or u[0] == 2:
-                        pygame.draw.rect(self.screen, u[1].player.color, (xx * 3 + 22 * 32, yy * 3 + self.INTERFACE_Y +1, 3, 3), 0)
+                        pygame.draw.rect(self.screen, u[1].player.color, (xx * 3 + self.MINIMAP_X, yy * 3 + self.INTERFACE_Y +1, 3, 3), 0)
         # fin Interface
 
         pygame.display.flip()
@@ -551,96 +568,88 @@ class World:
             for xx in range(0, self.size32.x):
                 r = self.world_map[yy][xx]
                 
-                # On travaille ne base 3
-                b1 = 1
-                b2 = 3
-                b3 = 9
-                b4 = 27
-                b5 = 81
-                b6 = 243
-                b7 = 729
-                b8 = 2187
+                # On travaille en base 2 sur 8 positions (de 0 à 7)
+                b0 = 1
+                b1 = 2
+                b2 = 4
+                b3 = 8
+                b4 = 16
+                b5 = 32
+                b6 = 64
+                b7 = 128
                 sum = 0
                 
                 # On commence en haut à gauche, puis on tourne dans le sens horaire
-                # 1 = différent 0 = égal 2 = bord
+                # 1 = différent 0 = égal (2 = bord : non, cela revient à pas de différence !)
                 # ligne du haut
                 if yy > 1 and xx > 1:
                     if self.world_map[yy-1][xx-1] != r:
-                        sum += 1 * b1 # sinon 0*b1 donc rien
-                else:
-                    sum += 2 * b1
+                        sum += 1 * b0 # sinon 0*b0 donc rien
                 if xx > 1:
                     if self.world_map[yy][xx-1] != r:
-                        sum += 1 * b2
-                else:
-                    sum += 2 * b2
+                        sum += 1 * b1
                 if yy < self.size32.y - 1 and xx > 1:
                     if self.world_map[yy+1][xx-1] != r:
-                        sum += 1 * b3
-                else:
-                    sum += 2 * b3
+                        sum += 1 * b2
                 # ligne du milieu, gauche
                 if yy < self.size32.y - 1:
                     if self.world_map[yy+1][xx] != r:
-                        sum += 1 * b4
-                else:
-                    sum += 2 * b4
+                        sum += 1 * b3
                 # ligne du bas, en partant de la gauche
                 if yy < self.size32.y - 1 and xx < self.size32.x - 1:
                     if self.world_map[yy+1][xx+1] != r:
-                        sum += 1 * b5
-                else:
-                    sum += 2 * b5
+                        sum += 1 * b4
                 if xx < self.size32.x - 1:
                     if self.world_map[yy][xx+1] != r:
-                        sum += 1 * b6
-                else:
-                    sum += 2 * b6
+                        sum += 1 * b5
                 if yy > 1 and xx < self.size32.x - 1:
                     if self.world_map[yy-1][xx+1] != r:
-                        sum += 1 * b7
-                else:
-                    sum += 2 * b7
+                        sum += 1 * b6
                 # ligne du milieu, droit
                 if yy > 1:
                     if self.world_map[yy-1][xx] != r:
-                        sum += 1 * b8
-                else:
-                    sum += 2 * b8
+                        sum += 1 * b7
                 
                 self.debug_map[yy][xx] = sum
                 
                 world_map2[yy][xx] = self.world_map[yy][xx]
-                if r == 300:
+                if r == 300 and sum != 0: # 0 = eau au milieu
                     # coin
-                    if sum == 2929 or sum == 2200 or sum == 2191: # coin haut gauche
+                    if sum == 199 or sum == 135 or sum == 131: # coin haut gauche
                         world_map2[yy][xx] = 1100
-                    elif sum == 3241: # coin haut droit
+                    elif sum == 241 or sum == 240: # coin haut droit
                         world_map2[yy][xx] = 1300
-                    elif sum == 1089 or sum == 1080 or sum == 351: # coin bas droit
+                    elif sum == 124 or sum == 56 or sum == 120: # coin bas droit
                         world_map2[yy][xx] = 1500
-                    elif sum == 121: # coin bas gauche
+                    elif sum == 31 or sum == 15: # coin bas gauche
                         world_map2[yy][xx] = 1700
                     # milieu
-                    elif sum == 2917: #2920: # milieu haut
+                    elif sum == 193: #2920: # milieu haut
                         world_map2[yy][xx] = 1200
-                    elif sum == 1053 or sum == 324: #3240: # milieu droit
+                    elif sum == 112 or sum == 48: #3240: # milieu droit
                         world_map2[yy][xx] = 1400
                         #print('modified! at', yy, xx, 'to', world_map2[yy][xx])
-                    elif sum == 117: #120: # milieu bas
+                    elif sum == 28: #120: # milieu bas
                         world_map2[yy][xx] = 1600
-                    elif sum == 13 or sum == 4: #2200: # milieu gauche
+                    elif sum == 7 or sum == 3: #2200: # milieu gauche
                         world_map2[yy][xx] = 1800
                     # les coins bizarres, entre deux diag /
                     elif sum == 1:
                         world_map2[yy][xx] = 2200
-                    elif sum == 81:
+                    elif sum == 16:
                         world_map2[yy][xx] = 2400
-                    elif sum == 82:
+                    elif sum == 17:
                         world_map2[yy][xx] = 2300
+                    elif sum == 19:
+                        world_map2[yy][xx] = 2500
+                    elif sum == 49:
+                        world_map2[yy][xx] = 2700
+                    elif sum == 100:
+                        world_map2[yy][xx] = 2900
+                    elif sum == 70:
+                        world_map2[yy][xx] = 2100
                     else:
-                        print(sum)
+                        print("unidentified transition for texture :", sum, "at", xx, ":", yy)
                 
                 # if xx < self.size32.x - 1:
                     # r_middle_right = world_map[xx+1][yy]
@@ -1169,10 +1178,10 @@ def configure():
         [100, 100, 100, 100, 100, 100, 100, 101, 101, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
         [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
         [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
-        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 300, 300, 100, 100, 100, 300, 300, 100, 100, 100, 100, 100],
         [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 300, 300, 100, 100, 100, 300, 300, 100, 100, 100, 100, 100],
         [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 101, 100, 100, 100, 100, 300, 300, 100, 100, 100, 100, 100, 300, 300, 100, 100, 100, 100],
-        [100, 100, 100, 100, 100, 100, 100, 100, 100, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 300, 300, 100, 100, 100, 100, 100, 300, 300, 100, 100, 100, 100],
         [100, 100, 100, 100, 100, 100, 100, 100, 100, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
         [100, 100, 100, 100, 100, 100, 100, 100, 100, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
     ]
