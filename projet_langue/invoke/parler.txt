@@ -29,3 +29,34 @@ elle, il	a	parlé
 nous		avons	parlé
 vous		avez	parlé
 elles, ils	ont	parlé
+1. Indicatif présent
+je		parle
+tu		parles
+elle, il	parle
+nous		parlons
+vous		parlez
+elles, ils	parlont
+
+2. Indicatif imparfait
+je		parlais
+tu		parlais
+elle, il	parlait
+nous		parlions
+vous		parliez
+elles, ils	parlaient
+
+3. Indicatif futur
+je		parlerai
+tu		parleras
+elle, il	parlera
+nous		parlerons
+vous		parlerez
+elles, ils	parleront
+
+4. Indicatif passé composé
+j'		ai	parlé
+tu		as	parlé
+elle, il	a	parlé
+nous		avons	parlé
+vous		avez	parlé
+elles, ils	ont	parlé

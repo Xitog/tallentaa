@@ -1402,16 +1402,22 @@ def exec_stat(p_auto=False, p_debug=False):
     p_conn.close()
 
 
-def exec_cmd(p_main, p_lang, p_order, p_auto=False, p_to=None, p_debug=False):
+def exec_cmd(p_main, p_lang, p_order='', p_auto=False, p_to=None, p_debug=False, display=True):
+    if p_order == '':
+        p_order =  p_lang + ".lang, " + p_lang + ".base"
+    
     p_conn = sqlite3.connect('example.db')
     p_cursor = p_conn.cursor()
     nb = 0
     if p_main in ['select', 'trans']:
-        display = True
+        cnt = False
+    elif p_main in ['count']:
+        cnt = True
     else:
-        display = False
+        print("! Command unknown : ", p_main)
+        return -1
     if p_main == 'select' or p_main == 'count':
-        p_string = ("SELECT " + p_lang + ".id, " + p_lang + ".base FROM voc_verbs as " + p_lang +
+        p_string = ("SELECT " + p_lang + ".id, " + p_lang + ".base, " + p_lang + ".surtype, " + p_lang + ".lvl" + " FROM voc_verbs as " + p_lang +
                     " WHERE " + p_lang + ".lang = '" + p_lang + "' ORDER BY " + p_order)
     elif p_main == 'trans':
         p_string = ("SELECT " + p_lang + ".id, " + p_lang + ".base, " + p_to + ".base, " + p_to + ".id, t.sens, t.id " +
@@ -1421,87 +1427,269 @@ def exec_cmd(p_main, p_lang, p_order, p_auto=False, p_to=None, p_debug=False):
                     "' ORDER BY " + p_order)
     if p_debug:
         print("% Executing : " + p_string)
-    if not p_auto:
-        print("% Press a key to continue")
-        input()
-    for p_row in p_cursor.execute(p_string):
-        if display:
-            if p_main == 'select':
-                try:
-                    print("#" + str(p_row[0]) + "  " + p_row[1])
-                except UnicodeEncodeError as e:
-                    word = p_row[1]
-                    word_modified = ''
-                    for letter in word:
-                        if letter == "\u0153":
-                            word_modified += 'oe'
-                        else:
-                            word_modified += letter
-                        #print('%04x' % ord(letter))
-                    print("#" + str(p_row[0]) + "  " + word_modified)
-            elif p_main == 'trans':
-                sys.stdout.write("#" + str(p_row[5]) + "  " + p_row[1] + " (" + str(p_row[0]) + ")")
-                if p_row[4] is not None:
-                    sys.stdout.write(" --> to " + p_row[2] + " (" + str(p_row[3]) + ") avec le sens de : " + p_row[4] +
-                                     "\n")
-                else:
-                    sys.stdout.write(" --> to " + p_row[2] + " (" + str(p_row[3]) + ")\n")
-        nb += 1
-    print("i Number of returned results = " + str(nb))
+    if display:
+        if not p_auto:
+            print("% Press a key to continue")
+            input()
+        for p_row in p_cursor.execute(p_string):
+            if not cnt: # si on compte pas, on affiche tout
+                if p_main == 'select':
+                    try:
+                        print("#" + str(p_row[0]) + "  " + p_row[1] + " (" + p_row[2] + ") [" + str(p_row[3]) + "]")
+                    except UnicodeEncodeError as e:
+                        word = p_row[1]
+                        word_modified = ''
+                        for letter in word:
+                            if letter == "\u0153":
+                                word_modified += 'oe'
+                            else:
+                                word_modified += letter
+                            #print('%04x' % ord(letter))
+                        print("#" + str(p_row[0]) + "  " + word_modified + " (" + p_row[2] + ") [" + str(p_row[3]) + "]")
+                elif p_main == 'trans':
+                    sys.stdout.write("#" + str(p_row[5]) + "  " + p_row[1] + " (" + str(p_row[0]) + ")")
+                    if p_row[4] is not None:
+                        sys.stdout.write(" --> to " + p_row[2] + " (" + str(p_row[3]) + ") avec le sens de : " + p_row[4] +
+                                         "\n")
+                    else:
+                        sys.stdout.write(" --> to " + p_row[2] + " (" + str(p_row[3]) + ")\n")
+            nb += 1
+    else: # ne marche que pour select
+        verbs = []
+        for p_row in p_cursor.execute(p_string):
+            v = {}
+            v['id'] = p_row[0]
+            v['base'] = p_row[1]
+            v['surtype'] = p_row[2]
+            v['lvl'] = p_row[3]
+            verbs.append(v)
+    print("i Number of returned results = " + str(nb))    
     p_cursor.close()
     p_conn.close()
-    return nb
+    if display:
+        return nb
+    else:
+        return verbs
 
 # Conjugate : new from 2/11/2015
 # Il faudrait faire une option qui génère tout cela dans un fichier texte plutôt qu'en sortie console.
 # Aucun test, cela ne marche que pour les verbes du 1er groupe se conjuguant avec avoir.
-def conjugate(verb, file=False):
-    if file:
-        f = open(verb+'.txt', 'w')
-        f.write('1. Indicatif présent\n')
+def conjugate(verb, lang, onfile=False, html=False):
+    if lang not in ['fr', 'en']:
+        print('Unknwon conjugaison for', lang)
+        return
+    
+    if verb == 'all':
+        r = exec_cmd('select', lang, '', False, None, False, False)
+        # filter on verb
+        nb = 0
+        for v in r:
+            if v['surtype'] == 'verb':
+                if lang == 'fr':
+                    conjugate_fr(verb, onfile, html)
+                elif lang == 'en':
+                    conjugate_en(verb, onfile, html)
+                nb += 1
+        print('i Done for ', nb, 'verbs')
+    else:
+        if lang == 'fr':
+            conjugate_fr(verb, onfile, html)
+        elif lang == 'en':
+            conjugate_en(verb, onfile, html)
+
+def conjugate_en(verb, onfile=False, html=False):
+    if not onfile or not html:
+        print("i This function works only with onfile and html set at true")
+        return
+    
+    f = open('output.html', 'a')
+    
+    pronoms = ['I', 'you', 'she, he, it', 'we', 'you', 'they']
+    root = verb
+    
+    f.write('<h3>Sens</h3>\n\n')
+    
+    f.write('<h3>Infinitif</h3>\n\n')
+    
+    f.write('<table>\n')
+    f.write('\t<thead>\n\t\t<tr><th>Infinitive</th></tr>\n\t</thead>\n\t<tbody>\n')
+    f.write('\t\t<tr><td>to ' + root + '</td></tr>\n')
+    f.write('\t</tbody>\n</table>\n\n')
+    
+    f.write('<h3>Formes simples de l\'indicatif</h3>\n\n<table>\n')
+    
+    # present
+    suffix = ['', '', 's', '', '', '']
+    f.write('\t<thead>\n\t\t<tr><th colspan="2">Present</th></tr>\n\t</thead>\n\t<tbody>\n')
+    for i, term in enumerate(suffix):
+        f.write('\t\t<tr><td>' + pronoms[i] + '</td><td>' + root + term + '</td></tr>\n')
+    f.write('\t</tbody>\n</table>\n\n<table>\n')
+    # preterit
+    suffix = ['ed', 'ed', 'ed', 'ed', 'ed', 'ed']
+    f.write('\t<thead>\n\t\t<tr><th colspan="2">Past</th></tr>\n\t</thead>\n\t<tbody>\n')
+    for i, term in enumerate(suffix):
+        f.write('\t\t<tr><td>' + pronoms[i] + '</td><td>' + root + term + '</td></tr>\n')
+    f.write('\t</tbody>\n</table>\n\n<table>\n')
+    # futur
+    prefix = ['will', 'will', 'will', 'will', 'will', 'will']
+    f.write('\t<thead>\n\t\t<tr><th colspan="2">Future</th></tr>\n\t</thead>\n\t<tbody>\n')
+    for i, pre in enumerate(prefix):
+        f.write('\t\t<tr><td>' + pronoms[i] + '</td><td>' + pre + ' ' + root + '</td></tr>\n')
+    f.write('\t</tbody>\n</table>\n\n<table>\n')
+    # present perfect
+    prefix = ['have', 'have', 'has', 'have', 'have', 'have']
+    suffix = 'ed'
+    f.write('\t<thead>\n\t\t<tr><th colspan="2">Present perfect</th></tr>\n\t</thead>\n\t<tbody>\n')
+    for i, pre in enumerate(prefix):
+        f.write('\t\t<tr><td>' + pronoms[i] + '</td><td>' + pre + ' ' + root + suffix + '</td></tr>\n')
+    f.write('\t</tbody>\n</table>\n\n<table>\n')
+    # Past perfect
+    prefix = ['had', 'had', 'had', 'had', 'had', 'had']
+    suffix = 'ed'
+    f.write('\t<thead>\n\t\t<tr><th colspan="2">Past perfect</th></tr>\n\t</thead>\n\t<tbody>\n')
+    for i, pre in enumerate(prefix):
+        f.write('\t\t<tr><td>' + pronoms[i] + '</td><td>' + pre + ' ' + root + suffix + '</td></tr>\n')
+    f.write('\t</tbody>\n</table>\n\n<table>\n')
+    # Future perfect
+    prefix = ['will have', 'will have', 'will have', 'will have', 'will have', 'will have']
+    suffix = 'ed'
+    f.write('\t<thead>\n\t\t<tr><th colspan="2">Future perfect</th></tr>\n\t</thead>\n\t<tbody>\n')
+    for i, pre in enumerate(prefix):
+        f.write('\t\t<tr><td>' + pronoms[i] + '</td><td>' + pre + ' ' + root + suffix + '</td></tr>\n')
+    f.write('\t</tbody>\n</table>\n\n')
+    
+    f.write('<h3>Aspect progressif de l\'indicatif</h3>\n\n<table>\n')
+    
+    # present +ing
+    prefix = ['am', 'are', 'is', 'are', 'are', 'are']
+    suffix = 'ing'
+    f.write('\t<thead>\n\t\t<tr><th colspan="2">Present</th></tr>\n\t</thead>\n\t<tbody>\n')
+    for i, pre in enumerate(prefix):
+        f.write('\t\t<tr><td>' + pronoms[i] + '</td><td>' + pre + ' ' + root + suffix + '</td></tr>\n')
+    f.write('\t</tbody>\n</table>\n\n<table>\n')
+    # preterit +ing
+    prefix = ['was', 'were', 'was', 'were', 'were', 'were']
+    suffix = 'ing'
+    f.write('\t<thead>\n\t\t<tr><th colspan="2">Past</th></tr>\n\t</thead>\n\t<tbody>\n')
+    for i, pre in enumerate(prefix):
+        f.write('\t\t<tr><td>' + pronoms[i] + '</td><td>' + pre + ' ' + root + suffix + '</td></tr>\n')
+    f.write('\t</tbody>\n</table>\n\n<table>\n')
+    # futur +ing
+    prefix = ['will be', 'will be', 'will be', 'will be', 'will be', 'will be']
+    suffix = 'ing'
+    f.write('\t<thead>\n\t\t<tr><th colspan="2">Future</th></tr>\n\t</thead>\n\t<tbody>\n')
+    for i, pre in enumerate(prefix):
+        f.write('\t\t<tr><td>' + pronoms[i] + '</td><td>' + pre + ' ' + root + suffix + '</td></tr>\n')
+    f.write('\t</tbody>\n</table>\n\n<table>\n')
+    # present perfect +ing
+    prefix = ['have been', 'have been', 'has been', 'have been', 'have been', 'have been']
+    suffix = 'ing'
+    f.write('\t<thead>\n\t\t<tr><th colspan="2">Present perfect</th></tr>\n\t</thead>\n\t<tbody>\n')
+    for i, pre in enumerate(prefix):
+        f.write('\t\t<tr><td>' + pronoms[i] + '</td><td>' + pre + ' ' + root + suffix + '</td></tr>\n')
+    f.write('\t</tbody>\n</table>\n\n<table>\n')
+    # Past perfect +ing
+    prefix = ['had been', 'had been', 'had been', 'had been', 'had been', 'had been']
+    suffix = 'ing'
+    f.write('\t<thead>\n\t\t<tr><th colspan="2">Past perfect</th></tr>\n\t</thead>\n\t<tbody>\n')
+    for i, pre in enumerate(prefix):
+        f.write('\t\t<tr><td>' + pronoms[i] + '</td><td>' + pre + ' ' + root + suffix + '</td></tr>\n')
+    f.write('\t</tbody>\n</table>\n\n<table>\n')
+    # Future perfect +ing
+    prefix = ['will have been', 'will have been', 'will have been', 'will have been', 'will have been', 'will have been']
+    suffix = 'ing'
+    f.write('\t<thead>\n\t\t<tr><th colspan="2">Future perfect</th></tr>\n\t</thead>\n\t<tbody>\n')
+    for i, pre in enumerate(prefix):
+        f.write('\t\t<tr><td>' + pronoms[i] + '</td><td>' + pre + ' ' + root + suffix + '</td></tr>\n')
+    f.write('\t</tbody>\n</table>\n\n')
+    
+    f.write('<h3>Conditionnel</h3>\n\n')
+    
+    f.write('<h3>Impératif</h3>\n\n')
+    
+    f.write('<h3>Subjonctif</h3>\n\n')
+    
+    f.close()
+    
+def conjugate_fr(verb, onfile=False, html=False):
+    if onfile:
+        f = open('output.html', 'a')
+        if not html:
+            f.write('\n###################################################\n\n')
+            f.write('1. Indicatif présent\n')
+        else:
+            f.write('\n\n<table><tbody>\n')
     pronoms = ['je', 'tu', 'elle, il', 'nous', 'vous', 'elles, ils']
     espace_pro = ['\t\t', '\t\t', '\t', '\t\t', '\t\t', '\t']
     root = verb[:-2]
     
-    print('\n1. Indicatif présent')
+    if not onfile: print('\n1. Indicatif présent')
     suffix = ['e', 'es', 'e', 'ons', 'ez', 'ont']
-    for i, v in enumerate(suffix):
-        print(pronoms[i] + espace_pro[i] + root + v)
-        if file:
-            f.write(pronoms[i] + espace_pro[i] + root + v + '\n')
-    if file:
-        f.write('\n2. Indicatif imparfait\n')
-
-    print('\n2. Indicatif imparfait')
-    suffix = ['ais', 'ais', 'ait', 'ions', 'iez', 'aient']
-    for i, v in enumerate(suffix):
-        print(pronoms[i] + espace_pro[i] + root + v)
-        if file:
-            f.write(pronoms[i] + espace_pro[i] + root + v + '\n')
-    if file:
-        f.write('\n3. Indicatif futur\n')
-
-    print('\n3. Indicatif futur')
-    suffix = ['ai', 'as', 'a', 'ons', 'ez', 'ont']
-    for i, v in enumerate(suffix):
-        print(pronoms[i] + espace_pro[i] + verb + v)
-        if file:
-            f.write(pronoms[i] + espace_pro[i] + verb + v + '\n')
-    if file:
-        f.write('\n4. Indicatif passé composé\n')
+    for i, term in enumerate(suffix):
+        if onfile:
+            if not html:
+                f.write(pronoms[i] + espace_pro[i] + root + term + '\n')
+            else:
+                f.write('\t<tr><td>' + pronoms[i] + '</td><td>' + root + term + '</td></tr>\n')
+        else:
+            print(pronoms[i] + espace_pro[i] + root + term)
+    if onfile:
+        if not html:
+            f.write('\n2. Indicatif imparfait\n')
+        else:
+            f.write('</tbody></table>\n\n<table><tbody>\n')
     
-    print('\n4. Indicatif passé composé')
+    if not onfile: print('\n2. Indicatif imparfait')
+    suffix = ['ais', 'ais', 'ait', 'ions', 'iez', 'aient']
+    for i, term in enumerate(suffix):
+        if onfile:
+            if not html:
+                f.write(pronoms[i] + espace_pro[i] + root + term + '\n')
+            else:
+                f.write('\t<tr><td>' + pronoms[i] + '</td><td>' + root + term + '</td></tr>\n')
+        else:
+            print(pronoms[i] + espace_pro[i] + root + term)
+    if onfile:
+        if not html:
+            f.write('\n3. Indicatif futur\n')
+        else:
+            f.write('</tbody></table>\n\n<table><tbody>\n')
+
+    if not onfile: print('\n3. Indicatif futur')
+    suffix = ['ai', 'as', 'a', 'ons', 'ez', 'ont']
+    for i, term in enumerate(suffix):
+        if onfile:
+            if not html:
+                f.write(pronoms[i] + espace_pro[i] + verb + term + '\n')
+            else:
+                f.write('\t<tr><td>' + pronoms[i] + '</td><td>' + verb + term + '</td></tr>\n')
+        else:
+            print(pronoms[i] + espace_pro[i] + verb + term)
+    if onfile:
+        if not html:
+            f.write('\n4. Indicatif passé composé\n')
+        else:
+            f.write('</tbody></table>\n\n<table><tbody>\n')
+    
+    if not onfile: print('\n4. Indicatif passé composé')
     pronoms = ["j'", 'tu', 'elle, il', 'nous', 'vous', 'elles, ils']
     prefix = ['ai', 'as', 'a', 'avons', 'avez', 'ont']
-    for i, v in enumerate(prefix):
-        print(pronoms[i] + espace_pro[i] + v + '\t' + root + 'é')
-        if file:
-            f.write(pronoms[i] + espace_pro[i] + v + '\t' + root + 'é' + '\n')
-    
-    print()
-    if file:
+    for i, aux in enumerate(prefix):
+        if onfile:
+            if not html:
+                f.write(pronoms[i] + espace_pro[i] + aux + '\t' + root + 'é' + '\n')
+            else:
+                f.write('\t<tr><td>' + pronoms[i] + '</td><td>' + aux + ' ' + root + 'é' + '</td></tr>\n')
+        else:
+            print(pronoms[i] + espace_pro[i] + aux + '\t' + root + 'é')
+    if onfile:
+        if html:
+            f.write('</tbody></table>\n\n')
         f.close()
-
+        print('i file output.html extended')
+    else:
+        print()
+    
     #f.write('4. Participe passé\n')
     #suffix_partpast = ['é', 'ée', 'és', 'ées']
     #root_pp = root
@@ -1517,22 +1705,39 @@ def conjugate(verb, file=False):
     
 # Mainloop
 
-def mainloop():
-    escape = False
-    cmd_lang = "fr"
-    cmd_order = cmd_lang + ".lang, " + cmd_lang + ".base"
-    cmd_to = "en"
-    cmd_auto = False
-    cmd_debug = True
-    print("i Welcome to Invoke v1.2")
-    print("i Type 'help' for help")
-    print("i DEBUG is set to", cmd_debug)
-    while not escape:
-        cmd = input('>>> ')
-        if cmd == 'exit':
+class Console:
+
+    def __init__(self, pre):
+        self.escape = False
+        self.cmd = ''
+        self.cmd_lang = "fr"
+        self.cmd_order = self.cmd_lang + ".lang, " + self.cmd_lang + ".base"
+        self.cmd_to = "en"
+        self.cmd_auto = False
+        self.cmd_debug = True
+        self.cmd_file = False # for conjugate
+        self.cmd_html = False # for conjugate
+        print("i Welcome to Invoke v1.2")
+        print("i Type 'help' for help")
+        print("i DEBUG is set to", self.cmd_debug)
+        self.mainloop(pre)
+        
+    def mainloop(self, pre=[]):
+        if len(pre) > 0:
+            for p in pre:
+                self.interpret(p)
+        while not self.escape:
+            self.cmd = input('>>> ')
+            self.interpret()
+            
+    def interpret(self, pcmd=None):
+        if pcmd is not None:
+            self.cmd = pcmd
+        
+        if self.cmd == 'exit':
             print('i Goodbye!')
             exit(0)
-        elif cmd == 'help':
+        elif self.cmd == 'help':
             print("i Commands :")
             print("  Main commands:")
             print("    help - print this help")
@@ -1549,69 +1754,93 @@ def mainloop():
             print("    lang - get the current lang of the returned results and translation")
             print("    to ... - set the translation of the returned results (for trans)")
             print("    auto - switch to wait for a key or not before executing the command")
+            print("    file - switch to conjugate a verb in a file instead of displaying it")
+            print("    html - switch to output in html in the file instead of plain text")
+            print("    reset - reset the file where the conjugated verbs are stored")
             print("  Available languages are : fr, en, it, eo, de")
-        elif cmd == 'create':
+        elif self.cmd == 'create':
             print("i Recreating the database")
             create()
             print("i Database recreated")
-        elif cmd == 'select':
-            exec_cmd('select', cmd_lang, cmd_order, cmd_auto, None, cmd_debug)
-        elif cmd == 'trans':
-            exec_cmd('trans', cmd_lang, cmd_order, cmd_auto, cmd_to, cmd_debug)
-        elif cmd == 'count':
-            print("i Returned results for lang [" + cmd_lang + "] = " + str(exec_cmd('count', cmd_lang, cmd_order, cmd_auto)))
-        elif cmd == 'auto':
-            if cmd_auto:
-                cmd_auto = False
+        elif self.cmd == 'select':
+            exec_cmd('select', self.cmd_lang, self.cmd_order, self.cmd_auto, None, self.cmd_debug)
+        elif self.cmd == 'trans':
+            exec_cmd('trans', self.cmd_lang, self.cmd_order, self.cmd_auto, self.cmd_to, self.cmd_debug)
+        elif self.cmd == 'count':
+            print("i Returned results for lang [" + self.cmd_lang + "] = " + str(exec_cmd('count', self.cmd_lang, self.cmd_order, self.cmd_auto)))
+        elif self.cmd == 'auto':
+            if self.cmd_auto:
+                self.cmd_auto = False
             else:
-                cmd_auto = True
-            print("i Auto switch to " + str(cmd_auto))
-        elif cmd == 'debug':
-            if cmd_debug:
-                cmd_debug = False
-                cmd_auto = True
+                self.cmd_auto = True
+            print("i Auto switch to " + str(self.cmd_auto))
+        elif self.cmd == 'file':
+            if self.cmd_file:
+                self.cmd_file = False
             else:
-                cmd_debug = True
-                cmd_auto = False
-            print("i Debug switch to " + str(cmd_debug))
-            print("i Auto switch to " + str(cmd_auto))
-        elif cmd == 'lang':
-            print("i Current language is [" + cmd_lang + "], current translation is [" + cmd_to + "]")
-        elif cmd == 'stats':
-            exec_stat(cmd_auto, cmd_debug)
-        elif cmd == 'conjugate':
+                self.cmd_file = True
+            print("i File switch to " + str(self.cmd_file))
+        elif self.cmd == 'html':
+            if self.cmd_html:
+                self.cmd_html = False
+            else:
+                self.cmd_html = True
+            print("i HTML switch to " + str(self.cmd_html))
+            if not self.cmd_file:
+                self.cmd_file = True
+                print("i File switch to True also")
+        elif self.cmd == 'reset':
+            f = open('output.html', 'w')
+            f.close()
+            print('i file output.html reset')
+        elif self.cmd == 'debug':
+            if self.cmd_debug:
+                self.cmd_debug = False
+                self.cmd_auto = True
+            else:
+                self.cmd_debug = True
+                self.cmd_auto = False
+            print("i Debug switch to " + str(self.cmd_debug))
+            print("i Auto switch to " + str(self.cmd_auto))
+        elif self.cmd == 'lang':
+            print("i Current language is [" + self.cmd_lang + "], current translation is [" + self.cmd_to + "]")
+        elif self.cmd == 'stats':
+            exec_stat(self.cmd_auto, self.cmd_debug)
+        elif self.cmd in ['conjugate', 'conj', 'con']:
             s = input('Enter a verb : ')
-            conjugate(s, True)
+            conjugate(s, self.cmd_lang, self.cmd_file, self.cmd_html)
             print("i Verb " + s + " conjugated. Results can be found in " + s.lower() + ".txt")
-        elif len(cmd.split(' ')) > 1:
-            c_tab = cmd.split(' ')
+        elif len(self.cmd.split(' ')) > 1:
+            c_tab = self.cmd.split(' ')
             if c_tab[0] == 'select':
                 if c_tab[1] in ['fr', 'it', 'eo', 'en', 'de']:
-                    if c_tab[1] != cmd_lang: # order must be set to the language we call
-                        exec_cmd('select', c_tab[1], c_tab[1] + ".lang, " + c_tab[1] + ".base", cmd_auto, None, cmd_debug)
+                    if c_tab[1] != self.cmd_lang: # order must be set to the language we call
+                        exec_cmd('select', c_tab[1], c_tab[1] + ".lang, " + c_tab[1] + ".base", self.cmd_auto, None, self.cmd_debug)
                     else:
-                        exec_cmd('select', c_tab[1], cmd_order, cmd_auto, None, cmd_debug)
+                        exec_cmd('select', c_tab[1], self.cmd_order, self.cmd_auto, None, self.cmd_debug)
                 else:
                     print("! Unknown language : ", c_tab[1])
             elif c_tab[0] == 'order':
-                cmd_order = c_tab[1]
+                self.cmd_order = c_tab[1]
             elif c_tab[0] == 'lang':
                 if c_tab[1] in ['fr', 'it', 'eo', 'en', 'de']:
-                    cmd_lang = c_tab[1]
-                    cmd_order = cmd_lang + ".lang, " + cmd_lang + ".base"
+                    self.cmd_lang = c_tab[1]
+                    self.cmd_order = self.cmd_lang + ".lang, " + self.cmd_lang + ".base"
                 else:
                     raise Exception("Unknown lang : " + c_tab[1])
             elif c_tab[0] == 'to':
                 if c_tab[1] in ['fr', 'it', 'eo', 'en', 'de']:
-                    cmd_to = c_tab[1]
+                    self.cmd_to = c_tab[1]
                 else:
                     raise Exception("Unknown lang : " + c_tab[1])
-            elif c_tab[0] == 'conjugate':
-                conjugate(c_tab[1])
+            elif c_tab[0] in ['conjugate', 'conj','con']:
+                conjugate(c_tab[1], self.cmd_lang, self.cmd_file, self.cmd_html)
                 # print("i Verb " + c_tab[1] + " conjugated. Results can be found in " + c_tab[1].lower() + ".txt")
             else:
-                print("! Unknown command with parameters : " + cmd)
+                print("! Unknown command with parameters : " + self.cmd)
+        elif self.cmd == '':
+            pass
         else:
-            print("! Unknown command : " + cmd)
+            print("! Unknown command : " + self.cmd)
 
-mainloop()
+Console(['reset', 'html', 'lang en', 'con talk', 'exit'])
