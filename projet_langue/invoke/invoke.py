@@ -24,9 +24,11 @@ def create():
 
     # Tables creation
 
-    c.execute("CREATE TABLE IF NOT EXISTS voc_verbs ( id int(11) NOT NULL, lang varchar(2) NOT NULL, base varchar(50) NOT NULL, surtype varchar(30) NOT NULL, lvl int(11) DEFAULT '1', PRIMARY KEY (`id`) ) ");
-    c.execute("CREATE TABLE IF NOT EXISTS voc_translate ( id int(11) NOT NULL, de int(11) NOT NULL, vers int(11) NOT NULL, sens varchar(100) DEFAULT NULL, PRIMARY KEY (`id`) ) ");
+    c.execute("CREATE TABLE IF NOT EXISTS voc_verbs ( id int(11) NOT NULL, lang varchar(2) NOT NULL, base varchar(50) NOT NULL, surtype varchar(30) NOT NULL, lvl int(11) DEFAULT '1', PRIMARY KEY (`id`) ) ")
+    c.execute("CREATE TABLE IF NOT EXISTS voc_translate ( id int(11) NOT NULL, de int(11) NOT NULL, vers int(11) NOT NULL, sens varchar(100) DEFAULT NULL, PRIMARY KEY (`id`) ) ")
 
+    c.execute("CREATE TABLE IF NOT EXISTS voc_verbs_en ( id int(11) NOT NULL, base varchar(50) NOT NULL, pret varchar(50) NOT NULL, past varchar(50) NOT NULL )")
+    
     # Tables filling
 
     content = [
@@ -812,6 +814,85 @@ def create():
     c.executemany('INSERT INTO voc_verbs VALUES (?,?,?,?,?)', content)
     #c.execute("INSERT INTO verbs VALUES ('ŝteli')")
 
+    #----------------------------------------------------------------
+    # VERBES ANGLAIS IRRÉGULIERS
+    #----------------------------------------------------------------
+    
+    content_verbs_en = [
+        (1, 'be', 'were', 'been'),
+        (2, 'begin', 'began', 'begun'),
+        (3, 'break', 'broke', 'broken'),
+        (4, 'bring', 'brought', 'brought'),
+        (5, 'buy', 'bought', 'bought'),
+        (6, 'build', 'built', 'built'),
+        (7, 'choose', 'chose', 'chosen'),
+        (8, 'come', 'came', 'come'),
+        (9, 'cost', 'cost', 'cost'),
+        (10, 'cut', 'cut', 'cut'),
+        (11, 'do', 'did', 'done'),
+        (12, 'draw', 'drew', 'drawn'),
+        (13, 'drive', 'drove', 'driven'),
+        (14, 'eat', 'ate', 'eaten'),
+        (15, 'feel', 'felt', 'felt'),
+        (16, 'find', 'found', 'found'),
+        (17, 'get', 'got', 'got'),
+        (18, 'give', 'gave', 'given'),
+        (19, 'go', 'went', 'gone'),
+        (20, 'have', 'had', 'had'),
+        (21, 'hear', 'heard', 'heard'),
+        (22, 'hold', 'held', 'held'),
+        (23, 'keep', 'kept', 'kept'),
+        (24, 'know', 'knew', 'known'),
+        (25, 'leave', 'left', 'left'),
+        (26, 'lead', 'led', 'led'),
+        (27, 'let', 'let', 'let'),
+        (28, 'lie', 'lay', 'lain'),
+        (29, 'lose', 'lost', 'lost'),
+        (30, 'make', 'made', 'made'),
+        (31, 'mean', 'meant', 'meant'),
+        (32, 'meet', 'met', 'met'),
+        (33, 'pay', 'paid', 'paid'),
+        (34, 'put', 'put', 'put'),
+        (35, 'run', 'ran', 'run'),
+        (36, 'say', 'said', 'said'),
+        (37, 'see', 'saw', 'seen'),
+        (38, 'sell', 'sold', 'sold'),
+        (39, 'send', 'sent', 'sent'),
+        (40, 'set', 'set', 'set'),
+        (41, 'sit', 'sat', 'sat'),
+        (42, 'speak', 'spoke', 'spoken'),
+        (43, 'spend', 'spent', 'spent'),
+        (44, 'stand', 'stood', 'stood'),
+        (45, 'take', 'took', 'taken'),
+        (46, 'teach', 'taught', 'taught'),
+        (47, 'tell', 'told', 'told'),
+        (48, 'think', 'thought', 'thought'),
+        (49, 'understand', 'understood', 'understood'),
+        (50, 'wear', 'wore', 'worn'),
+        (51, 'win', 'won', 'won'),
+        (52, 'write', 'wrote', 'written'),
+    ]
+    
+    irr_not_found = 0
+    for cc in content_verbs_en:
+        found = False
+        for v in content:
+            if cc[1] == v[2] and v[1] == 'en':
+                # le verbe est dans la base et dans celle des irréguliers
+                found = True
+                break
+        if not found:        
+            # on a un irrégulier qui n'est pas dans notre base
+            print(cc[1])
+            irr_not_found += 1
+    print("Irreguliers not found in our base :", irr_not_found)
+    
+    c.executemany('INSERT INTO voc_verbs_en VALUES (?,?,?,?)', content_verbs_en)
+    
+    #----------------------------------------------------------------
+    # TRADUCTIONS
+    #----------------------------------------------------------------
+    
     content = [
         (1, 1, 100001, None),
         (2, 1, 200001, None),
@@ -1309,7 +1390,7 @@ def create():
         #(666, 187, 99999, None) # ERREUR VOLONTAIRE "VERS" DE TEST
         #(666, 19999, 187, None) # ERREUR VOLONTAIRE "DE" DE TEST
         ]
-
+    
     # Tests Foreign Key
     error = False
     for cc in content:
@@ -1325,7 +1406,20 @@ def create():
     if error:
         print("Errors have been found.")
         exit()
-
+    
+    # Adding reverse translation only for en -> fr
+    id = 600
+    added = []
+    for cc in content:
+        id += 1
+        de = cc[1]
+        vers = cc[2]
+        comment = cc[3]
+        if vers >= 100000:
+            added.append((id, cc[2], cc[1], cc[3]))
+    for aa in added:
+        content.append(aa)
+    
     c.executemany('INSERT INTO voc_translate VALUES (?,?,?,?)', content)
 
     conn.commit()
@@ -1401,6 +1495,50 @@ def exec_stat(p_auto=False, p_debug=False):
     p_cursor.close()
     p_conn.close()
 
+
+def get_all_verbs():
+    p_conn = sqlite3.connect('example.db')
+    p_cursor = p_conn.cursor()
+    p_lang = 'en'
+    p_to = 'fr'
+    p_order = p_lang + '.base'
+    nb = 0
+    p_string = ("SELECT " + p_lang + ".id, " + p_lang + ".base, " + p_lang + ".surtype, " + p_lang + ".lvl, " + p_to + ".base, " + p_to + ".id, t.sens, t.id " +
+                "FROM voc_verbs as " +
+                p_lang + ", voc_verbs as " + p_to + ", voc_translate as t WHERE " + p_lang + ".id = t.de AND " +
+                p_to + ".id = t.vers AND " + p_lang + ".lang = '" + p_lang + "' AND " + p_to + ".lang = '" + p_to + "' AND " + p_lang + ".surtype = 'verb'" +
+                " ORDER BY " + p_order)
+    verbs = []
+    actual = None
+    #print(p_string)
+    for p_row in p_cursor.execute(p_string):
+        if actual is None or actual['id'] != p_row[0]:
+            if actual is None:
+                #print('debut')
+                actual = {}
+            else:
+                verbs.append(actual)
+                actual = {}
+            #print('verbe : ' + p_row[1])
+            actual['id'] = p_row[0]
+            actual['base'] = p_row[1]
+            actual['surtype'] = p_row[2]
+            actual['lvl'] = p_row[3]
+            actual['trans'] = {}
+            actual['trans'][p_row[4]] = p_row[6]
+            #print('\ttranslated to : ' + p_row[4])
+        elif actual is not None:
+            actual['trans'][p_row[4]] = p_row[6]
+            #print('\ttranslated to : ' + p_row[4])
+    if actual is not None:
+        verbs.append(actual)
+    return verbs
+
+
+#def pretty_print(verbs):
+#    print(len(verbs))
+#v = get_all_verbs()
+#pretty_print(v)
 
 def exec_cmd(p_main, p_lang, p_order='', p_auto=False, p_to=None, p_debug=False, display=True):
     if p_order == '':
@@ -1478,26 +1616,168 @@ def conjugate(verb, lang, onfile=False, html=False):
     if lang not in ['fr', 'en']:
         print('Unknwon conjugaison for', lang)
         return
-    
-    if verb == 'all':
+    if verb == 'all' and lang == 'en':
+        # make book
+        r = get_all_verbs()
+        #print("To do for", len(r))
+        nb = 0
+        for v in r:
+            if v['surtype'] == 'verb':
+                nb += 1
+                conjugate_en(v['base'], onfile, html, v, nb)
+                #print('i Done for ', nb, 'verbs')
+            else:
+                print(v['surtype'])
+        print('i Conjugaison done for', len(r), 'verbs')
+    elif verb == 'all':
         r = exec_cmd('select', lang, '', False, None, False, False)
         # filter on verb
         nb = 0
         for v in r:
             if v['surtype'] == 'verb':
                 if lang == 'fr':
-                    conjugate_fr(verb, onfile, html)
+                    conjugate_fr(v['base'], onfile, html)
                 elif lang == 'en':
-                    conjugate_en(verb, onfile, html)
+                    conjugate_en(v['base'], onfile, html)
                 nb += 1
-        print('i Done for ', nb, 'verbs')
+        print('i Conjugaison done for', nb, 'verbs')
     else:
         if lang == 'fr':
             conjugate_fr(verb, onfile, html)
         elif lang == 'en':
             conjugate_en(verb, onfile, html)
 
-def conjugate_en(verb, onfile=False, html=False):
+def rappel_en():
+    f = open('output.html', 'w')
+    f.write("""
+<html>
+    <head>
+        <style type="text/css">
+            body : {
+                font-family: Palatino;
+            }
+        </style>
+    </head>
+    <body>
+        <p>Modestie la portée de cet ouvrage</p>
+        <p>Légende : choix1/choix2 (négatif) pers. sing. </p>
+        <p>Les formes contractées de la négation</p>
+        <p>Les valeurs des modes et des temps
+            <ul>
+                <li><i>(L'iréel, la généralité)</i></li>
+                <li><i>(Le réel sous conditions)</i></li>
+                <li><i>(L\'irréel)</i></li>
+                <li><i>(L\'ordre)</i></li>
+            </ul>
+        </p>
+        <h1>Sommaire</h1>
+        <h2>Considérations sur les verbes anglais</h2>
+        
+        <h2>Liste des 200 verbes</h2>
+        <table>
+    """)
+    verbs = get_all_verbs()
+    nb = 0
+    for v in verbs:
+        nb += 1
+        pages = 100 + nb
+        f.write('\t<tr><td>' + str(nb) + '</td><td>' + v['base'] + '</td><td>' + str(pages) + '</td></tr>')
+    f.write('</table>\n\n\n')
+    f.close()
+
+    
+def irregular(base, pret, part, ing):
+    return (base, pret, part, ing)
+    #TODO + gestion du pret, run, ran, run
+
+
+def conjugate_en(verb, onfile=False, html=False, info=None, nb=None):
+    if not onfile or not html or nb is None or info is None:
+        print("i This function works only with onfile and html set at true")
+        return
+
+    f = open('output.html', 'a')
+    pronoms = ['I', 'you', 'she, he, it', 'we', 'you', 'they']
+    root = verb
+    
+    # Participe
+    if root[-1] != 'e' and root[-1] != 'y':
+        part = root + 'ed'
+    elif root[-1] == 'e':
+        part = root + 'd'
+    elif root[-1] == 'y':
+        part = root[0:-1] + "ied"
+    preterit = part
+    
+    # Present 3e
+    if root[-1] == 'y' and root[-2] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z']:
+        pres3 = root[0:-1] + "ies"
+    elif root[-1] in ['s', 'x', 'z', 'o'] or root[-2:] in ['ch', 'sh']:
+        pres3 = root + 'es'
+    else:
+        pres3 = root + 's'
+    
+    # ing
+    if root[-1] == 'e':
+        ing = root[0:-1] + 'ing'
+    elif root[-1] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z'] and root[-2] in ['a','e','i','o','u']:
+        ing = root + root[-1] + 'ing'
+    else:
+        ing = root + 'ing'
+    
+    f.write('<h2>' + str(nb) + '. ' + root + '</h2>\n')
+    f.write('<p><b>Sens et traduction</b> : <ul>\n')
+    for t in info['trans']:
+        if info['trans'][t] is not None:
+            f.write('\t<li>' + t + ' : ' + info['trans'][t] + '</li>\n')
+        else:
+            f.write('\t<li>' + t + '</li>\n')
+    f.write('</ul></p>\n')
+    
+    f.write('<p><b>Base verbale</b> : ' + root + '</p>\n')
+    f.write('<p><b>Infinitif</b> : to ' + root + '</p>\n')
+    f.write('<p><b>Participe passé</b> : ' + part + '</p>\n')
+    f.write('<p><b>Voix passive</b> : was/were ' + part + '</p>\n')
+    f.write('<p><b>Participe présent</b> : ' + ing + '</p>\n')
+    
+    f.write('<h3>Indicatif</h3>\n')
+    f.write('<p><b>Présent simple</b> :<ul>\n')
+    f.write('\t<li>forme <b>affirmative</b> : ' + root + ' (3e pers. sing. : ' + pres3 + ')</li>\n')
+    f.write('\t<li>forme <b>négative</b> : do not/don\'t ' + root + ' (3e pers. sing. : does not/doesn\'t ' + root + ')</li>\n')
+    f.write('</ul></p>\n')
+    f.write('<p><b>Passé simple (ou prétérit)</b> :<ul>\n')
+    f.write('\t<li>forme <b>affirmative</b> : ' + preterit + '</li>\n')
+    f.write('\t<li>forme <b>négative</b> : did not/didn\'t ' + root + '</li>\n')
+    f.write('</ul></p>\n')
+    f.write('<p><b>Futur simple</b> : will/shall (not) ' + root + '</p>\n')
+    f.write('<p><b>Présent parfait</b> :<ul>\n')
+    f.write('\t<li>forme <b>affirmative</b> : have ' + part + ' (3e pers. sing. : ' + 'ha<b>s</b> ' + part + ')</li>\n')
+    f.write('\t<li>forme <b>négative</b> : have not/haven\'t ' + part + ' (3e pers. sing. : ' + 'ha<b>s</b> not\hasn\'t ' + part + ') </li>\n')
+    f.write('</ul></p>')
+    f.write('<p><b>Passé parfait</b> : had (not) ' + part + '</p>\n')
+    f.write('<p><b>Futur parfait</b> : will (not) have ' + part + '</p>\n')
+    
+    f.write('<h3>Conditionnel</h3>\n')
+    f.write('<p><b>Présent</b> : should/would (not) ' + root + '</p>\n')
+    f.write('<p><b>Passé</b> : should/would (not) have ' + part + '</p>\n')
+    
+    f.write('<h3>Subjonctif</h3>\n')
+    f.write('<p>Expression d\'une <b>potentialité</b> : may/might (not) ' + root + '</p>\n')
+    f.write('<p>Expression d\'un <b>doute</b>, d\'une <b>supposition</b> ou <b>atténuation polie</b> : should (not) ' + root + '</p>\n')
+    
+    f.write('<h3>Impératif</h3>\n')
+    f.write('<p><b>2e pers.</b> : (do not) ' + root + '!</p>\n')
+    f.write('<p><b>Autres pers.</b> :<ul>\n')
+    f.write('\t<li><b>forme affirmative</b> : let me/her/him/it/us/them ' + root + '!</li>\n')
+    f.write('\t<li><b>formes négatives</b> :<ul>\n')
+    f.write('\t\t<li>do not/don\'t let me/her/him/it/us/them ' + root + '!</li>\n')
+    f.write('\t\t<li>let me/her/him/it/us/them not ' + root + '!</li>\n')
+    f.write('</ul></li></ul></p>\n')
+    f.write('<mbp:pagebreak />')
+    
+    f.close()
+    
+def conjugate_en2(verb, onfile=False, html=False):
     if not onfile or not html:
         print("i This function works only with onfile and html set at true")
         return
@@ -1790,8 +2070,9 @@ class Console:
                 self.cmd_file = True
                 print("i File switch to True also")
         elif self.cmd == 'reset':
-            f = open('output.html', 'w')
-            f.close()
+            #f = open('output.html', 'w')
+            #f.close()
+            rappel_en()
             print('i file output.html reset')
         elif self.cmd == 'debug':
             if self.cmd_debug:
@@ -1843,4 +2124,4 @@ class Console:
         else:
             print("! Unknown command : " + self.cmd)
 
-Console(['reset', 'html', 'lang en', 'con talk', 'exit'])
+Console(['create', 'reset', 'html', 'lang en', 'con all', 'exit']) #'con talk', 'con accept', 'exit'])
