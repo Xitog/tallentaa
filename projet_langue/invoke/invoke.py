@@ -13,6 +13,48 @@ import unicodedata
 # print("Current working dir : " + os.getcwd())
 
 
+def check_content_verbs(content):
+    # Test de l'unicité des ids et des bases
+    verbes_id = []
+    verbes_base_lang = {}
+    error = False
+    for cc in content:
+        id = cc[0]
+        if id in verbes_id:
+            print("ERROR : id 2x : " + str(id))
+            error = True
+        else:
+            verbes_id.append(id)
+        base = cc[2]
+        if base in verbes_base_lang and verbes_base_lang[base] == cc[1]: # same base and lang
+            print("ERROR : base 2x : " + base)
+            error = True
+        else:
+            verbes_base_lang[base] = cc[1] # 'dire' : 'fr' ou 'dire' : 'it'
+    if error:
+        print("Errors have been found.")
+        exit()
+    return verbes_id
+
+
+def check_content_trans(content, verbes_id):
+    # Tests Foreign Key
+    error = False
+    for cc in content:
+        de = cc[1]
+        vers = cc[2]
+        if de not in verbes_id or vers not in verbes_id:
+            if de not in verbes_id:
+                print("Unknown DE id : " + str(de) + " from " + str(cc))
+                error = True
+            if vers not in verbes_id:
+                print("Unknown VERS id : " + str(vers) + " from " + str(cc))
+                error = True
+    if error:
+        print("Errors have been found.")
+        exit()
+
+
 def create():
     try:
         os.remove('example.db')
@@ -27,11 +69,12 @@ def create():
     c.execute("CREATE TABLE IF NOT EXISTS voc_verbs ( id int(11) NOT NULL, lang varchar(2) NOT NULL, base varchar(50) NOT NULL, surtype varchar(30) NOT NULL, lvl int(11) DEFAULT '1', PRIMARY KEY (`id`) ) ")
     c.execute("CREATE TABLE IF NOT EXISTS voc_translate ( id int(11) NOT NULL, de int(11) NOT NULL, vers int(11) NOT NULL, sens varchar(100) DEFAULT NULL, PRIMARY KEY (`id`) ) ")
 
-    c.execute("CREATE TABLE IF NOT EXISTS voc_verbs_en ( id int(11) NOT NULL, base varchar(50) NOT NULL, pret varchar(50) NOT NULL, past varchar(50) NOT NULL )")
+    c.execute("CREATE TABLE IF NOT EXISTS voc_verbs_en ( id int(11) NOT NULL, base varchar(50) NOT NULL, pret varchar(50) NOT NULL, part varchar(50) NOT NULL )")
     
     # Tables filling
 
     content = [
+        # VAGUE 1
         (1, 'fr', 'ouvrir', 'verb', 1),
         (2, 'fr', 'voyager', 'verb', 1),
         (3, 'fr', 'vouloir', 'verb', 1),
@@ -173,6 +216,7 @@ def create():
         (150, 'fr', 'asseoir (s'')', 'verb', 1),
         (151, 'fr', 'enlever', 'verb', 1),
 
+        # VAGUE 2
         (152, 'fr', 'ajouter', 'verb', 2),
         (153, 'fr', 'attraper', 'verb', 2),
         (154, 'fr', 'augmenter', 'verb', 2),
@@ -208,7 +252,17 @@ def create():
         (185, 'fr', 'devenir', 'verb', 2),
         (186, 'fr', 'lancer', 'verb', 2),
         (187, 'fr', 'apporter', 'verb', 2),
-
+        
+        # VAGUE 3 : d'après la liste des verbes irréguliers
+        (188, 'fr', 'couper', 'verb', 2),
+        (189, 'fr', 'dessiner', 'verb', 2),
+        (190, 'fr', 'garder', 'verb', 2),
+        (191, 'fr', 'mener', 'verb', 2),
+        (192, 'fr', 'laisser', 'verb', 2),
+        (193, 'fr', 'mentir', 'verb', 2),
+        (194, 'fr', 'signifier', 'verb', 2),
+        (195, 'fr', 'dépenser', 'verb', 2),
+        
         (100001, 'en', 'open', 'verb', 1),
         (100002, 'en', 'travel', 'verb', 1),
         (100003, 'en', 'want', 'verb', 1),
@@ -261,7 +315,7 @@ def create():
         (100056, 'en', 'pass', 'verb', 1),
         (100057, 'en', 'pay', 'verb', 1),
         (100058, 'en', 'think', 'verb', 1),
-        (100059, 'en', 'loose', 'verb', 1),
+        (100059, 'en', 'lose', 'verb', 1),
         (100060, 'en', 'allow', 'verb', 1),
         (100061, 'en', 'please', 'verb', 1),
         (100062, 'en', 'cry', 'verb', 1),
@@ -367,6 +421,7 @@ def create():
         (190147, 'en', 'come up', 'verb', 1),
         (190148, 'en', 'come down', 'verb', 1),
 
+        # VAGUE 2
         (190126, 'en', 'happen', 'verb', 2),
         (100152, 'en', 'add', 'verb', 2),
         (100153, 'en', 'catch', 'verb', 2),
@@ -405,7 +460,18 @@ def create():
         (100184, 'en', 'empty', 'verb', 2),
         (100185, 'en', 'become', 'verb', 2),
         (100187, 'en', 'bring', 'verb', 2),
-
+        
+        # VAGUE 3
+        (100188, 'en', 'cut', 'verb', 2),
+        (100189, 'en', 'draw', 'verb', 2),
+        (100190, 'en', 'keep', 'verb', 2),
+        (100191, 'en', 'lead', 'verb', 2),
+        (100192, 'en', 'let', 'verb', 2),
+        (100193, 'en', 'lie', 'verb', 2),
+        (100194, 'en', 'mean', 'verb', 2),
+        (100195, 'en', 'spend', 'verb', 2),
+        (190063, 'en', 'wear', 'verb', 2),
+        
         (200001, 'it', 'aprire', 'verb', 1),
         (200002, 'it', 'viaggiare', 'verb', 1),
         (200003, 'it', 'volere', 'verb', 1),
@@ -790,26 +856,7 @@ def create():
 
         ]
 
-    # Test de l'unicité des ids et des bases
-    verbes_id = []
-    verbes_base_lang = {}
-    error = False
-    for cc in content:
-        id = cc[0]
-        if id in verbes_id:
-            print("ERROR : id 2x : " + str(id))
-            error = True
-        else:
-            verbes_id.append(id)
-        base = cc[2]
-        if base in verbes_base_lang and verbes_base_lang[base] == cc[1]: # same base and lang
-            print("ERROR : base 2x : " + base)
-            error = True
-        else:
-            verbes_base_lang[base] = cc[1] # 'dire' : 'fr' ou 'dire' : 'it'
-    if error:
-        print("Errors have been found.")
-        exit()
+    verbes_id = check_content_verbs(content)
 
     c.executemany('INSERT INTO voc_verbs VALUES (?,?,?,?,?)', content)
     #c.execute("INSERT INTO verbs VALUES ('ŝteli')")
@@ -859,18 +906,21 @@ def create():
         (38, 'sell', 'sold', 'sold'),
         (39, 'send', 'sent', 'sent'),
         (40, 'set', 'set', 'set'),
-        (41, 'sit', 'sat', 'sat'),
-        (42, 'speak', 'spoke', 'spoken'),
-        (43, 'spend', 'spent', 'spent'),
-        (44, 'stand', 'stood', 'stood'),
-        (45, 'take', 'took', 'taken'),
-        (46, 'teach', 'taught', 'taught'),
-        (47, 'tell', 'told', 'told'),
-        (48, 'think', 'thought', 'thought'),
-        (49, 'understand', 'understood', 'understood'),
-        (50, 'wear', 'wore', 'worn'),
-        (51, 'win', 'won', 'won'),
-        (52, 'write', 'wrote', 'written'),
+        (41, 'sing', 'sang', 'sung'),
+        (42, 'sit', 'sat', 'sat'),
+        (43, 'speak', 'spoke', 'spoken'),
+        (44, 'spend', 'spent', 'spent'),
+        (45, 'stand', 'stood', 'stood'),
+        (46, 'take', 'took', 'taken'),
+        (47, 'teach', 'taught', 'taught'),
+        (48, 'tell', 'told', 'told'),
+        (49, 'think', 'thought', 'thought'),
+        (50, 'understand', 'understood', 'understood'),
+        (51, 'wear', 'wore', 'worn'),
+        (52, 'win', 'won', 'won'),
+        (53, 'write', 'wrote', 'written'),
+        (54, 'become', 'became', 'become'),
+        (55, 'burn', 'burned/burnt', 'burned/burnt'),
     ]
     
     irr_not_found = 0
@@ -954,7 +1004,7 @@ def create():
         (56, 60, 100060, None),
         (57, 61, 100061, None),
         (58, 62, 100062, None),
-        (59, 63, 100063, None),
+        (59, 63, 100063, "porter un objet"), # porter => carry
         (60, 64, 100064, None),
         (61, 65, 100065, None),
         (62, 66, 100066, None),
@@ -1340,6 +1390,7 @@ def create():
         (449, 151, 200151, None),
         (450, 151, 400151, None),
 
+        # VAGUE 2
         (451, 126, 190126, "une occurrence"),
         (452, 152, 100152, None),
         (453, 153, 100153, None),
@@ -1389,26 +1440,23 @@ def create():
         (597, 187, 100187, None),
         #(666, 187, 99999, None) # ERREUR VOLONTAIRE "VERS" DE TEST
         #(666, 19999, 187, None) # ERREUR VOLONTAIRE "DE" DE TEST
-        ]
     
-    # Tests Foreign Key
-    error = False
-    for cc in content:
-        de = cc[1]
-        vers = cc[2]
-        if de not in verbes_id or vers not in verbes_id:
-            if de not in verbes_id:
-                print("Unknown DE id : " + str(de) + " from " + str(cc))
-                error = True
-            if vers not in verbes_id:
-                print("Unknown VERS id : " + str(vers) + " from " + str(cc))
-                error = True
-    if error:
-        print("Errors have been found.")
-        exit()
+        # VAGUE 3
+        (598, 188, 100188, None),
+        (599, 189, 100189, None),
+        (600, 190, 100190, None),
+        (601, 191, 100191, None),
+        (602, 192, 100192, None),
+        (603, 193, 100193, None),
+        (604, 194, 100194, None),
+        (605, 195, 100195, None),
+        (606, 63, 190063, "porter un vêtement"),
+        ]
+        
+    check_content_trans(content, verbes_id)
     
     # Adding reverse translation only for en -> fr
-    id = 600
+    id = 700
     added = []
     for cc in content:
         id += 1
@@ -1496,7 +1544,17 @@ def exec_stat(p_auto=False, p_debug=False):
     p_conn.close()
 
 
-def get_all_verbs():
+def get_all_verbs_en(): # fetch irregular
+    conn = sqlite3.connect('example.db')
+    cursor = conn.cursor()
+    request = "SELECT id, base, pret, part FROM voc_verbs_en"
+    results = {}
+    for row in cursor.execute(request):
+        results[row[1]] = { 'id' : row[0], 'base' : row[1], 'pret' : row[2], 'part' : row[3] }
+    return results
+
+
+def get_all_verbs_full(): # all verbs, with translations and irregular forms
     p_conn = sqlite3.connect('example.db')
     p_cursor = p_conn.cursor()
     p_lang = 'en'
@@ -1510,6 +1568,7 @@ def get_all_verbs():
                 " ORDER BY " + p_order)
     verbs = []
     actual = None
+    irregulars = get_all_verbs_en()
     #print(p_string)
     for p_row in p_cursor.execute(p_string):
         if actual is None or actual['id'] != p_row[0]:
@@ -1517,6 +1576,24 @@ def get_all_verbs():
                 #print('debut')
                 actual = {}
             else:
+                if len(actual['base'].split(' ')) > 1:
+                    actual['root_base'] = actual['base'].split(' ')[0]
+                    actual['particle'] = ' ' + actual['base'].split(' ')[1]
+                else:
+                    actual['root_base'] = actual['base']
+                    actual['particle'] = ''
+                if actual['root_base'] in irregulars:
+                    actual['pret'] = irregulars[actual['root_base']]['pret']
+                    actual['part'] = irregulars[actual['root_base']]['part']
+                else:
+                    # Building of preterit & past participe
+                    if actual['root_base'][-1] != 'e' and actual['root_base'][-1] != 'y':
+                        actual['part'] = actual['root_base'] + 'ed'
+                    elif actual['root_base'][-1] == 'e':
+                        actual['part'] = actual['root_base'] + 'd'
+                    elif actual['root_base'][-1] == 'y':
+                        actual['part'] = actual['root_base'][0:-1] + "ied"
+                    actual['pret'] = actual['part']
                 verbs.append(actual)
                 actual = {}
             #print('verbe : ' + p_row[1])
@@ -1531,6 +1608,24 @@ def get_all_verbs():
             actual['trans'][p_row[4]] = p_row[6]
             #print('\ttranslated to : ' + p_row[4])
     if actual is not None:
+        if len(actual['base'].split(' ')) > 1:
+            actual['root_base'] = actual['base'].split(' ')[0]
+            actual['particle'] = ' ' + actual['base'].split(' ')[1]
+        else:
+            actual['root_base'] = actual['base']
+            actual['particle'] = ''
+        if actual['root_base'] in irregulars:
+            actual['pret'] = irregulars[actual['root_base']]['pret']
+            actual['part'] = irregulars[actual['root_base']]['part']
+        else:
+            # Building of preterit & past participe
+            if actual['root_base'][-1] != 'e' and actual['root_base'][-1] != 'y':
+                actual['part'] = actual['root_base'] + 'ed'
+            elif actual['root_base'][-1] == 'e':
+                actual['part'] = actual['root_base'] + 'd'
+            elif actual['root_base'][-1] == 'y':
+                actual['part'] = actual['root_base'][0:-1] + "ied"
+            actual['pret'] = actual['part']
         verbs.append(actual)
     return verbs
 
@@ -1618,14 +1713,13 @@ def conjugate(verb, lang, onfile=False, html=False):
         return
     if verb == 'all' and lang == 'en':
         # make book
-        r = get_all_verbs()
+        r = get_all_verbs_full()
         #print("To do for", len(r))
         nb = 0
         for v in r:
             if v['surtype'] == 'verb':
                 nb += 1
                 conjugate_en(v['base'], onfile, html, v, nb)
-                #print('i Done for ', nb, 'verbs')
             else:
                 print(v['surtype'])
         print('i Conjugaison done for', len(r), 'verbs')
@@ -1656,12 +1750,76 @@ def rappel_en():
             body : {
                 font-family: Palatino;
             }
+            h1 {
+                color: #cc1479; /*#CC6714;*/
+            }
+            h2 {
+                color: #14cc67;
+                font-family: "Palatino Linotype";
+                font-size: 22px;
+                border-bottom: 1px solid #14cc67;
+            }
+            h3 {
+                color: #6714cc;
+                font-family: "Palatino Linotype";
+                font-size: 18px;
+            }
+            
+            tr:nth-child(odd) {
+                background: #DDDDDD;
+            }
+            
+            th {
+                background: #FFFFFF;
+                border-bottom: 1px black solid;
+            }
+            
         </style>
     </head>
     <body>
+        <h1>Sommaire</h1>
+        <h2>Considérations sur les verbes anglais</h2>
+            <h3>1. De la modeste portée de cet ouvrage</h3>
+            <h3>2. Légende : choix1/choix2 (négatif) pers. sing.</h3>
+            <h3>3. Les formes contractées de la négation</h3>
+            <h3>4. Les valeurs des modes et des temps</h3>
+            <h3>5. Règles systématiques de production des temps</h3>
+        <h2>Liste des 200 verbes</h2>
+    """)
+    #    <table><thead><tr><th>N°</th><th>Verbe</th><th>Page</th></thead><tbody>
+    #""")
+    verbs = get_all_verbs_full()
+    nb = 0
+    for v in verbs:
+        nb += 1
+        pages = 100 + nb
+        #f.write('\t<tr><td>' + str(nb) + '</td><td>' + v['base'] + '</td><td>' + str(pages) + '</td></tr>')
+        f.write('<h3>' + str(pages) + '. ' + v['root_base'] + v['particle'] + ' &nbsp;(' + v['pret'] + v['particle'] + ', ' + v['part'] + v['particle'] + ')</h3>')
+    f.write('</tbody></table>\n\n\n')
+    f.write("""
+        <h2>1. De la modeste portée de cet ouvrage</h2>
+        <p>Cette ouvrage entend proposer 200 verbes fondamentaux à la pratique de la langue anglaise. On y retrouvera pour chacun ses différentes traductions et formes dans un format concis et clair.</p>
+        
+        <p>La langue anglaise est <i>de facto</i> la langue auxiliaire internationale actuelle. Dans les aéroports et de nombreux endroits, elle fait office de langue secondaire pour comprendre l'essentiel. De part la puissance des économies anglophones, elle est aussi en usage dans de nombreux secteurs clés comme celui de la recherche scientifique. Pour toutes ces raisons, comprendre et savoir utiliser un minimum cette langue nous semble un élément essentiel du citoyen d'aujourd'hui. Cela ne doit pas se faire au détriment de sa (ses) langue(s) maternelle(s), mais en complément, comme le mot <i>auxiliaire</i> le laisse entendre. Néanmoins nous tenons à attirer l'attention de nos lecteurs sur des tentatives effectuées par de nombreux individus de doter l'Humanité, ou une grande partie de celle-ci, d'une langue auxiliaire <i>construite</i> ou <i>artificielle</i> comme l'<i>Esperanto</i>, l'<i>Ido</i> ou l'<i>Interlingua</i>, et toutes les autres. Ces langues poursuivent le but d'être <i>simple</i>, mais elles se heurtent à de nombreux obstacles : la définition même de cette <i>simplicité</i> rêvée - ce qui est simple pour un Chinois ne l'étant pas forcément pour un Français, le désintérêt du plus grande nombre pour la question, les obstacles posés par certains pays, institutions et personnes - dont la France et Staline, et la satisfaction générale pour la situation actuelle, ou du moins son acceptation fataliste. L'auteur ne peut que faire remarquer qu'avec un vocabulaire issu très fortement du français, peut-être moins dans le cas des verbes les plus utilisés, dont les origines sont plutôt germaniques, un Français peut fort aisément tirer partie de la domination de la langue anglaise, pour peu qu'il arrive à se faire à sa prononciation, tout en finesse.</p>
+        
+        <p>Comme il s'agit de la première édition, malgré nos soins aimants portés à ce livre, il est fort probable qu'il ne soit pas dénué de quelques erreurs fâcheuses. Nous demandons à nos aimables lecteurs de nous pardonner nos offenses à la langue et espérons qu'il y en aura le moins possible. Nous souhaitons avant tout que ce livre vous soit <i>utile</i>, que cela soit pour réviser ou apprendre ces fameux verbes. Bon apprentissage !</p>
+        
+        <h2>2. Légende : choix1/choix2 (négatif) pers. sing.</h2>
+        <h2>3. Les formes contractées de la négation</h2>
+        <h2>4. Les valeurs des modes et des temps</h2>
+        <h2>5. Règles systématiques de production des temps</h2>
         <p>Modestie la portée de cet ouvrage</p>
         <p>Légende : choix1/choix2 (négatif) pers. sing. </p>
         <p>Les formes contractées de la négation</p>
+            <table>
+            <thead>
+                <tr><th>Forme simple</th><th>Forme contractée</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>do not</td><td>don't</td></tr>
+                <tr><td>does not</td><td>doesn't</td></tr>
+            </tbody>
+            </table>
         <p>Les valeurs des modes et des temps
             <ul>
                 <li><i>(L'iréel, la généralité)</i></li>
@@ -1670,25 +1828,8 @@ def rappel_en():
                 <li><i>(L\'ordre)</i></li>
             </ul>
         </p>
-        <h1>Sommaire</h1>
-        <h2>Considérations sur les verbes anglais</h2>
-        
-        <h2>Liste des 200 verbes</h2>
-        <table>
     """)
-    verbs = get_all_verbs()
-    nb = 0
-    for v in verbs:
-        nb += 1
-        pages = 100 + nb
-        f.write('\t<tr><td>' + str(nb) + '</td><td>' + v['base'] + '</td><td>' + str(pages) + '</td></tr>')
-    f.write('</table>\n\n\n')
     f.close()
-
-    
-def irregular(base, pret, part, ing):
-    return (base, pret, part, ing)
-    #TODO + gestion du pret, run, ran, run
 
 
 def conjugate_en(verb, onfile=False, html=False, info=None, nb=None):
@@ -1698,16 +1839,10 @@ def conjugate_en(verb, onfile=False, html=False, info=None, nb=None):
 
     f = open('output.html', 'a')
     pronoms = ['I', 'you', 'she, he, it', 'we', 'you', 'they']
-    root = verb
-    
-    # Participe
-    if root[-1] != 'e' and root[-1] != 'y':
-        part = root + 'ed'
-    elif root[-1] == 'e':
-        part = root + 'd'
-    elif root[-1] == 'y':
-        part = root[0:-1] + "ied"
-    preterit = part
+    root = info['root_base']
+    particle = info['particle']
+    pret = info['pret']
+    part = info['part']
     
     # Present 3e
     if root[-1] == 'y' and root[-2] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z']:
@@ -1716,16 +1851,19 @@ def conjugate_en(verb, onfile=False, html=False, info=None, nb=None):
         pres3 = root + 'es'
     else:
         pres3 = root + 's'
-    
+
     # ing
     if root[-1] == 'e':
         ing = root[0:-1] + 'ing'
     elif root[-1] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z'] and root[-2] in ['a','e','i','o','u']:
-        ing = root + root[-1] + 'ing'
+        if root[-2] == 'a' and root[-3] == 'e':
+            ing = root + 'ing'
+        else:
+            ing = root + root[-1] + 'ing'
     else:
         ing = root + 'ing'
     
-    f.write('<h2>' + str(nb) + '. ' + root + '</h2>\n')
+    f.write('<h2>' + str(nb) + '. ' + root + ' &nbsp;&nbsp;(' + pret + ', ' + part + ')</h2>\n')
     f.write('<p><b>Sens et traduction</b> : <ul>\n')
     for t in info['trans']:
         if info['trans'][t] is not None:
@@ -1734,7 +1872,7 @@ def conjugate_en(verb, onfile=False, html=False, info=None, nb=None):
             f.write('\t<li>' + t + '</li>\n')
     f.write('</ul></p>\n')
     
-    f.write('<p><b>Base verbale</b> : ' + root + '</p>\n')
+    #f.write('<p><b>Base verbale</b> : ' + root + '</p>\n')
     f.write('<p><b>Infinitif</b> : to ' + root + '</p>\n')
     f.write('<p><b>Participe passé</b> : ' + part + '</p>\n')
     f.write('<p><b>Voix passive</b> : was/were ' + part + '</p>\n')
@@ -1742,36 +1880,36 @@ def conjugate_en(verb, onfile=False, html=False, info=None, nb=None):
     
     f.write('<h3>Indicatif</h3>\n')
     f.write('<p><b>Présent simple</b> :<ul>\n')
-    f.write('\t<li>forme <b>affirmative</b> : ' + root + ' (3e pers. sing. : ' + pres3 + ')</li>\n')
-    f.write('\t<li>forme <b>négative</b> : do not/don\'t ' + root + ' (3e pers. sing. : does not/doesn\'t ' + root + ')</li>\n')
+    f.write('\t<li>forme <b>affirmative</b> : ' + root + particle + ' (3e pers. sing. : ' + pres3 + particle + ')</li>\n')
+    f.write('\t<li>forme <b>négative</b> : do not/don\'t ' + root + ' (3e pers. sing. : does not/doesn\'t ' + root + particle + ')</li>\n')
     f.write('</ul></p>\n')
     f.write('<p><b>Passé simple (ou prétérit)</b> :<ul>\n')
-    f.write('\t<li>forme <b>affirmative</b> : ' + preterit + '</li>\n')
-    f.write('\t<li>forme <b>négative</b> : did not/didn\'t ' + root + '</li>\n')
+    f.write('\t<li>forme <b>affirmative</b> : ' + pret + particle + '</li>\n')
+    f.write('\t<li>forme <b>négative</b> : did not/didn\'t ' + root + particle + '</li>\n')
     f.write('</ul></p>\n')
-    f.write('<p><b>Futur simple</b> : will/shall (not) ' + root + '</p>\n')
+    f.write('<p><b>Futur simple</b> : will/shall (not) ' + root + particle + '</p>\n')
     f.write('<p><b>Présent parfait</b> :<ul>\n')
-    f.write('\t<li>forme <b>affirmative</b> : have ' + part + ' (3e pers. sing. : ' + 'ha<b>s</b> ' + part + ')</li>\n')
-    f.write('\t<li>forme <b>négative</b> : have not/haven\'t ' + part + ' (3e pers. sing. : ' + 'ha<b>s</b> not\hasn\'t ' + part + ') </li>\n')
+    f.write('\t<li>forme <b>affirmative</b> : have ' + part + particle + ' (3e pers. sing. : ' + 'ha<b>s</b> ' + part + particle + ')</li>\n')
+    f.write('\t<li>forme <b>négative</b> : have not/haven\'t ' + part + ' (3e pers. sing. : ' + 'ha<b>s</b> not\hasn\'t ' + part + particle + ') </li>\n')
     f.write('</ul></p>')
-    f.write('<p><b>Passé parfait</b> : had (not) ' + part + '</p>\n')
-    f.write('<p><b>Futur parfait</b> : will (not) have ' + part + '</p>\n')
+    f.write('<p><b>Passé parfait</b> : had (not) ' + part + particle + '</p>\n')
+    f.write('<p><b>Futur parfait</b> : will (not) have ' + part + particle + '</p>\n')
     
     f.write('<h3>Conditionnel</h3>\n')
-    f.write('<p><b>Présent</b> : should/would (not) ' + root + '</p>\n')
-    f.write('<p><b>Passé</b> : should/would (not) have ' + part + '</p>\n')
+    f.write('<p><b>Présent</b> : should/would (not) ' + root + particle + '</p>\n')
+    f.write('<p><b>Passé</b> : should/would (not) have ' + part + particle + '</p>\n')
     
     f.write('<h3>Subjonctif</h3>\n')
-    f.write('<p>Expression d\'une <b>potentialité</b> : may/might (not) ' + root + '</p>\n')
-    f.write('<p>Expression d\'un <b>doute</b>, d\'une <b>supposition</b> ou <b>atténuation polie</b> : should (not) ' + root + '</p>\n')
+    f.write('<p>Expression d\'une <b>potentialité</b> : may/might (not) ' + root + particle + '</p>\n')
+    f.write('<p>Expression d\'un <b>doute</b>, d\'une <b>supposition</b> ou <b>atténuation polie</b> : should (not) ' + root + particle + '</p>\n')
     
     f.write('<h3>Impératif</h3>\n')
-    f.write('<p><b>2e pers.</b> : (do not) ' + root + '!</p>\n')
+    f.write('<p><b>2e pers.</b> : (do not) ' + root + particle + '!</p>\n')
     f.write('<p><b>Autres pers.</b> :<ul>\n')
-    f.write('\t<li><b>forme affirmative</b> : let me/her/him/it/us/them ' + root + '!</li>\n')
+    f.write('\t<li><b>forme affirmative</b> : let me/her/him/it/us/them ' + root + particle + '!</li>\n')
     f.write('\t<li><b>formes négatives</b> :<ul>\n')
-    f.write('\t\t<li>do not/don\'t let me/her/him/it/us/them ' + root + '!</li>\n')
-    f.write('\t\t<li>let me/her/him/it/us/them not ' + root + '!</li>\n')
+    f.write('\t\t<li>do not/don\'t let me/her/him/it/us/them ' + root + particle + '!</li>\n')
+    f.write('\t\t<li>let me/her/him/it/us/them not ' + root + particle + '!</li>\n')
     f.write('</ul></li></ul></p>\n')
     f.write('<mbp:pagebreak />')
     

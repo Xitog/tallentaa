@@ -42,163 +42,172 @@ Toutes les traductions
 39. conduire --> to drive
 40. connaître --> to know
 41. construire --> to build
-42. courir --> to run
-43. coûter --> to cost
-44. crier --> to shout
-45. croire --> to believe
-46. créer --> to create
-47. cuire --> to cook
-48. danser --> to dance
-49. demander --> to ask
-50. descendre --> to go down avec le sens de : vu du lieu plus haut
-51. descendre --> to come down avec le sens de : vu du lieu plus bas
-52. devenir --> to become
-53. deviner --> to guess
-54. devoir --> to must
-55. diminuer --> to decrease
-56. dire --> to say
-57. discuter --> to discuss
-58. disparaître --> to disappear
-59. donner --> to give
-60. dormir --> to sleep
-61. durer --> to last
-62. décider --> to decide
-63. découvrir --> to discover
-64. désirer --> to want avec le sens de : vouloir
-65. désirer --> to wish avec le sens de : souhaiter
-66. désirer --> to desire avec le sens de : convoiter (y compris sexuellement)
-67. enlever --> to remove
-68. enseigner --> to teach
-69. entendre --> to hear
-70. entrer --> to go in avec le sens de : vu de lextérieur du lieu où lon entre
-71. entrer --> to come in avec le sens de : vu de lintérieur du lieu où lon entre
-72. entrer --> to enter avec le sens de : de façon générale
-73. envoyer --> to send
-74. espérer --> to hope
-75. essayer --> to try
-76. faire --> to do
-77. faire --> to make avec le sens de : fabriquer
-78. fermer --> to close
-79. finir --> to finish
-80. gagner --> to win
-81. glisser --> to slip avec le sens de : déraper
-82. glisser --> to glide avec le sens de : se mouvoir de façon fluide
-83. goûter --> to taste
-84. gémir --> to moan
-85. habiller (s) --> to dress
-86. habiter --> to live in
-87. intéresser --> to interest
-88. intéresser --> to concern avec le sens de : concerner
-89. inviter --> to invite
-90. jeter --> to throw
-91. jouer --> to play
-92. lancer --> to throw
-93. laver --> to wash
-94. lever --> to raise avec le sens de : lever
-95. lever --> to lift avec le sens de : soulever
-96. lever (se) --> to stand up
-97. lever (se) --> to rise avec le sens de : (se dit également du soleil)
-98. lire --> to read
-99. louer --> to rent
-100. louer --> to hire
-101. louer --> to lease
-102. manger --> to eat
-103. manquer --> to miss
-104. marcher --> to walk
-105. mettre --> to put
-106. monter --> to go up avec le sens de : vu du lieu plus bas
-107. monter --> to come up avec le sens de : vu du lieu plus haut
-108. montrer --> to show
-109. mourir --> to die
-110. nager --> to swim
-111. naître --> to be born
-112. nourrir --> to feed
-113. occuper (s) --> to take care
-114. oublier --> to forget
-115. ouvrir --> to open
-116. pardonner --> to forgive
-117. parler --> to speak
-118. partager --> to share
-119. partir --> to go
-120. passer --> to pass
-121. payer --> to pay
-122. pendre --> to hang
-123. penser --> to think
-124. perdre --> to loose
-125. permettre --> to allow
-126. plaire --> to please
-127. pleurer --> to cry
-128. plier --> to fold
-129. plonger --> to dive avec le sens de : immerger (dans l'eau), descendre (dans l'air)
-130. porter --> to carry
-131. poser --> to put
-132. pousser --> to push
-133. pouvoir --> to can
-134. prendre --> to take
-135. produire --> to produce
-136. promettre --> to pledge
-137. proposer --> to suggest
-138. présenter (se) --> to introduce yourself
-139. prêter --> to lend
-140. quitter --> to leave
-141. raconter --> to tell
-142. recevoir --> to receive
-143. regarder --> to watch avec le sens de : observer, surveiller, visionner (un film, une émission)
-144. regarder --> to look at
-145. regarder --> to concern avec le sens de : concerner
-146. remercier --> to thank
-147. remplir --> to fill
-148. rencontrer --> to meet
-149. reposer (se) --> to rest
-150. rester --> to stay
-151. retenir --> to hold
-152. revenir --> to come back
-153. rire --> to laugh
-154. réduire --> to reduce
-155. réfléchir --> to think
-156. répondre --> to answer
-157. réussir --> to success
-158. réveiller (se) --> to wake up
-159. rêver --> to dream
-160. sauter --> to jump
-161. savoir --> to know
-162. sentir --> to smell avec le sens de : une odeur
-163. sentir --> to feel avec le sens de : un sentiment
-164. sortir --> to go out avec le sens de : vu de lintérieur du lieu que lon quitte
-165. sortir --> to come out avec le sens de : vu de lextérieur du lieu que lon quitte
-166. sortir --> to take out avec le sens de : sortir quelque chose
-167. souffrir --> to suffer
-168. souhaiter --> to wish
-169. souvenir (se) --> to remember
-170. suivre --> to follow
-171. tenir --> to hold
-172. tirer --> to pull avec le sens de : amener vers soi un objet
-173. tirer --> to shoot avec le sens de : lancer un projectile
-174. tomber --> to fall
-175. toucher --> to touch
-176. tourner --> to turn
-177. traduire --> to translate
-178. travailler --> to work
-179. trouver --> to find
-180. utiliser --> to use
-181. valoir --> to be worth
-182. vendre --> to sell
-183. venir --> to come
-184. vider --> to empty
-185. visiter --> to visit
-186. vivre --> to live
-187. voir --> to see
-188. voir --> to watch avec le sens de : visionner (un film, une émission)
-189. voler --> to fly avec le sens de : dans les airs
-190. voler --> to steal avec le sens de : atteinte à la propriété dautrui
-191. vouloir --> to want
-192. voyager --> to travel
-193. écouter --> to listen
-194. écrire --> to write
-195. éteindre --> to turn off
-196. étudier --> to study
-197. être --> to be
-198. être daccord --> to agree
+42. couper --> to cut
+43. courir --> to run
+44. coûter --> to cost
+45. crier --> to shout
+46. croire --> to believe
+47. créer --> to create
+48. cuire --> to cook
+49. danser --> to dance
+50. demander --> to ask
+51. descendre --> to go down avec le sens de : vu du lieu plus haut
+52. descendre --> to come down avec le sens de : vu du lieu plus bas
+53. dessiner --> to draw
+54. devenir --> to become
+55. deviner --> to guess
+56. devoir --> to must
+57. diminuer --> to decrease
+58. dire --> to say
+59. discuter --> to discuss
+60. disparaître --> to disappear
+61. donner --> to give
+62. dormir --> to sleep
+63. durer --> to last
+64. décider --> to decide
+65. découvrir --> to discover
+66. dépenser --> to spend
+67. désirer --> to want avec le sens de : vouloir
+68. désirer --> to wish avec le sens de : souhaiter
+69. désirer --> to desire avec le sens de : convoiter (y compris sexuellement)
+70. enlever --> to remove
+71. enseigner --> to teach
+72. entendre --> to hear
+73. entrer --> to go in avec le sens de : vu de lextérieur du lieu où lon entre
+74. entrer --> to come in avec le sens de : vu de lintérieur du lieu où lon entre
+75. entrer --> to enter avec le sens de : de façon générale
+76. envoyer --> to send
+77. espérer --> to hope
+78. essayer --> to try
+79. faire --> to do
+80. faire --> to make avec le sens de : fabriquer
+81. fermer --> to close
+82. finir --> to finish
+83. gagner --> to win
+84. garder --> to keep
+85. glisser --> to slip avec le sens de : déraper
+86. glisser --> to glide avec le sens de : se mouvoir de façon fluide
+87. goûter --> to taste
+88. gémir --> to moan
+89. habiller (s) --> to dress
+90. habiter --> to live in
+91. intéresser --> to interest
+92. intéresser --> to concern avec le sens de : concerner
+93. inviter --> to invite
+94. jeter --> to throw
+95. jouer --> to play
+96. laisser --> to let
+97. lancer --> to throw
+98. laver --> to wash
+99. lever --> to raise avec le sens de : lever
+100. lever --> to lift avec le sens de : soulever
+101. lever (se) --> to stand up
+102. lever (se) --> to rise avec le sens de : (se dit également du soleil)
+103. lire --> to read
+104. louer --> to rent
+105. louer --> to hire
+106. louer --> to lease
+107. manger --> to eat
+108. manquer --> to miss
+109. marcher --> to walk
+110. mener --> to lead
+111. mentir --> to lie
+112. mettre --> to put
+113. monter --> to go up avec le sens de : vu du lieu plus bas
+114. monter --> to come up avec le sens de : vu du lieu plus haut
+115. montrer --> to show
+116. mourir --> to die
+117. nager --> to swim
+118. naître --> to be born
+119. nourrir --> to feed
+120. occuper (s) --> to take care
+121. oublier --> to forget
+122. ouvrir --> to open
+123. pardonner --> to forgive
+124. parler --> to speak
+125. partager --> to share
+126. partir --> to go
+127. passer --> to pass
+128. payer --> to pay
+129. pendre --> to hang
+130. penser --> to think
+131. perdre --> to lose
+132. permettre --> to allow
+133. plaire --> to please
+134. pleurer --> to cry
+135. plier --> to fold
+136. plonger --> to dive avec le sens de : immerger (dans l'eau), descendre (dans l'air)
+137. porter --> to carry avec le sens de : porter un objet
+138. porter --> to wear avec le sens de : porter un vêtement
+139. poser --> to put
+140. pousser --> to push
+141. pouvoir --> to can
+142. prendre --> to take
+143. produire --> to produce
+144. promettre --> to pledge
+145. proposer --> to suggest
+146. présenter (se) --> to introduce yourself
+147. prêter --> to lend
+148. quitter --> to leave
+149. raconter --> to tell
+150. recevoir --> to receive
+151. regarder --> to watch avec le sens de : observer, surveiller, visionner (un film, une émission)
+152. regarder --> to look at
+153. regarder --> to concern avec le sens de : concerner
+154. remercier --> to thank
+155. remplir --> to fill
+156. rencontrer --> to meet
+157. reposer (se) --> to rest
+158. rester --> to stay
+159. retenir --> to hold
+160. revenir --> to come back
+161. rire --> to laugh
+162. réduire --> to reduce
+163. réfléchir --> to think
+164. répondre --> to answer
+165. réussir --> to success
+166. réveiller (se) --> to wake up
+167. rêver --> to dream
+168. sauter --> to jump
+169. savoir --> to know
+170. sentir --> to smell avec le sens de : une odeur
+171. sentir --> to feel avec le sens de : un sentiment
+172. signifier --> to mean
+173. sortir --> to go out avec le sens de : vu de lintérieur du lieu que lon quitte
+174. sortir --> to come out avec le sens de : vu de lextérieur du lieu que lon quitte
+175. sortir --> to take out avec le sens de : sortir quelque chose
+176. souffrir --> to suffer
+177. souhaiter --> to wish
+178. souvenir (se) --> to remember
+179. suivre --> to follow
+180. tenir --> to hold
+181. tirer --> to pull avec le sens de : amener vers soi un objet
+182. tirer --> to shoot avec le sens de : lancer un projectile
+183. tomber --> to fall
+184. toucher --> to touch
+185. tourner --> to turn
+186. traduire --> to translate
+187. travailler --> to work
+188. trouver --> to find
+189. utiliser --> to use
+190. valoir --> to be worth
+191. vendre --> to sell
+192. venir --> to come
+193. vider --> to empty
+194. visiter --> to visit
+195. vivre --> to live
+196. voir --> to see
+197. voir --> to watch avec le sens de : visionner (un film, une émission)
+198. voler --> to fly avec le sens de : dans les airs
+199. voler --> to steal avec le sens de : atteinte à la propriété dautrui
+200. vouloir --> to want
+201. voyager --> to travel
+202. écouter --> to listen
+203. écrire --> to write
+204. éteindre --> to turn off
+205. étudier --> to study
+206. être --> to be
+207. être daccord --> to agree
 
 
 
@@ -244,151 +253,159 @@ Tous les verbes français
 37. #107 conduire
 38. #106 connaître
 39. #105 construire
-40. #104 courir
-41. #103 coûter
-42. #101 crier
-43. #100 croire
-44. #102 créer
-45. #99 cuire
-46. #98 danser
-47. #97 demander
-48. #148 descendre
-49. #185 devenir
-50. #161 deviner
-51. #96 devoir
-52. #162 diminuer
-53. #95 dire
-54. #163 discuter
-55. #164 disparaître
-56. #135 donner
-57. #94 dormir
-58. #165 durer
-59. #143 décider
-60. #159 découvrir
-61. #160 désirer
-62. #151 enlever
-63. #91 enseigner
-64. #90 entendre
-65. #139 entrer
-66. #89 envoyer
-67. #88 espérer
-68. #87 essayer
-69. #84 faire
-70. #83 fermer
-71. #21007 fille
-72. #21006 fils
-73. #82 finir
-74. #21004 frère
-75. #81 gagner
-76. #21008 garçon
-77. #168 glisser
-78. #80 goûter
-79. #167 gémir
-80. #79 habiller (s)
-81. #78 habiter
-82. #169 intéresser
-83. #77 inviter
-84. #76 jeter
-85. #75 jouer
-86. #186 lancer
-87. #74 laver
-88. #170 lever
-89. #73 lever (se)
-90. #72 lire
-91. #21001 lit
-92. #21000 livre
-93. #171 louer
-94. #71 manger
-95. #70 manquer
-96. #69 marcher
-97. #47 mettre
-98. #147 monter
-99. #48 montrer
-100. #49 mourir
-101. #21003 mère
-102. #50 nager
-103. #51 naître
-104. #172 nourrir
-105. #36 occuper (s)
-106. #52 oublier
-107. #1 ouvrir
-108. #53 pardonner
-109. #54 parler
-110. #173 partager
-111. #55 partir
-112. #56 passer
-113. #57 payer
-114. #174 pendre
-115. #58 penser
-116. #59 perdre
-117. #60 permettre
-118. #61 plaire
-119. #62 pleurer
-120. #175 plier
-121. #176 plonger
-122. #63 porter
-123. #144 poser
-124. #177 pousser
-125. #64 pouvoir
-126. #65 prendre
-127. #179 produire
-128. #67 promettre
-129. #142 proposer
-130. #66 présenter (se)
-131. #178 prêter
-132. #21002 père
-133. #68 quitter
-134. #26 raconter
-135. #27 recevoir
-136. #28 regarder
-137. #29 remercier
-138. #146 remplir
-139. #30 rencontrer
-140. #39 reposer (se)
-141. #32 rester
-142. #181 retenir
-143. #136 revenir
-144. #35 rire
-145. #145 réduire
-146. #180 réfléchir
-147. #31 répondre
-148. #33 réussir
-149. #34 réveiller (se)
-150. #182 rêver
-151. #37 sauter
-152. #38 savoir
-153. #41 sentir
-154. #138 sortir
-155. #42 souffrir
-156. #43 souhaiter
-157. #40 souvenir (se)
-158. #44 suivre
-159. #21005 sœur
-160. #45 tenir
-161. #46 tirer
-162. #17 tomber
-163. #16 toucher
-164. #15 tourner
-165. #14 traduire
-166. #13 travailler
-167. #12 trouver
-168. #11 utiliser
-169. #183 valoir
-170. #10 vendre
-171. #9 venir
-172. #184 vider
-173. #8 visiter
-174. #7 vivre
-175. #6 voir
-176. #5 voler
-177. #3 vouloir
-178. #2 voyager
-179. #93 écouter
-180. #92 écrire
-181. #141 éteindre
-182. #85 étudier
-183. #86 être
-184. #166 être daccord
+40. #188 couper
+41. #104 courir
+42. #103 coûter
+43. #101 crier
+44. #100 croire
+45. #102 créer
+46. #99 cuire
+47. #98 danser
+48. #97 demander
+49. #148 descendre
+50. #189 dessiner
+51. #185 devenir
+52. #161 deviner
+53. #96 devoir
+54. #162 diminuer
+55. #95 dire
+56. #163 discuter
+57. #164 disparaître
+58. #135 donner
+59. #94 dormir
+60. #165 durer
+61. #143 décider
+62. #159 découvrir
+63. #195 dépenser
+64. #160 désirer
+65. #151 enlever
+66. #91 enseigner
+67. #90 entendre
+68. #139 entrer
+69. #89 envoyer
+70. #88 espérer
+71. #87 essayer
+72. #84 faire
+73. #83 fermer
+74. #21007 fille
+75. #21006 fils
+76. #82 finir
+77. #21004 frère
+78. #81 gagner
+79. #190 garder
+80. #21008 garçon
+81. #168 glisser
+82. #80 goûter
+83. #167 gémir
+84. #79 habiller (s)
+85. #78 habiter
+86. #169 intéresser
+87. #77 inviter
+88. #76 jeter
+89. #75 jouer
+90. #192 laisser
+91. #186 lancer
+92. #74 laver
+93. #170 lever
+94. #73 lever (se)
+95. #72 lire
+96. #21001 lit
+97. #21000 livre
+98. #171 louer
+99. #71 manger
+100. #70 manquer
+101. #69 marcher
+102. #191 mener
+103. #193 mentir
+104. #47 mettre
+105. #147 monter
+106. #48 montrer
+107. #49 mourir
+108. #21003 mère
+109. #50 nager
+110. #51 naître
+111. #172 nourrir
+112. #36 occuper (s)
+113. #52 oublier
+114. #1 ouvrir
+115. #53 pardonner
+116. #54 parler
+117. #173 partager
+118. #55 partir
+119. #56 passer
+120. #57 payer
+121. #174 pendre
+122. #58 penser
+123. #59 perdre
+124. #60 permettre
+125. #61 plaire
+126. #62 pleurer
+127. #175 plier
+128. #176 plonger
+129. #63 porter
+130. #144 poser
+131. #177 pousser
+132. #64 pouvoir
+133. #65 prendre
+134. #179 produire
+135. #67 promettre
+136. #142 proposer
+137. #66 présenter (se)
+138. #178 prêter
+139. #21002 père
+140. #68 quitter
+141. #26 raconter
+142. #27 recevoir
+143. #28 regarder
+144. #29 remercier
+145. #146 remplir
+146. #30 rencontrer
+147. #39 reposer (se)
+148. #32 rester
+149. #181 retenir
+150. #136 revenir
+151. #35 rire
+152. #145 réduire
+153. #180 réfléchir
+154. #31 répondre
+155. #33 réussir
+156. #34 réveiller (se)
+157. #182 rêver
+158. #37 sauter
+159. #38 savoir
+160. #41 sentir
+161. #194 signifier
+162. #138 sortir
+163. #42 souffrir
+164. #43 souhaiter
+165. #40 souvenir (se)
+166. #44 suivre
+167. #21005 sœur
+168. #45 tenir
+169. #46 tirer
+170. #17 tomber
+171. #16 toucher
+172. #15 tourner
+173. #14 traduire
+174. #13 travailler
+175. #12 trouver
+176. #11 utiliser
+177. #183 valoir
+178. #10 vendre
+179. #9 venir
+180. #184 vider
+181. #8 visiter
+182. #7 vivre
+183. #6 voir
+184. #5 voler
+185. #3 vouloir
+186. #2 voyager
+187. #93 écouter
+188. #92 écrire
+189. #141 éteindre
+190. #85 étudier
+191. #86 être
+192. #166 être daccord
 
 
 
@@ -406,4 +423,4 @@ Verbes non traduits
 9. #21005 sœur
 
 
-Last edit on 2016-01-09 23:35:16
+Last edit on 2016-01-11 00:39:06
