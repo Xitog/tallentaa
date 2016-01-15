@@ -262,6 +262,8 @@ def create():
         (193, 'fr', 'mentir', 'verb', 2),
         (194, 'fr', 'signifier', 'verb', 2),
         (195, 'fr', 'dépenser', 'verb', 2),
+        (196, 'fr', 'être debout', 'verb', 2),
+        (197, 'fr', 'être assis', 'verb', 2),
         
         (100001, 'en', 'open', 'verb', 1),
         (100002, 'en', 'travel', 'verb', 1),
@@ -471,6 +473,10 @@ def create():
         (100194, 'en', 'mean', 'verb', 2),
         (100195, 'en', 'spend', 'verb', 2),
         (190063, 'en', 'wear', 'verb', 2),
+        (100196, 'en', 'stand', 'verb', 2),
+        (100197, 'en', 'sit', 'verb', 2),
+        (100199, 'en', 'get', 'verb', 2),
+        (100200, 'en', 'set', 'verb', 2),
         
         (200001, 'it', 'aprire', 'verb', 1),
         (200002, 'it', 'viaggiare', 'verb', 1),
@@ -867,21 +873,27 @@ def create():
     
     content_verbs_en = [
         (1, 'be', 'were', 'been'),
+        (54, 'become', 'became', 'become'),
         (2, 'begin', 'began', 'begun'),
         (3, 'break', 'broke', 'broken'),
         (4, 'bring', 'brought', 'brought'),
+        (55, 'burn', 'burned/burnt', 'burned/burnt'),
         (5, 'buy', 'bought', 'bought'),
         (6, 'build', 'built', 'built'),
+        (59, 'can', 'could', 'could'),
         (7, 'choose', 'chose', 'chosen'),
         (8, 'come', 'came', 'come'),
         (9, 'cost', 'cost', 'cost'),
         (10, 'cut', 'cut', 'cut'),
         (11, 'do', 'did', 'done'),
         (12, 'draw', 'drew', 'drawn'),
+        (66, 'drink', 'drank', 'drunk'),
         (13, 'drive', 'drove', 'driven'),
         (14, 'eat', 'ate', 'eaten'),
+        (60, 'fall', 'fell', 'fallen'),
         (15, 'feel', 'felt', 'felt'),
         (16, 'find', 'found', 'found'),
+        (58, 'forget', 'forgot', 'forgotten'),
         (17, 'get', 'got', 'got'),
         (18, 'give', 'gave', 'given'),
         (19, 'go', 'went', 'gone'),
@@ -898,30 +910,35 @@ def create():
         (30, 'make', 'made', 'made'),
         (31, 'mean', 'meant', 'meant'),
         (32, 'meet', 'met', 'met'),
+        (61, 'must', '-', '-'),
         (33, 'pay', 'paid', 'paid'),
         (34, 'put', 'put', 'put'),
+        (57, 'read', 'read', 'read'),
         (35, 'run', 'ran', 'run'),
         (36, 'say', 'said', 'said'),
         (37, 'see', 'saw', 'seen'),
         (38, 'sell', 'sold', 'sold'),
         (39, 'send', 'sent', 'sent'),
         (40, 'set', 'set', 'set'),
+        (56, 'shoot', 'shot', 'shot'),
         (41, 'sing', 'sang', 'sung'),
         (42, 'sit', 'sat', 'sat'),
         (43, 'speak', 'spoke', 'spoken'),
         (44, 'spend', 'spent', 'spent'),
         (45, 'stand', 'stood', 'stood'),
+        (62, 'steal', 'stole', 'stolen'),
+        (63, 'swim', 'swam', 'swum'),
         (46, 'take', 'took', 'taken'),
         (47, 'teach', 'taught', 'taught'),
         (48, 'tell', 'told', 'told'),
         (49, 'think', 'thought', 'thought'),
+        (64, 'throw', 'threw', 'thrown'),
         (50, 'understand', 'understood', 'understood'),
+        (65, 'wake', 'woke', 'woken'),
         (51, 'wear', 'wore', 'worn'),
         (52, 'win', 'won', 'won'),
         (53, 'write', 'wrote', 'written'),
-        (54, 'become', 'became', 'become'),
-        (55, 'burn', 'burned/burnt', 'burned/burnt'),
-    ]
+    ] # last is 65
     
     irr_not_found = 0
     for cc in content_verbs_en:
@@ -935,7 +952,7 @@ def create():
             # on a un irrégulier qui n'est pas dans notre base
             print(cc[1])
             irr_not_found += 1
-    print("Irreguliers not found in our base :", irr_not_found)
+    print("i Irregulars not found in our base :", irr_not_found)
     
     c.executemany('INSERT INTO voc_verbs_en VALUES (?,?,?,?)', content_verbs_en)
     
@@ -1451,6 +1468,17 @@ def create():
         (604, 194, 100194, None),
         (605, 195, 100195, None),
         (606, 63, 190063, "porter un vêtement"),
+        (607, 196, 100196, None), # être debout => stand
+        (608, 100196, 86, None), # stand => être, on ne le met que dans ce sens
+        (609, 197, 100197, None), # être assis => sit
+        (610, 150, 100197, None), # s'assoir => sit
+        (611, 100197, 86, None), # sit => être
+        (612, 100199, 124, None), # get => avoir
+        (613, 100199, 27, None), # get => recevoir
+        (614, 100199, 109, None), # get => comprendre
+        (615, 100200, 102, None), # set => créer
+        (616, 100200, 47, None), # set => mettre
+        (617, 100200, 144, None), # set => poser
         ]
         
     check_content_trans(content, verbes_id)
@@ -1576,23 +1604,39 @@ def get_all_verbs_full(): # all verbs, with translations and irregular forms
                 #print('debut')
                 actual = {}
             else:
+                # gestion à particules
                 if len(actual['base'].split(' ')) > 1:
                     actual['root_base'] = actual['base'].split(' ')[0]
                     actual['particle'] = ' ' + actual['base'].split(' ')[1]
                 else:
                     actual['root_base'] = actual['base']
                     actual['particle'] = ''
+                # gestion des prétérits
                 if actual['root_base'] in irregulars:
                     actual['pret'] = irregulars[actual['root_base']]['pret']
                     actual['part'] = irregulars[actual['root_base']]['part']
+                    actual['irregular'] = True
                 else:
+                    actual['irregular'] = False
                     # Building of preterit & past participe
-                    if actual['root_base'][-1] != 'e' and actual['root_base'][-1] != 'y':
-                        actual['part'] = actual['root_base'] + 'ed'
-                    elif actual['root_base'][-1] == 'e':
+                    if actual['root_base'][-1] == 'e':                              # change => changed
                         actual['part'] = actual['root_base'] + 'd'
                     elif actual['root_base'][-1] == 'y':
-                        actual['part'] = actual['root_base'][0:-1] + "ied"
+                        if actual['root_base'][-2] in ['a', 'e', 'i', 'o', 'u']:    # base (stay => stayed)
+                            actual['part'] = actual['root_base'] + "ed"
+                        else:
+                            actual['part'] = actual['root_base'][0:-1] + "ied"      # carry => carried
+                    elif actual['root_base'][-1] not in ['a', 'i', 'o', 'u']:
+                        if actual['root_base'][-2] in ['a', 'u']:
+                            if actual['root_base'][-3] in ['a', 'e', 'o', 'u']:     # base (cook => cooked)
+                                actual['part'] = actual['root_base'] + 'ed'
+                            else:                                                   # chat => chatted
+                                actual['part'] = actual['root_base'] + actual['root_base'][-1] + 'ed'
+                        else:
+                            actual['part'] = actual['root_base'] + 'ed'             # base
+                    else:
+                        actual['part'] = actual['root_base'] + 'ed'                 # base
+                    
                     actual['pret'] = actual['part']
                 verbs.append(actual)
                 actual = {}
@@ -1617,8 +1661,10 @@ def get_all_verbs_full(): # all verbs, with translations and irregular forms
         if actual['root_base'] in irregulars:
             actual['pret'] = irregulars[actual['root_base']]['pret']
             actual['part'] = irregulars[actual['root_base']]['part']
+            actual['irregular'] = True
         else:
-            # Building of preterit & past participe
+            # Building of preterit & past participe !!! DUPLICATE CODE HERE NOT UPDATED FROM UP THERE
+            actual['irregular'] = False
             if actual['root_base'][-1] != 'e' and actual['root_base'][-1] != 'y':
                 actual['part'] = actual['root_base'] + 'ed'
             elif actual['root_base'][-1] == 'e':
@@ -1748,7 +1794,7 @@ def rappel_en():
     <head>
         <style type="text/css">
             body : {
-                font-family: Palatino;
+                font-family: Verdana;
             }
             h1 {
                 color: #cc1479; /*#CC6714;*/
@@ -1774,9 +1820,98 @@ def rappel_en():
                 border-bottom: 1px black solid;
             }
             
+
+            b {
+                font-family: verdana;
+            }
+            
+            b.present {
+                color: white;
+                background: #4198e1;
+            }
+            
+            b.past {
+                color: white;
+                background: #e4575d;
+            }
+            
+            b.future {
+                color: white;
+                background: #419f3c;
+            }
+            
+            b.ing {
+                color: white;
+                background: #f4a014;
+            }
+            
+            b.s {
+                color: red;
+                background: #4198e1;
+            }
+            b.pp {
+                color: white;
+                background : #9a3c9f;
+            }
+            
+            div.simple {
+                border-left: 2px solid lightgrey;
+                padding-left: 5px;
+            }
+            
+            div.pp {
+                border-left: 2px solid #9a3c9f;
+                padding-left: 5px;
+            }
+            
+            div.ing {
+                border-left: 2px solid #f4a014;
+                padding-left: 5px;
+            }
+            
+            div.title_page {
+                width: 100%;
+                text-align:center;
+                border: 1px solid #cc1479;
+                padding: 10px;
+            }
+            
         </style>
     </head>
     <body>
+        <!-- Title Page -->
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <div class="title_page">
+            <h1>200 verbes anglais fondamentaux</h1>
+            <h3>Damien Gouteux</h3>
+        </div>
+        <mbp:pagebreak />
+        
+        <!-- Copyright Page -->
+        <p>© Damien Gouteux 2015</p>
+        <p>Tous droits de traduction, de reproduction et d'adaptation, totales ou partielles, réservés pour tous pays.</p>
+        <mbp:pagebreak />
+
+        <!-- Dedication -->
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <p>Aux anglais et à leur langue.</p>
+        <mbp:pagebreak />
+        
+        <!-- Preface -->
+        <!-- Prologue -->
+        
         <h1>Sommaire</h1>
         <h2>Considérations sur les verbes anglais</h2>
             <h3>1. De la modeste portée de cet ouvrage</h3>
@@ -1794,8 +1929,14 @@ def rappel_en():
         nb += 1
         pages = 100 + nb
         #f.write('\t<tr><td>' + str(nb) + '</td><td>' + v['base'] + '</td><td>' + str(pages) + '</td></tr>')
-        f.write('<h3>' + str(pages) + '. ' + v['root_base'] + v['particle'] + ' &nbsp;(' + v['pret'] + v['particle'] + ', ' + v['part'] + v['particle'] + ')</h3>')
-    f.write('</tbody></table>\n\n\n')
+        f.write('<h3>' + str(pages) + '. ' + v['root_base'] + v['particle'] + ' &nbsp;(' + v['pret'] + v['particle'] + ', ' + v['part'] + v['particle'] + ')')
+        if v['irregular']:
+            f.write(' *')
+        f.write('</h3>')
+    f.write('\n\n')
+    f.write('<p>Les verbes avec une * sont irréguliers.</p>')
+    f.write('<mbp:pagebreak />')
+    
     f.write("""
         <h2>1. De la modeste portée de cet ouvrage</h2>
         <p>Cette ouvrage entend proposer 200 verbes fondamentaux à la pratique de la langue anglaise. On y retrouvera pour chacun ses différentes traductions et formes dans un format concis et clair.</p>
@@ -1848,9 +1989,9 @@ def conjugate_en(verb, onfile=False, html=False, info=None, nb=None):
     if root[-1] == 'y' and root[-2] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z']:
         pres3 = root[0:-1] + "ies"
     elif root[-1] in ['s', 'x', 'z', 'o'] or root[-2:] in ['ch', 'sh']:
-        pres3 = root + 'es'
+        pres3 = root + '<b class="s">es</b>'
     else:
-        pres3 = root + 's'
+        pres3 = root + '<b class="s">s</b>'
 
     # ing
     if root[-1] == 'e':
@@ -1858,12 +1999,14 @@ def conjugate_en(verb, onfile=False, html=False, info=None, nb=None):
     elif root[-1] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z'] and root[-2] in ['a','e','i','o','u']:
         if root[-2] == 'a' and root[-3] == 'e':
             ing = root + 'ing'
+        elif root[-2] == 'o' and root[-3] == 'o':
+            ing = root + 'ing'
         else:
             ing = root + root[-1] + 'ing'
     else:
         ing = root + 'ing'
     
-    f.write('<h2>' + str(nb) + '. ' + root + ' &nbsp;&nbsp;(' + pret + ', ' + part + ')</h2>\n')
+    f.write('<h2>' + str(nb) + '. ' + root + particle + ' &nbsp;&nbsp;(' + pret + particle + ', ' + part + particle + ')</h2>\n')
     f.write('<p><b>Sens et traduction</b> : <ul>\n')
     for t in info['trans']:
         if info['trans'][t] is not None:
@@ -1873,27 +2016,44 @@ def conjugate_en(verb, onfile=False, html=False, info=None, nb=None):
     f.write('</ul></p>\n')
     
     #f.write('<p><b>Base verbale</b> : ' + root + '</p>\n')
-    f.write('<p><b>Infinitif</b> : to ' + root + '</p>\n')
-    f.write('<p><b>Participe passé</b> : ' + part + '</p>\n')
-    f.write('<p><b>Voix passive</b> : was/were ' + part + '</p>\n')
-    f.write('<p><b>Participe présent</b> : ' + ing + '</p>\n')
+    f.write('<p><b>Infinitif</b> : <b>to ' + root + '</b></p>\n')
+    f.write('<p><b>Participe passé</b> : <b class="pp">' + part + '</b></p>\n')
+    f.write('<p><b>Participe présent</b> : <b class="ing">' + ing + particle + '</b></p>\n')
+    f.write('<p><b>Voix passive</b> : <b>were ' + part + '</b> (1ère et 3e pers. sing. : <b>was ' + part + '</b>)</p>\n')
     
     f.write('<h3>Indicatif</h3>\n')
+    
+    f.write('<div class="simple">\n')
     f.write('<p><b>Présent simple</b> :<ul>\n')
-    f.write('\t<li>forme <b>affirmative</b> : ' + root + particle + ' (3e pers. sing. : ' + pres3 + particle + ')</li>\n')
-    f.write('\t<li>forme <b>négative</b> : do not/don\'t ' + root + ' (3e pers. sing. : does not/doesn\'t ' + root + particle + ')</li>\n')
+    f.write('\t<li>forme <b>affirmative</b> : <b class="present">' + root + particle + '</b> (3e pers. sing. : <b class="present">' + pres3 + particle + '</b>)</li>\n')
+    f.write('\t<li>forme <b>négative</b> : <b class="present">do not ' + root + '</b> (3e pers. sing. : <b class="present">do</b><b class="s">es</b><b class="present"> not ' + root + particle + ')</b></li>\n')
     f.write('</ul></p>\n')
     f.write('<p><b>Passé simple (ou prétérit)</b> :<ul>\n')
-    f.write('\t<li>forme <b>affirmative</b> : ' + pret + particle + '</li>\n')
-    f.write('\t<li>forme <b>négative</b> : did not/didn\'t ' + root + particle + '</li>\n')
+    f.write('\t<li>forme <b>affirmative</b> : <b class="past">' + pret + particle + '</b></li>\n')
+    f.write('\t<li>forme <b>négative</b> : <b class="past">did not ' + root + particle + '</b></li>\n')
     f.write('</ul></p>\n')
-    f.write('<p><b>Futur simple</b> : will/shall (not) ' + root + particle + '</p>\n')
-    f.write('<p><b>Présent parfait</b> :<ul>\n')
-    f.write('\t<li>forme <b>affirmative</b> : have ' + part + particle + ' (3e pers. sing. : ' + 'ha<b>s</b> ' + part + particle + ')</li>\n')
-    f.write('\t<li>forme <b>négative</b> : have not/haven\'t ' + part + ' (3e pers. sing. : ' + 'ha<b>s</b> not\hasn\'t ' + part + particle + ') </li>\n')
-    f.write('</ul></p>')
-    f.write('<p><b>Passé parfait</b> : had (not) ' + part + particle + '</p>\n')
-    f.write('<p><b>Futur parfait</b> : will (not) have ' + part + particle + '</p>\n')
+    f.write('<p><b>Futur simple</b> : <b class="future">will</b> (not) <b class="future">' + root + particle + '</b></p>\n')
+    f.write('</div>\n')
+    
+    f.write('<div class="pp">\n')
+    f.write('<p><b>Présent parfait</b> : <b class="present">have</b> (not) <b class="pp">' + part + particle + '</b> (3e pers. sing. : <b class="present">' + 'ha</b><b class="s">s</b> (not) <b class="pp">' + part + particle + '</b>)</p>\n')
+    f.write('<p><b>Passé parfait</b> : <b class="past">had</b> (not) <b class="pp">' + part + particle + '</b></p>\n')
+    f.write('<p><b>Futur parfait</b> : <b class="future">will</b> (not) <b class="future">have</b> <b class="pp">' + part + particle + '</b></p>\n')
+    f.write('</div>\n')
+    
+    f.write('<div class="ing">\n')
+    f.write('<p><b>Présent continu</b> : <b class="present">are</b> (not) <b class="ing">' + ing + particle +  '</b> (1ère et 3e pers. sing. : <b class="present">is</b> (not) <b class="ing">' + ing + particle + '</b></p>\n')
+    f.write('<p><b>Passé continu</b> : <b class="past">were</b> (not) <b class="ing">' + ing + particle +  '</b> (1ère et 3e pers. sing. : <b class="past">was</b> (not) <b class="ing">' + ing + particle + '</b></p>\n')
+    f.write('<p><b>Futur continu</b> : <b class="future">will be</b> (not) <b class="ing">' + ing + particle + '</b></p>\n')
+    f.write('</div>\n')
+    
+    f.write('<div class="pp">\n')
+    f.write('<div class="ing">\n')
+    f.write('<p><b>Présent parfait continu</b> : <b class="present">have</b> (not) <b class="pp">been</b> <b class="ing">' + ing + particle + '</b> (3e pers. sing. : <b class="present">' + 'ha</b><b class="s">s</b> (not) <b class="pp">been</b> <b class="ing">' + ing + particle + '</b>)</p>\n')
+    f.write('<p><b>Passé parfait continu</b> : <b class="past">had</b> (not) <b class="pp">been</b> <b class="ing">' + ing + particle + '</b></p>\n')
+    f.write('<p><b>Futur parfait continu</b> : <b class="future">will</b> (not) <b class="future">have</b> <b class="pp">been</b> <b class="ing">' + part + particle + '</b></p>\n')
+    f.write('</div>\n')
+    f.write('</div>\n')
     
     f.write('<h3>Conditionnel</h3>\n')
     f.write('<p><b>Présent</b> : should/would (not) ' + root + particle + '</p>\n')
