@@ -9,6 +9,10 @@
     <link href="../zlib/simplex.bootstrap.css" rel="stylesheet">
     <style type="text/css">
         
+        body {
+            font-family: "Palatino Linotype";
+        }
+        
         div.jumbotron p {
             font-family: "Palatino Linotype";
             font-size: 18px; /* de base 20px */
@@ -249,7 +253,15 @@
                     <li><a href="#loop">Répétitions</a></li>
                 </ol>
             </li>
-            <li><a href="#elem_fun">Fonctions</a></li>
+            <li><a href="#elem_fun">Fonctions</a>
+                <ol class="menu">
+                    <li><a href="#fun_def">Définition d'une fonction</a></li>
+                    <li><a href="#fun_cal">Appel d'une fonction</a></li>
+                    <li><a href="#fun_ret">Retour d'une fonction</a></li>
+                    <li><a href="#fun_aka">Alias d'une fonction (et d'une variable globale)</a></li>
+                    <li><a href="#fun_und">Suppression de la définition d'une fonction</a></li>
+                </ol>
+            </li>
             <li><a href="#elem_class">Classes et objets</a>
                 <ol class="menu">
                     <li><a href="#oo_intro">L'orientée objet</a></li>
@@ -1654,22 +1666,99 @@
         <h2 id="elem_fun">11. Fonctions</h2>
         <!-- ---------------------------------------------------------------- -->
         
-        <h3 id="fun">Fonctions</h3>
+        <h3 id="fun_def">Définition d'une fonction</h3>
+        
+        <p>En Ruby, les fonctions sont toutes des méthodes, c'est-à-dire appartenant à un objet. Pour définir une méthode, il faut utiliser le mot-clé <span class="code">def</span>.</p>
         
         <div class="code">
-            <p><b>def</b> identifiant [ ( par [, _par_] <b>*</b> ) ]<br />
+            <b>def</b> identifiant [ ( par [ = defval] [, par<sub>i</sub> [ = defval] ]<sup>*</sup> [, *par<sub>l</sub> ] [, &amp;par<sub>h</sub> ] ) ] <br />
             &nbsp;&nbsp; actions<br />
-            <b>end</b></p>
+            <b>end</b><br><br>
+            <i># Exemple 1</i><br>
+            <b>def</b> affiche_bonjour (nom)<br>
+            &nbsp;&nbsp; puts "Bonjour #{nom}"<br>
+            <b>end</b><br><br>
+            <i># Exemple 2</i><br>
+            <b>def</b> affiche_bonjour_x (nom, nb)<br>
+            &nbsp;&nbsp; i = 0<br>
+            &nbsp;&nbsp; <b>while</b> i &lt; nb<br>
+            &nbsp;&nbsp; &nbsp;&nbsp; affiche_bonjour nom<br>
+            &nbsp;&nbsp; &nbsp;&nbsp; i += 1<br>
+            &nbsp;&nbsp; <b>end</b><br>
+            <b>end</b><br>
         </div>
+        
+        <p>Si la fonction ne prend pas de paramètres, on peut se passer de parenthèse dans sa signature.</p>
+        <p>On peut préciser pour chaque paramètre une valeur par défaut. Si une valeur par défaut est définie, passer une valeur pour le paramètre devient optionnel.</p>
+        <p>Au contraire de Python, n'importe quel paramètre peut avoir une valeur par défaut, et on peut intercaler des paramètres avec et sans : <span class="code">def f (a=5, b)</span>.</p>
+        <p>Il faut toujours appeler une méthode avec le nombre de paramètre requis, au contraire d'un langage comme Lua. Sinon Ruby lèvera une exception <span class="code">ArgumentError</span></p>
+        
+        <p>Il peut y avoir potentiellement jusqu'à deux paramètres spéciaux pour avoir un nombre variable de paramètres :
+        <ul>
+            <li><span class="code">*nom</span> indique qu'il peut y avoir une infinité de paramètres, séparés par une virgule. Ils seront tous stockés dans nom sous la forme d'une liste.</li>
+            <li><span class="code">&amp;nom</span> indique qu'il peut y avoir une infinité de paramètres nommés, constitués d'un identifiant = une valeur. Ils seront tous stockés sous la forme d'un dictionnaire.</li>
+        </ul>
+        <span class="code">*nom</span> doit toujours précédé <span class="code">&amp;nom</span> s'il existe. <span class="code">*nom</span> doit toujours être en avant-dernière position si <span class="code">&amp;nom</span> existe ou en dernière position sinon. <span class="code">&amp;nom</span> doit toujours être en dernière position de la liste de paramètres.
+        </p>
+
+        <h3 id="fun_cal">Appel de fonction</h3>
+        
+        <p>Pour appeler une fonction, en Ruby on considère que l'on envoie un message (le nom de la fonction) à un objet, il faut utiliser la syntaxe suivante :</p>
+        
         <div class="code">
-            <b>return</b> [ expression ]  <i># Quitte la fonction</i>
+            [ objet <b>.</b> ] identifiant [ ( paramètres ) ]  <i># Appel de fonction</i><br>
+            <i># Exemple</i><br>
+            affiche_bonjour("Bob")<br>
+            affiche_bonjour(nom="Bob")<br>
+            affiche_bonjour "Slim"<br>
+            affiche_bonjour nom="Slim"<br>
+            affiche_bonjour_x "Bob", 2<br>
         </div>
+        
+        <p>Si aucun objet n'est précisé, le receveur est l'objet courant.</p>
+        <p>Les parenthèses sont optionnelles.</p>
+        <p>On peut préciser le nom du paramètre auquel on passe une valeur. Sinon l'attribution des valeurs se fait par la position.</p>
+        <p>On peut éclater un énumérable avec l'opérateur * :</p>
+        
         <div class="code">
-            [ objet <b>.</b> ] identifiant [ ( paramètres ) ]  <i># Appel de fonction</i>
+            *enum  <i># Fracturation d'un énumérable pour passer différents arguments</i><br><br>
+            <i># Exemple</i><br>
+            a = ["Bob", 2]<br>
+            affiche_bonjour_x *a<br>
         </div>
+        
+        <p>Attention : un hash se fracture en autant de liste qu'il a d'éléments. Chaque liste comportant 2 éléments : en indice 0 la clé, en indice 1 la valeur.</p>
+        
+        <h3 id="fun_ret">Retour de fonction</h3>
+        
+        <p>Normalement, une fois appelé, la fonction s'exécute jusqu'à sa fin.</p>
+        <p>En Ruby, une fonction retourne <strong>toujours</strong> une valeur, la dernière évaluée.</p>
+        <p>On peut sortir du code d'une fonction avec le mot-clé <span class="code">return</span>, éventuellement suivi d'une expression :</p>
+        
         <div class="code">
-            * tuple  <i># Fracturation d'un tuple pour passage différents en arguments</i>
+            <b>return</b> [ expression [, expression<sub>i</sub>]<sup>*</sup> ]  <i># Quitte la fonction</i>
         </div>
+        
+        <p>Si aucune expression n'est donnée, <span class="code">nil</span> sera retourné. Si plus d'une expression sont données, le type du résultat sera <span class="code">Array</span>.</p>
+        
+        <h3 id="fun_aka">Alias d'une fonction (et d'une variable globale)</h3>
+
+        <p>En Ruby, on peut définir un alias, un nouveau nom pour une méthode ou une variable globale. Le premier nom reste inchangé, il s'agit juste d'un nouveau moyen d'y accéder. Pratique pour avoir par exemple deux noms, count et length, pour une fonction qui compte un nombre d'éléments, sans avoir à écrire deux fois le même code.</p>
+        <p>Un alias ne peut pas être défini dans le corps d'une fonction.</p>
+        
+        <div class="code">
+            <b>alias</b> nouveau_nom ancien_nom <i># Définition d'un alias</i>
+        </div>
+        
+        <h3 id="fun_und">Suppression de la définition d'une fonction</h3>
+        
+        <p>Supprime la définition d'une méthode.</p>
+        <p>Cela ne peut pas être fait dans le corps d'une méthode.</p>
+        
+        <div class="code">
+            <b>undef</b> nom_methode <i># Suppression de la définition d'une fonction</i>
+        </div>
+        
         <p class="back"><a href="#sommaire">Retour sommaire</a></p>
         
         <!-- ---------------------------------------------------------------- -->
@@ -1757,6 +1846,10 @@
             &nbsp;&nbsp; <b>end</b> <br>
             <b>end</b>
         </div>
+
+        <p>On n'a pas besoin d'avoir une instance pour appeler une méthode de classe.</p>
+        <p>Une méthode de classe ne peut pas accéder aux variables d'instance @.</p>
+        <p>Pour l'appeler, on spécifiera comme receveur la classe : <span class="code">UneClasse.une_methode</span>.</p>
         
         <h3 id="oo_class_update">Modifier la définition d'une classe</h3>
         
@@ -1800,7 +1893,7 @@
         <p>En Ruby, les attributs d'instances sont <strong>protégés</strong>, ils ne sont accessibles que dans les instances de la classe où ils sont définis et dans ses sous-classes.</p>
         <p>En Ruby, les méthodes d'instances sont <strong>publiques</strong> par défaut, accessibles par tous. On peut utiliser les méthodes <strong>protected</strong> et <strong>private</strong> avant le <strong>def</strong> pour changer cela.</p>
         <p>Une méthode protégée ne peut être appelée que dans la classe et dans ses sous-classes.</p>
-        <p><strong>Contrairement aux autres langages orientés objets</strong>où une méthode privée ne peut être appelée que dans la classe même, en Ruby, une méthode privée peut-être appelée également dans ses sous-classes. La différence entre une méthode protégée et privée, et que cette dernière ne peut être appelée avec receveur explicite (notation receveur . méthode ). De ce fait, une fonction privée ne peut être appelée que par son objet.</p>
+        <p><strong>Contrairement aux autres langages orientés objets</strong>où une méthode privée ne peut être appelée que dans la classe même, en Ruby, une méthode privée peut-être appelée également dans ses sous-classes. La différence entre une méthode protégée et privée, et que cette dernière ne peut être appelée avec un receveur explicite (notation receveur . méthode ). De ce fait, une fonction privée ne peut être appelée que par son objet.</p>
         
         <div class="code">
             <b>class</b> A<br>
@@ -1829,6 +1922,8 @@
             &nbsp;&nbsp; <b>end</b><br>
             <b>end</b>
         </div>
+        
+        <p>Notons que quand une fonction est définie dans une classe, elle est par défaut publique. Au contraire, en dehors d'une classe, une méthode définie sera par défaut privée.</p>
         
         <h3 id="oo_self">Le mot-clé self</h3>
         
