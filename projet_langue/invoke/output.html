@@ -3,10 +3,12 @@
     <head>
         <style type="text/css">
             body : {
-                font-family: Verdana;
+                font-family: verdana;
             }
             h1 {
                 color: #cc1479; /*#CC6714;*/
+                width: 100%;
+                text-align:center;
             }
             h2 {
                 color: #14cc67;
@@ -85,6 +87,15 @@
                 padding: 10px;
             }
             
+            div.retour {
+                width: 100%;
+                text-align: center;
+            }
+            
+            a {
+                text-decoration: none;
+            }
+            
         </style>
     </head>
     <body>
@@ -121,31 +132,98 @@
         <!-- Preface -->
         <!-- Prologue -->
         
-        <h1>Sommaire</h1>
+        <h1 id="sommaire">Sommaire</h1>
         <h2>Considérations sur les verbes anglais</h2>
-            <h3>1. De la modeste portée de cet ouvrage</h3>
-            <h3>2. Légende : choix1/choix2 (négatif) pers. sing.</h3>
-            <h3>3. Les formes contractées de la négation</h3>
-            <h3>4. Les valeurs des modes et des temps</h3>
-            <h3>5. Règles systématiques de production des temps</h3>
-        <h2>Liste des 200 verbes</h2>
-    <h3>101. add &nbsp;(added, added)</h3><h3>102. agree &nbsp;(agreed, agreed)</h3><h3>103. allow &nbsp;(allowed, allowed)</h3><h3>104. answer &nbsp;(answered, answered)</h3><h3>105. arrive &nbsp;(arrived, arrived)</h3><h3>106. ask &nbsp;(asked, asked)</h3><h3>107. be &nbsp;(were, been) *</h3><h3>108. be afraid &nbsp;(were afraid, been afraid) *</h3><h3>109. be born &nbsp;(were born, been born) *</h3><h3>110. be worth &nbsp;(were worth, been worth) *</h3><h3>111. become &nbsp;(became, become) *</h3><h3>112. begin &nbsp;(began, begun) *</h3><h3>113. believe &nbsp;(believed, believed)</h3><h3>114. break &nbsp;(broke, broken) *</h3><h3>115. bring &nbsp;(brought, brought) *</h3><h3>116. build &nbsp;(built, built) *</h3><h3>117. burn &nbsp;(burned/burnt, burned/burnt) *</h3><h3>118. buy &nbsp;(bought, bought) *</h3><h3>119. call &nbsp;(called, called)</h3><h3>120. can &nbsp;(could, could) *</h3><h3>121. carry &nbsp;(carried, carried)</h3><h3>122. catch &nbsp;(catched, catched)</h3><h3>123. change &nbsp;(changed, changed)</h3><h3>124. chat &nbsp;(chatted, chatted)</h3><h3>125. choose &nbsp;(chose, chosen) *</h3><h3>126. close &nbsp;(closed, closed)</h3><h3>127. come &nbsp;(came, come) *</h3><h3>128. come back &nbsp;(came back, come back) *</h3><h3>129. come down &nbsp;(came down, come down) *</h3><h3>130. come in &nbsp;(came in, come in) *</h3><h3>131. come out &nbsp;(came out, come out) *</h3><h3>132. come up &nbsp;(came up, come up) *</h3><h3>133. concern &nbsp;(concerned, concerned)</h3><h3>134. cook &nbsp;(cooked, cooked)</h3><h3>135. cost &nbsp;(cost, cost) *</h3><h3>136. count &nbsp;(counted, counted)</h3><h3>137. create &nbsp;(created, created)</h3><h3>138. cry &nbsp;(cried, cried)</h3><h3>139. cut &nbsp;(cut, cut) *</h3><h3>140. dance &nbsp;(danced, danced)</h3><h3>141. decide &nbsp;(decided, decided)</h3><h3>142. decrease &nbsp;(decreased, decreased)</h3><h3>143. desire &nbsp;(desired, desired)</h3><h3>144. die &nbsp;(died, died)</h3><h3>145. disappear &nbsp;(disappeared, disappeared)</h3><h3>146. discover &nbsp;(discovered, discovered)</h3><h3>147. discuss &nbsp;(discussed, discussed)</h3><h3>148. dive &nbsp;(dived, dived)</h3><h3>149. do &nbsp;(did, done) *</h3><h3>150. draw &nbsp;(drew, drawn) *</h3><h3>151. dream &nbsp;(dreamed, dreamed)</h3><h3>152. dress &nbsp;(dressed, dressed)</h3><h3>153. drink &nbsp;(drank, drunk) *</h3><h3>154. drive &nbsp;(drove, driven) *</h3><h3>155. drive out &nbsp;(drove out, driven out) *</h3><h3>156. eat &nbsp;(ate, eaten) *</h3><h3>157. empty &nbsp;(emptied, emptied)</h3><h3>158. enter &nbsp;(entered, entered)</h3><h3>159. fall &nbsp;(fell, fallen) *</h3><h3>160. feed &nbsp;(feeded, feeded)</h3><h3>161. feel &nbsp;(felt, felt) *</h3><h3>162. fill &nbsp;(filled, filled)</h3><h3>163. find &nbsp;(found, found) *</h3><h3>164. finish &nbsp;(finished, finished)</h3><h3>165. fly &nbsp;(flew, flown) *</h3><h3>166. fold &nbsp;(folded, folded)</h3><h3>167. follow &nbsp;(followed, followed)</h3><h3>168. forget &nbsp;(forgot, forgotten) *</h3><h3>169. forgive &nbsp;(forgived, forgived)</h3><h3>170. get &nbsp;(got, got) *</h3><h3>171. give &nbsp;(gave, given) *</h3><h3>172. glide &nbsp;(glided, glided)</h3><h3>173. go &nbsp;(went, gone) *</h3><h3>174. go down &nbsp;(went down, gone down) *</h3><h3>175. go in &nbsp;(went in, gone in) *</h3><h3>176. go out &nbsp;(went out, gone out) *</h3><h3>177. go up &nbsp;(went up, gone up) *</h3><h3>178. guess &nbsp;(guessed, guessed)</h3><h3>179. hang &nbsp;(hanged, hanged)</h3><h3>180. happen &nbsp;(happened, happened)</h3><h3>181. have &nbsp;(had, had) *</h3><h3>182. hear &nbsp;(heard, heard) *</h3><h3>183. help &nbsp;(helped, helped)</h3><h3>184. hide &nbsp;(hided, hided)</h3><h3>185. hire &nbsp;(hired, hired)</h3><h3>186. hold &nbsp;(held, held) *</h3><h3>187. hope &nbsp;(hoped, hoped)</h3><h3>188. hunt &nbsp;(hunted, hunted)</h3><h3>189. increase &nbsp;(increased, increased)</h3><h3>190. interest &nbsp;(interested, interested)</h3><h3>191. introduce yourself &nbsp;(introduced yourself, introduced yourself)</h3><h3>192. invite &nbsp;(invited, invited)</h3><h3>193. jump &nbsp;(jumped, jumped)</h3><h3>194. keep &nbsp;(kept, kept) *</h3><h3>195. know &nbsp;(knew, known) *</h3><h3>196. last &nbsp;(lasted, lasted)</h3><h3>197. laugh &nbsp;(laughed, laughed)</h3><h3>198. lead &nbsp;(led, led) *</h3><h3>199. learn &nbsp;(learned, learned)</h3><h3>200. lease &nbsp;(leased, leased)</h3><h3>201. leave &nbsp;(left, left) *</h3><h3>202. lend &nbsp;(lended, lended)</h3><h3>203. let &nbsp;(let, let) *</h3><h3>204. lie &nbsp;(lay, lain) *</h3><h3>205. lift &nbsp;(lifted, lifted)</h3><h3>206. like &nbsp;(liked, liked)</h3><h3>207. listen &nbsp;(listened, listened)</h3><h3>208. live &nbsp;(lived, lived)</h3><h3>209. live in &nbsp;(lived in, lived in)</h3><h3>210. look at &nbsp;(looked at, looked at)</h3><h3>211. look for &nbsp;(looked for, looked for)</h3><h3>212. lose &nbsp;(lost, lost) *</h3><h3>213. love &nbsp;(loved, loved)</h3><h3>214. make &nbsp;(made, made) *</h3><h3>215. mean &nbsp;(meant, meant) *</h3><h3>216. meet &nbsp;(met, met) *</h3><h3>217. miss &nbsp;(missed, missed)</h3><h3>218. moan &nbsp;(moaned, moaned)</h3><h3>219. move &nbsp;(moved, moved)</h3><h3>220. must &nbsp;(-, -) *</h3><h3>221. need &nbsp;(needed, needed)</h3><h3>222. open &nbsp;(opened, opened)</h3><h3>223. pass &nbsp;(passed, passed)</h3><h3>224. pay &nbsp;(paid, paid) *</h3><h3>225. play &nbsp;(played, played)</h3><h3>226. please &nbsp;(pleased, pleased)</h3><h3>227. pledge &nbsp;(pledged, pledged)</h3><h3>228. produce &nbsp;(produced, produced)</h3><h3>229. pull &nbsp;(pulled, pulled)</h3><h3>230. push &nbsp;(pushed, pushed)</h3><h3>231. put &nbsp;(put, put) *</h3><h3>232. raise &nbsp;(raised, raised)</h3><h3>233. read &nbsp;(read, read) *</h3><h3>234. receive &nbsp;(received, received)</h3><h3>235. reduce &nbsp;(reduced, reduced)</h3><h3>236. remember &nbsp;(remembered, remembered)</h3><h3>237. remove &nbsp;(removed, removed)</h3><h3>238. rent &nbsp;(rented, rented)</h3><h3>239. rest &nbsp;(rested, rested)</h3><h3>240. rise &nbsp;(rised, rised)</h3><h3>241. run &nbsp;(ran, run) *</h3><h3>242. say &nbsp;(said, said) *</h3><h3>243. see &nbsp;(saw, seen) *</h3><h3>244. sell &nbsp;(sold, sold) *</h3><h3>245. send &nbsp;(sent, sent) *</h3><h3>246. set &nbsp;(set, set) *</h3><h3>247. share &nbsp;(shared, shared)</h3><h3>248. shine &nbsp;(shined, shined)</h3><h3>249. shoot &nbsp;(shot, shot) *</h3><h3>250. shout &nbsp;(shouted, shouted)</h3><h3>251. show &nbsp;(showed, showed)</h3><h3>252. sing &nbsp;(sang, sung) *</h3><h3>253. sit &nbsp;(sat, sat) *</h3><h3>254. sit down &nbsp;(sat down, sat down) *</h3><h3>255. sleep &nbsp;(sleeped, sleeped)</h3><h3>256. slip &nbsp;(sliped, sliped)</h3><h3>257. smell &nbsp;(smelled, smelled)</h3><h3>258. speak &nbsp;(spoke, spoken) *</h3><h3>259. spend &nbsp;(spent, spent) *</h3><h3>260. stand &nbsp;(stood, stood) *</h3><h3>261. stand up &nbsp;(stood up, stood up) *</h3><h3>262. stay &nbsp;(stayed, stayed)</h3><h3>263. steal &nbsp;(stole, stolen) *</h3><h3>264. stop &nbsp;(stoped, stoped)</h3><h3>265. study &nbsp;(studied, studied)</h3><h3>266. success &nbsp;(successed, successed)</h3><h3>267. suffer &nbsp;(suffered, suffered)</h3><h3>268. suggest &nbsp;(suggested, suggested)</h3><h3>269. swim &nbsp;(swam, swum) *</h3><h3>270. take &nbsp;(took, taken) *</h3><h3>271. take care &nbsp;(took care, taken care) *</h3><h3>272. take out &nbsp;(took out, taken out) *</h3><h3>273. taste &nbsp;(tasted, tasted)</h3><h3>274. teach &nbsp;(taught, taught) *</h3><h3>275. tell &nbsp;(told, told) *</h3><h3>276. thank &nbsp;(thanked, thanked)</h3><h3>277. think &nbsp;(thought, thought) *</h3><h3>278. throw &nbsp;(threw, thrown) *</h3><h3>279. touch &nbsp;(touched, touched)</h3><h3>280. translate &nbsp;(translated, translated)</h3><h3>281. travel &nbsp;(traveled, traveled)</h3><h3>282. trust &nbsp;(trusted, trusted)</h3><h3>283. try &nbsp;(tried, tried)</h3><h3>284. turn &nbsp;(turned, turned)</h3><h3>285. turn off &nbsp;(turned off, turned off)</h3><h3>286. turn on &nbsp;(turned on, turned on)</h3><h3>287. understand &nbsp;(understood, understood) *</h3><h3>288. use &nbsp;(used, used)</h3><h3>289. visit &nbsp;(visited, visited)</h3><h3>290. wait &nbsp;(waited, waited)</h3><h3>291. wake up &nbsp;(woke up, woken up) *</h3><h3>292. walk &nbsp;(walked, walked)</h3><h3>293. want &nbsp;(wanted, wanted)</h3><h3>294. wash &nbsp;(washed, washed)</h3><h3>295. watch &nbsp;(watched, watched)</h3><h3>296. wear &nbsp;(wore, worn) *</h3><h3>297. win &nbsp;(won, won) *</h3><h3>298. wish &nbsp;(wished, wished)</h3><h3>299. work &nbsp;(worked, worked)</h3><h3>300. write &nbsp;(wrote, written) *</h3>
+            <h3><a href="#intro">1. De la modeste portée de cet ouvrage</a></h3>
+            <h3><a href="#legends">2. Codes et abréviations employés dans l'ouvrage</a></h3>
+            <h3><a href="#sentences">3. Construction de la phrase en anglais</h3>
+            <h3><a href="#negations">4. Les formes contractées de la négation</a></h3>
+            <h3><a href="#formes">5. Les formes du verbe anglais</a></h2>
+            
+            <h3>6. Les valeurs des modes et des temps</h3>
 
-<p>Les verbes avec une * sont irréguliers.</p><mbp:pagebreak />
-        <h2>1. De la modeste portée de cet ouvrage</h2>
+        <h2 id="tous_les_verbes">Liste des 200 verbes</h2>
+    <h3><a href="#100152">1. add &nbsp;(added, added)</a></h3><h3><a href="#100166">2. agree &nbsp;(agreed, agreed)</a></h3><h3><a href="#100060">3. allow &nbsp;(allowed, allowed)</a></h3><h3><a href="#100031">4. answer &nbsp;(answered, answered)</a></h3><h3><a href="#100126">5. arrive &nbsp;(arrived, arrived)</a></h3><h3><a href="#100097">6. ask &nbsp;(asked, asked)</a></h3><h3><a href="#100086">7. be &nbsp;(were, been)</a> *</h3><h3><a href="#100121">8. be afraid &nbsp;(were afraid, been afraid)</a> *</h3><h3><a href="#100051">9. be born &nbsp;(were born, been born)</a> *</h3><h3><a href="#100183">10. be worth &nbsp;(were worth, been worth)</a> *</h3><h3><a href="#100185">11. become &nbsp;(became, become)</a> *</h3><h3><a href="#100110">12. begin &nbsp;(began, begun)</a> *</h3><h3><a href="#100100">13. believe &nbsp;(believed, believed)</a></h3><h3><a href="#100115">14. break &nbsp;(broke, broken)</a> *</h3><h3><a href="#100187">15. bring &nbsp;(brought, brought)</a> *</h3><h3><a href="#100105">16. build &nbsp;(built, built)</a> *</h3><h3><a href="#100117">17. burn &nbsp;(burned/burnt, burned/burnt)</a> *</h3><h3><a href="#100133">18. buy &nbsp;(bought, bought)</a> *</h3><h3><a href="#100130">19. call &nbsp;(called, called)</a></h3><h3><a href="#100064">20. can &nbsp;(could, could)</a> *</h3><h3><a href="#100063">21. carry &nbsp;(carried, carried)</a></h3><h3><a href="#100153">22. catch &nbsp;(catched, catched)</a></h3><h3><a href="#100114">23. change &nbsp;(changed, changed)</a></h3><h3><a href="#100120">24. chat &nbsp;(chatted, chatted)</a></h3><h3><a href="#100111">25. choose &nbsp;(chose, chosen)</a> *</h3><h3><a href="#100083">26. close &nbsp;(closed, closed)</a></h3><h3><a href="#100009">27. come &nbsp;(came, come)</a> *</h3><h3><a href="#100136">28. come back &nbsp;(came back, come back)</a> *</h3><h3><a href="#190148">29. come down &nbsp;(came down, come down)</a> *</h3><h3><a href="#190139">30. come in &nbsp;(came in, come in)</a> *</h3><h3><a href="#190138">31. come out &nbsp;(came out, come out)</a> *</h3><h3><a href="#190147">32. come up &nbsp;(came up, come up)</a> *</h3><h3><a href="#190169">33. concern &nbsp;(concerned, concerned)</a></h3><h3><a href="#100099">34. cook &nbsp;(cooked, cooked)</a></h3><h3><a href="#100103">35. cost &nbsp;(cost, cost)</a> *</h3><h3><a href="#100108">36. count &nbsp;(counted, counted)</a></h3><h3><a href="#100102">37. create &nbsp;(created, created)</a></h3><h3><a href="#100062">38. cry &nbsp;(cried, cried)</a></h3><h3><a href="#100188">39. cut &nbsp;(cut, cut)</a> *</h3><h3><a href="#100098">40. dance &nbsp;(danced, danced)</a></h3><h3><a href="#100143">41. decide &nbsp;(decided, decided)</a></h3><h3><a href="#100162">42. decrease &nbsp;(decreased, decreased)</a></h3><h3><a href="#100160">43. desire &nbsp;(desired, desired)</a></h3><h3><a href="#100049">44. die &nbsp;(died, died)</a></h3><h3><a href="#100164">45. disappear &nbsp;(disappeared, disappeared)</a></h3><h3><a href="#100159">46. discover &nbsp;(discovered, discovered)</a></h3><h3><a href="#100163">47. discuss &nbsp;(discussed, discussed)</a></h3><h3><a href="#100176">48. dive &nbsp;(dived, dived)</a></h3><h3><a href="#100084">49. do &nbsp;(did, done)</a> *</h3><h3><a href="#100189">50. draw &nbsp;(drew, drawn)</a> *</h3><h3><a href="#100182">51. dream &nbsp;(dreamed, dreamed)</a></h3><h3><a href="#100079">52. dress &nbsp;(dressed, dressed)</a></h3><h3><a href="#100119">53. drink &nbsp;(drank, drunk)</a> *</h3><h3><a href="#100107">54. drive &nbsp;(drove, driven)</a> *</h3><h3><a href="#190156">55. drive out &nbsp;(drove out, driven out)</a> *</h3><h3><a href="#100071">56. eat &nbsp;(ate, eaten)</a> *</h3><h3><a href="#100184">57. empty &nbsp;(emptied, emptied)</a></h3><h3><a href="#180139">58. enter &nbsp;(entered, entered)</a></h3><h3><a href="#100017">59. fall &nbsp;(fell, fallen)</a> *</h3><h3><a href="#100172">60. feed &nbsp;(feeded, feeded)</a></h3><h3><a href="#190041">61. feel &nbsp;(felt, felt)</a> *</h3><h3><a href="#100146">62. fill &nbsp;(filled, filled)</a></h3><h3><a href="#100012">63. find &nbsp;(found, found)</a> *</h3><h3><a href="#100082">64. finish &nbsp;(finished, finished)</a></h3><h3><a href="#100005">65. fly &nbsp;(flew, flown)</a> *</h3><h3><a href="#100175">66. fold &nbsp;(folded, folded)</a></h3><h3><a href="#100044">67. follow &nbsp;(followed, followed)</a></h3><h3><a href="#100052">68. forget &nbsp;(forgot, forgotten)</a> *</h3><h3><a href="#100053">69. forgive &nbsp;(forgived, forgived)</a></h3><h3><a href="#100199">70. get &nbsp;(got, got)</a> *</h3><h3><a href="#100135">71. give &nbsp;(gave, given)</a> *</h3><h3><a href="#190168">72. glide &nbsp;(glided, glided)</a></h3><h3><a href="#100055">73. go &nbsp;(went, gone)</a> *</h3><h3><a href="#100148">74. go down &nbsp;(went down, gone down)</a> *</h3><h3><a href="#100139">75. go in &nbsp;(went in, gone in)</a> *</h3><h3><a href="#100138">76. go out &nbsp;(went out, gone out)</a> *</h3><h3><a href="#100147">77. go up &nbsp;(went up, gone up)</a> *</h3><h3><a href="#100161">78. guess &nbsp;(guessed, guessed)</a></h3><h3><a href="#100174">79. hang &nbsp;(hanged, hanged)</a></h3><h3><a href="#190126">80. happen &nbsp;(happened, happened)</a></h3><h3><a href="#100124">81. have &nbsp;(had, had)</a> *</h3><h3><a href="#100090">82. hear &nbsp;(heard, heard)</a> *</h3><h3><a href="#100134">83. help &nbsp;(helped, helped)</a></h3><h3><a href="#100116">84. hide &nbsp;(hided, hided)</a></h3><h3><a href="#190171">85. hire &nbsp;(hired, hired)</a></h3><h3><a href="#100045">86. hold &nbsp;(held, held)</a> *</h3><h3><a href="#100088">87. hope &nbsp;(hoped, hoped)</a></h3><h3><a href="#100156">88. hunt &nbsp;(hunted, hunted)</a></h3><h3><a href="#100154">89. increase &nbsp;(increased, increased)</a></h3><h3><a href="#100169">90. interest &nbsp;(interested, interested)</a></h3><h3><a href="#100066">91. introduce yourself &nbsp;(introduced yourself, introduced yourself)</a></h3><h3><a href="#100077">92. invite &nbsp;(invited, invited)</a></h3><h3><a href="#100037">93. jump &nbsp;(jumped, jumped)</a></h3><h3><a href="#100190">94. keep &nbsp;(kept, kept)</a> *</h3><h3><a href="#100038">95. know &nbsp;(knew, known)</a> *</h3><h3><a href="#100165">96. last &nbsp;(lasted, lasted)</a></h3><h3><a href="#100035">97. laugh &nbsp;(laughed, laughed)</a></h3><h3><a href="#100191">98. lead &nbsp;(led, led)</a> *</h3><h3><a href="#100128">99. learn &nbsp;(learned, learned)</a></h3><h3><a href="#180171">100. lease &nbsp;(leased, leased)</a></h3><h3><a href="#100068">101. leave &nbsp;(left, left)</a> *</h3><h3><a href="#100178">102. lend &nbsp;(lended, lended)</a></h3><h3><a href="#100192">103. let &nbsp;(let, let)</a> *</h3><h3><a href="#100193">104. lie &nbsp;(lay, lain)</a> *</h3><h3><a href="#190170">105. lift &nbsp;(lifted, lifted)</a></h3><h3><a href="#100129">106. like &nbsp;(liked, liked)</a></h3><h3><a href="#100093">107. listen &nbsp;(listened, listened)</a></h3><h3><a href="#100007">108. live &nbsp;(lived, lived)</a></h3><h3><a href="#100078">109. live in &nbsp;(lived in, lived in)</a></h3><h3><a href="#190028">110. look at &nbsp;(looked at, looked at)</a></h3><h3><a href="#100112">111. look for &nbsp;(looked for, looked for)</a></h3><h3><a href="#100059">112. lose &nbsp;(lost, lost)</a> *</h3><h3><a href="#100132">113. love &nbsp;(loved, loved)</a></h3><h3><a href="#190084">114. make &nbsp;(made, made)</a> *</h3><h3><a href="#100194">115. mean &nbsp;(meant, meant)</a> *</h3><h3><a href="#100030">116. meet &nbsp;(met, met)</a> *</h3><h3><a href="#100070">117. miss &nbsp;(missed, missed)</a></h3><h3><a href="#100167">118. moan &nbsp;(moaned, moaned)</a></h3><h3><a href="#100118">119. move &nbsp;(moved, moved)</a></h3><h3><a href="#100096">120. must &nbsp;(-, -)</a> *</h3><h3><a href="#100123">121. need &nbsp;(needed, needed)</a></h3><h3><a href="#100001">122. open &nbsp;(opened, opened)</a></h3><h3><a href="#100056">123. pass &nbsp;(passed, passed)</a></h3><h3><a href="#100057">124. pay &nbsp;(paid, paid)</a> *</h3><h3><a href="#100075">125. play &nbsp;(played, played)</a></h3><h3><a href="#100061">126. please &nbsp;(pleased, pleased)</a></h3><h3><a href="#100067">127. pledge &nbsp;(pledged, pledged)</a></h3><h3><a href="#100179">128. produce &nbsp;(produced, produced)</a></h3><h3><a href="#100046">129. pull &nbsp;(pulled, pulled)</a></h3><h3><a href="#100177">130. push &nbsp;(pushed, pushed)</a></h3><h3><a href="#100047">131. put &nbsp;(put, put)</a> *</h3><h3><a href="#100170">132. raise &nbsp;(raised, raised)</a></h3><h3><a href="#100072">133. read &nbsp;(read, read)</a> *</h3><h3><a href="#100027">134. receive &nbsp;(received, received)</a></h3><h3><a href="#100145">135. reduce &nbsp;(reduced, reduced)</a></h3><h3><a href="#100040">136. remember &nbsp;(remembered, remembered)</a></h3><h3><a href="#100151">137. remove &nbsp;(removed, removed)</a></h3><h3><a href="#100171">138. rent &nbsp;(rented, rented)</a></h3><h3><a href="#100039">139. rest &nbsp;(rested, rested)</a></h3><h3><a href="#190073">140. rise &nbsp;(rised, rised)</a></h3><h3><a href="#100104">141. run &nbsp;(ran, run)</a> *</h3><h3><a href="#100095">142. say &nbsp;(said, said)</a> *</h3><h3><a href="#100006">143. see &nbsp;(saw, seen)</a> *</h3><h3><a href="#100010">144. sell &nbsp;(sold, sold)</a> *</h3><h3><a href="#100089">145. send &nbsp;(sent, sent)</a> *</h3><h3><a href="#100200">146. set &nbsp;(set, set)</a> *</h3><h3><a href="#100173">147. share &nbsp;(shared, shared)</a></h3><h3><a href="#100155">148. shine &nbsp;(shined, shined)</a></h3><h3><a href="#190046">149. shoot &nbsp;(shot, shot)</a> *</h3><h3><a href="#100101">150. shout &nbsp;(shouted, shouted)</a></h3><h3><a href="#100048">151. show &nbsp;(showed, showed)</a></h3><h3><a href="#100113">152. sing &nbsp;(sang, sung)</a> *</h3><h3><a href="#100197">153. sit &nbsp;(sat, sat)</a> *</h3><h3><a href="#100150">154. sit down &nbsp;(sat down, sat down)</a> *</h3><h3><a href="#100094">155. sleep &nbsp;(sleeped, sleeped)</a></h3><h3><a href="#100168">156. slip &nbsp;(sliped, sliped)</a></h3><h3><a href="#100041">157. smell &nbsp;(smelled, smelled)</a></h3><h3><a href="#100054">158. speak &nbsp;(spoke, spoken)</a> *</h3><h3><a href="#100195">159. spend &nbsp;(spent, spent)</a> *</h3><h3><a href="#100196">160. stand &nbsp;(stood, stood)</a> *</h3><h3><a href="#100073">161. stand up &nbsp;(stood up, stood up)</a> *</h3><h3><a href="#100032">162. stay &nbsp;(stayed, stayed)</a></h3><h3><a href="#190005">163. steal &nbsp;(stole, stolen)</a> *</h3><h3><a href="#100127">164. stop &nbsp;(stoped, stoped)</a></h3><h3><a href="#100085">165. study &nbsp;(studied, studied)</a></h3><h3><a href="#100033">166. success &nbsp;(successed, successed)</a></h3><h3><a href="#100042">167. suffer &nbsp;(suffered, suffered)</a></h3><h3><a href="#100142">168. suggest &nbsp;(suggested, suggested)</a></h3><h3><a href="#100050">169. swim &nbsp;(swam, swum)</a> *</h3><h3><a href="#100065">170. take &nbsp;(took, taken)</a> *</h3><h3><a href="#100036">171. take care &nbsp;(took care, taken care)</a> *</h3><h3><a href="#180138">172. take out &nbsp;(took out, taken out)</a> *</h3><h3><a href="#100080">173. taste &nbsp;(tasted, tasted)</a></h3><h3><a href="#100091">174. teach &nbsp;(taught, taught)</a> *</h3><h3><a href="#100026">175. tell &nbsp;(told, told)</a> *</h3><h3><a href="#100029">176. thank &nbsp;(thanked, thanked)</a></h3><h3><a href="#100058">177. think &nbsp;(thought, thought)</a> *</h3><h3><a href="#100076">178. throw &nbsp;(threw, thrown)</a> *</h3><h3><a href="#100016">179. touch &nbsp;(touched, touched)</a></h3><h3><a href="#100014">180. translate &nbsp;(translated, translated)</a></h3><h3><a href="#100002">181. travel &nbsp;(traveled, traveled)</a></h3><h3><a href="#100122">182. trust &nbsp;(trusted, trusted)</a></h3><h3><a href="#100087">183. try &nbsp;(tried, tried)</a></h3><h3><a href="#100015">184. turn &nbsp;(turned, turned)</a></h3><h3><a href="#100141">185. turn off &nbsp;(turned off, turned off)</a></h3><h3><a href="#100140">186. turn on &nbsp;(turned on, turned on)</a></h3><h3><a href="#100109">187. understand &nbsp;(understood, understood)</a> *</h3><h3><a href="#100011">188. use &nbsp;(used, used)</a></h3><h3><a href="#100008">189. visit &nbsp;(visited, visited)</a></h3><h3><a href="#100125">190. wait &nbsp;(waited, waited)</a></h3><h3><a href="#100034">191. wake up &nbsp;(woke up, woken up)</a> *</h3><h3><a href="#100069">192. walk &nbsp;(walked, walked)</a></h3><h3><a href="#100003">193. want &nbsp;(wanted, wanted)</a></h3><h3><a href="#100074">194. wash &nbsp;(washed, washed)</a></h3><h3><a href="#100028">195. watch &nbsp;(watched, watched)</a></h3><h3><a href="#190063">196. wear &nbsp;(wore, worn)</a> *</h3><h3><a href="#100081">197. win &nbsp;(won, won)</a> *</h3><h3><a href="#100043">198. wish &nbsp;(wished, wished)</a></h3><h3><a href="#100013">199. work &nbsp;(worked, worked)</a></h3><h3><a href="#100092">200. write &nbsp;(wrote, written)</a> *</h3>
+
+<p>Les verbes avec une astérisque <b>*</b> sont irréguliers.</p><mbp:pagebreak />
+        <h2 id="intro">1. De la modeste portée de cet ouvrage</h2>
         <p>Cette ouvrage entend proposer 200 verbes fondamentaux à la pratique de la langue anglaise. On y retrouvera pour chacun ses différentes traductions et formes dans un format concis et clair.</p>
         
-        <p>La langue anglaise est <i>de facto</i> la langue auxiliaire internationale actuelle. Dans les aéroports et de nombreux endroits, elle fait office de langue secondaire pour comprendre l'essentiel. De part la puissance des économies anglophones, elle est aussi en usage dans de nombreux secteurs clés comme celui de la recherche scientifique. Pour toutes ces raisons, comprendre et savoir utiliser un minimum cette langue nous semble un élément essentiel du citoyen d'aujourd'hui. Cela ne doit pas se faire au détriment de sa (ses) langue(s) maternelle(s), mais en complément, comme le mot <i>auxiliaire</i> le laisse entendre. Néanmoins nous tenons à attirer l'attention de nos lecteurs sur des tentatives effectuées par de nombreux individus de doter l'Humanité, ou une grande partie de celle-ci, d'une langue auxiliaire <i>construite</i> ou <i>artificielle</i> comme l'<i>Esperanto</i>, l'<i>Ido</i> ou l'<i>Interlingua</i>, et toutes les autres. Ces langues poursuivent le but d'être <i>simple</i>, mais elles se heurtent à de nombreux obstacles : la définition même de cette <i>simplicité</i> rêvée - ce qui est simple pour un Chinois ne l'étant pas forcément pour un Français, le désintérêt du plus grande nombre pour la question, les obstacles posés par certains pays, institutions et personnes - dont la France et Staline, et la satisfaction générale pour la situation actuelle, ou du moins son acceptation fataliste. L'auteur ne peut que faire remarquer qu'avec un vocabulaire issu très fortement du français, peut-être moins dans le cas des verbes les plus utilisés, dont les origines sont plutôt germaniques, un Français peut fort aisément tirer partie de la domination de la langue anglaise, pour peu qu'il arrive à se faire à sa prononciation, tout en finesse.</p>
+        <p>La langue anglaise est <i>de facto</i> la langue auxiliaire internationale actuelle. Dans les aéroports et de nombreux endroits, elle fait office de langue secondaire pour comprendre l'essentiel. De part la puissance des économies des pays anglophones, elle est aussi la langue <i>de base</i> dans de nombreux secteurs clés comme celui de la recherche scientifique et l'informatique. Pour toutes ces raisons, comprendre et savoir utiliser un minimum cette langue nous semble un élément essentiel du citoyen d'aujourd'hui. Cela ne doit pas se faire au détriment de sa (ses) langue(s) maternelle(s), mais en complément, comme le mot <i>auxiliaire</i> le laisse entendre.
         
-        <p>Comme il s'agit de la première édition, malgré nos soins aimants portés à ce livre, il est fort probable qu'il ne soit pas dénué de quelques erreurs fâcheuses. Nous demandons à nos aimables lecteurs de nous pardonner nos offenses à la langue et espérons qu'il y en aura le moins possible. Nous souhaitons avant tout que ce livre vous soit <i>utile</i>, que cela soit pour réviser ou apprendre ces fameux verbes. Bon apprentissage !</p>
+        <p>Certains parlerons de « domination » et de la différence injuste entre les « chanceux » dont c'est la langue maternelle et qui ont ainsi accès à de nombreuses ressources sans efforts et les « pauvres » qui doivent l'apprendre aux prix de nombreuses heures et ne la parlerons peut-être jamais aussi bien, sans compter que cela introduit une différence sociale supplémentaire entre ceux parlant « la langue maîtresse » et les autres membres d'une même société. Ce livre ne se veut pas un programme politique. Si vous l'avez acheté, c'est que vous reconnaissez déjà l'importance de parler l'anglais et il essayera de vous aider le plus efficacement possible. Il est aussi beaucoup plus facile de parler anglais avec une personne dont ce n'est pas la langue maternelle, et nos plus belles conversations dans la langue de Shakespeare ont été avec des Turcs, des Tchèques, des Danois et des Allemands. Aurions-nous eu l'intelligence d'apprendre toutes ces langues ? Sûrement pas. Une langue auxiliaire internationale est donc sans prix pour la communication entre êtres humains, et notre parcours de vie nous fait dire que l'anglais, de nos jours, en fait office.</p>
         
-        <h2>2. Légende : choix1/choix2 (négatif) pers. sing.</h2>
-        <h2>3. Les formes contractées de la négation</h2>
-        <h2>4. Les valeurs des modes et des temps</h2>
-        <h2>5. Règles systématiques de production des temps</h2>
-        <p>Modestie la portée de cet ouvrage</p>
-        <p>Légende : choix1/choix2 (négatif) pers. sing. </p>
-        <p>Les formes contractées de la négation</p>
+        <p>Néanmoins nous tenons à attirer l'attention de nos lecteurs sur des tentatives effectuées par de nombreux individus de doter l'Humanité, ou une grande partie de celle-ci, d'une langue auxiliaire <i>construite</i> ou <i>artificielle</i> comme l'<i>Esperanto</i>, l'<i>Ido</i> ou l'<i>Interlingua</i>, et toutes les autres, souvent dotées d'une organisation pour promouvoir leur utilisation. Ces langues poursuivent le but d'être <i>simple</i>, mais elles se heurtent à de nombreux obstacles : la définition même de cette <i>simplicité</i> rêvée, ce qui est simple pour un Chinois ne l'étant pas forcément pour un Français, le désintérêt du plus grande nombre pour la question, les obstacles posés par certains pays, institutions et personnes, dont le gouvernement français et Staline, et la satisfaction générale pour la situation actuelle, ou du moins son acceptation fataliste. L'auteur ne peut que faire remarquer qu'avec un vocabulaire issu très fortement du français, peut-être moins dans le cas des verbes les plus utilisés, dont les origines sont plutôt germaniques, un Français peut fort aisément tirer partie de la domination de la langue anglaise, pour peu qu'il arrive à se faire à sa prononciation, toute en finesse.</p>
+        
+        <p>Comme il s'agit de la première édition, malgré nos soins aimants portés à ce livre, il est fort probable qu'il ne soit pas dénué de quelques erreurs fâcheuses. Nous demandons à nos aimables lecteurs de nous pardonner nos offenses à la langue et espérons qu'il y en aura le moins possible. Nous souhaitons avant tout que ce livre vous soit <i>utile</i>, que cela soit pour réviser ou apprendre à utiliser ces fameux verbes. Bon apprentissage !</p>
+        
+        <p>Damien Gouteux</p>
+        <div class="retour"><a href="#sommaire"><b>Retour au sommaire</b></a></div>
+        
+        <h2 id="legends">2. Codes et abréviations employés dans l'ouvrage</h2>
+        <p>
+            Cette ouvrage utilise un code couleur très simple :
+            <ul>
+                <li><b class="present">cette combinaison de couleurs</b> indique une forme verbale au présent : <b class="present">talk</b>,</li>
+                <li><b class="past">cette combinaison de couleurs</b> indique une forme verbale au prétérit : <b class="past">talked</b>,</li>
+                <li><b class="future">cette combinaison de couleurs</b> indique une forme verbale au futur : <b class="future">will talk</b>,</li>
+                <li><b class="ing">cette combinaison de couleurs</b> indique une forme verbale continue : <b class="ing">talking</b>,</li>
+                <li><b class="pp">cette combinaison de couleurs</b> indique une forme verbale au participe passé : <b class="pp">talked</b>.</li>
+            </ul>
+            Certains temps sont une combinaison d'un auxiliaire à un certain temps avec une forme verbale continue ou au participe passé.<br> Cette coloration permet de voir rapidement quels temps et formes sont utilisés.<br> Pour les verbes réguliers anglais, le prétérit et le participe passé s'écrivent pareil. Le code couleur permet aussi de les distinguer.<br>
+            La 3e personne du présent de l'indicatif rajoute un <b>s</b> à la forme verbale de base du présent. Il est indiqué ainsi : <b>she</b> <b class="present">talk</b><b class="s">s</b><br>
+        </p>
+        <p>
+            La négation est obtenu par l'ajout de not qui est mis entre parenthèses dans la phrase affirmative, sauf pour le présent et le prétérit où la phrase affirmative et la phrase négative sont clairement différenciées.
+        </p>
+        <p>
+            L'abréviation pers. signifie personne.<br>
+            L'abréviation sing. signifie singulier.<br>
+            Ainsi 1ère pers. sing. signifie : 1ère personne du singulier (je ou I).
+        </p>
+        <div class="retour"><a href="#sommaire"><b>Retour au sommaire</b></a></div>
+        
+        <h2 id="sentences">3. Construction de la phrase en anglais</h2>
+        <p>
+            La <b>phrase affirmative</b> anglaise se construit généralement ainsi (par « sujet » et « verbe », nous entendons un mot ou un groupe de mots remplissant respectivement les fonctions de sujet et de base verbale) : 
+            <ul>
+                <li>Pour un verbe intransitif (sans complément) : <b>sujet + verbe</b> <i>(She is swimming)</i></li>
+                <li>Pour un verbe transitif (avec complément) : 
+                    <ul>
+                        <li><b>sujet + verbe + complément d'objet</b> <i>(We have a bag, I'm looking for a bag)</i></li>
+                        <li><b>sujet + verbe + complément d'objet premier + complément d'objet second</b> <i>(I give her a book, I give a book to her)</i></li>
+                    </ul>
+                </li>
+                <li>Pour un verbe copule (qui introduit un attribut) : <b>sujet + verbe + attribut du sujet</b> <i>(He is young)</i></li>
+            </ul>
+            Chacune de ses constructions peuvent se compléter de compléments circonstanciels.<br>
+            Le groupe remplissant la fonction de base verbale, verbe, se décompose ainsi : <b>auxiliaire + verbe proprement dit</b> <i>(She did answer)</i>
+        </p>
+        <p>
+            Pour la <b>phrase négative</b>, il suffit d'ajout dans le groupe remplissant la fonction de base verbale l'adverbe <b>not</b> : <b>auxiliaire + not + verbe proprement dit</b> <i>(She did not answer ou She didn't answer)</i>
+        </p>
+        <p>
+            La <b>phrase interrogative</b> se construit :
+            <ul>
+                <li>Avec un mot interrogatif : <b>mot interrogatif + auxiliaire + sujet + verbe proprement dit + reste de la phrase</b> <i>(What do you think?)</i></li>
+                <li>Sans mot interrogatif : <b>auxiliaire + sujet + verbe proprement dit + reste de la phrase</b> <i>(Do you know him?)</i></li>
+                <li>Dans le cas du verbe <b>to be</b>, il a deux utilisations :
+                <ul>
+                    <li>lorsqu'il est utilisé comme auxiliaire (au présent continu) il suit les mêmes constructions <i>(What are you doing? Are you going tomorrow?)</i>.</li>
+                    <li>lorsqu'il n'est pas utilisé comme auxiliaire, il prend la place de l'auxiliaire et il n'y a pas d'autre verbe <i>(Who are you? Are you insane?)</i>.</li>
+                </ul>
+            </ul>
+        </p>
+        <p>
+            La <b>phrase interro-négative</b> se contruit à partir de la phrase négative contractée. On inverse simplement auxilaire et sujet : You didn't sing &rarr; Didn't you sing? N'as tu pas chanté ?
+        </p>
+        <div class="retour"><a href="#sommaire"><b>Retour au sommaire</b></a></div>
+        
+        <h2 id="negations">4. Les formes contractées de la négation</h2>
+        <p>
+            Pour garder les descriptions des verbes les plus simples possibles, nous n'avons pas mis les formes contractées de la négation à chaque fois.<br>
+            La règle synthétique est de coller le verbe à not et de remplacer le o par l'apostrophe <b>'</b> mais il y a des exceptions (en gras).<br>
+            Nous résumons les formes contractées dans ce tableau :
             <table>
             <thead>
                 <tr><th>Forme simple</th><th>Forme contractée</th></tr>
@@ -153,8 +231,47 @@
             <tbody>
                 <tr><td>do not</td><td>don't</td></tr>
                 <tr><td>does not</td><td>doesn't</td></tr>
+                <tr><td>did not</td><td>didn't</td></tr>
+                <tr><td>has not</td><td>hasn't</td></tr>
+                <tr><td>have not</td><td>haven't</td></tr>
+                <tr><td>will not</td><td><b>won't</b></td></tr>
+                <tr><td>shall not</td><td><b>shan't</b></td></tr>
+                <tr><td>are not</td><td>aren't</td></tr>
+                <tr><td>was not</td><td>wasn't</td></tr>
+                <tr><td>were not</td><td>weren't</td></tr>
+                <tr><td><b>cannot</b></td><td><b>can't</b></td></tr>
             </tbody>
             </table>
+            <i>am not</i> ne se contracte pas, sauf dans un anglais oral, <i>ain't</i>, qui utilise même parfois <i>aren't</i>.
+        </p>
+        <div class="retour"><a href="#sommaire"><b>Retour au sommaire</b></a></div>
+        
+        <h2 id="formes">5. Les formes du verbe anglais</h2>
+        <p>
+            En anglais, il y a seulement 6 formes différentes pour un verbe donné, sauf pour le verbe <b>to be</b> qui en a 8. Les temps se construisent en les combinant. Les voici pour le verbe <b>to talk</b> :
+            <ol>
+                <li>la base verbale, ou verbe nu, qui est aussi la forme principal du présent de l'indicatif : <b class="present">talk</b>,</li>
+                <li>la 3e personne du singulier du présent de l'indicatif prend néanmoins un s : <b class="present">talk</b><b class="s">s</b>,</li>
+                <li>le prétérit se fait le plus souvent en ajoutant -(e)d à la fin de la base verbale : <b class="past">talked</b>,</li>
+                <li>le participe passé se fait de la même manière pour les verbes réguliers : <b class="pp">talk</b>,</li>
+                <li>le futur utilise l'auxiliaire <b>will</b> ou <b>shall</b> suivi de la base verbale : <b class="future">will talk</b>,</li>
+                <li>l'aspect continu rajoute -ing à la fin de la base verbale : <b class="ing">talking</b>,</li>
+                <li>enfin le verbe <b>to be</b> a une forme particulière à la 1ère personne du présent de l'indicatif : <b class="present">am</b>,</li>
+                <li>et à la 1ère et 3e personnes du singulier du prétérit : <b class="past">was</b>.</li>
+            </ol>
+            L'aspect continu est un point de vue qui insiste sur l'action en train d'être faite/de se faire/de se dérouler. En français, on le traduit généralement par « en train de » :
+            <ul>
+                <li>He talks : il parle</li>
+                <li>He is talking : il est en train de parler (quand soudain... : on peut introduire quelque chose pendant que l'action se déroule comme une « toile de fond »)</li>
+            </ul>
+            L'aspect non continu considère l'action comme un « tout global ».<br>
+            Une autre façon de se le représenter et d'imaginer une frise chronologique sur laquelle se déroule vos actions : l'aspect continu indiquera une période, un segment sur la frise chronologique, alors que l'aspect non continu indiquera un simple point.<br>
+        </p>
+        <div class="retour"><a href="#sommaire"><b>Retour au sommaire</b></a></div>
+        
+        <h2>6. Les valeurs des modes et des temps</h2>
+        <div class="retour"><a href="#sommaire"><b>Retour au sommaire</b></a></div>
+        
         <p>Les valeurs des modes et des temps
             <ul>
                 <li><i>(L'iréel, la généralité)</i></li>
@@ -163,9 +280,9 @@
                 <li><i>(L'ordre)</i></li>
             </ul>
         </p>
-    <h2>1. add &nbsp;&nbsp;(added, added)</h2>
+    <h2 id="100152">1. add &nbsp;&nbsp;(added, added)</h2>
 <p><b>Sens et traduction</b> : <ul>
-	<li>ajouter</li>
+	<li>ajouter quelque chose à quelque chose : to add something to something</li>
 </ul></p>
 <p><b>Infinitif</b> : <b>to add</b></p>
 <p><b>Participe passé</b> : <b class="pp">added</b></p>
@@ -214,7 +331,7 @@
 		<li>do not/don't let me/her/him/it/us/them add!</li>
 		<li>let me/her/him/it/us/them not add!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>2. agree &nbsp;&nbsp;(agreed, agreed)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100166">2. agree &nbsp;&nbsp;(agreed, agreed)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>être daccord</li>
 </ul></p>
@@ -265,7 +382,7 @@
 		<li>do not/don't let me/her/him/it/us/them agree!</li>
 		<li>let me/her/him/it/us/them not agree!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>3. allow &nbsp;&nbsp;(allowed, allowed)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100060">3. allow &nbsp;&nbsp;(allowed, allowed)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>permettre</li>
 </ul></p>
@@ -316,7 +433,7 @@
 		<li>do not/don't let me/her/him/it/us/them allow!</li>
 		<li>let me/her/him/it/us/them not allow!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>4. answer &nbsp;&nbsp;(answered, answered)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100031">4. answer &nbsp;&nbsp;(answered, answered)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>répondre</li>
 </ul></p>
@@ -367,7 +484,7 @@
 		<li>do not/don't let me/her/him/it/us/them answer!</li>
 		<li>let me/her/him/it/us/them not answer!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>5. arrive &nbsp;&nbsp;(arrived, arrived)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100126">5. arrive &nbsp;&nbsp;(arrived, arrived)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>arriver (quelque part)</li>
 </ul></p>
@@ -418,7 +535,7 @@
 		<li>do not/don't let me/her/him/it/us/them arrive!</li>
 		<li>let me/her/him/it/us/them not arrive!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>6. ask &nbsp;&nbsp;(asked, asked)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100097">6. ask &nbsp;&nbsp;(asked, asked)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>demander</li>
 </ul></p>
@@ -469,7 +586,7 @@
 		<li>do not/don't let me/her/him/it/us/them ask!</li>
 		<li>let me/her/him/it/us/them not ask!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>7. be &nbsp;&nbsp;(were, been)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100086">7. be &nbsp;&nbsp;(were, been)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>être</li>
 </ul></p>
@@ -520,7 +637,7 @@
 		<li>do not/don't let me/her/him/it/us/them be!</li>
 		<li>let me/her/him/it/us/them not be!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>8. be afraid &nbsp;&nbsp;(were afraid, been afraid)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100121">8. be afraid &nbsp;&nbsp;(were afraid, been afraid)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>avoir peur</li>
 </ul></p>
@@ -571,7 +688,7 @@
 		<li>do not/don't let me/her/him/it/us/them be afraid!</li>
 		<li>let me/her/him/it/us/them not be afraid!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>9. be born &nbsp;&nbsp;(were born, been born)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100051">9. be born &nbsp;&nbsp;(were born, been born)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>naître</li>
 </ul></p>
@@ -622,7 +739,7 @@
 		<li>do not/don't let me/her/him/it/us/them be born!</li>
 		<li>let me/her/him/it/us/them not be born!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>10. be worth &nbsp;&nbsp;(were worth, been worth)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100183">10. be worth &nbsp;&nbsp;(were worth, been worth)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>valoir</li>
 </ul></p>
@@ -673,7 +790,7 @@
 		<li>do not/don't let me/her/him/it/us/them be worth!</li>
 		<li>let me/her/him/it/us/them not be worth!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>11. become &nbsp;&nbsp;(became, become)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100185">11. become &nbsp;&nbsp;(became, become)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>devenir</li>
 </ul></p>
@@ -724,7 +841,7 @@
 		<li>do not/don't let me/her/him/it/us/them become!</li>
 		<li>let me/her/him/it/us/them not become!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>12. begin &nbsp;&nbsp;(began, begun)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100110">12. begin &nbsp;&nbsp;(began, begun)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>commencer</li>
 </ul></p>
@@ -775,7 +892,7 @@
 		<li>do not/don't let me/her/him/it/us/them begin!</li>
 		<li>let me/her/him/it/us/them not begin!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>13. believe &nbsp;&nbsp;(believed, believed)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100100">13. believe &nbsp;&nbsp;(believed, believed)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>croire</li>
 </ul></p>
@@ -826,7 +943,7 @@
 		<li>do not/don't let me/her/him/it/us/them believe!</li>
 		<li>let me/her/him/it/us/them not believe!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>14. break &nbsp;&nbsp;(broke, broken)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100115">14. break &nbsp;&nbsp;(broke, broken)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>casser</li>
 </ul></p>
@@ -877,7 +994,7 @@
 		<li>do not/don't let me/her/him/it/us/them break!</li>
 		<li>let me/her/him/it/us/them not break!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>15. bring &nbsp;&nbsp;(brought, brought)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100187">15. bring &nbsp;&nbsp;(brought, brought)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>apporter</li>
 </ul></p>
@@ -928,10 +1045,10 @@
 		<li>do not/don't let me/her/him/it/us/them bring!</li>
 		<li>let me/her/him/it/us/them not bring!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>16. build &nbsp;&nbsp;(built, built)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100105">16. build &nbsp;&nbsp;(built, built)</h2>
 <p><b>Sens et traduction</b> : <ul>
-	<li>bâtir</li>
 	<li>construire</li>
+	<li>bâtir</li>
 </ul></p>
 <p><b>Infinitif</b> : <b>to build</b></p>
 <p><b>Participe passé</b> : <b class="pp">built</b></p>
@@ -980,7 +1097,7 @@
 		<li>do not/don't let me/her/him/it/us/them build!</li>
 		<li>let me/her/him/it/us/them not build!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>17. burn &nbsp;&nbsp;(burned/burnt, burned/burnt)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100117">17. burn &nbsp;&nbsp;(burned/burnt, burned/burnt)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>brûler</li>
 </ul></p>
@@ -1031,7 +1148,7 @@
 		<li>do not/don't let me/her/him/it/us/them burn!</li>
 		<li>let me/her/him/it/us/them not burn!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>18. buy &nbsp;&nbsp;(bought, bought)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100133">18. buy &nbsp;&nbsp;(bought, bought)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>acheter</li>
 </ul></p>
@@ -1082,7 +1199,7 @@
 		<li>do not/don't let me/her/him/it/us/them buy!</li>
 		<li>let me/her/him/it/us/them not buy!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>19. call &nbsp;&nbsp;(called, called)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100130">19. call &nbsp;&nbsp;(called, called)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>appeler</li>
 </ul></p>
@@ -1133,7 +1250,7 @@
 		<li>do not/don't let me/her/him/it/us/them call!</li>
 		<li>let me/her/him/it/us/them not call!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>20. can &nbsp;&nbsp;(could, could)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100064">20. can &nbsp;&nbsp;(could, could)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>pouvoir</li>
 </ul></p>
@@ -1184,7 +1301,7 @@
 		<li>do not/don't let me/her/him/it/us/them can!</li>
 		<li>let me/her/him/it/us/them not can!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>21. carry &nbsp;&nbsp;(carried, carried)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100063">21. carry &nbsp;&nbsp;(carried, carried)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>porter (porter un objet)</li>
 </ul></p>
@@ -1235,7 +1352,7 @@
 		<li>do not/don't let me/her/him/it/us/them carry!</li>
 		<li>let me/her/him/it/us/them not carry!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>22. catch &nbsp;&nbsp;(catched, catched)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100153">22. catch &nbsp;&nbsp;(catched, catched)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>attraper</li>
 </ul></p>
@@ -1286,7 +1403,7 @@
 		<li>do not/don't let me/her/him/it/us/them catch!</li>
 		<li>let me/her/him/it/us/them not catch!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>23. change &nbsp;&nbsp;(changed, changed)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100114">23. change &nbsp;&nbsp;(changed, changed)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>changer</li>
 </ul></p>
@@ -1337,7 +1454,7 @@
 		<li>do not/don't let me/her/him/it/us/them change!</li>
 		<li>let me/her/him/it/us/them not change!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>24. chat &nbsp;&nbsp;(chatted, chatted)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100120">24. chat &nbsp;&nbsp;(chatted, chatted)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>bavarder</li>
 </ul></p>
@@ -1388,7 +1505,7 @@
 		<li>do not/don't let me/her/him/it/us/them chat!</li>
 		<li>let me/her/him/it/us/them not chat!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>25. choose &nbsp;&nbsp;(chose, chosen)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100111">25. choose &nbsp;&nbsp;(chose, chosen)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>choisir</li>
 </ul></p>
@@ -1439,7 +1556,7 @@
 		<li>do not/don't let me/her/him/it/us/them choose!</li>
 		<li>let me/her/him/it/us/them not choose!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>26. close &nbsp;&nbsp;(closed, closed)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100083">26. close &nbsp;&nbsp;(closed, closed)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>fermer</li>
 </ul></p>
@@ -1490,7 +1607,7 @@
 		<li>do not/don't let me/her/him/it/us/them close!</li>
 		<li>let me/her/him/it/us/them not close!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>27. come &nbsp;&nbsp;(came, come)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100009">27. come &nbsp;&nbsp;(came, come)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>venir de quelque part : to come from somewhere</li>
 	<li> venir ici : to come here</li>
@@ -1543,7 +1660,7 @@
 		<li>do not/don't let me/her/him/it/us/them come!</li>
 		<li>let me/her/him/it/us/them not come!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>28. come back &nbsp;&nbsp;(came back, come back)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100136">28. come back &nbsp;&nbsp;(came back, come back)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>revenir</li>
 </ul></p>
@@ -1594,7 +1711,7 @@
 		<li>do not/don't let me/her/him/it/us/them come back!</li>
 		<li>let me/her/him/it/us/them not come back!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>29. come down &nbsp;&nbsp;(came down, come down)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="190148">29. come down &nbsp;&nbsp;(came down, come down)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>descendre (vu du lieu plus bas)</li>
 </ul></p>
@@ -1645,7 +1762,7 @@
 		<li>do not/don't let me/her/him/it/us/them come down!</li>
 		<li>let me/her/him/it/us/them not come down!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>30. come in &nbsp;&nbsp;(came in, come in)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="190139">30. come in &nbsp;&nbsp;(came in, come in)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>entrer (vu de l'intérieur du lieu où l'on entre)</li>
 </ul></p>
@@ -1696,7 +1813,7 @@
 		<li>do not/don't let me/her/him/it/us/them come in!</li>
 		<li>let me/her/him/it/us/them not come in!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>31. come out &nbsp;&nbsp;(came out, come out)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="190138">31. come out &nbsp;&nbsp;(came out, come out)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>sortir (vu de l'extérieur du lieu que l'on quitte)</li>
 </ul></p>
@@ -1747,7 +1864,7 @@
 		<li>do not/don't let me/her/him/it/us/them come out!</li>
 		<li>let me/her/him/it/us/them not come out!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>32. come up &nbsp;&nbsp;(came up, come up)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="190147">32. come up &nbsp;&nbsp;(came up, come up)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>monter (vu du lieu plus haut)</li>
 </ul></p>
@@ -1798,7 +1915,7 @@
 		<li>do not/don't let me/her/him/it/us/them come up!</li>
 		<li>let me/her/him/it/us/them not come up!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>33. concern &nbsp;&nbsp;(concerned, concerned)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="190169">33. concern &nbsp;&nbsp;(concerned, concerned)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>intéresser (concerner)</li>
 	<li>regarder (concerner)</li>
@@ -1850,7 +1967,7 @@
 		<li>do not/don't let me/her/him/it/us/them concern!</li>
 		<li>let me/her/him/it/us/them not concern!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>34. cook &nbsp;&nbsp;(cooked, cooked)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100099">34. cook &nbsp;&nbsp;(cooked, cooked)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>cuire</li>
 </ul></p>
@@ -1901,7 +2018,7 @@
 		<li>do not/don't let me/her/him/it/us/them cook!</li>
 		<li>let me/her/him/it/us/them not cook!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>35. cost &nbsp;&nbsp;(cost, cost)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100103">35. cost &nbsp;&nbsp;(cost, cost)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>coûter</li>
 </ul></p>
@@ -1952,7 +2069,7 @@
 		<li>do not/don't let me/her/him/it/us/them cost!</li>
 		<li>let me/her/him/it/us/them not cost!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>36. count &nbsp;&nbsp;(counted, counted)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100108">36. count &nbsp;&nbsp;(counted, counted)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>compter</li>
 </ul></p>
@@ -2003,7 +2120,7 @@
 		<li>do not/don't let me/her/him/it/us/them count!</li>
 		<li>let me/her/him/it/us/them not count!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>37. create &nbsp;&nbsp;(created, created)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100102">37. create &nbsp;&nbsp;(created, created)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>créer</li>
 </ul></p>
@@ -2054,7 +2171,7 @@
 		<li>do not/don't let me/her/him/it/us/them create!</li>
 		<li>let me/her/him/it/us/them not create!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>38. cry &nbsp;&nbsp;(cried, cried)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100062">38. cry &nbsp;&nbsp;(cried, cried)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>pleurer</li>
 </ul></p>
@@ -2105,7 +2222,7 @@
 		<li>do not/don't let me/her/him/it/us/them cry!</li>
 		<li>let me/her/him/it/us/them not cry!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>39. cut &nbsp;&nbsp;(cut, cut)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100188">39. cut &nbsp;&nbsp;(cut, cut)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>couper</li>
 </ul></p>
@@ -2156,7 +2273,7 @@
 		<li>do not/don't let me/her/him/it/us/them cut!</li>
 		<li>let me/her/him/it/us/them not cut!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>40. dance &nbsp;&nbsp;(danced, danced)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100098">40. dance &nbsp;&nbsp;(danced, danced)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>danser</li>
 </ul></p>
@@ -2207,7 +2324,7 @@
 		<li>do not/don't let me/her/him/it/us/them dance!</li>
 		<li>let me/her/him/it/us/them not dance!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>41. decide &nbsp;&nbsp;(decided, decided)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100143">41. decide &nbsp;&nbsp;(decided, decided)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>décider</li>
 </ul></p>
@@ -2258,7 +2375,7 @@
 		<li>do not/don't let me/her/him/it/us/them decide!</li>
 		<li>let me/her/him/it/us/them not decide!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>42. decrease &nbsp;&nbsp;(decreased, decreased)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100162">42. decrease &nbsp;&nbsp;(decreased, decreased)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>diminuer</li>
 </ul></p>
@@ -2309,7 +2426,7 @@
 		<li>do not/don't let me/her/him/it/us/them decrease!</li>
 		<li>let me/her/him/it/us/them not decrease!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>43. desire &nbsp;&nbsp;(desired, desired)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100160">43. desire &nbsp;&nbsp;(desired, desired)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>désirer (convoiter (y compris sexuellement))</li>
 </ul></p>
@@ -2360,7 +2477,7 @@
 		<li>do not/don't let me/her/him/it/us/them desire!</li>
 		<li>let me/her/him/it/us/them not desire!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>44. die &nbsp;&nbsp;(died, died)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100049">44. die &nbsp;&nbsp;(died, died)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>mourir</li>
 </ul></p>
@@ -2411,7 +2528,7 @@
 		<li>do not/don't let me/her/him/it/us/them die!</li>
 		<li>let me/her/him/it/us/them not die!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>45. disappear &nbsp;&nbsp;(disappeared, disappeared)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100164">45. disappear &nbsp;&nbsp;(disappeared, disappeared)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>disparaître</li>
 </ul></p>
@@ -2462,7 +2579,7 @@
 		<li>do not/don't let me/her/him/it/us/them disappear!</li>
 		<li>let me/her/him/it/us/them not disappear!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>46. discover &nbsp;&nbsp;(discovered, discovered)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100159">46. discover &nbsp;&nbsp;(discovered, discovered)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>découvrir</li>
 </ul></p>
@@ -2513,7 +2630,7 @@
 		<li>do not/don't let me/her/him/it/us/them discover!</li>
 		<li>let me/her/him/it/us/them not discover!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>47. discuss &nbsp;&nbsp;(discussed, discussed)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100163">47. discuss &nbsp;&nbsp;(discussed, discussed)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>discuter</li>
 </ul></p>
@@ -2564,7 +2681,7 @@
 		<li>do not/don't let me/her/him/it/us/them discuss!</li>
 		<li>let me/her/him/it/us/them not discuss!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>48. dive &nbsp;&nbsp;(dived, dived)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100176">48. dive &nbsp;&nbsp;(dived, dived)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>plonger (immerger (dans l'eau), descendre (dans l'air))</li>
 </ul></p>
@@ -2615,7 +2732,7 @@
 		<li>do not/don't let me/her/him/it/us/them dive!</li>
 		<li>let me/her/him/it/us/them not dive!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>49. do &nbsp;&nbsp;(did, done)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100084">49. do &nbsp;&nbsp;(did, done)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>faire</li>
 </ul></p>
@@ -2666,7 +2783,7 @@
 		<li>do not/don't let me/her/him/it/us/them do!</li>
 		<li>let me/her/him/it/us/them not do!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>50. draw &nbsp;&nbsp;(drew, drawn)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100189">50. draw &nbsp;&nbsp;(drew, drawn)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>dessiner</li>
 </ul></p>
@@ -2717,7 +2834,7 @@
 		<li>do not/don't let me/her/him/it/us/them draw!</li>
 		<li>let me/her/him/it/us/them not draw!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>51. dream &nbsp;&nbsp;(dreamed, dreamed)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100182">51. dream &nbsp;&nbsp;(dreamed, dreamed)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>rêver</li>
 </ul></p>
@@ -2768,7 +2885,7 @@
 		<li>do not/don't let me/her/him/it/us/them dream!</li>
 		<li>let me/her/him/it/us/them not dream!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>52. dress &nbsp;&nbsp;(dressed, dressed)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100079">52. dress &nbsp;&nbsp;(dressed, dressed)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>habiller (s)</li>
 </ul></p>
@@ -2819,7 +2936,7 @@
 		<li>do not/don't let me/her/him/it/us/them dress!</li>
 		<li>let me/her/him/it/us/them not dress!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>53. drink &nbsp;&nbsp;(drank, drunk)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100119">53. drink &nbsp;&nbsp;(drank, drunk)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>boire</li>
 </ul></p>
@@ -2870,7 +2987,7 @@
 		<li>do not/don't let me/her/him/it/us/them drink!</li>
 		<li>let me/her/him/it/us/them not drink!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>54. drive &nbsp;&nbsp;(drove, driven)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100107">54. drive &nbsp;&nbsp;(drove, driven)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>conduire</li>
 </ul></p>
@@ -2921,7 +3038,7 @@
 		<li>do not/don't let me/her/him/it/us/them drive!</li>
 		<li>let me/her/him/it/us/them not drive!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>55. drive out &nbsp;&nbsp;(drove out, driven out)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="190156">55. drive out &nbsp;&nbsp;(drove out, driven out)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>chasser (expulser)</li>
 </ul></p>
@@ -2972,7 +3089,7 @@
 		<li>do not/don't let me/her/him/it/us/them drive out!</li>
 		<li>let me/her/him/it/us/them not drive out!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>56. eat &nbsp;&nbsp;(ate, eaten)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100071">56. eat &nbsp;&nbsp;(ate, eaten)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>manger</li>
 </ul></p>
@@ -3023,7 +3140,7 @@
 		<li>do not/don't let me/her/him/it/us/them eat!</li>
 		<li>let me/her/him/it/us/them not eat!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>57. empty &nbsp;&nbsp;(emptied, emptied)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100184">57. empty &nbsp;&nbsp;(emptied, emptied)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>vider</li>
 </ul></p>
@@ -3074,7 +3191,7 @@
 		<li>do not/don't let me/her/him/it/us/them empty!</li>
 		<li>let me/her/him/it/us/them not empty!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>58. enter &nbsp;&nbsp;(entered, entered)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="180139">58. enter &nbsp;&nbsp;(entered, entered)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>entrer (de façon générale)</li>
 </ul></p>
@@ -3125,7 +3242,7 @@
 		<li>do not/don't let me/her/him/it/us/them enter!</li>
 		<li>let me/her/him/it/us/them not enter!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>59. fall &nbsp;&nbsp;(fell, fallen)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100017">59. fall &nbsp;&nbsp;(fell, fallen)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>tomber</li>
 </ul></p>
@@ -3176,7 +3293,7 @@
 		<li>do not/don't let me/her/him/it/us/them fall!</li>
 		<li>let me/her/him/it/us/them not fall!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>60. feed &nbsp;&nbsp;(feeded, feeded)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100172">60. feed &nbsp;&nbsp;(feeded, feeded)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>nourrir</li>
 </ul></p>
@@ -3227,7 +3344,7 @@
 		<li>do not/don't let me/her/him/it/us/them feed!</li>
 		<li>let me/her/him/it/us/them not feed!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>61. feel &nbsp;&nbsp;(felt, felt)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="190041">61. feel &nbsp;&nbsp;(felt, felt)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>sentir (un sentiment)</li>
 </ul></p>
@@ -3278,7 +3395,7 @@
 		<li>do not/don't let me/her/him/it/us/them feel!</li>
 		<li>let me/her/him/it/us/them not feel!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>62. fill &nbsp;&nbsp;(filled, filled)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100146">62. fill &nbsp;&nbsp;(filled, filled)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>remplir</li>
 </ul></p>
@@ -3329,7 +3446,7 @@
 		<li>do not/don't let me/her/him/it/us/them fill!</li>
 		<li>let me/her/him/it/us/them not fill!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>63. find &nbsp;&nbsp;(found, found)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100012">63. find &nbsp;&nbsp;(found, found)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>trouver</li>
 </ul></p>
@@ -3380,7 +3497,7 @@
 		<li>do not/don't let me/her/him/it/us/them find!</li>
 		<li>let me/her/him/it/us/them not find!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>64. finish &nbsp;&nbsp;(finished, finished)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100082">64. finish &nbsp;&nbsp;(finished, finished)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>finir</li>
 </ul></p>
@@ -3431,7 +3548,7 @@
 		<li>do not/don't let me/her/him/it/us/them finish!</li>
 		<li>let me/her/him/it/us/them not finish!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>65. fly &nbsp;&nbsp;(flew, flown)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100005">65. fly &nbsp;&nbsp;(flew, flown)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>voler dans les airs : to fly</li>
 </ul></p>
@@ -3482,7 +3599,7 @@
 		<li>do not/don't let me/her/him/it/us/them fly!</li>
 		<li>let me/her/him/it/us/them not fly!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>66. fold &nbsp;&nbsp;(folded, folded)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100175">66. fold &nbsp;&nbsp;(folded, folded)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>plier</li>
 </ul></p>
@@ -3533,7 +3650,7 @@
 		<li>do not/don't let me/her/him/it/us/them fold!</li>
 		<li>let me/her/him/it/us/them not fold!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>67. follow &nbsp;&nbsp;(followed, followed)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100044">67. follow &nbsp;&nbsp;(followed, followed)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>suivre</li>
 </ul></p>
@@ -3584,7 +3701,7 @@
 		<li>do not/don't let me/her/him/it/us/them follow!</li>
 		<li>let me/her/him/it/us/them not follow!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>68. forget &nbsp;&nbsp;(forgot, forgotten)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100052">68. forget &nbsp;&nbsp;(forgot, forgotten)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>oublier</li>
 </ul></p>
@@ -3635,7 +3752,7 @@
 		<li>do not/don't let me/her/him/it/us/them forget!</li>
 		<li>let me/her/him/it/us/them not forget!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>69. forgive &nbsp;&nbsp;(forgived, forgived)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100053">69. forgive &nbsp;&nbsp;(forgived, forgived)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>pardonner</li>
 </ul></p>
@@ -3686,11 +3803,11 @@
 		<li>do not/don't let me/her/him/it/us/them forgive!</li>
 		<li>let me/her/him/it/us/them not forgive!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>70. get &nbsp;&nbsp;(got, got)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100199">70. get &nbsp;&nbsp;(got, got)</h2>
 <p><b>Sens et traduction</b> : <ul>
+	<li>recevoir</li>
 	<li>avoir</li>
 	<li>comprendre</li>
-	<li>recevoir</li>
 </ul></p>
 <p><b>Infinitif</b> : <b>to get</b></p>
 <p><b>Participe passé</b> : <b class="pp">got</b></p>
@@ -3739,7 +3856,7 @@
 		<li>do not/don't let me/her/him/it/us/them get!</li>
 		<li>let me/her/him/it/us/them not get!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>71. give &nbsp;&nbsp;(gave, given)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100135">71. give &nbsp;&nbsp;(gave, given)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>donner</li>
 </ul></p>
@@ -3790,7 +3907,7 @@
 		<li>do not/don't let me/her/him/it/us/them give!</li>
 		<li>let me/her/him/it/us/them not give!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>72. glide &nbsp;&nbsp;(glided, glided)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="190168">72. glide &nbsp;&nbsp;(glided, glided)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>glisser (se mouvoir de façon fluide)</li>
 </ul></p>
@@ -3841,7 +3958,7 @@
 		<li>do not/don't let me/her/him/it/us/them glide!</li>
 		<li>let me/her/him/it/us/them not glide!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>73. go &nbsp;&nbsp;(went, gone)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100055">73. go &nbsp;&nbsp;(went, gone)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>partir</li>
 	<li>aller</li>
@@ -3893,7 +4010,7 @@
 		<li>do not/don't let me/her/him/it/us/them go!</li>
 		<li>let me/her/him/it/us/them not go!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>74. go down &nbsp;&nbsp;(went down, gone down)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100148">74. go down &nbsp;&nbsp;(went down, gone down)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>descendre (vu du lieu plus haut)</li>
 </ul></p>
@@ -3944,7 +4061,7 @@
 		<li>do not/don't let me/her/him/it/us/them go down!</li>
 		<li>let me/her/him/it/us/them not go down!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>75. go in &nbsp;&nbsp;(went in, gone in)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100139">75. go in &nbsp;&nbsp;(went in, gone in)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>entrer (vu de l'extérieur du lieu où l'on entre)</li>
 </ul></p>
@@ -3995,7 +4112,7 @@
 		<li>do not/don't let me/her/him/it/us/them go in!</li>
 		<li>let me/her/him/it/us/them not go in!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>76. go out &nbsp;&nbsp;(went out, gone out)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100138">76. go out &nbsp;&nbsp;(went out, gone out)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>sortir (vu de l'intérieur du lieu que l'on quitte)</li>
 </ul></p>
@@ -4046,7 +4163,7 @@
 		<li>do not/don't let me/her/him/it/us/them go out!</li>
 		<li>let me/her/him/it/us/them not go out!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>77. go up &nbsp;&nbsp;(went up, gone up)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100147">77. go up &nbsp;&nbsp;(went up, gone up)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>monter (vu du lieu plus bas)</li>
 </ul></p>
@@ -4097,7 +4214,7 @@
 		<li>do not/don't let me/her/him/it/us/them go up!</li>
 		<li>let me/her/him/it/us/them not go up!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>78. guess &nbsp;&nbsp;(guessed, guessed)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100161">78. guess &nbsp;&nbsp;(guessed, guessed)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>deviner</li>
 </ul></p>
@@ -4148,7 +4265,7 @@
 		<li>do not/don't let me/her/him/it/us/them guess!</li>
 		<li>let me/her/him/it/us/them not guess!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>79. hang &nbsp;&nbsp;(hanged, hanged)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100174">79. hang &nbsp;&nbsp;(hanged, hanged)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>pendre</li>
 </ul></p>
@@ -4199,7 +4316,7 @@
 		<li>do not/don't let me/her/him/it/us/them hang!</li>
 		<li>let me/her/him/it/us/them not hang!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>80. happen &nbsp;&nbsp;(happened, happened)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="190126">80. happen &nbsp;&nbsp;(happened, happened)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>arriver (une occurrence)</li>
 </ul></p>
@@ -4250,7 +4367,7 @@
 		<li>do not/don't let me/her/him/it/us/them happen!</li>
 		<li>let me/her/him/it/us/them not happen!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>81. have &nbsp;&nbsp;(had, had)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100124">81. have &nbsp;&nbsp;(had, had)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>avoir</li>
 </ul></p>
@@ -4301,7 +4418,7 @@
 		<li>do not/don't let me/her/him/it/us/them have!</li>
 		<li>let me/her/him/it/us/them not have!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>82. hear &nbsp;&nbsp;(heard, heard)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100090">82. hear &nbsp;&nbsp;(heard, heard)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>entendre</li>
 </ul></p>
@@ -4352,7 +4469,7 @@
 		<li>do not/don't let me/her/him/it/us/them hear!</li>
 		<li>let me/her/him/it/us/them not hear!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>83. help &nbsp;&nbsp;(helped, helped)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100134">83. help &nbsp;&nbsp;(helped, helped)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>aider</li>
 </ul></p>
@@ -4403,7 +4520,7 @@
 		<li>do not/don't let me/her/him/it/us/them help!</li>
 		<li>let me/her/him/it/us/them not help!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>84. hide &nbsp;&nbsp;(hided, hided)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100116">84. hide &nbsp;&nbsp;(hided, hided)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>cacher</li>
 </ul></p>
@@ -4454,7 +4571,7 @@
 		<li>do not/don't let me/her/him/it/us/them hide!</li>
 		<li>let me/her/him/it/us/them not hide!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>85. hire &nbsp;&nbsp;(hired, hired)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="190171">85. hire &nbsp;&nbsp;(hired, hired)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>louer</li>
 </ul></p>
@@ -4505,7 +4622,7 @@
 		<li>do not/don't let me/her/him/it/us/them hire!</li>
 		<li>let me/her/him/it/us/them not hire!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>86. hold &nbsp;&nbsp;(held, held)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100045">86. hold &nbsp;&nbsp;(held, held)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>tenir</li>
 	<li>retenir</li>
@@ -4557,7 +4674,7 @@
 		<li>do not/don't let me/her/him/it/us/them hold!</li>
 		<li>let me/her/him/it/us/them not hold!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>87. hope &nbsp;&nbsp;(hoped, hoped)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100088">87. hope &nbsp;&nbsp;(hoped, hoped)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>espérer</li>
 </ul></p>
@@ -4608,7 +4725,7 @@
 		<li>do not/don't let me/her/him/it/us/them hope!</li>
 		<li>let me/her/him/it/us/them not hope!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>88. hunt &nbsp;&nbsp;(hunted, hunted)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100156">88. hunt &nbsp;&nbsp;(hunted, hunted)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>chasser (attraper du gibier)</li>
 </ul></p>
@@ -4659,7 +4776,7 @@
 		<li>do not/don't let me/her/him/it/us/them hunt!</li>
 		<li>let me/her/him/it/us/them not hunt!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>89. increase &nbsp;&nbsp;(increased, increased)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100154">89. increase &nbsp;&nbsp;(increased, increased)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>augmenter</li>
 </ul></p>
@@ -4710,7 +4827,7 @@
 		<li>do not/don't let me/her/him/it/us/them increase!</li>
 		<li>let me/her/him/it/us/them not increase!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>90. interest &nbsp;&nbsp;(interested, interested)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100169">90. interest &nbsp;&nbsp;(interested, interested)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>intéresser</li>
 </ul></p>
@@ -4761,7 +4878,7 @@
 		<li>do not/don't let me/her/him/it/us/them interest!</li>
 		<li>let me/her/him/it/us/them not interest!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>91. introduce yourself &nbsp;&nbsp;(introduced yourself, introduced yourself)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100066">91. introduce yourself &nbsp;&nbsp;(introduced yourself, introduced yourself)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>présenter (se)</li>
 </ul></p>
@@ -4812,7 +4929,7 @@
 		<li>do not/don't let me/her/him/it/us/them introduce yourself!</li>
 		<li>let me/her/him/it/us/them not introduce yourself!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>92. invite &nbsp;&nbsp;(invited, invited)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100077">92. invite &nbsp;&nbsp;(invited, invited)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>inviter</li>
 </ul></p>
@@ -4863,7 +4980,7 @@
 		<li>do not/don't let me/her/him/it/us/them invite!</li>
 		<li>let me/her/him/it/us/them not invite!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>93. jump &nbsp;&nbsp;(jumped, jumped)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100037">93. jump &nbsp;&nbsp;(jumped, jumped)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>sauter</li>
 </ul></p>
@@ -4914,7 +5031,7 @@
 		<li>do not/don't let me/her/him/it/us/them jump!</li>
 		<li>let me/her/him/it/us/them not jump!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>94. keep &nbsp;&nbsp;(kept, kept)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100190">94. keep &nbsp;&nbsp;(kept, kept)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>garder</li>
 </ul></p>
@@ -4965,7 +5082,7 @@
 		<li>do not/don't let me/her/him/it/us/them keep!</li>
 		<li>let me/her/him/it/us/them not keep!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>95. know &nbsp;&nbsp;(knew, known)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100038">95. know &nbsp;&nbsp;(knew, known)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>savoir</li>
 	<li>connaître</li>
@@ -5017,7 +5134,7 @@
 		<li>do not/don't let me/her/him/it/us/them know!</li>
 		<li>let me/her/him/it/us/them not know!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>96. last &nbsp;&nbsp;(lasted, lasted)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100165">96. last &nbsp;&nbsp;(lasted, lasted)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>durer</li>
 </ul></p>
@@ -5068,7 +5185,7 @@
 		<li>do not/don't let me/her/him/it/us/them last!</li>
 		<li>let me/her/him/it/us/them not last!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>97. laugh &nbsp;&nbsp;(laughed, laughed)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100035">97. laugh &nbsp;&nbsp;(laughed, laughed)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>rire</li>
 </ul></p>
@@ -5119,7 +5236,7 @@
 		<li>do not/don't let me/her/him/it/us/them laugh!</li>
 		<li>let me/her/him/it/us/them not laugh!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>98. lead &nbsp;&nbsp;(led, led)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100191">98. lead &nbsp;&nbsp;(led, led)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>mener</li>
 </ul></p>
@@ -5170,7 +5287,7 @@
 		<li>do not/don't let me/her/him/it/us/them lead!</li>
 		<li>let me/her/him/it/us/them not lead!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>99. learn &nbsp;&nbsp;(learned, learned)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100128">99. learn &nbsp;&nbsp;(learned, learned)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>apprendre</li>
 </ul></p>
@@ -5221,7 +5338,7 @@
 		<li>do not/don't let me/her/him/it/us/them learn!</li>
 		<li>let me/her/him/it/us/them not learn!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>100. lease &nbsp;&nbsp;(leased, leased)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="180171">100. lease &nbsp;&nbsp;(leased, leased)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>louer</li>
 </ul></p>
@@ -5272,7 +5389,7 @@
 		<li>do not/don't let me/her/him/it/us/them lease!</li>
 		<li>let me/her/him/it/us/them not lease!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>101. leave &nbsp;&nbsp;(left, left)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100068">101. leave &nbsp;&nbsp;(left, left)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>quitter</li>
 </ul></p>
@@ -5323,7 +5440,7 @@
 		<li>do not/don't let me/her/him/it/us/them leave!</li>
 		<li>let me/her/him/it/us/them not leave!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>102. lend &nbsp;&nbsp;(lended, lended)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100178">102. lend &nbsp;&nbsp;(lended, lended)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>prêter</li>
 </ul></p>
@@ -5374,7 +5491,7 @@
 		<li>do not/don't let me/her/him/it/us/them lend!</li>
 		<li>let me/her/him/it/us/them not lend!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>103. let &nbsp;&nbsp;(let, let)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100192">103. let &nbsp;&nbsp;(let, let)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>laisser</li>
 </ul></p>
@@ -5425,7 +5542,7 @@
 		<li>do not/don't let me/her/him/it/us/them let!</li>
 		<li>let me/her/him/it/us/them not let!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>104. lie &nbsp;&nbsp;(lay, lain)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100193">104. lie &nbsp;&nbsp;(lay, lain)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>mentir</li>
 </ul></p>
@@ -5476,7 +5593,7 @@
 		<li>do not/don't let me/her/him/it/us/them lie!</li>
 		<li>let me/her/him/it/us/them not lie!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>105. lift &nbsp;&nbsp;(lifted, lifted)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="190170">105. lift &nbsp;&nbsp;(lifted, lifted)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>lever (soulever)</li>
 </ul></p>
@@ -5527,7 +5644,7 @@
 		<li>do not/don't let me/her/him/it/us/them lift!</li>
 		<li>let me/her/him/it/us/them not lift!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>106. like &nbsp;&nbsp;(liked, liked)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100129">106. like &nbsp;&nbsp;(liked, liked)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>apprécier</li>
 </ul></p>
@@ -5578,7 +5695,7 @@
 		<li>do not/don't let me/her/him/it/us/them like!</li>
 		<li>let me/her/him/it/us/them not like!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>107. listen &nbsp;&nbsp;(listened, listened)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100093">107. listen &nbsp;&nbsp;(listened, listened)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>écouter</li>
 </ul></p>
@@ -5629,7 +5746,7 @@
 		<li>do not/don't let me/her/him/it/us/them listen!</li>
 		<li>let me/her/him/it/us/them not listen!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>108. live &nbsp;&nbsp;(lived, lived)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100007">108. live &nbsp;&nbsp;(lived, lived)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>vivre</li>
 </ul></p>
@@ -5680,7 +5797,7 @@
 		<li>do not/don't let me/her/him/it/us/them live!</li>
 		<li>let me/her/him/it/us/them not live!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>109. live in &nbsp;&nbsp;(lived in, lived in)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100078">109. live in &nbsp;&nbsp;(lived in, lived in)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>habiter</li>
 </ul></p>
@@ -5731,7 +5848,7 @@
 		<li>do not/don't let me/her/him/it/us/them live in!</li>
 		<li>let me/her/him/it/us/them not live in!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>110. look at &nbsp;&nbsp;(looked at, looked at)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="190028">110. look at &nbsp;&nbsp;(looked at, looked at)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>regarder</li>
 </ul></p>
@@ -5782,7 +5899,7 @@
 		<li>do not/don't let me/her/him/it/us/them look at!</li>
 		<li>let me/her/him/it/us/them not look at!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>111. look for &nbsp;&nbsp;(looked for, looked for)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100112">111. look for &nbsp;&nbsp;(looked for, looked for)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>chercher</li>
 </ul></p>
@@ -5833,7 +5950,7 @@
 		<li>do not/don't let me/her/him/it/us/them look for!</li>
 		<li>let me/her/him/it/us/them not look for!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>112. lose &nbsp;&nbsp;(lost, lost)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100059">112. lose &nbsp;&nbsp;(lost, lost)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>perdre</li>
 </ul></p>
@@ -5884,7 +6001,7 @@
 		<li>do not/don't let me/her/him/it/us/them lose!</li>
 		<li>let me/her/him/it/us/them not lose!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>113. love &nbsp;&nbsp;(loved, loved)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100132">113. love &nbsp;&nbsp;(loved, loved)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>aimer</li>
 </ul></p>
@@ -5935,7 +6052,7 @@
 		<li>do not/don't let me/her/him/it/us/them love!</li>
 		<li>let me/her/him/it/us/them not love!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>114. make &nbsp;&nbsp;(made, made)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="190084">114. make &nbsp;&nbsp;(made, made)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>faire (fabriquer)</li>
 </ul></p>
@@ -5986,7 +6103,7 @@
 		<li>do not/don't let me/her/him/it/us/them make!</li>
 		<li>let me/her/him/it/us/them not make!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>115. mean &nbsp;&nbsp;(meant, meant)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100194">115. mean &nbsp;&nbsp;(meant, meant)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>signifier</li>
 </ul></p>
@@ -6037,7 +6154,7 @@
 		<li>do not/don't let me/her/him/it/us/them mean!</li>
 		<li>let me/her/him/it/us/them not mean!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>116. meet &nbsp;&nbsp;(met, met)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100030">116. meet &nbsp;&nbsp;(met, met)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>rencontrer</li>
 </ul></p>
@@ -6088,7 +6205,7 @@
 		<li>do not/don't let me/her/him/it/us/them meet!</li>
 		<li>let me/her/him/it/us/them not meet!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>117. miss &nbsp;&nbsp;(missed, missed)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100070">117. miss &nbsp;&nbsp;(missed, missed)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>manquer</li>
 </ul></p>
@@ -6139,7 +6256,7 @@
 		<li>do not/don't let me/her/him/it/us/them miss!</li>
 		<li>let me/her/him/it/us/them not miss!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>118. moan &nbsp;&nbsp;(moaned, moaned)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100167">118. moan &nbsp;&nbsp;(moaned, moaned)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>gémir</li>
 </ul></p>
@@ -6190,7 +6307,7 @@
 		<li>do not/don't let me/her/him/it/us/them moan!</li>
 		<li>let me/her/him/it/us/them not moan!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>119. move &nbsp;&nbsp;(moved, moved)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100118">119. move &nbsp;&nbsp;(moved, moved)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>bouger</li>
 </ul></p>
@@ -6241,7 +6358,7 @@
 		<li>do not/don't let me/her/him/it/us/them move!</li>
 		<li>let me/her/him/it/us/them not move!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>120. must &nbsp;&nbsp;(-, -)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100096">120. must &nbsp;&nbsp;(-, -)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>devoir</li>
 </ul></p>
@@ -6292,7 +6409,7 @@
 		<li>do not/don't let me/her/him/it/us/them must!</li>
 		<li>let me/her/him/it/us/them not must!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>121. need &nbsp;&nbsp;(needed, needed)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100123">121. need &nbsp;&nbsp;(needed, needed)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>avoir besoin</li>
 </ul></p>
@@ -6343,7 +6460,7 @@
 		<li>do not/don't let me/her/him/it/us/them need!</li>
 		<li>let me/her/him/it/us/them not need!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>122. open &nbsp;&nbsp;(opened, opened)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100001">122. open &nbsp;&nbsp;(opened, opened)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>ouvrir quelque chose : to open something</li>
 </ul></p>
@@ -6394,7 +6511,7 @@
 		<li>do not/don't let me/her/him/it/us/them open!</li>
 		<li>let me/her/him/it/us/them not open!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>123. pass &nbsp;&nbsp;(passed, passed)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100056">123. pass &nbsp;&nbsp;(passed, passed)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>passer</li>
 </ul></p>
@@ -6445,7 +6562,7 @@
 		<li>do not/don't let me/her/him/it/us/them pass!</li>
 		<li>let me/her/him/it/us/them not pass!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>124. pay &nbsp;&nbsp;(paid, paid)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100057">124. pay &nbsp;&nbsp;(paid, paid)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>payer</li>
 </ul></p>
@@ -6496,7 +6613,7 @@
 		<li>do not/don't let me/her/him/it/us/them pay!</li>
 		<li>let me/her/him/it/us/them not pay!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>125. play &nbsp;&nbsp;(played, played)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100075">125. play &nbsp;&nbsp;(played, played)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>jouer</li>
 </ul></p>
@@ -6547,7 +6664,7 @@
 		<li>do not/don't let me/her/him/it/us/them play!</li>
 		<li>let me/her/him/it/us/them not play!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>126. please &nbsp;&nbsp;(pleased, pleased)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100061">126. please &nbsp;&nbsp;(pleased, pleased)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>plaire</li>
 </ul></p>
@@ -6598,7 +6715,7 @@
 		<li>do not/don't let me/her/him/it/us/them please!</li>
 		<li>let me/her/him/it/us/them not please!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>127. pledge &nbsp;&nbsp;(pledged, pledged)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100067">127. pledge &nbsp;&nbsp;(pledged, pledged)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>promettre</li>
 </ul></p>
@@ -6649,7 +6766,7 @@
 		<li>do not/don't let me/her/him/it/us/them pledge!</li>
 		<li>let me/her/him/it/us/them not pledge!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>128. produce &nbsp;&nbsp;(produced, produced)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100179">128. produce &nbsp;&nbsp;(produced, produced)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>produire</li>
 </ul></p>
@@ -6700,7 +6817,7 @@
 		<li>do not/don't let me/her/him/it/us/them produce!</li>
 		<li>let me/her/him/it/us/them not produce!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>129. pull &nbsp;&nbsp;(pulled, pulled)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100046">129. pull &nbsp;&nbsp;(pulled, pulled)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>tirer (amener vers soi un objet)</li>
 </ul></p>
@@ -6751,7 +6868,7 @@
 		<li>do not/don't let me/her/him/it/us/them pull!</li>
 		<li>let me/her/him/it/us/them not pull!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>130. push &nbsp;&nbsp;(pushed, pushed)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100177">130. push &nbsp;&nbsp;(pushed, pushed)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>pousser</li>
 </ul></p>
@@ -6802,7 +6919,7 @@
 		<li>do not/don't let me/her/him/it/us/them push!</li>
 		<li>let me/her/him/it/us/them not push!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>131. put &nbsp;&nbsp;(put, put)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100047">131. put &nbsp;&nbsp;(put, put)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>mettre</li>
 	<li>poser</li>
@@ -6854,7 +6971,7 @@
 		<li>do not/don't let me/her/him/it/us/them put!</li>
 		<li>let me/her/him/it/us/them not put!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>132. raise &nbsp;&nbsp;(raised, raised)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100170">132. raise &nbsp;&nbsp;(raised, raised)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>lever (lever)</li>
 </ul></p>
@@ -6905,7 +7022,7 @@
 		<li>do not/don't let me/her/him/it/us/them raise!</li>
 		<li>let me/her/him/it/us/them not raise!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>133. read &nbsp;&nbsp;(read, read)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100072">133. read &nbsp;&nbsp;(read, read)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>lire</li>
 </ul></p>
@@ -6956,7 +7073,7 @@
 		<li>do not/don't let me/her/him/it/us/them read!</li>
 		<li>let me/her/him/it/us/them not read!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>134. receive &nbsp;&nbsp;(received, received)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100027">134. receive &nbsp;&nbsp;(received, received)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>recevoir</li>
 </ul></p>
@@ -7007,7 +7124,7 @@
 		<li>do not/don't let me/her/him/it/us/them receive!</li>
 		<li>let me/her/him/it/us/them not receive!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>135. reduce &nbsp;&nbsp;(reduced, reduced)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100145">135. reduce &nbsp;&nbsp;(reduced, reduced)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>réduire</li>
 </ul></p>
@@ -7058,7 +7175,7 @@
 		<li>do not/don't let me/her/him/it/us/them reduce!</li>
 		<li>let me/her/him/it/us/them not reduce!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>136. remember &nbsp;&nbsp;(remembered, remembered)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100040">136. remember &nbsp;&nbsp;(remembered, remembered)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>souvenir (se)</li>
 </ul></p>
@@ -7109,7 +7226,7 @@
 		<li>do not/don't let me/her/him/it/us/them remember!</li>
 		<li>let me/her/him/it/us/them not remember!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>137. remove &nbsp;&nbsp;(removed, removed)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100151">137. remove &nbsp;&nbsp;(removed, removed)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>enlever</li>
 </ul></p>
@@ -7160,7 +7277,7 @@
 		<li>do not/don't let me/her/him/it/us/them remove!</li>
 		<li>let me/her/him/it/us/them not remove!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>138. rent &nbsp;&nbsp;(rented, rented)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100171">138. rent &nbsp;&nbsp;(rented, rented)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>louer</li>
 </ul></p>
@@ -7211,7 +7328,7 @@
 		<li>do not/don't let me/her/him/it/us/them rent!</li>
 		<li>let me/her/him/it/us/them not rent!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>139. rest &nbsp;&nbsp;(rested, rested)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100039">139. rest &nbsp;&nbsp;(rested, rested)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>reposer (se)</li>
 </ul></p>
@@ -7262,7 +7379,7 @@
 		<li>do not/don't let me/her/him/it/us/them rest!</li>
 		<li>let me/her/him/it/us/them not rest!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>140. rise &nbsp;&nbsp;(rised, rised)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="190073">140. rise &nbsp;&nbsp;(rised, rised)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>lever (se) ((se dit également du soleil))</li>
 </ul></p>
@@ -7313,7 +7430,7 @@
 		<li>do not/don't let me/her/him/it/us/them rise!</li>
 		<li>let me/her/him/it/us/them not rise!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>141. run &nbsp;&nbsp;(ran, run)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100104">141. run &nbsp;&nbsp;(ran, run)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>courir</li>
 </ul></p>
@@ -7364,7 +7481,7 @@
 		<li>do not/don't let me/her/him/it/us/them run!</li>
 		<li>let me/her/him/it/us/them not run!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>142. say &nbsp;&nbsp;(said, said)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100095">142. say &nbsp;&nbsp;(said, said)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>dire</li>
 </ul></p>
@@ -7415,7 +7532,7 @@
 		<li>do not/don't let me/her/him/it/us/them say!</li>
 		<li>let me/her/him/it/us/them not say!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>143. see &nbsp;&nbsp;(saw, seen)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100006">143. see &nbsp;&nbsp;(saw, seen)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>to see something</li>
 </ul></p>
@@ -7466,7 +7583,7 @@
 		<li>do not/don't let me/her/him/it/us/them see!</li>
 		<li>let me/her/him/it/us/them not see!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>144. sell &nbsp;&nbsp;(sold, sold)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100010">144. sell &nbsp;&nbsp;(sold, sold)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>vendre</li>
 </ul></p>
@@ -7517,7 +7634,7 @@
 		<li>do not/don't let me/her/him/it/us/them sell!</li>
 		<li>let me/her/him/it/us/them not sell!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>145. send &nbsp;&nbsp;(sent, sent)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100089">145. send &nbsp;&nbsp;(sent, sent)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>envoyer</li>
 </ul></p>
@@ -7568,11 +7685,11 @@
 		<li>do not/don't let me/her/him/it/us/them send!</li>
 		<li>let me/her/him/it/us/them not send!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>146. set &nbsp;&nbsp;(set, set)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100200">146. set &nbsp;&nbsp;(set, set)</h2>
 <p><b>Sens et traduction</b> : <ul>
-	<li>créer</li>
 	<li>mettre</li>
 	<li>poser</li>
+	<li>créer</li>
 </ul></p>
 <p><b>Infinitif</b> : <b>to set</b></p>
 <p><b>Participe passé</b> : <b class="pp">set</b></p>
@@ -7621,7 +7738,7 @@
 		<li>do not/don't let me/her/him/it/us/them set!</li>
 		<li>let me/her/him/it/us/them not set!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>147. share &nbsp;&nbsp;(shared, shared)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100173">147. share &nbsp;&nbsp;(shared, shared)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>partager</li>
 </ul></p>
@@ -7672,7 +7789,7 @@
 		<li>do not/don't let me/her/him/it/us/them share!</li>
 		<li>let me/her/him/it/us/them not share!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>148. shine &nbsp;&nbsp;(shined, shined)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100155">148. shine &nbsp;&nbsp;(shined, shined)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>briller</li>
 </ul></p>
@@ -7723,7 +7840,7 @@
 		<li>do not/don't let me/her/him/it/us/them shine!</li>
 		<li>let me/her/him/it/us/them not shine!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>149. shoot &nbsp;&nbsp;(shot, shot)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="190046">149. shoot &nbsp;&nbsp;(shot, shot)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>tirer (lancer un projectile)</li>
 </ul></p>
@@ -7774,7 +7891,7 @@
 		<li>do not/don't let me/her/him/it/us/them shoot!</li>
 		<li>let me/her/him/it/us/them not shoot!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>150. shout &nbsp;&nbsp;(shouted, shouted)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100101">150. shout &nbsp;&nbsp;(shouted, shouted)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>crier</li>
 </ul></p>
@@ -7825,7 +7942,7 @@
 		<li>do not/don't let me/her/him/it/us/them shout!</li>
 		<li>let me/her/him/it/us/them not shout!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>151. show &nbsp;&nbsp;(showed, showed)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100048">151. show &nbsp;&nbsp;(showed, showed)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>montrer</li>
 </ul></p>
@@ -7876,7 +7993,7 @@
 		<li>do not/don't let me/her/him/it/us/them show!</li>
 		<li>let me/her/him/it/us/them not show!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>152. sing &nbsp;&nbsp;(sang, sung)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100113">152. sing &nbsp;&nbsp;(sang, sung)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>chanter</li>
 </ul></p>
@@ -7927,11 +8044,11 @@
 		<li>do not/don't let me/her/him/it/us/them sing!</li>
 		<li>let me/her/him/it/us/them not sing!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>153. sit &nbsp;&nbsp;(sat, sat)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100197">153. sit &nbsp;&nbsp;(sat, sat)</h2>
 <p><b>Sens et traduction</b> : <ul>
-	<li>être</li>
-	<li>être assis</li>
 	<li>asseoir (s)</li>
+	<li>être assis</li>
+	<li>être</li>
 </ul></p>
 <p><b>Infinitif</b> : <b>to sit</b></p>
 <p><b>Participe passé</b> : <b class="pp">sat</b></p>
@@ -7980,7 +8097,7 @@
 		<li>do not/don't let me/her/him/it/us/them sit!</li>
 		<li>let me/her/him/it/us/them not sit!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>154. sit down &nbsp;&nbsp;(sat down, sat down)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100150">154. sit down &nbsp;&nbsp;(sat down, sat down)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>asseoir (s)</li>
 </ul></p>
@@ -8031,7 +8148,7 @@
 		<li>do not/don't let me/her/him/it/us/them sit down!</li>
 		<li>let me/her/him/it/us/them not sit down!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>155. sleep &nbsp;&nbsp;(sleeped, sleeped)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100094">155. sleep &nbsp;&nbsp;(sleeped, sleeped)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>dormir</li>
 </ul></p>
@@ -8082,7 +8199,7 @@
 		<li>do not/don't let me/her/him/it/us/them sleep!</li>
 		<li>let me/her/him/it/us/them not sleep!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>156. slip &nbsp;&nbsp;(sliped, sliped)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100168">156. slip &nbsp;&nbsp;(sliped, sliped)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>glisser (déraper)</li>
 </ul></p>
@@ -8133,7 +8250,7 @@
 		<li>do not/don't let me/her/him/it/us/them slip!</li>
 		<li>let me/her/him/it/us/them not slip!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>157. smell &nbsp;&nbsp;(smelled, smelled)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100041">157. smell &nbsp;&nbsp;(smelled, smelled)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>sentir (une odeur)</li>
 </ul></p>
@@ -8184,7 +8301,7 @@
 		<li>do not/don't let me/her/him/it/us/them smell!</li>
 		<li>let me/her/him/it/us/them not smell!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>158. speak &nbsp;&nbsp;(spoke, spoken)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100054">158. speak &nbsp;&nbsp;(spoke, spoken)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>parler</li>
 </ul></p>
@@ -8235,7 +8352,7 @@
 		<li>do not/don't let me/her/him/it/us/them speak!</li>
 		<li>let me/her/him/it/us/them not speak!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>159. spend &nbsp;&nbsp;(spent, spent)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100195">159. spend &nbsp;&nbsp;(spent, spent)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>dépenser</li>
 </ul></p>
@@ -8286,7 +8403,7 @@
 		<li>do not/don't let me/her/him/it/us/them spend!</li>
 		<li>let me/her/him/it/us/them not spend!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>160. stand &nbsp;&nbsp;(stood, stood)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100196">160. stand &nbsp;&nbsp;(stood, stood)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>être debout</li>
 	<li>être</li>
@@ -8338,7 +8455,7 @@
 		<li>do not/don't let me/her/him/it/us/them stand!</li>
 		<li>let me/her/him/it/us/them not stand!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>161. stand up &nbsp;&nbsp;(stood up, stood up)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100073">161. stand up &nbsp;&nbsp;(stood up, stood up)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>lever (se)</li>
 </ul></p>
@@ -8389,7 +8506,7 @@
 		<li>do not/don't let me/her/him/it/us/them stand up!</li>
 		<li>let me/her/him/it/us/them not stand up!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>162. stay &nbsp;&nbsp;(stayed, stayed)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100032">162. stay &nbsp;&nbsp;(stayed, stayed)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>rester</li>
 </ul></p>
@@ -8440,7 +8557,7 @@
 		<li>do not/don't let me/her/him/it/us/them stay!</li>
 		<li>let me/her/him/it/us/them not stay!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>163. steal &nbsp;&nbsp;(stole, stolen)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="190005">163. steal &nbsp;&nbsp;(stole, stolen)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>voler (atteinte à la propriété d'autrui)</li>
 </ul></p>
@@ -8491,7 +8608,7 @@
 		<li>do not/don't let me/her/him/it/us/them steal!</li>
 		<li>let me/her/him/it/us/them not steal!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>164. stop &nbsp;&nbsp;(stoped, stoped)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100127">164. stop &nbsp;&nbsp;(stoped, stoped)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>arrêter</li>
 </ul></p>
@@ -8542,7 +8659,7 @@
 		<li>do not/don't let me/her/him/it/us/them stop!</li>
 		<li>let me/her/him/it/us/them not stop!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>165. study &nbsp;&nbsp;(studied, studied)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100085">165. study &nbsp;&nbsp;(studied, studied)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>étudier</li>
 </ul></p>
@@ -8593,7 +8710,7 @@
 		<li>do not/don't let me/her/him/it/us/them study!</li>
 		<li>let me/her/him/it/us/them not study!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>166. success &nbsp;&nbsp;(successed, successed)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100033">166. success &nbsp;&nbsp;(successed, successed)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>réussir</li>
 </ul></p>
@@ -8644,7 +8761,7 @@
 		<li>do not/don't let me/her/him/it/us/them success!</li>
 		<li>let me/her/him/it/us/them not success!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>167. suffer &nbsp;&nbsp;(suffered, suffered)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100042">167. suffer &nbsp;&nbsp;(suffered, suffered)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>souffrir</li>
 </ul></p>
@@ -8695,7 +8812,7 @@
 		<li>do not/don't let me/her/him/it/us/them suffer!</li>
 		<li>let me/her/him/it/us/them not suffer!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>168. suggest &nbsp;&nbsp;(suggested, suggested)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100142">168. suggest &nbsp;&nbsp;(suggested, suggested)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>proposer</li>
 </ul></p>
@@ -8746,7 +8863,7 @@
 		<li>do not/don't let me/her/him/it/us/them suggest!</li>
 		<li>let me/her/him/it/us/them not suggest!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>169. swim &nbsp;&nbsp;(swam, swum)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100050">169. swim &nbsp;&nbsp;(swam, swum)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>nager</li>
 </ul></p>
@@ -8797,7 +8914,7 @@
 		<li>do not/don't let me/her/him/it/us/them swim!</li>
 		<li>let me/her/him/it/us/them not swim!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>170. take &nbsp;&nbsp;(took, taken)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100065">170. take &nbsp;&nbsp;(took, taken)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>prendre</li>
 </ul></p>
@@ -8848,7 +8965,7 @@
 		<li>do not/don't let me/her/him/it/us/them take!</li>
 		<li>let me/her/him/it/us/them not take!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>171. take care &nbsp;&nbsp;(took care, taken care)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100036">171. take care &nbsp;&nbsp;(took care, taken care)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>occuper (s)</li>
 </ul></p>
@@ -8899,7 +9016,7 @@
 		<li>do not/don't let me/her/him/it/us/them take care!</li>
 		<li>let me/her/him/it/us/them not take care!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>172. take out &nbsp;&nbsp;(took out, taken out)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="180138">172. take out &nbsp;&nbsp;(took out, taken out)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>sortir (sortir quelque chose)</li>
 </ul></p>
@@ -8950,7 +9067,7 @@
 		<li>do not/don't let me/her/him/it/us/them take out!</li>
 		<li>let me/her/him/it/us/them not take out!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>173. taste &nbsp;&nbsp;(tasted, tasted)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100080">173. taste &nbsp;&nbsp;(tasted, tasted)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>goûter</li>
 </ul></p>
@@ -9001,7 +9118,7 @@
 		<li>do not/don't let me/her/him/it/us/them taste!</li>
 		<li>let me/her/him/it/us/them not taste!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>174. teach &nbsp;&nbsp;(taught, taught)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100091">174. teach &nbsp;&nbsp;(taught, taught)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>enseigner</li>
 </ul></p>
@@ -9052,7 +9169,7 @@
 		<li>do not/don't let me/her/him/it/us/them teach!</li>
 		<li>let me/her/him/it/us/them not teach!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>175. tell &nbsp;&nbsp;(told, told)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100026">175. tell &nbsp;&nbsp;(told, told)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>raconter</li>
 </ul></p>
@@ -9103,7 +9220,7 @@
 		<li>do not/don't let me/her/him/it/us/them tell!</li>
 		<li>let me/her/him/it/us/them not tell!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>176. thank &nbsp;&nbsp;(thanked, thanked)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100029">176. thank &nbsp;&nbsp;(thanked, thanked)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>remercier</li>
 </ul></p>
@@ -9154,10 +9271,10 @@
 		<li>do not/don't let me/her/him/it/us/them thank!</li>
 		<li>let me/her/him/it/us/them not thank!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>177. think &nbsp;&nbsp;(thought, thought)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100058">177. think &nbsp;&nbsp;(thought, thought)</h2>
 <p><b>Sens et traduction</b> : <ul>
-	<li>réfléchir</li>
 	<li>penser</li>
+	<li>réfléchir</li>
 </ul></p>
 <p><b>Infinitif</b> : <b>to think</b></p>
 <p><b>Participe passé</b> : <b class="pp">thought</b></p>
@@ -9206,7 +9323,7 @@
 		<li>do not/don't let me/her/him/it/us/them think!</li>
 		<li>let me/her/him/it/us/them not think!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>178. throw &nbsp;&nbsp;(threw, thrown)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100076">178. throw &nbsp;&nbsp;(threw, thrown)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>jeter</li>
 	<li>lancer</li>
@@ -9258,7 +9375,7 @@
 		<li>do not/don't let me/her/him/it/us/them throw!</li>
 		<li>let me/her/him/it/us/them not throw!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>179. touch &nbsp;&nbsp;(touched, touched)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100016">179. touch &nbsp;&nbsp;(touched, touched)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>toucher</li>
 </ul></p>
@@ -9309,7 +9426,7 @@
 		<li>do not/don't let me/her/him/it/us/them touch!</li>
 		<li>let me/her/him/it/us/them not touch!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>180. translate &nbsp;&nbsp;(translated, translated)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100014">180. translate &nbsp;&nbsp;(translated, translated)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>traduire</li>
 </ul></p>
@@ -9360,7 +9477,7 @@
 		<li>do not/don't let me/her/him/it/us/them translate!</li>
 		<li>let me/her/him/it/us/them not translate!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>181. travel &nbsp;&nbsp;(traveled, traveled)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100002">181. travel &nbsp;&nbsp;(traveled, traveled)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>voyager : to travel</li>
 </ul></p>
@@ -9411,7 +9528,7 @@
 		<li>do not/don't let me/her/him/it/us/them travel!</li>
 		<li>let me/her/him/it/us/them not travel!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>182. trust &nbsp;&nbsp;(trusted, trusted)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100122">182. trust &nbsp;&nbsp;(trusted, trusted)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>avoir confiance</li>
 </ul></p>
@@ -9462,7 +9579,7 @@
 		<li>do not/don't let me/her/him/it/us/them trust!</li>
 		<li>let me/her/him/it/us/them not trust!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>183. try &nbsp;&nbsp;(tried, tried)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100087">183. try &nbsp;&nbsp;(tried, tried)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>essayer</li>
 </ul></p>
@@ -9513,7 +9630,7 @@
 		<li>do not/don't let me/her/him/it/us/them try!</li>
 		<li>let me/her/him/it/us/them not try!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>184. turn &nbsp;&nbsp;(turned, turned)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100015">184. turn &nbsp;&nbsp;(turned, turned)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>tourner</li>
 </ul></p>
@@ -9564,7 +9681,7 @@
 		<li>do not/don't let me/her/him/it/us/them turn!</li>
 		<li>let me/her/him/it/us/them not turn!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>185. turn off &nbsp;&nbsp;(turned off, turned off)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100141">185. turn off &nbsp;&nbsp;(turned off, turned off)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>éteindre</li>
 </ul></p>
@@ -9615,7 +9732,7 @@
 		<li>do not/don't let me/her/him/it/us/them turn off!</li>
 		<li>let me/her/him/it/us/them not turn off!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>186. turn on &nbsp;&nbsp;(turned on, turned on)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100140">186. turn on &nbsp;&nbsp;(turned on, turned on)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>allumer</li>
 </ul></p>
@@ -9666,7 +9783,7 @@
 		<li>do not/don't let me/her/him/it/us/them turn on!</li>
 		<li>let me/her/him/it/us/them not turn on!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>187. understand &nbsp;&nbsp;(understood, understood)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100109">187. understand &nbsp;&nbsp;(understood, understood)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>comprendre</li>
 </ul></p>
@@ -9717,7 +9834,7 @@
 		<li>do not/don't let me/her/him/it/us/them understand!</li>
 		<li>let me/her/him/it/us/them not understand!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>188. use &nbsp;&nbsp;(used, used)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100011">188. use &nbsp;&nbsp;(used, used)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>utiliser</li>
 </ul></p>
@@ -9768,7 +9885,7 @@
 		<li>do not/don't let me/her/him/it/us/them use!</li>
 		<li>let me/her/him/it/us/them not use!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>189. visit &nbsp;&nbsp;(visited, visited)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100008">189. visit &nbsp;&nbsp;(visited, visited)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>visiter</li>
 </ul></p>
@@ -9819,7 +9936,7 @@
 		<li>do not/don't let me/her/him/it/us/them visit!</li>
 		<li>let me/her/him/it/us/them not visit!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>190. wait &nbsp;&nbsp;(waited, waited)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100125">190. wait &nbsp;&nbsp;(waited, waited)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>attendre</li>
 </ul></p>
@@ -9870,7 +9987,7 @@
 		<li>do not/don't let me/her/him/it/us/them wait!</li>
 		<li>let me/her/him/it/us/them not wait!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>191. wake up &nbsp;&nbsp;(woke up, woken up)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100034">191. wake up &nbsp;&nbsp;(woke up, woken up)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>réveiller (se)</li>
 </ul></p>
@@ -9921,7 +10038,7 @@
 		<li>do not/don't let me/her/him/it/us/them wake up!</li>
 		<li>let me/her/him/it/us/them not wake up!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>192. walk &nbsp;&nbsp;(walked, walked)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100069">192. walk &nbsp;&nbsp;(walked, walked)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>marcher</li>
 </ul></p>
@@ -9972,7 +10089,7 @@
 		<li>do not/don't let me/her/him/it/us/them walk!</li>
 		<li>let me/her/him/it/us/them not walk!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>193. want &nbsp;&nbsp;(wanted, wanted)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100003">193. want &nbsp;&nbsp;(wanted, wanted)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>vouloir quelque chose : want something</li>
 	<li> vouloir faire quelque chose : want to do something</li>
@@ -10025,7 +10142,7 @@
 		<li>do not/don't let me/her/him/it/us/them want!</li>
 		<li>let me/her/him/it/us/them not want!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>194. wash &nbsp;&nbsp;(washed, washed)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100074">194. wash &nbsp;&nbsp;(washed, washed)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>laver</li>
 </ul></p>
@@ -10076,10 +10193,10 @@
 		<li>do not/don't let me/her/him/it/us/them wash!</li>
 		<li>let me/her/him/it/us/them not wash!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>195. watch &nbsp;&nbsp;(watched, watched)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100028">195. watch &nbsp;&nbsp;(watched, watched)</h2>
 <p><b>Sens et traduction</b> : <ul>
-	<li>regarder (observer, surveiller, visionner (un film, une émission))</li>
 	<li>voir (visionner (un film, une émission))</li>
+	<li>regarder (observer, surveiller, visionner (un film, une émission))</li>
 </ul></p>
 <p><b>Infinitif</b> : <b>to watch</b></p>
 <p><b>Participe passé</b> : <b class="pp">watched</b></p>
@@ -10128,7 +10245,7 @@
 		<li>do not/don't let me/her/him/it/us/them watch!</li>
 		<li>let me/her/him/it/us/them not watch!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>196. wear &nbsp;&nbsp;(wore, worn)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="190063">196. wear &nbsp;&nbsp;(wore, worn)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>porter (porter un vêtement)</li>
 </ul></p>
@@ -10179,7 +10296,7 @@
 		<li>do not/don't let me/her/him/it/us/them wear!</li>
 		<li>let me/her/him/it/us/them not wear!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>197. win &nbsp;&nbsp;(won, won)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100081">197. win &nbsp;&nbsp;(won, won)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>gagner</li>
 </ul></p>
@@ -10230,10 +10347,14 @@
 		<li>do not/don't let me/her/him/it/us/them win!</li>
 		<li>let me/her/him/it/us/them not win!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>198. wish &nbsp;&nbsp;(wished, wished)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100043">198. wish &nbsp;&nbsp;(wished, wished)</h2>
 <p><b>Sens et traduction</b> : <ul>
-	<li>souhaiter</li>
-	<li>désirer (souhaiter)</li>
+	<li>souhaiter que quelqu'un fasse quelque chose : to wish someone to do something</li>
+	<li> souhaiter faire quelque chose : to wish to do something</li>
+	<li> souhaiter quelque chose : to wish for something</li>
+	<li> souhaiter quelque chose à quelqu'un : to wish someone something</li>
+	<li> souhaiter quelque chose : to wish (that) proposition</li>
+	<li>désirer (dans le sens de souhaiter)</li>
 </ul></p>
 <p><b>Infinitif</b> : <b>to wish</b></p>
 <p><b>Participe passé</b> : <b class="pp">wished</b></p>
@@ -10282,7 +10403,7 @@
 		<li>do not/don't let me/her/him/it/us/them wish!</li>
 		<li>let me/her/him/it/us/them not wish!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>199. work &nbsp;&nbsp;(worked, worked)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100013">199. work &nbsp;&nbsp;(worked, worked)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>travailler</li>
 </ul></p>
@@ -10333,7 +10454,7 @@
 		<li>do not/don't let me/her/him/it/us/them work!</li>
 		<li>let me/her/him/it/us/them not work!</li>
 </ul></li></ul></p>
-<mbp:pagebreak /><h2>200. write &nbsp;&nbsp;(wrote, written)</h2>
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak /><h2 id="100092">200. write &nbsp;&nbsp;(wrote, written)</h2>
 <p><b>Sens et traduction</b> : <ul>
 	<li>écrire</li>
 </ul></p>
@@ -10384,4 +10505,4 @@
 		<li>do not/don't let me/her/him/it/us/them write!</li>
 		<li>let me/her/him/it/us/them not write!</li>
 </ul></li></ul></p>
-<mbp:pagebreak />
+<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div><mbp:pagebreak />
