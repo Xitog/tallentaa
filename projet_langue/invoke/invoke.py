@@ -2512,20 +2512,23 @@ def rappel_en():
         <p>
             La <b>phrase affirmative</b> anglaise se construit généralement ainsi (par « sujet » et « verbe », nous entendons un mot ou un groupe de mots remplissant respectivement les fonctions de sujet et de base verbale) : 
             <ul>
-                <li>Pour un verbe intransitif (sans complément) : <b>sujet + verbe</b> <i>(She is swimming)</i></li>
+                <li>Pour un verbe intransitif (sans complément) : <b>Sujet + GV</b> <i>(She is swimming.)</i></li>
                 <li>Pour un verbe transitif (avec complément) : 
                     <ul>
-                        <li><b>sujet + verbe + complément d'objet</b> <i>(We have a bag, I'm looking for a bag)</i></li>
-                        <li><b>sujet + verbe + complément d'objet premier + complément d'objet second</b> <i>(I give her a book, I give a book to her)</i></li>
+                        <li><b>Sujet + GV + Complément d'objet</b> <i>(We have a bag. I'm looking for a bag.)</i></li>
+                        <li><b>sujet + GV + Complément d'objet premier + Complément d'objet second</b> <i>(I give her a book. I give a book to her.)</i></li>
                     </ul>
                 </li>
-                <li>Pour un verbe copule (qui introduit un attribut) : <b>sujet + verbe + attribut du sujet</b> <i>(He is young)</i></li>
+                <li>Pour un verbe copule (qui introduit un attribut du sujet) : <b>Sujet + GV + Attribut du sujet</b> <i>(He is young.)</i></li>
+                <li>Pour un verbe introduisant un attribut du complément : <b>Sujet + GV + Complément d'objet + Attribut du complément</b> <i>(I find him young.)</i></li>
             </ul>
-            Chacune de ses constructions peuvent se compléter de compléments circonstanciels.<br>
-            Le groupe remplissant la fonction de base verbale, verbe, se décompose ainsi : <b>auxiliaire + verbe proprement dit</b> <i>(She did answer)</i>
+            Chacune de ses constructions peuvent se compléter de compléments circonstanciels et de propositions.<br>
+            Le groupe remplissant la fonction de base verbale, verbe, se décompose ainsi : <b>auxiliaire + verbe proprement dit</b> <i>(She did answer.)</i><br>
+            Les phrases affirmatives se terminent par un point <i>(a period or a fullstop)</i>.
         </p>
         <p>
-            Pour la <b>phrase négative</b>, il suffit d'ajout dans le groupe remplissant la fonction de base verbale l'adverbe <b>not</b> : <b>auxiliaire + not + verbe proprement dit</b> <i>(She did not answer ou She didn't answer)</i>
+            Pour la <b>phrase négative</b>, il suffit d'ajout dans le groupe remplissant la fonction de base verbale l'adverbe <b>not</b> : <b>auxiliaire + not + verbe proprement dit</b> <i>(She did not answer ou She didn't answer)</i><br>
+            Comme les phrases affirmatives, les phrases négatives se terminent par un point <i>(a period or a fullstop)</i> : <b>.</b> .
         </p>
         <p>
             La <b>phrase interrogative</b> se construit :
@@ -2538,10 +2541,35 @@ def rappel_en():
                     <li>lorsqu'il n'est pas utilisé comme auxiliaire, il prend la place de l'auxiliaire et il n'y a pas d'autre verbe <i>(Who are you? Are you insane?)</i>.</li>
                 </ul>
             </ul>
+            Les phrases interrogatives se terminent par un point d'interrogation <i>(a question mark)</i> : <b>?</b> .
         </p>
         <p>
-            La <b>phrase interro-négative</b> se contruit à partir de la phrase négative contractée. On inverse simplement auxilaire et sujet : You didn't sing &rarr; Didn't you sing? N'as tu pas chanté ?
+            La <b>phrase interro-négative</b> se construit à partir de la phrase négative contractée. On inverse simplement auxilaire et sujet : You didn't sing &rarr; Didn't you sing? N'as tu pas chanté ?<br>
+            Elles se terminent également par un point d'interrogation <i>(a question mark)</i> : <b>?</b> .
         </p>
+        <p>
+            La <b>phrase exclamative</b> se construit selon que l'élément sur lequel porte exclamation :
+            <ul>
+                <li>Sur un nom :
+                    <ul>
+                        <li><b>What + GN + Sujet + GV</b> (<i>What a nice friend you have! What losers they are!</i>),</li>
+                        <li><b>What + GN</b> (<i>What a nice friend! What losers!</i>),</li>
+                        <li><b>Sujet + GV + such + GN</b> <i>He is such a nice friend!</i>),</li>
+                    </ul>
+                    Si le GN a pour un noyau un nom singulier et dénombrable il devra commencer par <b>a</b> ou <b>an</b>.
+                </li>    
+                <li>Sur un adverbe ou un adjectif :
+                    <ul>
+                        <li><b>How + Adjectif/Adverbe + Sujet + GV</b> (<i>How nice he is!</i>),</li>
+                        <li><b>How + Adjectif/Adverbe</b> (<i>How nice!</i>),</li>
+                        <li><b>Sujet + Verbe copule + so + Attribut du sujet</b> (<i>He is so nice!</i>),</li>
+                    </ul>
+                </li>
+            </ul>
+            Les phrases exclamatives se terminent par un point d'exclamation <i>(an exclamation mark)</i> : <b>!</b> .<br>
+            Ne pas confondre <i>How nice he is!</i> qui est une phrase exclamative et <i>How nice is he?</i> qui est une phrase interrogative. Dans la première, il n'y pas d'inversion sujet - verbe.
+        </p>
+        
         <div class="retour"><a href="#sommaire"><b>Retour au sommaire</b></a></div>
         
         <h2 id="negations">4. Les formes contractées de la négation</h2>
