@@ -2028,7 +2028,7 @@ def create():
 
     #c.execute("SELECT * FROM voc_verbs")
     #r = c.fetchone()
-    f = open('results.txt', 'w', encoding='utf-8')
+    f = open('results.txt', mode='w', encoding='utf-8')
 
     f.write("------------------------------------------------------------------------\n")
     f.write("Toutes les traductions\n")
@@ -2165,11 +2165,10 @@ def get_all_verbs_full(): # all verbs, with translations and irregular forms
             actual['surtype'] = p_row[2]
             actual['lvl'] = p_row[3]
             actual['trans'] = {}
+            # attention parfois p_row 6 ou 8 peuvent-être None
             actual['trans'][p_row[4]] = (p_row[6], p_row[8])
-            #print('\ttranslated to : ' + p_row[4])
         elif actual is not None:
             actual['trans'][p_row[4]] = (p_row[6], p_row[8])
-            #print('\ttranslated to : ' + p_row[4])
     if actual is not None:
         if len(actual['base'].split(' ')) > 1:
             actual['root_base'] = actual['base'].split(' ')[0]
@@ -2307,155 +2306,14 @@ def conjugate(verb, lang, onfile=False, html=False):
             conjugate_en(verb, onfile, html)
 
 def rappel_en():
-    f = open('output.html', 'w')
-    f.write("""
-<html>
-    <head>
-        <style type="text/css">
-            body : {
-                font-family: verdana;
-            }
-            h1 {
-                color: #cc1479; /*#CC6714;*/
-                width: 100%;
-                text-align:center;
-            }
-            h2 {
-                color: #14cc67;
-                font-family: "Palatino Linotype";
-                font-size: 22px;
-                border-bottom: 1px solid #14cc67;
-            }
-            h3 {
-                color: #6714cc;
-                font-family: "Palatino Linotype";
-                font-size: 18px;
-            }
-            
-            tr:nth-child(odd) {
-                background: #DDDDDD;
-            }
-            
-            th {
-                background: #FFFFFF;
-                border-bottom: 1px black solid;
-            }
-            
-
-            b {
-                font-family: verdana;
-            }
-            
-            b.present {
-                color: white;
-                background: #4198e1;
-            }
-            
-            b.past {
-                color: white;
-                background: #e4575d;
-            }
-            
-            b.future {
-                color: white;
-                background: #419f3c;
-            }
-            
-            b.ing {
-                color: white;
-                background: #f4a014;
-            }
-            
-            b.s {
-                color: red;
-                background: #4198e1;
-            }
-            b.pp {
-                color: white;
-                background : #9a3c9f;
-            }
-            
-            div.simple {
-                border-left: 2px solid lightgrey;
-                padding-left: 5px;
-            }
-            
-            div.pp {
-                border-left: 2px solid #9a3c9f;
-                padding-left: 5px;
-            }
-            
-            div.ing {
-                border-left: 2px solid #f4a014;
-                padding-left: 5px;
-            }
-            
-            div.title_page {
-                width: 100%;
-                text-align:center;
-                border: 1px solid #cc1479;
-                padding: 10px;
-            }
-            
-            div.retour {
-                width: 100%;
-                text-align: center;
-            }
-            
-            a {
-                text-decoration: none;
-            }
-            
-        </style>
-    </head>
-    <body>
-        <!-- Title Page -->
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <div class="title_page">
-            <h1>200 verbes anglais fondamentaux</h1>
-            <h3>Damien Gouteux</h3>
-        </div>
-        <mbp:pagebreak />
-        
-        <!-- Copyright Page -->
-        <p>© Damien Gouteux 2015</p>
-        <p>Tous droits de traduction, de reproduction et d'adaptation, totales ou partielles, réservés pour tous pays.</p>
-        <mbp:pagebreak />
-
-        <!-- Dedication -->
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <p>Aux anglais et à leur langue.</p>
-        <mbp:pagebreak />
-        
-        <!-- Preface -->
-        <!-- Prologue -->
-        
-        <h1 id="sommaire">Sommaire</h1>
-        <h2>Considérations sur les verbes anglais</h2>
-            <h3><a href="#intro">1. De la modeste portée de cet ouvrage</a></h3>
-            <h3><a href="#legends">2. Codes et abréviations employés dans l'ouvrage</a></h3>
-            <h3><a href="#sentences">3. Construction de la phrase en anglais</h3>
-            <h3><a href="#negations">4. Les formes contractées de la négation</a></h3>
-            <h3><a href="#formes">5. Les formes du verbe anglais</a></h2>
-            
-            <h3>6. Les valeurs des modes et des temps</h3>
-
-        <h2 id="tous_les_verbes">Liste des 200 verbes</h2>
-    """)
-    #    <table><thead><tr><th>N°</th><th>Verbe</th><th>Page</th></thead><tbody>
-    #""")
+    f = open('output.html', mode='w', encoding='utf-8')
+    
+    html = open('invoke_chapters.html', mode='r', encoding='utf-8')
+    html_content = html.read()
+    html_parts = html_content.split('<!-- SPLIT HERE -->')
+    
+    f.write(html_parts[0])
+    
     verbs = get_all_verbs_full()
     nb = 0
     for v in verbs:
@@ -2467,173 +2325,11 @@ def rappel_en():
             f.write(' *')
         f.write('</h3>')
     f.write('\n\n')
-    f.write('<p>Les verbes avec une astérisque <b>*</b> sont irréguliers.</p>')
+    f.write('<p>Les verbes avec une ast&eacute;risque <b>*</b> sont irr&eacute;guliers.</p>')
     f.write('<mbp:pagebreak />')
     
-    f.write("""
-        <h2 id="intro">1. De la modeste portée de cet ouvrage</h2>
-        <p>Cette ouvrage entend proposer 200 verbes fondamentaux à la pratique de la langue anglaise. On y retrouvera pour chacun ses différentes traductions et formes dans un format concis et clair.</p>
-        
-        <p>La langue anglaise est <i>de facto</i> la langue auxiliaire internationale actuelle. Dans les aéroports et de nombreux endroits, elle fait office de langue secondaire pour comprendre l'essentiel. De part la puissance des économies des pays anglophones, elle est aussi la langue <i>de base</i> dans de nombreux secteurs clés comme celui de la recherche scientifique et l'informatique. Pour toutes ces raisons, comprendre et savoir utiliser un minimum cette langue nous semble un élément essentiel du citoyen d'aujourd'hui. Cela ne doit pas se faire au détriment de sa (ses) langue(s) maternelle(s), mais en complément, comme le mot <i>auxiliaire</i> le laisse entendre.
-        
-        <p>Certains parlerons de « domination » et de la différence injuste entre les « chanceux » dont c'est la langue maternelle et qui ont ainsi accès à de nombreuses ressources sans efforts et les « pauvres » qui doivent l'apprendre aux prix de nombreuses heures et ne la parlerons peut-être jamais aussi bien, sans compter que cela introduit une différence sociale supplémentaire entre ceux parlant « la langue maîtresse » et les autres membres d'une même société. Ce livre ne se veut pas un programme politique. Si vous l'avez acheté, c'est que vous reconnaissez déjà l'importance de parler l'anglais et il essayera de vous aider le plus efficacement possible. Il est aussi beaucoup plus facile de parler anglais avec une personne dont ce n'est pas la langue maternelle, et nos plus belles conversations dans la langue de Shakespeare ont été avec des Turcs, des Tchèques, des Danois et des Allemands. Aurions-nous eu l'intelligence d'apprendre toutes ces langues ? Sûrement pas. Une langue auxiliaire internationale est donc sans prix pour la communication entre êtres humains, et notre parcours de vie nous fait dire que l'anglais, de nos jours, en fait office.</p>
-        
-        <p>Néanmoins nous tenons à attirer l'attention de nos lecteurs sur des tentatives effectuées par de nombreux individus de doter l'Humanité, ou une grande partie de celle-ci, d'une langue auxiliaire <i>construite</i> ou <i>artificielle</i> comme l'<i>Esperanto</i>, l'<i>Ido</i> ou l'<i>Interlingua</i>, et toutes les autres, souvent dotées d'une organisation pour promouvoir leur utilisation. Ces langues poursuivent le but d'être <i>simple</i>, mais elles se heurtent à de nombreux obstacles : la définition même de cette <i>simplicité</i> rêvée, ce qui est simple pour un Chinois ne l'étant pas forcément pour un Français, le désintérêt du plus grande nombre pour la question, les obstacles posés par certains pays, institutions et personnes, dont le gouvernement français et Staline, et la satisfaction générale pour la situation actuelle, ou du moins son acceptation fataliste. L'auteur ne peut que faire remarquer qu'avec un vocabulaire issu très fortement du français, peut-être moins dans le cas des verbes les plus utilisés, dont les origines sont plutôt germaniques, un Français peut fort aisément tirer partie de la domination de la langue anglaise, pour peu qu'il arrive à se faire à sa prononciation, toute en finesse.</p>
-        
-        <p>Comme il s'agit de la première édition, malgré nos soins aimants portés à ce livre, il est fort probable qu'il ne soit pas dénué de quelques erreurs fâcheuses. Nous demandons à nos aimables lecteurs de nous pardonner nos offenses à la langue et espérons qu'il y en aura le moins possible. Nous souhaitons avant tout que ce livre vous soit <i>utile</i>, que cela soit pour réviser ou apprendre à utiliser ces fameux verbes. Bon apprentissage !</p>
-        
-        <p>Damien Gouteux</p>
-        <div class="retour"><a href="#sommaire"><b>Retour au sommaire</b></a></div>
-        
-        <h2 id="legends">2. Codes et abréviations employés dans l'ouvrage</h2>
-        <p>
-            Cette ouvrage utilise un code couleur très simple :
-            <ul>
-                <li><b class="present">cette combinaison de couleurs</b> indique une forme verbale au présent : <b class="present">talk</b>,</li>
-                <li><b class="past">cette combinaison de couleurs</b> indique une forme verbale au prétérit : <b class="past">talked</b>,</li>
-                <li><b class="future">cette combinaison de couleurs</b> indique une forme verbale au futur : <b class="future">will talk</b>,</li>
-                <li><b class="ing">cette combinaison de couleurs</b> indique une forme verbale continue : <b class="ing">talking</b>,</li>
-                <li><b class="pp">cette combinaison de couleurs</b> indique une forme verbale au participe passé : <b class="pp">talked</b>.</li>
-            </ul>
-            Certains temps sont une combinaison d'un auxiliaire à un certain temps avec une forme verbale continue ou au participe passé.<br> Cette coloration permet de voir rapidement quels temps et formes sont utilisés.<br> Pour les verbes réguliers anglais, le prétérit et le participe passé s'écrivent pareil. Le code couleur permet aussi de les distinguer.<br>
-            La 3e personne du présent de l'indicatif rajoute un <b>s</b> à la forme verbale de base du présent. Il est indiqué ainsi : <b>she</b> <b class="present">talk</b><b class="s">s</b><br>
-        </p>
-        <p>
-            La négation est obtenu par l'ajout de not qui est mis entre parenthèses dans la phrase affirmative, sauf pour le présent et le prétérit où la phrase affirmative et la phrase négative sont clairement différenciées.
-        </p>
-        <p>
-            L'abréviation pers. signifie personne.<br>
-            L'abréviation sing. signifie singulier.<br>
-            Ainsi 1ère pers. sing. signifie : 1ère personne du singulier (je ou I).
-        </p>
-        <div class="retour"><a href="#sommaire"><b>Retour au sommaire</b></a></div>
-        
-        <h2 id="sentences">3. Construction de la phrase en anglais</h2>
-        <p>
-            La <b>phrase affirmative</b> anglaise se construit généralement ainsi (par « sujet » et « verbe », nous entendons un mot ou un groupe de mots remplissant respectivement les fonctions de sujet et de base verbale) : 
-            <ul>
-                <li>Pour un verbe intransitif (sans complément) : <b>Sujet + GV</b> <i>(She is swimming.)</i></li>
-                <li>Pour un verbe transitif (avec complément) : 
-                    <ul>
-                        <li><b>Sujet + GV + Complément d'objet</b> <i>(We have a bag. I'm looking for a bag.)</i></li>
-                        <li><b>sujet + GV + Complément d'objet premier + Complément d'objet second</b> <i>(I give her a book. I give a book to her.)</i></li>
-                    </ul>
-                </li>
-                <li>Pour un verbe copule (qui introduit un attribut du sujet) : <b>Sujet + GV + Attribut du sujet</b> <i>(He is young.)</i></li>
-                <li>Pour un verbe introduisant un attribut du complément : <b>Sujet + GV + Complément d'objet + Attribut du complément</b> <i>(I find him young.)</i></li>
-            </ul>
-            Chacune de ses constructions peuvent se compléter de compléments circonstanciels et de propositions.<br>
-            Le groupe remplissant la fonction de base verbale, verbe, se décompose ainsi : <b>auxiliaire + verbe proprement dit</b> <i>(She did answer.)</i><br>
-            Les phrases affirmatives se terminent par un point <i>(a period or a fullstop)</i>.
-        </p>
-        <p>
-            Pour la <b>phrase négative</b>, il suffit d'ajout dans le groupe remplissant la fonction de base verbale l'adverbe <b>not</b> : <b>auxiliaire + not + verbe proprement dit</b> <i>(She did not answer ou She didn't answer)</i><br>
-            Comme les phrases affirmatives, les phrases négatives se terminent par un point <i>(a period or a fullstop)</i> : <b>.</b> .
-        </p>
-        <p>
-            La <b>phrase interrogative</b> se construit :
-            <ul>
-                <li>Avec un mot interrogatif : <b>mot interrogatif + auxiliaire + sujet + verbe proprement dit + reste de la phrase</b> <i>(What do you think?)</i></li>
-                <li>Sans mot interrogatif : <b>auxiliaire + sujet + verbe proprement dit + reste de la phrase</b> <i>(Do you know him?)</i></li>
-                <li>Dans le cas du verbe <b>to be</b>, il a deux utilisations :
-                <ul>
-                    <li>lorsqu'il est utilisé comme auxiliaire (au présent continu) il suit les mêmes constructions <i>(What are you doing? Are you going tomorrow?)</i>.</li>
-                    <li>lorsqu'il n'est pas utilisé comme auxiliaire, il prend la place de l'auxiliaire et il n'y a pas d'autre verbe <i>(Who are you? Are you insane?)</i>.</li>
-                </ul>
-            </ul>
-            Les phrases interrogatives se terminent par un point d'interrogation <i>(a question mark)</i> : <b>?</b> .
-        </p>
-        <p>
-            La <b>phrase interro-négative</b> se construit à partir de la phrase négative contractée. On inverse simplement auxilaire et sujet : You didn't sing &rarr; Didn't you sing? N'as tu pas chanté ?<br>
-            Elles se terminent également par un point d'interrogation <i>(a question mark)</i> : <b>?</b> .
-        </p>
-        <p>
-            La <b>phrase exclamative</b> se construit selon que l'élément sur lequel porte exclamation :
-            <ul>
-                <li>Sur un nom :
-                    <ul>
-                        <li><b>What + GN + Sujet + GV</b> (<i>What a nice friend you have! What losers they are!</i>),</li>
-                        <li><b>What + GN</b> (<i>What a nice friend! What losers!</i>),</li>
-                        <li><b>Sujet + GV + such + GN</b> <i>He is such a nice friend!</i>),</li>
-                    </ul>
-                    Si le GN a pour un noyau un nom singulier et dénombrable il devra commencer par <b>a</b> ou <b>an</b>.
-                </li>    
-                <li>Sur un adverbe ou un adjectif :
-                    <ul>
-                        <li><b>How + Adjectif/Adverbe + Sujet + GV</b> (<i>How nice he is!</i>),</li>
-                        <li><b>How + Adjectif/Adverbe</b> (<i>How nice!</i>),</li>
-                        <li><b>Sujet + Verbe copule + so + Attribut du sujet</b> (<i>He is so nice!</i>),</li>
-                    </ul>
-                </li>
-            </ul>
-            Les phrases exclamatives se terminent par un point d'exclamation <i>(an exclamation mark)</i> : <b>!</b> .<br>
-            Ne pas confondre <i>How nice he is!</i> qui est une phrase exclamative et <i>How nice is he?</i> qui est une phrase interrogative. Dans la première, il n'y pas d'inversion sujet - verbe.
-        </p>
-        
-        <div class="retour"><a href="#sommaire"><b>Retour au sommaire</b></a></div>
-        
-        <h2 id="negations">4. Les formes contractées de la négation</h2>
-        <p>
-            Pour garder les descriptions des verbes les plus simples possibles, nous n'avons pas mis les formes contractées de la négation à chaque fois.<br>
-            La règle synthétique est de coller le verbe à not et de remplacer le o par l'apostrophe <b>'</b> mais il y a des exceptions (en gras).<br>
-            Nous résumons les formes contractées dans ce tableau :
-            <table>
-            <thead>
-                <tr><th>Forme simple</th><th>Forme contractée</th></tr>
-            </thead>
-            <tbody>
-                <tr><td>do not</td><td>don't</td></tr>
-                <tr><td>does not</td><td>doesn't</td></tr>
-                <tr><td>did not</td><td>didn't</td></tr>
-                <tr><td>has not</td><td>hasn't</td></tr>
-                <tr><td>have not</td><td>haven't</td></tr>
-                <tr><td>will not</td><td><b>won't</b></td></tr>
-                <tr><td>shall not</td><td><b>shan't</b></td></tr>
-                <tr><td>are not</td><td>aren't</td></tr>
-                <tr><td>was not</td><td>wasn't</td></tr>
-                <tr><td>were not</td><td>weren't</td></tr>
-                <tr><td><b>cannot</b></td><td><b>can't</b></td></tr>
-            </tbody>
-            </table>
-            <i>am not</i> ne se contracte pas, sauf dans un anglais oral, <i>ain't</i>, qui utilise même parfois <i>aren't</i>.
-        </p>
-        <div class="retour"><a href="#sommaire"><b>Retour au sommaire</b></a></div>
-        
-        <h2 id="formes">5. Les formes du verbe anglais</h2>
-        <p>
-            En anglais, il y a seulement 6 formes différentes pour un verbe donné, sauf pour le verbe <b>to be</b> qui en a 8. Les temps se construisent en les combinant. Les voici pour le verbe <b>to talk</b> :
-            <ol>
-                <li>la base verbale, ou verbe nu, qui est aussi la forme principal du présent de l'indicatif : <b class="present">talk</b>,</li>
-                <li>la 3e personne du singulier du présent de l'indicatif prend néanmoins un s : <b class="present">talk</b><b class="s">s</b>,</li>
-                <li>le prétérit se fait le plus souvent en ajoutant -(e)d à la fin de la base verbale : <b class="past">talked</b>,</li>
-                <li>le participe passé se fait de la même manière pour les verbes réguliers : <b class="pp">talk</b>,</li>
-                <li>le futur utilise l'auxiliaire <b>will</b> ou <b>shall</b> suivi de la base verbale : <b class="future">will talk</b>,</li>
-                <li>l'aspect continu rajoute -ing à la fin de la base verbale : <b class="ing">talking</b>,</li>
-                <li>enfin le verbe <b>to be</b> a une forme particulière à la 1ère personne du présent de l'indicatif : <b class="present">am</b>,</li>
-                <li>et à la 1ère et 3e personnes du singulier du prétérit : <b class="past">was</b>.</li>
-            </ol>
-            L'aspect continu est un point de vue qui insiste sur l'action en train d'être faite/de se faire/de se dérouler. En français, on le traduit généralement par « en train de » :
-            <ul>
-                <li>He talks : il parle</li>
-                <li>He is talking : il est en train de parler (quand soudain... : on peut introduire quelque chose pendant que l'action se déroule comme une « toile de fond »)</li>
-            </ul>
-            L'aspect non continu considère l'action comme un « tout global ».<br>
-            Une autre façon de se le représenter et d'imaginer une frise chronologique sur laquelle se déroule vos actions : l'aspect continu indiquera une période, un segment sur la frise chronologique, alors que l'aspect non continu indiquera un simple point.<br>
-        </p>
-        <div class="retour"><a href="#sommaire"><b>Retour au sommaire</b></a></div>
-        
-        <h2>6. Les valeurs des modes et des temps</h2>
-        <div class="retour"><a href="#sommaire"><b>Retour au sommaire</b></a></div>
-        
-        <p>Les valeurs des modes et des temps
-            <ul>
-                <li><i>(L'iréel, la généralité)</i></li>
-                <li><i>(Le réel sous conditions)</i></li>
-                <li><i>(L\'irréel)</i></li>
-                <li><i>(L\'ordre)</i></li>
-            </ul>
-        </p>
-    """)
+    f.write(html_parts[1])
+    
     f.close()
 
 
@@ -2642,7 +2338,7 @@ def conjugate_en(verb, onfile=False, html=False, info=None, nb=None):
         print("i This function works only with onfile and html set at true")
         return
 
-    f = open('output.html', 'a')
+    f = open('output.html', mode='a', encoding='utf-8')
     pronoms = ['I', 'you', 'she, he, it', 'we', 'you', 'they']
     root = info['root_base']
     particle = info['particle']
@@ -2860,7 +2556,7 @@ def conjugate_en2(verb, onfile=False, html=False):
     
 def conjugate_fr(verb, onfile=False, html=False):
     if onfile:
-        f = open('output.html', 'a')
+        f = open('output.html', mode='a', encoding='utf-8')
         if not html:
             f.write('\n###################################################\n\n')
             f.write('1. Indicatif présent\n')
