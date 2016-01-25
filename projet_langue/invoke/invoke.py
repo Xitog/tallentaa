@@ -2101,27 +2101,26 @@ def get_all_verbs_en(): # fetch irregular
     return results
 
 
-def get_all_verbs_full(): # all verbs, with translations and irregular forms
+def get_all_verbs_full(p_lang = 'en', p_to = 'fr'): # all verbs, with translations and irregular forms
     p_conn = sqlite3.connect('example.db')
     p_cursor = p_conn.cursor()
-    p_lang = 'en'
-    p_to = 'fr'
     p_order = p_lang + '.base'
-    nb = 0
+    nb = 0                           # 0                    1                    2                      3                 4                  5     6       7     8
     p_string = ("SELECT " + p_lang + ".id, " + p_lang + ".base, " + p_lang + ".surtype, " + p_lang + ".lvl, " + p_to + ".base, " + p_to + ".id, t.sens, t.id, t.usage " +
                 "FROM voc_verbs as " +
                 p_lang + ", voc_verbs as " + p_to + ", voc_translate as t WHERE " + p_lang + ".id = t.de AND " +
                 p_to + ".id = t.vers AND " + p_lang + ".lang = '" + p_lang + "' AND " + p_to + ".lang = '" + p_to + "' AND " + p_lang + ".surtype = 'verb'" +
                 " ORDER BY " + p_order)
+    nb = 0
     verbs = []
     actual = None
     irregulars = get_all_verbs_en()
     #print(p_string)
     for p_row in p_cursor.execute(p_string):
         if actual is None or actual['id'] != p_row[0]:
+            nb += 1
             if actual is None:
-                #print('debut')
-                actual = {}
+                actual = { 'nb' : nb }
             else:
                 # gestion à particules
                 if len(actual['base'].split(' ')) > 1:
@@ -2146,7 +2145,7 @@ def get_all_verbs_full(): # all verbs, with translations and irregular forms
                         else:
                             actual['part'] = actual['root_base'][0:-1] + "ied"      # carry => carried
                     elif actual['root_base'][-1] not in ['a', 'i', 'o', 'u']:
-                        if actual['root_base'][-2] in ['a', 'u']:
+                        if actual['root_base'][-2] in ['a', 'u', 'i']:
                             if actual['root_base'][-3] in ['a', 'e', 'o', 'u']:     # base (cook => cooked)
                                 actual['part'] = actual['root_base'] + 'ed'
                             else:                                                   # chat => chatted
@@ -2158,7 +2157,7 @@ def get_all_verbs_full(): # all verbs, with translations and irregular forms
                     
                     actual['pret'] = actual['part']
                 verbs.append(actual)
-                actual = {}
+                actual = { 'nb' : nb }
             #print('verbe : ' + p_row[1])
             actual['id'] = p_row[0]
             actual['base'] = p_row[1]
@@ -2166,9 +2165,9 @@ def get_all_verbs_full(): # all verbs, with translations and irregular forms
             actual['lvl'] = p_row[3]
             actual['trans'] = {}
             # attention parfois p_row 6 ou 8 peuvent-être None
-            actual['trans'][p_row[4]] = (p_row[6], p_row[8])
+            actual['trans'][p_row[5]] = { 'base' : p_row[4], 'sens' : p_row[6], 'usage' : p_row[8] }
         elif actual is not None:
-            actual['trans'][p_row[4]] = (p_row[6], p_row[8])
+            actual['trans'][p_row[5]] = { 'base' : p_row[4], 'sens' : p_row[6], 'usage' : p_row[8] }
     if actual is not None:
         if len(actual['base'].split(' ')) > 1:
             actual['root_base'] = actual['base'].split(' ')[0]
@@ -2190,6 +2189,7 @@ def get_all_verbs_full(): # all verbs, with translations and irregular forms
             elif actual['root_base'][-1] == 'y':
                 actual['part'] = actual['root_base'][0:-1] + "ied"
             actual['pret'] = actual['part']
+        
         verbs.append(actual)
     return verbs
 
@@ -2305,7 +2305,7 @@ def conjugate(verb, lang, onfile=False, html=False):
         elif lang == 'en':
             conjugate_en(verb, onfile, html)
 
-def rappel_en():
+def header_en():
     f = open('output.html', mode='w', encoding='utf-8')
     
     html = open('invoke_chapters.html', mode='r', encoding='utf-8')
@@ -2314,17 +2314,34 @@ def rappel_en():
     
     f.write(html_parts[0])
     
-    verbs = get_all_verbs_full()
-    nb = 0
-    for v in verbs:
-        nb += 1
-        pages = 0 + nb
-        #f.write('\t<tr><td>' + str(nb) + '</td><td>' + v['base'] + '</td><td>' + str(pages) + '</td></tr>')
-        f.write('<h3><a href="#' + str(v['id']) + '">' + str(pages) + '. ' + v['root_base'] + v['particle'] + ' &nbsp;(' + v['pret'] + v['particle'] + ', ' + v['part'] + v['particle'] + ')</a>')
+    verbs_en = get_all_verbs_full('en', 'fr')
+    for v in verbs_en:
+        f.write('<h3><a href="#' + str(v['id']) + '">' + str(v['nb']) + '. ' + v['root_base'] + v['particle'] + ' &nbsp;(' + v['pret'] + v['particle'] + ', ' + v['part'] + v['particle'] + ')</a>')
         if v['irregular']:
-            f.write(' *')
-        f.write('</h3>')
+            f.write(' <b>*</b>')
+        f.write('</h3>\n')
     f.write('\n\n')
+    f.write('<p>Les verbes avec une ast&eacute;risque <b>*</b> sont irr&eacute;guliers.</p>')
+    f.write('<mbp:pagebreak />')
+    
+    f.write('<h2 id="liste_fr_en">Les 200 verbes fondamentaux anglais à partir de leurs traductions en français</h2>')
+    verbs_fr = get_all_verbs_full('fr', 'en')
+    for v in verbs_fr:
+        f.write('<h3>' + str(v['nb']) + '. ' + v['root_base'] + v['particle'] + ' : ')
+        trans = ''
+        nbt = 0
+        for t in v['trans']:
+            if nbt == 0:
+                trans = '<a href="#' + str(t) + '">' + v['trans'][t]['base'] + '</a>'
+                nbt += 1
+            else:
+                trans = trans + ', ' + '<a href="#' + str(t) + '">' + v['trans'][t]['base'] + '</a>'
+            for vv in verbs_en:
+                if vv['id'] == t:
+                    if vv['irregular']:
+                        trans = trans + ' <b>*</b>'
+                    break
+        f.write(trans + '</h3>\n')
     f.write('<p>Les verbes avec une ast&eacute;risque <b>*</b> sont irr&eacute;guliers.</p>')
     f.write('<mbp:pagebreak />')
     
@@ -2369,14 +2386,14 @@ def conjugate_en(verb, onfile=False, html=False, info=None, nb=None):
     f.write('<h2 id="' + str(info['id']) + '">' + str(nb) + '. ' + root + particle + ' &nbsp;&nbsp;(' + pret + particle + ', ' + part + particle + ')</h2>\n')
     f.write('<p><b>Sens et traduction</b> : <ul>\n')
     for t in info['trans']:
-        if info['trans'][t][1] is not None:
-            xs = info['trans'][t][1].split(',')
+        if info['trans'][t]['usage'] is not None:
+            xs = info['trans'][t]['usage'].split(',')
             for x in xs:
                 f.write('\t<li>' + x + '</li>\n')
-        elif info['trans'][t][0] is not None:
-            f.write('\t<li>' + t + ' (' + info['trans'][t][0] + ')</li>\n')
+        elif info['trans'][t]['sens'] is not None:
+            f.write('\t<li>' + info['trans'][t]['base'] + ' (' + info['trans'][t]['sens'] + ')</li>\n')
         else:
-            f.write('\t<li>' + t + '</li>\n')
+            f.write('\t<li>' + info['trans'][t]['base'] + '</li>\n')
     f.write('</ul></p>\n')
     
     #f.write('<p><b>Base verbale</b> : ' + root + '</p>\n')
@@ -2428,132 +2445,16 @@ def conjugate_en(verb, onfile=False, html=False, info=None, nb=None):
     f.write('<p>Expression d\'un <b>doute</b>, d\'une <b>supposition</b> ou <b>atténuation polie</b> : should (not) ' + root + particle + '</p>\n')
     
     f.write('<h3>Impératif</h3>\n')
-    f.write('<p><b>2e pers.</b> : (do not) ' + root + particle + '!</p>\n')
-    f.write('<p><b>Autres pers.</b> :<ul>\n')
-    f.write('\t<li><b>forme affirmative</b> : let me/her/him/it/us/them ' + root + particle + '!</li>\n')
-    f.write('\t<li><b>formes négatives</b> :<ul>\n')
-    f.write('\t\t<li>do not/don\'t let me/her/him/it/us/them ' + root + particle + '!</li>\n')
-    f.write('\t\t<li>let me/her/him/it/us/them not ' + root + particle + '!</li>\n')
-    f.write('</ul></li></ul></p>\n')
+    f.write('<p><b>2e pers.</b> : (do not) <b class="present">' + root + particle + '</b>!</p>\n')
+    f.write('<p><b>1e pers. du pluriel</b> (avec deux façons d\'exprimer la négation) : (do not) let\'s (not) <b class="present">' + root + particle + '</b>!</p>\n')
+    f.write('<p><b>3e pers.</b> (avec deux façons d\'exprimer la négation) : (do not) let her/him/them (not) <b class="present">' + root + particle + '</b>!</p>\n')
+    
     f.write('<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div>')
     f.write('<mbp:pagebreak />')
     
     f.close()
     
-def conjugate_en2(verb, onfile=False, html=False):
-    if not onfile or not html:
-        print("i This function works only with onfile and html set at true")
-        return
-    
-    f = open('output.html', 'a')
-    
-    pronoms = ['I', 'you', 'she, he, it', 'we', 'you', 'they']
-    root = verb
-    
-    f.write('<h3>Sens</h3>\n\n')
-    
-    f.write('<h3>Infinitif</h3>\n\n')
-    
-    f.write('<table>\n')
-    f.write('\t<thead>\n\t\t<tr><th>Infinitive</th></tr>\n\t</thead>\n\t<tbody>\n')
-    f.write('\t\t<tr><td>to ' + root + '</td></tr>\n')
-    f.write('\t</tbody>\n</table>\n\n')
-    
-    f.write('<h3>Formes simples de l\'indicatif</h3>\n\n<table>\n')
-    
-    # present
-    suffix = ['', '', 's', '', '', '']
-    f.write('\t<thead>\n\t\t<tr><th colspan="2">Present</th></tr>\n\t</thead>\n\t<tbody>\n')
-    for i, term in enumerate(suffix):
-        f.write('\t\t<tr><td>' + pronoms[i] + '</td><td>' + root + term + '</td></tr>\n')
-    f.write('\t</tbody>\n</table>\n\n<table>\n')
-    # preterit
-    suffix = ['ed', 'ed', 'ed', 'ed', 'ed', 'ed']
-    f.write('\t<thead>\n\t\t<tr><th colspan="2">Past</th></tr>\n\t</thead>\n\t<tbody>\n')
-    for i, term in enumerate(suffix):
-        f.write('\t\t<tr><td>' + pronoms[i] + '</td><td>' + root + term + '</td></tr>\n')
-    f.write('\t</tbody>\n</table>\n\n<table>\n')
-    # futur
-    prefix = ['will', 'will', 'will', 'will', 'will', 'will']
-    f.write('\t<thead>\n\t\t<tr><th colspan="2">Future</th></tr>\n\t</thead>\n\t<tbody>\n')
-    for i, pre in enumerate(prefix):
-        f.write('\t\t<tr><td>' + pronoms[i] + '</td><td>' + pre + ' ' + root + '</td></tr>\n')
-    f.write('\t</tbody>\n</table>\n\n<table>\n')
-    # present perfect
-    prefix = ['have', 'have', 'has', 'have', 'have', 'have']
-    suffix = 'ed'
-    f.write('\t<thead>\n\t\t<tr><th colspan="2">Present perfect</th></tr>\n\t</thead>\n\t<tbody>\n')
-    for i, pre in enumerate(prefix):
-        f.write('\t\t<tr><td>' + pronoms[i] + '</td><td>' + pre + ' ' + root + suffix + '</td></tr>\n')
-    f.write('\t</tbody>\n</table>\n\n<table>\n')
-    # Past perfect
-    prefix = ['had', 'had', 'had', 'had', 'had', 'had']
-    suffix = 'ed'
-    f.write('\t<thead>\n\t\t<tr><th colspan="2">Past perfect</th></tr>\n\t</thead>\n\t<tbody>\n')
-    for i, pre in enumerate(prefix):
-        f.write('\t\t<tr><td>' + pronoms[i] + '</td><td>' + pre + ' ' + root + suffix + '</td></tr>\n')
-    f.write('\t</tbody>\n</table>\n\n<table>\n')
-    # Future perfect
-    prefix = ['will have', 'will have', 'will have', 'will have', 'will have', 'will have']
-    suffix = 'ed'
-    f.write('\t<thead>\n\t\t<tr><th colspan="2">Future perfect</th></tr>\n\t</thead>\n\t<tbody>\n')
-    for i, pre in enumerate(prefix):
-        f.write('\t\t<tr><td>' + pronoms[i] + '</td><td>' + pre + ' ' + root + suffix + '</td></tr>\n')
-    f.write('\t</tbody>\n</table>\n\n')
-    
-    f.write('<h3>Aspect progressif de l\'indicatif</h3>\n\n<table>\n')
-    
-    # present +ing
-    prefix = ['am', 'are', 'is', 'are', 'are', 'are']
-    suffix = 'ing'
-    f.write('\t<thead>\n\t\t<tr><th colspan="2">Present</th></tr>\n\t</thead>\n\t<tbody>\n')
-    for i, pre in enumerate(prefix):
-        f.write('\t\t<tr><td>' + pronoms[i] + '</td><td>' + pre + ' ' + root + suffix + '</td></tr>\n')
-    f.write('\t</tbody>\n</table>\n\n<table>\n')
-    # preterit +ing
-    prefix = ['was', 'were', 'was', 'were', 'were', 'were']
-    suffix = 'ing'
-    f.write('\t<thead>\n\t\t<tr><th colspan="2">Past</th></tr>\n\t</thead>\n\t<tbody>\n')
-    for i, pre in enumerate(prefix):
-        f.write('\t\t<tr><td>' + pronoms[i] + '</td><td>' + pre + ' ' + root + suffix + '</td></tr>\n')
-    f.write('\t</tbody>\n</table>\n\n<table>\n')
-    # futur +ing
-    prefix = ['will be', 'will be', 'will be', 'will be', 'will be', 'will be']
-    suffix = 'ing'
-    f.write('\t<thead>\n\t\t<tr><th colspan="2">Future</th></tr>\n\t</thead>\n\t<tbody>\n')
-    for i, pre in enumerate(prefix):
-        f.write('\t\t<tr><td>' + pronoms[i] + '</td><td>' + pre + ' ' + root + suffix + '</td></tr>\n')
-    f.write('\t</tbody>\n</table>\n\n<table>\n')
-    # present perfect +ing
-    prefix = ['have been', 'have been', 'has been', 'have been', 'have been', 'have been']
-    suffix = 'ing'
-    f.write('\t<thead>\n\t\t<tr><th colspan="2">Present perfect</th></tr>\n\t</thead>\n\t<tbody>\n')
-    for i, pre in enumerate(prefix):
-        f.write('\t\t<tr><td>' + pronoms[i] + '</td><td>' + pre + ' ' + root + suffix + '</td></tr>\n')
-    f.write('\t</tbody>\n</table>\n\n<table>\n')
-    # Past perfect +ing
-    prefix = ['had been', 'had been', 'had been', 'had been', 'had been', 'had been']
-    suffix = 'ing'
-    f.write('\t<thead>\n\t\t<tr><th colspan="2">Past perfect</th></tr>\n\t</thead>\n\t<tbody>\n')
-    for i, pre in enumerate(prefix):
-        f.write('\t\t<tr><td>' + pronoms[i] + '</td><td>' + pre + ' ' + root + suffix + '</td></tr>\n')
-    f.write('\t</tbody>\n</table>\n\n<table>\n')
-    # Future perfect +ing
-    prefix = ['will have been', 'will have been', 'will have been', 'will have been', 'will have been', 'will have been']
-    suffix = 'ing'
-    f.write('\t<thead>\n\t\t<tr><th colspan="2">Future perfect</th></tr>\n\t</thead>\n\t<tbody>\n')
-    for i, pre in enumerate(prefix):
-        f.write('\t\t<tr><td>' + pronoms[i] + '</td><td>' + pre + ' ' + root + suffix + '</td></tr>\n')
-    f.write('\t</tbody>\n</table>\n\n')
-    
-    f.write('<h3>Conditionnel</h3>\n\n')
-    
-    f.write('<h3>Impératif</h3>\n\n')
-    
-    f.write('<h3>Subjonctif</h3>\n\n')
-    
-    f.close()
-    
+
 def conjugate_fr(verb, onfile=False, html=False):
     if onfile:
         f = open('output.html', mode='a', encoding='utf-8')
@@ -2735,7 +2636,7 @@ class Console:
         elif self.cmd == 'reset':
             #f = open('output.html', 'w')
             #f.close()
-            rappel_en()
+            header_en()
             print('i file output.html reset')
         elif self.cmd == 'debug':
             if self.cmd_debug:

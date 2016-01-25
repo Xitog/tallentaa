@@ -1,44 +1,45 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <title>Statistiques textuelles</title>
-    <link href='http://fonts.googleapis.com/css?family=Lobster' rel='stylesheet' type='text/css'>
-    <style type="text/css">
-        h1 {
-            font-family: "Lobster", cursive, monospace, "Consolas", "Century Gothic";
-            font-weight: 400;
-            font-size: 24px;
-            width: 100%;
-            color: #4087e4;
-            margin: auto;
-            margin-top: 5px;
-            text-align: center;
-        }
+<link href='http://fonts.googleapis.com/css?family=Lobster' rel='stylesheet' type='text/css'>
+<style type="text/css">
+    h1 {
+        font-family: "Lobster", cursive, monospace, "Consolas", "Century Gothic";
+        font-weight: 400;
+        font-size: 24px;
+        width: 100%;
+        color: #4087e4;
+        margin: auto;
+        margin-top: 5px;
+        text-align: center;
+    }
+    
+    a {
+        font-family: "Palatino Linotype";
+        font-size: 14px;
+        color: #CC6714;
+    }
+    
+    td.red {
+        background-color: #FF0000;
+    }
+    
+    td.orange {
+        background-color: #E04006;
+    }
+    
+    td.green {
+        background-color: #00FF00;
+    }
+    
+</style>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<!--<script src="http://tinymce.cachefly.net/4.0/tinymce.min.js"></script>-->
+<script>
+        //tinymce.init({selector:'textarea', height : 300});
         
-        a {
-            font-family: "Palatino Linotype";
-            font-size: 14px;
-            color: #CC6714;
-        }
-        
-        td.red {
-            background-color: #FF0000;
-        }
-        
-        td.orange {
-            background-color: #E04006;
-        }
-        
-        td.green {
-            background-color: #00FF00;
-        }
-        
-    </style>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-    <script>
-
         // Stats : textual statistics
-        // Copyright (C) 2013-2016 Damien Gouteux
+        // Copyright (C) 2013 Damien Gouteux
         
         // This program is free software: you can redistribute it and/or modify
         // it under the terms of the GNU General Public License as published by
@@ -65,12 +66,17 @@
         var ADVERBES = ["abondamment","absolument","abstraitement","abusivement","accessoirement","actuellement","admirablement","adorablement","adroitement","affablement","affectueusement","affirmativement","agilement","agréablement","aimablement","aisément","altrnativement","ambigument","ambitieusement","amèrement","amicalement","amoureusement","amplement","anciennement","annuellment","antérieurement","apparemment","arbitrairement","ardemment","artificiellement","assidûment","assurément","astucieuement","atrocement","attentivement","aucunement","audacieusement","austèrement","avantageusement","aveuglément","avidemet","banalement","bassement","bestialement","bonnement","bravement","brillamment","brusquement","brutalement","bruyamment","candidement","capricieusement","carrément","catégoriquement","cavalièrement","censément","cérémonieusement","certaineent","chaleureusement","charitablement","chèrement","chrétiennement","cinquièmement","civilement","clairement","clandestnement","collectivement","commodément","communément","comparativement","concurremment","conditionnellement","confidentielement","conformément","confortablement","confusément","congrûment","conjointement","consciencieusement","consciemment", "consécutivement","conséquemment","considérablement","constamment","constitutionnellement","continûment","continuellement","contradictoirement","convenablement","conventionnellement","copieusement","coquettement","cordialement","correctement","courageusement","couramment","craintivement","criminellement","crûment","cruellement","curieusement","dangereusement","décemment","décidément","décisivement","dédaigneusement","défensivement","définitivement","délibérément","délicatement","délicieusement","déloyalement","démesurément","dernièrement","désagréablement","désespérément","désordonnément","détermnément","détestablement","deuxièmement","diaboliquement","diagonalement","diamétralement","différemment","difficilement","diffusément","dignement","diligemment","directement","discrètement","disproportionnément","distinctement","distraitement","divinement","dixièmement","docilement","doublement","douloureusement","doucement","douzièmement","dramatiquement","dôement","dûment","durement","économiquement","effectivement","efficacement","effrontément","effroyablement","également","éogïstement","élégamment","éloquemment","éminemment","emphatiquement","ennuyeusement","énormément","éperdument","épouvantblement","équitablement","essentiellement","éternellement","étonnamment","étrangement","étroitement","évasivement","évenuellement","évidemment","exactement","excessivement","exclusivement","exécrablement","exemplairement","explicitement","epressément","exquisément","extérieurement","extraordinairement","extrêmement","fabuleusement","facilement","faiblement","fallacieusement","familièrement","fanatiquement","fastidieusement","fastueusement","fatalement","faussement","fervemment","fidèlement","fièrement","figurativement","figurément","finement","foncièrement","fondamentalement","forcément","formelement","formidablement","fortement","fortuitement","fougueusement","fraîchement","franchement","fraternellement","fraudleusement","frénétiquement","fréquemment","frivolement","froidement","furieusement","furtivement","gaiement","galamment","généralement","généreusement","glorieusement","goulûment","gracieusement","grammaticalement","gratuitement","gravement","grossièrement","habilement","habituellement","hardiment","harmonieusement","hâtivement","hautement","héréditairement","éoïquement","heureusement","hiérarchiquement","historiquement","honnêtement","honorablement","honteusement","horizontaleent","horriblement","hostilement","huitièmement","humainement","humblement","identiquement","illégalement","illicitement","illisiblement","illusoirement","immanquablement","immédiatement","immensément","immodérément","immuablement","imparfatement","impartialement","impatiemment","impérativement","imperceptiblement","impérieusement","impersonnellement","imperurbablement","impétueusement","impitoyablement","implicitement","importunément","imprudemment","incessamment","incidemmet","inclusivement","incommodément","incongrûment","inconsciemment","inconsidérément","incorrectement","incroyablement","ndécemment","indéfiniment","indépendamment","indéterminément","indifféremment","indirectement","indiscutablement","indisinctement","individuellement","indivisément","indûment","indubitablement","inébranlablement","inégalement","inéluctablemnt","inespérément","inévitablement","inexactement","inexorablement","inextricablement","infailliblement","infatigablement","inférieurement","infiniment","ingénieusement","ingénument","inlassablement","innocemment","innombrablement","inopinéent","inoubliablement","insatiablement","insidieusement","instamment","instantanément","insuffisamment","insupportablemet","intégralement","intelligemment","intelligiblement","intensément","intérieurement","interminablement","intrinsèquement","intuitivement","inutilement","invariablement","involontairement","ironiquement","irrégulièrement","irrémédiablement","irrésistiblement","irrésolument","irrévocablement","isolément","joliment","joyeusement","judiciairement","judicieusement","juridiquement","justement","laborieusement","lâchement","laconiquement","lamentablement","largement","latéralement","légalement","légitimement","lentement","libéralement","librement","licitement","lisiblement","littéralement","logiquement","longuement","longitudinalement","lourdement","loyalement","lucidement","luxueusement","machinalement","magistralement","magnifiquement","maigrement","majestueusement","maladivement","maladroitement","malaisément","malencontreusement","mlhabilement","malheureusement","malhonnêtement","malicieusement","manifestement","manuellement","maritalement","massivemnt","matériellement","maternellement","mathématiquement","mécaniquement","méchamment","médiocrement","mélancoliquement","mélodieusement","mentalement","merveilleusement","mesquinement","métaphoriquement","méthodiquement","mignonnement","miliairement","miraculeusement","misérablement","modérément","modestement","modiquement","momentanément","monstrueusement","oralement","mortellement","musicalement","mutuellement","mystérieusement","naïvement","nationalement","naturellement","nécessairement","négativement","négligemment","nerveusement","nettement","neuvièmement","noblement","nommément","nonchalament","normalement","nûment","nullement","numériquement","obliquement","obscurément","obstinément","occasionnellement","dieusement","offensivement","officiellement","officieusement","onzièmement","opiniâtrement","opportunément","ordinairemet","originairement","originellement","ostensiblement","outrageusement","ouvertement","pacifiquement","paisiblement","parillement","paresseusement","parfaitement","partialement","particulièrement","partiellement","passablement","passivement","passionnément","patiemment","pauvrement","péniblement","pensivement","périlleusement","périodiquement","pernicieusement","perpendiculairement","perpétuellement","personnellement","pertinemment","pesamment","petitement","peureusement","physquement","piteusement","pitoyablement","plaintivement","plaisamment","pleinement","poliment","politiquement","pompeusemet","ponctuellement","populairement","posément","positivement","postérieurement","pratiquement","préalablement","précédement","précieusement","précisément","préférablement","préliminairement","prématurément","premièrement","présentement","préomptueusement","primitivement","primordialement","principalement","probablement","prochainement","prodigieusement","proondément","profusément","progressivement","promptement","prophétiquement","proportionnément","proportionnellement","propement","proverbialement","provisoirement","prudemment","publiquement","pudiquement","puissamment","purement","quatorzièmment","quatrièmement","quinzièmement","quotidiennement","radicalement","raisonnablement","rapidement","rarement","récemmnt","réellement","régulièrement","relativement","religieusement","résolument","respectivement","respectueusement","révérncieusement","rêveusement","révolutionnairement","richement","ridiculement","rigidement","rigoureusement","risiblement","royalement","rudement","sagement","sainement","salutairement","satiriquement","sauvagement","savamment","savoureusement","scandaleusement","scientifiquement","scrupuleusement","sèchement","secrètement","seizièmement","sensément","sensiblement","sensuellement","sentimentalement","séparément","septièmement","sérieusement","servilement","seulement","sévèrement","simultanément","sincèrement","singulièrement","sixièmement","socialement","soigneusement","solennellement","solidairement","solidement","solitairement","sommairement","somptueusement","sordidement","sottement","soudainement","sournoisement","souverainement","spacieusement","spécialement","spécifiquement","spirituellement","splendidement","spontanément","stoïqement","strictement","stupidement","subitement","sublimement","subséquemment","substantiellement","subtilement","successvement","succinctement","suffisamment","superbement","superficiellement","supérieurement","superlativement","superstitiesement","suprêmement","sûrement","surabondamment","surnaturellement","symboliquement","symétriquement","synthétiquement","systématiquement","tacitement","tardivement","tellement","témérairement","temporairement","tendrement","terriblement","txtuellement","théoriquement","timidement","totalement","tragiquement","transversalement","treizièmement","triomphalement","tristement","trivialement","troisièmement","tumultueusement","tyranniquement","ultérieurement","unanimement","uniforméent","uniquement","universellement","usuellement","utilement","vaguement","vaillamment","vainement","valablement","valereusement","validement","vaniteusement","véhémentement","verbalement","véridiquement","véritablement","vertement","vertialement","vicieusement","victorieusement","vivement","vigilamment","vigoureusement","vilement","vilainement","violemment","virilement","virtuellement","visiblement","volontairement","voluptueusement","vraiment","vraisemblablement","vulgairement"];
         
         function main() {
+            //var textarea = document.getElementById("input");
+            //var content = textarea.textContent;
+            //var content = tinyMCE.get('input').getContent({format: 'raw'});
+            
+            //var reg = new RegExp("(<p>)", "g");
+            //content = content.replace(reg, "");
+            //reg = new RegExp("(</p>)", "g");
+            //content = content.replace(reg, "\n");
             var content = $("#txt_input").val();
-            if (content && typeof content === "string" && content.length > 0) {
-                stats(content);
-            } else {
-                alert("Il y a un problème avec votre texte, il n'a pas été analysé (les précédentes statistiques ont été conservées).");
-            }
+            
+            stats(content);
         }
         
         function is_us_letter(c) {
@@ -297,7 +303,7 @@
             //-----------------------------------------------------------------
             
             // Get
-            //var chk_strict = $("#chk_strict").is(":checked"); //document.getElementById("chk_strict");
+            var chk_strict = $("#chk_strict").is(":checked"); //document.getElementById("chk_strict");
             
             var res_title = document.getElementById("res_title");
             var res_table = document.getElementById("res_table");
@@ -615,6 +621,10 @@
             if (a === false || a == -1) {
                 res_signature.innerHTML = '<p><span style="color:red">Le logiciel n\'a pas réussi à détecter de signature.</span></p>';
             } else {
+                if (a == 24 && !chk_strict) {
+                    // White Rabbit
+                    res_signature.innerHTML = '<p><a href="' + String.fromCharCode(97,108,112,104,97) + '.jpg">' + String.fromCharCode(86,111,115,32,121,101,117,120,44,32,98,105,101,110,32,113,117,39,105,108,32,102,251,116,32,110,117,105,116,44,32,114,97,109,101,110,232,114,101,110,116,32,108,101,32,106,111,117,114) + '</a><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>' + String.fromCharCode(82,111,110,115,97,114,100,44,32,83,111,110,110,101,116,115,32,112,111,117,114,32,72,233,108,232,110,101) + '</i></p>';
+                }
                 res_signature.innerHTML += '<p>Signature détectée : <span style="color:blue">' + MOTS_SIGNATURE[a] + '</span></p>';
             }
             
@@ -724,8 +734,10 @@
             head1.innerHTML = "<span style='color: #FFFFFF'><u>Fréquence</u></span>";
             head1.bgColor = '#CEC498';
             
+            //var i = 0;
             var total = 0;
             for (var i = 0; i < rtable[0].length; i++) {
+            //for (var key in xwords) {
                 var row = res_mot.insertRow(i+1);
                 var cell_word = row.insertCell(0);
                 cell_word.innerHTML = rtable[0][i]; // key; mot
@@ -739,6 +751,7 @@
                 } else if (i%2 == 0) {
                     row.bgColor = '#F6F6F6';
                 }
+                //i+=1;
             }
             var row_total = res_mot.insertRow(rtable[0].length+1);
             var cell_total_lbl = row_total.insertCell(0);
@@ -749,19 +762,17 @@
                 row.bgColor = '#F6F6F6';
             }
                 
-            //for (var key in xwords) {
             //for (var i=0; i < words.length; i++)
         }
-    </script>
+</script>
 </head>
 <body width="100%" height="100%">
     <center>
-        <h1>Statistiques textuelles</h1>
+        <h1>Brieumatique</h1>
         <textarea id="txt_input" rows="40" cols="80" placeholder="Entrer votre texte..."></textarea>
-        <br><br>
-        <button onclick="main()">Analyser</button>
         <br>
-        <!--<form><input id="chk_strict" type="checkbox" checked="checked">strict</form>-->
+        <button onclick="main()">Brieuillant or not ?</button>
+        <form><input id="chk_strict" type="checkbox" checked="checked">strict</form>
         <div id="result"></div>
             <div id="res_title" class="title"></div>
             <table id="res_table"></table>
@@ -795,7 +806,25 @@
             <table id="res_mot"></table>
         </div>
         <br>
-        <p><a href="http://ran.alwaysdata.net/index.html">Damien Gouteux 2013-2016</a></p>
+        <p><a href="http://ran.alwaysdata.net/index.html">Damien Gouteux 2013</a></p>
     </center>
+        
+    <!--<table width="100%" height="100%">
+        <tr>
+            <td width="33%">
+                <textarea id="txt_input" rows="40" cols="80" placeholder="Entrer votre texte..."></textarea>
+            </td>
+            <td width="33%">
+                <button onclick="main()">Analyse</button>
+            </td>
+            <td width="33%">
+                <div id="result"></div>
+                    <div id="res_title" class="title"></div>
+                    <table id="res_table" style="border:1px solid #000000;"></table>
+                    <table id="res_mot" style="border:1px solid #000000;"></table>
+                </div>
+            </td>
+        </tr>
+    </table>-->
 </body>
 </html>
