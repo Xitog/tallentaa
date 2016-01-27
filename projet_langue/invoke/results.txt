@@ -147,7 +147,7 @@ Toutes les traductions
 144. produire --> to produce
 145. promettre --> to pledge
 146. proposer --> to suggest
-147. présenter (se) --> to introduce yourself
+147. présenter (se) --> to introduce avec le sens de : présenter quelqu'un
 148. prêter --> to lend
 149. quitter --> to leave
 150. raconter --> to tell
@@ -190,27 +190,28 @@ Toutes les traductions
 187. traduire --> to translate
 188. travailler --> to work
 189. trouver --> to find
-190. utiliser --> to use
-191. valoir --> to be worth
-192. vendre --> to sell
-193. venir --> to come
-194. vider --> to empty
-195. visiter --> to visit
-196. vivre --> to live
-197. voir --> to see
-198. voir --> to watch avec le sens de : visionner (un film, une émission)
-199. voler --> to fly avec le sens de : dans les airs
-200. voler --> to steal avec le sens de : atteinte à la propriété dautrui
-201. vouloir --> to want
-202. voyager --> to travel
-203. écouter --> to listen
-204. écrire --> to write
-205. éteindre --> to turn off
-206. étudier --> to study
-207. être --> to be
-208. être assis --> to sit
-209. être daccord --> to agree
-210. être debout --> to stand
+190. tuer --> to kill
+191. utiliser --> to use
+192. valoir --> to be worth
+193. vendre --> to sell
+194. venir --> to come
+195. vider --> to empty
+196. visiter --> to visit
+197. vivre --> to live
+198. voir --> to see
+199. voir --> to watch avec le sens de : visionner (un film, une émission)
+200. voler --> to fly avec le sens de : dans les airs
+201. voler --> to steal avec le sens de : atteinte à la propriété dautrui
+202. vouloir --> to want
+203. voyager --> to travel
+204. écouter --> to listen
+205. écrire --> to write
+206. éteindre --> to turn off
+207. étudier --> to study
+208. être --> to be
+209. être assis --> to sit
+210. être daccord --> to agree
+211. être debout --> to stand
 
 
 
@@ -392,25 +393,26 @@ Tous les verbes français
 173. #14 traduire
 174. #13 travailler
 175. #12 trouver
-176. #11 utiliser
-177. #183 valoir
-178. #10 vendre
-179. #9 venir
-180. #184 vider
-181. #8 visiter
-182. #7 vivre
-183. #6 voir
-184. #5 voler
-185. #3 vouloir
-186. #2 voyager
-187. #93 écouter
-188. #92 écrire
-189. #141 éteindre
-190. #85 étudier
-191. #86 être
-192. #197 être assis
-193. #166 être daccord
-194. #196 être debout
+176. #201 tuer
+177. #11 utiliser
+178. #183 valoir
+179. #10 vendre
+180. #9 venir
+181. #184 vider
+182. #8 visiter
+183. #7 vivre
+184. #6 voir
+185. #5 voler
+186. #3 vouloir
+187. #2 voyager
+188. #93 écouter
+189. #92 écrire
+190. #141 éteindre
+191. #85 étudier
+192. #86 être
+193. #197 être assis
+194. #166 être daccord
+195. #196 être debout
 
 
 
@@ -428,4 +430,4 @@ Verbes non traduits
 9. #21005 sœur
 
 
-Last edit on 2016-01-25 23:51:34
+Last edit on 2016-01-26 15:09:01

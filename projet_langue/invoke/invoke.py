@@ -264,6 +264,8 @@ def create():
         (195, 'fr', 'dépenser', 'verb', 2),
         (196, 'fr', 'être debout', 'verb', 2),
         (197, 'fr', 'être assis', 'verb', 2),
+        # VAGUE 4
+        (201, 'fr', 'tuer', 'verb', 4),
         
         (100001, 'en', 'open', 'verb', 1),
         (100002, 'en', 'travel', 'verb', 1),
@@ -324,7 +326,7 @@ def create():
         (100063, 'en', 'carry', 'verb', 1),
         (100064, 'en', 'can', 'verb', 1),
         (100065, 'en', 'take', 'verb', 1),
-        (100066, 'en', 'introduce yourself', 'verb', 1),
+        (100066, 'en', 'introduce', 'verb', 1),
         (100067, 'en', 'pledge', 'verb', 1),
         (100068, 'en', 'leave', 'verb', 1),
         (100069, 'en', 'walk', 'verb', 1),
@@ -477,6 +479,9 @@ def create():
         (100197, 'en', 'sit', 'verb', 2),
         (100199, 'en', 'get', 'verb', 2),
         (100200, 'en', 'set', 'verb', 2),
+        
+        # VAGUE 4
+        (100201, 'en', 'kill', 'verb', 4),
         
         (200001, 'it', 'aprire', 'verb', 1),
         (200002, 'it', 'viaggiare', 'verb', 1),
@@ -872,72 +877,181 @@ def create():
     #----------------------------------------------------------------
     
     content_verbs_en = [
+        (68, 'abide', 'abode', 'abode'),
+        (69, 'arise', 'arose', 'arisen'),
+        (70, 'awake', 'awoke', 'awoken'),
         (1, 'be', 'were', 'been'),
+        (71, 'bear', 'bore', 'borne/born'),
+        (72, 'beat', 'beat', 'beaten'),
         (54, 'become', 'became', 'become'),
+        (73, 'beget', 'begat/begot', 'begotten'),
         (2, 'begin', 'began', 'begun'),
+        (74, 'bend', 'bent', 'bent'),
+        (75, 'bereave', 'bereft/bereaved', 'bereft/bereaved'),
+        (76, 'bet', 'bet', 'bet'),
+        (77, 'bid', 'bid/bade', 'bid/bidden'),
+        (78, 'bleed', 'bled', 'bled'),
+        (79, 'blow', 'blew', 'blown'),
         (3, 'break', 'broke', 'broken'),
+        (80, 'breed', 'bred', 'bred'),
         (4, 'bring', 'brought', 'brought'),
-        (55, 'burn', 'burned/burnt', 'burned/burnt'),
-        (5, 'buy', 'bought', 'bought'),
+        (81, 'broadcast', 'broadcast', 'broadcast'),
         (6, 'build', 'built', 'built'),
+        (55, 'burn', 'burned/burnt', 'burned/burnt'),
+        (82, 'burst', 'burst', 'burst'),
+        (5, 'buy', 'bought', 'bought'),
         (59, 'can', 'could', 'could'),
+        (83, 'cast', 'cast', 'cast'),
+        (84, 'catch', 'caught', 'caught'),
+        (85, 'chide', 'chid', 'chiden'),
         (7, 'choose', 'chose', 'chosen'),
+        (86, 'cling', 'clung', 'clung'),
+        (87, 'clothe', 'clad/clothed', 'clad/clothed'),
         (8, 'come', 'came', 'come'),
         (9, 'cost', 'cost', 'cost'),
+        (88, 'creep', 'crept', 'crept'),
         (10, 'cut', 'cut', 'cut'),
+        (89, 'deal', 'dealt', 'dealt'),
+        (90, 'dig', 'dug', 'dug'),
+        (91, 'dive', 'dived', 'dived/dove'),
         (11, 'do', 'did', 'done'),
         (12, 'draw', 'drew', 'drawn'),
+        (92, 'dream', 'dreamt/dreamed', 'dreamt/dreamed'),
         (66, 'drink', 'drank', 'drunk'),
         (13, 'drive', 'drove', 'driven'),
+        (93, 'dwell', 'dwelt', 'dwelt/dwelled'),
         (14, 'eat', 'ate', 'eaten'),
         (60, 'fall', 'fell', 'fallen'),
+        (94, 'feed', 'fed', 'fed'),
         (15, 'feel', 'felt', 'felt'),
+        (95, 'fight', 'fought', 'fought'),
         (16, 'find', 'found', 'found'),
+        (96, 'flee', 'fled', 'fled'),
+        (97, 'fling', 'flung', 'flung'),
         (67, 'fly', 'flew', 'flown'),
+        (98, 'forbid', 'forbade', 'forbidden'),
+        (99, 'forecast', 'forecast', 'forecast'),
+        (100, 'foresee', 'foresaw', 'foreseen'),
         (58, 'forget', 'forgot', 'forgotten'),
-        (17, 'get', 'got', 'got'),
+        (101, 'forgive', 'forgave', 'forgiven'),
+        (102, 'forsake', 'forsook', 'forsaken'),
+        (103, 'freeze', 'froze', 'frozen'),
+        (17, 'get', 'got', 'got'), # gotten au pp aussi?
         (18, 'give', 'gave', 'given'),
         (19, 'go', 'went', 'gone'),
+        (104, 'grind', 'ground', 'ground'),
+        (105, 'grow', 'grew', 'grown'),
+        (106, 'hang', 'hung', 'hung'),
         (20, 'have', 'had', 'had'),
         (21, 'hear', 'heard', 'heard'),
+        (107, 'hide', 'hid', 'hidden'),
+        (108, 'hit', 'hit', 'hit'),
         (22, 'hold', 'held', 'held'),
+        (109, 'hurt', 'hurt', 'hurt'),
         (23, 'keep', 'kept', 'kept'),
+        (110, 'kneel', 'knelt/knelled', 'knelt/kneeled'),
         (24, 'know', 'knew', 'known'),
-        (25, 'leave', 'left', 'left'),
+        (111, 'lay', 'laid', 'laid'),
         (26, 'lead', 'led', 'led'),
+        (112, 'lean', 'leant/leaned', 'leant/leaned'),
+        (113, 'leap', 'leapt/leaped', 'leapt/leaped'),
+        (114, 'learn', 'learnt/learned', 'learnt/learned'),
+        (25, 'leave', 'left', 'left'),
+        (115, 'lend', 'lent', 'lent'),
         (27, 'let', 'let', 'let'),
         (28, 'lie', 'lay', 'lain'),
+        (116, 'light', 'lit/lighted', 'lit/lighted'),
         (29, 'lose', 'lost', 'lost'),
         (30, 'make', 'made', 'made'),
         (31, 'mean', 'meant', 'meant'),
         (32, 'meet', 'met', 'met'),
+        (117, 'mow', 'mowed', 'mowed/mown'),
         (61, 'must', '-', '-'),
+        (118, 'offset', 'offset', 'offset'),
+        (119, 'overcome', 'overcame', 'overcome'),
+        (120, 'partake', 'partook', 'partaken'),
         (33, 'pay', 'paid', 'paid'),
+        (121, 'plead', 'pled/pleaded', 'pled/pleaded'),
+        (122, 'preset', 'preset', 'preset'),
+        (123, 'prove', 'proved', 'proven/proved'),
         (34, 'put', 'put', 'put'),
+        (124, 'quit', 'quit', 'quit'),
         (57, 'read', 'read', 'read'),
+        (125, 'relay', 'relaid', 'relaid'),
+        (126, 'rend', 'rent', 'rent'),
+        (127, 'rid', 'rid', 'rid'),
+        (128, 'ride', 'rode', 'ridden'),
+        (129, 'ring', 'rang', 'rung'),
+        (130, 'rise', 'rose', 'risen'),
         (35, 'run', 'ran', 'run'),
+        (131, 'saw', 'saw/sawed', 'saw/sawed'),
         (36, 'say', 'said', 'said'),
         (37, 'see', 'saw', 'seen'),
+        (132, 'seek', 'sought', 'sought'),
         (38, 'sell', 'sold', 'sold'),
         (39, 'send', 'sent', 'sent'),
         (40, 'set', 'set', 'set'),
+        (133, 'shake', 'shook', 'shaken'),
+        (134, 'shed', 'shed', 'shed'),
+        (135, 'shine', 'shone', 'shone'),
+        (136, 'shoe', 'shod', 'shod'),
         (56, 'shoot', 'shot', 'shot'),
+        (137, 'show', 'showed', 'shown'),
+        (138, 'shut', 'shut', 'shut'),
         (41, 'sing', 'sang', 'sung'),
+        (139, 'sink', 'sank/sunk', 'sunk/sunken'),
         (42, 'sit', 'sat', 'sat'),
+        (140, 'slay', 'slew', 'slain'),
+        (141, 'sleep', 'slept', 'slept'),
+        (142, 'slide', 'slid', 'slid'),
+        (143, 'slink', 'slunk/slinked', 'slunk/slinked'),
+        (144, 'slit', 'slit', 'slit'),
+        (145, 'smell', 'smelt/smelled', 'smelt/smelled'),
+        (146, 'sow', 'sowed', 'sown/sowed'),
         (43, 'speak', 'spoke', 'spoken'),
+        (147, 'speed', 'sped', 'sped'),
+        (148, 'spell', 'spelt', 'spelt'),
         (44, 'spend', 'spent', 'spent'),
+        (149, 'spill', 'spilt/spilled', 'spilt/spilled'),
+        (150, 'spin', 'spun', 'spun'),
+        (151, 'spit', 'spat/spit', 'spat/spit'),
+        (152, 'split', 'split', 'split'),
+        (153, 'spoil', 'spoilt', 'spoilt'),
+        (154, 'spread', 'spread', 'spread'),
+        (155, 'spring', 'sprang', 'sprung'),
         (45, 'stand', 'stood', 'stood'),
         (62, 'steal', 'stole', 'stolen'),
+        (156, 'stick', 'stuck', 'stuck'),
+        (157, 'sting', 'stung', 'stung'),
+        (158, 'stink', 'stink', 'stink'),
+        (159, 'strew', 'strew', 'strew'),
+        (160, 'strike', 'struck', 'stricken/struck'),
+        (161, 'strive', 'strove', 'striven'),
+        (162, 'swear', 'swore', 'sworn'),
+        (163, 'sweat', 'sweat/sweated', 'sweat/sweated'),
+        (164, 'sweep', 'swept', 'swept'),
+        (165, 'swell', 'swelled', 'swollen/swelled'),
         (63, 'swim', 'swam', 'swum'),
         (46, 'take', 'took', 'taken'),
         (47, 'teach', 'taught', 'taught'),
+        (166, 'tear', 'tore', 'torn'),
         (48, 'tell', 'told', 'told'),
         (49, 'think', 'thought', 'thought'),
+        (167, 'thrive', 'throve/thrived', 'thriven/thrived'),
         (64, 'throw', 'threw', 'thrown'),
+        (168, 'thrust', 'thrust', 'thrust'),
+        (169, 'tread', 'trod', 'trodden'),
+        (170, 'typeset', 'typeset', 'typeset'),
+        (171, 'undergo', 'underwent', 'undergone'),
         (50, 'understand', 'understood', 'understood'),
         (65, 'wake', 'woke', 'woken'),
         (51, 'wear', 'wore', 'worn'),
+        (172, 'weep', 'wept', 'wept'),
+        (173, 'wet', 'wet/wetted', 'wet/wetted'),
         (52, 'win', 'won', 'won'),
+        (174, 'wind', 'wound', 'wound'),
+        (175, 'withdraw', 'withdrew', 'withdrawn'),
+        (176, 'wring', 'wrung', 'wrung'),
         (53, 'write', 'wrote', 'written'),
     ] # last is 67
     
@@ -962,6 +1076,9 @@ def create():
     #----------------------------------------------------------------
     
     content = [
+        #----------------------------------------------------------------------
+        # VAGUE 1 TRADUCTIONS FR->EN
+        #----------------------------------------------------------------------
         (1, 1, 100001, None, None),
         (2, 1, 200001, None, None),
         (3, 1, 300001, None, None),
@@ -1025,7 +1142,7 @@ def create():
         (59, 63, 100063, "porter un objet", None), # porter => carry
         (60, 64, 100064, None, None),
         (61, 65, 100065, None, None),
-        (62, 66, 100066, None, None),
+        (62, 66, 100066, "présenter quelqu'un", "to introduce someone/something to someone : présenter quelqu'un/quelqu'chose à quelqu'un, to introduce yourself : se présenter, to introduce something into something : introduire quelque chose dans quelque chose"),
         (63, 67, 100067, None, None),
         (64, 68, 100068, None, None),
         (65, 69, 100069, None, None),
@@ -1100,6 +1217,9 @@ def create():
         (134, 137, 100055, None, None), # CORRECTED
         (135, 46, 190046, 'lancer un projectile', None),
 
+        #----------------------------------------------------------------------
+        # VAGUE 1 TRADUCTIONS FR->EO
+        #----------------------------------------------------------------------
         (136, 1, 400001, None, None),
         (137, 9, 400009, None, None),
         (139, 2, 400002, None, None),
@@ -1231,6 +1351,9 @@ def create():
         (268, 5, 490005, 'atteinte à la propriété d''autrui', None),
         (269, 41, 490041, 'un sentiment', None),
 
+        #----------------------------------------------------------------------
+        # VAGUE 1 TRADUCTIONS FR->IT
+        #----------------------------------------------------------------------
         (270, 134, 200134, None, None),
         (271, 124, 200124, None, None),
         (272, 86, 200086, None, None),
@@ -1360,6 +1483,10 @@ def create():
         (396, 135, 200135, None, None),
         (397, 136, 200136, None, None),
         (398, 137, 200137, None, None),
+        
+        #----------------------------------------------------------------------
+        # VAGUE 1.5 TRADUCTIONS MIXTES FR->EO, EN, IT
+        #----------------------------------------------------------------------
         (399, 138, 400138, None, None),
         (400, 139, 400139, None, None),
         (401, 138, 100138, 'vu de l''intérieur du lieu que l''on quitte', None),
@@ -1406,7 +1533,9 @@ def create():
         (448, 151, 100151, None, None),
         (449, 151, 200151, None, None),
         (450, 151, 400151, None, None),
-        # VAGUE 2
+        #----------------------------------------------------------------------
+        # VAGUE 2 TRADUCTIONS FR->EN
+        #----------------------------------------------------------------------
         (451, 126, 190126, "une occurrence", None),
         (452, 152, 100152, None, None),
         (453, 153, 100153, None, None),
@@ -1456,7 +1585,9 @@ def create():
         (597, 187, 100187, None, None),
         #(666, 187, 99999, None) # ERREUR VOLONTAIRE "VERS" DE TEST
         #(666, 19999, 187, None) # ERREUR VOLONTAIRE "DE" DE TEST    
-        # VAGUE 3 TRADUCTIONS EN->FR
+        #----------------------------------------------------------------------
+        # VAGUE 3 TRADUCTIONS FR->EN
+        #----------------------------------------------------------------------
         (598, 188, 100188, None, None),
         (599, 189, 100189, None, None),
         (600, 190, 100190, None, None),
@@ -1469,8 +1600,14 @@ def create():
         (607, 196, 100196, None, None), # être debout => stand
         (609, 197, 100197, None, None), # être assis => sit
         (610, 150, 100197, None, None), # s'assoir => sit
+        #----------------------------------------------------------------------
+        # VAGUE 4 TRADUCTIONS FR->EN
+        #----------------------------------------------------------------------
+        (618, 201, 100201, None, None), # tuer => kill
         
-        # TRADUCTIONS EN->FR
+        #----------------------------------------------------------------------
+        # VAGUES 1 & 2 TRADUCTIONS EN->FR
+        #----------------------------------------------------------------------
 		(10000, 100001, 1, None, "ouvrir quelque chose : to open something"), # open => ouvrir
 		(60000, 100009, 9, None, "venir de quelque part : to come from somewhere, venir ici : to come here, venir jusqu'ici : to come this far"), # come => venir
 		(80000, 100002, 2, None, "voyager : to travel"), # travel => voyager
@@ -1529,7 +1666,7 @@ def create():
 		(590000, 100063, 63, "porter un objet", None), # carry => porter
 		(600000, 100064, 64, None, None), # can => pouvoir
 		(610000, 100065, 65, None, None), # take => prendre
-		(620000, 100066, 66, None, None), # introduce yourself => présenter (se)
+		(620000, 100066, 66, "présenter quelqu'un", "présenter quelqu'un/quelqu'chose à quelqu'un : to introduce someone/something to someone, se présenter : to introduce yourself, introduire quelque chose dans quelque chose : to introduce something into something"), # introduce yourself => présenter (se)
 		(630000, 100067, 67, None, None), # pledge => promettre
 		(640000, 100068, 68, None, None), # leave => quitter
 		(650000, 100069, 69, None, None), # walk => marcher
@@ -1681,17 +1818,25 @@ def create():
 		(6070000, 100196, 196, None, None), # stand => être debout VAGUE 3
 		(6090000, 100197, 197, None, None), # sit => être assis VAGUE 3
 		(6100000, 100197, 150, None, None), # sit => asseoir (s') VAGUE 3
-        # La vague 3 est uniquement dans le sens EN->FR
-        (608, 100196, 86, None, None), # stand => être VAGUE 3
-        (611, 100197, 86, None, None), # sit => être VAGUE 3
-        (612, 100199, 124, None, None), # get => avoir VAGUE 3
-        (613, 100199, 27, None, None), # get => recevoir VAGUE 3
-        (614, 100199, 109, None, None), # get => comprendre VAGUE 3
-        (615, 100200, 102, None, None), # set => créer VAGUE 3
-        (616, 100200, 47, None, None), # set => mettre VAGUE 3
-        (617, 100200, 144, None, None), # set => poser VAGUE 3
+        #----------------------------------------------------------------------
+        # VAGUE 3 TRADUCTIONS EN->FR (La vague 3 est uniquement dans le sens EN->FR)
+        #----------------------------------------------------------------------
+        (6080000, 100196, 86, None, None), # stand => être VAGUE 3
+        (6110000, 100197, 86, None, None), # sit => être VAGUE 3
+        (6120000, 100199, 124, None, None), # get => avoir VAGUE 3
+        (6130000, 100199, 27, None, None), # get => recevoir VAGUE 3
+        (6140000, 100199, 109, None, None), # get => comprendre VAGUE 3
+        (6150000, 100200, 102, None, None), # set => créer VAGUE 3
+        (6160000, 100200, 47, None, None), # set => mettre VAGUE 3
+        (6170000, 100200, 144, None, None), # set => poser VAGUE 3
+        #----------------------------------------------------------------------
+        # VAGUE 4 TRADUCTIONS EN->FR
+        #----------------------------------------------------------------------
+        (6180000, 100201, 201, None, None), # kill => tuer
         
-        # TRADUCTIONS EN->EO
+        #----------------------------------------------------------------------
+        # VAGUE 1 TRADUCTIONS EN->EO
+        #----------------------------------------------------------------------
 		(1360000, 400001, 1, None, None), # ouvrir
 		(1370000, 400009, 9, None, None), # venir
 		(1390000, 400002, 2, None, None),
@@ -2312,9 +2457,9 @@ def header_en():
     html_content = html.read()
     html_parts = html_content.split('<!-- SPLIT HERE -->')
     
-    f.write(html_parts[0])
-    
     verbs_en = get_all_verbs_full('en', 'fr')
+    
+    f.write(html_parts[0].replace('#NB#', str(len(verbs_en))))
     for v in verbs_en:
         f.write('<h3><a href="#' + str(v['id']) + '">' + str(v['nb']) + '. ' + v['root_base'] + v['particle'] + ' &nbsp;(' + v['pret'] + v['particle'] + ', ' + v['part'] + v['particle'] + ')</a>')
         if v['irregular']:
@@ -2324,8 +2469,9 @@ def header_en():
     f.write('<p>Les verbes avec une ast&eacute;risque <b>*</b> sont irr&eacute;guliers.</p>')
     f.write('<mbp:pagebreak />')
     
-    f.write('<h2 id="liste_fr_en">Les 200 verbes fondamentaux anglais à partir de leurs traductions en français</h2>')
     verbs_fr = get_all_verbs_full('fr', 'en')
+    
+    f.write('<h2 id="liste_fr_en">Les ' + str(len(verbs_en)) + ' verbes fondamentaux anglais à partir de leurs traductions en français</h2>')
     for v in verbs_fr:
         f.write('<h3>' + str(v['nb']) + '. ' + v['root_base'] + v['particle'] + ' : ')
         trans = ''
@@ -2441,13 +2587,19 @@ def conjugate_en(verb, onfile=False, html=False, info=None, nb=None):
     f.write('<p><b>Passé</b> : should/would (not) have ' + part + particle + '</p>\n')
     
     f.write('<h3>Subjonctif</h3>\n')
-    f.write('<p>Expression d\'une <b>potentialité</b> : may/might (not) ' + root + particle + '</p>\n')
-    f.write('<p>Expression d\'un <b>doute</b>, d\'une <b>supposition</b> ou <b>atténuation polie</b> : should (not) ' + root + particle + '</p>\n')
+    f.write('<p><b>Présent</b> : (not) <b class="present">' + root + particle + '</b></p>\n')
+    if root == 'be':
+        f.write('<p><b>Passé</b> : (not) <b class="past">' + pret + particle + '</b></p>\n')
     
     f.write('<h3>Impératif</h3>\n')
     f.write('<p><b>2e pers.</b> : (do not) <b class="present">' + root + particle + '</b>!</p>\n')
-    f.write('<p><b>1e pers. du pluriel</b> (avec deux façons d\'exprimer la négation) : (do not) let\'s (not) <b class="present">' + root + particle + '</b>!</p>\n')
-    f.write('<p><b>3e pers.</b> (avec deux façons d\'exprimer la négation) : (do not) let her/him/them (not) <b class="present">' + root + particle + '</b>!</p>\n')
+    f.write('<p><b>1e pers. du pluriel</b> (avec deux façons d\'exprimer la négation) : (do not) <b class="present">let</b> \'s (not) <b class="present">' + root + particle + '</b>!</p>\n')
+    f.write('<p><b>3e pers.</b> (avec deux façons d\'exprimer la négation) : (do not) <b class="present">let</b> her/him/them (not) <b class="present">' + root + particle + '</b>!</p>\n')
+    
+    f.write('<h3>Constructions avec auxilaires</h3>\n')
+    f.write('<p>Expression d\'une <b>potentialité</b> : may/might (not) <b class="present">' + root + particle + '</b></p>\n')
+    f.write('<p>Expression d\'une <b>autorisation</b> : may (not) <b class="present">' + root + particle + '</b></p>\n')
+    f.write('<p>Expression d\'un <b>doute</b>, d\'une <b>supposition</b> ou <b>atténuation polie</b> : should (not) <b class="present">' + root + particle + '</b></p>\n')
     
     f.write('<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div>')
     f.write('<mbp:pagebreak />')
