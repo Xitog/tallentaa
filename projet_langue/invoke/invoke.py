@@ -266,6 +266,8 @@ def create():
         (197, 'fr', 'être assis', 'verb', 2),
         # VAGUE 4
         (201, 'fr', 'tuer', 'verb', 4),
+        (202, 'fr', 'blesser', 'verb', 4),
+        (203, 'fr', 'combattre', 'verb', 4),
         
         (100001, 'en', 'open', 'verb', 1),
         (100002, 'en', 'travel', 'verb', 1),
@@ -482,6 +484,8 @@ def create():
         
         # VAGUE 4
         (100201, 'en', 'kill', 'verb', 4),
+        (100202, 'en', 'hurt', 'verb', 4),
+        (100203, 'en', 'fight', 'verb', 4),
         
         (200001, 'it', 'aprire', 'verb', 1),
         (200002, 'it', 'viaggiare', 'verb', 1),
@@ -774,17 +778,17 @@ def create():
         # (490046, 'xy', 'xxxx', 9)
 
         # INSERT NOUNS
-        (21000, 'fr', 'livre', 'noun', 1),   (11000, 'en', 'book', 'noun', 1),
-        (21001, 'fr', 'lit', 'noun', 1),     (11001, 'en', 'bed', 'noun', 1),
-        (21002, 'fr', 'père', 'noun', 1),    (11002, 'en', 'father', 'noun', 1),
-        (21003, 'fr', 'mère', 'noun', 1),    (11003, 'en', 'mother', 'noun', 1),
-        (21004, 'fr', 'frère', 'noun', 1),   (11004, 'en', 'brother', 'noun', 1),
-        (21005, 'fr', 'sœur', 'noun', 1),    (11005, 'en', 'sister', 'noun', 1),
-        (21006, 'fr', 'fils', 'noun', 1),    (11006, 'en', 'son', 'noun', 1),
-        (21007, 'fr', 'fille', 'noun', 1),   (11007, 'en', 'daughter', 'noun', 1),
-                                            (18007, 'en', 'girl', 'noun', 1),
-        (21008, 'fr', 'garçon', 'noun', 1),  (11008, 'en', 'boy', 'noun', 1),
-
+        (21000, 'fr', 'livre', 'noun', 1), (11000, 'en', 'book', 'noun', 1),
+        (21001, 'fr', 'lit', 'noun', 1), (11001, 'en', 'bed', 'noun', 1),
+        (21002, 'fr', 'père', 'noun', 1), (11002, 'en', 'father', 'noun', 1),
+        (21003, 'fr', 'mère', 'noun', 1), (11003, 'en', 'mother', 'noun', 1),
+        (21004, 'fr', 'frère', 'noun', 1), (11004, 'en', 'brother', 'noun', 1),
+        (21005, 'fr', 'sœur', 'noun', 1), (11005, 'en', 'sister', 'noun', 1),
+        (21006, 'fr', 'fils', 'noun', 1), (11006, 'en', 'son', 'noun', 1),
+        (21007, 'fr', 'fille', 'noun', 1), (11007, 'en', 'daughter', 'noun', 1),
+        (18007, 'en', 'girl', 'noun', 1),
+        (21008, 'fr', 'garçon', 'noun', 1), (11008, 'en', 'boy', 'noun', 1),
+        
         (121009, 'en', 'parent', 'noun', 1),
         (121010, 'en', 'person', 'noun', 1),
         (121011, 'en', 'friend', 'noun', 1),
@@ -1604,6 +1608,8 @@ def create():
         # VAGUE 4 TRADUCTIONS FR->EN
         #----------------------------------------------------------------------
         (618, 201, 100201, None, None), # tuer => kill
+        (619, 202, 100202, None, None), # blesser => hurt
+        (620, 203, 100203, None, None), # combattre => fight
         
         #----------------------------------------------------------------------
         # VAGUES 1 & 2 TRADUCTIONS EN->FR
@@ -1833,6 +1839,8 @@ def create():
         # VAGUE 4 TRADUCTIONS EN->FR
         #----------------------------------------------------------------------
         (6180000, 100201, 201, None, None), # kill => tuer
+        (6190000, 100202, 202, None, None), # hurt => blesser
+        (6200000, 100203, 203, None, None), # fight => combattre
         
         #----------------------------------------------------------------------
         # VAGUE 1 TRADUCTIONS EN->EO
@@ -2491,10 +2499,23 @@ def header_en():
     f.write('<p>Les verbes avec une ast&eacute;risque <b>*</b> sont irr&eacute;guliers.</p>')
     f.write('<mbp:pagebreak />')
     
-    f.write(html_parts[1])
+    f.write(html_parts[1].replace('#NB#', str(len(verbs_en))))
     
     f.close()
 
+
+def footer_en():
+    f = open('output.html', mode='a', encoding='utf-8')
+    
+    html = open('invoke_chapters.html', mode='r', encoding='utf-8')
+    html_content = html.read()
+    html_parts = html_content.split('<!-- SPLIT HERE -->')
+    
+    verbs_en = get_all_verbs_full('en', 'fr')
+    f.write(html_parts[2].replace('#NB#', str(len(verbs_en))))
+    
+    f.close()
+    
 
 def conjugate_en(verb, onfile=False, html=False, info=None, nb=None):
     if not onfile or not html or nb is None or info is None:
@@ -2543,7 +2564,7 @@ def conjugate_en(verb, onfile=False, html=False, info=None, nb=None):
     f.write('</ul></p>\n')
     
     #f.write('<p><b>Base verbale</b> : ' + root + '</p>\n')
-    f.write('<p><b>Infinitif</b> : <b>to ' + root + '</b></p>\n')
+    f.write('<p><b>Infinitif</b> : <b>to <b class="present">' + root + '</b></b></p>\n')
     f.write('<p><b>Participe passé</b> : <b class="pp">' + part + '</b></p>\n')
     f.write('<p><b>Participe présent</b> : <b class="ing">' + ing + particle + '</b></p>\n')
     f.write('<p><b>Voix passive</b> : <b>were ' + part + '</b> (1ère et 3e pers. sing. : <b>was ' + part + '</b>)</p>\n')
@@ -2559,47 +2580,47 @@ def conjugate_en(verb, onfile=False, html=False, info=None, nb=None):
     f.write('\t<li>forme <b>affirmative</b> : <b class="past">' + pret + particle + '</b></li>\n')
     f.write('\t<li>forme <b>négative</b> : <b class="past">did not ' + root + particle + '</b></li>\n')
     f.write('</ul></p>\n')
-    f.write('<p><b>Futur simple</b> : <b class="future">will</b> (not) <b class="future">' + root + particle + '</b></p>\n')
+    f.write('<p><b>Futur simple</b> : <b class="future">will</b> <b>(not)</b> <b class="future">' + root + particle + '</b></p>\n')
     f.write('</div>\n')
     
     f.write('<div class="pp">\n')
-    f.write('<p><b>Présent parfait</b> : <b class="present">have</b> (not) <b class="pp">' + part + particle + '</b> (3e pers. sing. : <b class="present">' + 'ha</b><b class="s">s</b> (not) <b class="pp">' + part + particle + '</b>)</p>\n')
-    f.write('<p><b>Passé parfait</b> : <b class="past">had</b> (not) <b class="pp">' + part + particle + '</b></p>\n')
-    f.write('<p><b>Futur parfait</b> : <b class="future">will</b> (not) <b class="future">have</b> <b class="pp">' + part + particle + '</b></p>\n')
+    f.write('<p><b>Présent parfait</b> : <b class="present">have</b> <b>(not)</b> <b class="pp">' + part + particle + '</b> (3e pers. sing. : <b class="present">' + 'ha</b><b class="s">s</b> <b>(not)</b> <b class="pp">' + part + particle + '</b>)</p>\n')
+    f.write('<p><b>Passé parfait</b> : <b class="past">had</b> <b>(not)</b> <b class="pp">' + part + particle + '</b></p>\n')
+    f.write('<p><b>Futur parfait</b> : <b class="future">will</b> <b>(not)</b> <b class="future">have</b> <b class="pp">' + part + particle + '</b></p>\n')
     f.write('</div>\n')
     
     f.write('<div class="ing">\n')
-    f.write('<p><b>Présent continu</b> : <b class="present">are</b> (not) <b class="ing">' + ing + particle +  '</b> (1ère et 3e pers. sing. : <b class="present">is</b> (not) <b class="ing">' + ing + particle + '</b></p>\n')
-    f.write('<p><b>Passé continu</b> : <b class="past">were</b> (not) <b class="ing">' + ing + particle +  '</b> (1ère et 3e pers. sing. : <b class="past">was</b> (not) <b class="ing">' + ing + particle + '</b></p>\n')
-    f.write('<p><b>Futur continu</b> : <b class="future">will be</b> (not) <b class="ing">' + ing + particle + '</b></p>\n')
+    f.write('<p><b>Présent continu</b> : <b class="present">are</b> <b>(not)</b> <b class="ing">' + ing + particle +  '</b> (1ère et 3e pers. sing. : <b class="present">is</b> <b>(not)</b> <b class="ing">' + ing + particle + '</b></p>\n')
+    f.write('<p><b>Passé continu</b> : <b class="past">were</b> <b>(not)</b> <b class="ing">' + ing + particle +  '</b> (1ère et 3e pers. sing. : <b class="past">was</b> <b>(not)</b> <b class="ing">' + ing + particle + '</b></p>\n')
+    f.write('<p><b>Futur continu</b> : <b class="future">will be</b> <b>(not)</b> <b class="ing">' + ing + particle + '</b></p>\n')
     f.write('</div>\n')
     
     f.write('<div class="pp">\n')
     f.write('<div class="ing">\n')
-    f.write('<p><b>Présent parfait continu</b> : <b class="present">have</b> (not) <b class="pp">been</b> <b class="ing">' + ing + particle + '</b> (3e pers. sing. : <b class="present">' + 'ha</b><b class="s">s</b> (not) <b class="pp">been</b> <b class="ing">' + ing + particle + '</b>)</p>\n')
-    f.write('<p><b>Passé parfait continu</b> : <b class="past">had</b> (not) <b class="pp">been</b> <b class="ing">' + ing + particle + '</b></p>\n')
-    f.write('<p><b>Futur parfait continu</b> : <b class="future">will</b> (not) <b class="future">have</b> <b class="pp">been</b> <b class="ing">' + part + particle + '</b></p>\n')
+    f.write('<p><b>Présent parfait continu</b> : <b class="present">have</b> <b>(not)</b> <b class="pp">been</b> <b class="ing">' + ing + particle + '</b> (3e pers. sing. : <b class="present">' + 'ha</b><b class="s">s</b> <b>(not)</b> <b class="pp">been</b> <b class="ing">' + ing + particle + '</b>)</p>\n')
+    f.write('<p><b>Passé parfait continu</b> : <b class="past">had</b> <b>(not)</b> <b class="pp">been</b> <b class="ing">' + ing + particle + '</b></p>\n')
+    f.write('<p><b>Futur parfait continu</b> : <b class="future">will</b> <b>(not)</b> <b class="future">have</b> <b class="pp">been</b> <b class="ing">' + part + particle + '</b></p>\n')
     f.write('</div>\n')
     f.write('</div>\n')
     
     f.write('<h3>Conditionnel</h3>\n')
-    f.write('<p><b>Présent</b> : should/would (not) ' + root + particle + '</p>\n')
-    f.write('<p><b>Passé</b> : should/would (not) have ' + part + particle + '</p>\n')
+    f.write('<p><b>Présent</b> : <b class="cond">should/would</b> <b>(not)</b> <b class="present">' + root + particle + '</b></p>\n')
+    f.write('<p><b>Passé</b> : <b class="cond">should/would</b> <b>(not)</b> <b class="cond">have</b> <b class="pp">' + part + particle + '</b></p>\n')
     
     f.write('<h3>Subjonctif</h3>\n')
-    f.write('<p><b>Présent</b> : (not) <b class="present">' + root + particle + '</b></p>\n')
+    f.write('<p><b>Présent</b> : <b>(not)</b> <b class="present">' + root + particle + '</b> (à <u>toutes</u> les personnes)</p>\n')
     if root == 'be':
-        f.write('<p><b>Passé</b> : (not) <b class="past">' + pret + particle + '</b></p>\n')
+        f.write('<p><b>Passé</b> : <b>(not)</b> <b class="past">' + pret + particle + '</b> (à <u>toutes</u> les personnes)</p>\n')
     
     f.write('<h3>Impératif</h3>\n')
-    f.write('<p><b>2e pers.</b> : (do not) <b class="present">' + root + particle + '</b>!</p>\n')
-    f.write('<p><b>1e pers. du pluriel</b> (avec deux façons d\'exprimer la négation) : (do not) <b class="present">let</b> \'s (not) <b class="present">' + root + particle + '</b>!</p>\n')
-    f.write('<p><b>3e pers.</b> (avec deux façons d\'exprimer la négation) : (do not) <b class="present">let</b> her/him/them (not) <b class="present">' + root + particle + '</b>!</p>\n')
+    f.write('<p><b>2e pers.</b> : <b>(do not)</b> <b class="present">' + root + particle + '</b>!</p>\n')
+    f.write('<p><b>1e pers. du pluriel</b> (avec deux façons d\'exprimer la négation) : <b>(do not)</b> <b class="present">let</b> \'s <b>(not)</b> <b class="present">' + root + particle + '</b>!</p>\n')
+    f.write('<p><b>3e pers.</b> (avec deux façons d\'exprimer la négation) : <b>(do not)</b> <b class="present">let</b> her/him/them <b>(not)</b> <b class="present">' + root + particle + '</b>!</p>\n')
     
-    f.write('<h3>Constructions avec auxilaires</h3>\n')
-    f.write('<p>Expression d\'une <b>potentialité</b> : may/might (not) <b class="present">' + root + particle + '</b></p>\n')
-    f.write('<p>Expression d\'une <b>autorisation</b> : may (not) <b class="present">' + root + particle + '</b></p>\n')
-    f.write('<p>Expression d\'un <b>doute</b>, d\'une <b>supposition</b> ou <b>atténuation polie</b> : should (not) <b class="present">' + root + particle + '</b></p>\n')
+    #f.write('<h3>Constructions avec auxilaires</h3>\n')
+    #f.write('<p>Expression d\'une <b>potentialité</b> : may/might (not) <b class="present">' + root + particle + '</b></p>\n')
+    #f.write('<p>Expression d\'une <b>autorisation</b> : may (not) <b class="present">' + root + particle + '</b></p>\n')
+    #f.write('<p>Expression d\'un <b>doute</b>, d\'une <b>supposition</b> ou <b>atténuation polie</b> : should (not) <b class="present">' + root + particle + '</b></p>\n')
     
     f.write('<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div>')
     f.write('<mbp:pagebreak />')
@@ -2753,6 +2774,7 @@ class Console:
             print("    file - switch to conjugate a verb in a file instead of displaying it")
             print("    html - switch to output in html in the file instead of plain text")
             print("    reset - reset the file where the conjugated verbs are stored")
+            print("    close - write the footer in the file where the conjugated verbs are stored")
             print("  Available languages are : fr, en, it, eo, de")
         elif self.cmd == 'create':
             print("i Recreating the database")
@@ -2789,7 +2811,10 @@ class Console:
             #f = open('output.html', 'w')
             #f.close()
             header_en()
-            print('i file output.html reset')
+            print('i file output.html reset, header written')
+        elif self.cmd == 'close':
+            footer_en()
+            print('i footer written in file output.html')
         elif self.cmd == 'debug':
             if self.cmd_debug:
                 self.cmd_debug = False
@@ -2840,4 +2865,4 @@ class Console:
         else:
             print("! Unknown command : " + self.cmd)
 
-Console(['create', 'reset', 'html', 'lang en', 'con all', 'exit']) #'con talk', 'con accept', 'exit'])
+Console(['create', 'reset', 'html', 'lang en', 'con all', 'close', 'exit']) #'con talk', 'con accept', 'exit'])

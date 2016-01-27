@@ -1,0 +1,2016 @@
+************* Module invoke
+C: 69, 0: Line too long (206/100) (line-too-long)
+C: 70, 0: Line too long (211/100) (line-too-long)
+C: 72, 0: Line too long (161/100) (line-too-long)
+C: 73, 0: Trailing whitespace (trailing-whitespace)
+C:255, 0: Trailing whitespace (trailing-whitespace)
+C:271, 0: Trailing whitespace (trailing-whitespace)
+C:469, 0: Trailing whitespace (trailing-whitespace)
+C:484, 0: Trailing whitespace (trailing-whitespace)
+C:489, 0: Trailing whitespace (trailing-whitespace)
+C:791, 0: Trailing whitespace (trailing-whitespace)
+C:882, 0: Trailing whitespace (trailing-whitespace)
+C:1061, 0: Trailing whitespace (trailing-whitespace)
+C:1070, 0: Trailing whitespace (trailing-whitespace)
+C:1075, 0: Trailing whitespace (trailing-whitespace)
+C:1077, 0: Trailing whitespace (trailing-whitespace)
+C:1081, 0: Trailing whitespace (trailing-whitespace)
+C:1110, 0: Exactly one space required after comma
+        (5,  6, 100028, "visionner (un film, une émission)", None),
+          ^ (bad-whitespace)
+C:1149, 0: Line too long (263/100) (line-too-long)
+C:1490, 0: Trailing whitespace (trailing-whitespace)
+C:1568, 0: Exactly one space required after comma
+        (476,  28, 190169, "concerner", None),
+            ^ (bad-whitespace)
+C:1591, 0: Trailing whitespace (trailing-whitespace)
+C:1613, 0: Trailing whitespace (trailing-whitespace)
+C:1617, 0: Wrong hanging indentation (add 6 spaces).
+		(10000, 100001, 1, None, "ouvrir quelque chose : to open something"), # open => ouvrir
+  ^     | (bad-continuation)
+C:1618, 0: Wrong hanging indentation (add 6 spaces).
+		(60000, 100009, 9, None, "venir de quelque part : to come from somewhere, venir ici : to come here, venir jusqu'ici : to come this far"), # come => venir
+  ^     | (bad-continuation)
+C:1618, 0: Line too long (155/100) (line-too-long)
+C:1619, 0: Wrong hanging indentation (add 6 spaces).
+		(80000, 100002, 2, None, "voyager : to travel"), # travel => voyager
+  ^     | (bad-continuation)
+C:1620, 0: Wrong hanging indentation (add 6 spaces).
+		(90000, 100003, 3, None, "vouloir quelque chose : want something, vouloir faire quelque chose : want to do something"), # want => vouloir
+  ^     | (bad-continuation)
+C:1620, 0: Line too long (139/100) (line-too-long)
+C:1621, 0: Wrong hanging indentation (add 6 spaces).
+		(100000, 100005, 5, "dans les airs", "voler dans les airs : to fly"), # fly => voler
+  ^     | (bad-continuation)
+C:1622, 0: Wrong hanging indentation (add 6 spaces).
+		(110000, 100006, 6, None, 'to see something'), # see => voir
+  ^     | (bad-continuation)
+C:1623, 0: Wrong hanging indentation (add 6 spaces).
+		(120000, 100007, 7, None, None), # live => vivre
+  ^     | (bad-continuation)
+C:1624, 0: Wrong hanging indentation (add 6 spaces).
+		(130000, 100008, 8, None, None), # visit => visiter
+  ^     | (bad-continuation)
+C:1625, 0: Wrong hanging indentation (add 6 spaces).
+		(140000, 100010, 10, None, None), # sell => vendre
+  ^     | (bad-continuation)
+C:1626, 0: Wrong hanging indentation (add 6 spaces).
+		(150000, 100011, 11, None, None), # use => utiliser
+  ^     | (bad-continuation)
+C:1627, 0: Wrong hanging indentation (add 6 spaces).
+		(160000, 100012, 12, None, None), # find => trouver
+  ^     | (bad-continuation)
+C:1628, 0: Wrong hanging indentation (add 6 spaces).
+		(170000, 100013, 13, None, None), # work => travailler
+  ^     | (bad-continuation)
+C:1629, 0: Wrong hanging indentation (add 6 spaces).
+		(180000, 100014, 14, None, None), # translate => traduire
+  ^     | (bad-continuation)
+C:1630, 0: Wrong hanging indentation (add 6 spaces).
+		(190000, 100015, 15, None, None), # turn => tourner
+  ^     | (bad-continuation)
+C:1631, 0: Wrong hanging indentation (add 6 spaces).
+		(200000, 100016, 16, None, None), # touch => toucher
+  ^     | (bad-continuation)
+C:1632, 0: Wrong hanging indentation (add 6 spaces).
+		(210000, 100017, 17, None, None), # fall => tomber
+  ^     | (bad-continuation)
+C:1633, 0: Wrong hanging indentation (add 6 spaces).
+		(220000, 100026, 26, None, None), # tell => raconter
+  ^     | (bad-continuation)
+C:1634, 0: Wrong hanging indentation (add 6 spaces).
+		(230000, 100027, 27, None, None), # receive => recevoir
+  ^     | (bad-continuation)
+C:1635, 0: Wrong hanging indentation (add 6 spaces).
+		(240000, 100028, 28, "observer, surveiller, visionner (un film, une émission)", None), # watch => regarder
+  ^     | (bad-continuation)
+C:1635, 0: Line too long (108/100) (line-too-long)
+C:1636, 0: Wrong hanging indentation (add 6 spaces).
+		(40000, 190028, 28, None, None), # look at => regarder
+  ^     | (bad-continuation)
+C:1637, 0: Wrong hanging indentation (add 6 spaces).
+		(50000, 100028, 6, "visionner (un film, une émission)", None), # watch => voir
+  ^     | (bad-continuation)
+C:1638, 0: Wrong hanging indentation (add 6 spaces).
+		(250000, 100029, 29, None, None), # thank => remercier
+  ^     | (bad-continuation)
+C:1639, 0: Wrong hanging indentation (add 6 spaces).
+		(260000, 100030, 30, None, None), # meet => rencontrer
+  ^     | (bad-continuation)
+C:1640, 0: Wrong hanging indentation (add 6 spaces).
+		(270000, 100031, 31, None, None), # answer => répondre
+  ^     | (bad-continuation)
+C:1641, 0: Wrong hanging indentation (add 6 spaces).
+		(280000, 100032, 32, None, None), # stay => rester
+  ^     | (bad-continuation)
+C:1642, 0: Wrong hanging indentation (add 6 spaces).
+		(290000, 100033, 33, None, None), # success => réussir
+  ^     | (bad-continuation)
+C:1643, 0: Wrong hanging indentation (add 6 spaces).
+		(300000, 100034, 34, None, None), # wake up => réveiller (se)
+  ^     | (bad-continuation)
+C:1644, 0: Wrong hanging indentation (add 6 spaces).
+		(310000, 100035, 35, None, None), # laugh => rire
+  ^     | (bad-continuation)
+C:1645, 0: Wrong hanging indentation (add 6 spaces).
+		(320000, 100036, 36, None, None), # take care => occuper (s')
+  ^     | (bad-continuation)
+C:1646, 0: Wrong hanging indentation (add 6 spaces).
+		(330000, 100037, 37, None, None), # jump => sauter
+  ^     | (bad-continuation)
+C:1647, 0: Wrong hanging indentation (add 6 spaces).
+		(340000, 100038, 38, None, None), # know => savoir
+  ^     | (bad-continuation)
+C:1648, 0: Wrong hanging indentation (add 6 spaces).
+		(350000, 100039, 39, None, None), # rest => reposer (se)
+  ^     | (bad-continuation)
+C:1649, 0: Wrong hanging indentation (add 6 spaces).
+		(360000, 100040, 40, None, None), # remember => souvenir (se)
+  ^     | (bad-continuation)
+C:1650, 0: Wrong hanging indentation (add 6 spaces).
+		(370000, 100041, 41, "une odeur", None), # smell => sentir
+  ^     | (bad-continuation)
+C:1651, 0: Wrong hanging indentation (add 6 spaces).
+		(380000, 100042, 42, None, None), # suffer => souffrir
+  ^     | (bad-continuation)
+C:1652, 0: Wrong hanging indentation (add 6 spaces).
+		(390000, 100043, 43, None, "souhaiter que quelqu'un fasse quelque chose : to wish someone to do something, souhaiter faire quelque chose : to wish to do something, souhaiter quelque chose : to wish for something, souhaiter quelque chose à quelqu'un : to wish someone something, souhaiter quelque chose : to wish (that) proposition"), # wish => souhaiter
+  ^     | (bad-continuation)
+C:1652, 0: Line too long (355/100) (line-too-long)
+C:1653, 0: Wrong hanging indentation (add 6 spaces).
+		(400000, 100044, 44, None, None), # follow => suivre
+  ^     | (bad-continuation)
+C:1654, 0: Wrong hanging indentation (add 6 spaces).
+		(410000, 100045, 45, None, None), # hold => tenir
+  ^     | (bad-continuation)
+C:1655, 0: Wrong hanging indentation (add 6 spaces).
+		(420000, 100046, 46, "amener vers soi un objet", None), # pull => tirer
+  ^     | (bad-continuation)
+C:1656, 0: Wrong hanging indentation (add 6 spaces).
+		(430000, 100047, 47, None, None), # put => mettre
+  ^     | (bad-continuation)
+C:1657, 0: Wrong hanging indentation (add 6 spaces).
+		(440000, 100048, 48, None, None), # show => montrer
+  ^     | (bad-continuation)
+C:1658, 0: Wrong hanging indentation (add 6 spaces).
+		(450000, 100049, 49, None, None), # die => mourir
+  ^     | (bad-continuation)
+C:1659, 0: Wrong hanging indentation (add 6 spaces).
+		(460000, 100050, 50, None, None), # swim => nager
+  ^     | (bad-continuation)
+C:1660, 0: Wrong hanging indentation (add 6 spaces).
+		(470000, 100051, 51, None, None), # be born => naître
+  ^     | (bad-continuation)
+C:1661, 0: Wrong hanging indentation (add 6 spaces).
+		(480000, 100052, 52, None, None), # forget => oublier
+  ^     | (bad-continuation)
+C:1662, 0: Wrong hanging indentation (add 6 spaces).
+		(490000, 100053, 53, None, None), # forgive => pardonner
+  ^     | (bad-continuation)
+C:1663, 0: Wrong hanging indentation (add 6 spaces).
+		(500000, 100054, 54, None, None), # speak => parler
+  ^     | (bad-continuation)
+C:1664, 0: Wrong hanging indentation (add 6 spaces).
+		(510000, 100055, 55, None, None), # go => partir
+  ^     | (bad-continuation)
+C:1665, 0: Wrong hanging indentation (add 6 spaces).
+		(520000, 100056, 56, None, None), # pass => passer
+  ^     | (bad-continuation)
+C:1666, 0: Wrong hanging indentation (add 6 spaces).
+		(530000, 100057, 57, None, None), # pay => payer
+  ^     | (bad-continuation)
+C:1667, 0: Wrong hanging indentation (add 6 spaces).
+		(540000, 100058, 58, None, None), # think => penser
+  ^     | (bad-continuation)
+C:1668, 0: Wrong hanging indentation (add 6 spaces).
+		(550000, 100059, 59, None, None), # lose => perdre
+  ^     | (bad-continuation)
+C:1669, 0: Wrong hanging indentation (add 6 spaces).
+		(560000, 100060, 60, None, None), # allow => permettre
+  ^     | (bad-continuation)
+C:1670, 0: Wrong hanging indentation (add 6 spaces).
+		(570000, 100061, 61, None, None), # please => plaire
+  ^     | (bad-continuation)
+C:1671, 0: Wrong hanging indentation (add 6 spaces).
+		(580000, 100062, 62, None, None), # cry => pleurer
+  ^     | (bad-continuation)
+C:1672, 0: Wrong hanging indentation (add 6 spaces).
+		(590000, 100063, 63, "porter un objet", None), # carry => porter
+  ^     | (bad-continuation)
+C:1673, 0: Wrong hanging indentation (add 6 spaces).
+		(600000, 100064, 64, None, None), # can => pouvoir
+  ^     | (bad-continuation)
+C:1674, 0: Wrong hanging indentation (add 6 spaces).
+		(610000, 100065, 65, None, None), # take => prendre
+  ^     | (bad-continuation)
+C:1675, 0: Wrong hanging indentation (add 6 spaces).
+		(620000, 100066, 66, "présenter quelqu'un", "présenter quelqu'un/quelqu'chose à quelqu'un : to introduce someone/something to someone, se présenter : to introduce yourself, introduire quelque chose dans quelque chose : to introduce something into something"), # introduce yourself => présenter (se)
+  ^     | (bad-continuation)
+C:1675, 0: Line too long (300/100) (line-too-long)
+C:1676, 0: Wrong hanging indentation (add 6 spaces).
+		(630000, 100067, 67, None, None), # pledge => promettre
+  ^     | (bad-continuation)
+C:1677, 0: Wrong hanging indentation (add 6 spaces).
+		(640000, 100068, 68, None, None), # leave => quitter
+  ^     | (bad-continuation)
+C:1678, 0: Wrong hanging indentation (add 6 spaces).
+		(650000, 100069, 69, None, None), # walk => marcher
+  ^     | (bad-continuation)
+C:1679, 0: Wrong hanging indentation (add 6 spaces).
+		(660000, 100070, 70, None, None), # miss => manquer
+  ^     | (bad-continuation)
+C:1680, 0: Wrong hanging indentation (add 6 spaces).
+		(670000, 100071, 71, None, None), # eat => manger
+  ^     | (bad-continuation)
+C:1681, 0: Wrong hanging indentation (add 6 spaces).
+		(680000, 100072, 72, None, None), # read => lire
+  ^     | (bad-continuation)
+C:1682, 0: Wrong hanging indentation (add 6 spaces).
+		(690000, 100073, 73, None, None), # stand up => lever (se)
+  ^     | (bad-continuation)
+C:1683, 0: Wrong hanging indentation (add 6 spaces).
+		(700000, 100074, 74, None, None), # wash => laver
+  ^     | (bad-continuation)
+C:1684, 0: Wrong hanging indentation (add 6 spaces).
+		(710000, 100075, 75, None, None), # play => jouer
+  ^     | (bad-continuation)
+C:1685, 0: Wrong hanging indentation (add 6 spaces).
+		(720000, 100076, 76, None, None), # throw => jeter
+  ^     | (bad-continuation)
+C:1686, 0: Wrong hanging indentation (add 6 spaces).
+		(730000, 100077, 77, None, None), # invite => inviter
+  ^     | (bad-continuation)
+C:1687, 0: Wrong hanging indentation (add 6 spaces).
+		(740000, 100078, 78, None, None), # live in => habiter
+  ^     | (bad-continuation)
+C:1688, 0: Wrong hanging indentation (add 6 spaces).
+		(750000, 100079, 79, None, None), # dress => habiller (s')
+  ^     | (bad-continuation)
+C:1689, 0: Wrong hanging indentation (add 6 spaces).
+		(760000, 100080, 80, None, None), # taste => goûter
+  ^     | (bad-continuation)
+C:1690, 0: Wrong hanging indentation (add 6 spaces).
+		(770000, 100081, 81, None, None), # win => gagner
+  ^     | (bad-continuation)
+C:1691, 0: Wrong hanging indentation (add 6 spaces).
+		(780000, 100082, 82, None, None), # finish => finir
+  ^     | (bad-continuation)
+C:1692, 0: Wrong hanging indentation (add 6 spaces).
+		(790000, 100083, 83, None, None), # close => fermer
+  ^     | (bad-continuation)
+C:1693, 0: Wrong hanging indentation (add 6 spaces).
+		(800000, 100084, 84, None, None), # do => faire
+  ^     | (bad-continuation)
+C:1694, 0: Wrong hanging indentation (add 6 spaces).
+		(810000, 100085, 85, None, None), # study => étudier
+  ^     | (bad-continuation)
+C:1695, 0: Wrong hanging indentation (add 6 spaces).
+		(820000, 100086, 86, None, None), # be => être
+  ^     | (bad-continuation)
+C:1696, 0: Wrong hanging indentation (add 6 spaces).
+		(830000, 100087, 87, None, None), # try => essayer
+  ^     | (bad-continuation)
+C:1697, 0: Wrong hanging indentation (add 6 spaces).
+		(840000, 100088, 88, None, None), # hope => espérer
+  ^     | (bad-continuation)
+C:1698, 0: Wrong hanging indentation (add 6 spaces).
+		(850000, 100089, 89, None, None), # send => envoyer
+  ^     | (bad-continuation)
+C:1699, 0: Wrong hanging indentation (add 6 spaces).
+		(860000, 100090, 90, None, None), # hear => entendre
+  ^     | (bad-continuation)
+C:1700, 0: Wrong hanging indentation (add 6 spaces).
+		(870000, 100091, 91, None, None), # teach => enseigner
+  ^     | (bad-continuation)
+C:1701, 0: Wrong hanging indentation (add 6 spaces).
+		(880000, 100092, 92, None, None), # write => écrire
+  ^     | (bad-continuation)
+C:1702, 0: Wrong hanging indentation (add 6 spaces).
+		(890000, 100093, 93, None, None), # listen => écouter
+  ^     | (bad-continuation)
+C:1703, 0: Wrong hanging indentation (add 6 spaces).
+		(900000, 100094, 94, None, None), # sleep => dormir
+  ^     | (bad-continuation)
+C:1704, 0: Wrong hanging indentation (add 6 spaces).
+		(910000, 100095, 95, None, None), # say => dire
+  ^     | (bad-continuation)
+C:1705, 0: Wrong hanging indentation (add 6 spaces).
+		(920000, 100096, 96, None, None), # must => devoir
+  ^     | (bad-continuation)
+C:1706, 0: Wrong hanging indentation (add 6 spaces).
+		(930000, 100097, 97, None, None), # ask => demander
+  ^     | (bad-continuation)
+C:1707, 0: Wrong hanging indentation (add 6 spaces).
+		(940000, 100098, 98, None, None), # dance => danser
+  ^     | (bad-continuation)
+C:1708, 0: Wrong hanging indentation (add 6 spaces).
+		(950000, 100099, 99, None, None), # cook => cuire
+  ^     | (bad-continuation)
+C:1709, 0: Wrong hanging indentation (add 6 spaces).
+		(960000, 100100, 100, None, None), # believe => croire
+  ^     | (bad-continuation)
+C:1710, 0: Wrong hanging indentation (add 6 spaces).
+		(970000, 100101, 101, None, None), # shout => crier
+  ^     | (bad-continuation)
+C:1711, 0: Wrong hanging indentation (add 6 spaces).
+		(980000, 100102, 102, None, None), # create => créer
+  ^     | (bad-continuation)
+C:1712, 0: Wrong hanging indentation (add 6 spaces).
+		(990000, 100103, 103, None, None), # cost => coûter
+  ^     | (bad-continuation)
+C:1713, 0: Wrong hanging indentation (add 6 spaces).
+		(1000000, 100104, 104, None, None), # run => courir 
+  ^     | (bad-continuation)
+C:1713, 0: Trailing whitespace (trailing-whitespace)
+C:1714, 0: Wrong hanging indentation (add 6 spaces).
+		(1010000, 100105, 105, None, None), # build => construire
+  ^     | (bad-continuation)
+C:1715, 0: Wrong hanging indentation (add 6 spaces).
+		(1020000, 100038, 106, None, None), # know => connaître
+  ^     | (bad-continuation)
+C:1716, 0: Wrong hanging indentation (add 6 spaces).
+		(1030000, 100107, 107, None, None), # drive => conduire
+  ^     | (bad-continuation)
+C:1717, 0: Wrong hanging indentation (add 6 spaces).
+		(1040000, 100108, 108, None, None), # count => compter
+  ^     | (bad-continuation)
+C:1718, 0: Wrong hanging indentation (add 6 spaces).
+		(1050000, 100109, 109, None, None), # understand => comprendre
+  ^     | (bad-continuation)
+C:1719, 0: Wrong hanging indentation (add 6 spaces).
+		(1060000, 100110, 110, None, None), # begin => commencer
+  ^     | (bad-continuation)
+C:1720, 0: Wrong hanging indentation (add 6 spaces).
+		(1070000, 100111, 111, None, None), # choose => choisir
+  ^     | (bad-continuation)
+C:1721, 0: Wrong hanging indentation (add 6 spaces).
+		(1080000, 100112, 112, None, None), # look for => chercher
+  ^     | (bad-continuation)
+C:1722, 0: Wrong hanging indentation (add 6 spaces).
+		(1090000, 100113, 113, None, None), # sing => chanter
+  ^     | (bad-continuation)
+C:1723, 0: Wrong hanging indentation (add 6 spaces).
+		(1100000, 100114, 114, None, None), # change => changer
+  ^     | (bad-continuation)
+C:1724, 0: Wrong hanging indentation (add 6 spaces).
+		(1110000, 100115, 115, None, None), # break => casser
+  ^     | (bad-continuation)
+C:1725, 0: Wrong hanging indentation (add 6 spaces).
+		(1120000, 100116, 116, None, None), # hide => cacher
+  ^     | (bad-continuation)
+C:1726, 0: Wrong hanging indentation (add 6 spaces).
+		(1130000, 100117, 117, None, None), # burn => brûler
+  ^     | (bad-continuation)
+C:1727, 0: Wrong hanging indentation (add 6 spaces).
+		(1140000, 100118, 118, None, None), # move => bouger
+  ^     | (bad-continuation)
+C:1728, 0: Wrong hanging indentation (add 6 spaces).
+		(1150000, 100119, 119, None, None), # drink => boire
+  ^     | (bad-continuation)
+C:1729, 0: Wrong hanging indentation (add 6 spaces).
+		(1160000, 100120, 120, None, None), # chat => bavarder
+  ^     | (bad-continuation)
+C:1730, 0: Wrong hanging indentation (add 6 spaces).
+		(1170000, 100121, 121, None, None), # be afraid => avoir peur
+  ^     | (bad-continuation)
+C:1731, 0: Wrong hanging indentation (add 6 spaces).
+		(1180000, 100122, 122, None, None), # trust => avoir confiance
+  ^     | (bad-continuation)
+C:1732, 0: Wrong hanging indentation (add 6 spaces).
+		(1190000, 100123, 123, None, None), # need => avoir besoin
+  ^     | (bad-continuation)
+C:1733, 0: Wrong hanging indentation (add 6 spaces).
+		(1200000, 100124, 124, None, None), # have => avoir
+  ^     | (bad-continuation)
+C:1734, 0: Wrong hanging indentation (add 6 spaces).
+		(1210000, 100125, 125, None, None), # wait => attendre
+  ^     | (bad-continuation)
+C:1735, 0: Wrong hanging indentation (add 6 spaces).
+		(1220000, 100126, 126, "quelque part", None), # arrive => arriver
+  ^     | (bad-continuation)
+C:1736, 0: Wrong hanging indentation (add 6 spaces).
+		(1230000, 100127, 127, None, None), # stop => arrêter
+  ^     | (bad-continuation)
+C:1737, 0: Wrong hanging indentation (add 6 spaces).
+		(1240000, 100128, 128, None, None), # learn => apprendre
+  ^     | (bad-continuation)
+C:1738, 0: Wrong hanging indentation (add 6 spaces).
+		(1250000, 100129, 129, None, None), # like => apprécier
+  ^     | (bad-continuation)
+C:1739, 0: Wrong hanging indentation (add 6 spaces).
+		(1260000, 100130, 130, None, None), # call => appeler
+  ^     | (bad-continuation)
+C:1740, 0: Wrong hanging indentation (add 6 spaces).
+		(1270000, 100132, 132, None, None), # love => aimer
+  ^     | (bad-continuation)
+C:1741, 0: Wrong hanging indentation (add 6 spaces).
+		(1280000, 100133, 133, None, None), # buy => acheter
+  ^     | (bad-continuation)
+C:1742, 0: Wrong hanging indentation (add 6 spaces).
+		(1290000, 100134, 134, None, None), # help => aider
+  ^     | (bad-continuation)
+C:1743, 0: Wrong hanging indentation (add 6 spaces).
+		(1300000, 100135, 135, None, None), # give => donner
+  ^     | (bad-continuation)
+C:1744, 0: Wrong hanging indentation (add 6 spaces).
+		(1310000, 100136, 136, None, None), # come back => revenir
+  ^     | (bad-continuation)
+C:1745, 0: Wrong hanging indentation (add 6 spaces).
+		(1320000, 190041, 41, "un sentiment", None), # feel => sentir
+  ^     | (bad-continuation)
+C:1746, 0: Wrong hanging indentation (add 6 spaces).
+		(1330000, 190005, 5, "atteinte à la propriété d'autrui", None), # steal => voler
+  ^     | (bad-continuation)
+C:1747, 0: Wrong hanging indentation (add 6 spaces).
+		(1340000, 100055, 137, None, None), # go => aller
+  ^     | (bad-continuation)
+C:1748, 0: Wrong hanging indentation (add 6 spaces).
+		(1350000, 190046, 46, "lancer un projectile", None), # shoot => tirer
+  ^     | (bad-continuation)
+C:1749, 0: Wrong hanging indentation (add 6 spaces).
+		(4010000, 100138, 138, "vu de l'intérieur du lieu que l'on quitte", None), # go out => sortir
+  ^     | (bad-continuation)
+C:1750, 0: Wrong hanging indentation (add 6 spaces).
+		(4020000, 190138, 138, "vu de l'extérieur du lieu que l'on quitte", None), # come out => sortir
+  ^     | (bad-continuation)
+C:1751, 0: Wrong hanging indentation (add 6 spaces).
+		(4030000, 180138, 138, "sortir quelque chose", None), # take out => sortir
+  ^     | (bad-continuation)
+C:1752, 0: Wrong hanging indentation (add 6 spaces).
+		(4040000, 100139, 139, "vu de l'extérieur du lieu où l'on entre", None), # go in => entrer
+  ^     | (bad-continuation)
+C:1753, 0: Wrong hanging indentation (add 6 spaces).
+		(4050000, 190139, 139, "vu de l'intérieur du lieu où l'on entre", None), # come in => entrer
+  ^     | (bad-continuation)
+C:1754, 0: Wrong hanging indentation (add 6 spaces).
+		(4060000, 180139, 139, "de façon générale", None), # enter => entrer
+  ^     | (bad-continuation)
+C:1755, 0: Wrong hanging indentation (add 6 spaces).
+		(4100000, 100140, 140, None, None), # turn on => allumer
+  ^     | (bad-continuation)
+C:1756, 0: Wrong hanging indentation (add 6 spaces).
+		(4110000, 100141, 141, None, None), # turn off => éteindre
+  ^     | (bad-continuation)
+C:1758, 0: Wrong hanging indentation (add 6 spaces).
+		(4220000, 100143, 143, None, None), # decide => décider
+  ^     | (bad-continuation)
+C:1759, 0: Wrong hanging indentation (add 6 spaces).
+		(4250000, 100047, 144, None, None), # put => poser
+  ^     | (bad-continuation)
+C:1760, 0: Wrong hanging indentation (add 6 spaces).
+		(4280000, 100145, 145, None, None), # reduce => réduire
+  ^     | (bad-continuation)
+C:1762, 0: Wrong hanging indentation (add 6 spaces).
+		(4340000, 100147, 147, "vu du lieu plus bas", None), # go up => monter
+  ^     | (bad-continuation)
+C:1763, 0: Wrong hanging indentation (add 6 spaces).
+		(4350000, 190147, 147, "vu du lieu plus haut", None), # come up => monter
+  ^     | (bad-continuation)
+C:1764, 0: Wrong hanging indentation (add 6 spaces).
+		(4380000, 100148, 148, "vu du lieu plus haut", None), # go down => descendre
+  ^     | (bad-continuation)
+C:1765, 0: Wrong hanging indentation (add 6 spaces).
+		(4390000, 190148, 148, "vu du lieu plus bas", None), # come down => descendre
+  ^     | (bad-continuation)
+C:1769, 0: Wrong hanging indentation (add 6 spaces).
+		(4520000, 100152, 152, None, "ajouter quelque chose à quelque chose : to add something to something"), # add => ajouter VAGUE 2
+  ^     | (bad-continuation)
+C:1769, 0: Line too long (129/100) (line-too-long)
+C:1770, 0: Wrong hanging indentation (add 6 spaces).
+		(4530000, 100153, 153, None, None), # catch => attraper VAGUE 2
+  ^     | (bad-continuation)
+C:1771, 0: Wrong hanging indentation (add 6 spaces).
+		(4540000, 100154, 154, None, None), # increase => augmenter VAGUE 2
+  ^     | (bad-continuation)
+C:1772, 0: Wrong hanging indentation (add 6 spaces).
+		(4550000, 100155, 155, None, None), # shine => briller VAGUE 2
+  ^     | (bad-continuation)
+C:1773, 0: Wrong hanging indentation (add 6 spaces).
+		(4560000, 100156, 156, "attraper du gibier", None), # hunt => chasser VAGUE 2
+  ^     | (bad-continuation)
+C:1774, 0: Wrong hanging indentation (add 6 spaces).
+		(4570000, 190156, 156, "expulser", None), # drive out => chasser VAGUE 2
+  ^     | (bad-continuation)
+C:1775, 0: Wrong hanging indentation (add 6 spaces).
+		(4580000, 100105, 158, None, None), # build => bâtir
+  ^     | (bad-continuation)
+C:1776, 0: Wrong hanging indentation (add 6 spaces).
+		(4590000, 100159, 159, None, None), # discover => découvrir  VAGUE 2
+  ^     | (bad-continuation)
+C:1777, 0: Wrong hanging indentation (add 6 spaces).
+		(4600000, 100003, 160, "vouloir", None), # want => désirer
+  ^     | (bad-continuation)
+C:1778, 0: Wrong hanging indentation (add 6 spaces).
+		(4610000, 100043, 160, "dans le sens de souhaiter", None), # wish => désirer
+  ^     | (bad-continuation)
+C:1779, 0: Wrong hanging indentation (add 6 spaces).
+		(4620000, 100160, 160, "convoiter (y compris sexuellement)", None), # desire => désirer VAGUE 2
+  ^     | (bad-continuation)
+C:1780, 0: Wrong hanging indentation (add 6 spaces).
+		(4630000, 100161, 161, None, None), # guess => deviner VAGUE 2
+  ^     | (bad-continuation)
+C:1781, 0: Wrong hanging indentation (add 6 spaces).
+		(4640000, 100162, 162, None, None), # decrease => diminuer VAGUE 2
+  ^     | (bad-continuation)
+C:1782, 0: Wrong hanging indentation (add 6 spaces).
+		(4650000, 100163, 163, None, None), # discuss => discuter VAGUE 2
+  ^     | (bad-continuation)
+C:1783, 0: Wrong hanging indentation (add 6 spaces).
+		(4660000, 190073, 73, "(se dit également du soleil)", None), # rise => lever (se)
+  ^     | (bad-continuation)
+C:1784, 0: Wrong hanging indentation (add 6 spaces).
+		(4670000, 190084, 84, "fabriquer", None), # make => faire
+  ^     | (bad-continuation)
+C:1785, 0: Wrong hanging indentation (add 6 spaces).
+		(4680000, 100164, 164, None, None), # disappear => disparaître VAGUE 2
+  ^     | (bad-continuation)
+C:1786, 0: Wrong hanging indentation (add 6 spaces).
+		(4690000, 100165, 165, None, None), # last => durer VAGUE 2
+  ^     | (bad-continuation)
+C:1787, 0: Wrong hanging indentation (add 6 spaces).
+		(4700000, 100166, 166, None, None), # agree => être d'accord VAGUE 2
+  ^     | (bad-continuation)
+C:1788, 0: Wrong hanging indentation (add 6 spaces).
+		(4710000, 100167, 167, None, None), # moan => gémir VAGUE 2
+  ^     | (bad-continuation)
+C:1789, 0: Wrong hanging indentation (add 6 spaces).
+		(4720000, 100168, 168, "déraper", None), # slip => glisser VAGUE 2
+  ^     | (bad-continuation)
+C:1790, 0: Wrong hanging indentation (add 6 spaces).
+		(4730000, 190168, 168, "se mouvoir de façon fluide", None), # glide => glisser VAGUE 2
+  ^     | (bad-continuation)
+C:1791, 0: Wrong hanging indentation (add 6 spaces).
+		(4740000, 100169, 169, None, None), # interest => intéresser VAGUE 2
+  ^     | (bad-continuation)
+C:1792, 0: Wrong hanging indentation (add 6 spaces).
+		(4750000, 190169, 169, "concerner", None), # concern => intéresser VAGUE 2
+  ^     | (bad-continuation)
+C:1793, 0: Wrong hanging indentation (add 6 spaces).
+		(4760000, 190169, 28, "concerner", None), # concern => regarder VAGUE 2
+  ^     | (bad-continuation)
+C:1794, 0: Wrong hanging indentation (add 6 spaces).
+		(4770000, 100170, 170, "lever", None), # raise => lever VAGUE 2
+  ^     | (bad-continuation)
+C:1795, 0: Wrong hanging indentation (add 6 spaces).
+		(4780000, 190170, 170, "soulever", None), # lift => lever VAGUE 2
+  ^     | (bad-continuation)
+C:1796, 0: Wrong hanging indentation (add 6 spaces).
+		(4790000, 100171, 171, None, None), # rent => louer VAGUE 2
+  ^     | (bad-continuation)
+C:1797, 0: Wrong hanging indentation (add 6 spaces).
+		(4800000, 190171, 171, None, None), # hire => louer VAGUE 2
+  ^     | (bad-continuation)
+C:1798, 0: Wrong hanging indentation (add 6 spaces).
+		(4810000, 180171, 171, None, None), # lease => louer VAGUE 2
+  ^     | (bad-continuation)
+C:1799, 0: Wrong hanging indentation (add 6 spaces).
+		(4820000, 100172, 172, None, None), # feed => nourrir VAGUE 2
+  ^     | (bad-continuation)
+C:1800, 0: Wrong hanging indentation (add 6 spaces).
+		(4830000, 100173, 173, None, None), # share => partager VAGUE 2
+  ^     | (bad-continuation)
+C:1801, 0: Wrong hanging indentation (add 6 spaces).
+		(4840000, 100174, 174, None, None), # hang => pendre VAGUE 2
+  ^     | (bad-continuation)
+C:1802, 0: Wrong hanging indentation (add 6 spaces).
+		(4850000, 100175, 175, None, None), # fold => plier VAGUE 2
+  ^     | (bad-continuation)
+C:1803, 0: Wrong hanging indentation (add 6 spaces).
+		(4860000, 100176, 176, "immerger (dans l'eau), descendre (dans l'air)", None), # dive => plonger VAGUE 2
+  ^     | (bad-continuation)
+C:1803, 0: Line too long (106/100) (line-too-long)
+C:1804, 0: Wrong hanging indentation (add 6 spaces).
+		(4870000, 100177, 177, None, None), # push => pousser VAGUE 2
+  ^     | (bad-continuation)
+C:1805, 0: Wrong hanging indentation (add 6 spaces).
+		(4880000, 100178, 178, None, None), # lend => prêter VAGUE 2
+  ^     | (bad-continuation)
+C:1806, 0: Wrong hanging indentation (add 6 spaces).
+		(4890000, 100179, 179, None, None), # produce => produire VAGUE 2
+  ^     | (bad-continuation)
+C:1807, 0: Wrong hanging indentation (add 6 spaces).
+		(4900000, 100058, 180, None, None), # think => réfléchir
+  ^     | (bad-continuation)
+C:1808, 0: Wrong hanging indentation (add 6 spaces).
+		(4910000, 100045, 181, None, None), # hold => retenir
+  ^     | (bad-continuation)
+C:1809, 0: Wrong hanging indentation (add 6 spaces).
+		(4920000, 100182, 182, None, None), # dream => rêver VAGUE 2
+  ^     | (bad-continuation)
+C:1810, 0: Wrong hanging indentation (add 6 spaces).
+		(4930000, 100183, 183, None, None), # be worth => valoir VAGUE 2
+  ^     | (bad-continuation)
+C:1811, 0: Wrong hanging indentation (add 6 spaces).
+		(4940000, 100184, 184, None, None), # empty => vider VAGUE 2
+  ^     | (bad-continuation)
+C:1812, 0: Wrong hanging indentation (add 6 spaces).
+		(4950000, 100185, 185, None, None), # become => devenir VAGUE 2
+  ^     | (bad-continuation)
+C:1813, 0: Wrong hanging indentation (add 6 spaces).
+		(4960000, 100076, 186, None, None), # throw => lancer VAGUE 2
+  ^     | (bad-continuation)
+C:1814, 0: Wrong hanging indentation (add 6 spaces).
+		(5970000, 100187, 187, None, None), # bring => apporter VAGUE 2
+  ^     | (bad-continuation)
+C:1815, 0: Wrong hanging indentation (add 6 spaces).
+		(5980000, 100188, 188, None, None), # cut => couper VAGUE 3
+  ^     | (bad-continuation)
+C:1816, 0: Wrong hanging indentation (add 6 spaces).
+		(5990000, 100189, 189, None, None), # draw => dessiner VAGUE 3
+  ^     | (bad-continuation)
+C:1817, 0: Wrong hanging indentation (add 6 spaces).
+		(6000000, 100190, 190, None, None), # keep => garder VAGUE 3
+  ^     | (bad-continuation)
+C:1818, 0: Wrong hanging indentation (add 6 spaces).
+		(6010000, 100191, 191, None, None), # lead => mener VAGUE 3
+  ^     | (bad-continuation)
+C:1819, 0: Wrong hanging indentation (add 6 spaces).
+		(6020000, 100192, 192, None, None), # let => laisser VAGUE 3
+  ^     | (bad-continuation)
+C:1820, 0: Wrong hanging indentation (add 6 spaces).
+		(6030000, 100193, 193, None, None), # lie => mentir VAGUE 3
+  ^     | (bad-continuation)
+C:1821, 0: Wrong hanging indentation (add 6 spaces).
+		(6040000, 100194, 194, None, None), # mean => signifier VAGUE 3
+  ^     | (bad-continuation)
+C:1822, 0: Wrong hanging indentation (add 6 spaces).
+		(6050000, 100195, 195, None, None), # spend => dépenser VAGUE 3
+  ^     | (bad-continuation)
+C:1823, 0: Wrong hanging indentation (add 6 spaces).
+		(6060000, 190063, 63, "porter un vêtement", None), # wear => porter VAGUE 3
+  ^     | (bad-continuation)
+C:1824, 0: Wrong hanging indentation (add 6 spaces).
+		(6070000, 100196, 196, None, None), # stand => être debout VAGUE 3
+  ^     | (bad-continuation)
+C:1825, 0: Wrong hanging indentation (add 6 spaces).
+		(6090000, 100197, 197, None, None), # sit => être assis VAGUE 3
+  ^     | (bad-continuation)
+C:1826, 0: Wrong hanging indentation (add 6 spaces).
+		(6100000, 100197, 150, None, None), # sit => asseoir (s') VAGUE 3
+  ^     | (bad-continuation)
+C:1844, 0: Trailing whitespace (trailing-whitespace)
+C:1848, 0: Wrong hanging indentation (add 6 spaces).
+		(1360000, 400001, 1, None, None), # ouvrir
+  ^     | (bad-continuation)
+C:1849, 0: Wrong hanging indentation (add 6 spaces).
+		(1370000, 400009, 9, None, None), # venir
+  ^     | (bad-continuation)
+C:1850, 0: Wrong hanging indentation (add 6 spaces).
+		(1390000, 400002, 2, None, None),
+  ^     | (bad-continuation)
+C:1851, 0: Wrong hanging indentation (add 6 spaces).
+		(1400000, 400003, 3, None, None),
+  ^     | (bad-continuation)
+C:1852, 0: Wrong hanging indentation (add 6 spaces).
+		(1410000, 400005, 5, "dans les airs", None),
+  ^     | (bad-continuation)
+C:1853, 0: Wrong hanging indentation (add 6 spaces).
+		(1420000, 400006, 6, None, None),
+  ^     | (bad-continuation)
+C:1854, 0: Wrong hanging indentation (add 6 spaces).
+		(1430000, 400007, 7, None, None),
+  ^     | (bad-continuation)
+C:1855, 0: Wrong hanging indentation (add 6 spaces).
+		(1440000, 400008, 8, None, None),
+  ^     | (bad-continuation)
+C:1856, 0: Wrong hanging indentation (add 6 spaces).
+		(1450000, 400010, 10, None, None),
+  ^     | (bad-continuation)
+C:1857, 0: Wrong hanging indentation (add 6 spaces).
+		(1460000, 400011, 11, None, None),
+  ^     | (bad-continuation)
+C:1858, 0: Wrong hanging indentation (add 6 spaces).
+		(1470000, 400012, 12, None, None),
+  ^     | (bad-continuation)
+C:1859, 0: Wrong hanging indentation (add 6 spaces).
+		(1480000, 400013, 13, None, None),
+  ^     | (bad-continuation)
+C:1860, 0: Wrong hanging indentation (add 6 spaces).
+		(1490000, 400014, 14, None, None),
+  ^     | (bad-continuation)
+C:1861, 0: Wrong hanging indentation (add 6 spaces).
+		(1500000, 400015, 15, None, None),
+  ^     | (bad-continuation)
+C:1862, 0: Wrong hanging indentation (add 6 spaces).
+		(1510000, 400016, 16, None, None),
+  ^     | (bad-continuation)
+C:1863, 0: Wrong hanging indentation (add 6 spaces).
+		(1520000, 400017, 17, None, None),
+  ^     | (bad-continuation)
+C:1864, 0: Wrong hanging indentation (add 6 spaces).
+		(1530000, 400026, 26, None, None),
+  ^     | (bad-continuation)
+C:1865, 0: Wrong hanging indentation (add 6 spaces).
+		(1540000, 400027, 27, None, None),
+  ^     | (bad-continuation)
+C:1866, 0: Wrong hanging indentation (add 6 spaces).
+		(1550000, 400028, 28, None, None),
+  ^     | (bad-continuation)
+C:1867, 0: Wrong hanging indentation (add 6 spaces).
+		(1560000, 400029, 29, None, None),
+  ^     | (bad-continuation)
+C:1868, 0: Wrong hanging indentation (add 6 spaces).
+		(1570000, 400030, 30, None, None),
+  ^     | (bad-continuation)
+C:1869, 0: Wrong hanging indentation (add 6 spaces).
+		(1580000, 400031, 31, None, None),
+  ^     | (bad-continuation)
+C:1870, 0: Wrong hanging indentation (add 6 spaces).
+		(1590000, 400032, 32, None, None),
+  ^     | (bad-continuation)
+C:1871, 0: Wrong hanging indentation (add 6 spaces).
+		(1600000, 400033, 33, None, None),
+  ^     | (bad-continuation)
+C:1872, 0: Wrong hanging indentation (add 6 spaces).
+		(1610000, 400034, 34, None, None),
+  ^     | (bad-continuation)
+C:1873, 0: Wrong hanging indentation (add 6 spaces).
+		(1620000, 400035, 35, None, None),
+  ^     | (bad-continuation)
+C:1874, 0: Wrong hanging indentation (add 6 spaces).
+		(1630000, 400036, 36, None, None),
+  ^     | (bad-continuation)
+C:1875, 0: Wrong hanging indentation (add 6 spaces).
+		(1640000, 400037, 37, None, None),
+  ^     | (bad-continuation)
+C:1876, 0: Wrong hanging indentation (add 6 spaces).
+		(1650000, 400038, 38, None, None),
+  ^     | (bad-continuation)
+C:1877, 0: Wrong hanging indentation (add 6 spaces).
+		(1660000, 400039, 39, None, None),
+  ^     | (bad-continuation)
+C:1878, 0: Wrong hanging indentation (add 6 spaces).
+		(1670000, 400040, 40, None, None),
+  ^     | (bad-continuation)
+C:1879, 0: Wrong hanging indentation (add 6 spaces).
+		(1680000, 400041, 41, "une odeur", None),
+  ^     | (bad-continuation)
+C:1880, 0: Wrong hanging indentation (add 6 spaces).
+		(1690000, 400042, 42, None, None),
+  ^     | (bad-continuation)
+C:1881, 0: Wrong hanging indentation (add 6 spaces).
+		(1700000, 400043, 43, None, None),
+  ^     | (bad-continuation)
+C:1882, 0: Wrong hanging indentation (add 6 spaces).
+		(1710000, 400044, 44, None, None),
+  ^     | (bad-continuation)
+C:1883, 0: Wrong hanging indentation (add 6 spaces).
+		(1720000, 400045, 45, None, None),
+  ^     | (bad-continuation)
+C:1884, 0: Wrong hanging indentation (add 6 spaces).
+		(1730000, 400046, 46, "amener vers soi un objet", None),
+  ^     | (bad-continuation)
+C:1885, 0: Wrong hanging indentation (add 6 spaces).
+		(1740000, 400047, 47, None, None),
+  ^     | (bad-continuation)
+C:1886, 0: Wrong hanging indentation (add 6 spaces).
+		(1750000, 400048, 48, None, None),
+  ^     | (bad-continuation)
+C:1887, 0: Wrong hanging indentation (add 6 spaces).
+		(1760000, 400049, 49, None, None),
+  ^     | (bad-continuation)
+C:1888, 0: Wrong hanging indentation (add 6 spaces).
+		(1770000, 400050, 50, None, None),
+  ^     | (bad-continuation)
+C:1889, 0: Wrong hanging indentation (add 6 spaces).
+		(1780000, 400051, 51, None, None),
+  ^     | (bad-continuation)
+C:1890, 0: Wrong hanging indentation (add 6 spaces).
+		(1790000, 400052, 52, None, None),
+  ^     | (bad-continuation)
+C:1891, 0: Wrong hanging indentation (add 6 spaces).
+		(1800000, 400053, 53, None, None),
+  ^     | (bad-continuation)
+C:1892, 0: Wrong hanging indentation (add 6 spaces).
+		(1810000, 400054, 54, None, None),
+  ^     | (bad-continuation)
+C:1893, 0: Wrong hanging indentation (add 6 spaces).
+		(1820000, 400055, 55, None, None),
+  ^     | (bad-continuation)
+C:1894, 0: Wrong hanging indentation (add 6 spaces).
+		(1830000, 400056, 56, None, None),
+  ^     | (bad-continuation)
+C:1895, 0: Wrong hanging indentation (add 6 spaces).
+		(1840000, 400057, 57, None, None),
+  ^     | (bad-continuation)
+C:1896, 0: Wrong hanging indentation (add 6 spaces).
+		(1850000, 400058, 58, None, None),
+  ^     | (bad-continuation)
+C:1897, 0: Wrong hanging indentation (add 6 spaces).
+		(1860000, 400059, 59, None, None),
+  ^     | (bad-continuation)
+C:1898, 0: Wrong hanging indentation (add 6 spaces).
+		(1870000, 400060, 60, None, None),
+  ^     | (bad-continuation)
+C:1899, 0: Wrong hanging indentation (add 6 spaces).
+		(1880000, 400061, 61, None, None),
+  ^     | (bad-continuation)
+C:1900, 0: Wrong hanging indentation (add 6 spaces).
+		(1890000, 400062, 62, None, None),
+  ^     | (bad-continuation)
+C:1901, 0: Wrong hanging indentation (add 6 spaces).
+		(1900000, 400063, 63, None, None),
+  ^     | (bad-continuation)
+C:1902, 0: Wrong hanging indentation (add 6 spaces).
+		(1910000, 400064, 64, None, None),
+  ^     | (bad-continuation)
+C:1903, 0: Wrong hanging indentation (add 6 spaces).
+		(1920000, 400065, 65, None, None),
+  ^     | (bad-continuation)
+C:1904, 0: Wrong hanging indentation (add 6 spaces).
+		(1930000, 400066, 66, None, None),
+  ^     | (bad-continuation)
+C:1905, 0: Wrong hanging indentation (add 6 spaces).
+		(1940000, 400067, 67, None, None),
+  ^     | (bad-continuation)
+C:1906, 0: Wrong hanging indentation (add 6 spaces).
+		(1950000, 400068, 68, None, None),
+  ^     | (bad-continuation)
+C:1907, 0: Wrong hanging indentation (add 6 spaces).
+		(1960000, 400069, 69, None, None),
+  ^     | (bad-continuation)
+C:1908, 0: Wrong hanging indentation (add 6 spaces).
+		(1970000, 400070, 70, None, None),
+  ^     | (bad-continuation)
+C:1909, 0: Wrong hanging indentation (add 6 spaces).
+		(1980000, 400071, 71, None, None),
+  ^     | (bad-continuation)
+C:1910, 0: Wrong hanging indentation (add 6 spaces).
+		(1990000, 400072, 72, None, None),
+  ^     | (bad-continuation)
+C:1911, 0: Wrong hanging indentation (add 6 spaces).
+		(2000000, 400073, 73, None, None),
+  ^     | (bad-continuation)
+C:1912, 0: Wrong hanging indentation (add 6 spaces).
+		(2010000, 400074, 74, None, None),
+  ^     | (bad-continuation)
+C:1913, 0: Wrong hanging indentation (add 6 spaces).
+		(2020000, 400075, 75, None, None),
+  ^     | (bad-continuation)
+C:1914, 0: Wrong hanging indentation (add 6 spaces).
+		(2030000, 400076, 76, None, None),
+  ^     | (bad-continuation)
+C:1915, 0: Wrong hanging indentation (add 6 spaces).
+		(2040000, 400077, 77, None, None),
+  ^     | (bad-continuation)
+C:1916, 0: Wrong hanging indentation (add 6 spaces).
+		(2050000, 400078, 78, None, None),
+  ^     | (bad-continuation)
+C:1917, 0: Wrong hanging indentation (add 6 spaces).
+		(2060000, 400079, 79, None, None),
+  ^     | (bad-continuation)
+C:1918, 0: Wrong hanging indentation (add 6 spaces).
+		(2070000, 400080, 80, None, None),
+  ^     | (bad-continuation)
+C:1919, 0: Wrong hanging indentation (add 6 spaces).
+		(2080000, 400081, 81, None, None),
+  ^     | (bad-continuation)
+C:1920, 0: Wrong hanging indentation (add 6 spaces).
+		(2090000, 400082, 82, None, None),
+  ^     | (bad-continuation)
+C:1921, 0: Wrong hanging indentation (add 6 spaces).
+		(2100000, 400083, 83, None, None),
+  ^     | (bad-continuation)
+C:1922, 0: Wrong hanging indentation (add 6 spaces).
+		(2110000, 400084, 84, None, None),
+  ^     | (bad-continuation)
+C:1923, 0: Wrong hanging indentation (add 6 spaces).
+		(2120000, 400085, 85, None, None),
+  ^     | (bad-continuation)
+C:1924, 0: Wrong hanging indentation (add 6 spaces).
+		(2130000, 400086, 86, None, None),
+  ^     | (bad-continuation)
+C:1925, 0: Wrong hanging indentation (add 6 spaces).
+		(2140000, 400087, 87, None, None),
+  ^     | (bad-continuation)
+C:1926, 0: Wrong hanging indentation (add 6 spaces).
+		(2150000, 400088, 88, None, None),
+  ^     | (bad-continuation)
+C:1927, 0: Wrong hanging indentation (add 6 spaces).
+		(2160000, 400089, 89, None, None),
+  ^     | (bad-continuation)
+C:1928, 0: Wrong hanging indentation (add 6 spaces).
+		(2170000, 400090, 90, None, None),
+  ^     | (bad-continuation)
+C:1929, 0: Wrong hanging indentation (add 6 spaces).
+		(2180000, 400091, 91, None, None),
+  ^     | (bad-continuation)
+C:1930, 0: Wrong hanging indentation (add 6 spaces).
+		(2190000, 400092, 92, None, None),
+  ^     | (bad-continuation)
+C:1931, 0: Wrong hanging indentation (add 6 spaces).
+		(2200000, 400093, 93, None, None),
+  ^     | (bad-continuation)
+C:1932, 0: Wrong hanging indentation (add 6 spaces).
+		(2210000, 400094, 94, None, None),
+  ^     | (bad-continuation)
+C:1933, 0: Wrong hanging indentation (add 6 spaces).
+		(2220000, 400095, 95, None, None),
+  ^     | (bad-continuation)
+C:1934, 0: Wrong hanging indentation (add 6 spaces).
+		(2230000, 400096, 96, None, None),
+  ^     | (bad-continuation)
+C:1935, 0: Wrong hanging indentation (add 6 spaces).
+		(2240000, 400097, 97, None, None),
+  ^     | (bad-continuation)
+C:1936, 0: Wrong hanging indentation (add 6 spaces).
+		(2250000, 400098, 98, None, None),
+  ^     | (bad-continuation)
+C:1937, 0: Wrong hanging indentation (add 6 spaces).
+		(2260000, 400099, 99, None, None),
+  ^     | (bad-continuation)
+C:1938, 0: Wrong hanging indentation (add 6 spaces).
+		(2270000, 400100, 100, None, None),
+  ^     | (bad-continuation)
+C:1939, 0: Wrong hanging indentation (add 6 spaces).
+		(2280000, 400101, 101, None, None),
+  ^     | (bad-continuation)
+C:1940, 0: Wrong hanging indentation (add 6 spaces).
+		(2290000, 400102, 102, None, None),
+  ^     | (bad-continuation)
+C:1941, 0: Wrong hanging indentation (add 6 spaces).
+		(2300000, 400103, 103, None, None),
+  ^     | (bad-continuation)
+C:1942, 0: Wrong hanging indentation (add 6 spaces).
+		(2310000, 400104, 104, None, None),
+  ^     | (bad-continuation)
+C:1943, 0: Wrong hanging indentation (add 6 spaces).
+		(2320000, 400105, 105, None, None),
+  ^     | (bad-continuation)
+C:1944, 0: Wrong hanging indentation (add 6 spaces).
+		(2330000, 400038, 106, None, None),
+  ^     | (bad-continuation)
+C:1945, 0: Wrong hanging indentation (add 6 spaces).
+		(2340000, 400107, 107, None, None),
+  ^     | (bad-continuation)
+C:1946, 0: Wrong hanging indentation (add 6 spaces).
+		(2350000, 400108, 108, None, None),
+  ^     | (bad-continuation)
+C:1947, 0: Wrong hanging indentation (add 6 spaces).
+		(2360000, 400109, 109, None, None),
+  ^     | (bad-continuation)
+C:1948, 0: Wrong hanging indentation (add 6 spaces).
+		(2370000, 400110, 110, None, None),
+  ^     | (bad-continuation)
+C:1949, 0: Wrong hanging indentation (add 6 spaces).
+		(2380000, 400111, 111, None, None),
+  ^     | (bad-continuation)
+C:1950, 0: Wrong hanging indentation (add 6 spaces).
+		(2390000, 400112, 112, None, None),
+  ^     | (bad-continuation)
+C:1951, 0: Wrong hanging indentation (add 6 spaces).
+		(2400000, 400113, 113, None, None),
+  ^     | (bad-continuation)
+C:1952, 0: Wrong hanging indentation (add 6 spaces).
+		(2410000, 400114, 114, None, None),
+  ^     | (bad-continuation)
+C:1953, 0: Wrong hanging indentation (add 6 spaces).
+		(2420000, 400115, 115, None, None),
+  ^     | (bad-continuation)
+C:1954, 0: Wrong hanging indentation (add 6 spaces).
+		(2430000, 400116, 116, None, None),
+  ^     | (bad-continuation)
+C:1955, 0: Wrong hanging indentation (add 6 spaces).
+		(2440000, 400117, 117, None, None),
+  ^     | (bad-continuation)
+C:1956, 0: Wrong hanging indentation (add 6 spaces).
+		(2450000, 400118, 118, None, None),
+  ^     | (bad-continuation)
+C:1957, 0: Wrong hanging indentation (add 6 spaces).
+		(2460000, 400119, 119, None, None),
+  ^     | (bad-continuation)
+C:1958, 0: Wrong hanging indentation (add 6 spaces).
+		(2470000, 400120, 120, None, None),
+  ^     | (bad-continuation)
+C:1959, 0: Wrong hanging indentation (add 6 spaces).
+		(2480000, 400121, 121, None, None),
+  ^     | (bad-continuation)
+C:1960, 0: Wrong hanging indentation (add 6 spaces).
+		(2490000, 400122, 122, None, None),
+  ^     | (bad-continuation)
+C:1961, 0: Wrong hanging indentation (add 6 spaces).
+		(2500000, 400123, 123, None, None),
+  ^     | (bad-continuation)
+C:1962, 0: Wrong hanging indentation (add 6 spaces).
+		(2510000, 400124, 124, None, None),
+  ^     | (bad-continuation)
+C:1963, 0: Wrong hanging indentation (add 6 spaces).
+		(2520000, 400125, 125, None, None),
+  ^     | (bad-continuation)
+C:1964, 0: Wrong hanging indentation (add 6 spaces).
+		(2530000, 400126, 126, "quelque part", None),
+  ^     | (bad-continuation)
+C:1965, 0: Wrong hanging indentation (add 6 spaces).
+		(2540000, 400127, 127, None, None),
+  ^     | (bad-continuation)
+C:1966, 0: Wrong hanging indentation (add 6 spaces).
+		(2550000, 400128, 128, None, None),
+  ^     | (bad-continuation)
+C:1967, 0: Wrong hanging indentation (add 6 spaces).
+		(2560000, 400129, 129, None, None),
+  ^     | (bad-continuation)
+C:1968, 0: Wrong hanging indentation (add 6 spaces).
+		(2570000, 400130, 130, None, None),
+  ^     | (bad-continuation)
+C:1969, 0: Wrong hanging indentation (add 6 spaces).
+		(2580000, 400132, 132, None, None),
+  ^     | (bad-continuation)
+C:1970, 0: Wrong hanging indentation (add 6 spaces).
+		(2590000, 400133, 133, None, None),
+  ^     | (bad-continuation)
+C:1971, 0: Wrong hanging indentation (add 6 spaces).
+		(2600000, 400134, 134, None, None),
+  ^     | (bad-continuation)
+C:1972, 0: Wrong hanging indentation (add 6 spaces).
+		(2610000, 400135, 135, None, None),
+  ^     | (bad-continuation)
+C:1973, 0: Wrong hanging indentation (add 6 spaces).
+		(2620000, 400136, 136, None, None),
+  ^     | (bad-continuation)
+C:1974, 0: Wrong hanging indentation (add 6 spaces).
+		(2650000, 400137, 137, None, None),
+  ^     | (bad-continuation)
+C:1975, 0: Wrong hanging indentation (add 6 spaces).
+		(2670000, 490046, 46, "lancer un projectile", None),
+  ^     | (bad-continuation)
+C:1976, 0: Wrong hanging indentation (add 6 spaces).
+		(2680000, 490005, 5, "atteinte à la propriété d'autrui", None),
+  ^     | (bad-continuation)
+C:1977, 0: Wrong hanging indentation (add 6 spaces).
+		(2690000, 490041, 41, "un sentiment", None),
+  ^     | (bad-continuation)
+C:1979, 0: Wrong hanging indentation (add 6 spaces).
+		(4000000, 400139, 139, None, None),
+  ^     | (bad-continuation)
+C:1981, 0: Wrong hanging indentation (add 6 spaces).
+		(4150000, 400141, 141, None, None),
+  ^     | (bad-continuation)
+C:1983, 0: Wrong hanging indentation (add 6 spaces).
+		(4240000, 400143, 143, None, None),
+  ^     | (bad-continuation)
+C:1984, 0: Wrong hanging indentation (add 6 spaces).
+		(4270000, 400047, 144, None, None),
+  ^     | (bad-continuation)
+C:1985, 0: Wrong hanging indentation (add 6 spaces).
+		(4300000, 400145, 145, None, None),
+  ^     | (bad-continuation)
+C:1986, 0: Wrong hanging indentation (add 6 spaces).
+		(4330000, 400146, 146, None, None),
+  ^     | (bad-continuation)
+C:1987, 0: Wrong hanging indentation (add 6 spaces).
+		(4360000, 400147, 147, None, None),
+  ^     | (bad-continuation)
+C:1988, 0: Wrong hanging indentation (add 6 spaces).
+		(4410000, 400148, 148, None, None),
+  ^     | (bad-continuation)
+C:1989, 0: Wrong hanging indentation (add 6 spaces).
+		(4470000, 400150, 150, None, None),
+  ^     | (bad-continuation)
+C:1990, 0: Wrong hanging indentation (add 6 spaces).
+		(4500000, 400151, 151, None, None),
+  ^     | (bad-continuation)
+C:1991, 0: Trailing whitespace (trailing-whitespace)
+C:1993, 0: Wrong hanging indentation (add 6 spaces).
+		(2700000, 200134, 134, None, None),
+  ^     | (bad-continuation)
+C:1994, 0: Wrong hanging indentation (add 6 spaces).
+		(2710000, 200124, 124, None, None),
+  ^     | (bad-continuation)
+C:1995, 0: Wrong hanging indentation (add 6 spaces).
+		(2720000, 200086, 86, None, None),
+  ^     | (bad-continuation)
+C:1996, 0: Wrong hanging indentation (add 6 spaces).
+		(2730000, 200055, 55, None, None),
+  ^     | (bad-continuation)
+C:1997, 0: Wrong hanging indentation (add 6 spaces).
+		(2740000, 200066, 66, None, None),
+  ^     | (bad-continuation)
+C:1998, 0: Wrong hanging indentation (add 6 spaces).
+		(2750000, 200002, 2, None, None),
+  ^     | (bad-continuation)
+C:1999, 0: Wrong hanging indentation (add 6 spaces).
+		(2760000, 200003, 3, None, None),
+  ^     | (bad-continuation)
+C:2000, 0: Wrong hanging indentation (add 6 spaces).
+		(2770000, 200005, 5, "dans les airs", None),
+  ^     | (bad-continuation)
+C:2001, 0: Wrong hanging indentation (add 6 spaces).
+		(2780000, 290005, 5, "dérober", None),
+  ^     | (bad-continuation)
+C:2002, 0: Wrong hanging indentation (add 6 spaces).
+		(2790000, 200006, 6, None, None),
+  ^     | (bad-continuation)
+C:2003, 0: Wrong hanging indentation (add 6 spaces).
+		(2800000, 200007, 7, None, None),
+  ^     | (bad-continuation)
+C:2004, 0: Wrong hanging indentation (add 6 spaces).
+		(2810000, 200008, 8, None, None),
+  ^     | (bad-continuation)
+C:2005, 0: Wrong hanging indentation (add 6 spaces).
+		(2820000, 200010, 10, None, None),
+  ^     | (bad-continuation)
+C:2006, 0: Wrong hanging indentation (add 6 spaces).
+		(2830000, 200011, 11, None, None),
+  ^     | (bad-continuation)
+C:2007, 0: Wrong hanging indentation (add 6 spaces).
+		(2840000, 200012, 12, None, None),
+  ^     | (bad-continuation)
+C:2008, 0: Wrong hanging indentation (add 6 spaces).
+		(2850000, 200013, 13, None, None),
+  ^     | (bad-continuation)
+C:2009, 0: Wrong hanging indentation (add 6 spaces).
+		(2860000, 200014, 14, "dune langue à une autre", None),
+  ^     | (bad-continuation)
+C:2010, 0: Wrong hanging indentation (add 6 spaces).
+		(2870000, 200015, 15, None, None),
+  ^     | (bad-continuation)
+C:2011, 0: Wrong hanging indentation (add 6 spaces).
+		(2880000, 200016, 16, "physiquement et émotionnellement", None),
+  ^     | (bad-continuation)
+C:2012, 0: Wrong hanging indentation (add 6 spaces).
+		(2890000, 200017, 17, None, None),
+  ^     | (bad-continuation)
+C:2013, 0: Wrong hanging indentation (add 6 spaces).
+		(2900000, 200026, 26, None, None),
+  ^     | (bad-continuation)
+C:2014, 0: Wrong hanging indentation (add 6 spaces).
+		(2910000, 200027, 27, None, None),
+  ^     | (bad-continuation)
+C:2015, 0: Wrong hanging indentation (add 6 spaces).
+		(2920000, 200028, 28, None, None),
+  ^     | (bad-continuation)
+C:2016, 0: Wrong hanging indentation (add 6 spaces).
+		(2930000, 200029, 29, None, None),
+  ^     | (bad-continuation)
+C:2017, 0: Wrong hanging indentation (add 6 spaces).
+		(2940000, 200030, 30, None, None),
+  ^     | (bad-continuation)
+C:2018, 0: Wrong hanging indentation (add 6 spaces).
+		(2950000, 200031, 31, None, None),
+  ^     | (bad-continuation)
+C:2019, 0: Wrong hanging indentation (add 6 spaces).
+		(2960000, 200032, 32, None, None),
+  ^     | (bad-continuation)
+C:2020, 0: Wrong hanging indentation (add 6 spaces).
+		(2970000, 200033, 33, None, None),
+  ^     | (bad-continuation)
+C:2021, 0: Wrong hanging indentation (add 6 spaces).
+		(2980000, 200034, 34, None, None),
+  ^     | (bad-continuation)
+C:2022, 0: Wrong hanging indentation (add 6 spaces).
+		(2990000, 200035, 35, None, None),
+  ^     | (bad-continuation)
+C:2023, 0: Wrong hanging indentation (add 6 spaces).
+		(3000000, 200036, 36, None, None),
+  ^     | (bad-continuation)
+C:2024, 0: Wrong hanging indentation (add 6 spaces).
+		(3010000, 200037, 37, None, None),
+  ^     | (bad-continuation)
+C:2025, 0: Wrong hanging indentation (add 6 spaces).
+		(3020000, 200038, 38, None, None),
+  ^     | (bad-continuation)
+C:2026, 0: Wrong hanging indentation (add 6 spaces).
+		(3030000, 200039, 39, None, None),
+  ^     | (bad-continuation)
+C:2027, 0: Wrong hanging indentation (add 6 spaces).
+		(3040000, 200040, 40, None, None),
+  ^     | (bad-continuation)
+C:2028, 0: Wrong hanging indentation (add 6 spaces).
+		(3050000, 200041, 41, "une odeur ou un sentiment", None),
+  ^     | (bad-continuation)
+C:2029, 0: Wrong hanging indentation (add 6 spaces).
+		(3060000, 200042, 42, None, None),
+  ^     | (bad-continuation)
+C:2030, 0: Wrong hanging indentation (add 6 spaces).
+		(3070000, 200043, 43, None, None),
+  ^     | (bad-continuation)
+C:2031, 0: Wrong hanging indentation (add 6 spaces).
+		(3080000, 200044, 44, None, None),
+  ^     | (bad-continuation)
+C:2032, 0: Wrong hanging indentation (add 6 spaces).
+		(3090000, 200045, 45, None, None),
+  ^     | (bad-continuation)
+C:2033, 0: Wrong hanging indentation (add 6 spaces).
+		(3100000, 200046, 46, None, None),
+  ^     | (bad-continuation)
+C:2034, 0: Wrong hanging indentation (add 6 spaces).
+		(3110000, 200047, 47, None, None),
+  ^     | (bad-continuation)
+C:2035, 0: Wrong hanging indentation (add 6 spaces).
+		(3120000, 200048, 48, None, None),
+  ^     | (bad-continuation)
+C:2036, 0: Wrong hanging indentation (add 6 spaces).
+		(3130000, 200049, 49, None, None),
+  ^     | (bad-continuation)
+C:2037, 0: Wrong hanging indentation (add 6 spaces).
+		(3140000, 200050, 50, None, None),
+  ^     | (bad-continuation)
+C:2038, 0: Wrong hanging indentation (add 6 spaces).
+		(3150000, 200051, 51, None, None),
+  ^     | (bad-continuation)
+C:2039, 0: Wrong hanging indentation (add 6 spaces).
+		(3160000, 200052, 52, None, None),
+  ^     | (bad-continuation)
+C:2040, 0: Wrong hanging indentation (add 6 spaces).
+		(3170000, 200053, 53, None, None),
+  ^     | (bad-continuation)
+C:2041, 0: Wrong hanging indentation (add 6 spaces).
+		(3180000, 200054, 54, None, None),
+  ^     | (bad-continuation)
+C:2042, 0: Wrong hanging indentation (add 6 spaces).
+		(3190000, 200056, 56, None, None),
+  ^     | (bad-continuation)
+C:2043, 0: Wrong hanging indentation (add 6 spaces).
+		(3200000, 200057, 57, None, None),
+  ^     | (bad-continuation)
+C:2044, 0: Wrong hanging indentation (add 6 spaces).
+		(3210000, 200058, 58, None, None),
+  ^     | (bad-continuation)
+C:2045, 0: Wrong hanging indentation (add 6 spaces).
+		(3220000, 200059, 59, None, None),
+  ^     | (bad-continuation)
+C:2046, 0: Wrong hanging indentation (add 6 spaces).
+		(3230000, 200060, 60, None, None),
+  ^     | (bad-continuation)
+C:2047, 0: Wrong hanging indentation (add 6 spaces).
+		(3240000, 200061, 61, None, None),
+  ^     | (bad-continuation)
+C:2048, 0: Wrong hanging indentation (add 6 spaces).
+		(3250000, 200062, 62, None, None),
+  ^     | (bad-continuation)
+C:2049, 0: Wrong hanging indentation (add 6 spaces).
+		(3260000, 200063, 63, None, None),
+  ^     | (bad-continuation)
+C:2050, 0: Wrong hanging indentation (add 6 spaces).
+		(3270000, 200064, 64, None, None),
+  ^     | (bad-continuation)
+C:2051, 0: Wrong hanging indentation (add 6 spaces).
+		(3280000, 200065, 65, None, None),
+  ^     | (bad-continuation)
+C:2052, 0: Wrong hanging indentation (add 6 spaces).
+		(3300000, 200067, 67, None, None),
+  ^     | (bad-continuation)
+C:2053, 0: Wrong hanging indentation (add 6 spaces).
+		(3310000, 200068, 68, None, None),
+  ^     | (bad-continuation)
+C:2054, 0: Wrong hanging indentation (add 6 spaces).
+		(3320000, 200069, 69, None, None),
+  ^     | (bad-continuation)
+C:2055, 0: Wrong hanging indentation (add 6 spaces).
+		(3330000, 200070, 70, None, None),
+  ^     | (bad-continuation)
+C:2056, 0: Wrong hanging indentation (add 6 spaces).
+		(3340000, 200071, 71, None, None),
+  ^     | (bad-continuation)
+C:2057, 0: Wrong hanging indentation (add 6 spaces).
+		(3350000, 200072, 72, None, None),
+  ^     | (bad-continuation)
+C:2058, 0: Wrong hanging indentation (add 6 spaces).
+		(3360000, 200073, 73, None, None),
+  ^     | (bad-continuation)
+C:2059, 0: Wrong hanging indentation (add 6 spaces).
+		(3370000, 200074, 74, None, None),
+  ^     | (bad-continuation)
+C:2060, 0: Wrong hanging indentation (add 6 spaces).
+		(3380000, 200075, 75, "à un jeu, un sport", None),
+  ^     | (bad-continuation)
+C:2061, 0: Wrong hanging indentation (add 6 spaces).
+		(3390000, 290075, 75, "une pièce au théâtre", None),
+  ^     | (bad-continuation)
+C:2062, 0: Wrong hanging indentation (add 6 spaces).
+		(3400000, 280075, 75, "d'un instrument", None),
+  ^     | (bad-continuation)
+C:2063, 0: Wrong hanging indentation (add 6 spaces).
+		(3410000, 200076, 76, None, None),
+  ^     | (bad-continuation)
+C:2064, 0: Wrong hanging indentation (add 6 spaces).
+		(3420000, 200077, 77, None, None),
+  ^     | (bad-continuation)
+C:2065, 0: Wrong hanging indentation (add 6 spaces).
+		(3430000, 200078, 78, None, None),
+  ^     | (bad-continuation)
+C:2066, 0: Wrong hanging indentation (add 6 spaces).
+		(3440000, 200079, 79, None, None),
+  ^     | (bad-continuation)
+C:2067, 0: Wrong hanging indentation (add 6 spaces).
+		(3450000, 200080, 80, None, None),
+  ^     | (bad-continuation)
+C:2068, 0: Wrong hanging indentation (add 6 spaces).
+		(3460000, 200081, 81, None, None),
+  ^     | (bad-continuation)
+C:2069, 0: Wrong hanging indentation (add 6 spaces).
+		(3470000, 200082, 82, None, None),
+  ^     | (bad-continuation)
+C:2070, 0: Wrong hanging indentation (add 6 spaces).
+		(3480000, 200083, 83, None, None),
+  ^     | (bad-continuation)
+C:2071, 0: Wrong hanging indentation (add 6 spaces).
+		(3490000, 200084, 84, None, None),
+  ^     | (bad-continuation)
+C:2072, 0: Wrong hanging indentation (add 6 spaces).
+		(3500000, 200085, 85, None, None),
+  ^     | (bad-continuation)
+C:2073, 0: Wrong hanging indentation (add 6 spaces).
+		(3510000, 200087, 87, None, None),
+  ^     | (bad-continuation)
+C:2074, 0: Wrong hanging indentation (add 6 spaces).
+		(3520000, 200088, 88, None, None),
+  ^     | (bad-continuation)
+C:2075, 0: Wrong hanging indentation (add 6 spaces).
+		(3530000, 200089, 89, None, None),
+  ^     | (bad-continuation)
+C:2076, 0: Wrong hanging indentation (add 6 spaces).
+		(3540000, 200041, 90, None, None),
+  ^     | (bad-continuation)
+C:2077, 0: Wrong hanging indentation (add 6 spaces).
+		(3550000, 200091, 91, None, None),
+  ^     | (bad-continuation)
+C:2078, 0: Wrong hanging indentation (add 6 spaces).
+		(3560000, 200092, 92, None, None),
+  ^     | (bad-continuation)
+C:2079, 0: Wrong hanging indentation (add 6 spaces).
+		(3570000, 200093, 93, None, None),
+  ^     | (bad-continuation)
+C:2080, 0: Wrong hanging indentation (add 6 spaces).
+		(3580000, 200094, 94, None, None),
+  ^     | (bad-continuation)
+C:2081, 0: Wrong hanging indentation (add 6 spaces).
+		(3590000, 200095, 95, None, None),
+  ^     | (bad-continuation)
+C:2082, 0: Wrong hanging indentation (add 6 spaces).
+		(3600000, 200096, 96, None, None),
+  ^     | (bad-continuation)
+C:2083, 0: Wrong hanging indentation (add 6 spaces).
+		(3610000, 200097, 97, None, None),
+  ^     | (bad-continuation)
+C:2084, 0: Wrong hanging indentation (add 6 spaces).
+		(3620000, 200098, 98, None, None),
+  ^     | (bad-continuation)
+C:2085, 0: Wrong hanging indentation (add 6 spaces).
+		(3630000, 200099, 99, None, None),
+  ^     | (bad-continuation)
+C:2086, 0: Wrong hanging indentation (add 6 spaces).
+		(3640000, 200100, 100, None, None),
+  ^     | (bad-continuation)
+C:2087, 0: Wrong hanging indentation (add 6 spaces).
+		(3650000, 200101, 101, None, None),
+  ^     | (bad-continuation)
+C:2088, 0: Wrong hanging indentation (add 6 spaces).
+		(3660000, 200102, 102, None, None),
+  ^     | (bad-continuation)
+C:2089, 0: Wrong hanging indentation (add 6 spaces).
+		(3670000, 200103, 103, None, None),
+  ^     | (bad-continuation)
+C:2090, 0: Wrong hanging indentation (add 6 spaces).
+		(3680000, 200104, 104, None, None),
+  ^     | (bad-continuation)
+C:2091, 0: Wrong hanging indentation (add 6 spaces).
+		(3690000, 200105, 105, None, None),
+  ^     | (bad-continuation)
+C:2092, 0: Wrong hanging indentation (add 6 spaces).
+		(3700000, 200106, 106, None, None),
+  ^     | (bad-continuation)
+C:2093, 0: Wrong hanging indentation (add 6 spaces).
+		(3710000, 200107, 107, None, None),
+  ^     | (bad-continuation)
+C:2094, 0: Wrong hanging indentation (add 6 spaces).
+		(3720000, 200108, 108, None, None),
+  ^     | (bad-continuation)
+C:2095, 0: Wrong hanging indentation (add 6 spaces).
+		(3730000, 200109, 109, None, None),
+  ^     | (bad-continuation)
+C:2096, 0: Wrong hanging indentation (add 6 spaces).
+		(3740000, 200110, 110, None, None),
+  ^     | (bad-continuation)
+C:2097, 0: Wrong hanging indentation (add 6 spaces).
+		(3750000, 200111, 111, None, None),
+  ^     | (bad-continuation)
+C:2098, 0: Wrong hanging indentation (add 6 spaces).
+		(3760000, 200112, 112, None, None),
+  ^     | (bad-continuation)
+C:2099, 0: Wrong hanging indentation (add 6 spaces).
+		(3770000, 200113, 113, None, None),
+  ^     | (bad-continuation)
+C:2100, 0: Wrong hanging indentation (add 6 spaces).
+		(3780000, 200114, 114, None, None),
+  ^     | (bad-continuation)
+C:2101, 0: Wrong hanging indentation (add 6 spaces).
+		(3790000, 200115, 115, None, None),
+  ^     | (bad-continuation)
+C:2102, 0: Wrong hanging indentation (add 6 spaces).
+		(3800000, 200116, 116, None, None),
+  ^     | (bad-continuation)
+C:2103, 0: Wrong hanging indentation (add 6 spaces).
+		(3810000, 200117, 117, None, None),
+  ^     | (bad-continuation)
+C:2104, 0: Wrong hanging indentation (add 6 spaces).
+		(3820000, 200118, 118, None, None),
+  ^     | (bad-continuation)
+C:2105, 0: Wrong hanging indentation (add 6 spaces).
+		(3830000, 200119, 119, None, None),
+  ^     | (bad-continuation)
+C:2106, 0: Wrong hanging indentation (add 6 spaces).
+		(3840000, 200120, 120, None, None),
+  ^     | (bad-continuation)
+C:2107, 0: Wrong hanging indentation (add 6 spaces).
+		(3850000, 200121, 121, None, None),
+  ^     | (bad-continuation)
+C:2108, 0: Wrong hanging indentation (add 6 spaces).
+		(3860000, 200122, 122, None, None),
+  ^     | (bad-continuation)
+C:2109, 0: Wrong hanging indentation (add 6 spaces).
+		(3870000, 200123, 123, None, None),
+  ^     | (bad-continuation)
+C:2110, 0: Wrong hanging indentation (add 6 spaces).
+		(3880000, 200125, 125, None, None),
+  ^     | (bad-continuation)
+C:2111, 0: Wrong hanging indentation (add 6 spaces).
+		(3890000, 200126, 126, "quelque part", None),
+  ^     | (bad-continuation)
+C:2112, 0: Wrong hanging indentation (add 6 spaces).
+		(3900000, 200127, 127, None, None),
+  ^     | (bad-continuation)
+C:2113, 0: Wrong hanging indentation (add 6 spaces).
+		(3910000, 200128, 128, None, None),
+  ^     | (bad-continuation)
+C:2114, 0: Wrong hanging indentation (add 6 spaces).
+		(3920000, 200129, 129, None, None),
+  ^     | (bad-continuation)
+C:2115, 0: Wrong hanging indentation (add 6 spaces).
+		(3930000, 200130, 130, None, None),
+  ^     | (bad-continuation)
+C:2116, 0: Wrong hanging indentation (add 6 spaces).
+		(3940000, 200132, 132, None, None),
+  ^     | (bad-continuation)
+C:2117, 0: Wrong hanging indentation (add 6 spaces).
+		(3950000, 200133, 133, None, None),
+  ^     | (bad-continuation)
+C:2118, 0: Wrong hanging indentation (add 6 spaces).
+		(3960000, 200135, 135, None, None),
+  ^     | (bad-continuation)
+C:2119, 0: Wrong hanging indentation (add 6 spaces).
+		(3970000, 200136, 136, None, None),
+  ^     | (bad-continuation)
+C:2120, 0: Wrong hanging indentation (add 6 spaces).
+		(3980000, 200137, 137, None, None),
+  ^     | (bad-continuation)
+C:2123, 0: Wrong hanging indentation (add 6 spaces).
+		(4090000, 290086, 86, "l'autre", None),
+  ^     | (bad-continuation)
+C:2125, 0: Wrong hanging indentation (add 6 spaces).
+		(4130000, 200141, 141, None, None),
+  ^     | (bad-continuation)
+C:2127, 0: Wrong hanging indentation (add 6 spaces).
+		(4230000, 200143, 143, None, None),
+  ^     | (bad-continuation)
+C:2129, 0: Wrong hanging indentation (add 6 spaces).
+		(4290000, 200145, 145, None, None),
+  ^     | (bad-continuation)
+C:2130, 0: Wrong hanging indentation (add 6 spaces).
+		(4320000, 200146, 146, None, None),
+  ^     | (bad-continuation)
+C:2131, 0: Wrong hanging indentation (add 6 spaces).
+		(4370000, 200147, 147, None, None),
+  ^     | (bad-continuation)
+C:2132, 0: Wrong hanging indentation (add 6 spaces).
+		(4400000, 200148, 148, None, None),
+  ^     | (bad-continuation)
+C:2133, 0: Wrong hanging indentation (add 6 spaces).
+		(4460000, 200150, 150, None, None),
+  ^     | (bad-continuation)
+C:2134, 0: Wrong hanging indentation (add 6 spaces).
+		(4490000, 200151, 151, None, None),
+  ^     | (bad-continuation)
+C:2135, 0: Wrong hanging indentation (add 6 spaces).
+		(20000, 200001, 1, None, None), # ouvrir
+  ^     | (bad-continuation)
+C:2136, 0: Wrong hanging indentation (add 6 spaces).
+		(70000, 200009, 9, None, None), # venir
+  ^     | (bad-continuation)
+C:2137, 0: Trailing whitespace (trailing-whitespace)
+C:2141, 0: Trailing whitespace (trailing-whitespace)
+C:2143, 0: Trailing whitespace (trailing-whitespace)
+C:2156, 0: Line too long (123/100) (line-too-long)
+C:2158, 0: Line too long (121/100) (line-too-long)
+C:2162, 0: Trailing whitespace (trailing-whitespace)
+C:2167, 0: Trailing whitespace (trailing-whitespace)
+C:2172, 0: Trailing whitespace (trailing-whitespace)
+C:2190, 0: Line too long (220/100) (line-too-long)
+C:2193, 0: Line too long (121/100) (line-too-long)
+C:2202, 0: Line too long (118/100) (line-too-long)
+C:2211, 0: Line too long (173/100) (line-too-long)
+C:2228, 0: Line too long (105/100) (line-too-long)
+C:2253, 0: No space allowed after bracket
+        results[row[1]] = { 'id' : row[0], 'base' : row[1], 'pret' : row[2], 'part' : row[3] }
+                          ^ (bad-whitespace)
+C:2253, 0: No space allowed before bracket
+        results[row[1]] = { 'id' : row[0], 'base' : row[1], 'pret' : row[2], 'part' : row[3] }
+                                                                                             ^ (bad-whitespace)
+C:2257, 0: Line too long (102/100) (line-too-long)
+C:2257, 0: No space allowed around keyword argument assignment
+def get_all_verbs_full(p_lang = 'en', p_to = 'fr'): # all verbs, with translations and irregular forms
+                              ^ (bad-whitespace)
+C:2257, 0: No space allowed around keyword argument assignment
+def get_all_verbs_full(p_lang = 'en', p_to = 'fr'): # all verbs, with translations and irregular forms
+                                           ^ (bad-whitespace)
+C:2261, 0: Line too long (162/100) (line-too-long)
+C:2262, 0: Line too long (169/100) (line-too-long)
+C:2264, 0: Line too long (112/100) (line-too-long)
+C:2265, 0: Line too long (157/100) (line-too-long)
+C:2276, 0: No space allowed after bracket
+                actual = { 'nb' : nb }
+                         ^ (bad-whitespace)
+C:2276, 0: No space allowed before bracket
+                actual = { 'nb' : nb }
+                                     ^ (bad-whitespace)
+C:2293, 0: Line too long (103/100) (line-too-long)
+C:2296, 0: Line too long (107/100) (line-too-long)
+C:2299, 0: Line too long (102/100) (line-too-long)
+C:2302, 0: Line too long (107/100) (line-too-long)
+C:2304, 0: Line too long (101/100) (line-too-long)
+C:2305, 0: Line too long (101/100) (line-too-long)
+C:2310, 0: Trailing whitespace (trailing-whitespace)
+C:2313, 0: No space allowed after bracket
+                actual = { 'nb' : nb }
+                         ^ (bad-whitespace)
+C:2313, 0: No space allowed before bracket
+                actual = { 'nb' : nb }
+                                     ^ (bad-whitespace)
+C:2321, 0: No space allowed after bracket
+            actual['trans'][p_row[5]] = { 'base' : p_row[4], 'sens' : p_row[6], 'usage' : p_row[8] }
+                                        ^ (bad-whitespace)
+C:2321, 0: No space allowed before bracket
+            actual['trans'][p_row[5]] = { 'base' : p_row[4], 'sens' : p_row[6], 'usage' : p_row[8] }
+                                                                                                   ^ (bad-whitespace)
+C:2323, 0: No space allowed after bracket
+            actual['trans'][p_row[5]] = { 'base' : p_row[4], 'sens' : p_row[6], 'usage' : p_row[8] }
+                                        ^ (bad-whitespace)
+C:2323, 0: No space allowed before bracket
+            actual['trans'][p_row[5]] = { 'base' : p_row[4], 'sens' : p_row[6], 'usage' : p_row[8] }
+                                                                                                   ^ (bad-whitespace)
+C:2336, 0: Line too long (101/100) (line-too-long)
+C:2345, 0: Trailing whitespace (trailing-whitespace)
+C:2357, 0: Exactly one space required after assignment
+        p_order =  p_lang + ".lang, " + p_lang + ".base"
+                ^ (bad-whitespace)
+C:2358, 0: Trailing whitespace (trailing-whitespace)
+C:2370, 0: Line too long (146/100) (line-too-long)
+C:2373, 0: Line too long (120/100) (line-too-long)
+C:2375, 0: Line too long (116/100) (line-too-long)
+C:2376, 0: Line too long (119/100) (line-too-long)
+C:2388, 0: Line too long (116/100) (line-too-long)
+C:2398, 0: Line too long (121/100) (line-too-long)
+C:2400, 0: Line too long (104/100) (line-too-long)
+C:2402, 0: Line too long (123/100) (line-too-long)
+C:2416, 0: Trailing whitespace (trailing-whitespace)
+C:2425, 0: Line too long (102/100) (line-too-long)
+C:2463, 0: Trailing whitespace (trailing-whitespace)
+C:2467, 0: Trailing whitespace (trailing-whitespace)
+C:2469, 0: Trailing whitespace (trailing-whitespace)
+C:2472, 0: Line too long (196/100) (line-too-long)
+C:2479, 0: Trailing whitespace (trailing-whitespace)
+C:2481, 0: Trailing whitespace (trailing-whitespace)
+C:2482, 0: Line too long (141/100) (line-too-long)
+C:2501, 0: Trailing whitespace (trailing-whitespace)
+C:2503, 0: Trailing whitespace (trailing-whitespace)
+C:2509, 0: Trailing whitespace (trailing-whitespace)
+C:2513, 0: Trailing whitespace (trailing-whitespace)
+C:2516, 0: Trailing whitespace (trailing-whitespace)
+C:2518, 0: Trailing whitespace (trailing-whitespace)
+C:2531, 0: Trailing whitespace (trailing-whitespace)
+C:2533, 0: Line too long (121/100) (line-too-long)
+C:2533, 0: Exactly one space required after comma
+    if root[-1] == 'y' and root[-2] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z']:
+                                           ^ (bad-whitespace)
+C:2533, 0: Exactly one space required after comma
+    if root[-1] == 'y' and root[-2] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z']:
+                                               ^ (bad-whitespace)
+C:2533, 0: Exactly one space required after comma
+    if root[-1] == 'y' and root[-2] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z']:
+                                                   ^ (bad-whitespace)
+C:2533, 0: Exactly one space required after comma
+    if root[-1] == 'y' and root[-2] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z']:
+                                                       ^ (bad-whitespace)
+C:2533, 0: Exactly one space required after comma
+    if root[-1] == 'y' and root[-2] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z']:
+                                                           ^ (bad-whitespace)
+C:2533, 0: Exactly one space required after comma
+    if root[-1] == 'y' and root[-2] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z']:
+                                                               ^ (bad-whitespace)
+C:2533, 0: Exactly one space required after comma
+    if root[-1] == 'y' and root[-2] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z']:
+                                                                   ^ (bad-whitespace)
+C:2533, 0: Exactly one space required after comma
+    if root[-1] == 'y' and root[-2] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z']:
+                                                                       ^ (bad-whitespace)
+C:2533, 0: Exactly one space required after comma
+    if root[-1] == 'y' and root[-2] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z']:
+                                                                           ^ (bad-whitespace)
+C:2533, 0: Exactly one space required after comma
+    if root[-1] == 'y' and root[-2] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z']:
+                                                                               ^ (bad-whitespace)
+C:2533, 0: Exactly one space required after comma
+    if root[-1] == 'y' and root[-2] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z']:
+                                                                                   ^ (bad-whitespace)
+C:2533, 0: Exactly one space required after comma
+    if root[-1] == 'y' and root[-2] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z']:
+                                                                                       ^ (bad-whitespace)
+C:2533, 0: Exactly one space required after comma
+    if root[-1] == 'y' and root[-2] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z']:
+                                                                                           ^ (bad-whitespace)
+C:2533, 0: Exactly one space required after comma
+    if root[-1] == 'y' and root[-2] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z']:
+                                                                                               ^ (bad-whitespace)
+C:2533, 0: Exactly one space required after comma
+    if root[-1] == 'y' and root[-2] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z']:
+                                                                                                   ^ (bad-whitespace)
+C:2533, 0: Exactly one space required after comma
+    if root[-1] == 'y' and root[-2] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z']:
+                                                                                                       ^ (bad-whitespace)
+C:2533, 0: Exactly one space required after comma
+    if root[-1] == 'y' and root[-2] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z']:
+                                                                                                           ^ (bad-whitespace)
+C:2533, 0: Exactly one space required after comma
+    if root[-1] == 'y' and root[-2] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z']:
+                                                                                                               ^ (bad-whitespace)
+C:2533, 0: Exactly one space required after comma
+    if root[-1] == 'y' and root[-2] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z']:
+                                                                                                                   ^ (bad-whitespace)
+C:2543, 0: Line too long (141/100) (line-too-long)
+C:2543, 0: Exactly one space required after comma
+    elif root[-1] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z'] and root[-2] in ['a','e','i','o','u']:
+                         ^ (bad-whitespace)
+C:2543, 0: Exactly one space required after comma
+    elif root[-1] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z'] and root[-2] in ['a','e','i','o','u']:
+                             ^ (bad-whitespace)
+C:2543, 0: Exactly one space required after comma
+    elif root[-1] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z'] and root[-2] in ['a','e','i','o','u']:
+                                 ^ (bad-whitespace)
+C:2543, 0: Exactly one space required after comma
+    elif root[-1] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z'] and root[-2] in ['a','e','i','o','u']:
+                                     ^ (bad-whitespace)
+C:2543, 0: Exactly one space required after comma
+    elif root[-1] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z'] and root[-2] in ['a','e','i','o','u']:
+                                         ^ (bad-whitespace)
+C:2543, 0: Exactly one space required after comma
+    elif root[-1] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z'] and root[-2] in ['a','e','i','o','u']:
+                                             ^ (bad-whitespace)
+C:2543, 0: Exactly one space required after comma
+    elif root[-1] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z'] and root[-2] in ['a','e','i','o','u']:
+                                                 ^ (bad-whitespace)
+C:2543, 0: Exactly one space required after comma
+    elif root[-1] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z'] and root[-2] in ['a','e','i','o','u']:
+                                                     ^ (bad-whitespace)
+C:2543, 0: Exactly one space required after comma
+    elif root[-1] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z'] and root[-2] in ['a','e','i','o','u']:
+                                                         ^ (bad-whitespace)
+C:2543, 0: Exactly one space required after comma
+    elif root[-1] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z'] and root[-2] in ['a','e','i','o','u']:
+                                                             ^ (bad-whitespace)
+C:2543, 0: Exactly one space required after comma
+    elif root[-1] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z'] and root[-2] in ['a','e','i','o','u']:
+                                                                 ^ (bad-whitespace)
+C:2543, 0: Exactly one space required after comma
+    elif root[-1] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z'] and root[-2] in ['a','e','i','o','u']:
+                                                                     ^ (bad-whitespace)
+C:2543, 0: Exactly one space required after comma
+    elif root[-1] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z'] and root[-2] in ['a','e','i','o','u']:
+                                                                         ^ (bad-whitespace)
+C:2543, 0: Exactly one space required after comma
+    elif root[-1] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z'] and root[-2] in ['a','e','i','o','u']:
+                                                                             ^ (bad-whitespace)
+C:2543, 0: Exactly one space required after comma
+    elif root[-1] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z'] and root[-2] in ['a','e','i','o','u']:
+                                                                                 ^ (bad-whitespace)
+C:2543, 0: Exactly one space required after comma
+    elif root[-1] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z'] and root[-2] in ['a','e','i','o','u']:
+                                                                                     ^ (bad-whitespace)
+C:2543, 0: Exactly one space required after comma
+    elif root[-1] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z'] and root[-2] in ['a','e','i','o','u']:
+                                                                                         ^ (bad-whitespace)
+C:2543, 0: Exactly one space required after comma
+    elif root[-1] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z'] and root[-2] in ['a','e','i','o','u']:
+                                                                                             ^ (bad-whitespace)
+C:2543, 0: Exactly one space required after comma
+    elif root[-1] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z'] and root[-2] in ['a','e','i','o','u']:
+                                                                                                 ^ (bad-whitespace)
+C:2543, 0: Exactly one space required after comma
+    elif root[-1] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z'] and root[-2] in ['a','e','i','o','u']:
+                                                                                                                           ^ (bad-whitespace)
+C:2543, 0: Exactly one space required after comma
+    elif root[-1] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z'] and root[-2] in ['a','e','i','o','u']:
+                                                                                                                               ^ (bad-whitespace)
+C:2543, 0: Exactly one space required after comma
+    elif root[-1] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z'] and root[-2] in ['a','e','i','o','u']:
+                                                                                                                                   ^ (bad-whitespace)
+C:2543, 0: Exactly one space required after comma
+    elif root[-1] in ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z'] and root[-2] in ['a','e','i','o','u']:
+                                                                                                                                       ^ (bad-whitespace)
+C:2552, 0: Trailing whitespace (trailing-whitespace)
+C:2553, 0: Line too long (158/100) (line-too-long)
+C:2561, 0: Line too long (103/100) (line-too-long)
+C:2565, 0: Trailing whitespace (trailing-whitespace)
+C:2570, 0: Line too long (121/100) (line-too-long)
+C:2571, 0: Trailing whitespace (trailing-whitespace)
+C:2573, 0: Trailing whitespace (trailing-whitespace)
+C:2576, 0: Line too long (168/100) (line-too-long)
+C:2577, 0: Line too long (209/100) (line-too-long)
+C:2581, 0: Line too long (103/100) (line-too-long)
+C:2583, 0: Line too long (131/100) (line-too-long)
+C:2585, 0: Trailing whitespace (trailing-whitespace)
+C:2587, 0: Line too long (254/100) (line-too-long)
+C:2588, 0: Line too long (125/100) (line-too-long)
+C:2589, 0: Line too long (155/100) (line-too-long)
+C:2591, 0: Trailing whitespace (trailing-whitespace)
+C:2593, 0: Line too long (238/100) (line-too-long)
+C:2594, 0: Line too long (232/100) (line-too-long)
+C:2595, 0: Line too long (131/100) (line-too-long)
+C:2597, 0: Trailing whitespace (trailing-whitespace)
+C:2600, 0: Line too long (308/100) (line-too-long)
+C:2601, 0: Line too long (156/100) (line-too-long)
+C:2602, 0: Line too long (187/100) (line-too-long)
+C:2605, 0: Trailing whitespace (trailing-whitespace)
+C:2607, 0: Line too long (133/100) (line-too-long)
+C:2608, 0: Line too long (151/100) (line-too-long)
+C:2609, 0: Trailing whitespace (trailing-whitespace)
+C:2611, 0: Line too long (132/100) (line-too-long)
+C:2613, 0: Line too long (131/100) (line-too-long)
+C:2614, 0: Trailing whitespace (trailing-whitespace)
+C:2616, 0: Line too long (105/100) (line-too-long)
+C:2617, 0: Line too long (203/100) (line-too-long)
+C:2618, 0: Line too long (201/100) (line-too-long)
+C:2619, 0: Trailing whitespace (trailing-whitespace)
+C:2621, 0: Line too long (127/100) (line-too-long)
+C:2622, 0: Line too long (121/100) (line-too-long)
+C:2623, 0: Line too long (171/100) (line-too-long)
+C:2624, 0: Trailing whitespace (trailing-whitespace)
+C:2625, 0: Line too long (107/100) (line-too-long)
+C:2627, 0: Trailing whitespace (trailing-whitespace)
+C:2629, 0: Trailing whitespace (trailing-whitespace)
+C:2642, 0: Trailing whitespace (trailing-whitespace)
+C:2658, 0: Trailing whitespace (trailing-whitespace)
+C:2690, 0: Trailing whitespace (trailing-whitespace)
+C:2699, 0: Line too long (106/100) (line-too-long)
+C:2709, 0: Trailing whitespace (trailing-whitespace)
+C:2716, 0: Trailing whitespace (trailing-whitespace)
+C:2722, 0: Trailing whitespace (trailing-whitespace)
+C:2741, 0: Trailing whitespace (trailing-whitespace)
+C:2749, 0: Trailing whitespace (trailing-whitespace)
+C:2753, 0: Trailing whitespace (trailing-whitespace)
+C:2786, 0: Line too long (104/100) (line-too-long)
+C:2788, 0: Line too long (146/100) (line-too-long)
+C:2828, 0: Line too long (112/100) (line-too-long)
+C:2840, 0: Line too long (132/100) (line-too-long)
+C:2842, 0: Line too long (105/100) (line-too-long)
+C:2858, 0: Exactly one space required after comma
+            elif c_tab[0] in ['conjugate', 'conj','con']:
+                                                 ^ (bad-whitespace)
+C:2860, 0: Line too long (115/100) (line-too-long)
+C:2868, 0: Line too long (111/100) (line-too-long)
+C:  1, 0: Too many lines in module (2868/1000) (too-many-lines)
+C:  1, 0: Missing module docstring (missing-docstring)
+W: 22, 8: Redefining built-in 'id' (redefined-builtin)
+C: 16, 0: Missing function docstring (missing-docstring)
+C: 21, 8: Invalid variable name "cc" (invalid-name)
+C: 22, 8: Invalid variable name "id" (invalid-name)
+C: 40, 0: Missing function docstring (missing-docstring)
+C: 43, 8: Invalid variable name "cc" (invalid-name)
+C: 44, 8: Invalid variable name "de" (invalid-name)
+C: 58, 0: Missing function docstring (missing-docstring)
+R: 58, 0: Too many local variables (16/15) (too-many-locals)
+C: 65, 4: Invalid variable name "c" (invalid-name)
+C:1063, 8: Invalid variable name "cc" (invalid-name)
+C:1065,12: Invalid variable name "v" (invalid-name)
+C:2170, 4: Invalid variable name "e" (invalid-name)
+C:2180, 4: Invalid variable name "c" (invalid-name)
+C:2184, 4: Invalid variable name "f" (invalid-name)
+C:2216, 4: Invalid variable name "s" (invalid-name)
+R: 58, 0: Too many branches (13/12) (too-many-branches)
+R: 58, 0: Too many statements (65/50) (too-many-statements)
+C:2222, 0: Missing function docstring (missing-docstring)
+C:2247, 0: Missing function docstring (missing-docstring)
+C:2257, 0: Missing function docstring (missing-docstring)
+C:2261, 4: Invalid variable name "nb" (invalid-name)
+C:2267, 4: Invalid variable name "nb" (invalid-name)
+E:2273,29: Value 'actual' is unsubscriptable (unsubscriptable-object)
+C:2274,12: Invalid variable name "nb" (invalid-name)
+E:2280,20: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2280,42: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2281,20: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2281,47: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2283,20: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2283,42: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2284,20: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2287,20: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2287,48: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2288,20: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2288,48: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2289,20: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2291,20: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2293,23: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2294,24: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2294,41: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2295,25: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2296,27: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2297,28: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2297,45: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2299,28: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2299,45: Value 'actual' is unsubscriptable (unsubscriptable-object)
+R:2272, 4: Too many nested blocks (6/5) (too-many-nested-blocks)
+E:2300,25: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2301,27: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2302,31: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2303,32: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2303,49: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2305,32: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2305,49: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2305,71: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2307,28: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2307,45: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2309,24: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2309,41: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2311,20: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:2311,37: Value 'actual' is unsubscriptable (unsubscriptable-object)
+R:2272, 4: Too many nested blocks (7/5) (too-many-nested-blocks)
+E:2323,12: Value 'actual' is unsubscriptable (unsubscriptable-object)
+R:2257, 0: Too many branches (27/12) (too-many-branches)
+R:2257, 0: Too many statements (76/50) (too-many-statements)
+C:2355, 0: Missing function docstring (missing-docstring)
+R:2355, 0: Too many arguments (7/5) (too-many-arguments)
+R:2355, 0: Too many local variables (19/15) (too-many-locals)
+C:2361, 4: Invalid variable name "nb" (invalid-name)
+C:2389,20: Invalid variable name "e" (invalid-name)
+C:2406,12: Invalid variable name "nb" (invalid-name)
+C:2410,12: Invalid variable name "v" (invalid-name)
+W:2389,20: Unused variable 'e' (unused-variable)
+R:2355, 0: Too many branches (23/12) (too-many-branches)
+R:2355, 0: Too many statements (54/50) (too-many-statements)
+C:2427, 0: Missing function docstring (missing-docstring)
+C:2433, 8: Invalid variable name "r" (invalid-name)
+C:2435, 8: Invalid variable name "nb" (invalid-name)
+C:2436,12: Invalid variable name "v" (invalid-name)
+C:2438,16: Invalid variable name "nb" (invalid-name)
+C:2444, 8: Invalid variable name "r" (invalid-name)
+C:2446, 8: Invalid variable name "nb" (invalid-name)
+C:2447,12: Invalid variable name "v" (invalid-name)
+C:2453,16: Invalid variable name "nb" (invalid-name)
+C:2461, 0: Missing function docstring (missing-docstring)
+C:2462, 4: Invalid variable name "f" (invalid-name)
+C:2471, 8: Invalid variable name "v" (invalid-name)
+C:2483, 8: Invalid variable name "v" (invalid-name)
+C:2487,12: Invalid variable name "t" (invalid-name)
+C:2493,16: Invalid variable name "vv" (invalid-name)
+C:2507, 0: Missing function docstring (missing-docstring)
+C:2508, 4: Invalid variable name "f" (invalid-name)
+C:2520, 0: Invalid argument name "nb" (invalid-name)
+C:2520, 0: Missing function docstring (missing-docstring)
+R:2520, 0: Too many local variables (16/15) (too-many-locals)
+C:2525, 4: Invalid variable name "f" (invalid-name)
+C:2555, 8: Invalid variable name "t" (invalid-name)
+C:2557,12: Invalid variable name "xs" (invalid-name)
+C:2558,16: Invalid variable name "x" (invalid-name)
+W:2520,17: Unused argument 'verb' (unused-argument)
+W:2526, 4: Unused variable 'pronoms' (unused-variable)
+R:2520, 0: Too many branches (16/12) (too-many-branches)
+R:2520, 0: Too many statements (83/50) (too-many-statements)
+C:2631, 0: Missing function docstring (missing-docstring)
+C:2633, 8: Invalid variable name "f" (invalid-name)
+C:2643,19: More than one statement on a single line (multiple-statements)
+C:2659,19: More than one statement on a single line (multiple-statements)
+C:2675,19: More than one statement on a single line (multiple-statements)
+C:2691,19: More than one statement on a single line (multiple-statements)
+R:2631, 0: Too many branches (39/12) (too-many-branches)
+R:2631, 0: Too many statements (74/50) (too-many-statements)
+C:2725, 0: Missing class docstring (missing-docstring)
+R:2725, 0: Too many instance attributes (9/7) (too-many-instance-attributes)
+W:2742, 4: Dangerous default value [] as argument (dangerous-default-value)
+C:2742, 4: Missing method docstring (missing-docstring)
+C:2744,16: Invalid variable name "p" (invalid-name)
+C:2750, 4: Missing method docstring (missing-docstring)
+C:2832,12: Invalid variable name "s" (invalid-name)
+R:2750, 4: Too many branches (42/12) (too-many-branches)
+R:2750, 4: Too many statements (113/50) (too-many-statements)
+W:  9, 0: Unused import unicodedata (unused-import)
+
+
+Report
+======
+606 statements analysed.
+
+Statistics by type
+------------------
+
++---------+-------+-----------+-----------+------------+---------+
+|type     |number |old number |difference |%documented |%badname |
++=========+=======+===========+===========+============+=========+
+|module   |1      |1          |=          |0.00        |0.00     |
++---------+-------+-----------+-----------+------------+---------+
+|class    |1      |1          |=          |0.00        |0.00     |
++---------+-------+-----------+-----------+------------+---------+
+|method   |3      |3          |=          |33.33       |0.00     |
++---------+-------+-----------+-----------+------------+---------+
+|function |12     |12         |=          |0.00        |0.00     |
++---------+-------+-----------+-----------+------------+---------+
+
+
+
+Raw metrics
+-----------
+
++----------+-------+------+---------+-----------+
+|type      |number |%     |previous |difference |
++==========+=======+======+=========+===========+
+|code      |2598   |90.52 |2598     |=          |
++----------+-------+------+---------+-----------+
+|docstring |6      |0.21  |6        |=          |
++----------+-------+------+---------+-----------+
+|comment   |134    |4.67  |134      |=          |
++----------+-------+------+---------+-----------+
+|empty     |132    |4.60  |132      |=          |
++----------+-------+------+---------+-----------+
+
+
+
+Duplication
+-----------
+
++-------------------------+------+---------+-----------+
+|                         |now   |previous |difference |
++=========================+======+=========+===========+
+|nb duplicated lines      |0     |0        |=          |
++-------------------------+------+---------+-----------+
+|percent duplicated lines |0.000 |0.000    |=          |
++-------------------------+------+---------+-----------+
+
+
+
+Messages by category
+--------------------
+
++-----------+-------+---------+-----------+
+|type       |number |previous |difference |
++===========+=======+=========+===========+
+|convention |745    |745      |=          |
++-----------+-------+---------+-----------+
+|refactor   |19     |19       |=          |
++-----------+-------+---------+-----------+
+|warning    |6      |6        |=          |
++-----------+-------+---------+-----------+
+|error      |38     |38       |=          |
++-----------+-------+---------+-----------+
+
+
+
+Messages
+--------
+
++-----------------------------+------------+
+|message id                   |occurrences |
++=============================+============+
+|bad-continuation             |484         |
++-----------------------------+------------+
+|line-too-long                |78          |
++-----------------------------+------------+
+|trailing-whitespace          |64          |
++-----------------------------+------------+
+|bad-whitespace               |58          |
++-----------------------------+------------+
+|invalid-name                 |40          |
++-----------------------------+------------+
+|unsubscriptable-object       |38          |
++-----------------------------+------------+
+|missing-docstring            |16          |
++-----------------------------+------------+
+|too-many-statements          |6           |
++-----------------------------+------------+
+|too-many-branches            |6           |
++-----------------------------+------------+
+|multiple-statements          |4           |
++-----------------------------+------------+
+|too-many-locals              |3           |
++-----------------------------+------------+
+|unused-variable              |2           |
++-----------------------------+------------+
+|too-many-nested-blocks       |2           |
++-----------------------------+------------+
+|unused-import                |1           |
++-----------------------------+------------+
+|unused-argument              |1           |
++-----------------------------+------------+
+|too-many-lines               |1           |
++-----------------------------+------------+
+|too-many-instance-attributes |1           |
++-----------------------------+------------+
+|too-many-arguments           |1           |
++-----------------------------+------------+
+|redefined-builtin            |1           |
++-----------------------------+------------+
+|dangerous-default-value      |1           |
++-----------------------------+------------+
+
+
+
+Global evaluation
+-----------------
+Your code has been rated at -5.84/10 (previous run: -5.84/10, +0.00)
+
