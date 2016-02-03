@@ -317,6 +317,7 @@ def create():
         (100052, 'en', 'forget', 'verb', 1),
         (100053, 'en', 'forgive', 'verb', 1),
         (100054, 'en', 'speak', 'verb', 1),
+        (190054, 'en', 'talk', 'verb', 1),
         (100055, 'en', 'go', 'verb', 1),
         (100056, 'en', 'pass', 'verb', 1),
         (100057, 'en', 'pay', 'verb', 1),
@@ -1134,7 +1135,8 @@ def create():
         (47, 51, 100051, None, None),
         (48, 52, 100052, None, None),
         (49, 53, 100053, None, None),
-        (50, 54, 100054, None, None),
+        (50, 54, 100054, 'parler une langue, échanger des paroles', None),
+        (621, 54, 190054, 'échanger des paroles', None),
         (51, 55, 100055, None, None),
         (52, 56, 100056, None, None),
         (53, 57, 100057, None, None),
@@ -1660,7 +1662,8 @@ def create():
 		(470000, 100051, 51, None, None), # be born => naître
 		(480000, 100052, 52, None, None), # forget => oublier
 		(490000, 100053, 53, None, None), # forgive => pardonner
-		(500000, 100054, 54, None, None), # speak => parler
+		(500000, 100054, 54, 'parler une langue, échanger des paroles', None), # speak => parler
+       (6210000, 190054, 54, 'échanger des paroles', None), # talk => parler
 		(510000, 100055, 55, None, None), # go => partir
 		(520000, 100056, 56, None, None), # pass => passer
 		(530000, 100057, 57, None, None), # pay => payer

@@ -11,9 +11,9 @@ Légende
     4. Les verbes irréguliers
     5. Les formes contractées des auxiliaires
 Aspects, modes, temps et constructions
-    1. Les 2 aspects
-    2. Les 4+1 modes
-    3. Les 12+6 temps
+    1. L'aspect global et l'aspect continu
+    2. Les 4 modes
+    3. Les temps de conjugaison
 Les temps de l'indicatif
     1. Le présent
     2. Le présent continu
@@ -23,21 +23,32 @@ Les temps de l'indicatif
     6. Le parfait continu
     7. Le plus-que-parfait
     8. Le plus-que-parfait continu
-    9. L'expression du futur
 Les autres modes et leurs temps
-    1. Le mode impératif
-    2. Le mode infinitif
-    3. Le présent du subjonctif
-    4. Le prétérit du subjonctif
-    5. L'expression du conditionnel
+    1. L'impératif
+    2. L'infinitif présent
+    3. L'infinitif parfait
+    4. Le présent du subjonctif
+    5. Le prétérit du subjonctif
 Les formations avec les auxiliaires et leurs emplois
-    L'auxiliaire can
-    L'auxiliaire may
-    L'auxiliaire must
-    Les auxiliaires shall et will
+    1. L'auxiliaire can au présent
+    2. L'auxiliaire can au prétérit : could
+    3. L'auxiliaire may au présent
+    4. L'auxiliaire may au prétérit : might
+    5. L'auxiliaire must
+    6. Les auxiliaires shall et will au présent
+    7. Les auxiliaires shall et will au prétérit : should et would
 Récapitulatifs des différents emplois
-    Tableau récapitulatif
+    1. L'expression du futur
+    2. L'expression du conditionnel
     
+---------------------------------------
+Introduction
+---------------------------------------
+
+---------------------------------------
+Légende
+---------------------------------------
+
 ---------------------------------------
 Éléments de syntaxe anglaise
 ---------------------------------------
@@ -66,18 +77,18 @@ XTODOX
 1. Les pronoms
 --------------
 
-                                    Sujet   Objet   Possessif
-1ère personne du singulier          I       me      mine
-2e personne du singulier            you     you     yours
-3e personne du singulier, féminin   she     her     hers
-3e personne du singulier, masculin  he      him     his
-3e personne du singulier, neutre    it      it      its own
+                                    Sujet   Objet   Possessif       Sujet en français
+1ère personne du singulier          I       me      mine            je
+2e personne du singulier            you     you     yours           tu
+3e personne du singulier, féminin   she     her     hers            elle
+3e personne du singulier, masculin  he      him     his             il
+3e personne du singulier, neutre    it      it      its own         il ou elle
 
-1ère personne du pluriel            we      us      ours
-2e personne du pluriel              you     you     yours
-3e personne du pluriel              they    them    theirs
+1ère personne du pluriel            we      us      ours            nous
+2e personne du pluriel              you     you     yours           vous
+3e personne du pluriel              they    them    theirs          elles, ils
 
-pronom indéfini                     one     one     one's own
+pronom indéfini                     one     one     one's own       on
 
 Le pronom neutre it est utilisé pour les animaux de sexe indifférencié et les choses inanimées.
 
@@ -117,7 +128,7 @@ En anglais, il y a seulement 5 formes différentes pour un verbe donné, sauf po
 
 Pour le verbe to be, il faut rajouter à la liste précédente ces formes particulières :
 - à la 1ère personne du présent de l'indicatif : am,
-- à la 1ère et 3e personnes du singulier du prétérit : was,
+- à la 1ère et 3e personnes du singulier du prétérit : was.
 
 4. Les verbes irréguliers
 -------------------------
@@ -126,10 +137,12 @@ De plus, l'anglais compte de nombreux verbes irréguliers qui construisent diff�
 - 3e personne du singulier du présent de l'indicatif : is
 - prétérit de l'indicatif (sauf les 1ère et 3e personnes du singulier) : were
 - participe passé : been
+
 Il faut apprendre ces verbes irréguliers qui sont donnés sous la forme : base verbale, prétérit, participe passé. Ils se divisent en 3 types :
 - base verbale = prétérit = participe passé comme avec cut, cut, cut : couper
 - prétérit et participe passé possèdent la même forme, différente de la base verbale : burn, burnt, burnt : brûler
 - base verbale, prétérit et participe passé sont différents : sing, sang, sung : chanter
+
 Notons qu'il y a une concurrence pour certaines formes des verbes irréguliers. Ainsi on peut rencontrer aussi bien burned que burnt, learned que learnt (de learn, learnt, learnt : apprendre).
 
 5. Les formes contractées des auxiliaires
@@ -137,7 +150,7 @@ Notons qu'il y a une concurrence pour certaines formes des verbes irréguliers. 
 
 Pour garder les descriptions des verbes les plus simples possibles, nous n'avons pas mis les formes contractées des différents auxiliaires qui s'emploient à l'oral ou lorsque l'on écrit de façon familière.
 
-Il existe deux types de formes contractées : celles de l'affirmation et celles de la négation à chaque fois.
+Il existe deux types de formes contractées : celles de l'affirmation et celles de la négation.
 
 Nous résumons les différentes formes contractées de l'affirmation dans le tableau suivant :
 
@@ -176,8 +189,8 @@ Pour le verbe to be, sa 1ère pers. sing. au pluriel, am not, ne se contracte pa
 Aspects, modes, temps et constructions
 --------------------------------------
 
-1. Les 2 aspects
-----------------
+1. L'aspect global et l'aspect continu
+--------------------------------------
 
 L'aspect continu, ou progressif est un point de vue qui insiste sur le déroulement de l'action. L'action est vue comme une activité avec une durée (peu importe qu'elle soit terminée ou non). En français, on le traduit souvent par « en train de » mais pas toujours.
 
@@ -188,8 +201,8 @@ L'aspect non continu, ou global, considère l'action comme un « tout global ».
 
 Une autre façon de se le représenter et d'imaginer une frise chronologique sur laquelle se déroulent les actions : l'aspect continu indiquera une période, un segment sur la frise chronologique, alors que l'aspect global indiquera un simple point.
 
-2. Les 4+1 modes
-----------------
+2. Les 4 modes
+--------------
 
 L'anglais possède :
 - un mode indicatif, 
@@ -197,47 +210,44 @@ L'anglais possède :
 - un mode infinitif,
 - un mode subjonctif très restreint.
 
-L'anglais ne possède pas de mode conditionnel comme le français. Le conditionnel s'exprime par différents moyens. Par assimilation avec la grammaire française, nous ajoutons pour chaque verbe son principal moyen d'expression, la construction avec l'auxiliaire will au prétérit suivi de la base verbale.
+L'anglais ne possède pas de mode conditionnel comme le français. Nous verrons comment l'exprimer dans les chapitres XXX et XXX.
 
-3. Les 12+6 temps
------------------
+3. Les temps de conjugaison
+---------------------------
 
-L'indicatif possède :
-- un présent simple
-- un présent continu
-- un prétérit
-- un prétérit continu
-- un présent parfait
-- un présent parfait continu
-- un plus-que-parfait
-- un plus-que-parfait continu
+L'indicatif possède 8 temps de conjugaison :
+- un présent simple,
+- un présent continu,
+- un prétérit,
+- un prétérit continu,
+- un présent parfait,
+- un présent parfait continu,
+- un plus-que-parfait,
+- un plus-que-parfait continu.
 
-L'impératif possède :
-- un temps unique
+L'impératif possède un temps unique.
 
-L'infinitif possède :
-- un temps unique
-
-Le subjonctif possède :
+L'infinitif possède 2 temps de conjugaison :
 - un présent
-- un prétérit, uniquement pour le verbe to be
+- un parfait
 
-L'indicatif ne possède pas de temps futur comme le français. Le futur s'exprime par différents moyens. Par assimilation avec la grammaire française, nous ajoutons pour chaque verbe le principal moyen d'expression du futur : la construction avec l'auxiliaire will suivi de la base verbale. Nous déclinons ce futur en futur continu, ???futur parfait et futur parfait continu.???
+Le subjonctif possède 2 temps de conjugaison :
+- un présent,
+- un prétérit, uniquement pour le verbe to be.
 
-Il existe aussi une construction similaire avec l'auxiliaire shall suivi de la base verbale, mais elle est moins utilisée, plus pompeuse (we shall overcome), et survit surtout dans certaines tournures interrogatives, traduisant un surcroît de politesse (Shall we go?).
+L'indicatif ne possède pas de temps futur comme le français. Le futur s'exprime par différents moyens que nous verrons dans les chapitre XXX et XXX.
 
-De même, pour le conditionnel, nous déclinons ce mode en conditionnel présent et passé.
+Il ne faut pas calquer la grammaire française sur la grammaire anglaise : si on retrouve de nombreuses similarités entre ses deux langues, elles demeurent différentes par d'autres aspects.
 
-On remarque que le l'indicatif s'articule autour de 3 « temps de l'action » (présent, passé, futur), 2 aspects (simple ou continu) et 2 nuances (parfait ou non) ce qui permet de construire 12 temps (3x2x2).
-
-L'anglais ne comporte que deux temps simples : le présent et le prétérit.
+Il n'y a donc pas une correspondance immédiate et totale entre les temps de l'anglais et ceux du français. À chaque fois, il faut réfléchir à ce que l'on veut exprimer.
 
 ------------------------
 Les temps de l'indicatif
 ------------------------
 
-Le mode indicatif possède 8 temps. On rajoute à ceux-ci les moyens pour exprimer le futur.
-Il n'y a une correspondance immédiate entre les temps de l'anglais et ceux du français. À chaque fois, il faut réfléchir à ce que l'on veut exprimer.
+Le mode indicatif possède 2 temps, dans le sens de considération temporelle : le présent et le prétérit (passé).
+Le mode indicatif possède 8 temps de conjugaisons : le présent, le présent continu, le prétérit, le prétérit continu, le parfait, le parfait continu, le plus-que-parfait, le plus-que-parfait continu.
+Le mode indicatif est un mode personnel.
 
 1. Le présent
 -------------
@@ -276,9 +286,9 @@ Construction :
     
 Emplois :
     Le présent continu peut servir à exprimer :
-    - un événement réel en cours de déroulement
-    - une habitude provisoire
-    - un fait, une situation temporaire
+    - un événement réel en cours de déroulement : He is playing tennis with Mario right now.
+    - une habitude provisoire : She is walking every day to her office since her car was stolen.
+    - un fait, une situation temporaire : He is living in Monaco.
     - une intention future
     - une passage, une transition d'un état à un autre
 
@@ -296,7 +306,7 @@ Sens général :
     
 Construction :
     Le prétérit a une forme :
-    - forme du prétérit (en ed)
+    - forme du prétérit (en ed) : She talked to her yesterday.
     Exception pour be qui 2 formes :
     - was were was were were were
 
@@ -313,12 +323,11 @@ Sens général :
     Le prétérit continu de l'indicatif présente des événements en rupture avec le réel ou le présent, qui sont présentés dans leur déroulement.
     
 Construction :
-    Le prétérit continu se construit avec l'auxiliaire be au prétérit de l'indicatif suivi de la forme progressive :
-    - was/were + forme progressive (en ing)
+    - Le prétérit continu se construit avec l'auxiliaire be au prétérit de l'indicatif suivi de la forme progressive : was/were + forme progressive (en ing) : She was talking to her all day long.
 
 Emplois :
     Le prétérit continu peut servir à exprimer :
-    - des événements passés en cours de déroulement
+    - des événements passés en cours de déroulement : We were waiting for hours when the train finally came.
     - des événements dans un passé immédiat (avec un adverbe exprimant cette idée) : I was just talking to her a minute ago (J'étais juste en train de lui parler il y a une minute).
     
 Notes :
@@ -331,13 +340,12 @@ Sens général :
     Le parfait de l'indicatif exprime des événements passés qui ont un lien avec le présent, au contraire du prétérit, qui lui exprime une rupture.
     
 Construction :
-    Le parfait se construit avec l'auxiliaire have au présent de l'indicatif suivi du participe passé :
-    - has/have + participe passé
+    Le parfait se construit avec l'auxiliaire have au présent de l'indicatif suivi du participe passé : has/have + participe passé : I have written a letter to her and I am still waiting for her answer.
     
 Emplois :
     Le parfait peut servir à exprimer :
-    - un fait passé ayant une conséquence dans le présent
-    - un fait passé toujours valable dans le présent
+    - un fait passé ayant une conséquence dans le présent : I have written a letter to her.
+    - un fait passé toujours valable dans le présent : They have won the war.
 
 6. Le parfait continu
 ---------------------
@@ -346,141 +354,212 @@ Sens général :
     Le parfait continu de l'indicatif exprime des événements passés qui ont un lien avec le présent, en insistant sur leur déroulement.
     
 Construction :
-    Le parfait continu se construit avec l'auxiliaire have au présent de l'indicatif suivi du participe passé de l'auxiliaire be suivi de la forme progressive du verbe :
-    - has/have + been + forme progressive (en ing)
+    Le parfait continu se construit avec l'auxiliaire have au présent de l'indicatif suivi du participe passé de l'auxiliaire be suivi de la forme progressive du verbe : has/have + been + forme  progressive (en ing) : I have been calling her all day long yesterday and I didn't manage to reach her.
     
 Emplois :
     Le parfait continu peut servir à exprimer :
-    - des activités passées qui continuent dans le présent
-    - des activités passées qui viennent tout juste de se terminer
+    - des activités passées qui continuent dans le présent : I have been waiting for you, Mister Anderson.
+    - des activités passées qui viennent tout juste de se terminer, avec l'adverbe just : I just have finished my work, we can play!
     
 7. Le plus-que-parfait
 ----------------------
 
 Sens général :
-
+    Le plus-que-parfait de l'indicatif exprime un premier événement passé qui a un lien avec un second événement passé, mais plus récent que le premier.
+    Dans une utilisation modale, il exprime l'irréel du passé.
+    
 Construction :
-
+    Le plus-que-parfait se construit avec l'auxiliaire have au prétérit de l'indicatif suivi du participe passé : had + participe passé : I had written a letter to her the day before and I was still waiting for her answer when she arrived suddenly.
+    
 Emplois :
-
-XTODOX
+    Le plus-que-parfait peut servir à exprimer :
+    - des actions passés qui ont une incidence ou continuent dans un passé plus récent : I had seen her many times, but I never understood how kind she was.
+    - dans une utilisation modale, le plus-que-parfait peut exprimer un événement non réel ou non réalisé du passé comme un regret : If only I had written a letter to her!
 
 8. Le plus-que-parfait continu
 ------------------------------
 
 Sens général :
+    Le plus-que-parfait continu de l'indicatif exprimer un premier événement passé qui a un lien avec un second événement passé, mais plus récent que le premier. On insiste sur le déroulement du premier événement.
+    Dans une utilisation modale, il exprime l'irréel du passé, en insistant sur l'aspect d'activité ayant un déroulement plutôt que celui d'action globale.
 
 Construction :
-
+    Le plus-que-parfait continu se construit avec l'auxiliaire have au prétérit de l'indicatif suivi du participe passé de l'auxiliaire be suivi de la forme progressive du verbe : had + been + forme progressive (en ing) : I had been writing a letter to her all day long when I heard she had already left the town.
+    
 Emplois :
-
-XTODOX
-
-9. L'expression du futur
-------------------------
-
-On peut utiliser les auxiliaires will et shall (voir le chapitre XXX).
-
-XTODOX
+    Le plus-que-parfait continu peut servir à exprimer :
+    - des activités passées qui ont une incidence sur un passé plus récent : I had been waiting for hours when she finally came back.
+    - dans une utilisation modale, le plus-que-parfait continu peut exprimer un événement non réel ou non réalisé du passé comme un regret, en insistance sur le déroulement de cet événement : If only I had been waiting for her at my home instead of her's).
 
 -------------------------------
 Les autres modes et leurs temps
 -------------------------------
 
-En plus de l'indicatif, l'anglais possède trois autres modes, auxquels on rajoute l'expression du conditionnel.
+En plus de l'indicatif, l'anglais possède trois autres modes : l'impératif, l'infinitif et le subjonctif.
 
-1. Le mode impératif
+1. L'impératif
 --------------------
 
 L'impératif n'a qu'un seul temps.
-
-Construction :
-
-Il se construit à la deuxième personne de l'impératif, que cela soit au singulier ou au pluriel (tu, vous / you), on emploie la base verbale en omettant le sujet (Do not) verbe : Go!
-
-Aux 3e personne du singulier et du pluriel (elle, il, elles, ils / she, he, they) et à la 1ère personne du pluriel (nous / us), on utilise le verbe let (laisser) comme un auxiliaire Let + 's/her/him/them + verbe.
-
-Cela le vide de son sens. La phrase Let him go! peut donc avoir deux traductions :
-- Qu'il parte ! : le verbe go est à l'impératif, let est ici employé comme auxiliaire,
-- Laisse le partir ! : ici, le verbe let est à la 2e personne de l'impératif, il n'est pas auxiliaire mais employé comme verbe au sens plein.
-
-Pour marquer la différence, à la 1ère personne du pluriel on emploie la forme contractée (Let's) lorsque let est un auxiliaire et la forme non contractée (Let us) lorsque let n'est pas un auxiliaire.
-
-Il existe deux façons d'exprimer la négation : Do not let + 's/her/him/them + verbe ou Let + 's/her/him/them + not + verbe
-
-Emplois :
-    - un ordre : Open the door.,
-    - une interdiction : Do not open the door!,
-    - une instruction : Open the box.
-
-Il peut aussi servir à exprimer l'irritation en rajoutant le sujet You devant : You + verbe
-Il existe aussi un impératif emphatique avec l'auxiliaire do qui exprime une insistance polie : Do + verbe
-
-2. Le mode infinitif
---------------------
+L'impératif est un semi-personnel : il n'a qu'une seule personne, la 2e.
+Pour les autres, on utilise une construction en employant le verbe let (laisser) comme auxiliaire.
 
 Sens général :
-    L'infinitif complet avec to présente l'action comme un but vers lequel on se dirige (qui est le sens premier de to : vers), on se place avant sa réalisation.
-    
+    L'impératif sert à exprimer un ordre ou une interdiction. Il sert aussi à exprimer une instruction, là où le français utiliserait l'infinitif.
+     
 Construction :
-    - L'infinitif présent avec to se construit en faisant précéder la base verbale par la préposition to.
-    - L'infinitif présent sans to ou incomplet est l'équivalent de la base verbale.
-    - L'infinitif passé (avec ou sans to) se construit avec l'auxiliaire have à l'infinitif suivi du participe passé.
+    - Il se construit à la deuxième personne de l'impératif, que cela soit au singulier ou au pluriel (tu, vous / you), avec la base verbale en omettant le sujet : (Do not) verbe : Go!
+    - Aux 3e personne du singulier et du pluriel et à la 1ère personne du pluriel, on utilise le verbe let (laisser) comme un auxiliaire : Let + 's/her/him/them + verbe.
+    - Il existe deux façons d'exprimer la négation avec let : Do not let + 's/her/him/them + verbe ou Let + 's/her/him/them + not + verbe
     
 Emplois :
+    - un ordre : Open the door.
+    - une interdiction : Do not open the door!
+    - une instruction : Open the box.
 
-XTODOX
+Notes :
 
-3. Le présent du subjonctif
+    L'utilisation de let comme auxiliaire vide de son sens. La phrase Let him go! peut donc avoir deux traductions :
+    - Qu'il parte ! : le verbe go est à l'impératif, let est ici employé comme auxiliaire,
+    - Laisse le partir ! : ici, le verbe let est à la 2e personne de l'impératif, il n'est pas auxiliaire mais employé comme verbe au sens plein.
+    Pour marquer la différence, à la 1ère personne du pluriel on emploie la forme contractée (Let's) lorsque let est un auxiliaire et la forme non contractée (Let us) lorsque let n'est pas un auxiliaire.
+    - Let us go! : Laisse nous partir !
+    - Let's go! : Allons-y !
+
+    Il existe deux autres constructions qui servent à exprimer :
+    - une irritation en rajoutant le sujet You devant : You + verbe
+    - une insistance polie. Il s'agit de l'impératif emphatique avec l'auxiliaire do, qu'on traduirait en français "je vous prie" : Do + verbe
+ 
+2. L'infinitif présent
+----------------------
+
+L'infinitif a deux temps : présent et parfait.
+L'infinitif est un mode impersonnel.
+
+Sens général :
+    L'infinitif présent complet (ou plein) avec to présente l'action comme un but vers lequel on se dirige (qui est le sens premier de to : vers), on se place avant sa réalisation.
+    L'infinitif présent sans to est aussi appelé réduit et il est l'équivalent pour sa forme de la base verbale.
+    
+Construction :
+    - L'infinitif présent avec to se construit en faisant précéder la base verbale par la préposition to : to give.
+    - L'infinitif présent sans to ou incomplet est l'équivalent de la base verbale : give.
+    - La négation se forme avec not devant la base verbale ou devant to : (to) not give ou not (to) give.
+    - Le passif se forme avec l'auxiliaire être : infinitif présent passif : be + participe passé : (to) be given.
+
+Emplois :
+    L'emploi de l'infinitif est lié aux diverses constructions de la langue anglaise qui le requièrent :
+    - L'infinitif présent complet s'emploie comme complément de verbe et comme sujet. Avec to, on exprime parfois que l'on se place avant que l'événement prenne place en expriment son but, à la manière de in order to (mais cet événement peut-être lui-même au passé, on se place juste avant) : I want a car to visit my uncle in Dallas.
+    - L'infinitif présent réduit s'emploie après les auxiliaires, après le verbe make, après les verbes de perception et après better et rather : I can't see him in this crowd!
+    
+3. L'infinitif parfait
+----------------------
+
+L'infinitif a deux temps : présent et parfait.
+L'infinitif est un mode impersonnel.
+
+Sens général :
+    L'infinitif parfait peut lui aussi être complet, avec to, ou réduit, sans to.
+    Comme pour l'infinitif présent, to présente l'action comme un but vers lequel on se dirigeait.
+
+Construction :
+    - L'infinitif parfait, avec ou sans to, se construit avec l'auxiliaire have à l'infinitif suivi du participe passé : (to) have given.
+    - La négation se forme avec not devant la base verbale, devant ou après le to : (to) have not given ou not (to) have given ou (to) not have given.
+    - Le passif se forme avec l'auxiliaire être : have + been + base verbale : (to) have been given.
+
+Emplois :
+    - L'infinitif parfait peut exprimer un événement qui aurait pu arriver dans le passé : To not have given this ring was a very bad idea.
+    - L'infinitif parfait peut exprimer un événement qui sera terminé dans le futur : We will have built your house before your return. 
+    - L'infinitif parfait complet s'emploie comme complément de verbe, comme sujet : He thought to have won the war, but it was only the beginning.
+    - L'infinitif parfait réduit s'emploie après les auxiliaires, après le verbe make, après les verbes de perception et après better et rather : You must have written your article before tomorrow.
+    
+4. Le présent du subjonctif
 ---------------------------
 
 Le subjonctif n'a qu'un seul temps, le présent, sauf pour le verbe to be qui possède en plus un prétérit du subjonctif.
+Le subjonctif est un mode personnel.
+
+Sens général :
+    Il sert à exprimer des événements qui ne sont pas réels mais reste dans le domaine du possible.
 
 Construction :
-    Le subjonctif utilise simplement la base verbale, avec seulement l'ajout de not pour exprimer la négation : (not) verbe : I suggest that he not leave until tomorrow morning.
-    À la différence du présent, la 3e personne du singulier n'est pas différente, on n'ajoute pas de s.
-
+    - Le présent du subjonctif utilise simplement la base verbale, avec seulement l'ajout de not pour exprimer la négation : (not) verbe : I suggest that he not leave until tomorrow morning.
+    - À la différence du présent, la 3e personne du singulier n'est pas différente, on n'ajoute pas de s.
+    
 Emplois :
-    Il exprime une valeur d'imaginaire mais qui reste dans le domaine du réel :
+    Le présent du subjonctif exprime une valeur d'imaginaire mais qui reste dans le domaine du possible :
     - souhait,
     - hypothèse,
     - suggestion.
     
 Notes :
     On le retrouve dans de nombreux expressions : Come what may. So be it. If need be.
-Il appartient à une langue plutôt recherchée.
+    Il appartient à une langue plutôt recherchée.
 
-4. Le prétérit du subjonctif
+5. Le prétérit du subjonctif
 ----------------------------
 
-Le subjonctif prétérit n'existe que pour le verbe to be. 
+Le prétérit du subjonctif n'existe que pour le verbe to be. 
+Le subjonctif est un mode personnel.
 
+Sens général :
+    Le prétérit du subjonctif sert à exprimer des événements irréels, impossibles.
+    
 Construction :
-    Il n'a qu'une forme : (not) were : If I were you, I would talk to her.
-    Attention, were s'utilise à toutes les personnes !
+    - Le prétérit du subjonctif n'a qu'une forme : (not) were : If I were you, I would talk to her.
+    - Attention, were s'utilise à toutes les personnes !
     
 Emplois :
-    - Il exprime une valeur de non-réel.
+    - Le prétérit du subjonctif exprime une valeur de non-réel, dans le sens d'irréel.
     
 Notes :
     Il appartient à une langue plutôt recherchée, sauf l'expression If I were you, plus courante.
-
-5. L'expression du conditionnel
--------------------------------
-
-XTODOX
 
 ----------------------------------------------------
 Les formations avec les auxiliaires et leurs emplois
 ----------------------------------------------------
 
-L'auxiliaire can
------------------
+1. L'auxiliaire can au présent
+-------------------------------
 
-XTODOX
+Sens général :
+    L'auxiliaire can au présent de l'indicatif indique une possibilité présentée comme objective. Il se traduit généralement en français par pouvoir.
 
-L'auxiliaire may
-----------------
+Construction :
+    - can + base verbale
+    - can ne prend pas de s au présent de l'indicatif
+    - la négation s'écrit cannot ou can't
+    
+Emploi :
+    - une capacité ou une incapacité : He can do it (Il peut le faire).
+    - dans ce même sens, avec un verbe de perception, il ne sera pas traduit : I can hear you know (Je t'entends à présent). Quand l'emploi de can n'est pas possible, on utilisera to be able to.
+    - une permission objective, qui ne dépend pas de la volonté de l'interlocuteur : Can I smoke hear? Quand l'emploi de can n'est pas possible, on utilisera to be allowed to.
+    - une possibilité matérielle : She can still come back (Elle peut toujours revenir).
+    - une suggestion, un ordre légèrement atténué par la politesse : Can you close door, please?
+    
+2. L'auxiliaire can au prétérit : could
+---------------------------------------
+
+Sens général :
+    L'auxiliaire can au prétérit de l'indicatif sert à exprimer une capacité dans un contexte passé ou non-réel.
+    
+Construction :
+    - could + base verbale
+    - la négation s'écrit could not ou couldn't
+    
+Emploi :
+    - une capacité ou une incapacité dans un contexte passé : She could not do it.
+    - une possibilité matérielle au passé : She could still have returned at this time.
+    - un reproche sur quelque chose qui n'a pas été fait : You could have told her!
+    - une suggestion, un ordre encore plus atténué par la politesse dans un contexte présent, au contraire du sens général de could : Could you close the door, please?
+
+3. L'auxiliaire may au présent
+------------------------------
+
+Sens général :
+
+Construction :
+
+Emploi :
 
 XTODOX changer format
 
@@ -497,13 +576,48 @@ De même, on peut exprimer sa volonté par une phrase affirmative avec cet auxil
 Pour exprimer une telle permission au passé, on emploiera could ou was/were allowed to.
 La forme prétérit de may, might est réservé au passé dans un discours indirect.
 
-L'auxiliaire must
------------------
+4. L'auxiliaire may au prétérit : might
+---------------------------------------
+
+Sens général :
+
+Construction :
+
+Emploi :
 
 XTODOX
 
-Les auxiliaires shall et will
------------------------------
+5. L'auxiliaire must
+--------------------
+
+
+Sens général :
+
+Construction :
+
+Emploi :
+
+XTODOX
+
+6. Les auxiliaires shall et will au présent
+-------------------------------------------
+
+Sens général :
+
+Construction :
+
+Emploi :
+
+XTODOX
+
+7. Les auxiliaires shall et will au prétérit : should et would
+--------------------------------------------------------------
+
+Sens général :
+
+Construction :
+
+Emploi :
 
 XTODOX
 
@@ -511,7 +625,81 @@ XTODOX
 Récapitulatifs des différents emplois
 -------------------------------------
 
-Tableau récapitulatif
-----------------------
+1. L'expression du futur
+------------------------
+
+Il existe différents moyens d'exprimer le futur en anglais selon la nuance du futur que l'on cherche à exprimer :
+    - Prévision d'un futur non routinier :
+        - will + base verbale : Tomorrow, the train will leave at 5:00 a.m. due to the strike.
+        - will + be + forme progressive pour insister sur son déroulement : Tomorrow, the train will be leaving at 5:00 a.m. due to the strike.
+        - différents verbes + base verbale dont le sens implique un événement futur : I plan to leave the country very soon.
+    - Futur routinier :
+        - présent de l'indicatif + adverbe : Tomorrow, the train to Detroit leaves at 4:40 a.m..
+    - Intention future :
+        - présent continu de l'indicatif : I'm leaving at 4:40 tomorrow.
+        - will + base verbale : I will learn Spanish.
+        - will + be + forme progressive pour insister sur son déroulement : I will be learning Spanish really soon.
+    - Futur imminent :
+        - to be about to + base verbale : I am about to explode with anger.
+    - Futur incertain mais néanmoins à forte probabilité :
+        - to be likely to + base verbale : We are likely to be defeated. 
+        - it is likely that + proposition : It is likely that we will be defeated.
+    - Futur certain :
+        - to be bound to + base verbale : We are bound to happiness, aren't we?
+
+2. L'expression du conditionnel
+-------------------------------
+
+3. L'expression de l'irréel
+-------------------------------------------------
+    L'irréel constitue un des versants du non-réel : on parle d'événements qui ne peuvent pas exister, ni maintenant, ni avant, ni après :
+        - avec le prétérit du subjonctif de to be, were : If I were you, I wouldn't touch that.
+    
+4. L'expression de l'imaginaire
+-------------------------------
+    L'imaginaire constitue l'autre versant du non-réel : on parle d'événements qui pourraient être possible, mais ne le sont pas : 
+    - Pour un souhait, une hypothèse : 
+    - Pour une suggestion :
+    
+5. L'expression de la direction
+-------------------------------
+
+    
+Futur hypothétique
+
+XTODOX
 
 XTODOX reprendre
+
+Regret
+Probabilité
+Reproche
+Concession
+Permission
+Souhait
+Insistance polie
+
+Interdiction
+Obligation
+Absence d'obligation
+Ordre
+Instruction
+
+Action dans son déroulement	aspect continu	He was leaving when I came in.
+Action dans sa globalité	aspect ponctuel1	He just left!
+Événement réel considérée dans sa globalité se passant en même temps que l'on parle	présent de l'indicatif	I go.
+Habitude	présent de l'indicatif	John walks to his office every day.
+Habitude provisoire, temporaire	présent de l'indicatif et aspect continu	John is walking to his office every day because his car is broken.
+Vérité générale	présent de l'indicatif	The sky is blue.
+Ordre, instruction	impératif	Open the box.
+Interdiction	impératif + négation	Do not open the door!
+Ordre avec irritation	you + impératif	You open the box.
+Insistance polie	do + impératif	Do take my arm.
+Imaginaire réaliste (souhait, hypothèse, suggestion)	subjonctif présent	I suggest that he not leave.
+Imaginaire irréaliste	subjonctif prétérit (pour to be seulement)	If I were you, I would stay.
+Imaginaire réaliste (souhait, potentialité)	auxiliaire may + base verbale	He may return.
+Imaginaire réaliste mais moins probable	auxiliaire may au prétérit (might) + base verbale	He might return.
+Permission (autorisation par la volonté d'un tiers)	auxiliaire may + base verbale	May I speak? You may speak.
+Suggestion	auxiliaire may + base verbale	You may buy the same gift to her.
+Concession	auxiliaire may + base verbale	You may be smart sometimes, but you can also be stupid.
+

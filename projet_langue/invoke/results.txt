@@ -127,93 +127,94 @@ Toutes les traductions
 124. oublier --> to forget
 125. ouvrir --> to open
 126. pardonner --> to forgive
-127. parler --> to speak
-128. partager --> to share
-129. partir --> to go
-130. passer --> to pass
-131. payer --> to pay
-132. pendre --> to hang
-133. penser --> to think
-134. perdre --> to lose
-135. permettre --> to allow
-136. plaire --> to please
-137. pleurer --> to cry
-138. plier --> to fold
-139. plonger --> to dive avec le sens de : immerger (dans l'eau), descendre (dans l'air)
-140. porter --> to carry avec le sens de : porter un objet
-141. porter --> to wear avec le sens de : porter un vêtement
-142. poser --> to put
-143. pousser --> to push
-144. pouvoir --> to can
-145. prendre --> to take
-146. produire --> to produce
-147. promettre --> to pledge
-148. proposer --> to suggest
-149. présenter (se) --> to introduce avec le sens de : présenter quelqu'un
-150. prêter --> to lend
-151. quitter --> to leave
-152. raconter --> to tell
-153. recevoir --> to receive
-154. regarder --> to watch avec le sens de : observer, surveiller, visionner (un film, une émission)
-155. regarder --> to look at
-156. regarder --> to concern avec le sens de : concerner
-157. remercier --> to thank
-158. remplir --> to fill
-159. rencontrer --> to meet
-160. reposer (se) --> to rest
-161. rester --> to stay
-162. retenir --> to hold
-163. revenir --> to come back
-164. rire --> to laugh
-165. réduire --> to reduce
-166. réfléchir --> to think
-167. répondre --> to answer
-168. réussir --> to success
-169. réveiller (se) --> to wake up
-170. rêver --> to dream
-171. sauter --> to jump
-172. savoir --> to know
-173. sentir --> to smell avec le sens de : une odeur
-174. sentir --> to feel avec le sens de : un sentiment
-175. signifier --> to mean
-176. sortir --> to go out avec le sens de : vu de lintérieur du lieu que lon quitte
-177. sortir --> to come out avec le sens de : vu de lextérieur du lieu que lon quitte
-178. sortir --> to take out avec le sens de : sortir quelque chose
-179. souffrir --> to suffer
-180. souhaiter --> to wish
-181. souvenir (se) --> to remember
-182. suivre --> to follow
-183. tenir --> to hold
-184. tirer --> to pull avec le sens de : amener vers soi un objet
-185. tirer --> to shoot avec le sens de : lancer un projectile
-186. tomber --> to fall
-187. toucher --> to touch
-188. tourner --> to turn
-189. traduire --> to translate
-190. travailler --> to work
-191. trouver --> to find
-192. tuer --> to kill
-193. utiliser --> to use
-194. valoir --> to be worth
-195. vendre --> to sell
-196. venir --> to come
-197. vider --> to empty
-198. visiter --> to visit
-199. vivre --> to live
-200. voir --> to see
-201. voir --> to watch avec le sens de : visionner (un film, une émission)
-202. voler --> to fly avec le sens de : dans les airs
-203. voler --> to steal avec le sens de : atteinte à la propriété dautrui
-204. vouloir --> to want
-205. voyager --> to travel
-206. écouter --> to listen
-207. écrire --> to write
-208. éteindre --> to turn off
-209. étudier --> to study
-210. être --> to be
-211. être assis --> to sit
-212. être daccord --> to agree
-213. être debout --> to stand
+127. parler --> to speak avec le sens de : parler une langue, échanger des paroles
+128. parler --> to talk avec le sens de : échanger des paroles
+129. partager --> to share
+130. partir --> to go
+131. passer --> to pass
+132. payer --> to pay
+133. pendre --> to hang
+134. penser --> to think
+135. perdre --> to lose
+136. permettre --> to allow
+137. plaire --> to please
+138. pleurer --> to cry
+139. plier --> to fold
+140. plonger --> to dive avec le sens de : immerger (dans l'eau), descendre (dans l'air)
+141. porter --> to carry avec le sens de : porter un objet
+142. porter --> to wear avec le sens de : porter un vêtement
+143. poser --> to put
+144. pousser --> to push
+145. pouvoir --> to can
+146. prendre --> to take
+147. produire --> to produce
+148. promettre --> to pledge
+149. proposer --> to suggest
+150. présenter (se) --> to introduce avec le sens de : présenter quelqu'un
+151. prêter --> to lend
+152. quitter --> to leave
+153. raconter --> to tell
+154. recevoir --> to receive
+155. regarder --> to watch avec le sens de : observer, surveiller, visionner (un film, une émission)
+156. regarder --> to look at
+157. regarder --> to concern avec le sens de : concerner
+158. remercier --> to thank
+159. remplir --> to fill
+160. rencontrer --> to meet
+161. reposer (se) --> to rest
+162. rester --> to stay
+163. retenir --> to hold
+164. revenir --> to come back
+165. rire --> to laugh
+166. réduire --> to reduce
+167. réfléchir --> to think
+168. répondre --> to answer
+169. réussir --> to success
+170. réveiller (se) --> to wake up
+171. rêver --> to dream
+172. sauter --> to jump
+173. savoir --> to know
+174. sentir --> to smell avec le sens de : une odeur
+175. sentir --> to feel avec le sens de : un sentiment
+176. signifier --> to mean
+177. sortir --> to go out avec le sens de : vu de lintérieur du lieu que lon quitte
+178. sortir --> to come out avec le sens de : vu de lextérieur du lieu que lon quitte
+179. sortir --> to take out avec le sens de : sortir quelque chose
+180. souffrir --> to suffer
+181. souhaiter --> to wish
+182. souvenir (se) --> to remember
+183. suivre --> to follow
+184. tenir --> to hold
+185. tirer --> to pull avec le sens de : amener vers soi un objet
+186. tirer --> to shoot avec le sens de : lancer un projectile
+187. tomber --> to fall
+188. toucher --> to touch
+189. tourner --> to turn
+190. traduire --> to translate
+191. travailler --> to work
+192. trouver --> to find
+193. tuer --> to kill
+194. utiliser --> to use
+195. valoir --> to be worth
+196. vendre --> to sell
+197. venir --> to come
+198. vider --> to empty
+199. visiter --> to visit
+200. vivre --> to live
+201. voir --> to see
+202. voir --> to watch avec le sens de : visionner (un film, une émission)
+203. voler --> to fly avec le sens de : dans les airs
+204. voler --> to steal avec le sens de : atteinte à la propriété dautrui
+205. vouloir --> to want
+206. voyager --> to travel
+207. écouter --> to listen
+208. écrire --> to write
+209. éteindre --> to turn off
+210. étudier --> to study
+211. être --> to be
+212. être assis --> to sit
+213. être daccord --> to agree
+214. être debout --> to stand
 
 
 
@@ -434,4 +435,4 @@ Verbes non traduits
 9. #21005 sœur
 
 
-Last edit on 2016-01-27 19:36:50
+Last edit on 2016-02-03 11:55:04
