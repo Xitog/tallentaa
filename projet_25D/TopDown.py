@@ -172,7 +172,7 @@ class Object:
         pass
 
 
-def main_loop(screen):
+def main_loop(screen, res):
     global app_end, app_fps
 
     player1 = Player(40, 40, 90)  # x, y, angle
@@ -198,65 +198,82 @@ def main_loop(screen):
     print("Level is = " + level1.name)
     print("Player life is = " + str(player1.life))
 
+    game = Game()
+    cam = Camera(screen, res)
+    
     while not app_end:
-        update(player1, level1)
-        render(screen, player1, level1)
+        app_end = game.update(player1, level1)
+        cam.render(player1, level1)
         # Limit to 60 fps maximum
         clock.tick(app_fps)
 
 
-def render(screen, player, level):
-    global res
-    screen.fill(BLACK)
-    # Level
-    # 1-sector
-    for s in level.sectors:
-        if level.is_in_sector():
-            pygame.draw.polygon(screen, GREEN, s, 0)
-            pygame.draw.polygon(screen, RED, s, 1)
-        else:
-            pygame.draw.polygon(screen, RED, s, 0)
-            pygame.draw.polygon(screen, GREEN, s, 1)
+class Camera:
 
-        #  for w in s:
-        #    pygame.draw.line(screen, RED, (w[0], w[1]), (w[2], w[3]), 1)
-    # 2-objects
-    for o in level.objects:
-        if o.kind == "life":
-            screen.blit(res.sprite_life, (o.x, o.y))
+    def __init__(self, screen, res):
+        if screen.__class__ != pygame.Surface:
+            raise TypeError("A pygame.Surface is required for parameter screen")
+        
+        self.screen = screen
+        self.res = res
+    
+    def render(self, player, level):
+        self.screen.fill(BLACK)
+        # Level
+        # 1-sector
+        for s in level.sectors:
+            if level.is_in_sector():
+                pygame.draw.polygon(self.screen, GREEN, s, 0)
+                pygame.draw.polygon(self.screen, RED, s, 1)
+            else:
+                pygame.draw.polygon(self.screen, RED, s, 0)
+                pygame.draw.polygon(self.screen, GREEN, s, 1)
 
-    # Player
-    pygame.draw.circle(screen, BLUE, player.pos, 10, 0)
-    pygame.draw.line(screen, BLUE, player.pos, player.gun, 1)
-    # Rest
-    pygame.display.flip()
+            #  for w in s:
+            #    pygame.draw.line(screen, RED, (w[0], w[1]), (w[2], w[3]), 1)
+        # 2-objects
+        for o in level.objects:
+            if o.kind == "life":
+                self.screen.blit(self.res.sprite_life, (o.x, o.y))
+
+        # Player
+        pygame.draw.circle(self.screen, BLUE, player.pos, 10, 0)
+        pygame.draw.line(self.screen, BLUE, player.pos, player.gun, 1)
+        # Rest
+        pygame.display.flip()
 
 
-def update(player, level):
-    global app_end
-    # Handle events
-    for event in pygame.event.get():
-        if event.type == QUIT:
-            app_end = True
-        elif event.type == KEYDOWN:
-            if event.key == K_ESCAPE:
+class Game:
+
+    def __init__(self):
+        pass
+        
+    def update(self, player, level):
+        app_end = False
+        # Handle events
+        for event in pygame.event.get():
+            if event.type == QUIT:
                 app_end = True
-            if event.key == K_p:
-                print("P")
-            if event.key == K_RIGHT:
-                player.move(True, False, False, False)
-            if event.key == K_LEFT:
-                player.move(False, True, False, False)
-            if event.key == K_UP:
-                player.move(False, False, True, False)
-            if event.key == K_DOWN:
-                player.move(False, False, False, True)
-        elif event.type == KEYUP:
-            pass
-    # Process
-    player.update()
-    level.update()
+            elif event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    app_end = True
+                if event.key == K_p:
+                    print("P")
+                if event.key == K_RIGHT:
+                    player.move(True, False, False, False)
+                if event.key == K_LEFT:
+                    player.move(False, True, False, False)
+                if event.key == K_UP:
+                    player.move(False, False, True, False)
+                if event.key == K_DOWN:
+                    player.move(False, False, False, True)
+            elif event.type == KEYUP:
+                pass
+        # Process
+        player.update()
+        level.update()
+        return app_end
 
-main_loop(app_screen)
+main_loop(app_screen, res)
 print("goodbye")
 pygame.quit()
