@@ -53,17 +53,50 @@ Légende
 Éléments de syntaxe anglaise
 ---------------------------------------
 
-XTODOX
+À chaque fois, nous prendrons le cas le plus simple, une phrase simple, composée d'une seule proposition, sans compléments circonstanciels (CC).
 
 L'assertion
 -----------
 
-XTODOX
+Les assertions se terminent par un point (a period or a fullstop).
+
+Affirmative
+
+- Si le noyau verbal est construit autour d'un verbe intransitif, il n'y a pas de complément du verbe : Sujet + Noyau Verbal (She is swimming.)
+- Si le noyau verbal est construit autour d'un verbe transitif avec un complément :
+Sujet + Noyau Verbal + Complément d'objet (We have a bag. I'm looking for a bag.)
+- Si le noyau verbal est construit autour d'un verbe transitif admettant deux compléments :
+Sujet + Noyau Verbal + Complément d'objet premier + Complément d'objet second (I give her a book. I give a book to her.)
+- Si le noyau verbal est construit autour d'un verbe copule qui introduit un attribut du sujet : Sujet + Noyau Verbal + Attribut du sujet (He is young.)
+- Si le noyau verbal est construit autour d'un verbe transitif introduisant un complément et un attribut du complément : Sujet + Noyau Verbal + Complément d'objet + Attribut du complément (I find him young.)
+
+Négative
+
+Elle se construit sur le modèle de l'affirmation.
+- Si le noyau verbal est le verbe be, ou l'un des auxiliaires may, must, will et shall, on rajoute juste l'adverbe not après l'auxiliaire : I will not tell you where she is.
+- Si le noyau verbal est un autre verbe, on ajoute l'auxiliaire do qui se conjugue selon les mêmes modalités que le verbe qu'il remplace, suivi de l'adverbe not et de la base verbale du verbe remplacé : I don't know her.
+- Pour le verbe have, les deux formes sont possibles : I don't have my bag. I haven't my bag.
 
 L'interrogation
 ---------------
 
-XTODOX
+Les interrogations se terminent par un point d'interrogation (a question mark) : ? . Contrairement au français, on colle le point d'interrogation au dernier mot de la phrase, sans espace.
+
+Caractéristique principale :
+    - L'interrogation utilise un auxiliaire.
+    - Elle inverse l'ordre du sujet-verbe conjugué en plaçant l'auxiliaire avant le sujet.
+
+Affirmative :
+    - Si le noyau verbal est le verbe be, ou l'un des auxiliaires may, must, will et shall, on place l'auxiliaire en premier, suivi du sujet. Si il y a un mot interrogatif, on le met avant l'auxiliaire : What are you doing? Are you going with us tomorrow?
+    - Si le noyau verbal est un autre verbe, on ajoute l'auxiliaire do qui se conjugue selon les mêmes modalités que le verbe qu'il remplace. On le place en premier, suivi du sujet et de la base verbale du verbe remplacé. S'il y a un mot interrogatif, on le met avant l'auxiliaire : Do you know him?
+
+Négative :
+    - Elle se construit sur le modèle de l'interrogation affirmative, on utilise simplement la forme contractée négative de l'auxiliaire : Don't you know him? (Tu ne le connais pas ?) 
+
+Notes :
+    - En anglais courant, on peut très bien construire une phrase interrogative comme une phrase affirmative, avec juste un point d'interrogation à la fin : You don't know him?
+    - En anglais courant, on peut faire des écho-interrogatives : on reprend une phrase affirmative en remplaçant la partie sur laquelle porte l'interrogation par le mot interrogatif correspondant en remplaçant le point par un point d'interrogation : I will go to Dallas tomorrow. → You will go where? ou You will go to Dallas when?
+    - Les mots interrogatifs sont : What, Which, Who, Whom, Whose, When, Where, Why, How, How + adjectif, How + adverbe, How much + nom indénombrable, How many + nom dénombrable.
 
 L'exclamation
 -------------
@@ -161,10 +194,11 @@ are             're
 have            've
 has             *'s*
 will            'll
+shall           'll
 had             *'d*
 would           *'d*
 
-Attention de bien noter qu'une même contraction (celles en gras) peut correspondre à deux auxiliaires différents ('s pour is et has, 'd pour had et would). De plus, on utilise jamais la forme contracté de l'affirmation lorsque l'auxiliaire est le dernier mot de la phrase, comme dans une réponse courte.
+Attention de bien noter qu'une même contraction (celles en gras) peut correspondre à deux auxiliaires différents ('s pour is et has, 'd pour had et would, 'll pour shall et will). De plus, on utilise jamais la forme contracté de l'affirmation lorsque l'auxiliaire est le dernier mot de la phrase, comme dans une réponse courte.
 
 Pour les formes contractées de la négation, la règle synthétique est de coller le verbe à not et de remplacer le o par l'apostrophe *'* mais il y a des exceptions (en gras).
 
@@ -177,11 +211,15 @@ did not	        didn't
 has not	        hasn't
 have not	    haven't
 will not	    *won't*
+would not       wouldn't
 shall not	    *shan't*
+should not      shouldn't
 are not	        aren't
 was not	        wasn't
 were not	    weren't
 *cannot*	    *can't*
+might not       mightn't
+need not        needn't
 
 Pour le verbe to be, sa 1ère pers. sing. au pluriel, am not, ne se contracte pas, sauf dans un anglais oral, sous la forme de ain't, ou même parfois aren't.
 
@@ -535,6 +573,10 @@ Emploi :
     - une permission objective, qui ne dépend pas de la volonté de l'interlocuteur : Can I smoke hear? Quand l'emploi de can n'est pas possible, on utilisera to be allowed to.
     - une possibilité matérielle : She can still come back (Elle peut toujours revenir).
     - une suggestion, un ordre légèrement atténué par la politesse : Can you close door, please?
+    - un fait intermittent : She can be mean (sometimes).
+    
+Notes :
+    - La possibilité présentée comme objective, exprimée par can, s'oppose à la possibilité par rapport à la volonté d'un tiers, c'est-à-dire une permission, exprimée par may.
     
 2. L'auxiliaire can au prétérit : could
 ---------------------------------------
@@ -547,7 +589,7 @@ Construction :
     - la négation s'écrit could not ou couldn't
     
 Emploi :
-    - une capacité ou une incapacité dans un contexte passé : She could not do it.
+    - une capacité ou une incapacité dans un contexte passé dans le cas où rien n'indique que l'action a été réalisée : She could not do it. Si l'action a été réalisée, on emploiera was/were able to : Se was able to do it.
     - une possibilité matérielle au passé : She could still have returned at this time.
     - un reproche sur quelque chose qui n'a pas été fait : You could have told her!
     - une suggestion, un ordre encore plus atténué par la politesse dans un contexte présent, au contraire du sens général de could : Could you close the door, please?
@@ -556,48 +598,57 @@ Emploi :
 ------------------------------
 
 Sens général :
-
+    L'auxiliaire may au présent de l'indicatif sert à exprimer quelque chose de non-certain ou de non-réel.
+    
 Construction :
-
+    - may + base verbale
+    - la négation s'écrit may not
+    
 Emploi :
-
-XTODOX changer format
-
-L'auxiliaire employé avec une base verbale peut servir pour exprimer une suggestion ou une concession : You may go in June, after the wedding.
-Employée au passé, une suggestion peut se transformer en reproche : You might have told her before it was too late.
-
-L'utilisation de l'auxiliaire may au présent de l'indicatif suivi de la base verbale exprime une potentialité ou un souhait may verbe (not) : He may not return of his journey abroad.
-Pour exprimer une telle potentialité ou souhait au passé, on emploiera have + participe passé : may (not) have participe passé : He may have not returned.
-La forme prétérit de may, might est réservé au passé dans un discours indirect ou pour renforcer l'incertitude de la potentialité, elle est encore moins plausible : He might return but it's difficult to tell.
-
-L'auxiliaire may peut aussi servir à demander une permission qui porte sur la volonté de son interlocuteur : May I speak? (je demande à vous si je peux parler)
-À la différence de can qui sert à demander une possibilité générale : Can I speak? (je demande si je peux parler, par rapport aux règles générales, au moment, etc.)
-De même, on peut exprimer sa volonté par une phrase affirmative avec cet auxiliaire : You may speak (je t'y autorise, moi).
-Pour exprimer une telle permission au passé, on emploiera could ou was/were allowed to.
-La forme prétérit de may, might est réservé au passé dans un discours indirect.
+    - une probabilité ou un souhait :  He may not return of his journey abroad.
+    - une suggestion ou une concession : You may talk to her.
+    - une demande de permission, où on questionne la volonté de son interlocuteur : May I speak? (Je demande -à vous- si je peux parler.)
+    - sa volonté : You may speak. (Je t'y autorise -moi-.)
+    
+Notes :
+    - Pour la permission, il faut bien voir la différence entre l'emploie de may, qui questionne la volonté de l'interlocuteur, lui demandant sa permission, et celui de can, qui questionne la possibilité physique : Can I speak? (je demande si je peux parler, par rapport aux règles générales, au moment, etc.)
 
 4. L'auxiliaire may au prétérit : might
 ---------------------------------------
 
 Sens général :
-
+    L'auxiliaire may au prétérit de l'indicatif sert à exprimer quelque chose de non-certain, avec une chance de probabilité encore plus faible, ou de non-réel.
+    
 Construction :
-
+    - might + base verbale
+    - la négation s'écrit might not ou mightn't
+    
 Emploi :
-
-XTODOX
+    - Employée au passé, une suggestion peut se transformer en reproche : You might have told her before it was too late. (Tu aurais pu lui dire avant qu'il ne soit trop tard. Ici on traduit par un conditionnel passé)
+    - Une probabilité très incertaine : He might return but it's difficult to tell.
+    
+Notes :
+    Attention, le passage au passé d'une phrase utilisant may ne se traduit pas automatiquement par might :
+    - Pour exprimer une potentialité ou souhait au passé sans renforcer son degré d'incertitude, on emploiera have + participe passé : may (not) have participe passé : He may not have returned.
+    - Pour exprimer une permission au passé, on emploiera was/were allowed to.
+    La forme prétérit de may, might peut néanmoins se retrouver exprimant ses valeurs dans un discours indirect : She said to me I might speak. (Elle me dit que je pouvais parler.) vs She allowed me to speak. (Elle me permit de parler.)
 
 5. L'auxiliaire must
 --------------------
 
-
 Sens général :
-
+    L'auxiliaire must au présent de l'indicatif sert à exprimer une nécessité présentée comme absolue.
+    
 Construction :
-
+    - must + base verbale
+    - la négation s'écrit must not ou mustn't
+    
 Emploi :
-
-XTODOX
+    - une obligation ou une interdiction : You must not be here!
+    - une très forte probabilité : He must be back.
+    
+Notes
+    - L'auxiliaire must n'a pas de prétérit. Pour le passé du discours indirect, on utilise le présent. Pour une obligation passée, on emploie had to + base verbale. Pour une très forte probabilité passé, on emploie must + have + participe passé.
 
 6. Les auxiliaires shall et will au présent
 -------------------------------------------
@@ -633,6 +684,8 @@ Il existe différents moyens d'exprimer le futur en anglais selon la nuance du f
         - will + base verbale : Tomorrow, the train will leave at 5:00 a.m. due to the strike.
         - will + be + forme progressive pour insister sur son déroulement : Tomorrow, the train will be leaving at 5:00 a.m. due to the strike.
         - différents verbes + base verbale dont le sens implique un événement futur : I plan to leave the country very soon.
+    - Prévision d'un futur hypothétique, soumis à des conditions :
+        - would + base verbale : I would if I could. (Je le ferais si je le pouvais.)
     - Futur routinier :
         - présent de l'indicatif + adverbe : Tomorrow, the train to Detroit leaves at 4:40 a.m..
     - Intention future :
@@ -646,10 +699,12 @@ Il existe différents moyens d'exprimer le futur en anglais selon la nuance du f
         - it is likely that + proposition : It is likely that we will be defeated.
     - Futur certain :
         - to be bound to + base verbale : We are bound to happiness, aren't we?
-
+    
 2. L'expression du conditionnel
 -------------------------------
 
+    XTODOX
+    
 3. L'expression de l'irréel
 -------------------------------------------------
     L'irréel constitue un des versants du non-réel : on parle d'événements qui ne peuvent pas exister, ni maintenant, ni avant, ni après :
@@ -660,14 +715,12 @@ Il existe différents moyens d'exprimer le futur en anglais selon la nuance du f
     L'imaginaire constitue l'autre versant du non-réel : on parle d'événements qui pourraient être possible, mais ne le sont pas : 
     - Pour un souhait, une hypothèse : 
     - Pour une suggestion :
+    - Pour une probabilité : must > may > might
     
 5. L'expression de la direction
 -------------------------------
 
-    
-Futur hypothétique
-
-XTODOX
+    XTODOX (ordre, interdiction)
 
 XTODOX reprendre
 

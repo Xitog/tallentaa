@@ -84,9 +84,9 @@ class Player:
         self.a += self.mod_a
         if self.ia is not None:
             self.ia(self)
-        if self.prev_a != self.a:
-            print("previous a:", self.prev_a, "new a:", self.a)
-            self.prev_a = self.a
+        #if self.prev_a != self.a:
+        #    print("previous a:", self.prev_a, "new a:", self.a)
+        #    self.prev_a = self.a
         
     def right(self):
         self.mod_a = 10.0
@@ -103,14 +103,20 @@ class Player:
 class Level:
 
     def __init__(self):
-        self.walls = {
-            1 : [160, 50, 160, 150]
-        }
+        self.walls = {}
+        self.nb = 0
+    
+    def add_wall(self, w):
+        self.nb += 1
+        self.walls[self.nb] = w
     
 def test(obj):
     print("P")
 
-rd = Renderer('Woolfie 3D', 640, 480, 32)
+WITDH = 640
+HEIGHT = 480
+    
+rd = Renderer('Woolfie 3D', WITDH, HEIGHT, 32)
 ih = InputHandler()
 ih.set(K_p, KEYDOWN, test)
 ih.set(K_RIGHT, KEYDOWN, Player.right)
@@ -121,12 +127,16 @@ ih.set(K_LEFT, KEYUP, Player.stop)
 player = Player(100, 100, 0)
 #player.set_ia(Player.right)
 level = Level()
+level.add_wall([160, 50, 160, 150]) # gauche
+level.add_wall([160, 150, 10, 150]) # bas
+level.add_wall([10, 150, 10, 50])   # droite
+level.add_wall([10, 50, 160, 50])   # haut
 
 viewport = []
-for i in range(0, 640):
+for i in range(0, WITDH):
     viewport.append((999999999, None, 0, 0, 0))
 
-DEG2RAD = 0.0174532925
+DEG2RAD = math.pi / 180 # 0.0174532925
 
 # Returns 1 if the lines intersect, otherwise 0. In addition, if the lines 
 # intersect the intersection point may be stored in the floats i_x and i_y.
@@ -175,32 +185,37 @@ while not app_end:
     nb = 0
     ii = start
     step = 90.0/640.0
-    while nb < 640:
-        dist = 100
+    while nb < WITDH:
+        dist = 300
         x1 = int(player.x + dist * math.cos(ii*DEG2RAD))
         y1 = int(player.y + dist * math.sin(ii*DEG2RAD))
         # rd.line(player.x, player.y, x1, y1, RED)
+        viewport[nb] = (999999999, None, x1, y1, ii) # on met le viewport courant à nul
         for wk in level.walls:
             w = level.walls[wk]
             r = get_line_intersection(player.x, player.y, x1, y1, w[0], w[1], w[2], w[3])
             if r[0]: # intersection
                 d = get_dist(player.x, player.y, r[1], r[2])
-                #try:
-                if viewport[nb][0] > d:
-                    viewport[nb] = (int(d), wk, int(r[1]), int(r[2]), ii) # la distance, le mur en cause, le x et y de l'intersection et l'angle (debug)
-                #except Exception as e:
-                #    print(nb)
-                #    print(e)
-            else:
-                viewport[nb] = (999999999, None, 0, 0, 0)
+                #if viewport[nb][0] > d:
+                viewport[nb] = (int(d), wk, int(r[1]), int(r[2]), ii) # la distance, le mur en cause, le x et y de l'intersection et l'angle (debug)
         # 2D draw
         if viewport[nb][0] != 999999999: # intersection
             rd.line(player.x, player.y, viewport[nb][2], viewport[nb][3], GREEN)
         else:
             rd.line(player.x, player.y, x1, y1, RED)
         ii += step
-        print(ii)
         nb += 1
+    # 2.5D Test
+    nb = 0
+    while nb < WITDH:
+        if viewport[nb][0] != 999999999:
+            d = viewport[nb][1]
+            line_height = HEIGHT / d
+            rd.line(nb, HEIGHT/2-line_height, nb, HEIGHT/2+line_height, GREEN)
+        else:
+            pass
+        nb += 1
+    # Final render
     rd.render()
 
 #print(viewport)
