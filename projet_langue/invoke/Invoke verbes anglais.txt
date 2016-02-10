@@ -38,8 +38,9 @@ Les formations avec les auxiliaires et leurs emplois
     6. Les auxiliaires shall et will au présent
     7. Les auxiliaires shall et will au prétérit : should et would
 Récapitulatifs des différents emplois
-    1. L'expression du futur
-    2. L'expression du conditionnel
+    1. Nuancer l'expression d'un événement
+    2. L'expression du futur
+    3. L'expression du conditionnel
     
 ---------------------------------------
 Introduction
@@ -54,6 +55,7 @@ Légende
 ---------------------------------------
 
 À chaque fois, nous prendrons le cas le plus simple, une phrase simple, composée d'une seule proposition, sans compléments circonstanciels (CC).
+Une phrase avec plusieurs propositions est appelée phrase complexe.
 
 L'assertion
 -----------
@@ -556,6 +558,16 @@ Notes :
 Les formations avec les auxiliaires et leurs emplois
 ----------------------------------------------------
 
+Résumé des auxiliaires et de leurs sens généraux
+
+Auxiliaire Sens général Emploi
+can     possibilité présentée comme objective   capacité, permission objective, possibilité matérielle, suggestion, fait intermittent
+may     probabilité d'un événement non-certain ou événement non-réel    probabilité, souhait, suggestion, concession, possibilité subjective ou permission, autorisation subjective
+must    nécessité présentée comme subjective et absolue   obligation, interdiction, très forte probabilité
+will    conséquence présentée comme absolue refus, requête, intention future, prédiction, caractéristique prévisible, certitude
+
+XTODOX
+
 1. L'auxiliaire can au présent
 -------------------------------
 
@@ -598,7 +610,7 @@ Emploi :
 ------------------------------
 
 Sens général :
-    L'auxiliaire may au présent de l'indicatif sert à exprimer quelque chose de non-certain ou de non-réel.
+    L'auxiliaire may au présent de l'indicatif sert à exprimer quelque chose de non-certain (probable) ou de non-réel.
     
 Construction :
     - may + base verbale
@@ -608,7 +620,7 @@ Emploi :
     - une probabilité ou un souhait :  He may not return of his journey abroad.
     - une suggestion ou une concession : You may talk to her.
     - une demande de permission, où on questionne la volonté de son interlocuteur : May I speak? (Je demande -à vous- si je peux parler.)
-    - sa volonté : You may speak. (Je t'y autorise -moi-.)
+    - une autorisation subjective : You may speak. (Je t'y autorise -moi-.)
     
 Notes :
     - Pour la permission, il faut bien voir la différence entre l'emploie de may, qui questionne la volonté de l'interlocuteur, lui demandant sa permission, et celui de can, qui questionne la possibilité physique : Can I speak? (je demande si je peux parler, par rapport aux règles générales, au moment, etc.)
@@ -654,11 +666,24 @@ Notes
 -------------------------------------------
 
 Sens général :
-
+    L'auxiliaire will au présent de l'indicatif traduit une conséquence présentée comme absolue.
+    
 Construction :
-
+    - will + base verbale
+    - la négation s'écrit will ou willn't
+    
 Emploi :
-
+    - un refus : He won't go with us. 
+    - une requête (introduite par si) : If you will allow me, I will now suspend our meeting. 
+    - une requête : Will you go to the shop to buy me some butter?
+    - une intention future : I will go with us.
+    - une prédiction : The cave will collapse if we remove this stones!
+    - une caractéristique prévisible : With time, girls will become Women.
+    - une certitude : She is upset. He will have been late again.
+    
+Notes :
+    - Le fait que l'on exprime une intention ou une requête dépend du fait que la phrase soit une assertion ou une interrogation. Pour poser une question sur une intention future plutôt que de formuler une requête, on peut utiliser la forme continue.
+      
 XTODOX
 
 7. Les auxiliaires shall et will au prétérit : should et would
@@ -676,7 +701,48 @@ XTODOX
 Récapitulatifs des différents emplois
 -------------------------------------
 
-1. L'expression du futur
+1. Nuancer l'expression d'un événement
+--------------------------------------
+
+Lorsque l'on évoque un événement il existe tout d'abord deux axes, sa temporalité et sa réalité, qui se traduisent dans le choix du mode et du temps employés.
+
+Pour le premier axe, on retrouve trois temporalités : 
+- passé : l'événement dont on parle se situe avant le moment où on l'évoque,
+- présent : l'événement dont on parle se situe au moment où on l'évoque,
+- futur : l'événement dont on parle se situera après le moment où on l'évoque.
+
+Le second axe est la réalité de l'événement, sur lequel on peut établir une gradation :
+- réel : l'événement est présenté comme réel,
+- non-certain, probable : l'événement n'est pas certain, mais pourrait bien être réel,
+- non-réel ouvert : l'événement n'est pas réel, mais pourrait bien se réaliser, comme un souhait, une intention ou une hypothèse,
+- non-réel fermé : l'événement n'est pas réel, et ne pourra jamais se réaliser, comme un regret.
+Certains grammaires parlent d'imaginaire ou d'irréel. Je préfère les notions de non-réel ouvert ou fermé pour clarifier les termes.
+
+Les deux axes ne sont pas indépendant : le choix du passé pour évoquer un événement non-réel le condamne souvent a être fermé :
+You could have won this match. (Tu aurais pu gagner ce match.)
+L'emploi du prétérit pour l'auxiliaire can indique une valeur de non-réel, l'action n'est pas réalisée.
+L'emploi de la forme have + participe passé fait basculer l'événement dans le non-réel fermé, il s'agit d'un regret : la personne n'a pas gagné le match et ne pourra plus jamais gagner celui-ci.
+You could win this match.
+L'emploi du prétérit pour l'auxiliaire can indique une valeur de non-réel, l'action n'est pas réalisée.
+L'emploi de la base verbale ici fait basculer l'événement dans le non-réel ouvert, il s'agit d'une hypothèse sur un événement futur : la personne pourrait gagner ce match.
+
+À ces deux axes, on peut également ajouter un troisième, le directif. Il recouvre aussi bien :
+- l'ordre, l'obligation ou l'interdiction,
+- la suggestion et le reproche,
+- la permission.
+
+Là aussi, il n'y a pas indépendance avec les deux axes précédents.
+You should have told her. (Tu aurais dû lui dire.)
+L'emploi du prétérit pour l'auxiliaire should indique une valeur de non-réel, il ne l'a pas dit, l'événement n'est pas réalisé.
+L'emploi de la forme have + participe passé fait basculer l'événement dans le non-réel fermé, il s'agit là d'un reproche : tu aurais dû lui dire avant que le moment où l'on parle et ce ne pourra plus être le cas.
+You should tell her. (Tu devrais lui dire.)
+L'emploi de la base verbale ici fait basculer l'événement dans le non-réel ouvert, il s'agit là d'une suggestion : tu devrais lui dire, tu peux le faire au moment où l'on parle ou après, mais c'est encore possible.
+
+À ces axes, on peut ajouter le caractère progressif ou global de l'événement que l'on évoque, s'il a des conséquences dans le présent ou s'il est circonscrit au seul passé, sa fréquence et bien d'autres. Nous ne détaillerons que les axes principaux dans les parties suivantes et nous invitons les lecteurs intéressés à poursuivre leurs investigations à l'aide d'autres supports. 
+
+Dans les chapitres précédents, nous partions des notions de la grammaire anglaise des verbes pour expliciter les nuances qu'elles impliquaient. Dans ce chapitre, nous allons faire l'inverse, en parant de la nuance que l'on veut exprimer pour aller vers les moyens dont dispose l'anglais pour la traduire.
+
+2. L'expression du futur
 ------------------------
 
 Il existe différents moyens d'exprimer le futur en anglais selon la nuance du futur que l'on cherche à exprimer :
@@ -700,24 +766,24 @@ Il existe différents moyens d'exprimer le futur en anglais selon la nuance du f
     - Futur certain :
         - to be bound to + base verbale : We are bound to happiness, aren't we?
     
-2. L'expression du conditionnel
+3. L'expression du conditionnel
 -------------------------------
 
     XTODOX
     
-3. L'expression de l'irréel
+4. L'expression de l'irréel
 -------------------------------------------------
     L'irréel constitue un des versants du non-réel : on parle d'événements qui ne peuvent pas exister, ni maintenant, ni avant, ni après :
         - avec le prétérit du subjonctif de to be, were : If I were you, I wouldn't touch that.
     
-4. L'expression de l'imaginaire
+5. L'expression de l'imaginaire
 -------------------------------
     L'imaginaire constitue l'autre versant du non-réel : on parle d'événements qui pourraient être possible, mais ne le sont pas : 
     - Pour un souhait, une hypothèse : 
     - Pour une suggestion :
     - Pour une probabilité : must > may > might
     
-5. L'expression de la direction
+6. L'expression de la direction
 -------------------------------
 
     XTODOX (ordre, interdiction)
