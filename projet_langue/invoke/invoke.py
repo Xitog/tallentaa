@@ -2300,10 +2300,10 @@ def get_all_verbs_full(p_lang = 'en', p_to = 'fr'): # all verbs, with translatio
                             actual['part'] = actual['root_base'] + "ed"
                         else:
                             actual['part'] = actual['root_base'][0:-1] + "ied"      # carry => carried
-                    elif actual['root_base'][-1] not in ['a', 'i', 'o', 'u']:
-                        if actual['root_base'][-2] in ['a', 'u', 'i']:
-                            if actual['root_base'][-3] in ['a', 'e', 'o', 'u']:     # base (cook => cooked)
-                                actual['part'] = actual['root_base'] + 'ed'
+                    elif actual['root_base'][-1] not in ['a', 'i', 'o', 'u']:       
+                        if actual['root_base'][-2] in ['a', 'u', 'i']:              
+                            if actual['root_base'][-3] in ['a', 'e', 'o', 'u'] or len(actual['root_base']) > 4:     # base (cook => cooked, wait => waited) et le cas visit => visited
+                                actual['part'] = actual['root_base'] + 'ed'                                         # au lieu de la len faire juste que -3 ne soit pas i ?
                             else:                                                   # chat => chatted
                                 actual['part'] = actual['root_base'] + actual['root_base'][-1] + 'ed'
                         else:
