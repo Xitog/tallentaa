@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Concerts classiques</title>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta name="Copyright" content="&copy; 2016, Damien Gouteux. All rights reserved.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, minimal-ui">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <link rel="stylesheet" type="text/css" href="lib/appframework/icons.css" />
+    <link rel="stylesheet" type="text/css" href="lib/appframework/af.ui.css" />
+    <link rel="stylesheet" href="css/perso.css">
+    
+    <script type="text/javascript" charset="utf-8" src="lib/jquery.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="lib/fastclick.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="lib/appframework/appframework.ui.min.js"></script>  
+    <script type="text/javascript" charset="utf-8" src="js/data.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/view.js"></script>
+    
+    <script text="javascript">
+        
+        // Wait for device API libraries to load
+        function onLoad() {
+            document.addEventListener("deviceready", onDeviceReady, false);
+        }
+        
+        // Device APIs are available
+        function onDeviceReady() {
+            intel.xdk.device.hideSplashScreen();
+            // Register the event listener
+            document.addEventListener("menubutton", onMenuKeyDown, false);
+        }
+            
+        // Handle the menu button
+        function onMenuKeyDown() {
+            alert("hello");
+        }
+        
+        $.afui.ready(
+            function(){
+                viewDate(new Date(), document, dates, months, works, authors);
+                viewAllComposers(document, dates, months, works, authors_abc);
+            }
+        );
+        
+    </script>
+    
+</head>
+
+<body onload="onLoad()">
+
+    <div class="view">
+        <header>
+            <h1>Concerts classiques<br> à Toulouse</h1>
+        </header>
+
+        <div class="pages">
+
+            <div class="panel" data-title="Home" id="tab1" data-selected="true">
+                <div id="main_list">
+                    
+                </div>
+            </div>
+
+            <div class="panel" data-title="Villes" id="tab2" >
+                This is view for second Tab
+            </div>
+
+            <div class="panel" data-title="Compositeurs" id="tab3">
+                <ul id="compo_list" class="list inset">
+                </ul>
+            </div>
+
+            <div class="panel" data-title="A propos" id="tab4">
+                <h1>Concerts Classiques</h1>
+                <p>Application pour trouver facilement des concerts classiques dans votre ville ou de votre compositeur préféré. Elle couvre pour l'instant :</p>
+                <ol class="list inset">
+                        <li>A Toulouse :<ol class="list inset">
+                            <li>Orchestre National du Capitole de Toulouse</li>
+                            </ol>
+                        </li>
+                </ol>
+                <p>Et bien d'autres bientôt !</p>
+                <p>Fait avec Intel &copy; XDK, App framework et beaucoup d'amour <span class="icon heart"></span></p>
+                <p>&copy; Damien Gouteux 2016</p>
+            </div>
+
+        </div>
+
+        <footer>
+            <a href="#tab1" class="icon calendar" onclick="$.afui.clearHistory()">Dates</a>
+            <a href="#tab2" class="icon location" onclick="$.afui.clearHistory()">Villes</a>
+            <a href="#tab3" class="icon heart" onclick="$.afui.clearHistory()">Compositeurs</a>
+            <a href="#tab4" class="icon info" onclick="$.afui.clearHistory()">A propos</a>
+        </footer>
+    </div>
+
+</body>
+
+</html>

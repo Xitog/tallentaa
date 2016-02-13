@@ -1,0 +1,27 @@
+div.date_nav {
+    text-align: center;
+    width: 100%;
+}
+
+span.date {
+    background-color: dodgerblue;
+    color: white;
+}
+
+span.month {
+    background-color: burlywood;
+    color: chocolate;
+    padding-left: 0.5em;
+}
+
+span.author {
+    font-style: italic;
+}
+
+span.space_left {
+    margin-left: 2em;
+}
+
+span.space_right {
+    margin-right: 2em;
+}
