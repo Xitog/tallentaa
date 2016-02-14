@@ -1,3 +1,13 @@
+        
+function getParameters(document) {
+    var params = {};
+    params.city_bdx = document.getElementById("par_city_bdx").checked;
+    params.city_tlse = document.getElementById("par_city_tlse").checked;
+    params.orch_onct = document.getElementById("par_orch_onct").checked;
+    params.date_over = document.getElementById("par_date_over").checked;
+    return params;
+}
+
 function viewAllComposers(document, dates, months, works, authors_abc) {
     var compo_list = document.getElementById("compo_list");
     for (var i=0; i < authors_abc.length; i++) {
@@ -9,6 +19,12 @@ function viewAllComposers(document, dates, months, works, authors_abc) {
 
 function viewDate(viewdate, document, dates, months, works, authors) {
     var main_list = document.getElementById("main_list");
+    // Nettoyage
+    while (main_list.firstChild) {
+        main_list.removeChild(main_list.firstChild);
+    }
+    
+    var params = getParameters(document);
     
     var div = document.createElement("div");
     div.setAttribute('class', 'date_nav');
@@ -19,6 +35,7 @@ function viewDate(viewdate, document, dates, months, works, authors) {
     space.setAttribute('class', 'space_right');
     var aa = document.createElement('a');
     aa.setAttribute('class', 'button previous');
+    aa.setAttribute('onclick', 'controlPrevDate()');
     aa.innerHTML = 'préc.';
     space.appendChild(aa);
     div.appendChild(space);
@@ -34,6 +51,7 @@ function viewDate(viewdate, document, dates, months, works, authors) {
     space.setAttribute('class', 'space_left');
     aa = document.createElement('a');
     aa.setAttribute('class', 'button next');
+    aa.setAttribute('onclick', 'controlNextDate()');
     aa.innerHTML = 'suiv.';
     space.appendChild(aa);
     div.appendChild(space);
@@ -41,9 +59,29 @@ function viewDate(viewdate, document, dates, months, works, authors) {
     main_list.appendChild(div);
     
     for (var i = 0; i < dates.length; i++) {
-        // Date
+        // Check Ville
+        var city = dates[i][7];
+        if (!params.city_tlse && city === 'Toulouse') {
+            continue;
+        }
+        // Check Date Over
         var d = dates[i][0];
         var tab = d.split('/');
+        if (!params.date_over) {
+            var dNow = new Date();
+            var dDate = Date.parse(tab[1] + '/' + tab[0] + '/' + tab[2]);
+            if (dDate < dNow) {
+                continue;
+            }
+        }
+        // Check Orchestra
+        if (!params.orch_onct && dates[i][2] === 'ONCT') {
+            continue;
+        }
+        // Check Date for Month
+        if (parseInt(tab[1]) !== (viewdate.getMonth() + 1)) {
+            continue;
+        }
         
         var p = document.createElement("p");
         var span = document.createElement('span');
@@ -55,11 +93,17 @@ function viewDate(viewdate, document, dates, months, works, authors) {
         span.setAttribute('class', 'month');
         span.textContent = months[tab[1]];
         p.appendChild(span);
-
+        
+        span = document.createElement('span');
+        span.setAttribute('class', 'space_left');
+        span.textContent = dates[i][1] + ' ' + dates[i][8];
+        p.appendChild(span);
+        
         var br = document.createElement('br');
         p.appendChild(br);
 
         var ol = document.createElement('ol');
+        ol.setAttribute('class', 'custom-counter');
         for (var j = 0; j < dates[i][6].length; j++) {
             var li = document.createElement('li');
             var author = dates[i][6][j][0];
@@ -81,6 +125,7 @@ function viewDate(viewdate, document, dates, months, works, authors) {
             //span = document.createElement('span');
             //span.textContent = author_short + ' : ' + opus_title;
         }
+        
         main_list.appendChild(p);
         main_list.appendChild(ol);
     }

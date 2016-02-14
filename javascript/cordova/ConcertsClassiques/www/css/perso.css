@@ -25,3 +25,30 @@ span.space_left {
 span.space_right {
     margin-right: 2em;
 }
+
+span.space_bottom {
+    margin-bottom: 2em;
+}
+
+.custom-counter {
+    margin-left: 0;
+    padding-right: 0;
+    list-style-type: none;
+}
+
+.custom-counter li {
+    counter-increment: step-counter;
+}
+
+.custom-counter li::before {
+    content: counter(step-counter);
+    margin-left: 0;
+    margin-right: 3px;
+    /*font-size: 80%;*/
+    background-color: rgb(200,200,200);
+    color: white;
+    font-weight: bold;
+    padding-left: 2px;
+    padding-right: 2px;
+    /*border-radius: 3px;*/
+}
