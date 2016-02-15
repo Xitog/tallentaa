@@ -42,24 +42,24 @@
         
         $.afui.ready(
             function(){
-                viewDate(mainDate, document, dates, months, works, authors_short);
+                viewDate(mainDate, document, dates, months, works, authors_short, org_disp);
                 viewAllComposers(document, dates, months, works, authors_abc);
             }
         );
         
         function refresh() {
-            viewDate(mainDate, document, dates, months, works, authors_short);
+            viewDate(mainDate, document, dates, months, works, authors_short, org_disp);
             $.afui.clearHistory();
         }
         
         function controlNextDate() {
             mainDate.setMonth(mainDate.getMonth() + 1);
-            viewDate(mainDate, document, dates, months, works, authors_short);
+            viewDate(mainDate, document, dates, months, works, authors_short, org_disp);
         }
         
         function controlPrevDate() {
             mainDate.setMonth(mainDate.getMonth() - 1);
-            viewDate(mainDate, document, dates, months, works, authors_short);
+            viewDate(mainDate, document, dates, months, works, authors_short, org_disp);
         }
         
     </script>
@@ -93,13 +93,19 @@
                     <input type="checkbox" name="par_orch_onct" id="par_orch_onct" checked>  <label for="par_orch_onct">ONCT</label>
                 </div>
                 <div class="input-group">
+                    Types
+                    <input type="checkbox" name="par_type_concert" id="par_type_concert" checked>  <label for="par_type_concert">Concerts</label>
+                    <input type="checkbox" name="par_type_opera" id="par_type_opera" checked>  <label for="par_type_opera">Opéra</label>
+                    <input type="checkbox" name="par_type_ballet" id="par_type_ballet" checked>  <label for="par_type_ballet">Ballet</label>
+                </div>
+                <div class="input-group">
                     Autres options
                     <input type="checkbox" name="par_date_over" id="par_date_over" checked>  <label for="par_date_over">Dates passées</label>
                 </div>
             </div>
 
             <div class="panel" data-title="Compositeurs" id="tab3">
-                <ul id="compo_list" class="list inset">
+                <ul id="compo_list" class="list">
                 </ul>
             </div>
 
