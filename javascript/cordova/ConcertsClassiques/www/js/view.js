@@ -154,19 +154,26 @@ function viewDate(viewdate, document, dates, months, works, authors, org_disp) {
         ol.setAttribute('class', 'custom-counter');
         for (var j = 0; j < dates[i][6].length; j++) {
             var li = document.createElement('li');
-            if (dates[i][9] == 'Concert') {
+            if (dates[i][9] == 'Concert' || (dates[i][9] == 'Ballet' && dates[i][6].length > 1)) { // Pour les ballets avec différentes pièces
                 li.setAttribute('class', 'x');
             }
+            
             var author = dates[i][6][j][0];
             var opus = dates[i][6][j][1];
             var opus_title = works[author][opus];
             var author_short = authors[author];
 
+            if (dates[i][6][j].length === 3) { // Pour les ballets sur une musique de 
+                span = document.createElement('span');
+                span.textContent =  dates[i][6][j][2] + ' sur la musique de ';
+                li.appendChild(span);
+            }
+            
             span = document.createElement('span');
             span.setAttribute('class', 'author');
             span.textContent = author_short;
             li.appendChild(span);
-
+            
             span = document.createElement('span');
             span.textContent = ' : ' + opus_title;
             li.appendChild(span);
