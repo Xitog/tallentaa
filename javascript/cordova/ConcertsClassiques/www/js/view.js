@@ -83,6 +83,9 @@ function viewDate(viewdate, document, dates, months, works, authors, org_disp) {
         if (!params.city_tlse && city === 'Toulouse') {
             continue;
         }
+        if (!params.city_bdx && city === 'Bordeaux') {
+            continue;
+        }
         // Check Date Over
         var d = dates[i][0];
         var tab = d.split('/');
