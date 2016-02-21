@@ -5,7 +5,7 @@
       "projectTypeName": "com.intel.xdk.projecttype.webapp",
       "src": "webapp/template-tab-view/sample.zip",
       "projectGuid": "30c0b17d-df8a-4937-855d-f92158ad7169",
-      "lastModifiedDate": 1455379618071,
+      "lastModifiedDate": 1456075311732,
       "creationDate": 1455379613368
     },
     "sourceDirectory": "www",
@@ -54,7 +54,8 @@
         "appVersion_": "0.0.1",
         "appVersionCode_": "1",
         "crosswalkVersion_": "14",
-        "appAuthor_": "Intel XDK"
+        "appAuthor_": "Intel XDK",
+        "appDescription_": ""
       },
       "Android-Crosswalk": {
         "platform_": "android",

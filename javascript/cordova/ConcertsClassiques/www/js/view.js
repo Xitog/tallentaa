@@ -1,4 +1,4 @@
-        
+
 function getParameters(document) {
     var params = {};
     params.city_bdx = document.getElementById("par_city_bdx").checked;
@@ -12,6 +12,13 @@ function getParameters(document) {
 }
 
 function viewAllComposers(document, dates, months, works, authors_abc) {
+    // On efface
+    var compo_div = document.getElementById("compo_div");
+    // Nettoyage
+    while (compo_div.firstChild) {
+        compo_div.removeChild(compo_div.firstChild);
+    }
+    
     var first = '';
     var compo_list = document.getElementById("compo_list");
     for (var i=0; i < authors_abc.length; i++) {
@@ -25,12 +32,134 @@ function viewAllComposers(document, dates, months, works, authors_abc) {
             compo_list.appendChild(divider);
         }
         var li = document.createElement('li');
-        li.textContent = authors_abc[i];
+        
+        var aa = document.createElement('a');
+        aa.textContent = authors_abc[i];
+        aa.setAttribute('onclick', "controlComposer('" + authors_abc[i] + "')");
+        li.appendChild(aa);
+        
+        //li.textContent = authors_abc[i];
         compo_list.appendChild(li);
     }
 }
 
-function viewDate(viewdate, document, dates, months, works, authors, org_disp) {
+function viewComposerDates(composer, document, dates, months, works, authors, org_disp) {
+    // On efface
+    var compo_list = document.getElementById("compo_list");
+    // Nettoyage
+    while (compo_list.firstChild) {
+        compo_list.removeChild(compo_list.firstChild);
+    }
+    
+    var compo_div = document.getElementById("compo_div");
+    
+    var div = document.createElement("div");
+    div.setAttribute('class', 'date_nav');
+    
+    var span = document.createElement('span');
+    span.setAttribute('class', 'space_right');
+    var aa = document.createElement('a');
+    aa.setAttribute('class', 'button previous');
+    aa.setAttribute('onclick', 'controlComposerList()');
+    aa.innerHTML = 'liste';
+    span.appendChild(aa);
+    div.appendChild(span);
+    
+    span = document.createElement("span");
+    span.setAttribute('class', 'button_false');
+    span.textContent = composer;
+    div.appendChild(span);
+    
+    compo_div.appendChild(div);
+    
+    // Affichage
+    for (var i = 0; i < dates.length; i++) {
+        var ok = false;
+        for (var j = 0; j < dates[i][6].length; j++) {
+            if (dates[i][6][j][0] === composer) {
+                ok = true;
+                break;
+            }
+        }
+        if (ok) {
+            div = document.createElement("div");
+            div.setAttribute('class', 'date_elem');
+            viewOnlyOneDate(div, dates[i], document, dates, months, works, authors, org_disp);
+            compo_div.appendChild(div);
+        }
+    }
+}
+
+function viewOnlyOneDate(div, date, document, dates, months, works, authors, org_disp) {
+    
+    var p = document.createElement("p");
+    var span = document.createElement('span');
+    span.setAttribute('class', 'date');
+    span.textContent = date[0].split('/')[0];
+    p.appendChild(span);
+
+    span = document.createElement('span');
+    span.setAttribute('class', 'month');
+    span.textContent = months[date[0].split('/')[1]];
+    p.appendChild(span);
+
+    span = document.createElement('span');
+    span.setAttribute('class', 'space_left icon clock mini');
+    span.textContent = date[1];
+    p.appendChild(span);
+    span = document.createElement('span');
+    span.setAttribute('class', 'space_left icon home mini');
+    span.textContent = date[8];
+    p.appendChild(span);
+
+    var p2 = document.createElement("p");
+    span = document.createElement('span');
+    span.textContent = date[9];
+    p2.appendChild(span);
+    span = document.createElement('span');
+    span.setAttribute('class', 'space_left icon star');
+    span.textContent = org_disp[date[2]];
+    p2.appendChild(span);
+
+    var br = document.createElement('br');
+    p.appendChild(br);
+
+    var ol = document.createElement('ol');
+    ol.setAttribute('class', 'custom-counter');
+    for (var j = 0; j < date[6].length; j++) {
+        var li = document.createElement('li');
+        if (date[9] == 'Concert' || (date[9] == 'Ballet' && date[6].length > 1)) { // Pour les ballets avec différentes pièces
+            li.setAttribute('class', 'x');
+        }
+
+        var author = date[6][j][0];
+        var opus = date[6][j][1];
+        var opus_title = works[author][opus];
+        var author_short = authors[author];
+
+        if (date[6][j].length === 3) { // Pour les ballets sur une musique de 
+            span = document.createElement('span');
+            span.textContent =  date[6][j][2] + ' sur la musique de ';
+            li.appendChild(span);
+        }
+
+        span = document.createElement('span');
+        span.setAttribute('class', 'author');
+        span.textContent = author_short;
+        li.appendChild(span);
+
+        span = document.createElement('span');
+        span.textContent = ' : ' + opus_title;
+        li.appendChild(span);
+        ol.appendChild(li);
+    }
+    
+    div.appendChild(p);
+    div.appendChild(p2);
+    div.appendChild(ol);
+}
+
+function viewAllDates(viewdate, document, dates, months, works, authors, org_disp) {
     var main_list = document.getElementById("main_list");
     // Nettoyage
     while (main_list.firstChild) {
@@ -54,10 +183,12 @@ function viewDate(viewdate, document, dates, months, works, authors, org_disp) {
     div.appendChild(space);
     
     space = document.createElement('span');
-    aa = document.createElement('a');
-    aa.setAttribute('class', 'button');
-    aa.textContent = mx[m] + ' ' + String(viewdate.getFullYear()).slice(2);
-    space.appendChild(aa);
+    //aa = document.createElement('a');
+    //aa.setAttribute('class', 'button');
+    //aa.textContent = mx[m] + ' ' + String(viewdate.getFullYear()).slice(2);
+    //space.appendChild(aa);
+    space.setAttribute('class', 'button_false');
+    space.textContent = mx[m] + ' ' + String(viewdate.getFullYear()).slice(2);
     div.appendChild(space);
     
     space = document.createElement('span');
@@ -70,10 +201,6 @@ function viewDate(viewdate, document, dates, months, works, authors, org_disp) {
     div.appendChild(space);
     
     main_list.appendChild(div);
-    
-    //var mega_list = document.createElement('ul');
-    //mega_list.setAttribute('class', 'list');
-    //main_list.appendChild(mega_list);
     
     var nb_dates = 0;
     
@@ -117,88 +244,10 @@ function viewDate(viewdate, document, dates, months, works, authors, org_disp) {
         // If all is good
         nb_dates++;
         
-        //var mega_li = document.createElement('li');
         var mega_div = document.createElement('div');
         mega_div.setAttribute('class', 'date_elem');
         
-        var p = document.createElement("p");
-        var span = document.createElement('span');
-        span.setAttribute('class', 'date');
-        span.textContent = tab[0];
-        p.appendChild(span);
-
-        span = document.createElement('span');
-        span.setAttribute('class', 'month');
-        span.textContent = months[tab[1]];
-        p.appendChild(span);
-        
-        span = document.createElement('span');
-        span.setAttribute('class', 'space_left icon clock mini');
-        span.textContent = dates[i][1];
-        p.appendChild(span);
-        span = document.createElement('span');
-        span.setAttribute('class', 'space_left icon home mini');
-        span.textContent = dates[i][8];
-        p.appendChild(span);
-        
-        var p2 = document.createElement("p");
-        span = document.createElement('span');
-        span.textContent = dates[i][9];
-        p2.appendChild(span);
-        span = document.createElement('span');
-        span.setAttribute('class', 'space_left icon star');
-        span.textContent = org_disp[dates[i][2]];
-        p2.appendChild(span);
-        
-        var br = document.createElement('br');
-        p.appendChild(br);
-        
-        var ol = document.createElement('ol');
-        ol.setAttribute('class', 'custom-counter');
-        for (var j = 0; j < dates[i][6].length; j++) {
-            var li = document.createElement('li');
-            if (dates[i][9] == 'Concert' || (dates[i][9] == 'Ballet' && dates[i][6].length > 1)) { // Pour les ballets avec différentes pièces
-                li.setAttribute('class', 'x');
-            }
-            
-            var author = dates[i][6][j][0];
-            var opus = dates[i][6][j][1];
-            var opus_title = works[author][opus];
-            var author_short = authors[author];
-
-            if (dates[i][6][j].length === 3) { // Pour les ballets sur une musique de 
-                span = document.createElement('span');
-                span.textContent =  dates[i][6][j][2] + ' sur la musique de ';
-                li.appendChild(span);
-            }
-            
-            span = document.createElement('span');
-            span.setAttribute('class', 'author');
-            span.textContent = author_short;
-            li.appendChild(span);
-            
-            span = document.createElement('span');
-            span.textContent = ' : ' + opus_title;
-            li.appendChild(span);
-
-            //li.appendChild(document.createTextNode(author_short + ' : ' + opus_title));
-            ol.appendChild(li);
-            //span = document.createElement('span');
-            //span.textContent = author_short + ' : ' + opus_title;
-        }
-        
-        //main_list.appendChild(p);
-        //main_list.appendChild(p2);
-        //main_list.appendChild(ol);
-        
-        //mega_li.appendChild(p);
-        //mega_li.appendChild(p2);
-        //mega_li.appendChild(ol);
-        //mega_list.appendChild(mega_li);
-        
-        mega_div.appendChild(p);
-        mega_div.appendChild(p2);
-        mega_div.appendChild(ol);
+        viewOnlyOneDate(mega_div, dates[i], document, dates, months, works, authors, org_disp);
         main_list.appendChild(mega_div);
     }
     

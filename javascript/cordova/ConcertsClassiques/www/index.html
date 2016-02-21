@@ -40,26 +40,38 @@
             // nothing
         }
         
+        $(function() {
+            FastClick.attach(document.body);
+        });
+        
         $.afui.ready(
             function(){
-                viewDate(mainDate, document, dates, months, works, authors_short, org_disp);
+                viewAllDates(mainDate, document, dates, months, works, authors_short, org_disp);
                 viewAllComposers(document, dates, months, works, authors_abc);
             }
         );
         
         function refresh() {
-            viewDate(mainDate, document, dates, months, works, authors_short, org_disp);
+            viewAllDates(mainDate, document, dates, months, works, authors_short, org_disp);
             $.afui.clearHistory();
         }
         
         function controlNextDate() {
             mainDate.setMonth(mainDate.getMonth() + 1);
-            viewDate(mainDate, document, dates, months, works, authors_short, org_disp);
+            viewAllDates(mainDate, document, dates, months, works, authors_short, org_disp);
         }
         
         function controlPrevDate() {
             mainDate.setMonth(mainDate.getMonth() - 1);
-            viewDate(mainDate, document, dates, months, works, authors_short, org_disp);
+            viewAllDates(mainDate, document, dates, months, works, authors_short, org_disp);
+        }
+        
+        function controlComposer(composer) {
+            viewComposerDates(composer, document, dates, months, works, authors_short, org_disp);
+        }
+        
+        function controlComposerList() {
+            viewAllComposers(document, dates, months, works, authors_abc);
         }
         
     </script>
@@ -107,11 +119,13 @@
             <div class="panel" data-title="Compositeurs" id="tab3">
                 <ul id="compo_list" class="list">
                 </ul>
+                <div id="compo_div">
+                </div>
             </div>
 
             <div class="panel" data-title="A propos" id="tab4">
                 <h1>Concerts Classiques</h1>
-                <p>Application pour trouver facilement des concerts classiques dans votre ville ou de votre compositeur préféré. Elle couvre pour l'instant :</p>
+                <!--<p>Application pour trouver facilement des concerts classiques dans votre ville ou de votre compositeur préféré. Elle couvre pour l'instant :</p>
                 <ol class="list inset">
                         <li>A Toulouse :<ol class="list inset">
                             <li>Orchestre National du Capitole de Toulouse</li>
@@ -119,7 +133,10 @@
                         </li>
                 </ol>
                 <p>Et bien d'autres bientôt !</p>
-                <p>Fait avec Intel &copy; XDK, App framework et beaucoup d'amour <span class="icon heart"></span></p>
+                <p>Fait avec Intel &copy; XDK, App framework et beaucoup d'amour <span class="icon heart"></span></p>-->
+                
+                <p>Application pour trouver facilement des concerts classiques.</p>
+                <p>Fait avec Intel &copy; XDK, App framework.</p>
                 <p>&copy; Damien Gouteux 2016</p>
             </div>
 
