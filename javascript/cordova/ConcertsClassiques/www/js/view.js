@@ -4,6 +4,9 @@ function getParameters(document) {
     params.city_bdx = document.getElementById("par_city_bdx").checked;
     params.city_tlse = document.getElementById("par_city_tlse").checked;
     params.orch_onct = document.getElementById("par_orch_onct").checked;
+    params.orch_onba = document.getElementById("par_orch_onba").checked;
+    params.par_trou_bc = document.getElementById("par_trou_bc").checked;
+    params.par_trou_tc = document.getElementById("par_trou_tc").checked;
     params.date_over = document.getElementById("par_date_over").checked;
     params.type_concert = document.getElementById("par_type_concert").checked;
     params.type_opera = document.getElementById("par_type_opera").checked;
@@ -227,6 +230,15 @@ function viewAllDates(viewdate, document, dates, months, works, authors, org_dis
         if (!params.orch_onct && dates[i][2] === 'ONCT') {
             continue;
         }
+        if (!params.orch_onba && dates[i][2] === 'ONBA') {
+            continue;
+        }
+        if (!params.par_trou_bc && dates[i][2] === 'BC') {
+            continue;
+        }
+        if (!params.par_trou_tc && dates[i][2] === 'TC') {
+            continue;
+        }
         // Check Type
         if (!params.type_concert && dates[i][9] == 'Concert') {
             continue;
@@ -253,7 +265,12 @@ function viewAllDates(viewdate, document, dates, months, works, authors, org_dis
     
     if (nb_dates === 0) {
         var nothing = document.createElement('span');
-        nothing.textContent = 'Pas de concerts ce mois-ci.';
+        nothing.textContent = 'Pas de concerts ce mois-ci pour les paramètres sélectionnés. ';
         main_list.appendChild(nothing);
+        var change = document.createElement('a');
+        change.setAttribute('href', '#tab2');
+        change.setAttribute('onclick', '$.afui.clearHistory()');
+        change.textContent = 'Changer les paramètres.';
+        main_list.appendChild(change);
     }
 }
