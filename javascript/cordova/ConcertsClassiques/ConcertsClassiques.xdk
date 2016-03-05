@@ -5,7 +5,7 @@
       "projectTypeName": "com.intel.xdk.projecttype.webapp",
       "src": "webapp/template-tab-view/sample.zip",
       "projectGuid": "30c0b17d-df8a-4937-855d-f92158ad7169",
-      "lastModifiedDate": 1456943736680,
+      "lastModifiedDate": 1457203285014,
       "creationDate": 1455379613368
     },
     "sourceDirectory": "www",
@@ -32,10 +32,11 @@
         "preferences_": {
           "android-minSdkVersion": "14",
           "android-targetSdkVersion": "19",
-          "android-installLocation": "auto"
+          "android-installLocation": "auto",
+          "Fullscreen": true
         },
         "isActive_": true,
-        "appName_": "ConcertsClassiques",
+        "appName_": "Concerts Classiques",
         "appID_": "dgx.concertsclassiques",
         "appAccess_": {
           "mode": "legacy",
@@ -76,8 +77,8 @@
         "excludedLibraries_": "",
         "iosProvs_": [],
         "cordovaCLIVersion_": "5.1.1",
-        "appVersion_": "1.0.1",
-        "appVersionCode_": "2",
+        "appVersion_": "1.0.2",
+        "appVersionCode_": "3",
         "crosswalkVersion_": "14",
         "appAuthor_": "Damien Gouteux",
         "appDescription_": "Calendrier de concerts classiques"
