@@ -264,13 +264,20 @@ function viewAllDates(viewdate, document, dates, months, works, authors, org_dis
     }
     
     if (nb_dates === 0) {
-        var nothing = document.createElement('span');
-        nothing.textContent = 'Pas de concerts ce mois-ci pour les paramètres sélectionnés. ';
+        var nothing = document.createElement('div');
+        nothing.setAttribute('class', 'no_date');
+        var nothing_txt = document.createElement('span');
+        nothing_txt.textContent = 'Pas de concerts ce mois-ci pour les paramètres sélectionnés. ';
+        nothing.appendChild(nothing_txt);
+        
+        var nothing_lnk = document.createElement('span');
+        var change_lnk = document.createElement('a');
+        change_lnk.setAttribute('href', '#tab2');
+        change_lnk.setAttribute('onclick', '$.afui.clearHistory()');
+        change_lnk.textContent = 'Changer les paramètres.';
+        nothing_lnk.appendChild(change_lnk);
+        nothing.appendChild(nothing_lnk);
+        
         main_list.appendChild(nothing);
-        var change = document.createElement('a');
-        change.setAttribute('href', '#tab2');
-        change.setAttribute('onclick', '$.afui.clearHistory()');
-        change.textContent = 'Changer les paramètres.';
-        main_list.appendChild(change);
     }
 }

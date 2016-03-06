@@ -1,7 +1,6 @@
 div.date_nav {
     text-align: center;
     width: 100%;
-    border-bottom: 1px solid dodgerblue;
 }
 
 span.date {
@@ -67,13 +66,19 @@ span.button_false {
 }
 
 div.date_elem {
-    /*background-color: white;*/
-    border-bottom: 1px solid dodgerblue;
+    border-top: 1px solid dodgerblue;
+}
+
+div.no_date {
+    border-top: 1px solid dodgerblue;
+    text-align: center;
+    padding-top: 1em;
+    padding-bottom: 1em;
 }
 
 #main_list {
     background: white;
-    border-radius: 3px;
+    border-radius: 5px;
     margin-top: 3px;
     margin-bottom: 2px;
     border: 1px solid rgb(204, 204, 204);
