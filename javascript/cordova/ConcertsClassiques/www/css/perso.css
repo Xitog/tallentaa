@@ -65,8 +65,13 @@ span.button_false {
     /*border-radius: 3px;*/
 }
 
+li.x {
+    text-color: black;
+}
+
 div.date_elem {
     border-top: 1px solid dodgerblue;
+    text-color: black;
 }
 
 div.no_date {
@@ -74,10 +79,12 @@ div.no_date {
     text-align: center;
     padding-top: 1em;
     padding-bottom: 1em;
+    text-color: black;
 }
 
 #main_list {
     background: white;
+    text-color: black;
     border-radius: 5px;
     margin-top: 3px;
     margin-bottom: 2px;
