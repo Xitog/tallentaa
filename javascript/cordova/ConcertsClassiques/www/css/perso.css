@@ -90,3 +90,12 @@ div.no_date {
     margin-bottom: 2px;
     border: 1px solid rgb(204, 204, 204);
 }
+
+#compo_div {
+    background: white;
+    text-color: black;
+    border-radius: 5px;
+    margin-top: 3px;
+    margin-bottom: 2px;
+    border: 1px solid rgb(204, 204, 204);    
+}
