@@ -292,7 +292,7 @@ while not app_end:
                 if viewport[nb][DIST] > d:
                     xortho = int(player.x + dist * math.cos((player.a + 90)*DEG2RAD))
                     yortho = int(player.y + dist * math.sin((player.a + 90)*DEG2RAD))
-                    cd = int(get_orthogonal_distance(player.x, player.y, xortho, yortho, r[1], r[2]))
+                    cd = get_orthogonal_distance(player.x, player.y, xortho, yortho, r[1], r[2])
                     line_height = int(min(HEIGHT, HEIGHT / (cd + 0.0000000000000001)))
                     viewport[nb] = (d, cd, line_height, wk, int(r[1]), int(r[2]), ii) # la distance, le mur en cause, le x et y de l'intersection et l'angle (debug)
         # 2D draw
