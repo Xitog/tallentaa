@@ -1,21 +1,13 @@
-# http://www.cplusplus.com/reference/clibrary/cmath/fabs/
-# http://www.student.kuleuven.be/~m0216922/CG/raycasting.html
-# http://www.pygame.org/docs/tut/newbieguide.html
-# http://www.permadi.com/tutorial/raycast/
-#   http://www.permadi.com/tutorial/raycast/rayc8.html distorsion
+#------------------------------------------------------------------------------
+# Wolfenstein 3D raycasting engine recreation
+# Inspired by Lode Vandevenne tutorials in C
+# Damien Gouteux 2015
+#------------------------------------------------------------------------------
 
-# Pour un s donne (s = sample = x)
-# drawStart
-# drawEnd
-# en y, la ligne pour le mur a tracer.
-#
-# tex[i] = area(texWidth * texHeight, 0)
-# tex est le tableau des textures
-# une texture est une ligne d'entier faisant la largeur * longueur
-
-# Import
 import pygame
 from pygame.locals import *
+import math
+import sys
 
 screenWidth = 200 #640
 screenHeight = 300 #480
@@ -27,13 +19,13 @@ WHITE = (255, 255, 255)
 TEXTURED = True
 FPS = 60 #
 
-#------------------- Matrix & Area
+#------------------------------------------------------------------------------
+# Matrix & Area tools
+#------------------------------------------------------------------------------
 
 def debug(w, block=True):
     print(str(w))
     if block: raw_input()
-
-import sys
 
 def area(size, default):
     l = []
@@ -64,9 +56,9 @@ es2 = matrix(3, 3, 'b')
 print_area(es1)
 print_matrix(es2)
 
-#------------------------------------------------
-
+#------------------------------------------------------------------------------
 # Texture Generator
+#------------------------------------------------------------------------------
 
 sbuffer = pygame.Surface((screenHeight, screenWidth))
 
@@ -98,6 +90,10 @@ for x in range(0, texWidth):
         # flat grey texture
         tex[7][texWidth * y + x] = 128 + 256 * 128 + 65536 * 128
 
+#------------------------------------------------------------------------------
+# Texture Handling
+#------------------------------------------------------------------------------
+
 def load_texture(filename, where):
     global tex
     # Load
@@ -120,17 +116,12 @@ load_texture('textures/redbrick.png', 2)
 load_texture('textures/bluestone.png', 3)
 load_texture('textures/greystone.png', 4) # pb quand on applique le filtre "dark side"
 
-# 14h52 : texture externe !!!!
+#------------------------------------------------------------------------------
+# Main loop
+#------------------------------------------------------------------------------
 
-#------------------------------------------------
-
-import math
-
-# Init
 pygame.init()
-
 pygame.display.set_caption('Woolfie 3D')
-
 resolution = (640, 480)
 flags = pygame.DOUBLEBUF # | pygame.FULLSCREEN
 
@@ -183,7 +174,7 @@ camera = [0.0, 0.66]        # camera plane (orthogonal to direction vector) 2 * 
 modx = 0.0
 mody = 0.0
 
-pygame.key.set_repeat(1,50) # mais c'est mieux de faire un  objet etat qui commence sur DOWN et s arrete sur UP car peut pas repeter DEUX TOUCHES !!!
+pygame.key.set_repeat(1,50)
 default = pygame.font.SysFont(pygame.font.get_default_font(), 16)
 
 def ccolor(index):
@@ -331,7 +322,7 @@ while not escape:
         sideDistX = 0.0
         sideDistY = 0.0
         
-        # Ajout perso Utile encore ?
+        # Added by me. Is it still useful?
         if rayDirX == 0: rayDirX = 0.00001
         if rayDirY == 0: rayDirY = 0.00001
         
@@ -423,7 +414,7 @@ while not escape:
             ## ME Now y
             for yy in range(int(drawStart), int(drawEnd)):
                 dd = yy * 256 - height * 128 + lineHeight * 128 # 256 and 128 factors to avoid floats
-                texY = int(((dd * texHeight) / lineHeight) / 256) # Py3.0 L'erreur etait la! Il doit restait int, il devenait float!
+                texY = int(((dd * texHeight) / lineHeight) / 256) # Py3.x error : it must be an int and not a float
                 # ME Hum... Normalement les textures font 64 !!!
                 if texY < 0 or texY > 63:
                     if texY < 0:
@@ -499,7 +490,7 @@ while not escape:
                 buffer[s,yyy] =  (tex[floorTexture][texWidth * floorTexY + floorTexX] >> 1) & 8355711  # buffer.set_at((s,yyy), (tex[floorTexture][texWidth * floorTexY + floorTexX] >> 1) & 8355711)
                 buffer[s, height-yyy] = tex[floorTexture][texWidth * floorTexY + floorTexX]  # buffer.set_at((s, height-yyy), tex[floorTexture][texWidth * floorTexY + floorTexX])
 
-            ##END FLOOR 15h22 Mais il y a une petite barre grise.
+            ##END FLOOR
                 
         ## END TEXTURE
         
