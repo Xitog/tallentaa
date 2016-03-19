@@ -5,7 +5,7 @@
       "projectTypeName": "com.intel.xdk.projecttype.webapp",
       "src": "webapp/template-tab-view/sample.zip",
       "projectGuid": "30c0b17d-df8a-4937-855d-f92158ad7169",
-      "lastModifiedDate": 1457339619192,
+      "lastModifiedDate": 1458378323156,
       "creationDate": 1455379613368
     },
     "sourceDirectory": "www",
@@ -77,8 +77,8 @@
         "excludedLibraries_": "",
         "iosProvs_": [],
         "cordovaCLIVersion_": "5.1.1",
-        "appVersion_": "1.0.3",
-        "appVersionCode_": "4",
+        "appVersion_": "1.0.4",
+        "appVersionCode_": "5",
         "crosswalkVersion_": "14",
         "appAuthor_": "Damien Gouteux",
         "appDescription_": "Calendrier de concerts classiques"

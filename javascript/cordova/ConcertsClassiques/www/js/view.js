@@ -250,7 +250,7 @@ function viewAllDates(viewdate, document, dates, months, works, authors, org_dis
             continue;
         }
         // Check Date for Month
-        if (parseInt(tab[1]) !== (viewdate.getMonth() + 1)) {
+        if (parseInt(tab[1]) !== (viewdate.getMonth() + 1) || parseInt(tab[2]) !== (viewdate.getFullYear())) {
             continue;
         }
         // If all is good

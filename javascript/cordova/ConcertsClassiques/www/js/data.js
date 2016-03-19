@@ -2,7 +2,7 @@
 // Data needed by the application covering :
 // ONCT 2015-2016 season
 //-----------------------------------------------------------------------------
-
+        
 var works = { 
     'Gustav Holst' : {
         '32' : 'The Planets op.32',
@@ -25,6 +25,7 @@ var works = {
         '61' : 'Concerto pour violon et orchestre en ré majeur op. 61',
         '68' : 'Symphonie n°6 « Pastorale » en fa majeur, op. 68',   
         '72B': 'Léonore III, Ouverture en do majeur, op. 72 B',
+        'Egmont Ouverture' : 'Egmont Ouverture',
     },
     'Bohuslav Martinů' : {
         'MemorialLidice' : 'Mémorial pour Lidice',
@@ -60,6 +61,9 @@ var works = {
         '74' : 'Symphonie n°6 « Pathétique », en si mineur, opus 74',
         'extraitsBelle04022016' : 'La Belle au bois dormant : Acte 2, scène 1 n°18 : Entr\'acte',
         'extraitsLac04022016' : 'Le Lac des Cygnes : Acte 1 n°5: Pas de deux "le cygne noir" et Acte 3: Danse Russe',
+        'BABD:Valse6' : 'La Belle au Bois Dormant : Valse n°6',
+        'SW:Spe1' : 'Le Lac des Cygnes : Danse Espagnole, Danse Hongroise Czardas',
+        'CN:Spe1' : 'Casse-Noisette : Danse des Mirlitons, Valse des Fleurs et Pas de deux',
     },
     'Sergei Vasilievich Rachmaninoff' : {
         '45' : 'Danses symphoniques op. 45',
@@ -75,6 +79,9 @@ var works = {
     },
     'Dmitri Dmitrievitch Chostakovitch' : {
         '10' : 'Symphonie n°1 en fa mineur op. 10',
+        'Jazz2' : 'Suite de Jazz n°2 : Valse II (Sérénade / Valse) et Little polka n°4',
+        'TahitiTrot' : 'Tahiti-Trot',
+        '93' : 'Symphonie n°10 en mi mineur, op. 93',
     },
     'Leonard Bernstein' : {
         'candide' : 'Candide, Ouverture',
@@ -101,6 +108,7 @@ var works = {
     'Igor Fyodorovich Stravinsky' : {
         'oiseausuite2' : 'L’Oiseau de feu, Suite pour orchestre n° 2',
         'oiseausuiteX' : 'Suite pour orchestre de l\'Oiseau de feu', // Ils ne précisent pas sur quelle suite Béjart a fait son ballet
+        'OF:Spe1' : 'L\'Oiseau de feu, Suite pour Orchestre (version 1919) : Danse infernale du Roi Kastcheï, Berceuse et Final ',   
     },
     'Arnold Schoenberg' : {
         '16' : 'Cinq pièces pour orchestre, op. 16',
@@ -114,6 +122,7 @@ var works = {
     'Franz Schubert' : {
         '485' : 'Symphonie n°5 en si bémol majeur, D. 485',
         '644': 'Ouverture de Rosamunde D. 644',
+        '935' : 'Impromptus n°3 et 4 D. 935'
     },
     'Johannes Brahms' : {
         '68' : 'Symphonie n° 1 en ut mineur, op. 68',
@@ -142,7 +151,9 @@ var works = {
         'Les Noces de Figaro' : 'Les Noces de Figaro', // 1789 3h20
         'years' : '1756-1791',
         'K297' : 'Symphonie n°31 en ré majeur « Paris », K. 297',
+        'KV297b' : 'Symphonie concertante pour vents, en mi bémol majeur, KV. 297b',
         'K315' : 'Andante pour flûte et orchestre en ut majeur, K. 315',
+        'K488' : 'Concerto pour piano n°23 K.488 en La Majeur',
         '551' : 'Symphonie n°41 en ut majeur, « Jupiter », KV. 551',
         'Nozze di Figaro, Ouverture et La deuxième comtesse « Dove sono »' : 'Nozze di Figaro, Ouverture et La deuxième comtesse « Dove sono »',
         'Don Giovanni, Ouverture et Air de Zerlina - Vedrai carino' : 'Don Giovanni, Ouverture et Air de Zerlina - Vedrai carino',
@@ -210,11 +221,42 @@ var works = {
     'Robert Schumann' : {
         '54' : 'Concerto pour piano et orchestre en la mineur, op. 54',
     },
+    'Vincenzo Bellini' : {
+        'ConcertoHauboisMiBémolMajeur' : 'Concerto pour Hautbois et orchestre en mi bémol Majeur',
+    },
+    'Aram Khatchaturian' : {
+        'DanseSabre' : 'La Danse du Sabre',
+    },
+    'Hervé Suhubiette' : {
+        'Gâteaux et chapeaux' : 'Gâteaux et chapeaux',
+    },
+    'Johann II Strauss' : {
+        'Bat' : 'La Chauve-Souris, ouverture',
+    },
+    'Jacques Offenbach' : {
+        'CdH:Barcarolle' : 'Les Contes d\'Hoffmann, Barcarolle',
+    },
+    'Giuseppe Verdi' : {
+        'Force du Destin : Ouverture' : 'Force du Destin : Ouverture',
+        'Don Carlo : Acte II, Choeur et aria (Il Frate) « Carlo, il sommo Imperatore… »' : 'Don Carlo : Acte II, Choeur et aria (Il Frate) « Carlo, il sommo Imperatore… »',
+        'Simon Boccanegra : Acte III, Prologue, récitatif avec choeur « A te l’estremo addio… »' : 'Simon Boccanegra : Acte III, Prologue, récitatif avec choeur « A te l’estremo addio… »',
+        'Nabucco : Gli arredi festivi (Choeur d’introduction du 1er acte)' : 'Nabucco : Gli arredi festivi (Choeur d’introduction du 1er acte)',
+        'Traviata : Prélude' : 'Traviata : Prélude',
+        'Nabucco : Acte II, Air de Zaccaria. Preghiera « Vieni, o Levita ! », « Tu sul labro… »' : 'Nabucco : Acte II, Air de Zaccaria. Preghiera « Vieni, o Levita ! », « Tu sul labro… »',
+        'Nabucco : Va’ pensiero' : 'Nabucco : Va’ pensiero',
+        'Macbeth (version Paris 1865) : Acte II, n°10, recitatif “Studia il passo” + Air de Banco “Come dal ciel precipita”' : 'Macbeth (version Paris 1865) : Acte II, n°10, recitatif “Studia il passo” + Air de Banco “Come dal ciel precipita”',
+        'Les Vêpres siciliennes : Ouverture' : 'Les Vêpres siciliennes : Ouverture',
+        'Les Vêpres siciliennes : Acte II, scène 1 (n°7) : Air de Giovanni da Procida « O patria o cara », « O tu Palermo ».' : 'Les Vêpres siciliennes : Acte II, scène 1 (n°7) : Air de Giovanni da Procida « O patria o cara », « O tu Palermo ».',
+        'Otello : Fuoco di gioia (1er acte)' : 'Otello : Fuoco di gioia (1er acte)',
+        'Ernani : Acte I, scène 9 (final), récitatif : « Che mai veggio » + air de Silva « Infelice !... e tuo credevi »' : 'Ernani : Acte I, scène 9 (final), récitatif : « Che mai veggio » + air de Silva « Infelice !... e tuo credevi »',
+        'Nabucco : Ouverture' : 'Nabucco : Ouverture',
+        'Don Carlo : Acte IV, Air de Filippo « Ella Giammai m’ amo »' : 'Don Carlo : Acte IV, Air de Filippo « Ella Giammai m’ amo »',
+    },
     'Spécial' : {
         'Programme spécial' : 'Programme spécial',
         'Clarinettes250216' : 'Ensemble de Clarinettes (pièce de 4 minutes, jouée par 150 élèves clarinettistes de Gironde)',
         'tourdumonde' : 'Petits et grands : Le tour du monde en 45\', Musiques de Tchaikovski, Bartok, De Falla, Copland...',
-        'nouvel_an_tlse_2016' : 'Concerts du nouvel an, Un nouvel an russe en compagnie de Tugan Sokhiev',
+        //'nouvel_an_tlse_2016' : 'Concerts du nouvel an, Un nouvel an russe en compagnie de Tugan Sokhiev',
         'BabaYaga' : 'Baba Yaga, avec la musique de M. Moussorgski et I. Stravinski',
     },
 };
@@ -632,6 +674,11 @@ var dates = [
         ],
         'Bordeaux', 'Auditorium (Dutilleux)', 'Concert',
     ],
+    
+    //-------------------------------------------------------------------------
+    // Janvier
+    //-------------------------------------------------------------------------
+    
     [
         '31/01/2016', '10:45', 'ONCT', 'Christophe Mangou (dir. et présentation)', '', '', [
             ['Spécial', 'tourdumonde'],
@@ -665,19 +712,86 @@ var dates = [
     ],
     [
         '01/01/2016', '18:00', 'ONCT', 'Tugan Sokhiev (dir.)', 'Alexeï Ogrintchouk (hautbois)', '', [
-            ['Spécial', 'nouvel_an_tlse_2016']
+            // CONCERTS DU NOUVEL AN : UN NOUVEL AN RUSSE EN COMPAGNIE DE TUGAN SOKHIEV
+            ['Piotr Ilitch Tchaïkovski', 'BABD:Valse6'],
+            ['Piotr Ilitch Tchaïkovski', 'SW:Spe1'],
+            ['Piotr Ilitch Tchaïkovski', 'CN:Spe1'],
+            ['Vincenzo Bellini', 'ConcertoHauboisMiBémolMajeur'],
+            ['Dmitri Dmitrievitch Chostakovitch', 'Jazz2'],
+            ['Aram Khatchaturian', 'DanseSabre'],
+            ['Dmitri Dmitrievitch Chostakovitch', 'TahitiTrot'],
+            ['Igor Fyodorovich Stravinsky', 'OF:Spe1'],
         ],
         'Toulouse', 'Halle aux grains', 'Concert',
     ],
+    
     //-------------------------------------------------------------------------
     // Décembre
     //-------------------------------------------------------------------------
-    
-    // #TODO#
+ 
+    [
+        '31/12/2015', '20:00', 'ONCT', 'Tugan Sokhiev (dir.)', 'Alexeï Ogrintchouk (hautbois)', '', [
+            // CONCERTS DU NOUVEL AN : UN NOUVEL AN RUSSE EN COMPAGNIE DE TUGAN SOKHIEV
+            ['Piotr Ilitch Tchaïkovski', 'BABD:Valse6'],
+            ['Piotr Ilitch Tchaïkovski', 'SW:Spe1'],
+            ['Piotr Ilitch Tchaïkovski', 'CN:Spe1'],
+            ['Vincenzo Bellini', 'ConcertoHauboisMiBémolMajeur'],
+            ['Dmitri Dmitrievitch Chostakovitch', 'Jazz2'],
+            ['Aram Khatchaturian', 'DanseSabre'],
+            ['Dmitri Dmitrievitch Chostakovitch', 'TahitiTrot'],
+            ['Igor Fyodorovich Stravinsky', 'OF:Spe1'],
+        ],
+        'Toulouse', 'Halle aux grains', 'Concert',
+    ],
+    [
+        '18/12/2015', '20:00', 'ONCT', 'Georges Prêtre (dir.)', 'Adam Laloum (piano pour moz et schu)', 'Eric Crambes (dir. violon solo pour moz)', [
+            ['Ludwig van Beethoven', 'Egmont Ouverture'],
+            ['Wolfgang Amadeus Mozart', 'K488'],
+            ['Johann II Strauss', 'Bat'],
+            ['Franz Schubert', '935'],
+            ['Jacques Offenbach', 'CdH:Barcarolle'],
+            ['Maurice Ravel', 'Boléro'],
+        ],
+        'Toulouse', 'Halle aux grains', 'Concert',
+    ],
+    [
+        '13/12/2015', '10:45', 'ONCT', 'François Terrieux (dir. et chef de choeur)', 'Hervé Suhubiette (récitant et chant)', 'Eloïse Chadourne (chant), Les éclats (choeur d\'enfants), Fabrice Guérin (mise en scène)', [
+            ['Hervé Suhubiette', 'Gâteaux et chapeaux'],
+        ],
+        'Toulouse', 'Halle aux grains', 'Concert',
+    ],
+    [
+        '09/12/2015', '20:00', 'ONCT', 'Tugan Sokhiev (dir.)', 'David Minetti (clarinette)', 'Olivier Stankiewicz (hautbois), Jacques Deleplancque (cor), Estelle Richard (basson)', [
+            ['Wolfgang Amadeus Mozart', 'KV297b'],
+            ['Dmitri Dmitrievitch Chostakovitch', '93'],            
+        ],
+        'Toulouse', 'Halle aux grains', 'Concert',
+    ],
+    [
+        '04/12/2015', '20:00', 'ONCT', 'Tugan Sokhiev (dir.)', 'Ferruccio Furlanetto (basse)', 'Choeur du Capitole (choeur), Alfonso Caiani (chef de coeur)', [
+            // Verdi : Airs d’opéras Don Carlo, Nabucco, Ernani, Simon Boccanegra, Vespri Siciliani, Macbeth
+            ['Giuseppe Verdi', 'Force du Destin : Ouverture'],
+            ['Giuseppe Verdi', 'Don Carlo : Acte II, Choeur et aria (Il Frate) « Carlo, il sommo Imperatore… »'],
+            ['Giuseppe Verdi', 'Simon Boccanegra : Acte III, Prologue, récitatif avec choeur « A te l’estremo addio… »'],
+            ['Giuseppe Verdi', 'Nabucco : Gli arredi festivi (Choeur d’introduction du 1er acte)'],
+            ['Giuseppe Verdi', 'Traviata : Prélude'],
+            ['Giuseppe Verdi', 'Nabucco : Acte II, Air de Zaccaria. Preghiera « Vieni, o Levita ! », « Tu sul labro… »'],
+            ['Giuseppe Verdi', 'Nabucco : Va’ pensiero'],
+            ['Giuseppe Verdi', 'Macbeth (version Paris 1865) : Acte II, n°10, recitatif “Studia il passo” + Air de Banco “Come dal ciel precipita”'],
+            ['Giuseppe Verdi', 'Les Vêpres siciliennes : Ouverture'],
+            ['Giuseppe Verdi', 'Les Vêpres siciliennes : Acte II, scène 1 (n°7) : Air de Giovanni da Procida « O patria o cara », « O tu Palermo ».'],
+            ['Giuseppe Verdi', 'Otello : Fuoco di gioia (1er acte) '],
+            ['Giuseppe Verdi', 'Ernani : Acte I, scène 9 (final), récitatif : « Che mai veggio » + air de Silva « Infelice !... e tuo credevi »'],
+            ['Giuseppe Verdi', 'Nabucco : Ouverture'],
+            ['Giuseppe Verdi', 'Don Carlo : Acte IV, Air de Filippo « Ella Giammai m’ amo »'],
+        ],
+        'Toulouse', 'Halle aux grains', 'Concert',
+    ],
     
     //-------------------------------------------------------------------------
     // Novembre
     //-------------------------------------------------------------------------
+    
     [
         '15/11/2015', '10:45', 'ONCT', 'Christophe Mangou (dir. et présentation)', 'Maëlle Mietton (récitante)', '', [
             ['Spécial', 'BabaYaga'],
@@ -693,9 +807,11 @@ var dates = [
         ],
         'Toulouse', 'Halle aux grains', 'Concert',
     ],
+    
     //-------------------------------------------------------------------------
     // Octobre
     //-------------------------------------------------------------------------
+    
     [
         '30/10/2015', '20:00', 'ONCT', 'Lahav Shani (dir.)', 'Philippe Bianconi (piano)', '', [
             ['Sergueï Prokofiev', '91'],
@@ -728,9 +844,11 @@ var dates = [
         ],
         'Toulouse', 'Halle aux grains', 'Concert',
     ],
+    
     //-------------------------------------------------------------------------
     // Septembre
     //-------------------------------------------------------------------------
+    
     [
         '18/09/2015', '20:00', 'ONCT', 'Tugan Sokhiev (dir.)', 'Elisabeth Leonskaja (piano)', '', [
             ['Franz Schubert', '644'],
@@ -738,7 +856,7 @@ var dates = [
             ['Antonín Dvořák', '88'],
         ],
         'Toulouse', 'Halle aux grains', 'Concert',
-    ],  
+    ],
 ];
 
 // FIN DATE
@@ -751,6 +869,7 @@ var authors_short = {
     'Samuel Barber' : 'Barber',
     'Béla Bartók' : 'Bartók',
     'Ludwig van Beethoven' : 'Beethoven',
+    'Vincenzo Bellini' : 'Bellini',
     'Luciano Berio' : 'Berio',
     'Hector Berlioz' : 'Berlioz',
     'Leonard Bernstein' : 'Bernstein',
@@ -773,6 +892,7 @@ var authors_short = {
     'Edvard Grieg' : 'Grieg',
     'Karl Amadeus Hartmann' : 'Hartmann (K.A.)',
     'Gustav Holst' : 'Holst',
+    'Aram Khatchaturian' : 'Khatchaturian',
     'Anatoli Konstantinovitch Liadov' : 'Liadov',
     'Damien Lehman' : 'Lehman',
     'Gustav Mahler' : 'Mahler',
@@ -782,6 +902,7 @@ var authors_short = {
     'Olivier Messiaen' : 'Messiaen',
     'Ludwig Minkus' : 'Minkus',
     'Wolfgang Amadeus Mozart' : 'Mozart',
+    'Jacques Offenbach' : 'Offenbach',
     'Sergueï Prokofiev' : 'Prokofiev',
     'Sergei Vasilievich Rachmaninoff' : 'Rachmaninoff',
     'Maurice Ravel' : 'Ravel',
@@ -791,11 +912,14 @@ var authors_short = {
     'Arnold Schoenberg' : 'Schoenberg',
     'Franz Schubert' : 'Schubert',
     'Robert Schumann' : 'Schumann',
+    'Johann II Strauss' : 'Strauss (J. II)',
     'Richard Strauss' : 'Strauss (R.)',
     'Igor Fyodorovich Stravinsky' : 'Stravinsky',
+    'Hervé Suhubiette' : 'Suhubiette',
     'Toru Takemitsu' : 'Takemitsu',
     'Eric Tanguy' : 'Tanguy',
     'Piotr Ilitch Tchaïkovski' : 'Tchaïkovski',
+    'Giuseppe Verdi' : 'Verdi',
     'Richard Wagner' : 'Wagner',
     'William Walton' : 'Walton',
     'Bernd Alois Zimmermann' : 'Zimmermann',
@@ -810,6 +934,7 @@ var authors_abc = [
     'Samuel Barber',
     'Béla Bartók',
     'Ludwig van Beethoven',
+    'Vincenzo Bellini',
     'Luciano Berio',
     'Hector Berlioz',
     'Leonard Bernstein',
@@ -832,6 +957,7 @@ var authors_abc = [
     'Edvard Grieg',
     'Karl Amadeus Hartmann',
     'Gustav Holst',
+    'Aram Khatchaturian',
     'Anatoli Konstantinovitch Liadov',
     'Damien Lehman',
     'Gustav Mahler',
@@ -841,6 +967,7 @@ var authors_abc = [
     'Olivier Messiaen',
     'Ludwig Minkus',
     'Wolfgang Amadeus Mozart',
+    'Jacques Offenbach',
     'Sergueï Prokofiev',
     'Sergei Vasilievich Rachmaninoff',
     'Maurice Ravel',
@@ -850,11 +977,14 @@ var authors_abc = [
     'Arnold Schoenberg',
     'Franz Schubert',
     'Robert Schumann',
+    'Johann II Strauss',
     'Richard Strauss',
     'Igor Fyodorovich Stravinsky',
+    'Hervé Suhubiette',
     'Toru Takemitsu',
     'Eric Tanguy',
     'Piotr Ilitch Tchaïkovski',
+    'Giuseppe Verdi',
     'Richard Wagner',
     'William Walton',
     'Bernd Alois Zimmermann',
