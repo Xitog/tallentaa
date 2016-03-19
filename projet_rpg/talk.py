@@ -19,7 +19,7 @@ STR_END = -2
 INTRO = 1
 TYPE = 2
 TYPE_CHOICE = 1
-TYPE_ANSWER = 2
+TYPE_SIMPLE = 2
 TYPE_END = 3
 CHOICES_ANSWER = 3
 CHOICES_SUITE = 4
@@ -35,7 +35,7 @@ dialog_tree = {
     },
     2 : {
         INTRO : 5,
-        TYPE : TYPE_ANSWER,
+        TYPE : TYPE_SIMPLE,
         ANSWER : 8,
         SUITE : 3,
     },
@@ -45,7 +45,7 @@ dialog_tree = {
     },
     4 : {
         INTRO : 6,
-        TYPE : TYPE_ANSWER,
+        TYPE : TYPE_SIMPLE,
         ANSWER : 10,
         SUITE : 5,
     },
@@ -76,7 +76,7 @@ def do_dialog(d, dialog_tree, locuteur, interlocuteur=None):
         choice = int(input('Entrer le chiffre correspondant à votre réponse : '))
         #print('>>> ' + resolve_tag(strings[dialog[CHOICES][choice-1]], locuteur))
         do_dialog(dialog[CHOICES_SUITE][choice-1], dialog_tree, locuteur, interlocuteur)
-    elif dialog[TYPE] == TYPE_ANSWER:
+    elif dialog[TYPE] == TYPE_SIMPLE:
         print(resolve_tag(strings[dialog[ANSWER]], locuteur))
         print()
         input(strings[STR_CONTINUE])
