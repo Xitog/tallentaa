@@ -9,14 +9,15 @@ from pygame.locals import *
 import math
 import sys
 
-screenWidth = 200 #640
-screenHeight = 300 #480
+screenWidth = 320  #300 #640
+screenHeight = 240 #200 #480
 texWidth = 64
 texHeight = 64
 
 WHITE = (255, 255, 255)
 
-TEXTURED = True
+WALL_TEXTURED = True
+FLOOR_TEXTURED = True
 FPS = 60 #
 
 #------------------------------------------------------------------------------
@@ -59,8 +60,6 @@ print_matrix(es2)
 #------------------------------------------------------------------------------
 # Texture Generator
 #------------------------------------------------------------------------------
-
-sbuffer = pygame.Surface((screenHeight, screenWidth))
 
 tex = area(8, None)
 for i in range(0,8):
@@ -130,6 +129,7 @@ print(pygame.display.mode_ok(resolution))
 # !0: best color depth
 
 screen = pygame.display.set_mode(resolution,flags,32)
+sbuffer = pygame.Surface((screenWidth, screenHeight))
 
 #sprite1 = pygame.image.load('flower.png').convert()
 #sprite1.set_colorkey((255,0,255))
@@ -221,8 +221,18 @@ while not escape:
             escape = True
         elif event.type == KEYDOWN and event.key == K_SPACE:
             reboot()
-        elif event.type == KEYUP and event.key == K_s:
-            TEXTURED = not TEXTURED
+        elif event.type == KEYUP and event.key == K_w:
+            WALL_TEXTURED = not WALL_TEXTURED
+        elif event.type == KEYUP and event.key == K_f:
+            FLOOR_TEXTURED = not FLOOR_TEXTURED
+        elif event.type == KEYUP and event.key == K_b:
+            if screenWidth == 320:
+                screenWidth = 640
+                screenHeight = 480
+            else:
+                screenWidth = 320
+                screenHeight = 240
+            sbuffer = pygame.Surface((screenWidth, screenHeight))
         elif event.type == KEYDOWN:
             if event.key == K_RIGHT:
                 right = True
@@ -275,11 +285,13 @@ while not escape:
     screen.fill((0,0,0))
     
     screen.blit(default.render(" x = %f  y = %f" % (position[0], position[1]), True, (255,0,0)), (320, 260))
-    screen.blit(default.render("dx = %f dy = %f" % (direction[0], direction[1]), True, (0,255,0)), (320, 260+16+2))
-    screen.blit(default.render("cx = %f cy = %f" % (camera[0], camera[1]), True, (0,0,255)), (320, 260+18*2))
-    screen.blit(default.render("Press space to reboot simulation", True, WHITE), (320, 260+18*3))
-    screen.blit(default.render("Press escape to quit", True, WHITE), (320, 260+18*4))
-    screen.blit(default.render("Press S to switch sky drawing", True, WHITE), (320, 260+18*5))
+    screen.blit(default.render("dx = %f dy = %f" % (direction[0], direction[1]), True, (0,255,0)), (320, 278)) #260+16+2))
+    screen.blit(default.render("cx = %f cy = %f" % (camera[0], camera[1]), True, (0,0,255)), (320, 296)) #260+18*2))
+    screen.blit(default.render("Press space to reboot simulation", True, WHITE), (320, 314)) #260+18*3))
+    screen.blit(default.render("Press escape to quit", True, WHITE), (320, 332)) #260+18*4))
+    screen.blit(default.render("Press w to switch wall texturing", True, WHITE), (320, 350)) #260+18*5))
+    screen.blit(default.render("Press f to switch floor texturing", True, WHITE), (320, 368))
+    screen.blit(default.render("Press b to display on 640x480 (b again to reset to 300x200)", True, WHITE), (320, 386)) #260+18*6))
     #screen.blit(sprite1, (100, 100))
     
     # Map and player
@@ -304,8 +316,16 @@ while not escape:
     pygame.draw.line(screen, (255,0,0), (pos_x+SIZE/2, pos_y+SIZE/2), (dir_x, dir_y), 1)
 
     # Raytracing 2.5D
-    height = 200
-    width = 300
+    height = screenHeight
+    width = screenWidth
+    
+    if not FLOOR_TEXTURED:
+        sbuffer.fill((64, 64, 64), (0, 0, screenWidth, screenHeight/2))
+        sbuffer.fill((128, 128, 128), (0, screenHeight/2, screenWidth, screenHeight/2))
+
+    if WALL_TEXTURED or FLOOR_TEXTURED:
+        buffer = pygame.PixelArray(sbuffer) ##
+        
     for s in range(0, width):
         # calculate ray position and direction 
         cameraX = 2 * s / float(width) - 1 #x-coordinate in camera space
@@ -383,10 +403,10 @@ while not escape:
         
         # choose wall color
         color = ccolor(area[mapX][mapY])
-
+        
         ## DEB TEXTURE
-
-        if TEXTURED:
+        
+        if WALL_TEXTURED or FLOOR_TEXTURED:
         
             # texturing calculations
             # 1 subtracted from it so that texture 0 can be used!
@@ -400,6 +420,8 @@ while not escape:
                 wallX = rayPosY + ((mapX - rayPosX + (1 - stepX) / 2) / rayDirX) * rayDirY
             wallX -= math.floor(wallX)
         
+        if WALL_TEXTURED:
+        
             # x coordinate on the texture
             texX = int(wallX * float(texWidth))
             
@@ -408,8 +430,6 @@ while not escape:
             
             # ME BICOLOR TEXTURE
             # if texX > 32: color = ((color[0]+100)%255,color[1],color[2])
-
-            buffer = pygame.PixelArray(sbuffer)  ##
 
             ## ME Now y
             for yy in range(int(drawStart), int(drawEnd)):
@@ -420,7 +440,7 @@ while not escape:
                     if texY < 0:
                         texY = 64 + texY
                     else:
-                        texY = texY % 64
+                        texY = texY & 63
                 # get pixel color from texture
                 # make color darker for y-sides: R, G and B byte each divided through two with a "shift" and an "and"              
                 try:
@@ -435,6 +455,9 @@ while not escape:
                     buffer[s, yy] = int(pixel)  # buffer.set_at((s,yy), int(pixel)) # Py3.0 pixel was promoted to float. It must be int!
                 except TypeError: # Py3.0 no need now
                     print("Color ERROR : " + str(pixel))
+            
+        if FLOOR_TEXTURED:
+            
             ##DEB FLOOR
                 
             # FLOOR CASTING
@@ -475,12 +498,12 @@ while not escape:
         
                 floorTexX = 0
                 floorTexY = 0
-                    
-                floorTexX = int(currentFloorX * texWidth) % texWidth
-                floorTexY = int(currentFloorY * texHeight) % texHeight
+                
+                floorTexX = int(currentFloorX * texWidth) & (texWidth-1)
+                floorTexY = int(currentFloorY * texHeight) & (texHeight-1)
                 
                 ## Checkboard pattern
-                checkerBoardPattern = (int(currentFloorX) + int(currentFloorY)) % 2
+                checkerBoardPattern = (int(currentFloorX) + int(currentFloorY)) & 1
                 floorTexture = 0
                 if checkerBoardPattern == 0: floorTexture = 3
                 else: floorTexture = 4 #6
@@ -491,17 +514,19 @@ while not escape:
                 buffer[s, height-yyy] = tex[floorTexture][texWidth * floorTexY + floorTexX]  # buffer.set_at((s, height-yyy), tex[floorTexture][texWidth * floorTexY + floorTexX])
 
             ##END FLOOR
-                
+        
         ## END TEXTURE
         
         #UNTEX
-        else:
-            pygame.draw.line(buffer.surface, color, (s,drawStart), (s,drawEnd), 1)  ##
-
-    del buffer ##
+        if not WALL_TEXTURED:
+            pygame.draw.line(sbuffer, color, (s,drawStart), (s,drawEnd), 1)  ##
+        
+    if WALL_TEXTURED or FLOOR_TEXTURED:
+        # From PyGame documentation:
+        # During its lifetime, the PixelArray locks the surface, thus you explicitly have to delete it once its not used anymore and the surface should perform operations in the same scope.
+        del buffer ##
     screen.blit(sbuffer, (0,0))  ##
     sbuffer.fill((0,0,0))  ##
-    ##ENDTEXT
     
     pygame.display.flip()
     
