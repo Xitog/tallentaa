@@ -250,12 +250,12 @@ function viewAllDates(viewdate, document, dates, months, works, authors, org_dis
             continue;
         }
         // Check Date for Month
-        if (parseInt(tab[1]) !== (viewdate.getMonth() + 1) || parseInt(tab[2]) !== (viewdate.getFullYear())) {
+        if (parseInt(tab[1], 10) !== (viewdate.getMonth() + 1) || parseInt(tab[2], 10) !== (viewdate.getFullYear())) {
             continue;
         }
         // If all is good
         nb_dates++;
-        
+         
         var mega_div = document.createElement('div');
         mega_div.setAttribute('class', 'date_elem');
         
@@ -268,6 +268,17 @@ function viewAllDates(viewdate, document, dates, months, works, authors, org_dis
         nothing.setAttribute('class', 'no_date');
         var nothing_txt = document.createElement('span');
         nothing_txt.textContent = 'Pas de concerts ce mois-ci pour les paramètres sélectionnés. ';
+        // debug
+        //if (viewdate.getMonth() === 8) {
+        //    for (var ii = 0; ii < dates.length; ii++) {
+        //        var dd = dates[ii][0];
+        //        var ttab = dd.split('/');
+        //        var s = "dates : " + dd + " tab[1] : " + ttab[1] + " parseInt(tab[1]) : " + parseInt(ttab[1], 10).toString() + " viewdate.getMonth() : " + viewdate.getMonth().toString() + " viewdate.getMonth() + 1 : " + (viewdate.getMonth()+1).toString() + " test : " + (parseInt(ttab[1], 10) === viewdate.getMonth()+1);
+        //        nothing_txt.textContent = s;
+        //    }
+        //}
+        // end debug
+           
         nothing.appendChild(nothing_txt);
         
         var nothing_lnk = document.createElement('span');
