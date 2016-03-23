@@ -396,9 +396,9 @@ while not escape:
         lineHeight = abs(int(float(height) / float(perpWallDist)))
        
         # Calculate lowest and highest pixel to fill in current stripe
-        drawStart = -lineHeight / 2 + height / 2
+        drawStart = int(-lineHeight / 2 + height / 2)
         if drawStart < 0: drawStart = 0
-        drawEnd = lineHeight / 2 + height / 2
+        drawEnd = int(lineHeight / 2 + height / 2)
         if drawEnd >= height: drawEnd = height - 1
         
         # choose wall color
@@ -432,7 +432,7 @@ while not escape:
             # if texX > 32: color = ((color[0]+100)%255,color[1],color[2])
 
             ## ME Now y
-            for yy in range(int(drawStart), int(drawEnd)):
+            for yy in range(drawStart, drawEnd):
                 dd = yy * 256 - height * 128 + lineHeight * 128 # 256 and 128 factors to avoid floats
                 texY = int(((dd * texHeight) / lineHeight) / 256) # Py3.x error : it must be an int and not a float
                 # ME Hum... Normalement les textures font 64 !!!
