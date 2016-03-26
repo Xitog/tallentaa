@@ -1,4 +1,4 @@
-#include "./SDL/include/SDL.h"
+#include "SDL.h"
 #include <stdio.h>
 #include <stdbool.h>
 #include <math.h>
@@ -505,6 +505,8 @@ int main(int argc, char *argv[]) {
         }
         else
         {
+            SDL_SetWindowTitle(window, "WoolfyC");
+
             // SDL_Surface * tex = SDL_LoadBMP( "textures/eagle.png" );
             
             //Main loop flag

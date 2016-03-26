@@ -109,11 +109,11 @@ def load_texture(filename, where):
             #print("%s for %s" % (z[xxx-1],xxx-1))
     tex[where] = z
 
-load_texture('textures/eagle.png', 0)
-load_texture('textures/wood.png', 1)
-load_texture('textures/redbrick.png', 2)
-load_texture('textures/bluestone.png', 3)
-load_texture('textures/greystone.png', 4) # pb quand on applique le filtre "dark side"
+load_texture('../assets/textures/eagle.png', 0)
+load_texture('../assets/textures/wood.png', 1)
+load_texture('../assets/textures/redbrick.png', 2)
+load_texture('../assets/textures/bluestone.png', 3)
+load_texture('../assets/textures/greystone.png', 4) # pb quand on applique le filtre "dark side"
 
 #------------------------------------------------------------------------------
 # Main loop
