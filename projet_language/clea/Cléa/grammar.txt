@@ -17,19 +17,30 @@
 
     PROGRAM --> STATEMENT { ';' STATEMENT }
     
-	STATEMENT --> BLOCK_STATEMENT
-        # Declaration (special first level statement)
-		| fun id [ '(' [ LIST_PARAM ] ')' ] is FUNC_BODY end
+	STATEMENT --> 
+        | BLOCK_STATEMENT
+        # Declaration (first level statement)
+        | module id is MOD_BODY end
+        | require string
+        # Declaration (common to 1st level and module)
+        | FUN_CONST_ENUM
+        
+    FUN_CONST_ENUM -->
+		| fun id [ '(' [ LIST_PARAM ] ')' ] [ : id ] is FUNC_BODY end
+        | sub id [ '(' [ LIST_PARAM ] ')' ] is SUB_BODY end
         | const id '=' EXPRESSION # var are defined in BLOCK_STATEMENT
         | enum id is LIST_ID end
-    
+        
     LIST_EXPRESSION --> EXPRESSION { ',' LIST_EXPRESSION }
     
     LIST_ID --> id { ',' LIST_ID }
     
-    LIST_PARAM --> [ id ] id { ',' LIST_PARAM }
+    LIST_ID_TYP --> id [ : id ]  { ',' LIST_ID }
     
-    EXPRESSION --> nil
+    LIST_PARAM --> id [ : id ] { ',' LIST_PARAM }
+    
+    EXPRESSION --> 
+        | nil
         | true
         | false
         | integer
@@ -41,7 +52,7 @@
         | id
         | EXPRESSION BIN_OP EXPRESSION
         | UNA_OP EXPRESSION
-        | FUNC_CALL
+        | FUNC_SUB_CALL
         | '(' EXPRESSION ')'
     
     BLOCK --> BLOCK_STATEMENT { ';' BLOCK_STATEMENT }
@@ -61,16 +72,31 @@
         | break
         | next
         # Declaration
-        | var LIST_ID = LIST_EXPRESSION
+        | var LIST_ID_TYP = LIST_EXPRESSION
         
     FUNC_BODY --> FUNC_STATEMENT { ';' FUNC_STATEMENT }
     
-    FUNC_STATEMENT --> ';'
+    FUNC_STATEMENT -->
         BLOCK_STATEMENT
         # Function special
         | return [ LIST_EXPRESSION ]
     
-    LAMBDA --> fun [ '(' LIST_PARAM ')' ] is FUNC_STATEMENT end
+    SUB_BODY --> SUB_STATEMENT { ';' SUB_STATEMENT }
+    
+    SUB_STATEMENT -->
+        BLOCK_STATEMENT
+        # Subprogram special
+        | return
+    
+    MOD_BODY --> MOD_STATEMENT { ';' MOD_STATEMENT }
+    
+    MOD_STATEMENT -->
+        | BLOCK_STATEMENT
+        | FUN_CONST_ENUM
+        
+    LAMBDA --> 
+        | fun [ '(' LIST_PARAM ')' ] [ : id ] is FUNC_STATEMENT end
+        | sub [ '(' LIST_PARAM ')' ] is SUB_STATEMENT end
     
     LIST --> '[' [ LIST_EXPRESSION ] [ ',' ] ']'
     
@@ -78,24 +104,27 @@
     
     LIST_KEY_VALUE --> KEY ':' EXPRESSION { ',' LIST_KEY_VALUE }
     
-    KEY --> true
+    KEY --> 
+        | true
         | false
         | integer
         | float
         | string
         | id
         
-	BIN_OP --> '+' | '-' | '*' | '/' | '//' | '**' | '%'
+	BIN_OP --> 
+        | '+' | '-' | '*' | '/' | '//' | '**' | '%'
 		| '&' | '~' | '|' | '>>' | '<<'
 		| '<' | '<=' | '>' | '>=' | '==' | '!='
 		| and | or
         | in | not in
     
-    UNA_OP --> '-'
+    UNA_OP --> 
+        | '-'
         | not
         | '~'
     
-    FUNC_CALL --> id ( LIST_EXPRESSION )
+    FUNC_SUB_CALL --> id ( LIST_EXPRESSION )
 
 -------------------------------------------------------------------------------  
 - Définition des tokens
@@ -128,6 +157,9 @@
     and --> 'and'
     or --> 'or'
     not --> 'not'
+    module --> 'module'
+    require --> 'require'
+    sub --> 'sub'
     
 -------------------------------------------------------------------------------  
 - Commentaires
@@ -180,3 +212,5 @@ writeln(p.age) # 6
 ?. Le switch : switch / case / default / break ou case / when / others / break
 
 ?. Le else if : elseif / elsif / elif
+
+?. Les var des for doivent-elles être déclarée avant ?
