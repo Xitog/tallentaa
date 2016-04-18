@@ -14,25 +14,28 @@ import sys
 
 from pygame.locals import *
 from collections import namedtuple
+from enum import Enum
 
-RED = Color(255, 0, 0)  # TODO Enum Python ?
-GREEN = Color(0, 255, 0)
-BLUE = Color(0, 0, 255)
-GREY = Color(200, 200, 200)
-BLACK = Color(0, 0, 0)
-WHITE = Color(255, 255, 255)
-YELLOW = Color(255, 255, 0)
-SKY_BLUE = Color(0, 255, 255)
-HALF_RED = Color(128, 0, 0)
-HALF_BLUE = Color(0, 0, 128)
-HALF_GREEN = Color(0, 128, 0)
 
-MINIMAP_GREEN_HALF = HALF_GREEN # terre verte
-MINIMAP_GREEN_LIGHT = Color(1,154,1) # terre verte claire
-MINIMAP_BROWN = Color(192,96,0) # terre marron claire
-MINIMAP_BROWN_DARK = Color(128,64,0) # terre marron sombre pas passable (rochers)
-MINIMAP_BLUE = BLUE # eau profonde pas passable
-MINIMAP_BLUE_LIGHT = Color(113,123,255) # eau claire peu profonde mais pas passable
+class Colors(Enum):
+    RED = Color(255, 0, 0)
+    GREEN = Color(0, 255, 0)
+    BLUE = Color(0, 0, 255)
+    GREY = Color(200, 200, 200)
+    BLACK = Color(0, 0, 0)
+    WHITE = Color(255, 255, 255)
+    YELLOW = Color(255, 255, 0)
+    SKY_BLUE = Color(0, 255, 255)
+    HALF_RED = Color(128, 0, 0)
+    HALF_BLUE = Color(0, 0, 128)
+    HALF_GREEN = Color(0, 128, 0)
+
+    MINIMAP_GREEN_HALF = HALF_GREEN # terre verte
+    MINIMAP_GREEN_LIGHT = Color(1,154,1) # terre verte claire
+    MINIMAP_BROWN = Color(192,96,0) # terre marron claire
+    MINIMAP_BROWN_DARK = Color(128,64,0) # terre marron sombre pas passable (rochers)
+    MINIMAP_BLUE = BLUE # eau profonde pas passable
+    MINIMAP_BLUE_LIGHT = Color(113,123,255) # eau claire peu profonde mais pas passable
 
 #UnitType = namedtuple("UnitType", "size range life dom speed reload")  # or ['size', 'range', 'life', 'dom']
 #BuildingType = namedtuple("BuildingType", "size range life dom speed reload type")
@@ -50,27 +53,27 @@ class Texture:
 
 TEXTURES = {
     # Doodads
-      1  : Texture('rock'  ,   1, 'rock_brown.png', MINIMAP_BROWN_DARK),
+      1  : Texture('rock'  ,   1, 'rock_brown.png', Colors.MINIMAP_BROWN_DARK),
     # Real textures
-    100 : Texture('grass' , 200, 'grass_two_leaves.png', MINIMAP_GREEN_LIGHT),
-    200 : Texture('ground', 100, 'ground.png', MINIMAP_BROWN),
-    300 : Texture('water' , 300, 'water0.png', MINIMAP_BLUE_LIGHT, False),
+    100 : Texture('grass' , 200, 'grass_two_leaves.png', Colors.MINIMAP_GREEN_LIGHT),
+    200 : Texture('ground', 100, 'ground.png', Colors.MINIMAP_BROWN),
+    300 : Texture('water' , 300, 'water0.png', Colors.MINIMAP_BLUE_LIGHT, False),
     
-    9100 : Texture('w1', 9100, 'w1.png', MINIMAP_BLUE_LIGHT, False), 
-    9200 : Texture('w2', 9200, 'w2.png', MINIMAP_BLUE_LIGHT, False), 
-    9300 : Texture('w3', 9300, 'w3.png', MINIMAP_BLUE_LIGHT, False),
-    9400 : Texture('w4', 9400, 'w4.png', MINIMAP_BLUE_LIGHT, False), 
-    9500 : Texture('w5', 9500, 'w5.png', MINIMAP_BLUE_LIGHT, False), 
-    9600 : Texture('w6', 9600, 'w6.png', MINIMAP_BLUE_LIGHT, False), 
-    9700 : Texture('w7', 9700, 'w7.png', MINIMAP_BLUE_LIGHT, False), 
-    9800 : Texture('w8', 9800, 'w8.png', MINIMAP_BLUE_LIGHT, False), 
-    8100 : Texture('water741', 8100, 'water741.png', MINIMAP_BLUE_LIGHT, False),
-    8200 : Texture('x2', 8200, 'x2.png', MINIMAP_BLUE_LIGHT, False), 
-    8300 : Texture('x24', 8300, 'x24.png', MINIMAP_BLUE_LIGHT, False),
-    8400 : Texture('x4', 8400, 'x4.png', MINIMAP_BLUE_LIGHT, False),
-    8500 : Texture('water85', 8500, 'water85.png', MINIMAP_BLUE_LIGHT, False),
-    8700 : Texture('water325', 8700, 'water325.png', MINIMAP_BLUE_LIGHT, False),
-    8900 : Texture('water981', 8900, 'water981.png', MINIMAP_BLUE_LIGHT, False),
+    9100 : Texture('w1', 9100, 'w1.png', Colors.MINIMAP_BLUE_LIGHT, False),
+    9200 : Texture('w2', 9200, 'w2.png', Colors.MINIMAP_BLUE_LIGHT, False),
+    9300 : Texture('w3', 9300, 'w3.png', Colors.MINIMAP_BLUE_LIGHT, False),
+    9400 : Texture('w4', 9400, 'w4.png', Colors.MINIMAP_BLUE_LIGHT, False),
+    9500 : Texture('w5', 9500, 'w5.png', Colors.MINIMAP_BLUE_LIGHT, False),
+    9600 : Texture('w6', 9600, 'w6.png', Colors.MINIMAP_BLUE_LIGHT, False),
+    9700 : Texture('w7', 9700, 'w7.png', Colors.MINIMAP_BLUE_LIGHT, False),
+    9800 : Texture('w8', 9800, 'w8.png', Colors.MINIMAP_BLUE_LIGHT, False),
+    8100 : Texture('water741', 8100, 'water741.png', Colors.MINIMAP_BLUE_LIGHT, False),
+    8200 : Texture('x2', 8200, 'x2.png', Colors.MINIMAP_BLUE_LIGHT, False),
+    8300 : Texture('x24', 8300, 'x24.png', Colors.MINIMAP_BLUE_LIGHT, False),
+    8400 : Texture('x4', 8400, 'x4.png', Colors.MINIMAP_BLUE_LIGHT, False),
+    8500 : Texture('water85', 8500, 'water85.png', Colors.MINIMAP_BLUE_LIGHT, False),
+    8700 : Texture('water325', 8700, 'water325.png', Colors.MINIMAP_BLUE_LIGHT, False),
+    8900 : Texture('water981', 8900, 'water981.png', Colors.MINIMAP_BLUE_LIGHT, False),
     
     # Computed textures
     # 1300 : Texture('grass_water_lm', 1200, 'grass_water_ml.png', MINIMAP_BLUE_LIGHT, False),
@@ -98,8 +101,39 @@ for a in [9100, 9200, 9300, 9400, 9500, 9600, 9700, 9800, 8100, 8200, 8300, 8400
             n = b*10+1000+a-8000
         TEXTURES[n] = Texture(str(n), n, s, TEXTURES[a].mini, TEXTURES[a].passable)
 
+
+class Engine:
+    def __init__(self, width, height):
+        self.size = width, height
+        self.screen = pygame.display.set_mode(self.size)  # , pygame.FULLSCREEN | pygame.HWSURFACE)
+        self.render_orders = []
+    
+    def tex(self, x, y, tex, z):
+        self.render_orders.append((0, x, y, tex, None, None, None, z))
+    
+    def rect(self, x, y, w, h, col, thick, z):
+        self.render_orders.append((1, x, y, w, h, col, thick, z))
+    
+    def circle(self, x, y, r, col, thick, z):
+        self.render_orders.append((2, x, y, r, None, col, thick, z))
+    
+    def line(self, x1, y1, x2, y2, col, thick, z):
+        self.render_orders.append((3, x1, y1, x2, y2, col, thick, z))   
+    
+    def render(self):
+        self.render_orders.sort(key=lambda elem: elem[7])
+        for o in self.render_orders:
+            if o[0] == 0: self.screen.blit(o[3], (o[1], o[2]))
+            elif o[0] == 1: pygame.draw.rect(self.screen, o[5].value, (o[1], o[2], o[3], o[4]), o[6])
+            elif o[0] == 2: pygame.draw.circle(self.screen, o[5].value, (o[1], o[2]), o[3], o[6])
+            elif o[0] == 3: pygame.draw.line(self.screen, o[5].value, (o[1], o[2]), (o[3], o[4]), o[6])
+        pygame.display.flip()
+        self.render_orders.clear()
+
 class Camera:
-    def __init__(self, width, height, scroll, player):
+    def __init__(self, engine, width, height, scroll, player):
+        self.engine = engine
+        self.screen = self.engine.screen
         self.width = width
         self.height = height
         self.size = width, height
@@ -110,13 +144,13 @@ class Camera:
         self.x = 0
         self.y = 0
         pygame.init()
-        self.screen = pygame.display.set_mode(self.size)  # , pygame.FULLSCREEN | pygame.HWSURFACE)
         self.font = pygame.font.SysFont("monospace", 10)
         self.SELECT_X = 0
         self.SELECT_Y = 0
         self.SELECT_R = False
-        self.INTERFACE_Y = 480
-        self.MINIMAP_X = 22 * 32
+        self.GUI_interface_y = 480
+        self.GUI_minimap_x = 22 * 32
+        self.GUI_display = True
         self.selected = []
         self.left = False
         self.right = False
@@ -134,18 +168,15 @@ class Camera:
         h //= 32
         ul = []
         if x == w and y == h:  # a square
-            t = self.player.world.unit_map[y][x]
-            if self.player.world.is_unit(x, y):
-                # if t[1].player == player:
-                ul.append(t[1])
+            u = self.player.world.get_unit_at(x, y)
+            if u is not None:
+                ul.append(u)
         else:  # a zone
             for i in range(x, w):
                 for j in range(y, h):
-                    # print(i, j)
-                    t = self.player.world.unit_map[j][i]
-                    if self.player.world.is_unit(i, j):
-                        # if t[1].player == player:
-                        ul.append(t[1])
+                    u = self.player.world.get_unit_at(j, i)
+                    if u is not None:
+                        ul.append(u)
         # DEBUG
         for u in ul:
             print(u)
@@ -167,28 +198,19 @@ class Camera:
             if event.type == pygame.QUIT:
                 return False
             elif event.type == KEYDOWN:
-                if event.key == K_ESCAPE:
-                    return False
-                elif event.key == K_DOWN:
-                    self.down = True
-                elif event.key == K_UP:
-                    self.up = True
-                elif event.key == K_LEFT:
-                    self.left = True
-                elif event.key == K_RIGHT:
-                    self.right = True
+                if event.key == K_ESCAPE: return False
+                elif event.key == K_DOWN: self.down = True
+                elif event.key == K_UP: self.up = True
+                elif event.key == K_LEFT: self.left = True
+                elif event.key == K_RIGHT: self.right = True
                 elif event.key == K_LSHIFT:
                     print('add_mod!')
                     self.add_mod = True
             elif event.type == KEYUP:
-                if event.key == K_DOWN:
-                    self.down = False
-                elif event.key == K_UP:
-                    self. up = False
-                elif event.key == K_LEFT:
-                    self.left = False
-                elif event.key == K_RIGHT:
-                    self.right = False
+                if event.key == K_DOWN: self.down = False
+                elif event.key == K_UP: self. up = False
+                elif event.key == K_LEFT: self.left = False
+                elif event.key == K_RIGHT: self.right = False
                 elif event.key == K_LSHIFT:
                     self.add_mod = False
                     print('stop add mod!')
@@ -200,6 +222,9 @@ class Camera:
                     else:
                         self.mode = 'normal'
                     print(self.mode)
+                elif event.key == K_TAB:
+                    self.GUI_display = not self.GUI_display
+                    print(self.GUI_display)
             elif event.type == MOUSEBUTTONDOWN:
                 if event.button == 1:
                     if not self.SELECT_R:
@@ -209,13 +234,13 @@ class Camera:
             elif event.type == MOUSEBUTTONUP:
                 self.SELECT_R = False
                 if event.button == 1:  # Left Button
-                    #print(self.SELECT_Y, self.INTERFACE_Y)
-                    if my > self.INTERFACE_Y: # Interface click
+                    #print(self.SELECT_Y, self.GUI_interface_y)
+                    if my > self.GUI_interface_y: # Interface click
                         #if self.mode == 'normal':
                         # CLICK FOR A BUILDING
-                        if self.SELECT_Y > self.INTERFACE_Y: # pour voir si on n'a pas "ripé" sur un bouton de construction
+                        if self.SELECT_Y > self.GUI_interface_y: # pour voir si on n'a pas "ripé" sur un bouton de construction ou la minimap
                             a = mx // 32
-                            b = (my-self.INTERFACE_Y) // 32
+                            b = (my-self.GUI_interface_y) // 32
                             # print(a,b)
                             nb = a + b * 3
                             if nb >= 0 and nb < len(self.player.game.all_building_types_ordered):
@@ -224,42 +249,15 @@ class Camera:
                                 self.mode = 'build'
                                 self.build_type = btn
                                 self.build_size = Pair(bt.grid_w, bt.grid_h)
-                        if mx > self.MINIMAP_X: # Minimap click
-                            a = int((mx - self.MINIMAP_X) / 3)
-                            b = int((my - self.INTERFACE_Y) / 3)
-                            if a < self.player.world.size32.x and b < self.player.world.size32.y:
-                                #print("self x, y old", self.x, self.y)
-                                #print("minimap", a, b)
-                                self.x = -a * 32 + 384 # 12 * 32 (pour 800 px)
-                                self.y = -b * 32 + 224 + 24 #  9 * 32 + 24 (600%32) (pour 600px) TODO: make generic
-                                #print("self x, y new", self.x, self.y)
-                        
-                        #if a == 0 and b == 0: # 100 000 000
-                        #    self.mode = 'build'
-                        #    self.build_type = 'solar'
-                        #    self.build_size = Pair(2, 1)
-                        #elif a == 1 and b == 0: # 010 000 000
-                        #    self.mode = 'build'
-                        #    self.build_type = 'mine'
-                        #    self.build_size = Pair(2, 2)
-                        #elif a == 2 and b == 0: # 001 000 000
-                        #    self.mode = 'build'
-                        #    self.build_type = 'radar'
-                        #    self.build_size = Pair(1, 1)
-                        #elif a == 0 and b == 1: # 000 100 000
-                        #    self.mode = 'build'
-                        #    self.build_type = 'barracks'
-                        #    self.build_size = Pair(2, 3)
-                        #elif a == 1 and b == 1: # 000 010 000
-                        #    self.mode = 'build'
-                        #    self.build_type = 'factory'
-                        #    self.build_size = Pair(2, 3)
-                        #elif a == 2 and b == 1: # 000 001 000
-                        #    self.mode = 'build'
-                        #    self.build_type = 'laboratory'
-                        #    self.build_size = Pair(2, 2)
-                        #elif self.mode == 'build':
-                        #    pass
+                            if mx > self.GUI_minimap_x: # Minimap click
+                                a = int((mx - self.GUI_minimap_x) / 3)
+                                b = int((my - self.GUI_interface_y) / 3)
+                                if a < self.player.world.size32.x and b < self.player.world.size32.y:
+                                    #print("self x, y old", self.x, self.y)
+                                    #print("minimap", a, b)
+                                    self.x = -a * 32 + 384 # 12 * 32 (pour 800 px)
+                                    self.y = -b * 32 + 224 + 24 #  9 * 32 + 24 (600%32) (pour 600px) TODO: make generic
+                                    #print("self x, y new", self.x, self.y) 
                     elif self.mode == 'normal':
                         deb_x = min(self.SELECT_X, mx - self.x)
                         fin_x = max(self.SELECT_X, mx - self.x)
@@ -344,37 +342,70 @@ class Camera:
         return True
 
     def render(self):
+        self.render_game()
+        if self.GUI_display:
+            self.render_gui()
+
+    def render_game(self):
         mx, my = pygame.mouse.get_pos()  # repeat from main_loop
-        self.screen.fill(BLACK)
+        self.screen.fill(Colors.BLACK.value)
 
         # Sol
         for yy in range(0, self.player.world.size32.y):
             for xx in range(0, self.player.world.size32.x):
                 t = self.player.world.world_map[yy][xx]
                 d = self.player.world.passable_map[yy][xx]
-                self.screen.blit(TEXTURES[t].img, (xx * 32 + self.x, yy * 32 + self.y, xx * 32 + self.x + 32, yy * 32 + self.y))
+                self.engine.tex(xx * 32 + self.x, yy * 32 + self.y, TEXTURES[t].img, 0)
                 if d != 0 and d != 99:
-                    self.screen.blit(TEXTURES[d].img, (xx * 32 + self.x, yy * 32 + self.y, xx * 32 + self.x + 32, yy * 32 + self.y))
+                    self.engine.tex(xx * 32 + self.x, yy * 32 + self.y, TEXTURES[d].img, 0)
                 
-                u = self.player.world.unit_map[yy][xx]
-                if u == 0:
+                su = self.player.world.unit_map[yy][xx]
+                if su == 0:
                     pass # Empty
-                elif u[0] == -1: # en mouvement, carreau reserve
-                    pygame.draw.rect(self.screen, HALF_RED, (xx * 32 + self.x +1, yy * 32 + self.y +1, 32-1, 32-1), 0)
-                elif u[1] == 1: # en position
-                    pygame.draw.rect(self.screen, HALF_BLUE, (xx * 32 + self.x +1, yy * 32 + self.y +1, 32-1, 32-1), 0)
-                elif u[1] == 2:
-                    pass # Building
-        
+                elif su[0] in (-1, 1): # en mouvement, carreau reserve ou en position
+                    if su[0] == -1:
+                        self.engine.rect(xx * 32 + self.x +1, yy * 32 + self.y +1, 31, 31, Colors.HALF_RED, 1, 1)
+                    elif su[0] == 1: # en position
+                        self.engine.rect(xx * 32 + self.x +1, yy * 32 + self.y +1, 31, 31, Colors.HALF_BLUE, 1, 1)
+                    u = su[1]
+                    if u in self.selected:
+                        if len(u.orders) > 0:
+                            lx = u.real_x + self.x
+                            ly = u.real_y + self.y
+                            for o in u.orders:
+                                if o.kind == 'go':
+                                    self.engine.circle(self.x2r(o.x), self.y2r(o.y), 5, Colors.GREEN, 0, 1)
+                                    self.engine.line(lx, ly, self.x2r(o.x), self.y2r(o.y), Colors.GREEN, 1, 1)
+                                    lx = self.x2r(o.x)
+                                    ly = self.y2r(o.y)
+                                elif o.kind == 'attack':
+                                    #pygame.draw.circle(self.screen, RED, (o.target.x*32+16 + self.x, o.target.y*32+16 + self.y), 5, 0)
+                                    self.engine.line(lx, ly, self.x2r(o.target.x), self.y2r(o.target.y), Colors.RED, 1, 1)
+                                    lx = self.x2r(o.target.x)
+                                    ly = self.y2r(o.target.y)
+                        self.engine.circle(u.real_x + self.x, u.real_y + self.y, u.size, u.player.color, 0, 1)
+                        if u.player == self.player:
+                            self.engine.circle(u.real_x + self.x, u.real_y + self.y, u.size+3, Colors.GREEN, 2, 1)
+                        else:
+                            self.engine.circle(u.real_x + self.x, u.real_y + self.y, u.size+3, Colors.RED, 2, 1)
+                    else:
+                        self.engine.circle(u.real_x + self.x, u.real_y + self.y, u.size, u.player.color, 0, 1)
+                elif su[0] == 2: # Building
+                    u = su[1]
+                    if xx == u.grid_x and yy == u.grid_y:
+                        self.engine.rect(xx * 32 + self.x, yy * 32 + self.y, u.type.grid_w * 32, u.type.grid_h * 32, u.player.color, 0, 2)
+                        if u in self.selected:
+                            self.engine.rect(u.grid_x * 32 + self.x, u.grid_y * 32 + self.y, u.type.grid_w * 32, u.type.grid_h * 32, Colors.GREEN, 2, 2)
+                            
                 # DEBUG
                 label = self.font.render("%(v)04d" % {"v" : self.player.world.debug_map[yy][xx]}, 1, (255, 0, 0))
-                self.screen.blit(label, (xx * 32 + self.x, yy * 32 + self.y))
+                self.engine.tex(xx * 32 + self.x, yy * 32 + self.y, label, 1)
                 
         # Cursor
         if self.mode == 'normal':
             if self.SELECT_R:
                 r = xrect(self.SELECT_X + self.x, self.SELECT_Y + self.y, mx, my)
-                pygame.draw.rect(self.screen, WHITE, r, 1)
+                self.engine.rect(r[0], r[1], r[2], r[3], Colors.WHITE, 1, 1)
         elif self.mode == 'build':
             xx = (mx - self.x) // 32
             yy = (my - self.y) // 32
@@ -384,83 +415,35 @@ class Camera:
             # test if ok
             v = self.player.world.is_empty_zone(xx-cw, yy-ch, self.build_size.x, self.build_size.y)
             if v:
-                c = GREEN
+                c = Colors.GREEN
             else:
-                c = RED
-            pygame.draw.rect(self.screen, c, ((xx-cw)*32+self.x, (yy-ch)*32+self.y, self.build_size.x*32,
-                                              self.build_size.y*32), 0)
-
-        # Unit
-        for u in self.player.world.units:
-            if type(u).__name__ == 'Building':
-                for ix in range(u.grid_x, u.grid_x+u.type.grid_w):
-                    for iy in range(u.grid_y, u.grid_y+u.type.grid_h):
-                        #print(ix, iy, ix * 32 + self.x, iy * 32 + self.y)
-                        pygame.draw.rect(self.screen, u.player.color, (ix * 32 + self.x, iy * 32 + self.y, 32, 32), 0)
-                        if u in self.selected: # and u.grid_x == ix and u.grid_y == iy:
-                            pygame.draw.rect(self.screen, GREEN, (u.grid_x * 32 + self.x, u.grid_y * 32 + self.y, u.type.grid_w * 32, u.type.grid_h * 32), 2)
-            else:
-                if u in self.selected:
-                    if len(u.orders) > 0:
-                        lx = u.real_x + self.x
-                        ly = u.real_y + self.y
-                        for o in u.orders:
-                            if o.kind == 'go': # x2r => return x * 32 + self.x + 16
-                                pygame.draw.circle(self.screen, GREEN, (self.x2r(o.x), self.y2r(o.y)), 5, 0)
-                                pygame.draw.line(self.screen, GREEN, (lx, ly), (self.x2r(o.x), self.y2r(o.y)), 1)
-                                lx = self.x2r(o.x)
-                                ly = self.y2r(o.y)
-                            elif o.kind == 'attack':
-                                #pygame.draw.circle(self.screen, RED, (o.target.x*32+16 + self.x, o.target.y*32+16 + self.y), 5, 0)
-                                pygame.draw.line(self.screen, RED, (lx, ly), (self.x2r(o.target.x), self.y2r(o.target.y)), 1)
-                                lx = self.x2r(o.target.x)
-                                ly = self.y2r(o.target.y)
-                    pygame.draw.circle(self.screen, u.player.color, (u.real_x + self.x, u.real_y + self.y), u.size, 0)
-                    if u.player == self.player:
-                        pygame.draw.circle(self.screen, GREEN, (u.real_x + self.x, u.real_y + self.y), u.size+3, 2)
-                    else:
-                        pygame.draw.circle(self.screen, RED, (u.real_x + self.x, u.real_y + self.y), u.size+3, 2)
-                else:
-                    pygame.draw.circle(self.screen, u.player.color, (u.real_x + self.x, u.real_y + self.y), u.size, 0)
+                c = Colors.RED
+            self.engine.rect((xx-cw)*32+self.x, (yy-ch)*32+self.y, self.build_size.x*32, self.build_size.y*32, c, 0, 1)
         
         for p in self.player.world.particles.core:
-            pygame.draw.circle(self.screen, RED, (p.x + self.x, p.y + self.y), 3, 0)
+            self.engine.circle(p.x + self.x, p.y + self.y, 3, Colors.RED, 0, 3)
 
-        # Interface
-        pygame.draw.rect(self.screen, GREY, (0, self.INTERFACE_Y, self.width-1, 200), 0) # fond
-        pygame.draw.line(self.screen, BLUE, (0, self.INTERFACE_Y), (self.width-1, self.INTERFACE_Y), 1)
+    def render_gui(self):
+        # Background
+        self.engine.rect(0, self.GUI_interface_y, self.width-1, 200, Colors.GREY, 0, 4) # fond
+        self.engine.line(0, self.GUI_interface_y, self.width-1, self.GUI_interface_y, Colors.BLUE, 1, 5)
         for xx in range(0, 3):
             for yy in range(0, 3):
-                pygame.draw.rect(self.screen, BLUE, (xx * 32, yy * 32 + self.INTERFACE_Y, 32, 32), 1)
-        pygame.draw.line(self.screen, BLUE, (self.MINIMAP_X - 1, self.INTERFACE_Y), (self.MINIMAP_X - 1, self.INTERFACE_Y + 96), 1)
-        pygame.draw.line(self.screen, BLUE, (self.MINIMAP_X - 1, self.INTERFACE_Y + 96), (self.width-1, self.INTERFACE_Y + 96), 1)
+                self.engine.rect(xx * 32, yy * 32 + self.GUI_interface_y, 32, 32, Colors.BLUE, 1, 5)
+        self.engine.line(self.GUI_minimap_x - 1, self.GUI_interface_y, self.GUI_minimap_x - 1, self.GUI_interface_y + 96, Colors.BLUE, 1, 4)
+        self.engine.line(self.GUI_minimap_x - 1, self.GUI_interface_y + 96, self.width-1, self.GUI_interface_y + 96, Colors.BLUE, 1, 4)
         
         # Build menu
-        
         xs = 8
-        ys = self.INTERFACE_Y + 8
+        ys = self.GUI_interface_y + 8
         for btn in self.player.game.all_building_types_ordered:
             bt = self.player.game.all_building_types[btn]
             label = self.font.render(bt.name[0:3], 1, (255, 255, 0))
-            self.screen.blit(label, (xs, ys))
+            self.engine.tex(xs, ys, label, 4)
             xs += 32
             if xs > 72:
                 xs = 8
                 ys += 32
-            
-        #label = self.font.render('Min', 1, (0, 0, 0))
-        #self.screen.blit(label, (8, self.INTERFACE_Y+8))
-        #label = self.font.render('Sol', 1, (0, 0, 0))
-        #self.screen.blit(label, (40, self.INTERFACE_Y+8))
-        #label = self.font.render('Rad', 1, (0, 0, 0))
-        #self.screen.blit(label, (72, self.INTERFACE_Y+8))
-        
-        #label = self.font.render('Cas', 1, (0, 0, 0))
-        #self.screen.blit(label, (8, self.INTERFACE_Y+40))
-        #label = self.font.render('Fac', 1, (0, 0, 0))
-        #self.screen.blit(label, (40, self.INTERFACE_Y+40))
-        #label = self.font.render('Lab', 1, (0, 0, 0))
-        #self.screen.blit(label, (72, self.INTERFACE_Y+40))
         
         # Metal (min) & Energie (sol)
         min = int(self.player.min)
@@ -470,7 +453,7 @@ class Camera:
             self.not_enough_ress -= 1
         else:
             label = self.font.render("M : %(min)04d E : %(sol)04d" % {"min" : min, "sol" : sol}, 1, (255, 255, 0))
-        self.screen.blit(label, (5, self.INTERFACE_Y+104))
+        self.engine.tex(5, self.GUI_interface_y+104, label, 5)
         
         # Minimap
         for yy in range(0, self.player.world.size32.y):
@@ -478,16 +461,13 @@ class Camera:
                 t = self.player.world.world_map[yy][xx]
                 d = self.player.world.passable_map[yy][xx]
                 if d != 0 and d != 99:
-                    pygame.draw.rect(self.screen, TEXTURES[d].mini, (xx * 3 + self.MINIMAP_X, yy * 3 + self.INTERFACE_Y +1, 3, 3), 0)
+                    self.engine.rect(xx * 3 + self.GUI_minimap_x, yy * 3 + self.GUI_interface_y +1, 3, 3, TEXTURES[d].mini, 0, 5)
                 else:
-                    pygame.draw.rect(self.screen, TEXTURES[t].mini, (xx * 3 + self.MINIMAP_X, yy * 3 + self.INTERFACE_Y +1, 3, 3), 0)
+                   self.engine.rect(xx * 3 + self.GUI_minimap_x, yy * 3 + self.GUI_interface_y +1, 3, 3, TEXTURES[t].mini, 0, 5)
                 u = self.player.world.unit_map[yy][xx]
                 if u != 0:
                     if u[0] == 1 or u[0] == 2:
-                        pygame.draw.rect(self.screen, u[1].player.color, (xx * 3 + self.MINIMAP_X, yy * 3 + self.INTERFACE_Y +1, 3, 3), 0)
-        # fin Interface
-
-        pygame.display.flip()
+                       self.engine.rect(xx * 3 + self.GUI_minimap_x, yy * 3 + self.GUI_interface_y +1, 3, 3, u[1].player.color, 0, 5)
 
 
 class Particles:
@@ -701,6 +681,12 @@ class World:
     def is_unit(self, x, y):
         return self.unit_map[y][x] != 0
 
+    def get_unit_at(self, x, y):
+        if 0 <= x < self.size32.x and 0 <= y < self.size32.y:
+            su = self.unit_map[y][x]
+            if su != 0:
+                return su[1]
+    
     @staticmethod
     def create_map(lines, columns, value):
         content = []
@@ -760,7 +746,8 @@ class Game:
         sys.stdout.write(' :: building #' + str(b.id) + ' created\n')
         return b.id
         
-    def order_move(self, units, x : int, y : int, add : bool):
+    #def order_move(self, units, x : int, y : int, add : bool):
+    def order_move(self, units, x, y, add):
         sys.stdout.write('Move ')
         for u in units:
             sys.stdout.write(str(u) + ' ')
@@ -870,7 +857,8 @@ class BuildLoad:
 
 class WeaponType:
 
-    def __init__(self, name : str, range : int, reload : int):
+    #def __init__(self, name : str, range : int, reload : int):
+    def __init__(self, name, range, reload):
         self.name = name
         self.range = range
         self.reload = reload
@@ -878,7 +866,8 @@ class WeaponType:
 
 class BuildingType:
 
-    def __init__(self, name : str, grid_h : int, grid_w : int, life : int, cost : int, build_load : BuildLoad = None, weapon_type : WeaponType = None):
+    #def __init__(self, name : str, grid_h : int, grid_w : int, life : int, cost : int, build_load : BuildLoad = None, weapon_type : WeaponType = None):
+    def __init__(self, name, grid_h, grid_w, life, cost, build_load = None, weapon_type = None):
         self.name = name
         self.grid_h = grid_h
         self.grid_w = grid_w
@@ -899,7 +888,8 @@ class GameObject:
 
 class Building(GameObject):
 
-    def __init__(self, player : Player, type : BuildingType, grid_x : int, grid_y : int):
+    #def __init__(self, player : Player, type : BuildingType, grid_x : int, grid_y : int):
+    def __init__(self, player, type, grid_x, grid_y):
         GameObject.__init__(self)
         self.player = player
         self.type = type
@@ -1006,14 +996,15 @@ class Unit(GameObject):
         self.player.world.unit_map[self.y][self.x] = (1, self) # CODE: STILL, UNIT
         return True
 
-    def order(self, o : Order):
+    #def order(self, o : Order):
+    def order(self, o):
         self.orders = [o]
 
     def add_order(self, o):
         self.orders.append(o)
 
-    def go(self, x : int, y : int):
-
+    #def go(self, x : int, y : int):
+    def go(self, x, y):
         if self.cpt_move > 0:
             self.cpt_move -= 1
             return False
@@ -1137,15 +1128,22 @@ def xrect(x1, y1, x2, y2):
     return Rect(rx, ry, tx, ty)
 
 
-def main_loop(camera):
-    while 1:
-
+def main_loop(camera, engine):
+    #clock = pygame.time.Clock()
+    #old_time = pygame.time.get_ticks()
+    while True:
         r = camera.update()
         camera.render()
+        engine.render()
         if not r:
             break
-
-        pygame.time.Clock().tick(30)
+        #new_time = pygame.time.get_ticks()
+        #waited = new_time - old_time
+        #old_time = new_time
+        #if waited < 60:
+        #    time.sleep(1.0 / (60 - waited))
+        #    print('waited: ', waited)
+        ##pygame.time.Clock().tick(30)
     print("Metal = " + str(camera.player.min))
     print("Energy = " + str(camera.player.sol))
 
@@ -1189,8 +1187,8 @@ def configure():
     # print('map y :', len(my_map))
 
     g = Game('Test 1', World(my_map))
-    g.create_player("Bob", YELLOW, 100, 100)
-    g.create_player("Henry", SKY_BLUE, 0, 0)
+    g.create_player("Bob", Colors.YELLOW, 100, 100)
+    g.create_player("Henry", Colors.SKY_BLUE, 0, 0)
     g.create_unit("Bob", 1, 1, "soldier")
     g.create_unit("Bob", 3, 3, "elite")
     
@@ -1199,12 +1197,13 @@ def configure():
     
     g.create_building("Bob", 5, 5, "mine")
     
-    return Camera(800, 600, 5, g.get_player_by_name("Bob"))  # x, y, scroll, player
+    e = Engine(800, 600)
+    return Camera(e, 800, 600, 5, g.get_player_by_name("Bob"))  # x, y, scroll, player
 
 
 def start():
     c = configure()
-    main_loop(c)
+    main_loop(c, c.engine)
 
 if __name__ == '__main__': 
     import sys

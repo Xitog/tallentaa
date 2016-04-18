@@ -1,0 +1,30 @@
+# PynSource Version 1.1
+{'type':'meta', 'info1':'Lorem ipsum dolor sit amet, consectetur adipiscing elit is latin.'}
+{'type':'umlshape', 'id':'Building', 'x':328, 'y':29, 'width':98, 'height':221, 'attrs':'player|type|grid_x|grid_y|orders', 'meths':'__init__|__str__|update|order|add_order'}
+{'type':'umlshape', 'id':'Particle', 'x':1166, 'y':567, 'width':98, 'height':237, 'attrs':'x|y|ax|ay|vel|tx|ty|ttl|guided', 'meths':'__init__|update'}
+{'type':'umlshape', 'id':'GameObject', 'x':665, 'y':80, 'width':120, 'height':109, 'attrs':'seed|id', 'meths':'__init__'}
+{'type':'umlshape', 'id':'UnitType', 'x':1186, 'y':156, 'width':98, 'height':189, 'attrs':'name|size|range|life|dom|speed|reload', 'meths':'__init__'}
+{'type':'umlshape', 'id':'Texture', 'x':992, 'y':572, 'width':87, 'height':157, 'attrs':'name|num|img|mini|passable', 'meths':'__init__'}
+{'type':'umlshape', 'id':'BuildLoad', 'x':976, 'y':52, 'width':109, 'height':67, 'attrs':'', 'meths':'__init__'}
+{'type':'umlshape', 'id':'Particles', 'x':81, 'y':778, 'width':109, 'height':125, 'attrs':'core', 'meths':'__init__|add|update'}
+{'type':'umlshape', 'id':'Player', 'x':534, 'y':185, 'width':82, 'height':221, 'attrs':'game|name|world|color|units|buildings|min|sol', 'meths':'__init__|update'}
+{'type':'umlshape', 'id':'Game', 'x':51, 'y':370, 'width':218, 'height':301, 'attrs':'name|world|players|unit_type|all_building_types|all_building_types_ordered', 'meths':'__init__|create_player|create_unit|create_building|order_move|get_player_by_name|get_unit_type_by_name|get_building_type_by_name|update'}
+{'type':'umlshape', 'id':'Camera', 'x':531, 'y':514, 'width':138, 'height':573, 'attrs':'width|height|size|scroll|player|auto_scroll_zone|game|x|y|screen|font|SELECT_X|SELECT_Y|SELECT_R|INTERFACE_Y|MINIMAP_X|selected|left|right|up|down|add_mod|mode|build_size|not_enough_ress|build_type', 'meths':'__init__|select_zone|x2r|y2r|update|render'}
+{'type':'umlshape', 'id':'WeaponType', 'x':1165, 'y':388, 'width':120, 'height':125, 'attrs':'name|range|reload', 'meths':'__init__'}
+{'type':'umlshape', 'id':'Pair', 'x':543, 'y':1256, 'width':74, 'height':189, 'attrs':'x|y|rep', 'meths':'__init__|set|__eq__|__ne__|__str__'}
+{'type':'umlshape', 'id':'World', 'x':384, 'y':553, 'width':114, 'height':285, 'attrs':'particles|size32|unit_map|world_map|passable_map|debug_map|units', 'meths':'__init__|is_valid|is_valid_zone|is_empty_zone|is_empty|is_unit|create_map'}
+{'type':'umlshape', 'id':'BuildingType', 'x':974, 'y':161, 'width':142, 'height':189, 'attrs':'name|grid_h|grid_w|life|cost|build_load|weapon_type', 'meths':'__init__'}
+{'type':'umlshape', 'id':'Order', 'x':983, 'y':385, 'width':74, 'height':141, 'attrs':'x|y|target|kind', 'meths':'__init__'}
+{'type':'umlshape', 'id':'Unit', 'x':776, 'y':474, 'width':98, 'height':493, 'attrs':'type|player|real_x|real_y|x|y|size|range|life|dom|reload|orders|cpt|cpt_move|speed_move|speed_step|old_x|old_y|transition|destination|previous32', 'meths':'__init__|__str__|update|order|add_order|go'}
+{'type':'edge', 'id':'Building_to_GameObject', 'source':'Building', 'target':'GameObject', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'Unit_to_GameObject', 'source':'Unit', 'target':'GameObject', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'Player_to_Building', 'source':'Player', 'target':'Building', 'uml_edge_type':'composition'}
+{'type':'edge', 'id':'Game_to_Player', 'source':'Game', 'target':'Player', 'uml_edge_type':'composition'}
+{'type':'edge', 'id':'World_to_Game', 'source':'World', 'target':'Game', 'uml_edge_type':'composition'}
+{'type':'edge', 'id':'Player_to_Game', 'source':'Player', 'target':'Game', 'uml_edge_type':'composition'}
+{'type':'edge', 'id':'Player_to_Camera', 'source':'Player', 'target':'Camera', 'uml_edge_type':'composition'}
+{'type':'edge', 'id':'Pair_to_Camera', 'source':'Pair', 'target':'Camera', 'uml_edge_type':'composition'}
+{'type':'edge', 'id':'Particles_to_World', 'source':'Particles', 'target':'World', 'uml_edge_type':'composition'}
+{'type':'edge', 'id':'Pair_to_World', 'source':'Pair', 'target':'World', 'uml_edge_type':'composition'}
+{'type':'edge', 'id':'Player_to_Unit', 'source':'Player', 'target':'Unit', 'uml_edge_type':'composition'}
+{'type':'edge', 'id':'Pair_to_Unit', 'source':'Pair', 'target':'Unit', 'uml_edge_type':'composition'}
