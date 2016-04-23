@@ -18,6 +18,7 @@ from enum import Enum
 
 
 class Colors(Enum):
+    
     RED = Color(255, 0, 0)
     GREEN = Color(0, 255, 0)
     BLUE = Color(0, 0, 255)
@@ -45,7 +46,7 @@ class Texture:
         self.name = name
         self.num = num
         if filename.__class__ == str:
-            self.img = pygame.image.load('../../assets/tiles32x32/' + filename)
+            self.img = pygame.image.load('..\\..\\assets\\tiles32x32\\' + filename)
         elif filename.__class__ == pygame.Surface:
             self.img = filename
         self.mini = minicolor
@@ -103,6 +104,13 @@ for a in [9100, 9200, 9300, 9400, 9500, 9600, 9700, 9800, 8100, 8200, 8300, 8400
 
 
 class Engine:
+    
+    class Keys(Enum):
+        
+        MOUSE_LEFT = 1
+        MOUSE_RIGHT = 3
+        MOUSE_MIDDLE = 2
+    
     def __init__(self, width, height):
         self.size = width, height
         self.screen = pygame.display.set_mode(self.size)  # , pygame.FULLSCREEN | pygame.HWSURFACE)
@@ -129,8 +137,13 @@ class Engine:
             elif o[0] == 3: pygame.draw.line(self.screen, o[5].value, (o[1], o[2]), (o[3], o[4]), o[6])
         pygame.display.flip()
         self.render_orders.clear()
+    
+    def get_mouse_pos(self):
+        return pygame.mouse.get_pos()
+
 
 class Camera:
+    
     def __init__(self, engine, width, height, scroll, player):
         self.engine = engine
         self.screen = self.engine.screen
@@ -190,10 +203,8 @@ class Camera:
 
     def update(self):
         
-        self.player.game.update() # here
+        mx, my = self.engine.get_mouse_pos()
         
-        mx, my = pygame.mouse.get_pos()
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False
@@ -233,7 +244,7 @@ class Camera:
                         self.SELECT_Y = my - self.y
             elif event.type == MOUSEBUTTONUP:
                 self.SELECT_R = False
-                if event.button == 1:  # Left Button
+                if event.button == self.engine.Keys.MOUSE_LEFT.value :  # Left Button
                     #print(self.SELECT_Y, self.GUI_interface_y)
                     if my > self.GUI_interface_y: # Interface click
                         #if self.mode == 'normal':
@@ -243,9 +254,9 @@ class Camera:
                             b = (my-self.GUI_interface_y) // 32
                             # print(a,b)
                             nb = a + b * 3
-                            if nb >= 0 and nb < len(self.player.game.all_building_types_ordered):
-                                btn = self.player.game.all_building_types_ordered[nb]
-                                bt = self.player.game.all_building_types[btn]
+                            if nb >= 0 and nb < len(self.player.game.building_types_ordered):
+                                btn = self.player.game.building_types_ordered[nb]
+                                bt = self.player.game.building_types[btn]
                                 self.mode = 'build'
                                 self.build_type = btn
                                 self.build_size = Pair(bt.grid_w, bt.grid_h)
@@ -288,7 +299,7 @@ class Camera:
                         v = self.player.world.is_empty_zone(xx-cw, yy-ch, self.build_size.x, self.build_size.y)
                         if v:
                             # Final Building Here
-                            bt = self.player.game.all_building_types[self.build_type]
+                            bt = self.player.game.building_types[self.build_type]
                             if self.player.min >= bt.cost[0] and self.player.sol >= bt.cost[1]:
                                 self.player.min -= bt.cost[0]
                                 self.player.sol -= bt.cost[1]
@@ -297,34 +308,24 @@ class Camera:
                                 self.not_enough_ress = 10
                         if not self.add_mod: # multiple construction orders
                             self.mode = 'normal'
-                elif event.button == 3:  # Right Button
+                elif event.button == self.engine.Keys.MOUSE_RIGHT.value:  # Right Button
                     if self.mode == 'build':
                         self.mode = 'normal'
                     elif len(self.selected) == 1 and self.selected[0].player != self.player:
+                        print('1 select from other player : todo : display info')
                         pass
                     else:
                         print('button right')
-                        s = self.player.world.unit_map[int((my - self.y)/32)][int((mx - self.x)/32)]
-                        if s == 0:  # nothing at the square clicked
-                            # faut-il faire un for u in self.selected?
-                            self.game.order_move(self.selected, (mx - self.x) // 32, (my - self.y) // 32, self.add_mod)
-                            #for u in self.selected:
-                            #    print(u, u.__class__)
-                            #    if not self.add_mod:
-                            #        #print('set order!')
-                            #        u.order(Order('go', (mx - self.x) // 32, (my - self.y) // 32))
-                            #        #print('go at ', (mx - self.x) // 32, (my - self.y) // 32)
-                            #    else:
-                            #        #print('add order!')
-                            #        #print(len(u.orders))
-                            #        u.add_order(Order('go', (mx - self.x) // 32, (my - self.y) // 32))
-                            #        #print(len(u.orders))
-                        elif s[1].player != self.player:
-                            for u in self.selected:
-                                if not self.add_mod:
-                                    u.order(Order('attack', target=s[1]))
-                                else:
-                                    u.add_order(Order('attack', target=s[1]))
+                        cy = (my - self.y) // 32
+                        cx = (mx - self.x) // 32
+                        if self.player.world.is_valid(cx, cy):
+                            u = self.player.world.get_unit_at(cx, cy)
+                            if u is None:
+                                self.game.order_move(self.selected, cx, cy, self.add_mod)
+                            elif u.player == self.player:
+                                self.game.order_move(self.selected, cy, cx, self.add_mod)
+                            else: # u.player != self.player:
+                                self.game.order_attack(self.selected, u, self.add_mod)
                 elif event.button == 2:  # Middle Button
                     print('button 3')
 
@@ -337,8 +338,7 @@ class Camera:
             self.y -= self.scroll
         if self.up or my < self.auto_scroll_zone:
             self.y += self.scroll
-
-        self.player.world.particles.update()
+        
         return True
 
     def render(self):
@@ -420,9 +420,12 @@ class Camera:
                 c = Colors.RED
             self.engine.rect((xx-cw)*32+self.x, (yy-ch)*32+self.y, self.build_size.x*32, self.build_size.y*32, c, 0, 1)
         
+        # Particles
         for p in self.player.world.particles.core:
-            self.engine.circle(p.x + self.x, p.y + self.y, 3, Colors.RED, 0, 3)
-
+            if p.kind == 'blue sphere':
+                print('Particle at ', p.x + self.x, ', ', p.y + self.y, ' aiming at ', p.tx, ', ', p.ty, ' ttl=', p.ttl)
+                self.engine.circle(int(p.x + self.x), int(p.y + self.y), 3, Colors.BLUE, 0, 3)
+    
     def render_gui(self):
         # Background
         self.engine.rect(0, self.GUI_interface_y, self.width-1, 200, Colors.GREY, 0, 4) # fond
@@ -436,8 +439,8 @@ class Camera:
         # Build menu
         xs = 8
         ys = self.GUI_interface_y + 8
-        for btn in self.player.game.all_building_types_ordered:
-            bt = self.player.game.all_building_types[btn]
+        for btn in self.player.game.building_types_ordered:
+            bt = self.player.game.building_types[btn]
             label = self.font.render(bt.name[0:3], 1, (255, 255, 0))
             self.engine.tex(xs, ys, label, 4)
             xs += 32
@@ -471,6 +474,7 @@ class Camera:
 
 
 class Particles:
+    
     def __init__(self):
         self.core = []
 
@@ -479,6 +483,7 @@ class Particles:
 
     def update(self):
         i = 0
+        #saved = []
         while i < len(self.core):
             ttl = self.core[i].update()
             if ttl <= 0:
@@ -490,35 +495,46 @@ class Particles:
 
 
 class Particle:
-    def __init__(self, pos, p_dir, target, ttl, guided=False):
-        self.x = pos[0]
-        self.y = pos[1]
-        self.ax = p_dir[0]
-        self.ay = p_dir[1]
-        self.vel = p_dir[2]
-        self.tx = target[0]
-        self.ty = target[1]
-        self.ttl = ttl
+    
+    def __init__(self, kind, parent, target, speed, damage, guided=True):
+        print(parent.x, parent.y)
+        self.kind = kind
+        self.x = parent.x  * 32 + 16
+        self.y = parent.y  * 32 + 16
+        self.speed = speed
+        self.damage = damage
+        self.target = target
         self.guided = guided
-
+        self.tx = self.target.x * 32 + 16
+        self.ty = self.target.y * 32 + 16
+        self.ttl = 100
+    
     def update(self):
-        if self.ttl == 0:
-            return 0
-        if not self.guided:
-            self.x += self.vel * self.ax
-            self.y += self.vel * self.ay
-        else:
-            pass
-        # print self.x > self.tx and self.y > self.ty
-        if self.x > self.tx and self.y > self.ty:
-            self.ttl = 0
-        else:
-            self.ttl -= 1
+        
+        self.ttl -= 1
+        
+        if self.guided:
+            self.tx = self.target.x * 32 + 16
+            self.ty = self.target.y * 32 + 16
+        
+        a = -get_angle(self.x, self.y, self.tx, self.ty)
+        #print(self.x, ', ', self.y, ' to ', self.tx, ', ', self.ty, ' with angle of ', a, ' cos : ', math.cos(a), ' sin : ', math.sin(a))
+        #input()
+        
+        self.x += math.cos(a) * self.speed
+        self.y += -math.sin(a) * self.speed
+        
+        if get_dist(self.x, self.y, self.tx, self.ty) < self.target.size:
+            ttl = 0
+            self.target.life -= self.damage
+            return ttl
+        
         return self.ttl
 
 
 # unit_map can be : 0 : void, (1, u) : unit u is here, (-1, u) : unit u is moving here
 class World:
+    
     def __init__(self, world_map):
         self.particles = Particles()
         if len(world_map) == 0:
@@ -679,12 +695,12 @@ class World:
         return self.passable_map[y][x] == 0 and self.unit_map[y][x] == 0
     
     def is_unit(self, x, y):
-        return self.unit_map[y][x] != 0
-
+        return self.unit_map[y][x] != 0 and self.unit_map[y][x][0] != -1 # 1 (unit) or 2 (building)
+    
     def get_unit_at(self, x, y):
         if 0 <= x < self.size32.x and 0 <= y < self.size32.y:
             su = self.unit_map[y][x]
-            if su != 0:
+            if su != 0 and su[0] != -1:
                 return su[1]
     
     @staticmethod
@@ -699,33 +715,41 @@ class World:
 
 
 class Game:
-    def __init__(self, name, world):
+    
+    def __init__(self, name):
         self.name = name
-        self.world = world
+        self.world = None
         self.players = {}
-        self.unit_type = {"soldier": UnitType("Soldier", size=10, range=100, life=100, dom=5, speed=8, reload=50),
-                          "elite": UnitType("Elite", size=10, range=150, life=100, dom=10, speed=8, reload=50),
-                          "big": UnitType("Big", size=20, range=30, life=300, dom=20, speed=8, reload=50)}
-        # self.building_type = {"mine": BuildingType(size=(2,2), range=20, life=300, dom=0, speed=0, reload=0, type=1)}
-        self.all_building_types = {"mine" : BuildingType("Mine", 2, 2, 100, (0,50)),
-                                   "solar" : BuildingType("Solar", 1, 2, 80, (0, 50)),
-                                   "radar" : BuildingType("Radar", 1, 1, 80, (50, 200)),
-                                   "barracks" : BuildingType("Barracks", 3, 2, 300, (50, 100)),
-                                   "factory" : BuildingType("Factory", 3, 2, 500, (200, 200)),
-                                   "laboratory" : BuildingType("Laboratory", 2, 2, 250, (100, 400)),
-                                  }
-        self.all_building_types_ordered = ["solar", "mine", "radar", "barracks", "factory", "laboratory"]
-        
+        self.actions = {}
+        self.triggers = {}
+        self.unit_types = {}
+        self.building_types = {}
+        self.building_types_ordered = []
+        self.is_live = True
+    
+    def set_name(self, name):
+        self.name = name
+    
+    def set_map(self, map):
+        self.world = World(map)
+    
+    def set_unit_types(self, unit_types):
+        self.unit_types = unit_types
+    
+    def set_building_types(self, building_types, order):
+        self.building_types = building_types
+        self.building_types_ordered = order
+    
     def create_player(self, name, player_color, *ress):
         print("creating player")
         if name in self.players:
             raise Exception("Already a player with this name")
         self.players[name] = Player(self, name, player_color, ress)
 
-    def create_unit(self, player_name, x, y, unit_type_name):
+    def create_unit(self, player_name, x, y, unit_types_name):
         sys.stdout.write("creating unit")
         p = self.get_player_by_name(player_name)
-        ut = self.get_unit_type_by_name(unit_type_name)
+        ut = self.get_unit_types_by_name(unit_types_name)
         if not self.world.is_valid(x, y) or not self.world.is_empty(x,y):
             raise Exception("False or not empty coordinates : " + str(x) + ", " + str(y) + " p = " + str(self.world.passable_map[y][x]))
         u = Unit(ut, p, x, y)
@@ -746,6 +770,14 @@ class Game:
         sys.stdout.write(' :: building #' + str(b.id) + ' created\n')
         return b.id
         
+    def create_trigger(self, name, kind, *params):
+        self.triggers[name] = Trigger(name, kind, params)
+    
+    def create_action(self, ref, kind, *params):
+        if ref not in self.actions:
+            self.actions[ref] = []
+        self.actions[ref].append(Action(kind, params))
+    
     #def order_move(self, units, x : int, y : int, add : bool):
     def order_move(self, units, x, y, add):
         sys.stdout.write('Move ')
@@ -758,21 +790,35 @@ class Game:
                 u.order(Order('go', x, y))
         sys.stdout.write('to ' + str(x) + ', ' + str(y) + '\n')
     
+    def order_attack(self, units, target, add):
+        sys.stdout.write('Attack ')
+        for u in units:
+            sys.stdout.write(str(u) + ' ')
+            if add:
+                sys.stdout.write('(delayed) ')
+                u.add_order(Order('attack', target=target))
+            else:
+                u.order(Order('attack', target=target))
+        sys.stdout.write('target => ' + str(target) + ' at ' + str(target.x) + ', ' + str(target.y) + '\n')
+    
     def get_player_by_name(self, player_name):
         if player_name not in self.players:
             raise Exception("Unknown player : " + player_name)
         return self.players[player_name]
 
-    def get_unit_type_by_name(self, unit_type_name):
-        if unit_type_name not in self.unit_type:
-            raise Exception("Unknown unit type : " + unit_type_name)
-        return self.unit_type[unit_type_name]
+    def get_unit_types_by_name(self, unit_types_name):
+        if unit_types_name not in self.unit_types:
+            raise Exception("Unknown unit type : " + unit_types_name)
+        return self.unit_types[unit_types_name]
         
     def get_building_type_by_name(self, building_type_name):
-        if building_type_name not in self.all_building_types:
+        if building_type_name not in self.building_types:
             raise Exception("Unknown building type : " + building_type_name)
-        return self.all_building_types[building_type_name]
-
+        return self.building_types[building_type_name]
+    
+    def get_players(self):
+        return self.players
+    
     #def get_units_by_id(self, ids):
     #    units = []
     #    cpt = 0
@@ -785,11 +831,20 @@ class Game:
     #    return units
     
     def update(self):
+        # Triggers and actions
+        for key, value in self.triggers.items():
+            if value.test(self):
+                for e in self.actions[key]:
+                    e.do(self)
+        # Particles
+        self.world.particles.update()
+        # Players & units
         for key, value in self.players.items():
             value.update()
-
+        return self.is_live
 
 class Player:
+    
     def __init__(self, game, name, player_color, ress):
         self.game = game
         self.name = name
@@ -799,14 +854,19 @@ class Player:
         self.buildings = []
         self.min = ress[0]
         self.sol = ress[1]
+        self.victorious = False
     
     def update(self):
-            # Update for all units?
-        for u in self.units:
-            if not u.update():
-                self.player.world.units.remove(u)
+        # Update for all units?
+        i = 0
+        while i < len(self.units):
+        #for u in self.units:
+            if not self.units[i].update():
+                self.world.units.remove(self.units[i])
+                del self.units[i]
                 print("deleting unit")
-                del u
+                # del u
+            i += 1
         for b in self.buildings:
             b.update()
 
@@ -980,19 +1040,13 @@ class Unit(GameObject):
                 if r:
                     del self.orders[0]
             elif o.kind == 'attack':
-                # print o.kind, o.target, o.target.x, o.target.y
-                if math.sqrt((self.x - o.target.x) ** 2 + (self.y - o.target.y) ** 2) > self.range or (
-                        self.x - 16) % 32 != 0 or (self.y - 16) % 32 != 0:
+                # print(self.range, get_dist(self.x, self.y, o.target.x, o.target.y)) # check if the unit is not 'in transit'
+                if get_dist(self.x, self.y, o.target.x, o.target.y) > self.range or (self.real_x - 16) % 32 != 0 or (self.real_y - 16) % 32 != 0:
                     self.go(o.target.x, o.target.y)
-                elif self.cpt <= 0:
-                    self.player.world.particles.add(
-                        Particle([self.x, self.y], [1, 1, 4], [o.target.x, o.target.y], self.range + 10, False))
-                    o.target.life -= self.dom
-                    self.cpt = self.reload
-                    if o.target.life <= 0:
-                        del self.orders[0]
                 else:
-                    self.cpt -= 1
+                    r = self.attack(o.target)
+                    if r:
+                        del self.orders[0]
         self.player.world.unit_map[self.y][self.x] = (1, self) # CODE: STILL, UNIT
         return True
 
@@ -1002,7 +1056,18 @@ class Unit(GameObject):
 
     def add_order(self, o):
         self.orders.append(o)
-
+    
+    def attack(self, target):
+        if self.cpt <= 0:
+            self.player.world.particles.add(Particle('blue sphere', self, target, 10, 100))
+            self.cpt = self.reload
+        else:
+            self.cpt -= 1
+        if target.life <= 0:
+            return True
+        else:
+            return False
+    
     #def go(self, x : int, y : int):
     def go(self, x, y):
         if self.cpt_move > 0:
@@ -1114,6 +1179,18 @@ class Unit(GameObject):
 # Tools
 
 
+def get_angle(x1, y1, x2, y2):
+    dx, dy = get_diff(x1, y1, x2, y2)
+    return math.atan2(dy, dx)
+
+
+def get_diff(x1, y1, x2, y2):
+    return x2 - x1, y2 - y1
+        
+
+def get_dist(x1, y1, x2, y2):
+    return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+    
 def xrect(x1, y1, x2, y2):
     tx = abs(x1 - x2)
     ty = abs(y1 - y2)
@@ -1128,14 +1205,15 @@ def xrect(x1, y1, x2, y2):
     return Rect(rx, ry, tx, ty)
 
 
-def main_loop(camera, engine):
+def main_loop(game, camera, engine):
     #clock = pygame.time.Clock()
     #old_time = pygame.time.get_ticks()
     while True:
-        r = camera.update()
+        r1 = game.update()
+        r2 = camera.update()
         camera.render()
         engine.render()
-        if not r:
+        if not r1 or not r2:
             break
         #new_time = pygame.time.get_ticks()
         #waited = new_time - old_time
@@ -1144,12 +1222,70 @@ def main_loop(camera, engine):
         #    time.sleep(1.0 / (60 - waited))
         #    print('waited: ', waited)
         ##pygame.time.Clock().tick(30)
-    print("Metal = " + str(camera.player.min))
-    print("Energy = " + str(camera.player.sol))
+    print('Game has ended.')
+    for p in game.get_players().values():
+        if p.victorious:
+            print('\tPlayer ' + p.name + ' is victorious!')
+        else:
+            print('\tPlayer ' + p.name + ' has been defeated.')
+    print('\tMetal = ' + str(camera.player.min))
+    print('\tEnergy = ' + str(camera.player.sol))
+    print('Press enter to quit.')
+    pygame.quit()
+    #input()
 
-def configure():
-    # 1 rock 0 ground 2 grass 3 water 
-    my_map = [
+
+class Trigger:
+
+    def __init__(self, name, kind, params):
+        self.name = name
+        self.kind = kind
+        self.params = params
+
+    def test(self, game):
+        if self.kind == 'always':
+            return True
+        elif self.kind == 'never':
+            return False
+        elif self.kind == 'player X control Y unit of type Z':
+            if self.params[2] == 'all':
+                return len(game.get_player_by_name(self.params[0]).units) == self.params[1]
+        else:
+            return False
+
+class Action:
+
+    def __init__(self, kind, params):
+        self.kind = kind
+        self.params = params
+        
+    def do(self, game):
+        if self.kind == 'win':
+            game.is_live = False
+            game.get_player_by_name(self.params[0]).victorious = True
+        else:
+            pass
+
+
+def mod_basic(game):
+
+    game.set_unit_types({"soldier": UnitType("Soldier", size=10, range=10, life=100, dom=5, speed=8, reload=50),
+                         "elite": UnitType("Elite", size=10, range=10, life=100, dom=10, speed=8, reload=50),
+                         "big": UnitType("Big", size=20, range=30, life=300, dom=20, speed=8, reload=50)})
+    game.set_building_types({"mine" : BuildingType("Mine", 2, 2, 100, (0,50)),
+                             "solar" : BuildingType("Solar", 1, 2, 80, (0, 50)),
+                             "radar" : BuildingType("Radar", 1, 1, 80, (50, 200)),
+                             "barracks" : BuildingType("Barracks", 3, 2, 300, (50, 100)),
+                             "factory" : BuildingType("Factory", 3, 2, 500, (200, 200)),
+                             "laboratory" : BuildingType("Laboratory", 2, 2, 250, (100, 400)),
+                            }, ["solar", "mine", "radar", "barracks", "factory", "laboratory"])
+
+
+def level_E1L1(game):
+    
+    game.set_name('The rescue party')
+    # 100 ground +1 rock 200 grass 300 water | len(my_map[0]) | len(my_map)
+    game.set_map([
         [101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
         [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
         [100, 100, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
@@ -1182,30 +1318,52 @@ def configure():
         [100, 100, 100, 100, 100, 100, 100, 100, 100, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 300, 300, 100, 100, 100, 100, 100, 300, 300, 100, 100, 100, 100],
         [100, 100, 100, 100, 100, 100, 100, 100, 100, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
         [100, 100, 100, 100, 100, 100, 100, 100, 100, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
-    ]
-    # print('map x :', len(my_map[0]))
-    # print('map y :', len(my_map))
+        ])
+    
+    game.create_player("Bob", Colors.YELLOW, 100, 100)
+    game.create_player("Henry", Colors.SKY_BLUE, 0, 0)
+    game.create_unit("Bob", 1, 1, "soldier")
+    game.create_unit("Bob", 3, 3, "elite")
+    
+    game.create_unit("Henry", 12, 12, "big")
+    game.create_unit("Henry", 18, 14, "soldier")
+    
+    game.create_building("Bob", 5, 5, "mine")
+    
+    game.create_trigger('t1', 'player X control Y unit of type Z', 'Henry', 0, 'all')
+    game.create_action('t1', 'win', 'Bob')
 
-    g = Game('Test 1', World(my_map))
-    g.create_player("Bob", Colors.YELLOW, 100, 100)
-    g.create_player("Henry", Colors.SKY_BLUE, 0, 0)
-    g.create_unit("Bob", 1, 1, "soldier")
-    g.create_unit("Bob", 3, 3, "elite")
     
-    g.create_unit("Henry", 12, 12, "big")
-    g.create_unit("Henry", 18, 14, "soldier")
-    
-    g.create_building("Bob", 5, 5, "mine")
-    
+def configure(g):
+    mod_basic(g)
+    level_E1L1(g)
     e = Engine(800, 600)
     return Camera(e, 800, 600, 5, g.get_player_by_name("Bob"))  # x, y, scroll, player
 
 
 def start():
-    c = configure()
-    main_loop(c, c.engine)
+    g = Game('Test 1')
+    c = configure(g)
+    main_loop(g, c, c.engine)
 
 if __name__ == '__main__': 
+
+    #
+    # ABC 
+    # H0D   
+    # GFE
+    #
+    print( math.degrees(get_angle(2, 2, 1, 1))) # 0 -> A +135
+    print( math.degrees(get_angle(2, 2, 2, 1))) # 0 -> B +90
+    print( math.degrees(get_angle(2, 2, 3, 1))) # 0 -> C +45
+    print( math.degrees(get_angle(2, 2, 3, 2))) # 0 -> D 000
+    print( math.degrees(get_angle(2, 2, 3, 3))) # 0 -> E -45
+    print( math.degrees(get_angle(2, 2, 2, 3))) # 0 -> F -90
+    print( math.degrees(get_angle(2, 2, 1, 3))) # A -> G -135
+    print( math.degrees(get_angle(2, 2, 1, 2))) # A -> H +180 // -180
+    
+    #exit()
+    
     import sys
     _maj, _min = sys.version_info[:2]
     print('Starting on Python ' + str(_maj) + "." + str(_min) + " with pygame " + pygame.version.ver)
