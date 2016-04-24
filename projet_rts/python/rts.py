@@ -187,7 +187,9 @@ class Camera:
         else:  # a zone
             for i in range(x, w):
                 for j in range(y, h):
-                    u = self.player.world.get_unit_at(j, i)
+                    #print(i, j, self.player.world.unit_map[j][i])
+                    u = self.player.world.get_unit_at(i, j)
+                    print(u)
                     if u is not None:
                         ul.append(u)
         # DEBUG
@@ -719,8 +721,8 @@ class Game:
     def __init__(self, name):
         self.name = name
         self.world = None
+        self.zones = {}
         self.players = {}
-        self.actions = {}
         self.triggers = {}
         self.unit_types = {}
         self.building_types = {}
@@ -770,13 +772,17 @@ class Game:
         sys.stdout.write(' :: building #' + str(b.id) + ' created\n')
         return b.id
         
-    def create_trigger(self, name, kind, *params):
-        self.triggers[name] = Trigger(name, kind, params)
+    def create_trigger(self, name):
+        self.triggers[name] = Trigger(name)
+        
+    def create_condition(self, ref, kind, *params):
+        self.triggers[ref].conditions.append(Condition(kind, params))
     
     def create_action(self, ref, kind, *params):
-        if ref not in self.actions:
-            self.actions[ref] = []
-        self.actions[ref].append(Action(kind, params))
+        self.triggers[ref].actions.append(Action(kind, params))
+    
+    def create_zone(self, name, x1, y1, x2, y2):
+        self.zones[name] = Zone(name, x1, y1, x2, y2)
     
     #def order_move(self, units, x : int, y : int, add : bool):
     def order_move(self, units, x, y, add):
@@ -816,6 +822,17 @@ class Game:
             raise Exception("Unknown building type : " + building_type_name)
         return self.building_types[building_type_name]
     
+    def get_all_units_in_zone_for_player(self, ref_zone, ref_player):
+        p = self.players[ref_player]
+        z = self.zones[ref_zone]
+        units = []
+        for i in range(z.x1, z.x2):
+            for j in range(z.y1, z.y2):
+                u = self.world.get_unit_at(i, j)
+                if u is not None and u.player == p:
+                    units.append(u)
+        return units
+    
     def get_players(self):
         return self.players
     
@@ -833,9 +850,8 @@ class Game:
     def update(self):
         # Triggers and actions
         for key, value in self.triggers.items():
-            if value.test(self):
-                for e in self.actions[key]:
-                    e.do(self)
+            if value.test_all(self):
+                value.do_all(self)
         # Particles
         self.world.particles.update()
         # Players & units
@@ -1235,10 +1251,37 @@ def main_loop(game, camera, engine):
     #input()
 
 
+class Zone:
+
+    def __init__(self, name, x1, y1, x2, y2):
+        self.name = name
+        self.x1 = x1
+        self.y1 = y1
+        self.x2 = x2
+        self.y2 = y2
+
+
 class Trigger:
 
-    def __init__(self, name, kind, params):
+    def __init__(self, name):
         self.name = name
+        self.conditions = []
+        self.actions = []
+    
+    def test_all(self, game):
+        for c in self.conditions:
+            if not c.test(game):
+                return False
+        return True
+    
+    def do_all(self, game):
+        for a in self.actions:
+            a.do(game)
+
+
+class Condition:
+
+    def __init__(self, kind, params):
         self.kind = kind
         self.params = params
 
@@ -1247,9 +1290,25 @@ class Trigger:
             return True
         elif self.kind == 'never':
             return False
-        elif self.kind == 'player X control Y unit of type Z':
-            if self.params[2] == 'all':
-                return len(game.get_player_by_name(self.params[0]).units) == self.params[1]
+        elif self.kind == 'player P control OPT1 (exactly/at least/at most) N unit of type T in Zone Z': #'player X control Y unit of type Z':
+            if self.params[3] == 'all':
+                    if self.params[4] == 'everywhere':
+                        if self.params[1] == 1:
+                            return len(game.get_player_by_name(self.params[0]).units) == self.params[2]
+                        elif self.params[2] == 2:
+                            return len(game.get_player_by_name(self.params[0]).units) >= self.params[2]
+                        elif self.params[3] == 3:
+                            return len(game.get_player_by_name(self.params[0]).units) <= self.params[2]
+                    else:
+                        ref_zone = self.params[4]
+                        units = game.get_all_units_in_zone_for_player(ref_zone, self.params[0])
+                        #print(ref_zone, units, len(units), self.params[1], self.params[2])
+                        if self.params[1] == 1:
+                            return len(units) == self.params[2]
+                        elif self.params[1] == 2:
+                            return len(units) >= self.params[2]
+                        elif self.params[1] == 3:
+                            return len(units) <= self.params[2]
         else:
             return False
 
@@ -1263,6 +1322,14 @@ class Action:
         if self.kind == 'win':
             game.is_live = False
             game.get_player_by_name(self.params[0]).victorious = True
+        elif self.kind == 'give all unit of player P1 to player P2 in Zone Z':
+            if self.params[2] != 'everywhere':
+                units = game.get_all_units_in_zone_for_player(self.params[2], self.params[0])
+                receiver = game.get_player_by_name(self.params[1])
+                for u in units:
+                    u.player.units.remove(u)
+                    u.player = receiver
+                    u.player.units.append(u)
         else:
             pass
 
@@ -1322,18 +1389,28 @@ def level_E1L1(game):
     
     game.create_player("Bob", Colors.YELLOW, 100, 100)
     game.create_player("Henry", Colors.SKY_BLUE, 0, 0)
+    game.create_player("Neutral", Colors.GREY, 20, 20)
+    
     game.create_unit("Bob", 1, 1, "soldier")
     game.create_unit("Bob", 3, 3, "elite")
+    game.create_unit("Neutral", 20, 20, "soldier")
     
     game.create_unit("Henry", 12, 12, "big")
     game.create_unit("Henry", 18, 14, "soldier")
     
     game.create_building("Bob", 5, 5, "mine")
     
-    game.create_trigger('t1', 'player X control Y unit of type Z', 'Henry', 0, 'all')
+    game.create_trigger('t1')
+    game.create_condition('t1', 'player P control OPT1 (exactly/at least/at most) N unit of type T in Zone Z', 'Henry', 1, 0, 'all', 'everywhere')
     game.create_action('t1', 'win', 'Bob')
-
     
+    game.create_trigger('t2')
+    game.create_zone('z1', 17, 17, 23, 23)
+    game.create_condition('t2', 'player P control OPT1 (exactly/at least/at most) N unit of type T in Zone Z', 'Bob', 2, 1, 'all', 'z1')
+    #game.create_action('t2', 'win', 'Bob')
+    game.create_action('t2', 'give all unit of player P1 to player P2 in Zone Z', 'Neutral', 'Bob', 'z1')
+    
+
 def configure(g):
     mod_basic(g)
     level_E1L1(g)
