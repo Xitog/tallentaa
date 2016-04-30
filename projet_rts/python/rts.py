@@ -112,9 +112,18 @@ class Engine:
         MOUSE_MIDDLE = 2
     
     def __init__(self, width, height):
+        pygame.init()
         self.size = width, height
         self.screen = pygame.display.set_mode(self.size)  # , pygame.FULLSCREEN | pygame.HWSURFACE)
         self.render_orders = []
+        self.font = pygame.font.SysFont("monospace", 10)
+    
+    def text(self, x, y, text, color, z, center=False):
+        label = self.font.render(text, 1, color.value)
+        if center:
+            self.tex(x - label.get_width()/2, y - label.get_height()/2, label, z)
+        else:
+            self.tex(x, y, label, z)
     
     def tex(self, x, y, tex, z):
         self.render_orders.append((0, x, y, tex, None, None, None, z))
@@ -156,8 +165,6 @@ class Camera:
         self.game = player.game
         self.x = 0
         self.y = 0
-        pygame.init()
-        self.font = pygame.font.SysFont("monospace", 10)
         self.SELECT_X = 0
         self.SELECT_Y = 0
         self.SELECT_R = False
@@ -171,8 +178,10 @@ class Camera:
         self.down = False
         self.add_mod = False
         self.mode = 'normal'  # or build
-        self.build_size = Pair(3, 3)
+        self.build_type = None
+        self.build_size = None
         self.not_enough_ress = 0
+        self.dev_mode = False
     
     def select_zone(self, x, y, w, h):  # , player)
         x //= 32
@@ -189,12 +198,12 @@ class Camera:
                 for j in range(y, h):
                     #print(i, j, self.player.world.unit_map[j][i])
                     u = self.player.world.get_unit_at(i, j)
-                    print(u)
+                    #print(u)
                     if u is not None:
                         ul.append(u)
         # DEBUG
-        for u in ul:
-            print(u)
+        #for u in ul:
+            #print(u)
         return ul
 
     def x2r(self, x):
@@ -232,12 +241,19 @@ class Camera:
                 elif event.key == K_b:
                     if self.mode == 'normal':
                         self.mode = 'build'
+                        self.build_type = self.player.game.building_types_ordered[0]
+                        self.build_size = Pair(2, 1)
                     else:
                         self.mode = 'normal'
-                    print(self.mode)
+                    #print(self.mode)
                 elif event.key == K_TAB:
                     self.GUI_display = not self.GUI_display
-                    print(self.GUI_display)
+                    #print(self.GUI_display)
+                elif event.key == K_RETURN:
+                    self.dev_mode = not self.dev_mode
+                    #print(self.dev_mode)
+                else:
+                    print(event.key)
             elif event.type == MOUSEBUTTONDOWN:
                 if event.button == 1:
                     if not self.SELECT_R:
@@ -354,7 +370,9 @@ class Camera:
 
         # Sol
         for yy in range(0, self.player.world.size32.y):
+            #if yy * 32 + self.y >= self.height: break
             for xx in range(0, self.player.world.size32.x):
+                #if xx * 32 + self.x >= self.width: continue
                 t = self.player.world.world_map[yy][xx]
                 d = self.player.world.passable_map[yy][xx]
                 self.engine.tex(xx * 32 + self.x, yy * 32 + self.y, TEXTURES[t].img, 0)
@@ -400,8 +418,8 @@ class Camera:
                             self.engine.rect(u.grid_x * 32 + self.x, u.grid_y * 32 + self.y, u.type.grid_w * 32, u.type.grid_h * 32, Colors.GREEN, 2, 2)
                             
                 # DEBUG
-                label = self.font.render("%(v)04d" % {"v" : self.player.world.debug_map[yy][xx]}, 1, (255, 0, 0))
-                self.engine.tex(xx * 32 + self.x, yy * 32 + self.y, label, 1)
+                if self.dev_mode:
+                    self.engine.text(xx * 32 + self.x, yy * 32 + self.y, "%(v)04d" % {"v" : self.player.world.debug_map[yy][xx]}, Colors.RED, 1)
                 
         # Cursor
         if self.mode == 'normal':
@@ -425,7 +443,7 @@ class Camera:
         # Particles
         for p in self.player.world.particles.core:
             if p.kind == 'blue sphere':
-                print('Particle at ', p.x + self.x, ', ', p.y + self.y, ' aiming at ', p.tx, ', ', p.ty, ' ttl=', p.ttl)
+                #print('Particle at ', p.x + self.x, ', ', p.y + self.y, ' aiming at ', p.tx, ', ', p.ty, ' ttl=', p.ttl)
                 self.engine.circle(int(p.x + self.x), int(p.y + self.y), 3, Colors.BLUE, 0, 3)
     
     def render_gui(self):
@@ -443,8 +461,7 @@ class Camera:
         ys = self.GUI_interface_y + 8
         for btn in self.player.game.building_types_ordered:
             bt = self.player.game.building_types[btn]
-            label = self.font.render(bt.name[0:3], 1, (255, 255, 0))
-            self.engine.tex(xs, ys, label, 4)
+            self.engine.text(xs, ys, bt.name[0:3], Colors.YELLOW, 4)
             xs += 32
             if xs > 72:
                 xs = 8
@@ -454,11 +471,13 @@ class Camera:
         min = int(self.player.min)
         sol = int(self.player.sol)
         if self.not_enough_ress > 0:
-            label = self.font.render("M : %(min)04d E : %(sol)04d NOT ENOUGH RESSOURCES!" % {"min" : min, "sol" : sol}, 1, (255, 0, 0))
+            text = "M : %(min)04d E : %(sol)04d NOT ENOUGH RESSOURCES!" % {"min" : min, "sol" : sol}
+            col = Colors.RED
             self.not_enough_ress -= 1
         else:
-            label = self.font.render("M : %(min)04d E : %(sol)04d" % {"min" : min, "sol" : sol}, 1, (255, 255, 0))
-        self.engine.tex(5, self.GUI_interface_y+104, label, 5)
+            text = "M : %(min)04d E : %(sol)04d" % {"min" : min, "sol" : sol}
+            col = Colors.YELLOW
+        self.engine.text(5, self.GUI_interface_y+104, text, col, 5)
         
         # Minimap
         for yy in range(0, self.player.world.size32.y):
@@ -490,10 +509,10 @@ class Particles:
             ttl = self.core[i].update()
             if ttl <= 0:
                 del self.core[i]
-                print(ttl, len(self.core))
+                #print(ttl, len(self.core))
             else:
                 i += 1
-                print(ttl, len(self.core))
+                #print(ttl, len(self.core))
 
 
 class Particle:
@@ -1145,11 +1164,11 @@ class Unit(GameObject):
                     test = (from_x, n_y, n_x, from_y)
 
                 if self.player.world.is_empty(test[0], test[1]):
-                    print("trying : " + str(test[0]) + ", " + str(test[1]))
+                    #print("trying : " + str(test[0]) + ", " + str(test[1]))
                     n_x = test[0]
                     n_y = test[1]
                 elif self.player.world.is_empty(test[2], test[3]):
-                    print("trying : " + str(test[2]) + ", " + str(test[3]))
+                    #print("trying : " + str(test[2]) + ", " + str(test[3]))
                     n_x = test[2]
                     n_y = test[3]
                 if n_x == self.old_x and n_y == self.old_y:
@@ -1187,69 +1206,12 @@ class Unit(GameObject):
             self.destination = None
             self.transition = None
 
-        print(self.x, self.y, "tr= ", self.transition, "dst= ", self.destination) # Add details on pathfinding (verbose)
+        #print(self.x, self.y, "tr= ", self.transition, "dst= ", self.destination) # Add details on pathfinding (verbose)
         return self.x == x and self.y == y
 
-
-# -----------------------------------------------------------------------------
-# Tools
-
-
-def get_angle(x1, y1, x2, y2):
-    dx, dy = get_diff(x1, y1, x2, y2)
-    return math.atan2(dy, dx)
-
-
-def get_diff(x1, y1, x2, y2):
-    return x2 - x1, y2 - y1
-        
-
-def get_dist(x1, y1, x2, y2):
-    return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
-    
-def xrect(x1, y1, x2, y2):
-    tx = abs(x1 - x2)
-    ty = abs(y1 - y2)
-    if x1 > x2:
-        rx = x2
-    else:
-        rx = x1
-    if y1 > y2:
-        ry = y2
-    else:
-        ry = y1
-    return Rect(rx, ry, tx, ty)
-
-
-def main_loop(game, camera, engine):
-    #clock = pygame.time.Clock()
-    #old_time = pygame.time.get_ticks()
-    while True:
-        r1 = game.update()
-        r2 = camera.update()
-        camera.render()
-        engine.render()
-        if not r1 or not r2:
-            break
-        #new_time = pygame.time.get_ticks()
-        #waited = new_time - old_time
-        #old_time = new_time
-        #if waited < 60:
-        #    time.sleep(1.0 / (60 - waited))
-        #    print('waited: ', waited)
-        ##pygame.time.Clock().tick(30)
-    print('Game has ended.')
-    for p in game.get_players().values():
-        if p.victorious:
-            print('\tPlayer ' + p.name + ' is victorious!')
-        else:
-            print('\tPlayer ' + p.name + ' has been defeated.')
-    print('\tMetal = ' + str(camera.player.min))
-    print('\tEnergy = ' + str(camera.player.sol))
-    print('Press enter to quit.')
-    pygame.quit()
-    #input()
-
+#------------------------------------------------------------------------------
+# Scripting the world : Trigger, Zone, Condition & Action
+#------------------------------------------------------------------------------
 
 class Zone:
 
@@ -1334,6 +1296,139 @@ class Action:
             pass
 
 
+
+# -----------------------------------------------------------------------------
+# Tools
+#------------------------------------------------------------------------------
+
+def get_angle(x1, y1, x2, y2):
+    dx, dy = get_diff(x1, y1, x2, y2)
+    return math.atan2(dy, dx)
+
+
+def get_diff(x1, y1, x2, y2):
+    return x2 - x1, y2 - y1
+        
+
+def get_dist(x1, y1, x2, y2):
+    return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+    
+def xrect(x1, y1, x2, y2):
+    tx = abs(x1 - x2)
+    ty = abs(y1 - y2)
+    if x1 > x2:
+        rx = x2
+    else:
+        rx = x1
+    if y1 > y2:
+        ry = y2
+    else:
+        ry = y1
+    return Rect(rx, ry, tx, ty)
+
+#------------------------------------------------------------------------------
+# Menu
+#------------------------------------------------------------------------------
+
+
+class Button:
+
+    def __init__(self, engine, text, x, y, w, h, c, ctext):
+        self.engine = engine
+        self.text = text
+        self.x = x
+        self.y = y
+        self.width = w
+        self.height = h
+        self.color = c
+        self.color_text = ctext
+    
+    def update(self):
+        pass
+        
+    def render(self):
+        self.engine.rect(self.x, self.y, self.width, self.height, self.color, 0, 1) # fond
+        self.engine.text(self.x + self.width/2, self.y + self.height/2, self.text, self.color_text, 2, True) # texte
+    
+    def is_in(self, x, y):
+        return self.x <= x < self.x + self.width and self.y <= y <= self.y + self.height
+
+    def click(self, state):
+        if self.text == 'Campaign' or self.text == 'Skirmish':
+            state['launch_game'] = True
+        elif self.text == 'Quit':
+            state['quit'] = True
+
+
+class Menu:
+    
+    def __init__(self, engine):
+        self.engine = engine
+        self.buttons = []
+        self.buttons.append(Button(engine, "Campaign", engine.size[0]/2-60, engine.size[1]/2-15-90, 120, 30, Colors.BLUE, Colors.YELLOW))
+        self.buttons.append(Button(engine, "Skirmish", engine.size[0]/2-60, engine.size[1]/2-15-30, 120, 30, Colors.BLUE, Colors.YELLOW))
+        self.buttons.append(Button(engine, "Options", engine.size[0]/2-60, engine.size[1]/2-15+30, 120, 30, Colors.BLUE, Colors.YELLOW))
+        self.buttons.append(Button(engine, "Quit", engine.size[0]/2-60, engine.size[1]/2-15+90, 120, 30, Colors.BLUE, Colors.YELLOW))
+        self.state = {}
+        self.state['launch_game'] = False
+        self.state['quit'] = False
+        
+    def update(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.state['quit'] = True
+            elif event.type == KEYDOWN:
+                if event.key == K_ESCAPE: self.state['quit'] = True
+            elif event.type == MOUSEBUTTONUP:
+                mx, my = self.engine.get_mouse_pos()
+                if event.button == self.engine.Keys.MOUSE_LEFT.value :
+                    for b in self.buttons:
+                        if b.is_in(mx, my):
+                            b.click(self.state)
+        return self.state
+    
+    def render(self):
+        for b in self.buttons:
+            b.render()
+        
+def menu(engine):
+    m = Menu(engine)
+    while True:
+        state = m.update()
+        m.render()
+        engine.render()
+        if state['launch_game'] or state['quit']: break
+    return state
+
+def main_loop(game, camera, engine):
+    #clock = pygame.time.Clock()
+    #old_time = pygame.time.get_ticks()
+    while True:
+        r1 = game.update()
+        r2 = camera.update()
+        camera.render()
+        engine.render()
+        if not r1 or not r2:
+            break
+        #new_time = pygame.time.get_ticks()
+        #waited = new_time - old_time
+        #old_time = new_time
+        #if waited < 60:
+        #    time.sleep(1.0 / (60 - waited))
+        #    print('waited: ', waited)
+        ##pygame.time.Clock().tick(30)
+    print('Game has ended.')
+    for p in game.get_players().values():
+        if p.victorious:
+            print('\tPlayer ' + p.name + ' is victorious!')
+        else:
+            print('\tPlayer ' + p.name + ' has been defeated.')
+    print('\tMetal = ' + str(camera.player.min))
+    print('\tEnergy = ' + str(camera.player.sol))
+    print('Press enter to quit.')
+    pygame.quit()
+    #input()
+
 def mod_basic(game):
 
     game.set_unit_types({"soldier": UnitType("Soldier", size=10, range=10, life=100, dom=5, speed=8, reload=50),
@@ -1411,17 +1506,21 @@ def level_E1L1(game):
     game.create_action('t2', 'give all unit of player P1 to player P2 in Zone Z', 'Neutral', 'Bob', 'z1')
     
 
-def configure(g):
+def configure(g, e):
     mod_basic(g)
-    level_E1L1(g)
-    e = Engine(800, 600)
+    level_E1L1(g)   
     return Camera(e, 800, 600, 5, g.get_player_by_name("Bob"))  # x, y, scroll, player
 
 
 def start():
-    g = Game('Test 1')
-    c = configure(g)
-    main_loop(g, c, c.engine)
+    e = Engine(800, 600)
+    s = menu(e)
+    if s['launch_game']:
+        g = Game('Test 1')
+        c = configure(g, e)
+        main_loop(g, c, e)
+    else:
+        print('Goodbye')
 
 if __name__ == '__main__': 
 
@@ -1430,14 +1529,14 @@ if __name__ == '__main__':
     # H0D   
     # GFE
     #
-    print( math.degrees(get_angle(2, 2, 1, 1))) # 0 -> A +135
-    print( math.degrees(get_angle(2, 2, 2, 1))) # 0 -> B +90
-    print( math.degrees(get_angle(2, 2, 3, 1))) # 0 -> C +45
-    print( math.degrees(get_angle(2, 2, 3, 2))) # 0 -> D 000
-    print( math.degrees(get_angle(2, 2, 3, 3))) # 0 -> E -45
-    print( math.degrees(get_angle(2, 2, 2, 3))) # 0 -> F -90
-    print( math.degrees(get_angle(2, 2, 1, 3))) # A -> G -135
-    print( math.degrees(get_angle(2, 2, 1, 2))) # A -> H +180 // -180
+    #print( math.degrees(get_angle(2, 2, 1, 1))) # 0 -> A +135
+    #print( math.degrees(get_angle(2, 2, 2, 1))) # 0 -> B +90
+    #print( math.degrees(get_angle(2, 2, 3, 1))) # 0 -> C +45
+    #print( math.degrees(get_angle(2, 2, 3, 2))) # 0 -> D 000
+    #print( math.degrees(get_angle(2, 2, 3, 3))) # 0 -> E -45
+    #print( math.degrees(get_angle(2, 2, 2, 3))) # 0 -> F -90
+    #print( math.degrees(get_angle(2, 2, 1, 3))) # A -> G -135
+    #print( math.degrees(get_angle(2, 2, 1, 2))) # A -> H +180 // -180
     
     #exit()
     
