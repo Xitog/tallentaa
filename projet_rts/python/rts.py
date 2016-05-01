@@ -30,7 +30,9 @@ class Colors(Enum):
     HALF_RED = Color(128, 0, 0)
     HALF_BLUE = Color(0, 0, 128)
     HALF_GREEN = Color(0, 128, 0)
-
+    LIGHT_BLUE = Color(0, 128, 255)
+    DARK_BLUE = Color(0, 64, 128)
+    MINIMAP_GREEN_DARK = (0, 64, 0)
     MINIMAP_GREEN_HALF = HALF_GREEN # terre verte
     MINIMAP_GREEN_LIGHT = Color(1,154,1) # terre verte claire
     MINIMAP_BROWN = Color(192,96,0) # terre marron claire
@@ -42,7 +44,7 @@ class Colors(Enum):
 #BuildingType = namedtuple("BuildingType", "size range life dom speed reload type")
 
 class Texture:
-    def __init__(self, name, num, filename, minicolor, passable=True):
+    def __init__(self, name, num, filename, minicolor, passable=True, mod_x=0, mod_y=0):
         self.name = name
         self.num = num
         if filename.__class__ == str:
@@ -51,10 +53,14 @@ class Texture:
             self.img = filename
         self.mini = minicolor
         self.passable = passable
+        self.mod_x = mod_x
+        self.mod_y = mod_y
 
 TEXTURES = {
     # Doodads
-      1  : Texture('rock'  ,   1, 'rock_brown.png', Colors.MINIMAP_BROWN_DARK),
+      1  : Texture('rock', 1, 'rock_brown.png', Colors.MINIMAP_BROWN_DARK, False),
+     25  : Texture('tree', 2, '25_arbre_1.png', Colors.MINIMAP_GREEN_DARK, False, -32, -96),  
+     26  : Texture('tree', 2, '26_arbre_2.png', Colors.MINIMAP_GREEN_DARK, False, -32, -64),  
     # Real textures
     100 : Texture('grass' , 200, 'grass_two_leaves.png', Colors.MINIMAP_GREEN_LIGHT),
     200 : Texture('ground', 100, 'ground.png', Colors.MINIMAP_BROWN),
@@ -114,12 +120,15 @@ class Engine:
     def __init__(self, width, height):
         pygame.init()
         self.size = width, height
-        self.screen = pygame.display.set_mode(self.size)  # , pygame.FULLSCREEN | pygame.HWSURFACE)
+        self.screen = pygame.display.set_mode(self.size, pygame.DOUBLEBUF, 32)  # , pygame.FULLSCREEN | pygame.HWSURFACE)
         self.render_orders = []
-        self.font = pygame.font.SysFont("monospace", 10)
+        self.fonts = { 10 : pygame.font.SysFont("monospace", 10), 12 : pygame.font.SysFont("monospace", 12), 18 : pygame.font.SysFont("monospace", 18) }
     
-    def text(self, x, y, text, color, z, center=False):
-        label = self.font.render(text, 1, color.value)
+    def stop(self):
+        pygame.quit()
+    
+    def text(self, x, y, text, color, z, center=False, size=10):
+        label = self.fonts[size].render(text, 1, color.value)
         if center:
             self.tex(x - label.get_width()/2, y - label.get_height()/2, label, z)
         else:
@@ -137,6 +146,9 @@ class Engine:
     def line(self, x1, y1, x2, y2, col, thick, z):
         self.render_orders.append((3, x1, y1, x2, y2, col, thick, z))   
     
+    def fill(self, col):
+        self.render_orders.append((4, col, None, None, None, None, None, -1))
+    
     def render(self):
         self.render_orders.sort(key=lambda elem: elem[7])
         for o in self.render_orders:
@@ -144,6 +156,7 @@ class Engine:
             elif o[0] == 1: pygame.draw.rect(self.screen, o[5].value, (o[1], o[2], o[3], o[4]), o[6])
             elif o[0] == 2: pygame.draw.circle(self.screen, o[5].value, (o[1], o[2]), o[3], o[6])
             elif o[0] == 3: pygame.draw.line(self.screen, o[5].value, (o[1], o[2]), (o[3], o[4]), o[6])
+            elif o[0] == 4: self.screen.fill(o[1].value)
         pygame.display.flip()
         self.render_orders.clear()
     
@@ -221,18 +234,18 @@ class Camera:
                 return False
             elif event.type == KEYDOWN:
                 if event.key == K_ESCAPE: return False
-                elif event.key == K_DOWN: self.down = True
-                elif event.key == K_UP: self.up = True
-                elif event.key == K_LEFT: self.left = True
-                elif event.key == K_RIGHT: self.right = True
+                elif event.key in (K_DOWN, 115): self.down = True
+                elif event.key in (K_UP, 119): self.up = True
+                elif event.key in (K_LEFT, 97): self.left = True
+                elif event.key in (K_RIGHT, 100): self.right = True
                 elif event.key == K_LSHIFT:
                     print('add_mod!')
                     self.add_mod = True
             elif event.type == KEYUP:
-                if event.key == K_DOWN: self.down = False
-                elif event.key == K_UP: self. up = False
-                elif event.key == K_LEFT: self.left = False
-                elif event.key == K_RIGHT: self.right = False
+                if event.key in (K_DOWN, 115): self.down = False
+                elif event.key in (K_UP, 119): self. up = False
+                elif event.key in (K_LEFT, 97): self.left = False
+                elif event.key in (K_RIGHT, 100): self.right = False
                 elif event.key == K_LSHIFT:
                     self.add_mod = False
                     print('stop add mod!')
@@ -376,8 +389,9 @@ class Camera:
                 t = self.player.world.world_map[yy][xx]
                 d = self.player.world.passable_map[yy][xx]
                 self.engine.tex(xx * 32 + self.x, yy * 32 + self.y, TEXTURES[t].img, 0)
-                if d != 0 and d != 99:
-                    self.engine.tex(xx * 32 + self.x, yy * 32 + self.y, TEXTURES[d].img, 0)
+                if d != 0 and d != 99: # there is visible blocking doodad, 0 = passable, 99 = invisible and not passable
+                    self.engine.tex(xx * 32 + self.x + TEXTURES[d].mod_x, yy * 32 + self.y + TEXTURES[d].mod_y, TEXTURES[d].img, 0.5)
+                    if self.dev_mode: self.engine.rect(xx * 32 + self.x, yy * 32 + self.y, 32, 32, Colors.RED, 1, 1)
                 
                 su = self.player.world.unit_map[yy][xx]
                 if su == 0:
@@ -1333,8 +1347,7 @@ def xrect(x1, y1, x2, y2):
 
 class Button:
 
-    def __init__(self, engine, text, x, y, w, h, c, ctext):
-        self.engine = engine
+    def __init__(self, menu, text, x, y, w, h, c, ctext, cover, cclicked, size):
         self.text = text
         self.x = x
         self.y = y
@@ -1342,22 +1355,33 @@ class Button:
         self.height = h
         self.color = c
         self.color_text = ctext
+        self.color_over = cover
+        self.color_clicked = cclicked
+        self.size = size
+        self.clicked = False
+        self.menu = menu
     
     def update(self):
-        pass
-        
+        if self.clicked:
+            self.menu.state['clicked'] = self.text
+    
     def render(self):
-        self.engine.rect(self.x, self.y, self.width, self.height, self.color, 0, 1) # fond
-        self.engine.text(self.x + self.width/2, self.y + self.height/2, self.text, self.color_text, 2, True) # texte
+        mx, my = self.menu.engine.get_mouse_pos()
+        if self.clicked:
+            c = self.color_clicked
+        elif self.is_in(mx, my):
+            c = self.color_over
+        else:
+            c = self.color
+        self.menu.engine.rect(self.x, self.y, self.width, self.height, c, 1, 1) # fond
+        self.menu.engine.rect(self.x-5, self.y-5, self.width+10, self.height+10, c, 1, 1) # fond
+        self.menu.engine.text(self.x + self.width/2, self.y + self.height/2, self.text, self.color_text, 2, True, self.size) # texte
     
     def is_in(self, x, y):
         return self.x <= x < self.x + self.width and self.y <= y <= self.y + self.height
 
-    def click(self, state):
-        if self.text == 'Campaign' or self.text == 'Skirmish':
-            state['launch_game'] = True
-        elif self.text == 'Quit':
-            state['quit'] = True
+    def click(self):
+        self.clicked = True
 
 
 class Menu:
@@ -1365,14 +1389,23 @@ class Menu:
     def __init__(self, engine):
         self.engine = engine
         self.buttons = []
-        self.buttons.append(Button(engine, "Campaign", engine.size[0]/2-60, engine.size[1]/2-15-90, 120, 30, Colors.BLUE, Colors.YELLOW))
-        self.buttons.append(Button(engine, "Skirmish", engine.size[0]/2-60, engine.size[1]/2-15-30, 120, 30, Colors.BLUE, Colors.YELLOW))
-        self.buttons.append(Button(engine, "Options", engine.size[0]/2-60, engine.size[1]/2-15+30, 120, 30, Colors.BLUE, Colors.YELLOW))
-        self.buttons.append(Button(engine, "Quit", engine.size[0]/2-60, engine.size[1]/2-15+90, 120, 30, Colors.BLUE, Colors.YELLOW))
         self.state = {}
-        self.state['launch_game'] = False
-        self.state['quit'] = False
+        self.state['clicked'] = None
         
+    def menu_start(self):
+        def pipo():
+            pass
+        self.buttons.append(Button(self, "Campaign", self.engine.size[0]/2-100, self.engine.size[1]/2-15-90, 200, 30, Colors.DARK_BLUE, Colors.YELLOW, Colors.LIGHT_BLUE, Colors.YELLOW, 18))
+        self.buttons.append(Button(self, "Skirmish", self.engine.size[0]/2-100, self.engine.size[1]/2-15-30, 200, 30, Colors.DARK_BLUE, Colors.YELLOW, Colors.LIGHT_BLUE, Colors.YELLOW, 18))
+        self.buttons.append(Button(self, "Options", self.engine.size[0]/2-100, self.engine.size[1]/2-15+30, 200, 30, Colors.DARK_BLUE, Colors.YELLOW, Colors.LIGHT_BLUE, Colors.YELLOW, 18))
+        self.buttons.append(Button(self, "Quit", self.engine.size[0]/2-100, self.engine.size[1]/2-15+90, 200, 30, Colors.DARK_BLUE, Colors.YELLOW, Colors.LIGHT_BLUE, Colors.YELLOW, 18))
+        
+    def menu_pause(self):
+        self.buttons.append(Button(self, "Quit to main menu", self.engine.size[0]/2-100, self.engine.size[1]/2-15-90, 200, 30, Colors.DARK_BLUE, Colors.YELLOW, Colors.LIGHT_BLUE, Colors.YELLOW, 18))
+        self.buttons.append(Button(self, "Resume", self.engine.size[0]/2-100, self.engine.size[1]/2-15-30, 200, 30, Colors.DARK_BLUE, Colors.YELLOW, Colors.LIGHT_BLUE, Colors.YELLOW, 18))
+        self.buttons.append(Button(self, "Options", self.engine.size[0]/2-100, self.engine.size[1]/2-15+30, 200, 30, Colors.DARK_BLUE, Colors.YELLOW, Colors.LIGHT_BLUE, Colors.YELLOW, 18))
+        self.buttons.append(Button(self, "Quit", self.engine.size[0]/2-100, self.engine.size[1]/2-15+90, 200, 30, Colors.DARK_BLUE, Colors.YELLOW, Colors.LIGHT_BLUE, Colors.YELLOW, 18))
+    
     def update(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -1384,31 +1417,70 @@ class Menu:
                 if event.button == self.engine.Keys.MOUSE_LEFT.value :
                     for b in self.buttons:
                         if b.is_in(mx, my):
-                            b.click(self.state)
+                            b.click()
+        for b in self.buttons:
+            b.update()
         return self.state
     
     def render(self):
+        self.engine.fill(Colors.BLACK)
         for b in self.buttons:
             b.render()
-        
-def menu(engine):
-    m = Menu(engine)
+    
+def start():
+    e = Engine(800, 600)
     while True:
-        state = m.update()
+        r = menu_loop(e) 
+        if not r: break
+    e.stop()
+    print('Goodbye')  
+
+def menu_loop(engine):
+    m = Menu(engine)
+    m.menu_start()
+    while True:
+        s = m.update()
         m.render()
         engine.render()
-        if state['launch_game'] or state['quit']: break
-    return state
+        if s['clicked'] is not None: break
+    if s['clicked'] in ['Campaign', 'Skirmish']:
+        g = Game('Test 1')
+        c = configure(g, engine)
+        r = game_loop(g, c, engine)
+        return r
+    elif s['clicked'] == 'Options':
+        pass
+    elif s['clicked'] == 'Quit':
+        return False
 
-def main_loop(game, camera, engine):
+
+def game_menu_loop(engine):
+    m = Menu(engine)
+    m.menu_pause()
+    while True:
+        s = m.update()
+        m.render()
+        engine.render()
+        if s['clicked'] is not None: break
+    if s['clicked'] == 'Options':
+        pass
+    else:
+        return s['clicked']
+       
+
+def game_loop(game, camera, engine): 
     #clock = pygame.time.Clock()
     #old_time = pygame.time.get_ticks()
     while True:
-        r1 = game.update()
-        r2 = camera.update()
+        res_gam = game.update()
+        res_cam = camera.update()
         camera.render()
         engine.render()
-        if not r1 or not r2:
+        if not res_cam:
+            r = game_menu_loop(engine)
+            if r != 'Resume': break
+        if not res_gam: 
+            r = 'Game Finished'
             break
         #new_time = pygame.time.get_ticks()
         #waited = new_time - old_time
@@ -1417,17 +1489,19 @@ def main_loop(game, camera, engine):
         #    time.sleep(1.0 / (60 - waited))
         #    print('waited: ', waited)
         ##pygame.time.Clock().tick(30)
-    print('Game has ended.')
-    for p in game.get_players().values():
-        if p.victorious:
-            print('\tPlayer ' + p.name + ' is victorious!')
-        else:
-            print('\tPlayer ' + p.name + ' has been defeated.')
-    print('\tMetal = ' + str(camera.player.min))
-    print('\tEnergy = ' + str(camera.player.sol))
-    print('Press enter to quit.')
-    pygame.quit()
-    #input()
+    if r in ('Game Finished', 'Quit'):
+        print('Game has ended.')
+        for p in game.get_players().values():
+            if p.victorious:
+                print('\tPlayer ' + p.name + ' is victorious!')
+            else:
+                print('\tPlayer ' + p.name + ' has been defeated.')
+        print('\tMetal = ' + str(camera.player.min))
+        print('\tEnergy = ' + str(camera.player.sol))
+        print('Press enter to quit.')
+        return False
+    elif r == 'Quit to main menu':
+        return True
 
 def mod_basic(game):
 
@@ -1475,7 +1549,7 @@ def level_E1L1(game):
         [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
         [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
         [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 300, 300, 100, 100, 100, 300, 300, 100, 100, 100, 100, 100],
-        [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 300, 300, 100, 100, 100, 300, 300, 100, 100, 100, 100, 100],
+        [100, 100, 100, 100, 100, 100, 100, 100, 100, 125, 125, 126, 100, 100, 100, 100, 100, 100, 100, 100, 300, 300, 100, 100, 100, 300, 300, 100, 100, 100, 100, 100],
         [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 101, 100, 100, 100, 100, 300, 300, 100, 100, 100, 100, 100, 300, 300, 100, 100, 100, 100],
         [100, 100, 100, 100, 100, 100, 100, 100, 100, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 300, 300, 100, 100, 100, 100, 100, 300, 300, 100, 100, 100, 100],
         [100, 100, 100, 100, 100, 100, 100, 100, 100, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
@@ -1511,16 +1585,6 @@ def configure(g, e):
     level_E1L1(g)   
     return Camera(e, 800, 600, 5, g.get_player_by_name("Bob"))  # x, y, scroll, player
 
-
-def start():
-    e = Engine(800, 600)
-    s = menu(e)
-    if s['launch_game']:
-        g = Game('Test 1')
-        c = configure(g, e)
-        main_loop(g, c, e)
-    else:
-        print('Goodbye')
 
 if __name__ == '__main__': 
 
