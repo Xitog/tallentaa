@@ -213,7 +213,7 @@ Toutes les traductions
 210. étudier --> to study
 211. être --> to be
 212. être assis --> to sit
-213. être daccord --> to agree
+213. être d'accord --> to agree
 214. être debout --> to stand
 
 
@@ -416,7 +416,7 @@ Tous les verbes français
 193. #85 étudier
 194. #86 être
 195. #197 être assis
-196. #166 être daccord
+196. #166 être d'accord
 197. #196 être debout
 
 
@@ -435,4 +435,4 @@ Verbes non traduits
 9. #21005 sœur
 
 
-Last edit on 2016-02-11 09:20:47
+Last edit on 2016-05-08 01:28:10

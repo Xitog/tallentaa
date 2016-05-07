@@ -1469,8 +1469,8 @@ def game_menu_loop(engine):
        
 
 def game_loop(game, camera, engine): 
-    #clock = pygame.time.Clock()
-    #old_time = pygame.time.get_ticks()
+    clock = pygame.time.Clock()
+    start_time = pygame.time.get_ticks()
     while True:
         res_gam = game.update()
         res_cam = camera.update()
@@ -1491,6 +1491,7 @@ def game_loop(game, camera, engine):
         ##pygame.time.Clock().tick(30)
     if r in ('Game Finished', 'Quit'):
         print('Game has ended.')
+        end_time = pygame.time.get_ticks()
         for p in game.get_players().values():
             if p.victorious:
                 print('\tPlayer ' + p.name + ' is victorious!')
@@ -1498,6 +1499,15 @@ def game_loop(game, camera, engine):
                 print('\tPlayer ' + p.name + ' has been defeated.')
         print('\tMetal = ' + str(camera.player.min))
         print('\tEnergy = ' + str(camera.player.sol))
+        print('Game has started at ' + str(start_time))
+        print('Game had ended at ' + str(end_time))
+        duration_milli_sec = end_time - start_time
+        duration_sec = duration_milli_sec // 1000
+        duration_min = duration_sec // 60
+        duration_sec -= duration_min * 60
+        duration_hour = duration_min // 60
+        duration_min -= duration_hour * 60
+        print('Game duration: ' + str(duration_hour)+ 'h' + str(duration_min) + 'm' + str(duration_sec) + 's')
         print('Press enter to quit.')
         return False
     elif r == 'Quit to main menu':

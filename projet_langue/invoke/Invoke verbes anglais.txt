@@ -4,8 +4,8 @@ Damien Gouteux
 © Damien Gouteux 2016
 Tous droits de traduction, de reproduction et d'adaptation, totales ou partielles, réservés pour tous pays.
 
-« Words are very unnecessary : they can only do harm. »
-Depeche Mode, Enjoy the Silence, Violator, 1990
+« Words are very unnecessary: they can only do harm. »
+Depeche Mode, Enjoy the Silence, 1990
 
 Sommaire
 
@@ -22,7 +22,7 @@ Index des verbes
     IV. Éléments de conjugaison anglaise
             1. Les pronoms
             2. Les 2 types de verbes
-            3. Les 5 formes du verbes
+            3. Les 5 formes du verbe
             4. Les verbes irréguliers
             5. Les formes contractées des auxiliaires
     V.  Aspects, modes, temps et constructions
@@ -65,13 +65,13 @@ Les #NB# verbes fondamentaux
 I. Introduction
 ---------------
 
-Cette ouvrage entend proposer #NB# verbes fondamentaux à la pratique de la langue anglaise et les rudiments pour les employer correctement. On y retrouvera pour chacun des verbes de façon claire et précise ses différentes traductions et formes. Le mot rudiment n'est pas choisi à la légère et nous n'ignorons pas que certains lettrés bien plus au fait de cette matière-là pourraient froncer les sourcils devant tel raccourci un peu rapide ou devant telle omission fâcheuse. Nous avons en effet privilégié la concision et la simplicité avant tout, ce qui en matière de grammaire, ne peut se faire qu'aux détriments d'une réalité linguistique parfois fort complexe. Nous espérons néanmoins avoir fourni un outil efficace et pratique pour s'exprimer en anglais.
+Cet ouvrage entend proposer #NB# verbes fondamentaux à la pratique de la langue anglaise et les rudiments pour les employer correctement. On y retrouvera pour chacun des verbes ses différentes traductions et formes données d'une manière claire et précise. Le mot rudiment n'est pas choisi à la légère et nous n'ignorons pas que certains savants bien plus au fait de cette matière-là pourraient froncer les sourcils devant tel raccourci un peu rapide ou telle omission fâcheuse. Nous avons en effet privilégié dans ce document la concision et la simplicité avant tout ce qui, en matière de grammaire, ne peut se faire qu'aux détriments d'une réalité linguistique parfois fort complexe. Nous espérons néanmoins avoir fourni un outil efficace et pratique pour s'exprimer et être compris dans l'utilisation des verbes anglais.
 
-La langue anglaise est de facto la langue auxiliaire internationale actuelle : dans les aéroports et de nombreux endroits, elle fait office de langue secondaire pour comprendre l'essentiel. De part la puissance des économies des pays anglophones, elle est aussi la langue de base dans de nombreux secteurs clés comme ceux de la recherche scientifique ou de l'informatique. Elle est enseignée dans le système scolaire dans de nombreux pays et elle peut alors servir de pont entre deux individus aux langues maternelles très éloignées pour nouer des relations amicales, commerciales ou affectives. Elle permet également d'avoir accès à de nombreuses cultures (américaines, australiennes, britanniques, canadiennes, indiennes, néo-zélandaises, sud-africaines, etc.).
+La langue anglaise est de facto la langue auxiliaire internationale actuelle : dans les aéroports et de nombreux endroits, elle fait office de langue secondaire pour comprendre l'essentiel. De par la puissance économique et culturelle de certains pays anglophones, elle est aussi la langue de base dans de nombreux secteurs clés comme ceux de la recherche scientifique ou de l'informatique. Elle est enseignée dans le système scolaire dans de nombreux pays et elle peut alors servir de pont entre deux individus aux langues maternelles très éloignées pour nouer des relations amicales, commerciales ou affectives. Elle permet bien sûr aussi d'avoir accès aux nombreuses cultures anglophones : américaines, australiennes, britanniques, canadiennes, indiennes, néo-zélandaises, sud-africaines, etc.
 
-Nous ne pouvons néanmoins passer sous silence deux points qui nous aimerions porter à l'attention de nos lecteurs. Certaines voix s'élèvent contre ce qu'elles appellent une véritable « domination » de langue anglaise. Son influence et celles des cultures dont elle est la vectrice, pour la plus grand part l'anglo-saxonne, infiltreraient à tous les niveaux notre vie quotidienne avec de regrettables conséquences. Il est intéressant de noter que certains chanteurs français affirment que composer en anglais leur est plus « naturelle ». Un autre point est qu'il existe depuis le XIXe siècle des tentatives, passées de la théorie à la pratique, de créer une langue auxiliaire construite dans un but d'égalité - elle serait la langue de tous et de personne à la fois - et de simplicité, même si cette dernière notion est très difficile à définir, ce qui est simple pour un Chinois ne l'étant pas forcément pour un Français, et inversement. On peut citer par exemple les langues Esperanto, Ido et Interlingua. Ce débat politique, philosophie et linguistique dépasse bien largement la portée de ce modeste traité, et nous invitons les lecteurs intéressés à lire d'autres sources et le cas échéant, traduire leurs réflexions par les urnes et leurs engagements.
+Nous ne pouvons néanmoins passer sous silence deux points qui nous aimerions porter à l'attention de nos lecteurs. Le premier est de parler de certaines voix qui s'élèvent contre ce qu'elles appellent une véritable « domination » de la langue anglaise. Son influence et, par son entremise, celles de certaines des cultures précitées, infiltreraient à tous les niveaux notre vie quotidienne avec de regrettables conséquences. Il est intéressant par exemple de noter que certains chanteurs français affirment que composer en anglais leur est plus « naturel ». Plus grave, une division sociale se creuserait entre ceux « parlant la langue des maîtres » et ceux l'ignorant. Un autre point est qu'il existe depuis le XIXe siècle des tentatives, passées de la théorie à la pratique, de créer une langue auxiliaire construite dans un but d'égalité - elle serait la langue de tous et de personne à la fois - et de simplicité. Mais cette dernière notion est très difficile à définir, car ce qui est simple pour un Chinois ne l'est pas forcément pour un Français, et inversement. Comme exemples, on peut citer les langues construites que sont l'Esperanto, l'Ido et l'Interlingua. Ce débat politique, philosophie et linguistique dépasse bien largement la portée de ce modeste traité, et nous invitons les lecteurs intéressés à lire d'autres sources pour former leur opinion et, le cas échéant, traduire leurs réflexions dans les urnes et par leurs engagements.
 
-Pour en revenir aux verbes anglais, comme il s'agit d'une première édition, malgré nos soins aimants portés à ce livre, il est fort probable qu'il ne soit pas dénué de quelques regrettables erreurs. Nous demandons à nos aimables lecteurs de nous pardonner nos offenses à ces belles langues et espérons qu'il y en aura le moins possible. Nous souhaitons avant tout que ce livre vous soit utile, que cela soit pour réviser ou apprendre à utiliser ces fameux verbes. Bon apprentissage !
+De notre côté, pour en revenir aux verbes anglais, nous essayons simplement de fournir un outil simple et peu onéreux pour aider toutes les personnes souhaitant apprendre cette langue. Comme il s'agit d'une première édition, malgré nos soins aimants portés à ce livre, il est fort probable qu'il ne soit pas dénué de quelques regrettables erreurs. Nous demandons à nos aimables lecteurs de nous pardonner nos offenses à ces belles langues et espérons qu'il y en aura le moins possible. Nous souhaitons avant tout que ce livre vous soit utile, que cela soit pour réviser ou apprendre à utiliser ces fameux verbes. Bon courage et bon apprentissage !
 
 Damien Gouteux
 
@@ -90,8 +90,8 @@ Cette légende s'applique à la description des verbes fondamentaux.
     
 Pour tous les verbes réguliers anglais et certains verbes irréguliers, le prétérit et le participe passé s'écrivent pareil. Le code couleur permet de distinguer la forme utilisée.
 Certains temps sont une combinaison d'un auxiliaire conjugué au temps d'un certain mode avec une base verbale, une forme verbale progressive, un participe passé ou la construction have + participe passé (voir XXX).
-    
-- Utilisation des parenthèses : les parenthèses indiquent un élément qu'il faut rajouter pour former la phrase négative. Exemple : I will (not) come back. I will come back est l'assertion affirmative (Je reviendrai) alors I will not come back est l'assertion négative (Je ne reviendrai pas). Lorsque le passage de la phrase affirmative à la phrase négative est plus complexe, les deux sont clairement différenciées.
+
+- Utilisation des parenthèses : les parenthèses indiquent un élément qu'il faut rajouter pour former la phrase négative. Exemple : « I will (not) come back ». « I will come back » est l'assertion affirmative (Je reviendrai) alors « I will not come back » est l'assertion négative (Je ne reviendrai pas). Lorsque le passage de la phrase affirmative à la phrase négative est plus complexe, les deux sont clairement différenciées.
 
 - Abréviations : on emploie l'abréviation pers. pour signifier "personne" et l'abréviation sing. pour signifier singulier. Exemples : 1ère pers. sing. signifie la 1ère personne du singulier. 1ère pers. signifie les 1ères personnes du singulier et du pluriel.
 
@@ -99,7 +99,7 @@ Certains temps sont une combinaison d'un auxiliaire conjugué au temps d'un cert
 III. Éléments de syntaxe anglaise
 ---------------------------------
 
-À chaque fois, nous prendrons le cas le plus simple, une phrase simple, composée d'une seule proposition, sans compléments circonstanciels (CC).
+À chaque fois, nous prendrons le cas le plus simple, une phrase simple, composée d'une seule proposition, sans compléments circonstanciels.
 Une phrase avec plusieurs propositions est appelée phrase complexe.
 
 III.1 L'assertion
@@ -110,23 +110,20 @@ Les assertions se terminent par un point (a period or a fullstop).
 Affirmative
 
 - Si le noyau verbal est construit autour d'un verbe intransitif, il n'y a pas de complément du verbe : Sujet + Noyau Verbal (She is swimming.)
-- Si le noyau verbal est construit autour d'un verbe transitif avec un complément :
-Sujet + Noyau Verbal + Complément d'objet (We have a bag. I'm looking for a bag.)
-- Si le noyau verbal est construit autour d'un verbe transitif admettant deux compléments :
-Sujet + Noyau Verbal + Complément d'objet premier + Complément d'objet second (I give her a book. I give a book to her.)
+- Si le noyau verbal est construit autour d'un verbe transitif avec un complément : Sujet + Noyau Verbal + Complément d'objet (We have a bag. I'm looking for a bag.)
+- Si le noyau verbal est construit autour d'un verbe transitif admettant deux compléments : Sujet + Noyau Verbal + Complément d'objet premier + Complément d'objet second (I give her a book. I give a book to her.)
 - Si le noyau verbal est construit autour d'un verbe copule qui introduit un attribut du sujet : Sujet + Noyau Verbal + Attribut du sujet (He is young.)
 - Si le noyau verbal est construit autour d'un verbe transitif introduisant un complément et un attribut du complément : Sujet + Noyau Verbal + Complément d'objet + Attribut du complément (I find him young.)
 
 Négative
 
 Elle se construit sur le modèle de l'affirmation.
-- Si le noyau verbal est le verbe be, ou l'un des auxiliaires can, may, must, will et shall, on rajoute juste l'adverbe not après l'auxiliaire : I will not tell you where she is.
-- Si le noyau verbal est un autre verbe, on ajoute l'auxiliaire do qui se conjugue selon les mêmes modalités que le verbe qu'il remplace, suivi de l'adverbe not et de la base verbale du verbe remplacé : I don't know her.
-- Pour le verbe have, les deux formes sont possibles : I don't have my bag. I haven't my bag.
+- Si le noyau verbal est le verbe be, ou l'un des auxiliaires can, may, must, will et shall, on rajoute juste l'adverbe not après l'auxiliaire (I will tell you where she is. → I will not tell you where she is.).
+- Si le noyau verbal est un autre verbe, on ajoute l'auxiliaire do qui se conjugue selon les mêmes modalités que le verbe qu'il remplace, suivi de l'adverbe not et de la base verbale du verbe remplacé (He knowns her. → He doesn't know her.).
+- Pour le verbe have, les deux formes sont possibles (I have my bag. → I don't have my bag. ou I haven't my bag.).
 
 Notes :
-    - On peut ajouter de l'emphase à une assertion affirmative, pour accentuer son propos, insister, infirmer ce qui vient d'être dit. Si le noyau verbal est le verbe be, ou l'un des auxiliaires can, may, must, will et shall, on ne modifie pas le noyau verbal. Sinon on rajoute l'auxiliaire do qui se conjugue selon les mêmes modalités que le verbe qu'il remplace suivi de la base verbale du verbe remplacé. On peut utiliser un point d'exclamation ou un point à fin de la phrase :
-    I do know her. ou I do know her!
+    - On peut ajouter de l'emphase à une assertion affirmative, pour accentuer son propos, insister ou infirmer ce qui vient d'être dit. Si le noyau verbal est le verbe be, ou l'un des auxiliaires can, may, must, will et shall, on ne modifie pas le noyau verbal, seule l'intonation traduit l'emphase (I must go!). Dans les autres cas, on rajoute l'auxiliaire do qui se conjugue selon les mêmes modalités que le verbe qu'il remplace suivi de la base verbale du verbe remplacé. On peut utiliser un point d'exclamation ou un point à fin de la phrase (I do know her. ou I do know her!).
 
 III.2 L'interrogation
 ---------------------
@@ -138,15 +135,15 @@ Caractéristique principale :
     - Elle inverse l'ordre du sujet-verbe conjugué en plaçant l'auxiliaire avant le sujet.
 
 Affirmative :
-    - Si le noyau verbal est le verbe be, ou l'un des auxiliaires can, may, must, will et shall, on place l'auxiliaire en premier, suivi du sujet. Si il y a un mot interrogatif, on le met avant l'auxiliaire : What are you doing? Are you going with us tomorrow?
-    - Si le noyau verbal est un autre verbe, on ajoute l'auxiliaire do qui se conjugue selon les mêmes modalités que le verbe qu'il remplace. On le place en premier, suivi du sujet et de la base verbale du verbe remplacé. S'il y a un mot interrogatif, on le met avant l'auxiliaire : Do you know him?
+    - Si le noyau verbal est le verbe be, ou l'un des auxiliaires can, may, must, will et shall, on place l'auxiliaire en premier, suivi du sujet. Si il y a un mot interrogatif, on le met avant l'auxiliaire (What are you doing? Are you going with us tomorrow?)
+    - Si le noyau verbal est un autre verbe, on ajoute l'auxiliaire do qui se conjugue selon les mêmes modalités que le verbe qu'il remplace. On le place en premier, suivi du sujet et de la base verbale du verbe remplacé. S'il y a un mot interrogatif, on le met avant l'auxiliaire (Do you know him? What do you want?)
 
 Négative :
-    - Elle se construit sur le modèle de l'interrogation affirmative, on utilise simplement la forme contractée négative de l'auxiliaire : Don't you know him? (Tu ne le connais pas ?) 
+    - Elle se construit sur le modèle de l'interrogation affirmative, on utilise simplement la forme contractée négative de l'auxiliaire (Don't you know him? - se traduit par : Tu ne le connais pas ?)
 
 Notes :
-    - En anglais courant, on peut très bien construire une interrogation comme une assertion, avec juste un point d'interrogation à la fin : You don't know him?
-    - En anglais courant, on peut faire des écho-interrogations : on reprend une phrase affirmative en remplaçant la partie sur laquelle porte l'interrogation par le mot interrogatif correspondant en remplaçant le point par un point d'interrogation : I will go to Dallas tomorrow. → You will go where? ou You will go to Dallas when?
+    - En anglais courant, on peut très bien construire une interrogation comme une assertion, avec juste un point d'interrogation à la fin et en changeant l'intonation (You don't know him?)
+    - En anglais courant, on peut faire des écho-interrogations : on reprend une phrase affirmative en remplaçant la partie sur laquelle porte l'interrogation par le mot interrogatif correspondant et en remplaçant le point par un point d'interrogation (I will go to Dallas tomorrow. → You will go where? ou You will go to Dallas when?)
     - Les mots interrogatifs sont : What, Which, Who, Whom, Whose, When, Where, Why, How, How + adjectif, How + adverbe, How much + nom indénombrable, How many + nom dénombrable.
 
 III.3 L'exclamation
@@ -158,22 +155,18 @@ Caractéristique principale :
     - L'exclamation peut porter sur la phrase entière, un nom, un adverbe ou un adjectif et suivra selon le cas une construction différente.
     
 Affirmative :
-    - Sur la phrase entière, on reprend la construction de l'assertion affirmative et on remplace simplement le point par un point d'exclamation : You won!
-    - Sur un nom, on débute la phrase par What suivi du groupe nominal accentué : What a nice friend (he is)!
-    - Une construction alternative avec l'adverbe such :
-    He is such a nice friend!
-    - Sur un adverbe ou un adjectif, on débute la phrase par How suivi de l'élément accentué :
-    How nice (he is)!
-    - Une construction alternative avec l'adverbe so :
-    He is so nice!
+    - Sur la phrase entière, on reprend la construction de l'assertion affirmative et on remplace simplement le point par un point d'exclamation (You won!)
+    - Sur un nom, on débute la phrase par What suivi du groupe nominal accentué (What a nice friend he is! ou simplement What a nice friend!)
+    - Une construction alternative pour ce cas existe avec l'adverbe such (He is such a nice friend!)
+    - Sur un adverbe ou un adjectif, on débute la phrase par How suivi de l'élément accentué (How nice it is! ou simplement How nice!)
+    - Une construction alternative pour ce cas existe avec l'adverbe so (He is so nice!)
     
 Négative :
-    - Si l'exclamation porte sur la phrase entière, on reprend la construction de l'assertion négative, en remplaçant le point par un point d'exclamation :
-    You didn't win!
+    - Si l'exclamation porte sur la phrase entière, on reprend la construction de l'assertion négative, en remplaçant le point par un point d'exclamation (You didn't win!)
     
 Notes :
     Assertion et exclamation peuvent utiliser le mode impératif. Ce mode suit des règles de construction spécifiques (pas de sujet à la 2e personne) qui impacteront la construction de la phrase. Voir le chapitre XXX pour plus de détails. 
-    
+
 ------------------------------------
 IV. Éléments de conjugaison anglaise
 ------------------------------------
@@ -196,7 +189,7 @@ pronom indéfini                     one     one     one's own       on
 
 Le pronom neutre it est utilisé pour les animaux de sexe indifférencié et les choses inanimées.
 
-En anglais utilise les mêmes pronoms pour la 2e personne du singulier et celle du pluriel. Il n'y a donc pas de questions à se poser sur le tutoiement ou le vouvoiement.
+Dans la langue anglaise on utilise les mêmes pronoms (you, you, yours) pour la 2e personne du singulier et celle du pluriel. Il n'y a donc pas de questions à se poser sur le tutoiement ou le vouvoiement.
 
 Pour les pronoms objets on emploie aussi le terme de pronoms compléments.
 
@@ -217,12 +210,12 @@ Ils servent :
  
 Les verbes lexicaux sont tous les autres verbes.
 
-Il faut bien différencier l'emploi d'un auxiliaire pour une construction (Do you know her?) d'un emploi où l'on utilise son sens (I did a great thing yesterday) comme pour les verbes lexicaux.
+Il faut bien différencier l'emploi d'un auxiliaire pour une construction (Do you know her?) d'un emploi où l'on utilise son sens (I did a great thing yesterday) à la manière des verbes lexicaux.
 
-IV.3 Les 5 formes du verbes
----------------------------
+IV.3 Les 5 formes du verbe
+--------------------------
 
-En anglais, il y a seulement 5 formes différentes pour un verbe donné, sauf pour le verbe to be qui en a 2 supplémentaires et les auxiliaires modaux qui en ont 4. Les temps se construisent en  combinant ces formes. Les voici pour le verbe to talk :
+En anglais, il y a seulement 5 formes différentes pour un verbe donné, sauf pour le verbe to be qui en a 2 supplémentaires et les auxiliaires modaux qui en ont 4. Les temps se construisent en combinant ces formes. Les voici pour le verbe to talk :
 
 1. la base verbale, ou verbe nu, qui est aussi la forme du présent de l'indicatif, sauf à la 3e personne du singulier : talk,
 2. la base verbale à laquelle on ajoute un s ou es. Elle est utilisée pour la 3e personne du singulier du présent de l'indicatif. Les auxiliaires modaux (can, may, must, shall, will) ne possèdent pas cette forme : talks,
@@ -237,7 +230,7 @@ Pour le verbe to be, il faut rajouter à la liste précédente ces formes partic
 IV.4 Les verbes irréguliers
 ---------------------------
 
-De plus, l'anglais compte de nombreux verbes irréguliers qui construisent différemment les 5 formes de base, comme be :
+De plus, l'anglais compte de nombreux verbes irréguliers qui construisent différemment les 5 formes de base, comme to be :
 - 3e personne du singulier du présent de l'indicatif : is
 - prétérit de l'indicatif (sauf les 1ère et 3e personnes du singulier) : were
 - participe passé : been
@@ -247,7 +240,7 @@ Il faut apprendre ces verbes irréguliers qui sont donnés sous la forme : base 
 - prétérit et participe passé possèdent la même forme, différente de la base verbale : burn, burnt, burnt : brûler
 - base verbale, prétérit et participe passé sont différents : sing, sang, sung : chanter
 
-Notons qu'il y a une concurrence pour certaines formes des verbes irréguliers. Ainsi on peut rencontrer aussi bien burned que burnt, learned que learnt (de learn, learnt, learnt : apprendre).
+Notons qu'il y a une concurrence entre certaines formes pour les verbes irréguliers. Ainsi on peut rencontrer aussi bien burned que burnt pour le verbe to burn : brûler, learned que learnt pour le verbe to learn : apprendre, au prétérit et au participe passé.
 
 IV.5 Les formes contractées des auxiliaires
 -------------------------------------------
@@ -260,20 +253,25 @@ Nous résumons les différentes formes contractées de l'affirmation dans le tab
 
 Forme simple	Forme contractée
 am              'm
-is              *'s*
+is              's
 are             're
 have            've
-has             *'s*
+has             's
 will            'll
 shall           'll
-had             *'d*
-would           *'d*
+had             'd
+would           'd
 
-Attention de bien noter qu'une même contraction (celles en gras) peut correspondre à deux auxiliaires différents ('s pour is et has, 'd pour had et would, 'll pour shall et will). De plus, on utilise jamais la forme contracté de l'affirmation lorsque l'auxiliaire est le dernier mot de la phrase, comme dans une réponse courte.
+Attention de bien noter qu'une même contraction peut correspondre à deux auxiliaires différents, il faudra interroger le contexte pour résoudre cette ambiguité : 
 
-Pour les formes contractées de la négation, la règle synthétique est de coller le verbe à not et de remplacer le o par l'apostrophe *'* mais il y a des exceptions (en gras).
+Forme contractée    Forme simple
+'s                  is ou has
+'d                  had ou would
+'ll                 will ou shall
 
-Nous résumons les différentes formes contractées de la négation dans le tableau suivant :
+De plus, on n'utilise jamais la forme contractée de l'affirmation lorsque l'auxiliaire est le dernier mot de la phrase, comme dans une réponse courte.
+
+Pour les formes contractées de la négation, la règle synthétique est de coller le verbe à not et de remplacer le o par l'apostrophe ' mais il y a des exceptions pour will not, shall not et l'association de can avec not :
 
 Forme simple	Forme contractée
 do not	        don't
@@ -281,14 +279,14 @@ does not	    doesn't
 did not	        didn't
 has not	        hasn't
 have not	    haven't
-will not	    *won't*
+will not	    won't
 would not       wouldn't
-shall not	    *shan't*
+shall not	    shan't
 should not      shouldn't
 are not	        aren't
 was not	        wasn't
 were not	    weren't
-*cannot*	    *can't*
+cannot	        can't
 might not       mightn't
 need not        needn't
 
@@ -308,14 +306,14 @@ L'aspect continu, ou progressif est un point de vue qui insiste sur le déroulem
 
 L'aspect non continu, ou global, considère l'action comme un « tout global ».
 
-Une autre façon de se le représenter et d'imaginer une frise chronologique sur laquelle se déroulent les actions : l'aspect continu indiquera une période, un segment sur la frise chronologique, alors que l'aspect global indiquera un simple point.
+Une autre façon de se le représenter et d'imaginer une frise chronologique sur laquelle se déroulent les actions : on utilise l'aspect continu pour indiquer une période, un segment sur la frise chronologique, alors que l'aspect global indiquer un simple point.
 
 V.2. Les 4 modes
 ----------------
 
 L'anglais possède :
 - un mode indicatif, 
-- un mode impératif ,
+- un mode impératif,
 - un mode infinitif,
 - un mode subjonctif très restreint.
 
@@ -348,9 +346,9 @@ L'indicatif ne possède pas de temps futur comme le français. Le futur s'exprim
 
 Attention a bien différencié le temps de conjugaison du véritable temps dans lequel l'événement prend lieu. Ainsi le temps de conjugaison prétérit peut servir à exprimer le temps passé, mais aussi un présent ou un futur non-certain.
 
-Il ne faut pas calquer la grammaire française sur la grammaire anglaise : si on retrouve de nombreuses similarités entre ses deux langues, elles demeurent différentes par d'autres aspects.
+Il ne faut pas calquer la grammaire française sur la grammaire anglaise : si on retrouve de nombreuses similarités entre ces deux langues, elles demeurent différentes par d'autres aspects.
 
-Il n'y a donc pas une correspondance immédiate et totale entre les temps de l'anglais et ceux du français. À chaque fois, il faut réfléchir à ce que l'on veut exprimer.
+Il n'y a donc pas une correspondance immédiate et totale entre les temps de l'anglais et ceux du français. À chaque fois, il faut réfléchir à ce que l'on veut exprimer et les usages de la langue.
 
 ----------------------------
 VI. Les temps de l'indicatif
@@ -358,18 +356,18 @@ VI. Les temps de l'indicatif
 
 Le mode indicatif possède 2 temps, dans le sens de considération temporelle : le présent et le prétérit (passé).
 Le mode indicatif possède 8 temps de conjugaisons : le présent, le présent continu, le prétérit, le prétérit continu, le parfait, le parfait continu, le plus-que-parfait, le plus-que-parfait continu.
-Le mode indicatif est un mode personnel.
+Le mode indicatif est un mode personnel (il dispose de 5 personnes : je tu/vous il/elle nous ils/elles).
 
 VI.1 Le présent
 ---------------
 
 Sens général :
-    Le présent de l'indicatif est le temps du réel, soit par le fait qu'il s'oppose au non-réel (choses imaginaires ou incertaines), soit par le fait qu'il s'ancre dans le temps où le locuteur parle ou que le scripteur écrit. En l'employant, on considère l'événement dans sa globalité.
+    Le présent de l'indicatif est le temps du réel, soit par le fait qu'il s'oppose au non-réel (évènements imaginaires ou incertains), soit par le fait qu'il s'ancre dans le temps où le locuteur parle ou que le scripteur écrit. En l'employant, on considère l'événement dans sa globalité.
     
 Construction : 
     Le présent de l'indicatif a deux formes :
     - base verbale
-    - sauf à la 3e personne du singulier : forme en s
+    - base verbale à laquelle on ajoute un s ou essauf à la 3e personne du singulier
     Exception pour be qui a 3 formes :
     - am are is are are are
     La négation se construit avec l'auxiliaire do au présent.
@@ -465,7 +463,7 @@ Sens général :
     Le parfait continu de l'indicatif exprime des événements passés qui ont un lien avec le présent, en insistant sur leur déroulement.
     
 Construction :
-    Le parfait continu se construit avec l'auxiliaire have au présent de l'indicatif suivi du participe passé de l'auxiliaire be suivi de la forme progressive du verbe : has/have + been + forme  progressive (en ing) : I have been calling her all day long yesterday and I didn't manage to reach her.
+    Le parfait continu se construit avec l'auxiliaire have au présent de l'indicatif suivi du participe passé de l'auxiliaire be suivi de la forme progressive du verbe : has/have + been + forme progressive (en ing) : I have been calling her all day long yesterday and I didn't manage to reach her.
     
 Emplois :
     Le parfait continu peut servir à exprimer :
@@ -603,7 +601,7 @@ Emplois :
     - suggestion.
     
 Notes :
-    On le retrouve dans de nombreux expressions : Come what may. So be it. If need be.
+    On le retrouve dans de nombreuses expressions : Come what may. So be it. If need be.
     Il appartient à une langue plutôt recherchée.
 
 VII.5. Le prétérit du subjonctif
@@ -730,7 +728,7 @@ Emploi :
     - une très forte probabilité : He must be back.
     
 Notes
-    - L'auxiliaire must n'a pas de prétérit. Pour le passé du discours indirect, on utilise le présent. Pour une obligation passée, on emploie had to + base verbale. Pour une très forte probabilité passé, on emploie must + have + participe passé.
+    - L'auxiliaire must n'a pas de prétérit. Pour le passé du discours indirect, on utilise le présent. Pour une obligation passée, on emploie had to + base verbale. Pour une très forte probabilité passée, on emploie must + have + participe passé.
 
 VIII.6 L'auxiliaire shall au présent
 ------------------------------------
@@ -819,9 +817,9 @@ Le second axe est la réalité de l'événement, sur lequel on peut établir une
 - non-certain, probable : l'événement n'est pas certain, mais pourrait bien être réel,
 - non-réel ouvert : l'événement n'est pas réel, mais pourrait bien se réaliser, comme un souhait, une intention ou une hypothèse,
 - non-réel fermé : l'événement n'est pas réel, et ne pourra jamais se réaliser, comme un regret.
-Certains grammaires parlent d'imaginaire ou d'irréel. Je préfère les notions de non-réel ouvert ou fermé pour clarifier les termes.
+Certaines grammaires parlent d'imaginaire ou d'irréel. Je préfère les notions de non-réel ouvert ou fermé pour clarifier les termes.
 
-Les deux axes ne sont pas indépendant : le choix du passé pour évoquer un événement non-réel le condamne souvent a être fermé :
+Les deux axes ne sont pas indépendants : le choix du passé pour évoquer un événement non-réel le condamne souvent a être en fait impossible et donc fermé :
 You could have won this match. (Tu aurais pu gagner ce match.)
 L'emploi du prétérit pour l'auxiliaire can indique une valeur de non-réel, l'action n'est pas réalisée.
 L'emploi de la forme have + participe passé fait basculer l'événement dans le non-réel fermé, il s'agit d'un regret : la personne n'a pas gagné le match et ne pourra plus jamais gagner celui-ci.
@@ -870,6 +868,7 @@ Il existe différents moyens d'exprimer le futur en anglais selon la nuance du f
         - to be bound to + base verbale : We are bound to happiness, aren't we?
 
 Attention ! Dans une subordonnée de temps (après when) ou dans une subordonnée de condition (après if), on n'emploie jamais le futur en anglais mais le présent de l'indicatif, contrairement au français.
+Nous discuterons, quand il sera là. : We will talk when he arrives.
 
 3. L'expression du conditionnel
 -------------------------------

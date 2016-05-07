@@ -1,3 +1,9 @@
+#------------------------------------------------------------------------------
+# Ce ficher date du 26 mars 2011 dans mon dossier Projet
+# Il semble d'agir d'une... console en PyGame !
+# Mais ce fichier n'a pas dépassé le stade du premier mouvement.
+#------------------------------------------------------------------------------
+
 # 18h50 : base de "words"
 
 import pygame

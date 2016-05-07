@@ -1,3 +1,6 @@
+puts "début memento_tests.rb"
+# ce fichier a besoin du fichier mod_rb.rb
+
 # Orienté objets
 
 class A
@@ -29,7 +32,7 @@ end
 b = B.new
 b.une_methode
 
-exit
+# exit
 
 class Pipo
     attr_reader :a
@@ -60,9 +63,12 @@ begin
 end if a != 5
 
 $LOAD_PATH << '.'
-require "mod_rb"
+#require "mod_rb"
+load "mod_rb.rb"
 name = "mod_rb"
-require name
+#require name
+load name + '.rb' # load peut marcher deux fois, pas require
+#require_relative xxx évite de devoir mettre le CWD current working dir dans le load_path. Celui n'y est plus depuis 1.9
 puts Mod
 
 module Bob
