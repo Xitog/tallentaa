@@ -1,3 +1,15 @@
+def get_create_table_verbs():
+    c = "CREATE TABLE IF NOT EXISTS voc_verbs ( id int(11) NOT NULL, lang varchar(2) NOT NULL, base varchar(50) NOT NULL, surtype varchar(30) NOT NULL, lvl int(11) DEFAULT '1', PRIMARY KEY (`id`) ) "
+    return c
+
+def get_create_table_trans():
+    c = "CREATE TABLE IF NOT EXISTS voc_translate ( id int(11) NOT NULL, de int(11) NOT NULL, vers int(11) NOT NULL, sens varchar(100) DEFAULT NULL, usage varchar(100) DEFAULT NULL, PRIMARY KEY (`id`) ) "
+    return c
+    
+def get_create_table_verbs_en():
+    c = "CREATE TABLE IF NOT EXISTS voc_verbs_en ( id int(11) NOT NULL, base varchar(50) NOT NULL, pret varchar(50) NOT NULL, part varchar(50) NOT NULL )"
+    return c
+    
 def get_verbs():
 
     content = [
@@ -354,8 +366,8 @@ def get_verbs():
         (190139, 'en', 'come in', 'verb', 1),
         (190147, 'en', 'come up', 'verb', 1),
         (190148, 'en', 'come down', 'verb', 1),
-
-        # VAGUE 2
+        
+        # VAGUE 2 complément
         (190126, 'en', 'happen', 'verb', 2),
         (100152, 'en', 'add', 'verb', 2),
         (100153, 'en', 'catch', 'verb', 2),
@@ -395,7 +407,7 @@ def get_verbs():
         (100185, 'en', 'become', 'verb', 2),
         (100187, 'en', 'bring', 'verb', 2),
         
-        # VAGUE 3
+        # VAGUE 3 compléments
         (100188, 'en', 'cut', 'verb', 2),
         (100189, 'en', 'draw', 'verb', 2),
         (100190, 'en', 'keep', 'verb', 2),
@@ -410,11 +422,65 @@ def get_verbs():
         (100199, 'en', 'get', 'verb', 2),
         (100200, 'en', 'set', 'verb', 2),
         
-        # VAGUE 4
+        # VAGUE 4 compléments
         (100201, 'en', 'kill', 'verb', 4),
         (100202, 'en', 'hurt', 'verb', 4),
         (100203, 'en', 'fight', 'verb', 4),
         
+        # VAGUE 5
+        (100204, 'en', 'ask out', 'verb', 5),
+        (100205, 'en', 'add up', 'verb', 5),
+        (100206, 'en', 'bear', 'verb', 5),
+        (100207, 'en', 'beat', 'verb', 5),
+        (100208, 'en', 'bend', 'verb', 5),
+        (100209, 'en', 'bet', 'verb', 5),
+        (100210, 'en', 'bid', 'verb', 5),
+        (100211, 'en', 'bind', 'verb', 5),
+        (100212, 'en', 'bite', 'verb', 5),
+        (100213, 'en', 'bleed', 'verb', 5),
+        (100214, 'en', 'blow', 'verb', 5),
+        (100215, 'en', 'breed', 'verb', 5),
+        (100216, 'en', 'broadcast', 'verb', 5),
+        (100217, 'en', 'blow up', 'verb', 5),
+        (100218, 'en', 'break down', 'verb', 5),
+        (100219, 'en', 'break in', 'verb', 5),
+        (100220, 'en', 'break up', 'verb', 5),
+        (100221, 'en', 'break out', 'verb', 5),
+        (100222, 'en', 'bring up', 'verb', 5),
+        (100223, 'en', 'cast', 'verb', 5),
+        (100224, 'en', 'call back', 'verb', 5),
+        (100225, 'en', 'call off', 'verb', 5),
+        (100226, 'en', 'calm down', 'verb', 5),
+        (100227, 'en', 'check', 'verb', 5),
+        (100228, 'en', 'check in', 'verb', 5),
+        (100229, 'en', 'check out', 'verb', 5),
+        (100230, 'en', 'cheer up', 'verb', 5),
+        (100231, 'en', 'come across', 'verb', 5),
+        (100232, 'en', 'come forward', 'verb', 5),
+        (100233, 'en', 'count on', 'verb', 5),
+        (100234, 'en', 'cross out', 'verb', 5),
+        (100235, 'en', 'deal', 'verb', 5),
+        (100236, 'en', 'dig', 'verb', 5),
+        (100237, 'en', 'dwell', 'verb', 5),
+        (100238, 'en', 'drop in', 'verb', 5),
+        (100239, 'en', 'drop off', 'verb', 5),
+        (100240, 'en', 'drop out', 'verb', 5),
+        (100241, 'en', 'end up', 'verb', 5),
+        (100242, 'en', 'flee', 'verb', 5),
+        (100243, 'en', 'fling', 'verb', 5),
+        (100244, 'en', 'forbid', 'verb', 5),
+        (100245, 'en', 'foresee', 'verb', 5),
+        (100246, 'en', 'forsake', 'verb', 5),
+        (100247, 'en', 'freeze', 'verb', 5),
+        (100248, 'en', 'fall apart', 'verb', 5),
+        (100249, 'en', 'fall down', 'verb', 5),
+        (100250, 'en', 'figure out', 'verb', 5),
+        (100251, 'en', 'find out', 'verb', 5),
+        (100252, 'en', 'grow', 'verb', 5),
+        
+        #
+        # Verbes italiens
+        #
         (200001, 'it', 'aprire', 'verb', 1),
         (200002, 'it', 'viaggiare', 'verb', 1),
         (200003, 'it', 'volere', 'verb', 1),

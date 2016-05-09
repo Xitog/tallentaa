@@ -1,77 +1,21 @@
 ************* Module invoke
-C:101, 0: Line too long (206/100) (line-too-long)
-C:102, 0: Line too long (211/100) (line-too-long)
-C:103, 0: Line too long (161/100) (line-too-long)
-C:104, 0: Trailing whitespace (trailing-whitespace)
-C:110, 0: Trailing whitespace (trailing-whitespace)
-C:120, 0: Trailing whitespace (trailing-whitespace)
-C:125, 0: Trailing whitespace (trailing-whitespace)
-C:129, 0: Trailing whitespace (trailing-whitespace)
-C:131, 0: Trailing whitespace (trailing-whitespace)
-C:136, 0: Trailing whitespace (trailing-whitespace)
-C:141, 0: Trailing whitespace (trailing-whitespace)
-C:159, 0: Line too long (220/100) (line-too-long)
+C:159, 0: Line too long (229/100) (line-too-long)
 C:162, 0: Line too long (121/100) (line-too-long)
-C:171, 0: Line too long (118/100) (line-too-long)
-C:180, 0: Line too long (173/100) (line-too-long)
+C:171, 0: Line too long (127/100) (line-too-long)
+C:180, 0: Line too long (182/100) (line-too-long)
 C:197, 0: Line too long (105/100) (line-too-long)
-C:222, 0: No space allowed after bracket
-        results[row[1]] = { 'id' : row[0], 'base' : row[1], 'pret' : row[2], 'part' : row[3] }
-                          ^ (bad-whitespace)
-C:222, 0: No space allowed before bracket
-        results[row[1]] = { 'id' : row[0], 'base' : row[1], 'pret' : row[2], 'part' : row[3] }
-                                                                                             ^ (bad-whitespace)
-C:226, 0: Line too long (102/100) (line-too-long)
-C:226, 0: No space allowed around keyword argument assignment
-def get_all_verbs_full(p_lang = 'en', p_to = 'fr'): # all verbs, with translations and irregular forms
-                              ^ (bad-whitespace)
-C:226, 0: No space allowed around keyword argument assignment
-def get_all_verbs_full(p_lang = 'en', p_to = 'fr'): # all verbs, with translations and irregular forms
-                                           ^ (bad-whitespace)
 C:230, 0: Line too long (162/100) (line-too-long)
 C:231, 0: Line too long (169/100) (line-too-long)
 C:233, 0: Line too long (112/100) (line-too-long)
 C:234, 0: Line too long (157/100) (line-too-long)
-C:245, 0: No space allowed after bracket
-                actual = { 'nb' : nb }
-                         ^ (bad-whitespace)
-C:245, 0: No space allowed before bracket
-                actual = { 'nb' : nb }
-                                     ^ (bad-whitespace)
 C:262, 0: Line too long (103/100) (line-too-long)
 C:265, 0: Line too long (107/100) (line-too-long)
 C:268, 0: Line too long (102/100) (line-too-long)
-C:269, 0: Trailing whitespace (trailing-whitespace)
-C:270, 0: Trailing whitespace (trailing-whitespace)
 C:271, 0: Line too long (182/100) (line-too-long)
 C:272, 0: Line too long (170/100) (line-too-long)
 C:273, 0: Line too long (101/100) (line-too-long)
 C:274, 0: Line too long (101/100) (line-too-long)
-C:279, 0: Trailing whitespace (trailing-whitespace)
-C:282, 0: No space allowed after bracket
-                actual = { 'nb' : nb }
-                         ^ (bad-whitespace)
-C:282, 0: No space allowed before bracket
-                actual = { 'nb' : nb }
-                                     ^ (bad-whitespace)
-C:290, 0: No space allowed after bracket
-            actual['trans'][p_row[5]] = { 'base' : p_row[4], 'sens' : p_row[6], 'usage' : p_row[8] }
-                                        ^ (bad-whitespace)
-C:290, 0: No space allowed before bracket
-            actual['trans'][p_row[5]] = { 'base' : p_row[4], 'sens' : p_row[6], 'usage' : p_row[8] }
-                                                                                                   ^ (bad-whitespace)
-C:292, 0: No space allowed after bracket
-            actual['trans'][p_row[5]] = { 'base' : p_row[4], 'sens' : p_row[6], 'usage' : p_row[8] }
-                                        ^ (bad-whitespace)
-C:292, 0: No space allowed before bracket
-            actual['trans'][p_row[5]] = { 'base' : p_row[4], 'sens' : p_row[6], 'usage' : p_row[8] }
-                                                                                                   ^ (bad-whitespace)
 C:305, 0: Line too long (101/100) (line-too-long)
-C:314, 0: Trailing whitespace (trailing-whitespace)
-C:326, 0: Exactly one space required after assignment
-        p_order =  p_lang + ".lang, " + p_lang + ".base"
-                ^ (bad-whitespace)
-C:327, 0: Trailing whitespace (trailing-whitespace)
 C:339, 0: Line too long (146/100) (line-too-long)
 C:342, 0: Line too long (120/100) (line-too-long)
 C:344, 0: Line too long (116/100) (line-too-long)
@@ -80,104 +24,49 @@ C:357, 0: Line too long (116/100) (line-too-long)
 C:367, 0: Line too long (121/100) (line-too-long)
 C:369, 0: Line too long (104/100) (line-too-long)
 C:371, 0: Line too long (123/100) (line-too-long)
-C:385, 0: Trailing whitespace (trailing-whitespace)
 C:394, 0: Line too long (102/100) (line-too-long)
-C:432, 0: Trailing whitespace (trailing-whitespace)
-C:436, 0: Trailing whitespace (trailing-whitespace)
-C:438, 0: Trailing whitespace (trailing-whitespace)
 C:441, 0: Line too long (196/100) (line-too-long)
-C:448, 0: Trailing whitespace (trailing-whitespace)
-C:450, 0: Trailing whitespace (trailing-whitespace)
 C:451, 0: Line too long (141/100) (line-too-long)
-C:470, 0: Trailing whitespace (trailing-whitespace)
-C:472, 0: Trailing whitespace (trailing-whitespace)
-C:478, 0: Trailing whitespace (trailing-whitespace)
-C:482, 0: Trailing whitespace (trailing-whitespace)
-C:485, 0: Trailing whitespace (trailing-whitespace)
-C:487, 0: Trailing whitespace (trailing-whitespace)
-C:500, 0: Trailing whitespace (trailing-whitespace)
 C:502, 0: Line too long (140/100) (line-too-long)
 C:512, 0: Line too long (164/100) (line-too-long)
-C:521, 0: Trailing whitespace (trailing-whitespace)
 C:522, 0: Line too long (158/100) (line-too-long)
 C:530, 0: Line too long (103/100) (line-too-long)
-C:534, 0: Trailing whitespace (trailing-whitespace)
 C:539, 0: Line too long (121/100) (line-too-long)
-C:540, 0: Trailing whitespace (trailing-whitespace)
-C:542, 0: Trailing whitespace (trailing-whitespace)
 C:545, 0: Line too long (168/100) (line-too-long)
 C:546, 0: Line too long (209/100) (line-too-long)
 C:550, 0: Line too long (103/100) (line-too-long)
 C:552, 0: Line too long (131/100) (line-too-long)
-C:554, 0: Trailing whitespace (trailing-whitespace)
 C:556, 0: Line too long (254/100) (line-too-long)
 C:557, 0: Line too long (125/100) (line-too-long)
 C:558, 0: Line too long (155/100) (line-too-long)
-C:560, 0: Trailing whitespace (trailing-whitespace)
 C:562, 0: Line too long (238/100) (line-too-long)
 C:563, 0: Line too long (232/100) (line-too-long)
 C:564, 0: Line too long (131/100) (line-too-long)
-C:566, 0: Trailing whitespace (trailing-whitespace)
 C:569, 0: Line too long (308/100) (line-too-long)
 C:570, 0: Line too long (156/100) (line-too-long)
 C:571, 0: Line too long (187/100) (line-too-long)
-C:574, 0: Trailing whitespace (trailing-whitespace)
 C:576, 0: Line too long (133/100) (line-too-long)
 C:577, 0: Line too long (151/100) (line-too-long)
-C:578, 0: Trailing whitespace (trailing-whitespace)
 C:580, 0: Line too long (132/100) (line-too-long)
 C:582, 0: Line too long (131/100) (line-too-long)
-C:583, 0: Trailing whitespace (trailing-whitespace)
 C:585, 0: Line too long (105/100) (line-too-long)
 C:586, 0: Line too long (203/100) (line-too-long)
 C:587, 0: Line too long (201/100) (line-too-long)
-C:588, 0: Trailing whitespace (trailing-whitespace)
 C:590, 0: Line too long (127/100) (line-too-long)
 C:591, 0: Line too long (121/100) (line-too-long)
 C:592, 0: Line too long (171/100) (line-too-long)
-C:593, 0: Trailing whitespace (trailing-whitespace)
 C:594, 0: Line too long (107/100) (line-too-long)
-C:596, 0: Trailing whitespace (trailing-whitespace)
-C:608, 0: Trailing whitespace (trailing-whitespace)
-C:622, 0: Trailing whitespace (trailing-whitespace)
-C:658, 0: Trailing whitespace (trailing-whitespace)
-C:660, 0: Trailing whitespace (trailing-whitespace)
-C:662, 0: Trailing whitespace (trailing-whitespace)
-C:665, 0: Trailing whitespace (trailing-whitespace)
 C:667, 0: Line too long (125/100) (line-too-long)
 C:680, 0: Line too long (138/100) (line-too-long)
 C:682, 0: Line too long (115/100) (line-too-long)
 C:688, 0: Line too long (129/100) (line-too-long)
-C:689, 0: Exactly one space required around assignment
-                i+=1
-                 ^^ (bad-whitespace)
-C:690, 0: Exactly one space required around assignment
-            nb+=1
-              ^^ (bad-whitespace)
-C:692, 0: Trailing whitespace (trailing-whitespace)
-C:695, 0: Trailing whitespace (trailing-whitespace)
-C:697, 0: Trailing whitespace (trailing-whitespace)
-C:706, 0: Trailing whitespace (trailing-whitespace)
-C:717, 0: Trailing whitespace (trailing-whitespace)
-C:733, 0: Trailing whitespace (trailing-whitespace)
-C:765, 0: Trailing whitespace (trailing-whitespace)
 C:774, 0: Line too long (110/100) (line-too-long)
-C:784, 0: Trailing whitespace (trailing-whitespace)
-C:791, 0: Trailing whitespace (trailing-whitespace)
-C:797, 0: Trailing whitespace (trailing-whitespace)
-C:818, 0: Trailing whitespace (trailing-whitespace)
-C:826, 0: Trailing whitespace (trailing-whitespace)
-C:830, 0: Trailing whitespace (trailing-whitespace)
 C:864, 0: Line too long (104/100) (line-too-long)
 C:866, 0: Line too long (146/100) (line-too-long)
 C:906, 0: Line too long (112/100) (line-too-long)
 C:921, 0: Line too long (132/100) (line-too-long)
 C:923, 0: Line too long (105/100) (line-too-long)
-C:939, 0: Exactly one space required after comma
-            elif c_tab[0] in ['conjugate', 'conj','con']:
-                                                 ^ (bad-whitespace)
 C:941, 0: Line too long (115/100) (line-too-long)
-C:949, 0: Trailing whitespace (trailing-whitespace)
 C:  1, 0: Missing module docstring (missing-docstring)
 C: 48, 0: Missing function docstring (missing-docstring)
 C: 53, 8: Invalid variable name "cc" (invalid-name)
@@ -186,11 +75,9 @@ C: 75, 8: Invalid variable name "cc" (invalid-name)
 C: 76, 8: Invalid variable name "de" (invalid-name)
 C: 90, 0: Missing function docstring (missing-docstring)
 R: 90, 0: Too many local variables (16/15) (too-many-locals)
-C: 97, 4: Invalid variable name "c" (invalid-name)
 C:113, 8: Invalid variable name "cc" (invalid-name)
 C:115,12: Invalid variable name "v" (invalid-name)
 C:139, 4: Invalid variable name "e" (invalid-name)
-C:149, 4: Invalid variable name "c" (invalid-name)
 C:153, 4: Invalid variable name "f" (invalid-name)
 C:185, 4: Invalid variable name "s" (invalid-name)
 R: 90, 0: Too many branches (13/12) (too-many-branches)
@@ -280,8 +167,8 @@ C:494, 4: Invalid variable name "f" (invalid-name)
 C:524, 8: Invalid variable name "t" (invalid-name)
 C:526,12: Invalid variable name "xs" (invalid-name)
 C:527,16: Invalid variable name "x" (invalid-name)
-W:495, 4: Unused variable 'pronoms' (unused-variable)
 W:489,17: Unused argument 'verb' (unused-argument)
+W:495, 4: Unused variable 'pronoms' (unused-variable)
 R:489, 0: Too many branches (16/12) (too-many-branches)
 R:489, 0: Too many statements (83/50) (too-many-statements)
 C:604, 0: Missing class docstring (missing-docstring)
@@ -326,12 +213,11 @@ C:910,12: Invalid variable name "s" (invalid-name)
 R:827, 4: Too many branches (43/12) (too-many-branches)
 R:827, 4: Too many statements (117/50) (too-many-statements)
 C:951, 4: Invalid constant name "commands" (invalid-name)
-W: 41, 0: Unused import unicodedata (unused-import)
 
 
 Report
 ======
-658 statements analysed.
+657 statements analysed.
 
 Statistics by type
 ------------------
@@ -356,11 +242,11 @@ Raw metrics
 +----------+-------+------+---------+-----------+
 |type      |number |%     |previous |difference |
 +==========+=======+======+=========+===========+
-|code      |743    |77.80 |743      |=          |
+|code      |742    |77.70 |742      |=          |
 +----------+-------+------+---------+-----------+
 |docstring |6      |0.63  |6        |=          |
 +----------+-------+------+---------+-----------+
-|comment   |101    |10.58 |101      |=          |
+|comment   |102    |10.68 |102      |=          |
 +----------+-------+------+---------+-----------+
 |empty     |105    |10.99 |105      |=          |
 +----------+-------+------+---------+-----------+
@@ -386,11 +272,11 @@ Messages by category
 +-----------+-------+---------+-----------+
 |type       |number |previous |difference |
 +===========+=======+=========+===========+
-|convention |218    |218      |=          |
+|convention |137    |139      |-2.00      |
 +-----------+-------+---------+-----------+
 |refactor   |22     |22       |=          |
 +-----------+-------+---------+-----------+
-|warning    |8      |8        |=          |
+|warning    |7      |7        |=          |
 +-----------+-------+---------+-----------+
 |error      |48     |48       |=          |
 +-----------+-------+---------+-----------+
@@ -403,17 +289,13 @@ Messages
 +-----------------------------+------------+
 |message id                   |occurrences |
 +=============================+============+
-|line-too-long                |72          |
+|line-too-long                |68          |
 +-----------------------------+------------+
-|trailing-whitespace          |59          |
-+-----------------------------+------------+
-|invalid-name                 |46          |
+|invalid-name                 |44          |
 +-----------------------------+------------+
 |unsubscriptable-object       |39          |
 +-----------------------------+------------+
 |missing-docstring            |21          |
-+-----------------------------+------------+
-|bad-whitespace               |16          |
 +-----------------------------+------------+
 |undefined-variable           |9           |
 +-----------------------------+------------+
@@ -433,8 +315,6 @@ Messages
 +-----------------------------+------------+
 |too-many-nested-blocks       |2           |
 +-----------------------------+------------+
-|unused-import                |1           |
-+-----------------------------+------------+
 |too-many-instance-attributes |1           |
 +-----------------------------+------------+
 |too-many-arguments           |1           |
@@ -448,5 +328,5 @@ Messages
 
 Global evaluation
 -----------------
-Your code has been rated at 2.58/10 (previous run: 2.58/10, +0.00)
+Your code has been rated at 3.82/10 (previous run: 3.79/10, +0.03)
 

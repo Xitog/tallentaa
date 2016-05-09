@@ -38,7 +38,7 @@
 import os
 import sys
 import sqlite3
-import unicodedata
+#import unicodedata
 import invoke_data
 
 #------------------------------------------------------------------------------
@@ -87,27 +87,27 @@ def check_content_trans(content, verbes_id):
         exit()
 
 
-def create():
+def create(dbPath):
     try:
-        os.remove('example.db')
+        os.remove(dbPath)
     except FileNotFoundError:
         print("FileNotFound")
 
-    conn = sqlite3.connect('example.db')
-    c = conn.cursor()
+    conn = sqlite3.connect(dbPath)
+    connection = conn.cursor()
 
     # Tables creation
 
-    c.execute("CREATE TABLE IF NOT EXISTS voc_verbs ( id int(11) NOT NULL, lang varchar(2) NOT NULL, base varchar(50) NOT NULL, surtype varchar(30) NOT NULL, lvl int(11) DEFAULT '1', PRIMARY KEY (`id`) ) ")
-    c.execute("CREATE TABLE IF NOT EXISTS voc_translate ( id int(11) NOT NULL, de int(11) NOT NULL, vers int(11) NOT NULL, sens varchar(100) DEFAULT NULL, usage varchar(100) DEFAULT NULL, PRIMARY KEY (`id`) ) ")
-    c.execute("CREATE TABLE IF NOT EXISTS voc_verbs_en ( id int(11) NOT NULL, base varchar(50) NOT NULL, pret varchar(50) NOT NULL, part varchar(50) NOT NULL )")
-    
+    connection.execute(invoke_data.get_create_table_verbs())
+    connection.execute(invoke_data.get_create_table_trans())
+    connection.execute(invoke_data.get_create_table_verbs_en())
+
     # Tables filling
 
     content = invoke_data.get_verbs()
     verbes_id = check_content_verbs(content)
-    c.executemany('INSERT INTO voc_verbs VALUES (?,?,?,?,?)', content)
-    
+    connection.executemany('INSERT INTO voc_verbs VALUES (?,?,?,?,?)', content)
+
     content_verbs_en = invoke_data.get_irregular_verbs()
     irr_not_found = 0
     for cc in content_verbs_en:
@@ -117,46 +117,46 @@ def create():
                 # le verbe est dans la base et dans celle des irréguliers
                 found = True
                 break
-        if not found:        
+        if not found:
             # on a un irrégulier qui n'est pas dans notre base
             print(cc[1])
             irr_not_found += 1
     print("i Irregulars not found in our base :", irr_not_found)
-    
-    c.executemany('INSERT INTO voc_verbs_en VALUES (?,?,?,?)', content_verbs_en)
+
+    connection.executemany('INSERT INTO voc_verbs_en VALUES (?,?,?,?)', content_verbs_en)
 
     content = invoke_data.get_traductions()
-    
+
     check_content_trans(content, verbes_id)
-    
+
     for i in content:
         if len(i) != 5:
             print(i)
             exit()
-    
+
     try:
-        c.executemany('INSERT INTO voc_translate VALUES (?, ?, ?, ?, ?)', content)
+        connection.executemany('INSERT INTO voc_translate VALUES (?, ?, ?, ?, ?)', content)
     except sqlite3.ProgrammingError as e:
         print('! Erreur : ' + str(e))
-    
+
     conn.commit()
 
     conn.close()
 
     # ---
 
-    conn = sqlite3.connect('example.db')
-    c = conn.cursor()
+    conn = sqlite3.connect(dbPath)
+    connection = conn.cursor()
 
-    #c.execute("SELECT * FROM voc_verbs")
-    #r = c.fetchone()
-    f = open('results.txt', mode='w', encoding='utf-8')
+    #connection.execute("SELECT * FROM voc_verbs")
+    #r = connection.fetchone()
+    f = open('./output/results.txt', mode='w', encoding='utf-8')
 
     f.write("------------------------------------------------------------------------\n")
     f.write("Toutes les traductions\n")
     f.write("------------------------------------------------------------------------\n")
     i = 0
-    for row in c.execute("SELECT fr.base, en.base, t.sens FROM voc_verbs as fr, voc_verbs as en, voc_translate as t WHERE fr.id = t.de AND en.id = t.vers AND fr.lang = 'fr' AND en.lang = 'en' ORDER BY fr.lang, fr.base"):
+    for row in connection.execute("SELECT fr.base, en.base, t.sens FROM voc_verbs as fr, voc_verbs as en, voc_translate as t WHERE fr.id = t.de AND en.id = t.vers AND fr.lang = 'fr' AND en.lang = 'en' ORDER BY fr.lang, fr.base"):
         i += 1
         if row[2] is not None:
             f.write(str(i) + ". " + row[0] + " --> to " + row[1] + " avec le sens de : " + row[2] +"\n") #'::'.join(row))
@@ -168,7 +168,7 @@ def create():
     f.write("Tous les verbes français\n")
     f.write("------------------------------------------------------------------------\n")
     i = 0
-    for row in c.execute("SELECT fr.id, fr.base FROM voc_verbs as fr WHERE fr.lang = 'fr' ORDER BY fr.lang, fr.base"):
+    for row in connection.execute("SELECT fr.id, fr.base FROM voc_verbs as fr WHERE fr.lang = 'fr' ORDER BY fr.lang, fr.base"):
         i += 1
         f.write(str(i) + ". #" + str(row[0]) + " " + row[1] + "\n")
 
@@ -177,7 +177,7 @@ def create():
     f.write("Verbes non traduits\n")
     f.write("------------------------------------------------------------------------\n")
     i = 0
-    for row in c.execute("SELECT fr.id, fr.base FROM voc_verbs as fr WHERE fr.lang = 'fr' AND fr.id NOT IN (SELECT t.de FROM voc_translate as t) ORDER BY fr.lang, fr.base"):
+    for row in connection.execute("SELECT fr.id, fr.base FROM voc_verbs as fr WHERE fr.lang = 'fr' AND fr.id NOT IN (SELECT t.de FROM voc_translate as t) ORDER BY fr.lang, fr.base"):
         i += 1
         f.write(str(i) + ". #" + str(row[0]) + " " + row[1] + "\n")
 
@@ -188,8 +188,8 @@ def create():
     f.close()
 
 
-def exec_stat(p_auto=False, p_debug=False):
-    p_conn = sqlite3.connect('example.db')
+def exec_stat(dbPath, p_auto=False, p_debug=False):
+    p_conn = sqlite3.connect(dbPath)
     p_cursor = p_conn.cursor()
     dic = {'fr': 'French', 'en': 'English', 'it': 'Italian', 'eo': 'Esperanto', 'de' : 'German'}
     total = 0
@@ -213,18 +213,18 @@ def exec_stat(p_auto=False, p_debug=False):
     p_conn.close()
 
 
-def get_all_verbs_en(): # fetch irregular
-    conn = sqlite3.connect('example.db')
+def get_all_verbs_en(dbPath): # fetch irregular
+    conn = sqlite3.connect(dbPath)
     cursor = conn.cursor()
     request = "SELECT id, base, pret, part FROM voc_verbs_en"
     results = {}
     for row in cursor.execute(request):
-        results[row[1]] = { 'id' : row[0], 'base' : row[1], 'pret' : row[2], 'part' : row[3] }
+        results[row[1]] = {'id' : row[0], 'base' : row[1], 'pret' : row[2], 'part' : row[3]}
     return results
 
 
-def get_all_verbs_full(p_lang = 'en', p_to = 'fr'): # all verbs, with translations and irregular forms
-    p_conn = sqlite3.connect('example.db')
+def get_all_verbs_full(dbPath, p_lang='en', p_to='fr'): # all verbs, with translations and irregular forms
+    p_conn = sqlite3.connect(dbPath)
     p_cursor = p_conn.cursor()
     p_order = p_lang + '.base'
     nb = 0                           # 0                    1                    2                      3                 4                  5     6       7     8
@@ -236,13 +236,13 @@ def get_all_verbs_full(p_lang = 'en', p_to = 'fr'): # all verbs, with translatio
     nb = 0
     verbs = []
     actual = None
-    irregulars = get_all_verbs_en()
+    irregulars = get_all_verbs_en(dbPath)
     #print(p_string)
     for p_row in p_cursor.execute(p_string):
         if actual is None or actual['id'] != p_row[0]:
             nb += 1
             if actual is None:
-                actual = { 'nb' : nb }
+                actual = {'nb' : nb}
             else:
                 # gestion à particules
                 if len(actual['base'].split(' ')) > 1:
@@ -266,8 +266,8 @@ def get_all_verbs_full(p_lang = 'en', p_to = 'fr'): # all verbs, with translatio
                             actual['part'] = actual['root_base'] + "ed"
                         else:
                             actual['part'] = actual['root_base'][0:-1] + "ied"      # carry => carried
-                    elif actual['root_base'][-1] not in ['a', 'i', 'o', 'u']:       
-                        if actual['root_base'][-2] in ['a', 'u', 'i']:              
+                    elif actual['root_base'][-1] not in ['a', 'i', 'o', 'u']:
+                        if actual['root_base'][-2] in ['a', 'u', 'i']:
                             if actual['root_base'][-3] in ['a', 'e', 'o', 'u'] or len(actual['root_base']) > 4:     # base (cook => cooked, wait => waited) et le cas visit => visited
                                 actual['part'] = actual['root_base'] + 'ed'                                         # au lieu de la len faire juste que -3 ne soit pas i ?
                             else:                                                   # chat => chatted
@@ -276,10 +276,10 @@ def get_all_verbs_full(p_lang = 'en', p_to = 'fr'): # all verbs, with translatio
                             actual['part'] = actual['root_base'] + 'ed'             # base
                     else:
                         actual['part'] = actual['root_base'] + 'ed'                 # base
-                    
+
                     actual['pret'] = actual['part']
                 verbs.append(actual)
-                actual = { 'nb' : nb }
+                actual = {'nb' : nb}
             #print('verbe : ' + p_row[1])
             actual['id'] = p_row[0]
             actual['base'] = p_row[1]
@@ -287,9 +287,9 @@ def get_all_verbs_full(p_lang = 'en', p_to = 'fr'): # all verbs, with translatio
             actual['lvl'] = p_row[3]
             actual['trans'] = {}
             # attention parfois p_row 6 ou 8 peuvent-être None
-            actual['trans'][p_row[5]] = { 'base' : p_row[4], 'sens' : p_row[6], 'usage' : p_row[8] }
+            actual['trans'][p_row[5]] = {'base' : p_row[4], 'sens' : p_row[6], 'usage' : p_row[8]}
         elif actual is not None:
-            actual['trans'][p_row[5]] = { 'base' : p_row[4], 'sens' : p_row[6], 'usage' : p_row[8] }
+            actual['trans'][p_row[5]] = {'base' : p_row[4], 'sens' : p_row[6], 'usage' : p_row[8]}
     if actual is not None:
         if len(actual['base'].split(' ')) > 1:
             actual['root_base'] = actual['base'].split(' ')[0]
@@ -311,7 +311,7 @@ def get_all_verbs_full(p_lang = 'en', p_to = 'fr'): # all verbs, with translatio
             elif actual['root_base'][-1] == 'y':
                 actual['part'] = actual['root_base'][0:-1] + "ied"
             actual['pret'] = actual['part']
-        
+
         verbs.append(actual)
     return verbs
 
@@ -321,11 +321,11 @@ def get_all_verbs_full(p_lang = 'en', p_to = 'fr'): # all verbs, with translatio
 #v = get_all_verbs()
 #pretty_print(v)
 
-def exec_cmd(p_main, p_lang, p_order='', p_auto=False, p_to=None, p_debug=False, display=True):
+def exec_cmd(dbPath, p_main, p_lang, p_order='', p_auto=False, p_to=None, p_debug=False, display=True):
     if p_order == '':
-        p_order =  p_lang + ".lang, " + p_lang + ".base"
-    
-    p_conn = sqlite3.connect('example.db')
+        p_order = p_lang + ".lang, " + p_lang + ".base"
+
+    p_conn = sqlite3.connect(dbPath)
     p_cursor = p_conn.cursor()
     nb = 0
     if p_main in ['select', 'trans']:
@@ -382,7 +382,7 @@ def exec_cmd(p_main, p_lang, p_order='', p_auto=False, p_to=None, p_debug=False,
             v['surtype'] = p_row[2]
             v['lvl'] = p_row[3]
             verbs.append(v)
-    print("i Number of returned results = " + str(nb))    
+    print("i Number of returned results = " + str(nb))
     p_cursor.close()
     p_conn.close()
     if display:
@@ -393,13 +393,13 @@ def exec_cmd(p_main, p_lang, p_order='', p_auto=False, p_to=None, p_debug=False,
 # Conjugate : new from 2/11/2015
 # Il faudrait faire une option qui génère tout cela dans un fichier texte plutôt qu'en sortie console.
 # Aucun test, cela ne marche que pour les verbes du 1er groupe se conjuguant avec avoir.
-def conjugate(verb, lang, onfile=False, html=False):
+def conjugate(dbPath, verb, lang, onfile=False, html=False):
     if lang not in ['fr', 'en']:
         print('Unknwon conjugaison for', lang)
         return
     if verb == 'all' and lang == 'en':
         # make book
-        r = get_all_verbs_full()
+        r = get_all_verbs_full(dbPath)
         #print("To do for", len(r))
         nb = 0
         for v in r:
@@ -410,7 +410,7 @@ def conjugate(verb, lang, onfile=False, html=False):
                 print(v['surtype'])
         print('i Conjugaison done for', len(r), 'verbs')
     elif verb == 'all':
-        r = exec_cmd('select', lang, '', False, None, False, False)
+        r = exec_cmd(dbPath, 'select', lang, '', False, None, False, False)
         # filter on verb
         nb = 0
         for v in r:
@@ -427,15 +427,15 @@ def conjugate(verb, lang, onfile=False, html=False):
         elif lang == 'en':
             conjugate_en(verb, onfile, html)
 
-def header_en():
-    f = open('output.html', mode='w', encoding='utf-8')
-    
+def header_en(dbPath):
+    f = open('./output/output1.html', mode='w', encoding='utf-8')
+
     html = open('invoke_chapters.html', mode='r', encoding='utf-8')
     html_content = html.read()
     html_parts = html_content.split('<!-- SPLIT HERE -->')
-    
-    verbs_en = get_all_verbs_full('en', 'fr')
-    
+
+    verbs_en = get_all_verbs_full(dbPath, 'en', 'fr')
+
     f.write(html_parts[0].replace('#NB#', str(len(verbs_en))))
     for v in verbs_en:
         f.write('<h3><a href="#' + str(v['id']) + '">' + str(v['nb']) + '. ' + v['root_base'] + v['particle'] + ' &nbsp;(' + v['pret'] + v['particle'] + ', ' + v['part'] + v['particle'] + ')</a>')
@@ -445,9 +445,9 @@ def header_en():
     f.write('\n\n')
     f.write('<p>Les verbes avec une ast&eacute;risque <b>*</b> sont irr&eacute;guliers.</p>')
     f.write('<mbp:pagebreak />')
-    
-    verbs_fr = get_all_verbs_full('fr', 'en')
-    
+
+    verbs_fr = get_all_verbs_full(dbPath, 'fr', 'en')
+
     f.write('<h2 id="liste_fr_en">Les ' + str(len(verbs_en)) + ' verbes fondamentaux anglais à partir de leurs traductions en français</h2>')
     for v in verbs_fr:
         f.write('<h3>' + str(v['nb']) + '. ' + v['root_base'] + v['particle'] + ' : ')
@@ -467,37 +467,37 @@ def header_en():
         f.write(trans + '</h3>\n')
     f.write('<p>Les verbes avec une ast&eacute;risque <b>*</b> sont irr&eacute;guliers.</p>')
     f.write('<mbp:pagebreak />')
-    
+
     f.write(html_parts[1].replace('#NB#', str(len(verbs_en))))
-    
+
     f.close()
 
 
-def footer_en():
-    f = open('output.html', mode='a', encoding='utf-8')
-    
+def footer_en(dbPath):
+    f = open('./output/output1.html', mode='a', encoding='utf-8')
+
     html = open('invoke_chapters.html', mode='r', encoding='utf-8')
     html_content = html.read()
     html_parts = html_content.split('<!-- SPLIT HERE -->')
-    
-    verbs_en = get_all_verbs_full('en', 'fr')
+
+    verbs_en = get_all_verbs_full(dbPath, 'en', 'fr')
     f.write(html_parts[2].replace('#NB#', str(len(verbs_en))))
-    
+
     f.close()
-    
+
 
 def conjugate_en(verb, onfile=False, html=False, info=None, nb=None):
     if not onfile or not html or nb is None or info is None:
         print("i This function works only with onfile and html set at true")
         return
 
-    f = open('output.html', mode='a', encoding='utf-8')
+    f = open('./output/output1.html', mode='a', encoding='utf-8')
     pronoms = ['I', 'you', 'she, he, it', 'we', 'you', 'they']
     root = info['root_base']
     particle = info['particle']
     pret = info['pret']
     part = info['part']
-    
+
     # Present 3e
     if root[-1] == 'y' and root[-2] in ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'z']:
         pres3 = root[0:-1] + "ies"
@@ -518,7 +518,7 @@ def conjugate_en(verb, onfile=False, html=False, info=None, nb=None):
             ing = root + root[-1] + 'ing'
     else:
         ing = root + 'ing'
-    
+
     f.write('<h2 id="' + str(info['id']) + '">' + str(nb) + '. ' + root + particle + ' &nbsp;&nbsp;(' + pret + particle + ', ' + part + particle + ')</h2>\n')
     f.write('<p><b>Sens et traduction</b> : <ul>\n')
     for t in info['trans']:
@@ -531,15 +531,15 @@ def conjugate_en(verb, onfile=False, html=False, info=None, nb=None):
         else:
             f.write('\t<li>' + info['trans'][t]['base'] + '</li>\n')
     f.write('</ul></p>\n')
-    
+
     #f.write('<p><b>Base verbale</b> : ' + root + '</p>\n')
     f.write('<p><b>Infinitif</b> : <b>to <b class="present">' + root + '</b></b></p>\n')
     f.write('<p><b>Participe passé</b> : <b class="pp">' + part + '</b></p>\n')
     f.write('<p><b>Participe présent</b> : <b class="ing">' + ing + particle + '</b></p>\n')
     f.write('<p><b>Voix passive</b> : <b>were ' + part + '</b> (1ère et 3e pers. sing. : <b>was ' + part + '</b>)</p>\n')
-    
+
     f.write('<h3>Indicatif</h3>\n')
-    
+
     f.write('<div class="simple">\n')
     f.write('<p><b>Présent simple</b> :<ul>\n')
     f.write('\t<li>forme <b>affirmative</b> : <b class="present">' + root + particle + '</b> (3e pers. sing. : <b class="present">' + pres3 + particle + '</b>)</li>\n')
@@ -551,19 +551,19 @@ def conjugate_en(verb, onfile=False, html=False, info=None, nb=None):
     f.write('</ul></p>\n')
     f.write('<p><b>Futur simple</b> : <b class="future">will</b> <b>(not)</b> <b class="future">' + root + particle + '</b></p>\n')
     f.write('</div>\n')
-    
+
     f.write('<div class="pp">\n')
     f.write('<p><b>Présent parfait</b> : <b class="present">have</b> <b>(not)</b> <b class="pp">' + part + particle + '</b> (3e pers. sing. : <b class="present">' + 'ha</b><b class="s">s</b> <b>(not)</b> <b class="pp">' + part + particle + '</b>)</p>\n')
     f.write('<p><b>Passé parfait</b> : <b class="past">had</b> <b>(not)</b> <b class="pp">' + part + particle + '</b></p>\n')
     f.write('<p><b>Futur parfait</b> : <b class="future">will</b> <b>(not)</b> <b class="future">have</b> <b class="pp">' + part + particle + '</b></p>\n')
     f.write('</div>\n')
-    
+
     f.write('<div class="ing">\n')
     f.write('<p><b>Présent continu</b> : <b class="present">are</b> <b>(not)</b> <b class="ing">' + ing + particle +  '</b> (1ère et 3e pers. sing. : <b class="present">is</b> <b>(not)</b> <b class="ing">' + ing + particle + '</b></p>\n')
     f.write('<p><b>Passé continu</b> : <b class="past">were</b> <b>(not)</b> <b class="ing">' + ing + particle +  '</b> (1ère et 3e pers. sing. : <b class="past">was</b> <b>(not)</b> <b class="ing">' + ing + particle + '</b></p>\n')
     f.write('<p><b>Futur continu</b> : <b class="future">will be</b> <b>(not)</b> <b class="ing">' + ing + particle + '</b></p>\n')
     f.write('</div>\n')
-    
+
     f.write('<div class="pp">\n')
     f.write('<div class="ing">\n')
     f.write('<p><b>Présent parfait continu</b> : <b class="present">have</b> <b>(not)</b> <b class="pp">been</b> <b class="ing">' + ing + particle + '</b> (3e pers. sing. : <b class="present">' + 'ha</b><b class="s">s</b> <b>(not)</b> <b class="pp">been</b> <b class="ing">' + ing + particle + '</b>)</p>\n')
@@ -571,29 +571,29 @@ def conjugate_en(verb, onfile=False, html=False, info=None, nb=None):
     f.write('<p><b>Futur parfait continu</b> : <b class="future">will</b> <b>(not)</b> <b class="future">have</b> <b class="pp">been</b> <b class="ing">' + part + particle + '</b></p>\n')
     f.write('</div>\n')
     f.write('</div>\n')
-    
+
     f.write('<h3>Conditionnel</h3>\n')
     f.write('<p><b>Présent</b> : <b class="cond">should/would</b> <b>(not)</b> <b class="present">' + root + particle + '</b></p>\n')
     f.write('<p><b>Passé</b> : <b class="cond">should/would</b> <b>(not)</b> <b class="cond">have</b> <b class="pp">' + part + particle + '</b></p>\n')
-    
+
     f.write('<h3>Subjonctif</h3>\n')
     f.write('<p><b>Présent</b> : <b>(not)</b> <b class="present">' + root + particle + '</b> (à <u>toutes</u> les personnes)</p>\n')
     if root == 'be':
         f.write('<p><b>Passé</b> : <b>(not)</b> <b class="past">' + pret + particle + '</b> (à <u>toutes</u> les personnes)</p>\n')
-    
+
     f.write('<h3>Impératif</h3>\n')
     f.write('<p><b>2e pers.</b> : <b>(do not)</b> <b class="present">' + root + particle + '</b>!</p>\n')
     f.write('<p><b>1e pers. du pluriel</b> (avec deux façons d\'exprimer la négation) : <b>(do not)</b> <b class="present">let</b> \'s <b>(not)</b> <b class="present">' + root + particle + '</b>!</p>\n')
     f.write('<p><b>3e pers.</b> (avec deux façons d\'exprimer la négation) : <b>(do not)</b> <b class="present">let</b> her/him/them <b>(not)</b> <b class="present">' + root + particle + '</b>!</p>\n')
-    
+
     #f.write('<h3>Constructions avec auxilaires</h3>\n')
     #f.write('<p>Expression d\'une <b>potentialité</b> : may/might (not) <b class="present">' + root + particle + '</b></p>\n')
     #f.write('<p>Expression d\'une <b>autorisation</b> : may (not) <b class="present">' + root + particle + '</b></p>\n')
     #f.write('<p>Expression d\'un <b>doute</b>, d\'une <b>supposition</b> ou <b>atténuation polie</b> : should (not) <b class="present">' + root + particle + '</b></p>\n')
-    
+
     f.write('<div class="retour"><b><a href="#tous_les_verbes">Retour à la liste des verbes</a></b></div>')
     f.write('<mbp:pagebreak />')
-    
+
     f.close()
 
 
@@ -605,7 +605,7 @@ class Renderer:
 
     def __init__(self, tables):
         self.tables = tables
-    
+
     def info(self):
         print('Number of tables:', len(tables))
         for key in tables:
@@ -619,7 +619,7 @@ class Renderer:
 #------------------------------------------------------------------------------
 
 class ConjugateTabularEn(Renderer):
-    
+
     def header(self, f):
         f.write("""
 <head>
@@ -627,45 +627,52 @@ class ConjugateTabularEn(Renderer):
         table {
             border: 1px solid rgb(91, 155, 213);
             border-collapse: collapse;
-            width: 18cm;
+            width: 20cm;
             margin: auto;
             font-size: 18px;
             font-family: Calibri;
         }
-        
+
         td.num {
             width: 1.5cm;
             text-align: center;
         }
-        
+
         th {
             background: rgb(91, 155, 213);
             color: rgb(255, 255, 255);
             font-weight: bold;
         }
-        
+
         tr:nth-child(odd) {
             background: rgb(242, 242, 242);
         }
-        
+
         span.irr {
             font-weight: bold;
             color: rgb(10, 10, 100); //rgb(146, 208, 80);
         }
+        
+        h1 {
+            width: 100%;
+            text-align: center;
+        }
     </style>
 </head>
         """)
-    
+
     def render(self, target):
-        
+
         verbs = self.tables['verbs']
-        
+
         f = open(target, mode='w', encoding='utf-8')
         self.header(f)
-        
+
         f.write('<table>\n')
-        f.write('<tr><th>n°</th><th>Base verbale</th><th>Prétérit</th><th>Participe passé</th><th>Traduction(s)</th></tr>\n')
-        nb = 1
+        f.write('<tr><th>n° racine</th><th>n° verbe</th><th>n° trad</th><th>Base verbale</th><th>Prétérit</th><th>Participe passé</th><th>Traduction(s)</th></tr>\n')
+        nb_root = 0
+        nb_verb = 1
+        nb_trad = 0
         previous_base = None
         for v in verbs:
             verb = v['root_base'] + ' ' + v['particle']
@@ -676,25 +683,29 @@ class ConjugateTabularEn(Renderer):
             pret = v['pret'] if not v['irregular'] else '<span class="irr">' + v['pret'] + '</span>'
             part = v['part'] if not v['irregular'] else '<span class="irr">' + v['part'] + '</span>'
             trans = v['trans']
+            nb_trad += 1
             if previous_base is None or previous_base != v['root_base']:
-                f.write('<tr><td class="num">' + str(nb) + '</td><td>' + verb_display + '</td><td>' + pret + '</td><td>' + part + '</td>')
+                nb_root += 1
+                f.write('<tr><td class="num">' + str(nb_root) + '</td><td class="num">' + str(nb_verb) + '</td><td class="num">' + str(nb_trad) + '</td><td>' + verb_display + '</td><td>' + pret + '</td><td>' + part + '</td>')
             else:
-                f.write('<tr><td class="num">' + str(nb) + '</td><td> ' + verb_display + '</td><td></td><td></td>')
+                f.write('<tr><td></td><td class="num">' + str(nb_verb) + '</td><td class="num">' + str(nb_trad) + '</td><td> ' + verb_display + '</td><td></td><td></td>')
             i = 1
             for t in trans:
                 if i == 1:
                     f.write('<td>to ' + verb + ' : ' + trans[t]['base'] + '</td></tr>\n')
                 elif i > 1:
-                    f.write('<tr><td></td><td></td><td></td><td></td><td>to ' + verb + ' : ' + trans[t]['base'] + '</td></tr>\n')
-                i+=1
-            nb+=1
+                    nb_trad += 1
+                    f.write('<tr><td></td><td></td><td class="num">' + str(nb_trad) + '</td><td></td><td></td><td></td><td>to ' + verb + ' : ' + trans[t]['base'] + '</td></tr>\n')
+                i += 1
+            nb_verb += 1
             previous_base = v['root_base']
-        
+
         f.write('</table>\n')
+        f.write('<h1>' + str(nb_root) + ' bases, ' + str(nb_verb) + ' verbs, ' + str(nb_trad-1) + ' traductions.</h1>')
         f.close()
-        
-        return nb
-        
+
+        return nb_verb
+
 #------------------------------------------------------------------------------
 # Simple renderer for French, txt or html
 #------------------------------------------------------------------------------
@@ -703,9 +714,9 @@ class ConjugateFr(Renderer):
 
     def render(self, onfile=False, html=False):
         verbs = self.tables['verbs']
-        
+
         if onfile:
-            f = open('output.html', mode='a', encoding='utf-8')
+            f = open('./output/output1.html', mode='a', encoding='utf-8')
             if not html:
                 f.write('\n###################################################\n\n')
                 f.write('1. Indicatif présent\n')
@@ -714,7 +725,7 @@ class ConjugateFr(Renderer):
         pronoms = ['je', 'tu', 'elle, il', 'nous', 'vous', 'elles, ils']
         espace_pro = ['\t\t', '\t\t', '\t', '\t\t', '\t\t', '\t']
         root = verb[:-2]
-        
+
         if not onfile: print('\n1. Indicatif présent')
         suffix = ['e', 'es', 'e', 'ons', 'ez', 'ont']
         for i, term in enumerate(suffix):
@@ -730,7 +741,7 @@ class ConjugateFr(Renderer):
                 f.write('\n2. Indicatif imparfait\n')
             else:
                 f.write('</tbody></table>\n\n<table><tbody>\n')
-        
+
         if not onfile: print('\n2. Indicatif imparfait')
         suffix = ['ais', 'ais', 'ait', 'ions', 'iez', 'aient']
         for i, term in enumerate(suffix):
@@ -762,7 +773,7 @@ class ConjugateFr(Renderer):
                 f.write('\n4. Indicatif passé composé\n')
             else:
                 f.write('</tbody></table>\n\n<table><tbody>\n')
-        
+
         if not onfile: print('\n4. Indicatif passé composé')
         pronoms = ["j'", 'tu', 'elle, il', 'nous', 'vous', 'elles, ils']
         prefix = ['ai', 'as', 'a', 'avons', 'avez', 'ont']
@@ -781,20 +792,20 @@ class ConjugateFr(Renderer):
             print('i file output.html extended')
         else:
             print()
-        
+
         #f.write('4. Participe passé\n')
         #suffix_partpast = ['é', 'ée', 'és', 'ées']
         #root_pp = root
         #for index, value in enumerate(suffix_partpast):
         #    f.write('\t\t' + root_pp + value + '\n')
         #f.write('\n')
-        
+
         #f.write('5. Participe présent\n')
         #suffix_partpresent = ['ant']
         #root_pp = root
         #f.write('\t\t' + root_pp + suffix_partpresent[0] + '\n')
         #f.write('\n')
-    
+
 #------------------------------------------------------------------------------
 # Console
 #------------------------------------------------------------------------------
@@ -815,7 +826,7 @@ class Console:
         print("i Type 'help' for help")
         print("i DEBUG is set to", self.cmd_debug)
         self.mainloop(pre)
-        
+
     def mainloop(self, pre=[]):
         if len(pre) > 0:
             for p in pre:
@@ -823,11 +834,14 @@ class Console:
         while not self.escape:
             self.cmd = input('>>> ')
             self.interpret()
-            
+
     def interpret(self, pcmd=None):
+    
+        dbPath = './output/example.db'
+        
         if pcmd is not None:
             self.cmd = pcmd
-        
+
         if self.cmd == 'exit':
             print('i Goodbye!')
             exit(0)
@@ -856,14 +870,14 @@ class Console:
             print("  Available languages are : fr, en, it, eo, de")
         elif self.cmd == 'create':
             print("i Recreating the database")
-            create()
+            create(dbPath)
             print("i Database recreated")
         elif self.cmd == 'select':
-            exec_cmd('select', self.cmd_lang, self.cmd_order, self.cmd_auto, None, self.cmd_debug)
+            exec_cmd(dbPath, 'select', self.cmd_lang, self.cmd_order, self.cmd_auto, None, self.cmd_debug)
         elif self.cmd == 'trans':
-            exec_cmd('trans', self.cmd_lang, self.cmd_order, self.cmd_auto, self.cmd_to, self.cmd_debug)
+            exec_cmd(dbPath, 'trans', self.cmd_lang, self.cmd_order, self.cmd_auto, self.cmd_to, self.cmd_debug)
         elif self.cmd == 'count':
-            print("i Returned results for lang [" + self.cmd_lang + "] = " + str(exec_cmd('count', self.cmd_lang, self.cmd_order, self.cmd_auto)))
+            print("i Returned results for lang [" + self.cmd_lang + "] = " + str(exec_cmd(dbPath, 'count', self.cmd_lang, self.cmd_order, self.cmd_auto)))
         elif self.cmd == 'auto':
             if self.cmd_auto:
                 self.cmd_auto = False
@@ -886,12 +900,12 @@ class Console:
                 self.cmd_file = True
                 print("i File switch to True also")
         elif self.cmd == 'reset':
-            #f = open('output.html', 'w')
+            #f = open('./output/output1.html', 'w')
             #f.close()
-            header_en()
+            header_en(dbPath)
             print('i file output.html reset, header written')
         elif self.cmd == 'close':
-            footer_en()
+            footer_en(dbPath)
             print('i footer written in file output.html')
         elif self.cmd == 'debug':
             if self.cmd_debug:
@@ -908,19 +922,19 @@ class Console:
             exec_stat(self.cmd_auto, self.cmd_debug)
         elif self.cmd in ['conjugate', 'conj', 'con']:
             s = input('Enter a verb : ')
-            conjugate(s, self.cmd_lang, self.cmd_file, self.cmd_html)
+            conjugate(dbPath, s, self.cmd_lang, self.cmd_file, self.cmd_html)
             print("i Verb " + s + " conjugated. Results can be found in " + s.lower() + ".txt")
         elif self.cmd in ['render']: # New Architecture
-            verbs = get_all_verbs_full('en', 'fr')
-            ConjugateTabularEn({'verbs' : verbs}).render('output2.html')
+            verbs = get_all_verbs_full(dbPath, 'en', 'fr')
+            ConjugateTabularEn({'verbs' : verbs}).render('./output/output2.html')
         elif len(self.cmd.split(' ')) > 1:
             c_tab = self.cmd.split(' ')
             if c_tab[0] == 'select':
                 if c_tab[1] in ['fr', 'it', 'eo', 'en', 'de']:
                     if c_tab[1] != self.cmd_lang: # order must be set to the language we call
-                        exec_cmd('select', c_tab[1], c_tab[1] + ".lang, " + c_tab[1] + ".base", self.cmd_auto, None, self.cmd_debug)
+                        exec_cmd(dbPath, 'select', c_tab[1], c_tab[1] + ".lang, " + c_tab[1] + ".base", self.cmd_auto, None, self.cmd_debug)
                     else:
-                        exec_cmd('select', c_tab[1], self.cmd_order, self.cmd_auto, None, self.cmd_debug)
+                        exec_cmd(dbPath, 'select', c_tab[1], self.cmd_order, self.cmd_auto, None, self.cmd_debug)
                 else:
                     print("! Unknown language : ", c_tab[1])
             elif c_tab[0] == 'order':
@@ -936,8 +950,8 @@ class Console:
                     self.cmd_to = c_tab[1]
                 else:
                     raise Exception("Unknown lang : " + c_tab[1])
-            elif c_tab[0] in ['conjugate', 'conj','con']:
-                conjugate(c_tab[1], self.cmd_lang, self.cmd_file, self.cmd_html)
+            elif c_tab[0] in ['conjugate', 'conj', 'con']:
+                conjugate(dbPath, c_tab[1], self.cmd_lang, self.cmd_file, self.cmd_html)
                 # print("i Verb " + c_tab[1] + " conjugated. Results can be found in " + c_tab[1].lower() + ".txt")
             else:
                 print("! Unknown command with parameters : " + self.cmd)
@@ -946,7 +960,7 @@ class Console:
         else:
             print("! Unknown command : " + self.cmd)
 
-if __name__ == '__main__': 
+if __name__ == '__main__':
     #commands = ['create', 'reset', 'html', 'lang en', 'con all', 'close', 'exit']
     commands = ['create', 'render', 'exit']
     Console(commands) #'con talk', 'con accept', 'exit'])
