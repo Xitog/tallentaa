@@ -222,7 +222,9 @@ def get_all_verbs_en(dbPath): # fetch irregular
         results[row[1]] = {'id' : row[0], 'base' : row[1], 'pret' : row[2], 'part' : row[3]}
     return results
 
-
+# Fetch all the verbs in lines with the translation
+# I translate these lines into structured verb hash
+# But in ConjugateTabularEn::render() I transform them in lines again!
 def get_all_verbs_full(dbPath, p_lang='en', p_to='fr'): # all verbs, with translations and irregular forms
     p_conn = sqlite3.connect(dbPath)
     p_cursor = p_conn.cursor()
@@ -258,25 +260,7 @@ def get_all_verbs_full(dbPath, p_lang='en', p_to='fr'): # all verbs, with transl
                     actual['irregular'] = True
                 else:
                     actual['irregular'] = False
-                    # Building of preterit & past participe
-                    if actual['root_base'][-1] == 'e':                              # change => changed
-                        actual['part'] = actual['root_base'] + 'd'
-                    elif actual['root_base'][-1] == 'y':
-                        if actual['root_base'][-2] in ['a', 'e', 'i', 'o', 'u']:    # base (stay => stayed)
-                            actual['part'] = actual['root_base'] + "ed"
-                        else:
-                            actual['part'] = actual['root_base'][0:-1] + "ied"      # carry => carried
-                    elif actual['root_base'][-1] not in ['a', 'i', 'o', 'u']:
-                        if actual['root_base'][-2] in ['a', 'u', 'i']:
-                            if actual['root_base'][-3] in ['a', 'e', 'o', 'u'] or len(actual['root_base']) > 4:     # base (cook => cooked, wait => waited) et le cas visit => visited
-                                actual['part'] = actual['root_base'] + 'ed'                                         # au lieu de la len faire juste que -3 ne soit pas i ?
-                            else:                                                   # chat => chatted
-                                actual['part'] = actual['root_base'] + actual['root_base'][-1] + 'ed'
-                        else:
-                            actual['part'] = actual['root_base'] + 'ed'             # base
-                    else:
-                        actual['part'] = actual['root_base'] + 'ed'                 # base
-
+                    actual['part'] = en_make_part(actual['root_base'])
                     actual['pret'] = actual['part']
                 verbs.append(actual)
                 actual = {'nb' : nb}
@@ -285,6 +269,8 @@ def get_all_verbs_full(dbPath, p_lang='en', p_to='fr'): # all verbs, with transl
             actual['base'] = p_row[1]
             actual['surtype'] = p_row[2]
             actual['lvl'] = p_row[3]
+            actual['ing'] = en_make_ing(p_row[1].split(' ')[0])
+            actual['p3ps'] = en_make_pres3ps(p_row[1].split(' ')[0])
             actual['trans'] = {}
             # attention parfois p_row 6 ou 8 peuvent-être None
             actual['trans'][p_row[5]] = {'base' : p_row[4], 'sens' : p_row[6], 'usage' : p_row[8]}
@@ -486,6 +472,59 @@ def footer_en(dbPath):
     f.close()
 
 
+def en_make_pres3ps(root):
+    pres3 = ''
+    # Present 3e
+    if root == 'be':
+        pres3 = '<b class="s">is</b>'
+    elif root in ['must']:
+        pres3 = '<b class="s">-</b>'
+    elif root[-1] == 'y' and root[-2] in ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'z']:
+        pres3 = root[0:-1] + "ies"
+    elif root[-1] in ['s', 'x', 'z', 'o'] or root[-2:] in ['ch', 'sh']:
+        pres3 = root + '<b class="s">es</b>'
+    else:
+        pres3 = root + '<b class="s">s</b>'
+    return pres3
+
+def en_make_ing(root):
+    ing = ''
+    if root == 'be':
+        ing = 'being'
+    elif root in ['must']:
+        ing = '<b class="s">-</b>'
+    elif root[-1] == 'e' and root[-2] in ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'z']:    # becoME => becoming (cons + E) => (cons + ing)
+        ing = root[:-1] + 'ing'
+    elif root[-1] in ['t'] and root[-2] in ['a', 'e'] and root[-3] in ['h', 'g']:                                                                 # cHAT => chatting (h + a + t) => (hatt + ing)
+        ing = root + root[-1] + 'ing'                                                                                                             # GET => getting (g + e + t) => (gett + ing)
+    else:
+        ing = root + 'ing'
+    return ing
+
+
+def en_make_part(root):
+    part = ''
+    # Building of preterit & past participe
+    if root[-1] == 'e':                              # change => changed
+        part = root + 'd'
+    elif root[-1] == 'y':
+        if root[-2] in ['a', 'e', 'i', 'o', 'u']:    # base (stay => stayed)
+            part = root + "ed"
+        else:
+            part = root[0:-1] + "ied"      # carry => carried
+    elif root[-1] not in ['a', 'i', 'o', 'u']:
+        if root[-2] in ['a', 'u', 'i']:
+            if root[-3] in ['a', 'e', 'o', 'u'] or len(root) > 4:     # base (cook => cooked, wait => waited) et le cas visit => visited
+                part = root + 'ed'                                         # au lieu de la len faire juste que -3 ne soit pas i ?
+            else:                                                   # chat => chatted
+                part = root + root[-1] + 'ed'
+        else:
+            part = root + 'ed'             # base
+    else:
+        part = root + 'ed'                 # base
+    return part
+    
+
 def conjugate_en(verb, onfile=False, html=False, info=None, nb=None):
     if not onfile or not html or nb is None or info is None:
         print("i This function works only with onfile and html set at true")
@@ -498,27 +537,9 @@ def conjugate_en(verb, onfile=False, html=False, info=None, nb=None):
     pret = info['pret']
     part = info['part']
 
-    # Present 3e
-    if root[-1] == 'y' and root[-2] in ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'z']:
-        pres3 = root[0:-1] + "ies"
-    elif root[-1] in ['s', 'x', 'z', 'o'] or root[-2:] in ['ch', 'sh']:
-        pres3 = root + '<b class="s">es</b>'
-    else:
-        pres3 = root + '<b class="s">s</b>'
-
-    # ing
-    if root[-1] == 'e':
-        ing = root[0:-1] + 'ing'
-    elif root[-1] in ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'z'] and root[-2] in ['a', 'e', 'i', 'o', 'u']:
-        if root[-2] == 'a' and root[-3] == 'e':
-            ing = root + 'ing'
-        elif root[-2] == 'o' and root[-3] == 'o':
-            ing = root + 'ing'
-        else:
-            ing = root + root[-1] + 'ing'
-    else:
-        ing = root + 'ing'
-
+    pres3 = en_make_pres3ps(root)
+    ing = en_make_ing(root)
+    
     f.write('<h2 id="' + str(info['id']) + '">' + str(nb) + '. ' + root + particle + ' &nbsp;&nbsp;(' + pret + particle + ', ' + part + particle + ')</h2>\n')
     f.write('<p><b>Sens et traduction</b> : <ul>\n')
     for t in info['trans']:
@@ -627,7 +648,7 @@ class ConjugateTabularEn(Renderer):
         table {
             border: 1px solid rgb(91, 155, 213);
             border-collapse: collapse;
-            width: 20cm;
+            width: 28cm; /* 20 */
             margin: auto;
             font-size: 18px;
             font-family: Calibri;
@@ -648,8 +669,12 @@ class ConjugateTabularEn(Renderer):
             background: rgb(242, 242, 242);
         }
 
-        span.irr {
+        td.irr {
             font-weight: bold;
+            color: rgb(10, 10, 100); //rgb(146, 208, 80);
+        }
+        
+        b.s {
             color: rgb(10, 10, 100); //rgb(146, 208, 80);
         }
         
@@ -669,42 +694,87 @@ class ConjugateTabularEn(Renderer):
         self.header(f)
 
         f.write('<table>\n')
-        f.write('<tr><th>n° racine</th><th>n° verbe</th><th>n° trad</th><th>Base verbale</th><th>Prétérit</th><th>Participe passé</th><th>Traduction(s)</th></tr>\n')
+        f.write("""<tr><th>nRacine</th>
+                        <th>Irr</th>
+                        <th>VID</th>
+                        <th>Base verbale</th>
+                        <th>Prétérit</th>
+                        <th>Participe passé</th>
+                        <th>Participe présent</th>
+                        <th>3e pers. sing.</th>
+                        <th>nConstruction</th>
+                        <th>Construction</th>
+                        <th>nTrad</th>
+                        <th>Traduction</th>
+                        <th>Ex</th>
+                        <th>Ex fr</th>
+                   </tr>\n""")
         nb_root = 0
-        nb_verb = 1
+        nb_cons = 0
         nb_trad = 0
         previous_base = None
+        previous_cons = None
         for v in verbs:
-            verb = v['root_base'] + ' ' + v['particle']
-            if v['irregular']:
-                verb_display = '<span class="irr">' + verb + '</span>'
-            else:
-                verb_display = verb
-            pret = v['pret'] if not v['irregular'] else '<span class="irr">' + v['pret'] + '</span>'
-            part = v['part'] if not v['irregular'] else '<span class="irr">' + v['part'] + '</span>'
+            vid = v['id']
+            base = v['root_base']
+            particle = v['particle']
+            irregular = v['irregular']
+            pret = v['pret']
+            part = v['part']
             trans = v['trans']
-            nb_trad += 1
-            if previous_base is None or previous_base != v['root_base']:
-                nb_root += 1
-                f.write('<tr><td class="num">' + str(nb_root) + '</td><td class="num">' + str(nb_verb) + '</td><td class="num">' + str(nb_trad) + '</td><td>' + verb_display + '</td><td>' + pret + '</td><td>' + part + '</td>')
+            ing = v['ing']
+            p3ps = v['p3ps']
+            
+            if base not in ['must']:
+                cons = 'to ' + base + ' ' + particle if particle is not None and particle != '' else 'to ' + base
             else:
-                f.write('<tr><td></td><td class="num">' + str(nb_verb) + '</td><td class="num">' + str(nb_trad) + '</td><td> ' + verb_display + '</td><td></td><td></td>')
-            i = 1
-            for t in trans:
-                if i == 1:
-                    f.write('<td>to ' + verb + ' : ' + trans[t]['base'] + '</td></tr>\n')
-                elif i > 1:
-                    nb_trad += 1
-                    f.write('<tr><td></td><td></td><td class="num">' + str(nb_trad) + '</td><td></td><td></td><td></td><td>to ' + verb + ' : ' + trans[t]['base'] + '</td></tr>\n')
-                i += 1
-            nb_verb += 1
-            previous_base = v['root_base']
+                cons = 'must'
 
+            irr = 'class="irr"' if irregular else ''
+            str_irr = 'True' if irregular else 'False'
+            
+            if previous_base is None or previous_base != base:
+                nb_root += 1
+                cpt_cons = 0
+            str_nb_root = str(nb_root)
+            if previous_base == base:
+                str_nb_root = ''
+                str_irr = ''
+                #vid = ''
+                base = ''
+                pret = ''
+                part = ''
+                ing = ''
+                p3ps = ''
+            if previous_cons is None or previous_cons != cons:
+                nb_cons += 1
+                cpt_cons += 1
+            str_nb_cons = str(nb_cons) + ' [' + str(cpt_cons) + ']'
+                        
+            cpt_trad = 0
+            for t in trans:
+                nb_trad += 1
+                cpt_trad += 1
+                f.write('<tr><td class="num">' + str_nb_root + '</td><td ' + irr + '>' + str_irr + '</td><td>' + str(vid) + '</td><td ' + irr + '>' + base + '</td><td ' + irr + '>' + pret + '</td><td ' + irr + '>' + part + '</td><td>' + ing + '</td><td>' + p3ps + '</td><td class="num">' + str_nb_cons + '</td><td>' + cons + '</td><td class="num">' + str(nb_trad) + ' [' + str(cpt_trad) + ']' + '</td><td>' + trans[t]['base'] + '</td><td></td><td></td></tr>\n')
+                if cpt_trad > 0:
+                    str_irr = ''
+                    #vid = ''
+                    base = ''
+                    pret = ''
+                    part = ''
+                    ing = ''
+                    p3ps = ''
+                    str_nb_root = ''
+                    str_nb_cons = ''
+                    cons = ''
+            previous_base = v['root_base']
+            previous_cons = 'to ' + v['root_base'] + ' ' + particle if particle is not None and particle != '' else v['root_base']
+        
         f.write('</table>\n')
-        f.write('<h1>' + str(nb_root) + ' bases, ' + str(nb_verb) + ' verbs, ' + str(nb_trad-1) + ' traductions.</h1>')
+        f.write('<h1>' + str(nb_root) + ' bases, ' + str(nb_cons) + ' verbs, ' + str(nb_trad-1) + ' traductions.</h1>')
         f.close()
 
-        return nb_verb
+        return nb_cons
 
 #------------------------------------------------------------------------------
 # Simple renderer for French, txt or html
