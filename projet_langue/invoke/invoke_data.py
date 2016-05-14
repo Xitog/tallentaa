@@ -431,14 +431,24 @@ def get_verbs():
         (100204, 'en', 'ask out', 'verb', 5),
         (100205, 'en', 'add up', 'verb', 5),
         (100206, 'en', 'bear', 'verb', 5),
+        
         (100207, 'en', 'beat', 'verb', 5),
+        (207, 'fr', 'battre', 'verb', 5),
+        
         (100208, 'en', 'bend', 'verb', 5),
         (100209, 'en', 'bet', 'verb', 5),
         (100210, 'en', 'bid', 'verb', 5),
+        
         (100211, 'en', 'bind', 'verb', 5),
+        (211, 'fr', 'attacher', 'verb', 5),
+        (90211, 'fr', 'lier', 'verb', 5),
         (100212, 'en', 'bite', 'verb', 5),
+        (212, 'fr', 'mordre', 'verb', 5),
         (100213, 'en', 'bleed', 'verb', 5),
-        (100214, 'en', 'blow', 'verb', 5),
+        (213, 'fr', 'saigner', 'verb', 5),
+        (100214, 'en', 'blow', 'verb', 5), # souffler
+        (214, 'fr', 'souffler', 'verb', 5),
+        
         (100215, 'en', 'breed', 'verb', 5),
         (100216, 'en', 'broadcast', 'verb', 5),
         (100217, 'en', 'blow up', 'verb', 5),
@@ -451,7 +461,10 @@ def get_verbs():
         (100224, 'en', 'call back', 'verb', 5),
         (100225, 'en', 'call off', 'verb', 5),
         (100226, 'en', 'calm down', 'verb', 5),
+        
         (100227, 'en', 'check', 'verb', 5),
+        (227, 'fr', 'vérifier', 'verb', 5),
+        
         (100228, 'en', 'check in', 'verb', 5),
         (100229, 'en', 'check out', 'verb', 5),
         (100230, 'en', 'cheer up', 'verb', 5),
@@ -510,6 +523,129 @@ def get_verbs():
         (100283, 'en', 'look forward', 'verb', 5),
         (100284, 'en', 'look into', 'verb', 5),
         (100285, 'en', 'look out', 'verb', 5),
+        (100286, 'en', 'make up', 'verb', 5),
+        (100287, 'en', 'offset', 'verb', 5),
+        (100288, 'en', 'partake', 'verb', 5),
+        (100289, 'en', 'plead', 'verb', 5),
+        (100290, 'en', 'prove', 'verb', 5),
+        (100291, 'en', 'pass away', 'verb', 5),
+        (100292, 'en', 'pass out', 'verb', 5),
+        (100293, 'en', 'pay back', 'verb', 5),
+        (100294, 'en', 'pick out', 'verb', 5),
+        (100295, 'en', 'quit', 'verb', 5),
+        (100296, 'en', 'relay', 'verb', 5),
+        (100297, 'en', 'rid', 'verb', 5),
+        (100298, 'en', 'ride', 'verb', 5),
+        (100299, 'en', 'ring', 'verb', 5),
+        (100300, 'en', 'run away', 'verb', 5),
+        (100301, 'en', 'run out', 'verb', 5),
+        (100302, 'en', 'seek', 'verb', 5),
+        (100303, 'en', 'shake', 'verb', 5),
+        (100304, 'en', 'shed', 'verb', 5),
+        (100305, 'en', 'shut', 'verb', 5),
+        (100306, 'en', 'sink', 'verb', 5),
+        (100307, 'en', 'speed', 'verb', 5),
+        (100308, 'en', 'spell', 'verb', 5),
+        (100309, 'en', 'spill', 'verb', 5),
+        (100310, 'en', 'spin', 'verb', 5),
+        (100311, 'en', 'spit', 'verb', 5),
+        (100312, 'en', 'split', 'verb', 5),
+        (100313, 'en', 'spoil', 'verb', 5),
+        (100314, 'en', 'spread', 'verb', 5),
+        (100315, 'en', 'stick', 'verb', 5),
+        (100316, 'en', 'string', 'verb', 5),
+        (100317, 'en', 'stink', 'verb', 5),
+        (100318, 'en', 'strew', 'verb', 5),
+        (100319, 'en', 'strike', 'verb', 5),
+        (100320, 'en', 'swear', 'verb', 5),
+        (100321, 'en', 'sweat', 'verb', 5),
+        (100322, 'en', 'sweep', 'verb', 5), # stand for
+        (100323, 'en', 'swell', 'verb', 5),
+        (100324, 'en', 'swing', 'verb', 5),
+        (100325, 'en', 'send back', 'verb', 5),
+        (100326, 'en', 'set up', 'verb', 5),
+        (100327, 'en', 'shop around', 'verb', 5),
+        (100328, 'en', 'show off', 'verb', 5),
+        (100329, 'en', 'sleep over', 'verb', 5),
+        (100330, 'en', 'stick to', 'verb', 5),
+        (100331, 'en', 'tear', 'verb', 5),
+        (100332, 'en', 'tread', 'verb', 5),
+        (100334, 'en', 'take off', 'verb', 5),
+        (100335, 'en', 'land', 'verb', 5),
+        (100336, 'en', 'throw away', 'verb', 5),
+        (100337, 'en', 'turn down', 'verb', 5),
+        #(100338, 'en', 'turn off', 'verb', 5),
+        #(100339, 'en', 'turn on', 'verb', 5),
+        (100340, 'en', 'turn up', 'verb', 5),
+        (100341, 'en', 'try out', 'verb', 5),
+        (100342, 'en', 'undergo', 'verb', 5),
+        (100343, 'en', 'wake', 'verb', 5),
+        (100344, 'en', 'weep', 'verb', 5),
+        (100345, 'en', 'wet', 'verb', 5),
+        (100346, 'en', 'wind', 'verb', 5),
+        (100347, 'en', 'withdraw', 'verb', 5),
+        (100348, 'en', 'wring', 'verb', 5),
+        (100349, 'en', 'warm up', 'verb', 5),
+        (100350, 'en', 'wear off', 'verb', 5),
+        (100351, 'en', 'work out', 'verb', 5),
+        (100352, 'en', 'mislay', 'verb', 5),
+        (100353, 'en', 'mislead', 'verb', 5),
+        (100354, 'en', 'mistake', 'verb', 5),
+        (100355, 'en', 'misunderstand', 'verb', 5),
+        (100356, 'en', 'outrun', 'verb', 5),
+        (100357, 'en', 'overcome', 'verb', 5),
+        (100358, 'en', 'overdo', 'verb', 5),
+        (100359, 'en', 'overhear', 'verb', 5),
+        (100360, 'en', 'overlay', 'verb', 5),
+        (100361, 'en', 'override', 'verb', 5),
+        (100362, 'en', 'overrun', 'verb', 5),
+        (100363, 'en', 'oversee', 'verb', 5),
+        (100364, 'en', 'oversleep', 'verb', 5),
+        (100365, 'en', 'overtake', 'verb', 5),
+        (100366, 'en', 'overthrow', 'verb', 5),
+        (100367, 'en', 'rebuild', 'verb', 5),
+        (100368, 'en', 'redo', 'verb', 5),
+        (100369, 'en', 'regrow', 'verb', 5),
+        (100370, 'en', 'relight', 'verb', 5),
+        (100371, 'en', 'remake', 'verb', 5),
+        (100372, 'en', 'reset', 'verb', 5),
+        (100373, 'en', 'retake', 'verb', 5),
+        (100374, 'en', 'rewind', 'verb', 5),
+        (100375, 'en', 'undo', 'verb', 5),
+        (100376, 'en', 'unwind', 'verb', 5),
+        (100377, 'en', 'underlie', 'verb', 5),
+        (100378, 'en', 'load', 'verb', 5),
+        # VAGUE 6 : verb irr not in list
+        (100379, 'en', 'abide', 'verb', 6),
+        (100380, 'en', 'arise', 'verb', 6),
+        (100381, 'en', 'awake', 'verb', 6),
+        (100382, 'en', 'beget', 'verb', 6),
+        (100383, 'en', 'bereave', 'verb', 6),
+        (100384, 'en', 'burst', 'verb', 6),
+        (100385, 'en', 'chide', 'verb', 6),
+        (100386, 'en', 'cling', 'verb', 6),
+        (100387, 'en', 'clothe', 'verb', 6),
+        (100388, 'en', 'creep', 'verb', 6),
+        (100389, 'en', 'forecast', 'verb', 6),
+        (100390, 'en', 'grind', 'verb', 6),
+        (100391, 'en', 'kneel', 'verb', 6),
+        (100392, 'en', 'mow', 'verb', 6),
+        (100393, 'en', 'preset', 'verb', 6),
+        (100394, 'en', 'rend', 'verb', 6),
+        (100395, 'en', 'saw', 'verb', 6),
+        (100396, 'en', 'shoe', 'verb', 6),
+        (100397, 'en', 'slay', 'verb', 6),
+        (100398, 'en', 'slide', 'verb', 6),
+        (100399, 'en', 'slink', 'verb', 6),
+        (100400, 'en', 'slit', 'verb', 6),
+        (100401, 'en', 'sow', 'verb', 6),
+        (100402, 'en', 'sting', 'verb', 6),
+        (100403, 'en', 'strive', 'verb', 6),
+        (100404, 'en', 'thrive', 'verb', 6),
+        (100405, 'en', 'thrust', 'verb', 6),
+        (100406, 'en', 'typeset', 'verb', 6),
+        
+        #(100, 'en', '', 'verb', 5),
         
         #
         # Verbes italiens
@@ -914,6 +1050,7 @@ def get_irregular_verbs():
         (75, 'bereave', 'bereft/bereaved', 'bereft/bereaved'),
         (76, 'bet', 'bet', 'bet'),
         (77, 'bid', 'bid/bade', 'bid/bidden'),
+        (177, 'bite', 'bit', 'bitten'),
         (78, 'bleed', 'bled', 'bled'),
         (79, 'blow', 'blew', 'blown'),
         (3, 'break', 'broke', 'broken'),
@@ -1077,7 +1214,7 @@ def get_irregular_verbs():
         (175, 'withdraw', 'withdrew', 'withdrawn'),
         (176, 'wring', 'wrung', 'wrung'),
         (53, 'write', 'wrote', 'written'),
-    ] # last is 67
+    ] # last is 177
     return content
 
 
@@ -1846,6 +1983,17 @@ def get_traductions():
         (6180000, 100201, 201, None, None), # kill => tuer
         (6190000, 100202, 202, None, None), # hurt => blesser
         (6200000, 100203, 203, None, None), # fight => combattre
+        #----------------------------------------------------------------------
+        # VAGUE 5 TRADUCTIONS EN->FR
+        #----------------------------------------------------------------------
+        
+        (620001, 100214, 214, None, None), # blow => souffler
+        (620002, 100211, 211, None, None), # bind => attacher
+        (620003, 100211, 90211, None, None), # bind => lier
+        (620004, 100227, 227, None, None), # check => vérifier
+        (620005, 100207, 207, None, None), # beat => battre
+        (620006, 100212, 212, None, None), # bite => mordre
+        (620007, 100213, 213, None, None), # bleed => saigner
         
         #----------------------------------------------------------------------
         # VAGUE 1 TRADUCTIONS EN->EO

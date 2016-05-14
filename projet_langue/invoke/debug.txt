@@ -1,223 +1,232 @@
 ************* Module invoke
-C:159, 0: Line too long (229/100) (line-too-long)
-C:162, 0: Line too long (121/100) (line-too-long)
-C:171, 0: Line too long (127/100) (line-too-long)
-C:180, 0: Line too long (182/100) (line-too-long)
-C:197, 0: Line too long (105/100) (line-too-long)
-C:230, 0: Line too long (162/100) (line-too-long)
-C:231, 0: Line too long (169/100) (line-too-long)
-C:233, 0: Line too long (112/100) (line-too-long)
-C:234, 0: Line too long (157/100) (line-too-long)
-C:262, 0: Line too long (103/100) (line-too-long)
-C:265, 0: Line too long (107/100) (line-too-long)
-C:268, 0: Line too long (102/100) (line-too-long)
-C:271, 0: Line too long (182/100) (line-too-long)
-C:272, 0: Line too long (170/100) (line-too-long)
-C:273, 0: Line too long (101/100) (line-too-long)
-C:274, 0: Line too long (101/100) (line-too-long)
-C:305, 0: Line too long (101/100) (line-too-long)
-C:339, 0: Line too long (146/100) (line-too-long)
-C:342, 0: Line too long (120/100) (line-too-long)
-C:344, 0: Line too long (116/100) (line-too-long)
-C:345, 0: Line too long (119/100) (line-too-long)
-C:357, 0: Line too long (116/100) (line-too-long)
-C:367, 0: Line too long (121/100) (line-too-long)
-C:369, 0: Line too long (104/100) (line-too-long)
-C:371, 0: Line too long (123/100) (line-too-long)
-C:394, 0: Line too long (102/100) (line-too-long)
-C:441, 0: Line too long (196/100) (line-too-long)
-C:451, 0: Line too long (141/100) (line-too-long)
-C:502, 0: Line too long (140/100) (line-too-long)
-C:512, 0: Line too long (164/100) (line-too-long)
-C:522, 0: Line too long (158/100) (line-too-long)
-C:530, 0: Line too long (103/100) (line-too-long)
-C:539, 0: Line too long (121/100) (line-too-long)
-C:545, 0: Line too long (168/100) (line-too-long)
-C:546, 0: Line too long (209/100) (line-too-long)
-C:550, 0: Line too long (103/100) (line-too-long)
+C: 49, 0: Trailing whitespace (trailing-whitespace)
+C:163, 0: Line too long (233/100) (line-too-long)
+C:166, 0: Line too long (125/100) (line-too-long)
+C:175, 0: Line too long (131/100) (line-too-long)
+C:184, 0: Line too long (186/100) (line-too-long)
+C:201, 0: Line too long (105/100) (line-too-long)
+C:232, 0: Line too long (106/100) (line-too-long)
+C:236, 0: Line too long (162/100) (line-too-long)
+C:237, 0: Line too long (169/100) (line-too-long)
+C:239, 0: Line too long (112/100) (line-too-long)
+C:240, 0: Line too long (157/100) (line-too-long)
+C:279, 0: Line too long (110/100) (line-too-long)
+C:280, 0: Line too long (135/100) (line-too-long)
+C:282, 0: Line too long (135/100) (line-too-long)
+C:295, 0: Line too long (101/100) (line-too-long)
+C:309, 0: Line too long (103/100) (line-too-long)
+C:324, 0: Line too long (146/100) (line-too-long)
+C:327, 0: Line too long (120/100) (line-too-long)
+C:329, 0: Line too long (116/100) (line-too-long)
+C:330, 0: Line too long (119/100) (line-too-long)
+C:342, 0: Line too long (116/100) (line-too-long)
+C:352, 0: Line too long (121/100) (line-too-long)
+C:354, 0: Line too long (104/100) (line-too-long)
+C:356, 0: Line too long (123/100) (line-too-long)
+C:379, 0: Line too long (102/100) (line-too-long)
+C:419, 0: Line too long (139/100) (line-too-long)
+C:421, 0: Trailing whitespace (trailing-whitespace)
+C:430, 0: Line too long (146/100) (line-too-long)
+C:445, 0: Line too long (194/100) (line-too-long)
+C:447, 0: Line too long (193/100) (line-too-long)
+C:448, 0: Line too long (191/100) (line-too-long)
+C:466, 0: Line too long (140/100) (line-too-long)
+C:467, 0: Line too long (133/100) (line-too-long)
+C:475, 0: Trailing whitespace (trailing-whitespace)
+C:491, 0: Trailing whitespace (trailing-whitespace)
+C:492, 0: Line too long (158/100) (line-too-long)
+C:500, 0: Line too long (103/100) (line-too-long)
+C:509, 0: Line too long (121/100) (line-too-long)
+C:515, 0: Line too long (168/100) (line-too-long)
+C:516, 0: Line too long (209/100) (line-too-long)
+C:520, 0: Line too long (103/100) (line-too-long)
+C:522, 0: Line too long (131/100) (line-too-long)
+C:526, 0: Line too long (254/100) (line-too-long)
+C:527, 0: Line too long (125/100) (line-too-long)
+C:528, 0: Line too long (155/100) (line-too-long)
+C:532, 0: Line too long (238/100) (line-too-long)
+C:533, 0: Line too long (232/100) (line-too-long)
+C:534, 0: Line too long (131/100) (line-too-long)
+C:539, 0: Line too long (308/100) (line-too-long)
+C:540, 0: Line too long (156/100) (line-too-long)
+C:541, 0: Line too long (187/100) (line-too-long)
+C:546, 0: Line too long (133/100) (line-too-long)
+C:547, 0: Line too long (151/100) (line-too-long)
+C:550, 0: Line too long (132/100) (line-too-long)
 C:552, 0: Line too long (131/100) (line-too-long)
-C:556, 0: Line too long (254/100) (line-too-long)
-C:557, 0: Line too long (125/100) (line-too-long)
-C:558, 0: Line too long (155/100) (line-too-long)
-C:562, 0: Line too long (238/100) (line-too-long)
-C:563, 0: Line too long (232/100) (line-too-long)
-C:564, 0: Line too long (131/100) (line-too-long)
-C:569, 0: Line too long (308/100) (line-too-long)
-C:570, 0: Line too long (156/100) (line-too-long)
-C:571, 0: Line too long (187/100) (line-too-long)
-C:576, 0: Line too long (133/100) (line-too-long)
-C:577, 0: Line too long (151/100) (line-too-long)
-C:580, 0: Line too long (132/100) (line-too-long)
-C:582, 0: Line too long (131/100) (line-too-long)
-C:585, 0: Line too long (105/100) (line-too-long)
-C:586, 0: Line too long (203/100) (line-too-long)
-C:587, 0: Line too long (201/100) (line-too-long)
-C:590, 0: Line too long (127/100) (line-too-long)
-C:591, 0: Line too long (121/100) (line-too-long)
-C:592, 0: Line too long (171/100) (line-too-long)
-C:594, 0: Line too long (107/100) (line-too-long)
-C:667, 0: Line too long (125/100) (line-too-long)
-C:680, 0: Line too long (138/100) (line-too-long)
-C:682, 0: Line too long (115/100) (line-too-long)
-C:688, 0: Line too long (129/100) (line-too-long)
-C:774, 0: Line too long (110/100) (line-too-long)
-C:864, 0: Line too long (104/100) (line-too-long)
-C:866, 0: Line too long (146/100) (line-too-long)
-C:906, 0: Line too long (112/100) (line-too-long)
-C:921, 0: Line too long (132/100) (line-too-long)
-C:923, 0: Line too long (105/100) (line-too-long)
-C:941, 0: Line too long (115/100) (line-too-long)
+C:555, 0: Line too long (105/100) (line-too-long)
+C:556, 0: Line too long (203/100) (line-too-long)
+C:557, 0: Line too long (201/100) (line-too-long)
+C:560, 0: Line too long (127/100) (line-too-long)
+C:561, 0: Line too long (121/100) (line-too-long)
+C:562, 0: Line too long (171/100) (line-too-long)
+C:564, 0: Line too long (107/100) (line-too-long)
+C:574, 0: Trailing whitespace (trailing-whitespace)
+C:592, 0: Trailing whitespace (trailing-whitespace)
+C:678, 0: Trailing whitespace (trailing-whitespace)
+C:680, 0: Line too long (113/100) (line-too-long)
+C:686, 0: Trailing whitespace (trailing-whitespace)
+C:704, 0: Trailing whitespace (trailing-whitespace)
+C:709, 0: Line too long (536/100) (line-too-long)
+C:722, 0: Line too long (130/100) (line-too-long)
+C:723, 0: Trailing whitespace (trailing-whitespace)
+C:725, 0: Line too long (119/100) (line-too-long)
+C:735, 0: Trailing whitespace (trailing-whitespace)
+C:806, 0: Line too long (110/100) (line-too-long)
+C:831, 0: Line too long (200/100) (line-too-long)
+C:841, 0: Line too long (145/100) (line-too-long)
+C:851, 0: Line too long (104/100) (line-too-long)
+C:877, 0: Trailing whitespace (trailing-whitespace)
+C:883, 0: Trailing whitespace (trailing-whitespace)
+C:908, 0: Trailing whitespace (trailing-whitespace)
+C:910, 0: Trailing whitespace (trailing-whitespace)
+C:945, 0: Line too long (106/100) (line-too-long)
+C:947, 0: Line too long (112/100) (line-too-long)
+C:949, 0: Line too long (154/100) (line-too-long)
+C:989, 0: Line too long (112/100) (line-too-long)
+C:1004, 0: Line too long (140/100) (line-too-long)
+C:1006, 0: Line too long (113/100) (line-too-long)
+C:1024, 0: Line too long (115/100) (line-too-long)
+C:  1, 0: Too many lines in module (1036/1000) (too-many-lines)
 C:  1, 0: Missing module docstring (missing-docstring)
-C: 48, 0: Missing function docstring (missing-docstring)
-C: 53, 8: Invalid variable name "cc" (invalid-name)
-C: 72, 0: Missing function docstring (missing-docstring)
-C: 75, 8: Invalid variable name "cc" (invalid-name)
-C: 76, 8: Invalid variable name "de" (invalid-name)
-C: 90, 0: Missing function docstring (missing-docstring)
-R: 90, 0: Too many local variables (16/15) (too-many-locals)
-C:113, 8: Invalid variable name "cc" (invalid-name)
-C:115,12: Invalid variable name "v" (invalid-name)
-C:139, 4: Invalid variable name "e" (invalid-name)
-C:153, 4: Invalid variable name "f" (invalid-name)
-C:185, 4: Invalid variable name "s" (invalid-name)
-R: 90, 0: Too many branches (13/12) (too-many-branches)
-R: 90, 0: Too many statements (65/50) (too-many-statements)
-C:191, 0: Missing function docstring (missing-docstring)
-C:216, 0: Missing function docstring (missing-docstring)
-C:226, 0: Missing function docstring (missing-docstring)
-C:230, 4: Invalid variable name "nb" (invalid-name)
+C: 56,12: Invalid variable name "cc" (invalid-name)
+C: 78,12: Invalid variable name "cc" (invalid-name)
+C: 79,12: Invalid variable name "de" (invalid-name)
+C: 94, 4: Invalid argument name "dbPath" (invalid-name)
+C: 94, 4: Missing method docstring (missing-docstring)
+R: 94, 4: Too many local variables (17/15) (too-many-locals)
+C:117,12: Invalid variable name "cc" (invalid-name)
+C:119,16: Invalid variable name "v" (invalid-name)
+C:143, 8: Invalid variable name "e" (invalid-name)
+C:157, 8: Invalid variable name "f" (invalid-name)
+C:189, 8: Invalid variable name "s" (invalid-name)
+R: 94, 4: Too many branches (13/12) (too-many-branches)
+R: 94, 4: Too many statements (65/50) (too-many-statements)
+C:195, 0: Invalid argument name "dbPath" (invalid-name)
+C:195, 0: Missing function docstring (missing-docstring)
+C:220, 0: Invalid argument name "dbPath" (invalid-name)
+C:220, 0: Missing function docstring (missing-docstring)
+C:232, 0: Invalid argument name "dbPath" (invalid-name)
+C:232, 0: Missing function docstring (missing-docstring)
 C:236, 4: Invalid variable name "nb" (invalid-name)
-E:242,29: Value 'actual' is unsubscriptable (unsubscriptable-object)
-C:243,12: Invalid variable name "nb" (invalid-name)
-E:249,20: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:249,42: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:250,20: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:250,47: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:252,20: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:252,42: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:253,20: Value 'actual' is unsubscriptable (unsubscriptable-object)
+C:242, 4: Invalid variable name "nb" (invalid-name)
+E:248,29: Value 'actual' is unsubscriptable (unsubscriptable-object)
+C:249,12: Invalid variable name "nb" (invalid-name)
+E:255,20: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:255,42: Value 'actual' is unsubscriptable (unsubscriptable-object)
 E:256,20: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:256,48: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:257,20: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:257,48: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:256,47: Value 'actual' is unsubscriptable (unsubscriptable-object)
 E:258,20: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:260,20: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:262,23: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:263,24: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:263,41: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:264,25: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:265,27: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:266,28: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:266,45: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:268,28: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:268,45: Value 'actual' is unsubscriptable (unsubscriptable-object)
-R:241, 4: Too many nested blocks (6/5) (too-many-nested-blocks)
-E:269,25: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:270,27: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:271,31: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:271,86: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:272,32: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:272,49: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:274,32: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:274,49: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:274,71: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:276,28: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:276,45: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:278,24: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:278,41: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:280,20: Value 'actual' is unsubscriptable (unsubscriptable-object)
-E:280,37: Value 'actual' is unsubscriptable (unsubscriptable-object)
-R:241, 4: Too many nested blocks (7/5) (too-many-nested-blocks)
-E:292,12: Value 'actual' is unsubscriptable (unsubscriptable-object)
-R:226, 0: Too many branches (27/12) (too-many-branches)
-R:226, 0: Too many statements (76/50) (too-many-statements)
-C:324, 0: Missing function docstring (missing-docstring)
-R:324, 0: Too many arguments (7/5) (too-many-arguments)
-R:324, 0: Too many local variables (19/15) (too-many-locals)
-C:330, 4: Invalid variable name "nb" (invalid-name)
-C:358,20: Invalid variable name "e" (invalid-name)
-C:375,12: Invalid variable name "nb" (invalid-name)
-C:379,12: Invalid variable name "v" (invalid-name)
-W:358,20: Unused variable 'e' (unused-variable)
-R:324, 0: Too many branches (23/12) (too-many-branches)
-R:324, 0: Too many statements (54/50) (too-many-statements)
-C:396, 0: Missing function docstring (missing-docstring)
-C:402, 8: Invalid variable name "r" (invalid-name)
-C:404, 8: Invalid variable name "nb" (invalid-name)
-C:405,12: Invalid variable name "v" (invalid-name)
+E:258,42: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:259,20: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:262,20: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:262,48: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:263,20: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:263,48: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:264,20: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:266,20: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:267,20: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:267,63: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:268,20: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:268,37: Value 'actual' is unsubscriptable (unsubscriptable-object)
+E:282,12: Value 'actual' is unsubscriptable (unsubscriptable-object)
+R:232, 0: Too many branches (17/12) (too-many-branches)
+R:232, 0: Too many statements (62/50) (too-many-statements)
+C:309, 0: Invalid argument name "dbPath" (invalid-name)
+C:309, 0: Missing function docstring (missing-docstring)
+R:309, 0: Too many arguments (8/5) (too-many-arguments)
+R:309, 0: Too many local variables (20/15) (too-many-locals)
+C:315, 4: Invalid variable name "nb" (invalid-name)
+C:343,20: Invalid variable name "e" (invalid-name)
+C:360,12: Invalid variable name "nb" (invalid-name)
+C:364,12: Invalid variable name "v" (invalid-name)
+W:343,20: Unused variable 'e' (unused-variable)
+R:309, 0: Too many branches (23/12) (too-many-branches)
+R:309, 0: Too many statements (54/50) (too-many-statements)
+C:381, 0: Invalid argument name "dbPath" (invalid-name)
+C:381, 0: Missing function docstring (missing-docstring)
+C:387, 8: Invalid variable name "r" (invalid-name)
+C:389, 8: Invalid variable name "nb" (invalid-name)
+C:390,12: Invalid variable name "v" (invalid-name)
+C:392,16: Invalid variable name "nb" (invalid-name)
+C:398, 8: Invalid variable name "r" (invalid-name)
+C:400, 8: Invalid variable name "nb" (invalid-name)
+C:401,12: Invalid variable name "v" (invalid-name)
+E:404,20: Undefined variable 'conjugate_fr' (undefined-variable)
 C:407,16: Invalid variable name "nb" (invalid-name)
-C:413, 8: Invalid variable name "r" (invalid-name)
-C:415, 8: Invalid variable name "nb" (invalid-name)
-C:416,12: Invalid variable name "v" (invalid-name)
-E:419,20: Undefined variable 'conjugate_fr' (undefined-variable)
-C:422,16: Invalid variable name "nb" (invalid-name)
-E:426,12: Undefined variable 'conjugate_fr' (undefined-variable)
-C:430, 0: Missing function docstring (missing-docstring)
-C:431, 4: Invalid variable name "f" (invalid-name)
-C:440, 8: Invalid variable name "v" (invalid-name)
-C:452, 8: Invalid variable name "v" (invalid-name)
-C:456,12: Invalid variable name "t" (invalid-name)
-C:462,16: Invalid variable name "vv" (invalid-name)
-C:476, 0: Missing function docstring (missing-docstring)
-C:477, 4: Invalid variable name "f" (invalid-name)
-C:489, 0: Invalid argument name "nb" (invalid-name)
-C:489, 0: Missing function docstring (missing-docstring)
-R:489, 0: Too many local variables (16/15) (too-many-locals)
-C:494, 4: Invalid variable name "f" (invalid-name)
-C:524, 8: Invalid variable name "t" (invalid-name)
-C:526,12: Invalid variable name "xs" (invalid-name)
-C:527,16: Invalid variable name "x" (invalid-name)
-W:489,17: Unused argument 'verb' (unused-argument)
-W:495, 4: Unused variable 'pronoms' (unused-variable)
-R:489, 0: Too many branches (16/12) (too-many-branches)
-R:489, 0: Too many statements (83/50) (too-many-statements)
-C:604, 0: Missing class docstring (missing-docstring)
-C:609, 4: Missing method docstring (missing-docstring)
-E:610,39: Undefined variable 'tables' (undefined-variable)
-E:611,19: Undefined variable 'tables' (undefined-variable)
-E:612,58: Undefined variable 'tables' (undefined-variable)
-R:609, 4: Method could be a function (no-self-use)
-C:614, 4: Missing method docstring (missing-docstring)
-W:614,21: Unused argument 'target' (unused-argument)
-R:614, 4: Method could be a function (no-self-use)
-C:621, 0: Missing class docstring (missing-docstring)
-C:623, 4: Invalid argument name "f" (invalid-name)
-C:623, 4: Missing method docstring (missing-docstring)
-R:623, 4: Method could be a function (no-self-use)
-C:663, 8: Invalid variable name "f" (invalid-name)
-C:668, 8: Invalid variable name "nb" (invalid-name)
-C:670,12: Invalid variable name "v" (invalid-name)
-C:684,16: Invalid variable name "t" (invalid-name)
-C:690,12: Invalid variable name "nb" (invalid-name)
-C:702, 0: Missing class docstring (missing-docstring)
-W:704, 4: Arguments number differs from overridden 'render' method (arguments-differ)
-C:708,12: Invalid variable name "f" (invalid-name)
-E:716,15: Undefined variable 'verb' (undefined-variable)
-C:718,23: More than one statement on a single line (multiple-statements)
-C:734,23: More than one statement on a single line (multiple-statements)
+E:411,12: Undefined variable 'conjugate_fr' (undefined-variable)
+C:423, 4: Missing method docstring (missing-docstring)
+C:439, 4: Missing method docstring (missing-docstring)
+C:454, 4: Missing method docstring (missing-docstring)
+C:477, 0: Invalid argument name "nb" (invalid-name)
+C:477, 0: Missing function docstring (missing-docstring)
+R:477, 0: Too many local variables (16/15) (too-many-locals)
+C:482, 4: Invalid variable name "f" (invalid-name)
+C:494, 8: Invalid variable name "t" (invalid-name)
+C:496,12: Invalid variable name "xs" (invalid-name)
+C:497,16: Invalid variable name "x" (invalid-name)
+W:483, 4: Unused variable 'pronoms' (unused-variable)
+W:477,17: Unused argument 'verb' (unused-argument)
+R:477, 0: Too many statements (68/50) (too-many-statements)
+C:578, 4: Missing method docstring (missing-docstring)
+E:579,39: Undefined variable 'tables' (undefined-variable)
+E:580,19: Undefined variable 'tables' (undefined-variable)
+E:581,58: Undefined variable 'tables' (undefined-variable)
+R:578, 4: Method could be a function (no-self-use)
+C:583, 4: Missing method docstring (missing-docstring)
+W:583,21: Unused argument 'target' (unused-argument)
+R:583, 4: Method could be a function (no-self-use)
+C:593, 4: Invalid argument name "f" (invalid-name)
+C:593, 4: Missing method docstring (missing-docstring)
+R:593, 4: Method could be a function (no-self-use)
+R:638, 4: Too many local variables (27/15) (too-many-locals)
+C:642, 8: Invalid variable name "f" (invalid-name)
+C:668,12: Invalid variable name "v" (invalid-name)
+C:706,16: Invalid variable name "t" (invalid-name)
+R:638, 4: Too many statements (61/50) (too-many-statements)
+W:736, 4: Arguments number differs from overridden 'render' method (arguments-differ)
+C:740,12: Invalid variable name "f" (invalid-name)
+E:748,15: Undefined variable 'verb' (undefined-variable)
 C:750,23: More than one statement on a single line (multiple-statements)
-E:755,57: Undefined variable 'verb' (undefined-variable)
-E:757,70: Undefined variable 'verb' (undefined-variable)
-E:759,51: Undefined variable 'verb' (undefined-variable)
 C:766,23: More than one statement on a single line (multiple-statements)
-W:705, 8: Unused variable 'verbs' (unused-variable)
-R:704, 4: Too many branches (39/12) (too-many-branches)
-R:704, 4: Too many statements (75/50) (too-many-statements)
-C:802, 0: Missing class docstring (missing-docstring)
-R:802, 0: Too many instance attributes (9/7) (too-many-instance-attributes)
-W:819, 4: Dangerous default value [] as argument (dangerous-default-value)
-C:819, 4: Missing method docstring (missing-docstring)
-C:821,16: Invalid variable name "p" (invalid-name)
-C:827, 4: Missing method docstring (missing-docstring)
-C:910,12: Invalid variable name "s" (invalid-name)
-R:827, 4: Too many branches (43/12) (too-many-branches)
-R:827, 4: Too many statements (117/50) (too-many-statements)
-C:951, 4: Invalid constant name "commands" (invalid-name)
+C:782,23: More than one statement on a single line (multiple-statements)
+E:787,57: Undefined variable 'verb' (undefined-variable)
+E:789,70: Undefined variable 'verb' (undefined-variable)
+E:791,51: Undefined variable 'verb' (undefined-variable)
+C:798,23: More than one statement on a single line (multiple-statements)
+W:737, 8: Unused variable 'verbs' (unused-variable)
+R:736, 4: Too many branches (39/12) (too-many-branches)
+R:736, 4: Too many statements (75/50) (too-many-statements)
+C:818, 0: Missing class docstring (missing-docstring)
+C:820, 4: Invalid argument name "dbPath" (invalid-name)
+C:820, 4: Missing method docstring (missing-docstring)
+E:820, 4: Method should have "self" as first argument (no-self-argument)
+C:821, 8: Invalid variable name "f" (invalid-name)
+C:830,12: Invalid variable name "v" (invalid-name)
+C:842,12: Invalid variable name "v" (invalid-name)
+C:846,16: Invalid variable name "t" (invalid-name)
+C:852,20: Invalid variable name "vv" (invalid-name)
+C:866, 4: Invalid argument name "dbPath" (invalid-name)
+C:866, 4: Missing method docstring (missing-docstring)
+E:866, 4: Method should have "self" as first argument (no-self-argument)
+C:867, 8: Invalid variable name "f" (invalid-name)
+R:879, 0: Too many instance attributes (9/7) (too-many-instance-attributes)
+W:899, 4: Dangerous default value [] as argument (dangerous-default-value)
+C:899, 4: Missing method docstring (missing-docstring)
+C:901,16: Invalid variable name "p" (invalid-name)
+C:907, 4: Missing method docstring (missing-docstring)
+C:909, 8: Invalid variable name "dbPath" (invalid-name)
+E:974,12: Undefined variable 'header_en' (undefined-variable)
+E:977,12: Undefined variable 'footer_en' (undefined-variable)
+C:993,12: Invalid variable name "s" (invalid-name)
+R:907, 4: Too many branches (43/12) (too-many-branches)
+R:907, 4: Too many statements (118/50) (too-many-statements)
+C:1035, 4: Invalid constant name "commands" (invalid-name)
 
 
 Report
 ======
-657 statements analysed.
+711 statements analysed.
 
 Statistics by type
 ------------------
@@ -227,11 +236,11 @@ Statistics by type
 +=========+=======+===========+===========+============+=========+
 |module   |1      |1          |=          |0.00        |0.00     |
 +---------+-------+-----------+-----------+------------+---------+
-|class    |4      |4          |=          |0.00        |0.00     |
+|class    |7      |7          |=          |85.71       |0.00     |
 +---------+-------+-----------+-----------+------------+---------+
-|method   |9      |9          |=          |44.44       |0.00     |
+|method   |17     |17         |=          |35.29       |0.00     |
 +---------+-------+-----------+-----------+------------+---------+
-|function |11     |11         |=          |0.00        |0.00     |
+|function |6      |6          |=          |0.00        |0.00     |
 +---------+-------+-----------+-----------+------------+---------+
 
 
@@ -242,13 +251,13 @@ Raw metrics
 +----------+-------+------+---------+-----------+
 |type      |number |%     |previous |difference |
 +==========+=======+======+=========+===========+
-|code      |742    |77.70 |742      |=          |
+|code      |826    |79.42 |826      |=          |
 +----------+-------+------+---------+-----------+
-|docstring |6      |0.63  |6        |=          |
+|docstring |28     |2.69  |28       |=          |
 +----------+-------+------+---------+-----------+
-|comment   |102    |10.68 |102      |=          |
+|comment   |74     |7.12  |74       |=          |
 +----------+-------+------+---------+-----------+
-|empty     |105    |10.99 |105      |=          |
+|empty     |112    |10.77 |112      |=          |
 +----------+-------+------+---------+-----------+
 
 
@@ -272,13 +281,13 @@ Messages by category
 +-----------+-------+---------+-----------+
 |type       |number |previous |difference |
 +===========+=======+=========+===========+
-|convention |137    |139      |-2.00      |
+|convention |163    |163      |=          |
 +-----------+-------+---------+-----------+
-|refactor   |22     |22       |=          |
+|refactor   |21     |21       |=          |
 +-----------+-------+---------+-----------+
 |warning    |7      |7        |=          |
 +-----------+-------+---------+-----------+
-|error      |48     |48       |=          |
+|error      |32     |32       |=          |
 +-----------+-------+---------+-----------+
 
 
@@ -289,31 +298,35 @@ Messages
 +-----------------------------+------------+
 |message id                   |occurrences |
 +=============================+============+
-|line-too-long                |68          |
+|line-too-long                |73          |
 +-----------------------------+------------+
-|invalid-name                 |44          |
+|invalid-name                 |51          |
 +-----------------------------+------------+
-|unsubscriptable-object       |39          |
+|unsubscriptable-object       |19          |
 +-----------------------------+------------+
-|missing-docstring            |21          |
+|missing-docstring            |19          |
 +-----------------------------+------------+
-|undefined-variable           |9           |
+|trailing-whitespace          |15          |
 +-----------------------------+------------+
-|too-many-statements          |6           |
+|undefined-variable           |11          |
 +-----------------------------+------------+
-|too-many-branches            |6           |
+|too-many-statements          |7           |
++-----------------------------+------------+
+|too-many-branches            |5           |
++-----------------------------+------------+
+|too-many-locals              |4           |
 +-----------------------------+------------+
 |multiple-statements          |4           |
 +-----------------------------+------------+
 |unused-variable              |3           |
 +-----------------------------+------------+
-|too-many-locals              |3           |
-+-----------------------------+------------+
 |no-self-use                  |3           |
 +-----------------------------+------------+
 |unused-argument              |2           |
 +-----------------------------+------------+
-|too-many-nested-blocks       |2           |
+|no-self-argument             |2           |
++-----------------------------+------------+
+|too-many-lines               |1           |
 +-----------------------------+------------+
 |too-many-instance-attributes |1           |
 +-----------------------------+------------+
@@ -328,5 +341,5 @@ Messages
 
 Global evaluation
 -----------------
-Your code has been rated at 3.82/10 (previous run: 3.79/10, +0.03)
+Your code has been rated at 5.06/10 (previous run: 5.06/10, +0.00)
 

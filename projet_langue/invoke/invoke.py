@@ -1,11 +1,6 @@
-﻿# ------------------------------------------------------------------------------
+﻿#------------------------------------------------------------------------------
 # Local version of Invoke
-#------------------------------------------------------------------------------
-#
 # Handle the database of words and translations.
-#
-#------------------------------------------------------------------------------
-#
 # Commands
 #  Main commands
 #    help - print this help
@@ -28,11 +23,6 @@
 #    reset - reset the file where the conjugated verbs are stored
 #    close - write the footer in the file where the conjugated verbs are stored
 # Available languages are : fr, en, it, eo, de
-#
-#------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------
-# Import
 #------------------------------------------------------------------------------
 
 import os
@@ -41,151 +31,142 @@ import sqlite3
 #import unicodedata
 import invoke_data
 
-#------------------------------------------------------------------------------
-# Functions
-#------------------------------------------------------------------------------
 
-def check_content_verbs(content):
-    # Test de l'unicité des ids et des bases
-    verbes_id = []
-    verbes_base_lang = {}
-    error = False
-    for cc in content:
-        idv = cc[0]
-        if idv in verbes_id:
-            print("ERROR : id 2x : " + str(idv))
-            error = True
-        else:
-            verbes_id.append(idv)
-        base = cc[2]
-        if base in verbes_base_lang and verbes_base_lang[base] == cc[1]: # same base and lang
-            print("ERROR : base 2x : " + base)
-            error = True
-        else:
-            verbes_base_lang[base] = cc[1] # 'dire' : 'fr' ou 'dire' : 'it'
-    if error:
-        print("Errors have been found.")
-        exit()
-    return verbes_id
-
-
-def check_content_trans(content, verbes_id):
-    # Tests Foreign Key
-    error = False
-    for cc in content:
-        de = cc[1]
-        vers = cc[2]
-        if de not in verbes_id or vers not in verbes_id:
-            if de not in verbes_id:
-                print("Unknown DE id : " + str(de) + " from " + str(cc))
+class InvokeDB:
+    """
+        Creation, verification of the Invoke Database
+    """
+    
+    @staticmethod
+    def check_content_verbs(content):
+        "Test de l'unicité des ids et des bases"
+        verbes_id = []
+        verbes_base_lang = {}
+        error = False
+        for cc in content:
+            idv = cc[0]
+            if idv in verbes_id:
+                print("ERROR : id 2x : " + str(idv))
                 error = True
-            if vers not in verbes_id:
-                print("Unknown VERS id : " + str(vers) + " from " + str(cc))
+            else:
+                verbes_id.append(idv)
+            base = cc[2]
+            if base in verbes_base_lang and verbes_base_lang[base] == cc[1]: # same base and lang
+                print("ERROR : base 2x : " + base)
                 error = True
-    if error:
-        print("Errors have been found.")
-        exit()
+            else:
+                verbes_base_lang[base] = cc[1] # 'dire' : 'fr' ou 'dire' : 'it'
+        if error:
+            print("Errors have been found.")
+            exit()
+        return verbes_id
 
-
-def create(dbPath):
-    try:
-        os.remove(dbPath)
-    except FileNotFoundError:
-        print("FileNotFound")
-
-    conn = sqlite3.connect(dbPath)
-    connection = conn.cursor()
-
-    # Tables creation
-
-    connection.execute(invoke_data.get_create_table_verbs())
-    connection.execute(invoke_data.get_create_table_trans())
-    connection.execute(invoke_data.get_create_table_verbs_en())
-
-    # Tables filling
-
-    content = invoke_data.get_verbs()
-    verbes_id = check_content_verbs(content)
-    connection.executemany('INSERT INTO voc_verbs VALUES (?,?,?,?,?)', content)
-
-    content_verbs_en = invoke_data.get_irregular_verbs()
-    irr_not_found = 0
-    for cc in content_verbs_en:
-        found = False
-        for v in content:
-            if cc[1] == v[2] and v[1] == 'en':
-                # le verbe est dans la base et dans celle des irréguliers
-                found = True
-                break
-        if not found:
-            # on a un irrégulier qui n'est pas dans notre base
-            print(cc[1])
-            irr_not_found += 1
-    print("i Irregulars not found in our base :", irr_not_found)
-
-    connection.executemany('INSERT INTO voc_verbs_en VALUES (?,?,?,?)', content_verbs_en)
-
-    content = invoke_data.get_traductions()
-
-    check_content_trans(content, verbes_id)
-
-    for i in content:
-        if len(i) != 5:
-            print(i)
+    @staticmethod
+    def check_content_trans(content, verbes_id):
+        "Tests Foreign Key"
+        error = False
+        for cc in content:
+            de = cc[1]
+            vers = cc[2]
+            if de not in verbes_id or vers not in verbes_id:
+                if de not in verbes_id:
+                    print("Unknown DE id : " + str(de) + " from " + str(cc))
+                    error = True
+                if vers not in verbes_id:
+                    print("Unknown VERS id : " + str(vers) + " from " + str(cc))
+                    error = True
+        if error:
+            print("Errors have been found.")
             exit()
 
-    try:
-        connection.executemany('INSERT INTO voc_translate VALUES (?, ?, ?, ?, ?)', content)
-    except sqlite3.ProgrammingError as e:
-        print('! Erreur : ' + str(e))
 
-    conn.commit()
+    @staticmethod
+    def create_db(dbPath):
+        try:
+            os.remove(dbPath)
+        except FileNotFoundError:
+            print("FileNotFound")
+        conn = sqlite3.connect(dbPath)
+        connection = conn.cursor()
 
-    conn.close()
+        # Tables creation
+        connection.execute(invoke_data.get_create_table_verbs())
+        connection.execute(invoke_data.get_create_table_trans())
+        connection.execute(invoke_data.get_create_table_verbs_en())
 
-    # ---
+        # Tables filling
+        content = invoke_data.get_verbs()
+        verbes_id = InvokeDB.check_content_verbs(content)
+        connection.executemany('INSERT INTO voc_verbs VALUES (?,?,?,?,?)', content)
 
-    conn = sqlite3.connect(dbPath)
-    connection = conn.cursor()
+        content_verbs_en = invoke_data.get_irregular_verbs()
+        irr_not_found = 0
+        for cc in content_verbs_en:
+            found = False
+            for v in content:
+                if cc[1] == v[2] and v[1] == 'en':
+                    # le verbe est dans la base et dans celle des irréguliers
+                    found = True
+                    break
+            if not found:
+                # on a un irrégulier qui n'est pas dans notre base
+                print(cc[1])
+                irr_not_found += 1
+        print("i Irregulars not found in our base :", irr_not_found)
 
-    #connection.execute("SELECT * FROM voc_verbs")
-    #r = connection.fetchone()
-    f = open('./output/results.txt', mode='w', encoding='utf-8')
+        connection.executemany('INSERT INTO voc_verbs_en VALUES (?,?,?,?)', content_verbs_en)
 
-    f.write("------------------------------------------------------------------------\n")
-    f.write("Toutes les traductions\n")
-    f.write("------------------------------------------------------------------------\n")
-    i = 0
-    for row in connection.execute("SELECT fr.base, en.base, t.sens FROM voc_verbs as fr, voc_verbs as en, voc_translate as t WHERE fr.id = t.de AND en.id = t.vers AND fr.lang = 'fr' AND en.lang = 'en' ORDER BY fr.lang, fr.base"):
-        i += 1
-        if row[2] is not None:
-            f.write(str(i) + ". " + row[0] + " --> to " + row[1] + " avec le sens de : " + row[2] +"\n") #'::'.join(row))
-        else:
-            f.write(str(i) + ". " + row[0] + " --> to " + row[1] + "\n") #'::'.join(row))
+        content = invoke_data.get_traductions()
+        InvokeDB.check_content_trans(content, verbes_id)
+        for i in content:
+            if len(i) != 5:
+                print(i)
+                exit()
+        try:
+            connection.executemany('INSERT INTO voc_translate VALUES (?, ?, ?, ?, ?)', content)
+        except sqlite3.ProgrammingError as e:
+            print('! Erreur : ' + str(e))
 
-    f.write("\n\n\n")
-    f.write("------------------------------------------------------------------------\n")
-    f.write("Tous les verbes français\n")
-    f.write("------------------------------------------------------------------------\n")
-    i = 0
-    for row in connection.execute("SELECT fr.id, fr.base FROM voc_verbs as fr WHERE fr.lang = 'fr' ORDER BY fr.lang, fr.base"):
-        i += 1
-        f.write(str(i) + ". #" + str(row[0]) + " " + row[1] + "\n")
+        conn.commit()
+        conn.close()
 
-    f.write("\n\n\n")
-    f.write("------------------------------------------------------------------------\n")
-    f.write("Verbes non traduits\n")
-    f.write("------------------------------------------------------------------------\n")
-    i = 0
-    for row in connection.execute("SELECT fr.id, fr.base FROM voc_verbs as fr WHERE fr.lang = 'fr' AND fr.id NOT IN (SELECT t.de FROM voc_translate as t) ORDER BY fr.lang, fr.base"):
-        i += 1
-        f.write(str(i) + ". #" + str(row[0]) + " " + row[1] + "\n")
+        conn = sqlite3.connect(dbPath) # réouverture
+        connection = conn.cursor()
+        f = open('./output/results.txt', mode='w', encoding='utf-8')
 
-    from time import gmtime, strftime
-    s = strftime("%Y-%m-%d %H:%M:%S") #, gmtime())
-    f.write("\n\nLast edit on " + s)
+        f.write("------------------------------------------------------------------------\n")
+        f.write("Toutes les traductions\n")
+        f.write("------------------------------------------------------------------------\n")
+        i = 0
+        for row in connection.execute("SELECT fr.base, en.base, t.sens FROM voc_verbs as fr, voc_verbs as en, voc_translate as t WHERE fr.id = t.de AND en.id = t.vers AND fr.lang = 'fr' AND en.lang = 'en' ORDER BY fr.lang, fr.base"):
+            i += 1
+            if row[2] is not None:
+                f.write(str(i) + ". " + row[0] + " --> to " + row[1] + " avec le sens de : " + row[2] +"\n") #'::'.join(row))
+            else:
+                f.write(str(i) + ". " + row[0] + " --> to " + row[1] + "\n") #'::'.join(row))
 
-    f.close()
+        f.write("\n\n\n")
+        f.write("------------------------------------------------------------------------\n")
+        f.write("Tous les verbes français\n")
+        f.write("------------------------------------------------------------------------\n")
+        i = 0
+        for row in connection.execute("SELECT fr.id, fr.base FROM voc_verbs as fr WHERE fr.lang = 'fr' ORDER BY fr.lang, fr.base"):
+            i += 1
+            f.write(str(i) + ". #" + str(row[0]) + " " + row[1] + "\n")
+
+        f.write("\n\n\n")
+        f.write("------------------------------------------------------------------------\n")
+        f.write("Verbes non traduits\n")
+        f.write("------------------------------------------------------------------------\n")
+        i = 0
+        for row in connection.execute("SELECT fr.id, fr.base FROM voc_verbs as fr WHERE fr.lang = 'fr' AND fr.id NOT IN (SELECT t.de FROM voc_translate as t) ORDER BY fr.lang, fr.base"):
+            i += 1
+            f.write(str(i) + ". #" + str(row[0]) + " " + row[1] + "\n")
+
+        from time import gmtime, strftime
+        s = strftime("%Y-%m-%d %H:%M:%S") #, gmtime())
+        f.write("\n\nLast edit on " + s)
+        f.close()
 
 
 def exec_stat(dbPath, p_auto=False, p_debug=False):
@@ -200,8 +181,6 @@ def exec_stat(dbPath, p_auto=False, p_debug=False):
         if not p_auto:
             print("% Press a key to continue")
             input()
-        # res = p_cursor.execute(p_string)
-        # line = res.fetchone()
         count_lang = 0
         for p_row in p_cursor.execute(p_string):
             print("i   " + dic[lang] + " " + p_row[1] + " : " + str(p_row[0]))
@@ -239,7 +218,6 @@ def get_all_verbs_full(dbPath, p_lang='en', p_to='fr'): # all verbs, with transl
     verbs = []
     actual = None
     irregulars = get_all_verbs_en(dbPath)
-    #print(p_string)
     for p_row in p_cursor.execute(p_string):
         if actual is None or actual['id'] != p_row[0]:
             nb += 1
@@ -260,7 +238,7 @@ def get_all_verbs_full(dbPath, p_lang='en', p_to='fr'): # all verbs, with transl
                     actual['irregular'] = True
                 else:
                     actual['irregular'] = False
-                    actual['part'] = en_make_part(actual['root_base'])
+                    actual['part'] = EnglishUtils.en_make_part(actual['root_base'])
                     actual['pret'] = actual['part']
                 verbs.append(actual)
                 actual = {'nb' : nb}
@@ -269,13 +247,13 @@ def get_all_verbs_full(dbPath, p_lang='en', p_to='fr'): # all verbs, with transl
             actual['base'] = p_row[1]
             actual['surtype'] = p_row[2]
             actual['lvl'] = p_row[3]
-            actual['ing'] = en_make_ing(p_row[1].split(' ')[0])
-            actual['p3ps'] = en_make_pres3ps(p_row[1].split(' ')[0])
+            actual['ing'] = EnglishUtils.en_make_ing(p_row[1].split(' ')[0])
+            actual['p3ps'] = EnglishUtils.en_make_pres3ps(p_row[1].split(' ')[0])
             actual['trans'] = {}
-            # attention parfois p_row 6 ou 8 peuvent-être None
-            actual['trans'][p_row[5]] = {'base' : p_row[4], 'sens' : p_row[6], 'usage' : p_row[8]}
+            # attention parfois p_row 6 ou 8 peuvent-être None tid : translation id, tvid : translated verb id
+            actual['trans'][p_row[5]] = {'base' : p_row[4], 'sens' : p_row[6], 'usage' : p_row[8], 'tid' : p_row[7], 'tvid' : p_row[5]}
         elif actual is not None:
-            actual['trans'][p_row[5]] = {'base' : p_row[4], 'sens' : p_row[6], 'usage' : p_row[8]}
+            actual['trans'][p_row[5]] = {'base' : p_row[4], 'sens' : p_row[6], 'usage' : p_row[8], 'tid' : p_row[7], 'tvid' : p_row[5]}
     if actual is not None:
         if len(actual['base'].split(' ')) > 1:
             actual['root_base'] = actual['base'].split(' ')[0]
@@ -301,11 +279,6 @@ def get_all_verbs_full(dbPath, p_lang='en', p_to='fr'): # all verbs, with transl
         verbs.append(actual)
     return verbs
 
-
-#def pretty_print(verbs):
-#    print(len(verbs))
-#v = get_all_verbs()
-#pretty_print(v)
 
 def exec_cmd(dbPath, p_main, p_lang, p_order='', p_auto=False, p_to=None, p_debug=False, display=True):
     if p_order == '':
@@ -413,116 +386,68 @@ def conjugate(dbPath, verb, lang, onfile=False, html=False):
         elif lang == 'en':
             conjugate_en(verb, onfile, html)
 
-def header_en(dbPath):
-    f = open('./output/output1.html', mode='w', encoding='utf-8')
 
-    html = open('invoke_chapters.html', mode='r', encoding='utf-8')
-    html_content = html.read()
-    html_parts = html_content.split('<!-- SPLIT HERE -->')
+class EnglishUtils:
+    """
+        Classe regroupant des méthodes statiques pour la langue anglaise.
+        Comment faire automatiquement la 3e personne du singulier, le participe présent et le participe/prétérit pour les verbes réguliers.
+    """
+    
+    @staticmethod
+    def en_make_pres3ps(root):
+        pres3 = ''
+        # Present 3e
+        if root == 'be':
+            pres3 = '<b class="s">is</b>'
+        elif root in ['must']:
+            pres3 = '<b class="s">-</b>'
+        elif root[-1] == 'y' and root[-2] in ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'z']:
+            pres3 = root[0:-1] + "ies"
+        elif root[-1] in ['s', 'x', 'z', 'o'] or root[-2:] in ['ch', 'sh']:
+            pres3 = root + '<b class="s">es</b>'
+        else:
+            pres3 = root + '<b class="s">s</b>'
+        return pres3
 
-    verbs_en = get_all_verbs_full(dbPath, 'en', 'fr')
+    @staticmethod
+    def en_make_ing(root):
+        ing = ''
+        if root == 'be':
+            ing = 'being'
+        elif len(root) == 3 and root[-2:] == 'ie':
+            ing = root[:-2] + 'ying' # die and lie
+        elif root in ['must']:
+            ing = '<b class="s">-</b>'
+        elif root[-1] == 'e' and root[-2] in ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'z']: # becoME => becoming (cons + E) => (cons + ing)
+            ing = root[:-1] + 'ing'
+        elif root[-1] in ['t'] and root[-2] in ['a', 'e'] and root[-3] in ['h', 'g']:                                                              # cHAT => chatting (h + a + t) => (hatt + ing)
+            ing = root + root[-1] + 'ing'                                                                                                          # GET => getting (g + e + t) => (gett + ing)
+        else:
+            ing = root + 'ing'
+        return ing
 
-    f.write(html_parts[0].replace('#NB#', str(len(verbs_en))))
-    for v in verbs_en:
-        f.write('<h3><a href="#' + str(v['id']) + '">' + str(v['nb']) + '. ' + v['root_base'] + v['particle'] + ' &nbsp;(' + v['pret'] + v['particle'] + ', ' + v['part'] + v['particle'] + ')</a>')
-        if v['irregular']:
-            f.write(' <b>*</b>')
-        f.write('</h3>\n')
-    f.write('\n\n')
-    f.write('<p>Les verbes avec une ast&eacute;risque <b>*</b> sont irr&eacute;guliers.</p>')
-    f.write('<mbp:pagebreak />')
-
-    verbs_fr = get_all_verbs_full(dbPath, 'fr', 'en')
-
-    f.write('<h2 id="liste_fr_en">Les ' + str(len(verbs_en)) + ' verbes fondamentaux anglais à partir de leurs traductions en français</h2>')
-    for v in verbs_fr:
-        f.write('<h3>' + str(v['nb']) + '. ' + v['root_base'] + v['particle'] + ' : ')
-        trans = ''
-        nbt = 0
-        for t in v['trans']:
-            if nbt == 0:
-                trans = '<a href="#' + str(t) + '">' + v['trans'][t]['base'] + '</a>'
-                nbt += 1
+    @staticmethod
+    def en_make_part(root):
+        part = ''
+        # Building of preterit & past participe
+        if root[-1] == 'e':                              # change => changed
+            part = root + 'd'
+        elif root[-1] == 'y':
+            if root[-2] in ['a', 'e', 'i', 'o', 'u']:    # base (stay => stayed)
+                part = root + "ed"
             else:
-                trans = trans + ', ' + '<a href="#' + str(t) + '">' + v['trans'][t]['base'] + '</a>'
-            for vv in verbs_en:
-                if vv['id'] == t:
-                    if vv['irregular']:
-                        trans = trans + ' <b>*</b>'
-                    break
-        f.write(trans + '</h3>\n')
-    f.write('<p>Les verbes avec une ast&eacute;risque <b>*</b> sont irr&eacute;guliers.</p>')
-    f.write('<mbp:pagebreak />')
-
-    f.write(html_parts[1].replace('#NB#', str(len(verbs_en))))
-
-    f.close()
-
-
-def footer_en(dbPath):
-    f = open('./output/output1.html', mode='a', encoding='utf-8')
-
-    html = open('invoke_chapters.html', mode='r', encoding='utf-8')
-    html_content = html.read()
-    html_parts = html_content.split('<!-- SPLIT HERE -->')
-
-    verbs_en = get_all_verbs_full(dbPath, 'en', 'fr')
-    f.write(html_parts[2].replace('#NB#', str(len(verbs_en))))
-
-    f.close()
-
-
-def en_make_pres3ps(root):
-    pres3 = ''
-    # Present 3e
-    if root == 'be':
-        pres3 = '<b class="s">is</b>'
-    elif root in ['must']:
-        pres3 = '<b class="s">-</b>'
-    elif root[-1] == 'y' and root[-2] in ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'z']:
-        pres3 = root[0:-1] + "ies"
-    elif root[-1] in ['s', 'x', 'z', 'o'] or root[-2:] in ['ch', 'sh']:
-        pres3 = root + '<b class="s">es</b>'
-    else:
-        pres3 = root + '<b class="s">s</b>'
-    return pres3
-
-def en_make_ing(root):
-    ing = ''
-    if root == 'be':
-        ing = 'being'
-    elif root in ['must']:
-        ing = '<b class="s">-</b>'
-    elif root[-1] == 'e' and root[-2] in ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'z']:    # becoME => becoming (cons + E) => (cons + ing)
-        ing = root[:-1] + 'ing'
-    elif root[-1] in ['t'] and root[-2] in ['a', 'e'] and root[-3] in ['h', 'g']:                                                                 # cHAT => chatting (h + a + t) => (hatt + ing)
-        ing = root + root[-1] + 'ing'                                                                                                             # GET => getting (g + e + t) => (gett + ing)
-    else:
-        ing = root + 'ing'
-    return ing
-
-
-def en_make_part(root):
-    part = ''
-    # Building of preterit & past participe
-    if root[-1] == 'e':                              # change => changed
-        part = root + 'd'
-    elif root[-1] == 'y':
-        if root[-2] in ['a', 'e', 'i', 'o', 'u']:    # base (stay => stayed)
-            part = root + "ed"
+                part = root[0:-1] + "ied"      # carry => carried
+        elif root[-1] not in ['a', 'i', 'o', 'u']:
+            if root[-2] in ['a', 'u', 'i']:
+                if root[-3] in ['a', 'e', 'o', 'u'] or len(root) > 4:     # base (cook => cooked, wait => waited) et le cas visit => visited
+                    part = root + 'ed'                                         # au lieu de la len faire juste que -3 ne soit pas i ?
+                else:                                                   # chat => chatted
+                    part = root + root[-1] + 'ed'
+            else:
+                part = root + 'ed'             # base
         else:
-            part = root[0:-1] + "ied"      # carry => carried
-    elif root[-1] not in ['a', 'i', 'o', 'u']:
-        if root[-2] in ['a', 'u', 'i']:
-            if root[-3] in ['a', 'e', 'o', 'u'] or len(root) > 4:     # base (cook => cooked, wait => waited) et le cas visit => visited
-                part = root + 'ed'                                         # au lieu de la len faire juste que -3 ne soit pas i ?
-            else:                                                   # chat => chatted
-                part = root + root[-1] + 'ed'
-        else:
-            part = root + 'ed'             # base
-    else:
-        part = root + 'ed'                 # base
-    return part
+            part = root + 'ed'                 # base
+        return part
     
 
 def conjugate_en(verb, onfile=False, html=False, info=None, nb=None):
@@ -537,8 +462,8 @@ def conjugate_en(verb, onfile=False, html=False, info=None, nb=None):
     pret = info['pret']
     part = info['part']
 
-    pres3 = en_make_pres3ps(root)
-    ing = en_make_ing(root)
+    pres3 = EnglishUtils.en_make_pres3ps(root)
+    ing = EnglishUtils.en_make_ing(root)
     
     f.write('<h2 id="' + str(info['id']) + '">' + str(nb) + '. ' + root + particle + ' &nbsp;&nbsp;(' + pret + particle + ', ' + part + particle + ')</h2>\n')
     f.write('<p><b>Sens et traduction</b> : <ul>\n')
@@ -618,12 +543,11 @@ def conjugate_en(verb, onfile=False, html=False, info=None, nb=None):
     f.close()
 
 
-#------------------------------------------------------------------------------
-# Basic Abstract Renderer (BAR)
-#------------------------------------------------------------------------------
-
-class Renderer:
-
+class AbstractRenderer:
+    """
+        Basic Abstract Renderer (BAR)
+    """
+    
     def __init__(self, tables):
         self.tables = tables
 
@@ -635,55 +559,56 @@ class Renderer:
     def render(self, target):
         raise Exception('This is an abstract class.')
 
-#------------------------------------------------------------------------------
-# Simple tabular renderer for English, html
-#------------------------------------------------------------------------------
 
-class ConjugateTabularEn(Renderer):
-
+class ConjugateTabularEnRenderer(AbstractRenderer):
+    """
+        Debug renderer : Simple tabular renderer for English in html
+        Affiche tout dans un tableau avec les id.
+    """
+    
     def header(self, f):
         f.write("""
-<head>
-    <style type="text/css">
-        table {
-            border: 1px solid rgb(91, 155, 213);
-            border-collapse: collapse;
-            width: 28cm; /* 20 */
-            margin: auto;
-            font-size: 18px;
-            font-family: Calibri;
-        }
+            <head>
+                <style type="text/css">
+                    table {
+                        border: 1px solid rgb(91, 155, 213);
+                        border-collapse: collapse;
+                        width: 32cm; /* 20 */
+                        margin: auto;
+                        font-size: 18px;
+                        font-family: Calibri;
+                    }
 
-        td.num {
-            width: 1.5cm;
-            text-align: center;
-        }
+                    td.num {
+                        width: 1.5cm;
+                        text-align: center;
+                    }
 
-        th {
-            background: rgb(91, 155, 213);
-            color: rgb(255, 255, 255);
-            font-weight: bold;
-        }
+                    th {
+                        background: rgb(91, 155, 213);
+                        color: rgb(255, 255, 255);
+                        font-weight: bold;
+                    }
 
-        tr:nth-child(odd) {
-            background: rgb(242, 242, 242);
-        }
+                    tr:nth-child(odd) {
+                        background: rgb(242, 242, 242);
+                    }
 
-        td.irr {
-            font-weight: bold;
-            color: rgb(10, 10, 100); //rgb(146, 208, 80);
-        }
-        
-        b.s {
-            color: rgb(10, 10, 100); //rgb(146, 208, 80);
-        }
-        
-        h1 {
-            width: 100%;
-            text-align: center;
-        }
-    </style>
-</head>
+                    td.irr {
+                        font-weight: bold;
+                        color: rgb(10, 10, 100); //rgb(146, 208, 80);
+                    }
+                    
+                    b.s {
+                        color: rgb(10, 10, 100); //rgb(146, 208, 80);
+                    }
+                    
+                    h1 {
+                        width: 100%;
+                        text-align: center;
+                    }
+                </style>
+            </head>
         """)
 
     def render(self, target):
@@ -705,6 +630,8 @@ class ConjugateTabularEn(Renderer):
                         <th>nConstruction</th>
                         <th>Construction</th>
                         <th>nTrad</th>
+                        <th>TID</th>
+                        <th>TVID</th>
                         <th>Traduction</th>
                         <th>Ex</th>
                         <th>Ex fr</th>
@@ -755,7 +682,7 @@ class ConjugateTabularEn(Renderer):
             for t in trans:
                 nb_trad += 1
                 cpt_trad += 1
-                f.write('<tr><td class="num">' + str_nb_root + '</td><td ' + irr + '>' + str_irr + '</td><td>' + str(vid) + '</td><td ' + irr + '>' + base + '</td><td ' + irr + '>' + pret + '</td><td ' + irr + '>' + part + '</td><td>' + ing + '</td><td>' + p3ps + '</td><td class="num">' + str_nb_cons + '</td><td>' + cons + '</td><td class="num">' + str(nb_trad) + ' [' + str(cpt_trad) + ']' + '</td><td>' + trans[t]['base'] + '</td><td></td><td></td></tr>\n')
+                f.write('<tr><td class="num">' + str_nb_root + '</td><td ' + irr + '>' + str_irr + '</td><td>' + str(vid) + '</td><td ' + irr + '>' + base + '</td><td ' + irr + '>' + pret + '</td><td ' + irr + '>' + part + '</td><td>' + ing + '</td><td>' + p3ps + '</td><td class="num">' + str_nb_cons + '</td><td>' + cons + '</td><td class="num">' + str(nb_trad) + ' [' + str(cpt_trad) + ']' + '</td><td>' + str(trans[t]['tid']) + '</td><td>' + str(trans[t]['tvid']) + '</td><td>' + trans[t]['base'] + '</td><td></td><td></td></tr>\n')
                 if cpt_trad > 0:
                     str_irr = ''
                     #vid = ''
@@ -776,12 +703,12 @@ class ConjugateTabularEn(Renderer):
 
         return nb_cons
 
-#------------------------------------------------------------------------------
-# Simple renderer for French, txt or html
-#------------------------------------------------------------------------------
 
-class ConjugateFr(Renderer):
-
+class ConjugateFrRenderer(AbstractRenderer):
+    """
+        Simple renderer for French, txt or html
+    """
+    
     def render(self, onfile=False, html=False):
         verbs = self.tables['verbs']
 
@@ -863,25 +790,73 @@ class ConjugateFr(Renderer):
         else:
             print()
 
-        #f.write('4. Participe passé\n')
-        #suffix_partpast = ['é', 'ée', 'és', 'ées']
-        #root_pp = root
-        #for index, value in enumerate(suffix_partpast):
-        #    f.write('\t\t' + root_pp + value + '\n')
-        #f.write('\n')
 
-        #f.write('5. Participe présent\n')
-        #suffix_partpresent = ['ant']
-        #root_pp = root
-        #f.write('\t\t' + root_pp + suffix_partpresent[0] + '\n')
-        #f.write('\n')
+class ConjugateOldRendered(AbstractRenderer):
 
-#------------------------------------------------------------------------------
-# Console
-#------------------------------------------------------------------------------
+    def header_en(dbPath):
+        f = open('./output/output1.html', mode='w', encoding='utf-8')
+
+        html = open('invoke_chapters.html', mode='r', encoding='utf-8')
+        html_content = html.read()
+        html_parts = html_content.split('<!-- SPLIT HERE -->')
+
+        verbs_en = get_all_verbs_full(dbPath, 'en', 'fr')
+
+        f.write(html_parts[0].replace('#NB#', str(len(verbs_en))))
+        for v in verbs_en:
+            f.write('<h3><a href="#' + str(v['id']) + '">' + str(v['nb']) + '. ' + v['root_base'] + v['particle'] + ' &nbsp;(' + v['pret'] + v['particle'] + ', ' + v['part'] + v['particle'] + ')</a>')
+            if v['irregular']:
+                f.write(' <b>*</b>')
+            f.write('</h3>\n')
+        f.write('\n\n')
+        f.write('<p>Les verbes avec une ast&eacute;risque <b>*</b> sont irr&eacute;guliers.</p>')
+        f.write('<mbp:pagebreak />')
+
+        verbs_fr = get_all_verbs_full(dbPath, 'fr', 'en')
+
+        f.write('<h2 id="liste_fr_en">Les ' + str(len(verbs_en)) + ' verbes fondamentaux anglais à partir de leurs traductions en français</h2>')
+        for v in verbs_fr:
+            f.write('<h3>' + str(v['nb']) + '. ' + v['root_base'] + v['particle'] + ' : ')
+            trans = ''
+            nbt = 0
+            for t in v['trans']:
+                if nbt == 0:
+                    trans = '<a href="#' + str(t) + '">' + v['trans'][t]['base'] + '</a>'
+                    nbt += 1
+                else:
+                    trans = trans + ', ' + '<a href="#' + str(t) + '">' + v['trans'][t]['base'] + '</a>'
+                for vv in verbs_en:
+                    if vv['id'] == t:
+                        if vv['irregular']:
+                            trans = trans + ' <b>*</b>'
+                        break
+            f.write(trans + '</h3>\n')
+        f.write('<p>Les verbes avec une ast&eacute;risque <b>*</b> sont irr&eacute;guliers.</p>')
+        f.write('<mbp:pagebreak />')
+
+        f.write(html_parts[1].replace('#NB#', str(len(verbs_en))))
+
+        f.close()
+
+
+    def footer_en(dbPath):
+        f = open('./output/output1.html', mode='a', encoding='utf-8')
+
+        html = open('invoke_chapters.html', mode='r', encoding='utf-8')
+        html_content = html.read()
+        html_parts = html_content.split('<!-- SPLIT HERE -->')
+
+        verbs_en = get_all_verbs_full(dbPath, 'en', 'fr')
+        f.write(html_parts[2].replace('#NB#', str(len(verbs_en))))
+
+        f.close()
+        
 
 class Console:
-
+    """
+        Console
+    """
+    
     def __init__(self, pre):
         self.escape = False
         self.cmd = ''
@@ -940,7 +915,7 @@ class Console:
             print("  Available languages are : fr, en, it, eo, de")
         elif self.cmd == 'create':
             print("i Recreating the database")
-            create(dbPath)
+            InvokeDB.create_db(dbPath)
             print("i Database recreated")
         elif self.cmd == 'select':
             exec_cmd(dbPath, 'select', self.cmd_lang, self.cmd_order, self.cmd_auto, None, self.cmd_debug)
@@ -996,7 +971,7 @@ class Console:
             print("i Verb " + s + " conjugated. Results can be found in " + s.lower() + ".txt")
         elif self.cmd in ['render']: # New Architecture
             verbs = get_all_verbs_full(dbPath, 'en', 'fr')
-            ConjugateTabularEn({'verbs' : verbs}).render('./output/output2.html')
+            ConjugateTabularEnRenderer({'verbs' : verbs}).render('./output/output2.html')
         elif len(self.cmd.split(' ')) > 1:
             c_tab = self.cmd.split(' ')
             if c_tab[0] == 'select':
@@ -1029,6 +1004,7 @@ class Console:
             pass
         else:
             print("! Unknown command : " + self.cmd)
+
 
 if __name__ == '__main__':
     #commands = ['create', 'reset', 'html', 'lang en', 'con all', 'close', 'exit']
