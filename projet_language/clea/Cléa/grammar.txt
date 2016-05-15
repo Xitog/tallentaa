@@ -26,16 +26,18 @@
         | FUN_CONST_ENUM
         
     FUN_CONST_ENUM -->
-		| fun id [ '(' [ LIST_PARAM ] ')' ] [ : id ] is FUNC_BODY end
-        | sub id [ '(' [ LIST_PARAM ] ')' ] is SUB_BODY end
+		| fun id [ '(' [ LIST_PARAM ] ')' ] [ : id ] ( is | \n ) FUNC_BODY end
+        | sub id [ '(' [ LIST_PARAM ] ')' ] ( is | \n ) SUB_BODY end
         | const id '=' EXPRESSION # var are defined in BLOCK_STATEMENT
-        | enum id is LIST_ID end
+        | enum id [ : id ] ( is | \n ) LIST_VAL_ENUM end
         
     LIST_EXPRESSION --> EXPRESSION { ',' LIST_EXPRESSION }
     
     LIST_ID --> id { ',' LIST_ID }
     
     LIST_ID_TYP --> id [ : id ]  { ',' LIST_ID }
+    
+    LIST_VAL_ENUM --> id [ = expression ] { ( ',' | \n ) LIST_VAL_ENUM }
     
     LIST_PARAM --> id [ : id ] { ',' LIST_PARAM }
     
@@ -62,17 +64,20 @@
         | LIST_ID = LIST_EXPRESSION
 		| EXPRESSION
 		# Selection
-		| if EXPRESSION then BLOCK { elseif EXPRESSION then BLOCK } [ else BLOCK ] end
+		| if EXPRESSION ( then | \n ) BLOCK { elseif EXPRESSION then BLOCK } [ else BLOCK ] end
         # Loop
-        | while EXPRESSION do BLOCK end
+        | while EXPRESSION ( do | \n ) BLOCK end
 		| repeat BLOCK until EXPRESSION
-		| for id = EXPRESSION ',' EXPRESSION [ ',' EXPRESSION ] do BLOCK end
-		| for LIST_ID in LIST_EXPRESSION do BLOCK end
+		| for id = EXPRESSION ',' EXPRESSION [ ',' EXPRESSION ] ( do | \n ) BLOCK end
+		| for LIST_ID in LIST_EXPRESSION ( do | \n ) BLOCK end
         # Loop special
         | break
         | next
         # Declaration
         | var LIST_ID_TYP = LIST_EXPRESSION
+        # Exception
+        | try [\n] BLOCK { catch [id : ] id BLOCK } [ finally BLOCK ] end
+        | throw expression
         
     FUNC_BODY --> FUNC_STATEMENT { ';' FUNC_STATEMENT }
     
@@ -95,8 +100,8 @@
         | FUN_CONST_ENUM
         
     LAMBDA --> 
-        | fun [ '(' LIST_PARAM ')' ] [ : id ] is FUNC_STATEMENT end
-        | sub [ '(' LIST_PARAM ')' ] is SUB_STATEMENT end
+        | fun [ '(' LIST_PARAM ')' ] [ : id ] ( is | \n ) FUNC_STATEMENT end
+        | sub [ '(' LIST_PARAM ')' ] ( is | \n ) SUB_STATEMENT end
     
     LIST --> '[' [ LIST_EXPRESSION ] [ ',' ] ']'
     
@@ -160,6 +165,10 @@
     module --> 'module'
     require --> 'require'
     sub --> 'sub'
+    try --> 'try'
+    catch --> 'catch'
+    finally --> 'finally'
+    throw --> 'throw'
     
 -------------------------------------------------------------------------------  
 - Commentaires
@@ -193,11 +202,7 @@ writeln(p.age) # 6
 
 ?. On testera nil avec == pas is None comme en Python
 
-?. valoriser les enums ? (av 1 type)
-
-?. retirer les enums ?
-
-?. pas de redo / retry
+?. pas de redo / retry = reset dans les boucles
 
 ?. dans les dico = au lieu de : (choquant si pas symbole : "a" = 5 non. => ?
 
@@ -206,8 +211,6 @@ writeln(p.age) # 6
 ?. Il faudrait fusionner CalcoolettePy et CalcooletteC et CalcooletteJS et Cléa dans un seul modèle.
 
 ?. Définir l'interrogation de définition : defined? (en méthode) non car on veut savoir si une var existe, il faut un keyword ??? ou ?
-
-?. Les exceptions : try / catch / finally / throw ou try / except / finally / throw
 
 ?. Le switch : switch / case / default / break ou case / when / others / break
 

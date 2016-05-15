@@ -10,6 +10,18 @@ def get_create_table_verbs_en():
     c = "CREATE TABLE IF NOT EXISTS voc_verbs_en ( id int(11) NOT NULL, base varchar(50) NOT NULL, pret varchar(50) NOT NULL, part varchar(50) NOT NULL )"
     return c
     
+def get_select_translation_en():
+    c = "SELECT fr.base, en.base, t.sens FROM voc_verbs as fr, voc_verbs as en, voc_translate as t WHERE fr.id = t.de AND en.id = t.vers AND fr.lang = 'fr' AND en.lang = 'en' ORDER BY fr.lang, fr.base"
+    return c
+    
+def get_select_untranslated_en():
+    c = "SELECT fr.id, fr.base FROM voc_verbs as fr WHERE fr.lang = 'fr' AND fr.id NOT IN (SELECT t.de FROM voc_translate as t) ORDER BY fr.lang, fr.base"
+    return c
+
+def get_select_table_verbs_fr():
+    c = "SELECT fr.id, fr.base FROM voc_verbs as fr WHERE fr.lang = 'fr' ORDER BY fr.lang, fr.base"
+    return c
+
 def get_verbs():
 
     content = [
@@ -430,6 +442,7 @@ def get_verbs():
         # VAGUE 5
         (100204, 'en', 'ask out', 'verb', 5),
         (100205, 'en', 'add up', 'verb', 5),
+        #(90152, 'fr', 'additionner', 'verb', 2), # se monter à ?
         (100206, 'en', 'bear', 'verb', 5),
         
         (100207, 'en', 'beat', 'verb', 5),
@@ -458,8 +471,13 @@ def get_verbs():
         (100221, 'en', 'break out', 'verb', 5),
         (100222, 'en', 'bring up', 'verb', 5),
         (100223, 'en', 'cast', 'verb', 5),
+        
         (100224, 'en', 'call back', 'verb', 5),
-        (100225, 'en', 'call off', 'verb', 5),
+        
+        (190225, 'en', 'call off', 'verb', 5),
+        (225, 'fr', 'annuler', 'verb', 5),
+        (100225, 'en', 'cancel', 'verb', 5),
+        
         (100226, 'en', 'calm down', 'verb', 5),
         
         (100227, 'en', 'check', 'verb', 5),
@@ -1040,7 +1058,7 @@ def get_irregular_verbs():
         (68, 'abide', 'abode', 'abode'),
         (69, 'arise', 'arose', 'arisen'),
         (70, 'awake', 'awoke', 'awoken'),
-        (1, 'be', 'were', 'been'),
+        (1, 'be', 'was / were', 'been'),
         (71, 'bear', 'bore', 'borne/born'),
         (72, 'beat', 'beat', 'beaten'),
         (54, 'become', 'became', 'become'),
@@ -1050,6 +1068,7 @@ def get_irregular_verbs():
         (75, 'bereave', 'bereft/bereaved', 'bereft/bereaved'),
         (76, 'bet', 'bet', 'bet'),
         (77, 'bid', 'bid/bade', 'bid/bidden'),
+        (178, 'bind', 'bound', 'bound'),
         (177, 'bite', 'bit', 'bitten'),
         (78, 'bleed', 'bled', 'bled'),
         (79, 'blow', 'blew', 'blown'),
@@ -1214,7 +1233,7 @@ def get_irregular_verbs():
         (175, 'withdraw', 'withdrew', 'withdrawn'),
         (176, 'wring', 'wrung', 'wrung'),
         (53, 'write', 'wrote', 'written'),
-    ] # last is 177
+    ] # last used is 178
     return content
 
 
@@ -1994,6 +2013,8 @@ def get_traductions():
         (620005, 100207, 207, None, None), # beat => battre
         (620006, 100212, 212, None, None), # bite => mordre
         (620007, 100213, 213, None, None), # bleed => saigner
+        (620008, 100225, 225, None, None), # cancel => annuler
+        (620009, 190225, 225, None, None), # call off => annuler
         
         #----------------------------------------------------------------------
         # VAGUE 1 TRADUCTIONS EN->EO
