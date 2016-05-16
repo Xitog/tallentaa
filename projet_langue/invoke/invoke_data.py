@@ -1,3 +1,318 @@
+import os
+import sqlite3
+
+class InvokeDB:
+    """
+        Creation, verification of the Invoke Database
+    """
+
+    @staticmethod
+    def check_content_verbs(content):
+        "Test de l'unicité des ids et des bases"
+        verbes_id = []
+        verbes_base_lang = {}
+        error = False
+        for verb in content:
+            idv = verb[0]
+            if idv in verbes_id:
+                print("ERROR : id 2x : " + str(idv))
+                error = True
+            else:
+                verbes_id.append(idv)
+            base = verb[2]
+            if base in verbes_base_lang and verbes_base_lang[base] == verb[1]: # same base and lang
+                print("ERROR : base 2x : " + base)
+                error = True
+            else:
+                verbes_base_lang[base] = verb[1] # 'dire' : 'fr' ou 'dire' : 'it'
+        if error:
+            print("Errors have been found.")
+            exit()
+        return verbes_id
+
+    @staticmethod
+    def check_content_trans(content, verbes_id):
+        "Tests Foreign Key"
+        error = False
+        for trans in content:
+            origine = trans[1]
+            vers = trans[2]
+            if origine not in verbes_id or vers not in verbes_id:
+                if origine not in verbes_id:
+                    print("Unknown DE id : " + str(origine) + " from " + str(trans))
+                    error = True
+                if vers not in verbes_id:
+                    print("Unknown VERS id : " + str(vers) + " from " + str(trans))
+                    error = True
+        if error:
+            print("Errors have been found.")
+            exit()
+
+
+    @staticmethod
+    def create_db(db_path):
+        "Create the invoke database"
+        try:
+            os.remove(db_path)
+        except FileNotFoundError:
+            print("FileNotFound")
+        conn = sqlite3.connect(db_path)
+        connection = conn.cursor()
+
+        # Tables creation
+        connection.execute(get_create_table_verbs())
+        connection.execute(get_create_table_trans())
+        connection.execute(get_create_table_verbs_en())
+
+        # Tables filling
+        content = get_verbs()
+        verbes_id = InvokeDB.check_content_verbs(content)
+        connection.executemany('INSERT INTO voc_verbs VALUES (?,?,?,?,?)', content)
+
+        content_verbs_en = get_irregular_verbs()
+        irr_not_found = 0
+        for irr_verb in content_verbs_en:
+            found = False
+            for verb in content:
+                if irr_verb[1] == verb[2] and verb[1] == 'en':
+                    # le verbe est dans la base et dans celle des irréguliers
+                    found = True
+                    break
+            if not found:
+                # on a un irrégulier qui n'est pas dans notre base
+                print(irr_verb[1])
+                irr_not_found += 1
+        print("i Irregulars not found in our base :", irr_not_found)
+
+        connection.executemany('INSERT INTO voc_verbs_en VALUES (?,?,?,?)', content_verbs_en)
+
+        content = get_traductions()
+        InvokeDB.check_content_trans(content, verbes_id)
+        for i in content:
+            if len(i) != 5:
+                print(i)
+                exit()
+        try:
+            connection.executemany('INSERT INTO voc_translate VALUES (?, ?, ?, ?, ?)', content)
+        except sqlite3.ProgrammingError as prog_err:
+            print('! Erreur : ' + str(prog_err))
+
+        conn.commit()
+        conn.close()
+        InvokeDB.analyse_create(db_path)
+
+
+    @staticmethod
+    def analyse_create(db_path):
+        "Analyse the database created"
+        conn = sqlite3.connect(db_path) # réouverture
+        connection = conn.cursor()
+        res_file = open('./output/results.txt', mode='w', encoding='utf-8')
+
+        res_file.write("------------------------------------------------------------------------\n")
+        res_file.write("Toutes les traductions\n")
+        res_file.write("------------------------------------------------------------------------\n")
+        i = 0
+        for row in connection.execute(get_select_translation_en()):
+            i += 1
+            if row[2] is not None:
+                res_file.write(str(i) + ". " + row[0] + " --> to " + row[1] + " avec le sens de : "
+                               + row[2] +"\n")
+            else:
+                res_file.write(str(i) + ". " + row[0] + " --> to " + row[1] + "\n") #'::'.join(row))
+
+        res_file.write("\n\n\n")
+        res_file.write("------------------------------------------------------------------------\n")
+        res_file.write("Tous les verbes français\n")
+        res_file.write("------------------------------------------------------------------------\n")
+        i = 0
+        for row in connection.execute(get_select_table_verbs_fr()):
+            i += 1
+            res_file.write(str(i) + ". #" + str(row[0]) + " " + row[1] + "\n")
+
+        res_file.write("\n\n\n")
+        res_file.write("------------------------------------------------------------------------\n")
+        res_file.write("Verbes non traduits\n")
+        res_file.write("------------------------------------------------------------------------\n")
+        i = 0
+        for row in connection.execute(get_select_untranslated_en()):
+            i += 1
+            res_file.write(str(i) + ". #" + str(row[0]) + " " + row[1] + "\n")
+
+        from time import gmtime, strftime
+        res_file.write("\n\nLast edit on " + strftime("%Y-%m-%d %H:%M:%S"))  #, gmtime())
+        res_file.close()
+        
+    @staticmethod
+    def get_all_verbs_en(db_path):
+        "fetch irregular"
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        request = "SELECT id, base, pret, part FROM voc_verbs_en"
+        results = {}
+        for row in cursor.execute(request): # base = be afraid, root = be
+            results[row[1]] = {'id' : row[0], 'base' : row[1], 'pret' : row[2], 'part' : row[3]}
+        return results
+
+    # Fetch all the verbs in lines with the translation
+    # I translate these lines into structured verb hash
+    # But in ConjugateTabularEn::render() I transform them in lines again!
+    @staticmethod
+    def get_all_verbs_full(db_path, p_lang='en', p_to='fr'):
+        "All verbs, with translations and irregular forms"
+        p_conn = sqlite3.connect(db_path)
+        p_cursor = p_conn.cursor()
+        p_order = p_lang + '.base'
+        counter = 0                    # 0      1        2       3     4        5     6       7     8
+        p_string = ("SELECT " + p_lang + ".id, " + p_lang + ".base, " + p_lang + ".surtype, " + p_lang +
+                    ".lvl, " + p_to + ".base, " + p_to + ".id, t.sens, t.id, t.usage " +
+                    "FROM voc_verbs as " + p_lang + ", voc_verbs as " + p_to +
+                    ", voc_translate as t WHERE " + p_lang + ".id = t.de AND " + p_to +
+                    ".id = t.vers AND " + p_lang + ".lang = '" + p_lang + "' AND " + p_to +
+                    ".lang = '" + p_to + "' AND " + p_lang + ".surtype = 'verb'" +
+                    " ORDER BY " + p_order)
+        verbs = []
+        actual = {}
+        irregulars = InvokeDB.get_all_verbs_en(db_path)
+        for p_row in p_cursor.execute(p_string):
+            if actual == {} or actual['id'] != p_row[0]:
+                counter += 1
+                if actual == {}:
+                    actual = {'nb' : counter}
+                else:
+                    # gestion à particules
+                    if len(actual['base'].split(' ')) > 1:
+                        actual['root'] = actual['base'].split(' ')[0]
+                        actual['particle'] = ' ' + actual['base'].split(' ')[1]
+                    else:
+                        actual['root'] = actual['base']
+                        actual['particle'] = ''
+                    # gestion des prétérits
+                    if actual['root'] in irregulars:
+                        actual['pret'] = irregulars[actual['root']]['pret']
+                        actual['part'] = irregulars[actual['root']]['part']
+                        actual['irregular'] = True
+                    else:
+                        actual['irregular'] = False
+                        actual['part'] = EnglishUtils.en_make_part(actual['root'])
+                        actual['pret'] = actual['part']
+                    verbs.append(actual)
+                    actual = {'nb' : counter}
+                #print('verbe : ' + p_row[1])
+                actual['id'] = p_row[0]
+                actual['base'] = p_row[1]
+                actual['surtype'] = p_row[2]
+                actual['lvl'] = p_row[3]
+                actual['ing'] = EnglishUtils.en_make_ing(p_row[1].split(' ')[0])
+                actual['p3ps'] = EnglishUtils.en_make_pres3ps(p_row[1].split(' ')[0])
+                actual['trans'] = {}
+                # attention parfois p_row 6 ou 8 peuvent-être None
+                # tid : translation id, tvid : translated verb id
+                actual['trans'][p_row[5]] = {'base' : p_row[4], 'sens' : p_row[6], 'usage' : p_row[8],
+                                             'tid' : p_row[7], 'tvid' : p_row[5]}
+            elif actual is not None:
+                actual['trans'][p_row[5]] = {'base' : p_row[4], 'sens' : p_row[6], 'usage' : p_row[8],
+                                             'tid' : p_row[7], 'tvid' : p_row[5]}
+        if actual is not None:
+            if len(actual['base'].split(' ')) > 1:
+                actual['root'] = actual['base'].split(' ')[0]
+                actual['particle'] = ' ' + actual['base'].split(' ')[1]
+            else:
+                actual['root'] = actual['base']
+                actual['particle'] = ''
+            if actual['root'] in irregulars:
+                actual['pret'] = irregulars[actual['root']]['pret']
+                actual['part'] = irregulars[actual['root']]['part']
+                actual['irregular'] = True
+            else:
+                # Building of preterit & past participe !! DUPLICATE CODE HERE NOT UPDATED FROM UP THERE
+                actual['irregular'] = False
+                if actual['root'][-1] != 'e' and actual['root'][-1] != 'y':
+                    actual['part'] = actual['root'] + 'ed'
+                elif actual['root'][-1] == 'e':
+                    actual['part'] = actual['root'] + 'd'
+                elif actual['root'][-1] == 'y':
+                    actual['part'] = actual['root'][0:-1] + "ied"
+                actual['pret'] = actual['part']
+
+            verbs.append(actual)
+        return verbs
+
+
+class EnglishUtils:
+    """
+        Classe regroupant des méthodes statiques pour la langue anglaise.
+        Comment faire automatiquement la 3e personne du singulier, le participe présent et
+        le participe/prétérit pour les verbes réguliers.
+    """
+
+    @staticmethod
+    def en_make_pres3ps(root):
+        "3e personne du présent de l'indicatif"
+        pres3 = ''
+        # Present 3e
+        if root == 'be':
+            pres3 = 'is'
+        elif root in ['must']:
+            pres3 = '-'
+        elif root[-1] == 'y' and root[-2] in ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n',
+                                              'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'z']:
+            pres3 = root[0:-1] + "ies"
+        elif root[-1] in ['s', 'x', 'z', 'o'] or root[-2:] in ['ch', 'sh']:
+            pres3 = root + '<b class="s">es</b>'
+        else:
+            pres3 = root + '<b class="s">s</b>'
+        return pres3
+
+    @staticmethod
+    def en_make_ing(root):
+        "participe présent"
+        ing = ''
+        if root == 'be':
+            ing = 'being'
+        elif len(root) == 3 and root[-2:] == 'ie':
+            ing = root[:-2] + 'ying' # die and lie
+        elif root in ['must']:
+            ing = '-'  # becoME => becoming (cons + E) => (cons + ing)
+        elif root[-1] == 'e' and root[-2] in ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n',
+                                              'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'z']:
+            ing = root[:-1] + 'ing'
+        elif root[-1] in ['t', 'p'] and root[-2] in ['a', 'e', 'i'] and root[-3] in ['h', 'g', 'l']:
+            # cHAT => chatting (h + a + t) => (hatt + ing)
+            # slip => slipping (l + i + p) => (lipp + ing)
+            ing = root + root[-1] + 'ing'
+        else:
+            # GET => getting (g + e + t) => (gett + ing)
+            ing = root + 'ing'
+        return ing
+
+    @staticmethod
+    def en_make_part(root):
+        "participe passé et prétérit réguliers"
+        part = ''
+        # Building of preterit & past participe
+        if root[-1] == 'e':                              # change => changed
+            part = root + 'd'
+        elif root[-1] == 'y':
+            if root[-2] in ['a', 'e', 'i', 'o', 'u']:    # base (stay => stayed)
+                part = root + "ed"
+            else:
+                part = root[0:-1] + "ied"      # carry => carried
+        elif root[-1] not in ['a', 'i', 'o', 'u']:
+            if root[-2] in ['a', 'u', 'i']:
+                if root[-3] in ['a', 'e', 'o', 'u'] or len(root) > 4:
+                    # base (cook => cooked, wait => waited) et le cas visit => visited
+                    # au lieu de la len faire juste que -3 ne soit pas i ?
+                    part = root + 'ed'
+                else:                                                   # chat => chatted
+                    part = root + root[-1] + 'ed'
+            else:
+                part = root + 'ed'             # base
+        else:
+            part = root + 'ed'                 # base
+        return part
+
+
 def get_create_table_verbs():
     c = "CREATE TABLE IF NOT EXISTS voc_verbs ( id int(11) NOT NULL, lang varchar(2) NOT NULL, base varchar(50) NOT NULL, surtype varchar(30) NOT NULL, lvl int(11) DEFAULT '1', PRIMARY KEY (`id`) ) "
     return c
@@ -52,7 +367,7 @@ def get_verbs():
         (33, 'fr', 'réussir', 'verb', 1),
         (34, 'fr', 'réveiller (se)', 'verb', 1),
         (35, 'fr', 'rire', 'verb', 1),
-        (36, 'fr', 'occuper (s'')', 'verb', 1),
+        (36, 'fr', 'occuper (s\')', 'verb', 1),
         (37, 'fr', 'sauter', 'verb', 1),
         (38, 'fr', 'savoir', 'verb', 1),
         (39, 'fr', 'reposer (se)', 'verb', 1),
@@ -95,7 +410,7 @@ def get_verbs():
         (76, 'fr', 'jeter', 'verb', 1),
         (77, 'fr', 'inviter', 'verb', 1),
         (78, 'fr', 'habiter', 'verb', 1),
-        (79, 'fr', 'habiller (s'')', 'verb', 1),
+        (79, 'fr', 'habiller (s\')', 'verb', 1),
         (80, 'fr', 'goûter', 'verb', 1),
         (81, 'fr', 'gagner', 'verb', 1),
         (82, 'fr', 'finir', 'verb', 1),
@@ -164,7 +479,7 @@ def get_verbs():
         (146, 'fr', 'remplir', 'verb', 1),
         (147, 'fr', 'monter', 'verb', 1),
         (148, 'fr', 'descendre', 'verb', 1),
-        (150, 'fr', 'asseoir (s'')', 'verb', 1),
+        (150, 'fr', 'asseoir (s\')', 'verb', 1),
         (151, 'fr', 'enlever', 'verb', 1),
 
         # VAGUE 2
@@ -1377,7 +1692,7 @@ def get_traductions():
         (130, 135, 100135, None, None),
         (131, 136, 100136, None, None),
         (132, 41, 190041, 'un sentiment', None),
-        (133, 5, 190005, 'atteinte à la propriété d''autrui', None),
+        (133, 5, 190005, 'atteinte à la propriété d\'autrui', None),
         (134, 137, 100055, None, None), # CORRECTED
         (135, 46, 190046, 'lancer un projectile', None),
 
@@ -1512,7 +1827,7 @@ def get_traductions():
         (262, 136, 400136, None, None),
         (265, 137, 400137, None, None),
         (267, 46, 490046, 'lancer un projectile', None),
-        (268, 5, 490005, 'atteinte à la propriété d''autrui', None),
+        (268, 5, 490005, 'atteinte à la propriété d\'autrui', None),
         (269, 41, 490041, 'un sentiment', None),
 
         #----------------------------------------------------------------------
@@ -1534,7 +1849,7 @@ def get_traductions():
         (283, 11, 200011, None, None),
         (284, 12, 200012, None, None),
         (285, 13, 200013, None, None),
-        (286, 14, 200014, 'd''une langue à une autre', None),
+        (286, 14, 200014, 'd\'une langue à une autre', None),
         (287, 15, 200015, None, None),
         (288, 16, 200016, 'physiquement et émotionnellement', None),
         (289, 17, 200017, None, None),
@@ -1588,7 +1903,7 @@ def get_traductions():
         (337, 74, 200074, None, None),
         (338, 75, 200075, 'à un jeu, un sport', None),
         (339, 75, 290075, 'une pièce au théâtre', None),
-        (340, 75, 280075, 'd''un instrument', None),
+        (340, 75, 280075, 'd\'un instrument', None),
         (341, 76, 200076, None, None),
         (342, 77, 200077, None, None),
         (343, 78, 200078, None, None),
@@ -1653,11 +1968,11 @@ def get_traductions():
         #----------------------------------------------------------------------
         (399, 138, 400138, None, None),
         (400, 139, 400139, None, None),
-        (401, 138, 100138, 'vu de l''intérieur du lieu que l''on quitte', None),
-        (402, 138, 190138, 'vu de l''extérieur du lieu que l''on quitte', None),
+        (401, 138, 100138, 'vu de l\'intérieur du lieu que l\'on quitte', None),
+        (402, 138, 190138, 'vu de l\'extérieur du lieu que l\'on quitte', None),
         (403, 138, 180138, 'sortir quelque chose', None),
-        (404, 139, 100139, 'vu de l''extérieur du lieu où l''on entre', None),
-        (405, 139, 190139, 'vu de l''intérieur du lieu où l''on entre', None),
+        (404, 139, 100139, 'vu de l\'extérieur du lieu où l\'on entre', None),
+        (405, 139, 190139, 'vu de l\'intérieur du lieu où l\'on entre', None),
         (406, 139, 180139, 'de façon générale', None),
         (407, 138, 200138, None, None),
         (408, 139, 200139, None, None),

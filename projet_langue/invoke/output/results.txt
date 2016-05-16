@@ -14,8 +14,8 @@ Toutes les traductions
 11. arriver --> to arrive avec le sens de : quelque part
 12. arriver --> to happen avec le sens de : une occurrence
 13. arrêter --> to stop
-14. asseoir (s) --> to sit down
-15. asseoir (s) --> to sit
+14. asseoir (s') --> to sit down
+15. asseoir (s') --> to sit
 16. attendre --> to wait
 17. attraper --> to catch
 18. augmenter --> to increase
@@ -76,8 +76,8 @@ Toutes les traductions
 73. enlever --> to remove
 74. enseigner --> to teach
 75. entendre --> to hear
-76. entrer --> to go in avec le sens de : vu de lextérieur du lieu où lon entre
-77. entrer --> to come in avec le sens de : vu de lintérieur du lieu où lon entre
+76. entrer --> to go in avec le sens de : vu de l'extérieur du lieu où l'on entre
+77. entrer --> to come in avec le sens de : vu de l'intérieur du lieu où l'on entre
 78. entrer --> to enter avec le sens de : de façon générale
 79. envoyer --> to send
 80. espérer --> to hope
@@ -92,7 +92,7 @@ Toutes les traductions
 89. glisser --> to glide avec le sens de : se mouvoir de façon fluide
 90. goûter --> to taste
 91. gémir --> to moan
-92. habiller (s) --> to dress
+92. habiller (s') --> to dress
 93. habiter --> to live in
 94. intéresser --> to interest
 95. intéresser --> to concern avec le sens de : concerner
@@ -123,7 +123,7 @@ Toutes les traductions
 120. nager --> to swim
 121. naître --> to be born
 122. nourrir --> to feed
-123. occuper (s) --> to take care
+123. occuper (s') --> to take care
 124. oublier --> to forget
 125. ouvrir --> to open
 126. pardonner --> to forgive
@@ -177,8 +177,8 @@ Toutes les traductions
 174. sentir --> to smell avec le sens de : une odeur
 175. sentir --> to feel avec le sens de : un sentiment
 176. signifier --> to mean
-177. sortir --> to go out avec le sens de : vu de lintérieur du lieu que lon quitte
-178. sortir --> to come out avec le sens de : vu de lextérieur du lieu que lon quitte
+177. sortir --> to go out avec le sens de : vu de l'intérieur du lieu que l'on quitte
+178. sortir --> to come out avec le sens de : vu de l'extérieur du lieu que l'on quitte
 179. sortir --> to take out avec le sens de : sortir quelque chose
 180. souffrir --> to suffer
 181. souhaiter --> to wish
@@ -204,7 +204,7 @@ Toutes les traductions
 201. voir --> to see
 202. voir --> to watch avec le sens de : visionner (un film, une émission)
 203. voler --> to fly avec le sens de : dans les airs
-204. voler --> to steal avec le sens de : atteinte à la propriété dautrui
+204. voler --> to steal avec le sens de : atteinte à la propriété d'autrui
 205. vouloir --> to want
 206. voyager --> to travel
 207. écouter --> to listen
@@ -234,7 +234,7 @@ Tous les verbes français
 11. #129 apprécier
 12. #126 arriver
 13. #127 arrêter
-14. #150 asseoir (s)
+14. #150 asseoir (s')
 15. #211 attacher
 16. #125 attendre
 17. #153 attraper
@@ -309,7 +309,7 @@ Tous les verbes français
 86. #168 glisser
 87. #80 goûter
 88. #167 gémir
-89. #79 habiller (s)
+89. #79 habiller (s')
 90. #78 habiter
 91. #169 intéresser
 92. #77 inviter
@@ -339,7 +339,7 @@ Tous les verbes français
 116. #50 nager
 117. #51 naître
 118. #172 nourrir
-119. #36 occuper (s)
+119. #36 occuper (s')
 120. #52 oublier
 121. #1 ouvrir
 122. #53 pardonner
@@ -451,4 +451,4 @@ Verbes non traduits
 17. #227 vérifier
 
 
-Last edit on 2016-05-16 00:30:05
+Last edit on 2016-05-16 19:44:51
