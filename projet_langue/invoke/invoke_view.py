@@ -117,15 +117,68 @@ class VerbesAnglaisEssentielsRenderer(AbstractRenderer):
         fout = open(target, mode='a', encoding='utf-8')
         fout.write("<div><h1>Verbes anglais essentiels</h1></div>")
 
-  
+        fout.write("<div><h2>Index</h2></div>")
         self.sub_render_menu_letters_en(fout, roots)
         self.sub_render_menu_letters_fr(fout, roots)
+        fout.write(self.get_table_construction())
         self.sub_render_menu_verbs_by_letter_en(fout, roots)
         self.sub_render_menu_verbs_by_letter_fr(fout, roots)
         self.sub_render_verbs_en(fout, roots)
         fout.close()
 
 
+    def get_table_construction(self):
+        c = """
+            <div><h2>Constructions syntaxiques du groupe verbal anglais</h2></div>
+            <table class="mono" id="cons">
+                <tr><th>Construction</th><th>Forme</th><th>Exemple</th></tr>
+                <tr><td>Présent</td><td>base verbale ou 3<sup>e</sup> pers. sing.</td><td>They talk. She talks to Samantha.</td></tr>
+                <tr><td>Prétérit</td><td>prétérit</td><td>She talked to Samantha.</td></tr>
+                <tr><td>Futur</td><td>will / shall + base verbale</td><td>She will talk to Samantha.</td></tr>
+                <tr><td>Continu</td><td>be + participe présent</td><td>She is talking to Samantha.</td></tr>
+                <tr><td>Parfait</td><td>have + participe passé</td><td>She have talked to Samantha.</td></tr>
+                <tr><td>Passif</td><td>be + participe passé</td><td>The letter is written by Jack.</td></tr>
+                <tr><td>Autres</td><td>would / should + base verbale<br>may + base verbale<br>might + base verbale<br>can + base verbale<br>could + base verbale</td><td>She should talk to Samantha.<br>She may talk to Samantha.<br>She might talk to Samantha.<br>She can talk to Samantha.<br>She could talk to Samantha.</td></tr>
+            </table>
+            <br><br>
+            <div><h2>Constructions des 5 formes des verbes anglais</h2></div>
+            <table class="mono" id="forms">
+                <tr><th>Forme</th><th>Construction</th><th>Exemple</th></tr>
+                <tr><td>Présent, sauf 3<sup>e</sup> pers. sing.</td><td>base verbale</td><td>talk &#8594; talk</td></tr>
+                <tr><td>Présent, 3<sup>e</sup> pers. sing.</td><td>base verbale +s</td><td>talk &#8594; talks</td></tr>
+                <tr><td>Prétérit</td><td>base verbale +ed</td><td>talk &#8594; talked</td></tr>
+                <tr><td>Participe passé</td><td>base verbale +ed</td><td>talk &#8594; talked</td></tr>
+                <tr><td>Participe présent</td><td>base verbale +ing</td><td>talk &#8594; talking</td></tr>
+            </table>
+            <br><br>
+        """
+        return c
+
+
+    def get_table_pronoms(self):
+        c = """
+        """
+        return c
+        
+    
+    def get_table_abreviations(self):
+        c = """
+        """
+        return c
+        
+    
+    def get_table_negations(self):
+        c = """
+        """
+        return c
+        
+    
+    def get_table_sens_emplois(self):
+        c = """
+        """
+        return c
+        
+    
 class ConjugateTabularEnRenderer(AbstractRenderer):
     """
         Debug renderer : Simple tabular renderer for English in html
@@ -252,6 +305,39 @@ class ConjugateTabularEnRenderer(AbstractRenderer):
                     
                     table td:last-child {
                         border-right: none;
+                    }
+                    
+                    /* construction table */
+                    
+                    #cons, #forms {
+                        border: 1px solid rgb(91, 155, 213);
+                    }
+                    
+                    #cons td, #forms td {
+                        border-right: 1px solid rgb(91, 155, 213);
+                        text-align: left;
+                    }
+                    
+                    #cons tr td:last-child , #forms tr td:last-child {
+                        border-right: none;
+                        font-style: italic;
+                    }
+                    
+                    #cons th, #forms th {
+                        text-align: center;
+                        font-size: 22px;
+                        font-weight: bold;
+                        background-color: rgb(91, 155, 213);
+                        color: white;
+                    }
+                    
+                    #cons tr td:first-child, #forms tr td:first-child {
+                        font-size: 22px;
+                    }
+                    
+                    #cons tr:nth-child(2n+1) , #forms tr:nth-child(2n+1) {
+                        background-color: rgb(146, 208, 80); /*rgb(213,91,94);*/
+                        color: white;
                     }
                     
                 </style>
@@ -544,5 +630,172 @@ class ConjugateOldRenderer(AbstractRenderer):
         verbs_en = get_all_verbs_full(db_path, 'en', 'fr')
         fout.write(html_parts[2].replace('#NB#', str(len(verbs_en))))
 
+        fout.close()
+
+
+    def conjugate(self, db_path, verb, lang, onfile=False, html=False):
+        """
+            Conjugate : new from 2/11/2015
+            Il faudrait faire une option qui génère tout cela dans un fichier texte plutôt qu'en sortie
+            console.
+            Aucun test, cela ne marche que pour les verbes du 1er groupe se conjuguant avec avoir.
+        """
+        if lang not in ['fr', 'en']:
+            print('Unknwon conjugaison for', lang)
+            return
+        if verb == 'all' and lang == 'en':
+            # make book
+            results = InvokeDB.get_all_verbs_full(db_path)
+            counter = 0
+            for res_elem in results:
+                if res_elem['surtype'] == 'verb':
+                    counter += 1
+                    conjugate_en(res_elem['base'], onfile, html, res_elem, counter)
+                else:
+                    print(res_elem['surtype'])
+            print('i Conjugaison done for', len(results), 'verbs')
+        elif verb == 'all':
+            results = exec_cmd(db_path, 'select', lang, '', False, None, False, False)
+            # filter on verb
+            counter = 0
+            for res_elem in results:
+                if res_elem['surtype'] == 'verb':
+                    if lang == 'fr':
+                        raise 'Not working anymore' # conjugate_fr(res_elem['base'], onfile, html)
+                    elif lang == 'en':
+                        conjugate_en(res_elem['base'], onfile, html)
+                    counter += 1
+            print('i Conjugaison done for', counter, 'verbs')
+        else:
+            if lang == 'fr':
+                raise 'Not working anymore' # conjugate_fr(verb, onfile, html)
+            elif lang == 'en':
+                conjugate_en(verb, onfile, html)
+
+
+    def conjugate_en(self, verb, onfile=False, html=False, info=None, number=None):
+        "Conjugue une verbe en anglais"
+        if verb != info['root']:
+            raise "Function Deprecated"
+        if not onfile or not html or number is None or info is None:
+            print("i This function works only with onfile and html set at true")
+            return
+
+        fout = open('./output/output1.html', mode='a', encoding='utf-8')
+        #pronoms = ['I', 'you', 'she, he, it', 'we', 'you', 'they']
+        root = info['root']
+        particle = info['particle']
+        pret = info['pret']
+        part = info['part']
+
+        pres3 = EnglishUtils.en_make_pres3ps(root)
+        ing = EnglishUtils.en_make_ing(root)
+
+        fout.write('<h2 id="' + str(info['id']) + '">' + str(number) + '. ' + root + particle +
+                   ' &nbsp;&nbsp;(' + pret + particle + ', ' + part + particle + ')</h2>\n')
+        fout.write('<p><b>Sens et traduction</b> : <ul>\n')
+        for trans in info['trans']:
+            if info['trans'][trans]['usage'] is not None:
+                usages = info['trans'][trans]['usage'].split(',')
+                for usage in usages:
+                    fout.write('\t<li>' + usage + '</li>\n')
+            elif info['trans'][trans]['sens'] is not None:
+                fout.write('\t<li>' + info['trans'][trans]['base'] + ' (' + info['trans'][trans]['sens']
+                           + ')</li>\n')
+            else:
+                fout.write('\t<li>' + info['trans'][trans]['base'] + '</li>\n')
+        fout.write('</ul></p>\n')
+
+        #f.write('<p><b>Base verbale</b> : ' + root + '</p>\n')
+        fout.write('<p><b>Infinitif</b> : <b>to <b class="present">' + root + '</b></b></p>\n')
+        fout.write('<p><b>Participe passé</b> : <b class="pp">' + part + '</b></p>\n')
+        fout.write('<p><b>Participe présent</b> : <b class="ing">' + ing + particle + '</b></p>\n')
+        fout.write('<p><b>Voix passive</b> : <b>were ' + part + '</b> (1ère et 3e pers. sing. : <b>was '
+                   + part + '</b>)</p>\n')
+
+        fout.write('<h3>Indicatif</h3>\n')
+
+        fout.write('<div class="simple">\n')
+        fout.write('<p><b>Présent simple</b> :<ul>\n')
+        fout.write('\t<li>forme <b>affirmative</b> : <b class="present">' + root + particle +
+                   '</b> (3e pers. sing. : <b class="present">' + pres3 + particle + '</b>)</li>\n')
+        fout.write('\t<li>forme <b>négative</b> : <b class="present">do not ' + root +
+                   '</b> (3e pers. sing. : <b class="present">do</b><b class="s">es</b>' +
+                   '<b class="present">' + ' not ' + root + particle + ')</b></li>\n')
+        fout.write('</ul></p>\n')
+        fout.write('<p><b>Passé simple (ou prétérit)</b> :<ul>\n')
+        fout.write('\t<li>forme <b>affirmative</b> : <b class="past">' + pret + particle +
+                   '</b></li>\n')
+        fout.write('\t<li>forme <b>négative</b> : <b class="past">did not ' + root + particle +
+                   '</b></li>\n')
+        fout.write('</ul></p>\n')
+        fout.write('<p><b>Futur simple</b> : <b class="future">will</b> <b>(not)</b> <b class="future">'
+                   + root + particle + '</b></p>\n')
+        fout.write('</div>\n')
+
+        fout.write('<div class="pp">\n')
+        fout.write('<p><b>Présent parfait</b> : <b class="present">have</b> <b>(not)</b> <b class="pp">'
+                   + part + particle + '</b> (3e pers. sing. : <b class="present">' +
+                   'ha</b><b class="s">s</b> <b>(not)</b> <b class="pp">' + part + particle +
+                   '</b>)</p>\n')
+        fout.write('<p><b>Passé parfait</b> : <b class="past">had</b> <b>(not)</b> <b class="pp">' +
+                   part + particle + '</b></p>\n')
+        fout.write('<p><b>Futur parfait</b> : <b class="future">will</b> <b>(not)</b> ' +
+                   '<b class="future">have</b> <b class="pp">' + part + particle + '</b></p>\n')
+        fout.write('</div>\n')
+
+        fout.write('<div class="ing">\n')
+        fout.write('<p><b>Présent continu</b> : <b class="present">are</b> <b>(not)</b> ' +
+                   '<b class="ing">' + ing + particle +  '</b> (1ère et 3e pers. sing. : ' +
+                   ' <b class="present">is</b> ' + '<b>(not)</b> <b class="ing">' + ing + particle +
+                   '</b></p>\n')
+        fout.write('<p><b>Passé continu</b> : <b class="past">were</b> <b>(not)</b> <b class="ing">' +
+                   ing + particle +  '</b> (1ère et 3e pers. sing. : <b class="past">was</b> ' +
+                   '<b>(not)</b>'+ ' <b class="ing">' + ing + particle + '</b></p>\n')
+        fout.write('<p><b>Futur continu</b> : <b class="future">will be</b> <b>(not)</b> ' +
+                   '<b class="ing">' + ing + particle + '</b></p>\n')
+        fout.write('</div>\n')
+
+        fout.write('<div class="pp">\n')
+        fout.write('<div class="ing">\n')
+        fout.write('<p><b>Présent parfait continu</b> : <b class="present">have</b> <b>(not)</b> ' +
+                   '<b class="pp">been</b> <b class="ing">' + ing + particle +
+                   '</b> (3e pers. sing. : <b class="present">' + 'ha</b><b class="s">s</b> ' +
+                   '<b>(not)</b> <b class="pp">been</b> <b class="ing">' + ing + particle +
+                   '</b>)</p>\n')
+        fout.write('<p><b>Passé parfait continu</b> : <b class="past">had</b> <b>(not)</b> ' +
+                   '<b class="pp">been</b> <b class="ing">' + ing + particle + '</b></p>\n')
+        fout.write('<p><b>Futur parfait continu</b> : <b class="future">will</b> <b>(not)</b> ' +
+                   '<b class="future">have</b> <b class="pp">been</b> <b class="ing">' + part +
+                   particle + '</b></p>\n')
+        fout.write('</div>\n')
+        fout.write('</div>\n')
+
+        fout.write('<h3>Conditionnel</h3>\n')
+        fout.write('<p><b>Présent</b> : <b class="cond">should/would</b> <b>(not)</b> ' +
+                   '<b class="present">' + root + particle + '</b></p>\n')
+        fout.write('<p><b>Passé</b> : <b class="cond">should/would</b> <b>(not)</b> ' +
+                   '<b class="cond">have</b> <b class="pp">' + part + particle + '</b></p>\n')
+
+        fout.write('<h3>Subjonctif</h3>\n')
+        fout.write('<p><b>Présent</b> : <b>(not)</b> <b class="present">' + root + particle +
+                   '</b> (à <u>toutes</u> les personnes)</p>\n')
+        if root == 'be':
+            fout.write('<p><b>Passé</b> : <b>(not)</b> <b class="past">' + pret + particle +
+                       '</b> (à <u>toutes</u> les personnes)</p>\n')
+
+        fout.write('<h3>Impératif</h3>\n')
+        fout.write('<p><b>2e pers.</b> : <b>(do not)</b> <b class="present">' + root + particle +
+                   '</b>!</p>\n')
+        fout.write('<p><b>1e pers. du pluriel</b> (avec deux façons d\'exprimer la négation) : ' +
+                   '<b>(do not)</b> <b class="present">let</b> \'s <b>(not)</b> <b class="present">' +
+                   root + particle + '</b>!</p>\n')
+        fout.write('<p><b>3e pers.</b> (avec deux façons d\'exprimer la négation) : <b>(do not)</b> ' +
+                   '<b class="present">let</b> her/him/them <b>(not)</b> <b class="present">' + root +
+                   particle + '</b>!</p>\n')
+
+        fout.write('<div class="retour"><b><a href="#tous_les_verbes">' +
+                   'Retour à la liste des verbes</a>' + '</b></div>')
+        fout.write('<mbp:pagebreak />')
         fout.close()
 

@@ -312,7 +312,7 @@ class EnglishUtils:
             part = root + 'ed'                 # base
         return part
 
-
+    
 def get_create_table_verbs():
     c = "CREATE TABLE IF NOT EXISTS voc_verbs ( id int(11) NOT NULL, lang varchar(2) NOT NULL, base varchar(50) NOT NULL, surtype varchar(30) NOT NULL, lvl int(11) DEFAULT '1', PRIMARY KEY (`id`) ) "
     return c
@@ -977,6 +977,22 @@ def get_verbs():
         (100404, 'en', 'thrive', 'verb', 6),
         (100405, 'en', 'thrust', 'verb', 6),
         (100406, 'en', 'typeset', 'verb', 6),
+        # VAGUE 7 : vus et entendus
+        (100407, 'en', 'return', 'verb', 7),
+        (100408, 'en', 'fire', 'verb', 7),
+        (100409, 'en', 'worry', 'verb', 7),
+        (100410, 'en', 'defeat', 'verb', 7),
+        (100411, 'en', 'avoid', 'verb', 7),
+        (100412, 'en', 'obey', 'verb', 7),
+        (100413, 'en', 'save', 'verb', 7),
+        (100414, 'en', 'surprise', 'verb', 7),
+        
+        # to turn traitor : trahir (devenir traître)
+        # to stand by : attendre
+        # to fallback : se replier
+        # take (back to?) your seat : regagner 
+        # to take out sone : neutraliser
+        # clear off the area : évacuer
         
         #(100, 'en', '', 'verb', 5),
         
