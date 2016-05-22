@@ -1,3 +1,5 @@
+import locale
+locale.setlocale(locale.LC_ALL, '') #"fr_FR.UTF-8")
 
 class AbstractRenderer:
     """
@@ -35,43 +37,45 @@ class VerbesAnglaisEssentielsRenderer(AbstractRenderer):
     def sub_render_menu_by_letters(self, fout, roots, lang, text, reverse):
         """by letters"""
         dico = roots.get_reverse_by_first_letter() if reverse else roots.get_roots_by_first_letter()
-        fout.write('<a name="letters_' + lang + '"></a><table class="mono"><tr class="title"><td>' + text + '</td></tr><tr><td class="trad">')
-        for letter in sorted(dico):
+        fout.write('<a name="letters_' + lang + '"></a><table class="mono" id="index_' + lang + '"><tr class="title"><td>' + text + '</td></tr><tr><td class="trad">')
+        for letter in sorted(dico, key=locale.strxfrm):
             fout.write('<a href="#' + lang + '_' + letter + '">' + letter.capitalize() + '</a>&nbsp;&nbsp;')
         fout.write('</td></tr></table><br><br>')   
     
     
-    def sub_render_menu_verbs_by_letter_en(self, fout, roots):
+    def sub_render_menu_verbs_by_letter_en(self, fout, roots):  # group verbs by letter
         """classement par lettre des verbes anglais"""
         self.sub_render_menu_verbs_by_letter(fout, roots, 'en', 'Que signifie ce verbe anglais ?', False)
 
         
-    def sub_render_menu_verbs_by_letter_fr(self, fout, roots):
+    def sub_render_menu_verbs_by_letter_fr(self, fout, roots): # group verbs by letter
         """classement par lettre des verbes français"""
         self.sub_render_menu_verbs_by_letter(fout, roots, 'fr', 'Comment dire en anglais ?', True)
     
     
-    def sub_render_menu_verbs_by_letter(self, fout, roots, lang, text, reverse):
+    def sub_render_menu_verbs_by_letter(self, fout, roots, lang, text, reverse):  # group verbs by letter
         """classement par lettre des verbes"""
         dico = roots.get_reverse_by_first_letter() if reverse else roots.get_roots_by_first_letter()
-        fout.write('<div><h2>' + text + '</h2></div>')
+        fout.write('<div><h2 id="t' + lang + '">' + text + '</h2></div>')
+        if lang == 'en': self.sub_render_menu_letters_en(fout, roots)
+        elif lang == 'fr' : self.sub_render_menu_letters_fr(fout, roots)
         for letter in sorted(dico):
             fout.write('<a name="' + lang + '_' + letter + '"></a><table class="mono"><tr class="title"><td><a href="#letters_' + lang + '">&lt;&nbsp;&nbsp;</a>' + letter + '</td></tr><tr class="trad"><td>')
             nb_on_line = 0
-            for roots_of_this_letter in dico[letter]:
+            for roots_of_this_letter in sorted(dico[letter]): # on trie les roots
                 if lang == 'en':
                     for base in sorted(roots_of_this_letter.get_all_verbs()):
                         verbs_of_this_letter = roots_of_this_letter.get_all_verbs()[base]
-                        irr = '&nbsp;<b class="s">*</b>' if roots_of_this_letter.irregular else ''
+                        irr = '&nbsp;<b>*</b>' if roots_of_this_letter.irregular else ''
                         nb_on_line += len(verbs_of_this_letter.base)
                         nb_on_line = (nb_on_line + 2) if irr != '' else nb_on_line
                         if nb_on_line >= 80:
                             fout.write('<br>')
                             nb_on_line = 0
                         fout.write('<a href="#' + verbs_of_this_letter.base + '">' + verbs_of_this_letter.base + '</a>' + irr + '&nbsp;&nbsp;')
-                elif lang == 'fr':
+                elif lang == 'fr': # fr => en
                     fout.write(roots_of_this_letter + '&nbsp;:&nbsp;')
-                    for verb_en in dico[letter][roots_of_this_letter]:
+                    for verb_en in sorted(dico[letter][roots_of_this_letter]): # on trie les traductions chasser : drive out, hunt
                         fout.write('<a href="#' + verb_en.root.root + '">' + verb_en.base + '</a> ')
                     nb_on_line += (len(roots_of_this_letter) + 3)
                     if nb_on_line >= 80:
@@ -82,7 +86,7 @@ class VerbesAnglaisEssentielsRenderer(AbstractRenderer):
     
     def sub_render_verbs_en(self, fout, roots):
         """Verbes anglais (1 par tableau)"""
-        fout.write('<div><h2>Les verbes anglais</h2></div>')
+        fout.write('<div><h2 id="tverbes">Les verbes anglais</h2></div>')
         for root_key in sorted(roots.get_roots()):
             root = roots.get_roots()[root_key]
             fout.write('<a name="' + root.root + '"></a>' + '<table class="mono">\n')
@@ -93,8 +97,8 @@ class VerbesAnglaisEssentielsRenderer(AbstractRenderer):
             fout.write('<tr class="temps"><td>Présent</td><td>Prétérit</td>' +
                        '<td>Participe passé</td><td>Participe présent</td>' +
                        '<td>3e pers. sing.</td></tr>')
-            p3ps = root.forms['p3ps'] if root.root != 'be' else '<b class="s">' + root.forms['p3ps'] + '</b>'
-            pret = root.forms['pret'] if root.root != 'be' else '<b class="s">' + root.forms['pret'] + '</b>'
+            p3ps = root.forms['p3ps'] if root.root != 'be' else '<b>' + root.forms['p3ps'] + '</b>'
+            pret = root.forms['pret'] if root.root != 'be' else '<b>' + root.forms['pret'] + '</b>'
             fout.write('<tr class="forms"><td>' + root.root +
                        '</td><td>' + pret + '</td><td>' + root.forms['part'] + '</td><td>' +
                        root.forms['ing'] + '</td><td>' + p3ps + '</td></tr>')
@@ -104,9 +108,10 @@ class VerbesAnglaisEssentielsRenderer(AbstractRenderer):
                 for trans_key in sorted(verb.get_all_trans()):
                     trans = verb.get_all_trans()[trans_key]
                     to = 'to ' if verb.base != 'must' else ''
+                    str_trans = trans.get_target() + '<i> (' + trans.get_sens() + ')</i>' if trans.get_sens() is not None else trans.get_target()
                     fout.write('<tr class="trad"><td colspan="5">' + to +
                                verb.base + ' ' +
-                               ' : ' + trans + '</td></tr>')
+                               ' : ' + str_trans + '</td></tr>')
             fout.write('</table>')
             fout.write('<br><br>')
     
@@ -116,20 +121,35 @@ class VerbesAnglaisEssentielsRenderer(AbstractRenderer):
         roots = self.tables['roots']
         fout = open(target, mode='a', encoding='utf-8')
         fout.write("<div><h1>Verbes anglais essentiels</h1></div>")
-
-        fout.write("<div><h2>Index</h2></div>")
-        self.sub_render_menu_letters_en(fout, roots)
-        self.sub_render_menu_letters_fr(fout, roots)
-        fout.write(self.get_table_construction())
+        
+        fout.write("<div><h2>Sommaire</h2></div>")
+        fout.write("""
+            <div><ol>
+                <!--<li><a href="#tindex">Index des verbes</a></li>-->
+                <li><a href="#tpronoms">Pronoms anglais</a></li>
+                <li><a href="#tsyntaxe">Constructions syntaxiques du groupe verbal anglais</a></li>
+                <li><a href="#tabreviations">Abréviations des verbes anglais</a></li>
+                <li><a href="#tnegations">Constructions contractées de la négation</a></li>
+                <li><a href="#ten">Que signifie ce verbe anglais ?</a></li>
+                <li><a href="#tfr">Comment dire en anglais ?</a></li>
+                <li><a href="#tverbes">Les verbes anglais</a></li>
+            </ol></div>
+                   """)
+        #fout.write('<div><h2 id="tindex">Index des verbes</h2></div>')
+        
+        fout.write(self.get_table_pronoms())
+        fout.write(self.get_table_constructions())
+        fout.write(self.get_table_abreviations())
+        fout.write(self.get_table_negations())
         self.sub_render_menu_verbs_by_letter_en(fout, roots)
         self.sub_render_menu_verbs_by_letter_fr(fout, roots)
         self.sub_render_verbs_en(fout, roots)
         fout.close()
 
 
-    def get_table_construction(self):
+    def get_table_constructions(self):
         c = """
-            <div><h2>Constructions syntaxiques du groupe verbal anglais</h2></div>
+            <div><h2 id="tsyntaxe">Constructions syntaxiques du groupe verbal anglais</h2></div>
             <table class="mono" id="cons">
                 <tr><th>Construction</th><th>Forme</th><th>Exemple</th></tr>
                 <tr><td>Présent</td><td>base verbale ou 3<sup>e</sup> pers. sing.</td><td>They talk. She talks to Samantha.</td></tr>
@@ -157,18 +177,78 @@ class VerbesAnglaisEssentielsRenderer(AbstractRenderer):
 
     def get_table_pronoms(self):
         c = """
+        <div><h2 id="tpronoms">Pronoms anglais</h2></div>
+        <table class="mono" id="pronoms">
+            <thead>
+                <tr><th>Personne, nombre et genre</th><th>Sujet</th><th>Objet</th><th>Possessif</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>1<sup>ère</sup> personne du singulier</td><td>I <i>(je)</i></td><td>me <i>(moi)</i></td><td>mine <i>(le mien)</i></td></tr>
+                <tr><td>2<sup>e</sup> personne du singulier</td><td>you <i>(tu)</i></td><td>you <i>(toi)</i></td><td>yours <i>(le tien)</i></td></tr>
+                <tr><td>3<sup>e</sup> personne du singulier, féminin</td><td>she <i>(elle)</i></td><td>her <i>(la)</i></td><td>hers <i>(le sien)</i></td></tr>
+                <tr><td>3<sup>e</sup> personne du singulier, masculin</td><td>he <i>(il)</i></td><td>him <i>(le)</i></td><td>his <i>(le sien)</i></td></tr>
+                <tr><td>3<sup>e</sup> personne du singulier, neutre</td><td>it</td><td>it</td><td>its own <i>(le sien)</i></td></tr>
+                <tr><td>1<sup>ère</sup> personne du pluriel</td><td>we <i>(nous)</i></td><td>us <i>(nous)</i></td><td>ours <i>(le nôtre)</i></td></tr>
+                <tr><td>2<sup>e</sup> personne du pluriel</td><td>you <i>(vous)</i></td><td>you <i>(vous)</i></td><td>yours <i>(le vôtre)</i></td></tr>
+                <tr><td>3<sup>e</sup> personne du pluriel</td><td>they <i>(elles ou ils)</i></td><td>them <i>(les)</i></td><td>theirs <i>(les leur)</i></td></tr>
+                <tr><td>pronom indéfini</td><td>one <i>(on)</i></td><td>one</td><td>one's own</td></tr>
+            </tbody>
+        </table>
+        <br><br>
         """
         return c
         
     
     def get_table_abreviations(self):
         c = """
+        <div><h2 id="tabreviations">Abréviations des verbes anglais</h2></div>
+        <table class="mono" id="abreviations">
+            <thead>
+                <tr><th>Construction simple</th><th>Construction contractée</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>am</td><td>'m</td></tr>
+                <tr><td>is</td><td><b>'s</b></td></tr>
+                <tr><td>are</td><td>'re</td></tr>
+                <tr><td>have</td><td>'ve</td></tr>
+                <tr><td>has</td><td><b>'s</b></td></tr>
+                <tr><td>had</td><td><b>'d</b></td></tr>
+                <tr><td>will</td><td><b>'ll</b></td></tr>
+                <tr><td>shall</td><td><b>'ll</b></td></tr>
+                <tr><td>would</td><td><b>'d</b></td></tr>
+            </tbody>
+        </table>
+        <br><br>
         """
         return c
         
     
     def get_table_negations(self):
         c = """
+        <div><h2 id="tnegations">Constructions contractées de la négation</h2></div>
+        <table class="mono" id="negations">
+            <thead>
+                <tr><th>Construction simple</th><th>Construction contractée</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>do not</td><td>don't</td></tr>
+                <tr><td>does not</td><td>doesn't</td></tr>
+                <tr><td>did not</td><td>didn't</td></tr>
+                <tr><td>has not</td><td>hasn't</td></tr>
+                <tr><td>have not</td><td>haven't</td></tr>
+                <tr><td>will not</td><td><b>won't</b></td></tr>
+                <tr><td>would not</td><td>wouldn't</td></tr>
+                <tr><td>shall not</td><td><b>shan't</b></td></tr>
+                <tr><td>should not</td><td>shouldn't</td></tr>
+                <tr><td>are not</td><td>aren't</td></tr>
+                <tr><td>was not</td><td>wasn't</td></tr>
+                <tr><td>were not</td><td>weren't</td></tr>
+                <tr><td><b>cannot</b></td><td><b>can't</b></td></tr>
+                <tr><td>might not</td><td>mightn't</td></tr>
+                <tr><td>need not</td><td>needn't</td></tr>
+            </tbody>
+        </table>
+        <br><br>
         """
         return c
         
@@ -190,6 +270,7 @@ class ConjugateTabularEnRenderer(AbstractRenderer):
         fout.write("""
             <html>
             <head>
+                <title>Verbes anglais essentiels</title>
                 <meta charset="utf-8">
                 <style type="text/css">
                     div {
@@ -214,13 +295,19 @@ class ConjugateTabularEnRenderer(AbstractRenderer):
                         text-align: left;
                     }
                     
-                    table.all {
+                    table {
                         border: 1px solid rgb(91, 155, 213);
-                        border-collapse: collapse;
-                        width: 32cm; /* 20 */
-                        margin: auto;
+                        /*border-collapse: collapse;*/
+                        border-spacing: 0;
+                        border-radius: 5px;
+                        
                         font-size: 18px;
                         font-family: Calibri;
+                    }
+                    
+                    table.all {
+                        width: 32cm; /* 20 */
+                        margin: auto;
                     }
 
                     table.all td.num {
@@ -243,39 +330,40 @@ class ConjugateTabularEnRenderer(AbstractRenderer):
                         color: rgb(10, 10, 100); //rgb(146, 208, 80);
                     }
 
-                    b.s {
-                        color: rgb(10, 10, 100); //rgb(146, 208, 80);
+                    b {
+                        color: rgb(213,91,155);
                     }
 
-                    /*h1 {
-                        width: 100%;
-                        text-align: center;
-                    }*/
-
-                    table.mono {
-                        border: 1px solid rgb(91, 155, 213);
-                        /*border-collapse: collapse;*/
-                        border-spacing: 0;
-                        border-radius: 5px;
-                        /*-webkit-border-radius: 5px;*/
-                        width: 20cm;
-                        margin: auto;
+                    ol {
                         font-size: 18px;
                         font-family: Calibri;
                     }
-
+                    
+                    table.mono {
+                        width: 20cm;
+                        margin: auto;
+                    }
+                    
                     table.mono td {
                         border-right: 1px solid rgb(91, 155, 213);
                         text-align: center;
                     }
                     
-                    tr.title {
+                    table.mono th, tr.title {
                         color: rgb(255, 255, 255);
                         background-color: rgb(91, 155, 213);
                         font-weight: bold;
                         font-size: 22px;
                     }
-
+                    
+                    #index_en tr.title td, #index_fr tr.title {
+                        background-color: rgb(146, 208, 80);
+                    }
+                    
+                    #index_en, #index_fr {
+                        border: 1px solid rgb(146, 208, 80);
+                    }
+                    
                     tr.title a {
                         text-decoration: none;
                         color: rgb(255, 255, 255);
@@ -297,10 +385,6 @@ class ConjugateTabularEnRenderer(AbstractRenderer):
 
                     table.mono tr.trad td {
                         text-align: left;
-                    }
-
-                    table.mono b.s {
-                        color: rgb(213,91,155);
                     }
                     
                     table td:last-child {
@@ -335,11 +419,15 @@ class ConjugateTabularEnRenderer(AbstractRenderer):
                         font-size: 22px;
                     }
                     
-                    #cons tr:nth-child(2n+1) , #forms tr:nth-child(2n+1) {
+                    #cons tr:nth-child(2n+1) , #forms tr:nth-child(2n+1), #pronoms tr:nth-child(2n+1), #abreviations tr:nth-child(2n+1), #negations tr:nth-child(2n+1) {
                         background-color: rgb(146, 208, 80); /*rgb(213,91,94);*/
                         color: white;
                     }
                     
+                    #pronoms td:first-child {
+                        text-align: left;
+                        padding-left: 4em;
+                    }
                 </style>
             </head>
             <body>

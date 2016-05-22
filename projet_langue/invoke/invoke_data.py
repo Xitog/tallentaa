@@ -830,7 +830,7 @@ def get_verbs():
         (100257, 'en', 'give in', 'verb', 5),
         (100258, 'en', 'give up', 'verb', 5),
         (100259, 'en', 'go ahead', 'verb', 5),
-        (100260, 'en', 'go back', 'verb', 5),
+        (100260, 'en', 'go back', 'verb', 5), #done
         (100261, 'en', 'go by', 'verb', 5),
         (100262, 'en', 'go out with', 'verb', 5),
         (100263, 'en', 'grow back', 'verb', 5),
@@ -978,14 +978,26 @@ def get_verbs():
         (100405, 'en', 'thrust', 'verb', 6),
         (100406, 'en', 'typeset', 'verb', 6),
         # VAGUE 7 : vus et entendus
+        # Done en
         (100407, 'en', 'return', 'verb', 7),
-        (100408, 'en', 'fire', 'verb', 7),
         (100409, 'en', 'worry', 'verb', 7),
         (100410, 'en', 'defeat', 'verb', 7),
+        (100408, 'en', 'fire', 'verb', 7),
         (100411, 'en', 'avoid', 'verb', 7),
         (100412, 'en', 'obey', 'verb', 7),
         (100413, 'en', 'save', 'verb', 7),
         (100414, 'en', 'surprise', 'verb', 7),
+        (100415, 'en', 'give back', 'verb', 7),
+        # Done fr
+        (407, 'fr', 'retourner', 'verb', 7),
+        (409, 'fr', 'inquiéter (s\')', 'verb', 7),
+        (410, 'fr', 'vaincre', 'verb', 7),
+        (411, 'fr', 'éviter', 'verb', 7),
+        (412, 'fr', 'obéir', 'verb', 7),
+        (413, 'fr', 'sauver', 'verb', 7),
+        (90413, 'fr', 'sauvegarder', 'verb', 7),
+        (414, 'fr', 'surprendre', 'verb', 7),
+        (415, 'fr', 'rendre', 'verb', 7),
         
         # to turn traitor : trahir (devenir traître)
         # to stand by : attendre
@@ -2283,7 +2295,7 @@ def get_traductions():
 		(4740000, 100169, 169, None, None), # interest => intéresser VAGUE 2
 		(4750000, 190169, 169, "concerner", None), # concern => intéresser VAGUE 2
 		(4760000, 190169, 28, "concerner", None), # concern => regarder VAGUE 2
-		(4770000, 100170, 170, "lever", None), # raise => lever VAGUE 2
+		(4770000, 100170, 170, None, None), #"lever", None), # raise => lever VAGUE 2
 		(4780000, 190170, 170, "soulever", None), # lift => lever VAGUE 2
 		(4790000, 100171, 171, None, None), # rent => louer VAGUE 2
 		(4800000, 190171, 171, None, None), # hire => louer VAGUE 2
@@ -2336,7 +2348,6 @@ def get_traductions():
         #----------------------------------------------------------------------
         # VAGUE 5 TRADUCTIONS EN->FR
         #----------------------------------------------------------------------
-        
         (620001, 100214, 214, None, None), # blow => souffler
         (620002, 100211, 211, None, None), # bind => attacher
         (620003, 100211, 90211, None, None), # bind => lier
@@ -2346,7 +2357,22 @@ def get_traductions():
         (620007, 100213, 213, None, None), # bleed => saigner
         (620008, 100225, 225, None, None), # cancel => annuler
         (620009, 190225, 225, None, None), # call off => annuler
-        
+        #----------------------------------------------------------------------
+        # VAGUE 7 TRADUCTIONS EN->FR
+        #----------------------------------------------------------------------
+        (630001, 100407, 415, None, None), # return => rendre
+        (630002, 100407, 407, None, None), # return => retourner
+        (630003, 100407, 136, None, None), # return => revenir 
+        (630004, 100409, 409, None, None), # worry => s'inquiéter
+        (630005, 100410, 410, None, None), # defeat => vaincre
+        (630006, 100260, 407, None, None), # go back => retourner
+        (630007, 100408, 46, 'utiliser une arme à feu', None), # fire => tirer
+        (630008, 100411, 411, None, None), # avoid => éviter
+        (630009, 100412, 412, None, None), # obey => obéir
+        (630010, 100413, 413, None, None), # save => sauver
+        (630011, 100413, 90413, None, None), # save => sauvegarder
+        (630012, 100414, 414, None, None), # surprendre => surprendre
+        (630013, 100415, 415, None, None), # give back => rendre
         #----------------------------------------------------------------------
         # VAGUE 1 TRADUCTIONS EN->EO
         #----------------------------------------------------------------------

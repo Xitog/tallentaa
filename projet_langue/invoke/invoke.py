@@ -264,7 +264,7 @@ class Console:
             for verb in verbs:
                 new_verb = roots.add_root(verb['root'], verb['irregular'], verb['base'], pret=verb['pret'], part=verb['part'], p3ps=verb['p3ps'], ing=verb['ing'])
                 for trans in verb['trans']:
-                    new_verb.add_translation(verb['trans'][trans]['base'])
+                    new_verb.add_translation(verb['trans'][trans]['base'], verb['trans'][trans]['sens'])
             roots.build_reverse()
             ConjugateTabularEnRenderer({'verbs' : verbs, 'roots' : roots}).render('./output/output2.html')
         elif len(self.cmd.split(' ')) > 1:
