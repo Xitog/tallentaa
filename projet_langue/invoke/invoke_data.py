@@ -988,6 +988,8 @@ def get_verbs():
         (100413, 'en', 'save', 'verb', 7),
         (100414, 'en', 'surprise', 'verb', 7),
         (100415, 'en', 'give back', 'verb', 7),
+        (190032, 'en', 'remain', 'verb', 7),
+        (100416, 'en', 'explain', 'verb', 7),
         # Done fr
         (407, 'fr', 'retourner', 'verb', 7),
         (409, 'fr', 'inquiéter (s\')', 'verb', 7),
@@ -998,6 +1000,7 @@ def get_verbs():
         (90413, 'fr', 'sauvegarder', 'verb', 7),
         (414, 'fr', 'surprendre', 'verb', 7),
         (415, 'fr', 'rendre', 'verb', 7),
+        (416, 'fr', 'expliquer', 'verb', 7),
         
         # to turn traitor : trahir (devenir traître)
         # to stand by : attendre
@@ -2366,13 +2369,15 @@ def get_traductions():
         (630004, 100409, 409, None, None), # worry => s'inquiéter
         (630005, 100410, 410, None, None), # defeat => vaincre
         (630006, 100260, 407, None, None), # go back => retourner
-        (630007, 100408, 46, 'utiliser une arme à feu', None), # fire => tirer
+        (630007, 100408,  46, 'utiliser une arme à feu', None), # fire => tirer
         (630008, 100411, 411, None, None), # avoid => éviter
         (630009, 100412, 412, None, None), # obey => obéir
         (630010, 100413, 413, None, None), # save => sauver
         (630011, 100413, 90413, None, None), # save => sauvegarder
         (630012, 100414, 414, None, None), # surprendre => surprendre
         (630013, 100415, 415, None, None), # give back => rendre
+        (630014, 190032,  32, None, None), # remain => rester
+        (630015, 100416, 416, None, None), # explain => expliquer
         #----------------------------------------------------------------------
         # VAGUE 1 TRADUCTIONS EN->EO
         #----------------------------------------------------------------------

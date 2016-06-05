@@ -164,6 +164,10 @@ class Engine:
         return pygame.mouse.get_pos()
 
 
+class CameraStorm:
+    pass
+
+
 class Camera:
     
     def __init__(self, engine, width, height, scroll, player):
@@ -195,7 +199,11 @@ class Camera:
         self.build_size = None
         self.not_enough_ress = 0
         self.dev_mode = False
-    
+        self.ALLOW_BEYOND_MAP_SCROLLING = False
+        self.NB_SQUARE_WIDTH = 25
+        self.NB_SQUARE_HEIGHT = 15
+
+
     def select_zone(self, x, y, w, h):  # , player)
         x //= 32
         y //= 32
@@ -369,7 +377,17 @@ class Camera:
             self.y -= self.scroll
         if self.up or my < self.auto_scroll_zone:
             self.y += self.scroll
-        
+        # Block scroll to the map
+        if not self.ALLOW_BEYOND_MAP_SCROLLING:
+            if self.x > 0:
+                self.x = 0
+            elif self.x < -(self.player.world.size32.x - self.NB_SQUARE_WIDTH) * 32:
+                self.x = -(self.player.world.size32.x - self.NB_SQUARE_WIDTH) * 32
+            if self.y > 0:
+                self.y = 0
+            elif self.y < -(self.player.world.size32.y - self.NB_SQUARE_HEIGHT) * 32:
+                self.y = -(self.player.world.size32.y - self.NB_SQUARE_HEIGHT) * 32
+
         return True
 
     def render(self):
@@ -379,57 +397,61 @@ class Camera:
 
     def render_game(self):
         mx, my = pygame.mouse.get_pos()  # repeat from main_loop
+        first_square = (-self.x//32, -self.y//32)
         self.screen.fill(Colors.BLACK.value)
 
         # Sol
-        for yy in range(0, self.player.world.size32.y):
-            #if yy * 32 + self.y >= self.height: break
-            for xx in range(0, self.player.world.size32.x):
-                #if xx * 32 + self.x >= self.width: continue
+        # for yy in range(0, self.player.world.size32.y):
+        for yy in range(first_square[1], min(first_square[1] + self.NB_SQUARE_HEIGHT + 4, self.player.world.size32.y)): # 4 = LARGEST SPRITE HEIGHT
+            # if yy * 32 + self.y >= self.height: break
+            # for xx in range(0, self.player.world.size32.x):
+            for xx in range(first_square[0], min(first_square[0] + self.NB_SQUARE_WIDTH + 3, self.player.world.size32.x)): # 3 = LARGET SPRITE WIDTH
+                # if xx * 32 + self.x >= self.width: continue
                 t = self.player.world.world_map[yy][xx]
                 d = self.player.world.passable_map[yy][xx]
-                self.engine.tex(xx * 32 + self.x, yy * 32 + self.y, TEXTURES[t].img, 0)
-                if d != 0 and d != 99: # there is visible blocking doodad, 0 = passable, 99 = invisible and not passable
-                    self.engine.tex(xx * 32 + self.x + TEXTURES[d].mod_x, yy * 32 + self.y + TEXTURES[d].mod_y, TEXTURES[d].img, 0.5)
-                    if self.dev_mode: self.engine.rect(xx * 32 + self.x, yy * 32 + self.y, 32, 32, Colors.RED, 1, 1)
+                if self.player.fog_map[yy][xx]:
+                    self.engine.tex(xx * 32 + self.x, yy * 32 + self.y, TEXTURES[t].img, 0)
+                    if d != 0 and d != 99: # there is visible blocking doodad, 0 = passable, 99 = invisible and not passable
+                        self.engine.tex(xx * 32 + self.x + TEXTURES[d].mod_x, yy * 32 + self.y + TEXTURES[d].mod_y, TEXTURES[d].img, 0.5)
+                        if self.dev_mode: self.engine.rect(xx * 32 + self.x, yy * 32 + self.y, 32, 32, Colors.RED, 1, 1)
                 
-                su = self.player.world.unit_map[yy][xx]
-                if su == 0:
-                    pass # Empty
-                elif su[0] in (-1, 1): # en mouvement, carreau reserve ou en position
-                    if su[0] == -1:
-                        self.engine.rect(xx * 32 + self.x +1, yy * 32 + self.y +1, 31, 31, Colors.HALF_RED, 1, 1)
-                    elif su[0] == 1: # en position
-                        self.engine.rect(xx * 32 + self.x +1, yy * 32 + self.y +1, 31, 31, Colors.HALF_BLUE, 1, 1)
-                    u = su[1]
-                    if u in self.selected:
-                        if len(u.orders) > 0:
-                            lx = u.real_x + self.x
-                            ly = u.real_y + self.y
-                            for o in u.orders:
-                                if o.kind == 'go':
-                                    self.engine.circle(self.x2r(o.x), self.y2r(o.y), 5, Colors.GREEN, 0, 1)
-                                    self.engine.line(lx, ly, self.x2r(o.x), self.y2r(o.y), Colors.GREEN, 1, 1)
-                                    lx = self.x2r(o.x)
-                                    ly = self.y2r(o.y)
-                                elif o.kind == 'attack':
-                                    #pygame.draw.circle(self.screen, RED, (o.target.x*32+16 + self.x, o.target.y*32+16 + self.y), 5, 0)
-                                    self.engine.line(lx, ly, self.x2r(o.target.x), self.y2r(o.target.y), Colors.RED, 1, 1)
-                                    lx = self.x2r(o.target.x)
-                                    ly = self.y2r(o.target.y)
-                        self.engine.circle(u.real_x + self.x, u.real_y + self.y, u.size, u.player.color, 0, 1)
-                        if u.player == self.player:
-                            self.engine.circle(u.real_x + self.x, u.real_y + self.y, u.size+3, Colors.GREEN, 2, 1)
-                        else:
-                            self.engine.circle(u.real_x + self.x, u.real_y + self.y, u.size+3, Colors.RED, 2, 1)
-                    else:
-                        self.engine.circle(u.real_x + self.x, u.real_y + self.y, u.size, u.player.color, 0, 1)
-                elif su[0] == 2: # Building
-                    u = su[1]
-                    if xx == u.grid_x and yy == u.grid_y:
-                        self.engine.rect(xx * 32 + self.x, yy * 32 + self.y, u.type.grid_w * 32, u.type.grid_h * 32, u.player.color, 0, 2)
+                    su = self.player.world.unit_map[yy][xx]
+                    if su == 0:
+                        pass # Empty
+                    elif su[0] in (-1, 1): # en mouvement, carreau reserve ou en position
+                        if su[0] == -1:
+                            self.engine.rect(xx * 32 + self.x +1, yy * 32 + self.y +1, 31, 31, Colors.HALF_RED, 1, 1)
+                        elif su[0] == 1: # en position
+                            self.engine.rect(xx * 32 + self.x +1, yy * 32 + self.y +1, 31, 31, Colors.HALF_BLUE, 1, 1)
+                        u = su[1]
                         if u in self.selected:
-                            self.engine.rect(u.grid_x * 32 + self.x, u.grid_y * 32 + self.y, u.type.grid_w * 32, u.type.grid_h * 32, Colors.GREEN, 2, 2)
+                            if len(u.orders) > 0:
+                                lx = u.real_x + self.x
+                                ly = u.real_y + self.y
+                                for o in u.orders:
+                                    if o.kind == 'go':
+                                        self.engine.circle(self.x2r(o.x), self.y2r(o.y), 5, Colors.GREEN, 0, 1)
+                                        self.engine.line(lx, ly, self.x2r(o.x), self.y2r(o.y), Colors.GREEN, 1, 1)
+                                        lx = self.x2r(o.x)
+                                        ly = self.y2r(o.y)
+                                    elif o.kind == 'attack':
+                                        #pygame.draw.circle(self.screen, RED, (o.target.x*32+16 + self.x, o.target.y*32+16 + self.y), 5, 0)
+                                        self.engine.line(lx, ly, self.x2r(o.target.x), self.y2r(o.target.y), Colors.RED, 1, 1)
+                                        lx = self.x2r(o.target.x)
+                                        ly = self.y2r(o.target.y)
+                            self.engine.circle(u.real_x + self.x, u.real_y + self.y, u.size, u.player.color, 0, 1)
+                            if u.player == self.player:
+                                self.engine.circle(u.real_x + self.x, u.real_y + self.y, u.size+3, Colors.GREEN, 2, 1)
+                            else:
+                                self.engine.circle(u.real_x + self.x, u.real_y + self.y, u.size+3, Colors.RED, 2, 1)
+                        else:
+                            self.engine.circle(u.real_x + self.x, u.real_y + self.y, u.size, u.player.color, 0, 1)
+                    elif su[0] == 2: # Building
+                        u = su[1]
+                        if xx == u.grid_x and yy == u.grid_y:
+                            self.engine.rect(xx * 32 + self.x, yy * 32 + self.y, u.type.grid_w * 32, u.type.grid_h * 32, u.player.color, 0, 2)
+                            if u in self.selected:
+                                self.engine.rect(u.grid_x * 32 + self.x, u.grid_y * 32 + self.y, u.type.grid_w * 32, u.type.grid_h * 32, Colors.GREEN, 2, 2)
                             
                 # DEBUG
                 if self.dev_mode:
@@ -904,7 +926,8 @@ class Player:
         self.min = ress[0]
         self.sol = ress[1]
         self.victorious = False
-    
+        self.fog_map = World.create_map(self.world.size32.x, self.world.size32.y, False)
+
     def update(self):
         # Update for all units?
         i = 0
@@ -1033,9 +1056,10 @@ class Building(GameObject):
 
 class UnitType:
 
-    def __init__(self, name, size, range, life, dom, speed, reload):
+    def __init__(self, name, size, vision, range, life, dom, speed, reload):
         self.name = name
         self.size = size
+        self.vision = vision
         self.range = range
         self.life = life
         self.dom = dom
@@ -1045,25 +1069,26 @@ class UnitType:
 
 class Unit(GameObject):
     
-    def __init__(self, type, player, x, y):
+    def __init__(self, utype, player, x, y):
         GameObject.__init__(self)
-        self.type = type
+        self.type = utype
         self.player = player
         self.real_x = x * 32 + 16
         self.real_y = y * 32 + 16
         self.x = x
         self.y = y
-        self.size = type.size
-        self.range = type.range
-        self.life = type.life
-        self.dom = type.dom
-        self.reload = type.reload
+        self.size = utype.size
+        self.range = utype.range
+        self.vision = utype.vision
+        self.life = utype.life
+        self.dom = utype.dom
+        self.reload = utype.reload
         
         self.orders = []
         self.cpt = 0
         self.cpt_move = 0
         self.speed_move = 1
-        self.speed_step = type.speed  # must be 1 or a multiple of 2 - 2 before
+        self.speed_step = utype.speed  # must be 1 or a multiple of 2 - 2 before
         self.old_x = x
         self.old_y = y
 
@@ -1072,11 +1097,15 @@ class Unit(GameObject):
         self.destination = None
         self.previous32 = None
 
+        self.light()
+
     def __str__(self):
         return 'Unit #' + str(self.id) + ' (' + self.type.name + ')'
         #return str(id(self)) + ' (' + self.uname + ')'
 
     def update(self):
+        old_x = self.x
+        old_y = self.y
         self.player.world.unit_map[self.y][self.x] = 0
         # print 'update ', len(self.orders)
         if self.life <= 0:
@@ -1097,9 +1126,19 @@ class Unit(GameObject):
                     if r:
                         del self.orders[0]
         self.player.world.unit_map[self.y][self.x] = (1, self) # CODE: STILL, UNIT
+
+        # fog
+        self.light(old_x, old_y)
+
         return True
 
-    #def order(self, o : Order):
+    def light(self, old_x=None, old_y=None):
+        if old_x != self.x or old_y != self.y:
+            for yy in range(max(0, self.y-self.vision), min(self.player.world.size32.y, self.y+self.vision)):
+                for xx in range(max(0, self.x-self.vision), min(self.player.world.size32.x, self.x+self.vision)):
+                    self.player.fog_map[yy][xx] = True
+
+    # def order(self, o : Order):
     def order(self, o):
         self.orders = [o]
 
@@ -1515,9 +1554,9 @@ def game_loop(game, camera, engine):
 
 def mod_basic(game):
 
-    game.set_unit_types({"soldier": UnitType("Soldier", size=10, range=10, life=100, dom=5, speed=8, reload=50),
-                         "elite": UnitType("Elite", size=10, range=10, life=100, dom=10, speed=8, reload=50),
-                         "big": UnitType("Big", size=20, range=30, life=300, dom=20, speed=8, reload=50)})
+    game.set_unit_types({"soldier": UnitType("Soldier", size=10, vision=5, range=10, life=100, dom=5, speed=8, reload=50),
+                         "elite": UnitType("Elite", size=10, vision=10, range=10, life=100, dom=10, speed=8, reload=50),
+                         "big": UnitType("Big", size=20, vision=2, range=30, life=300, dom=20, speed=8, reload=50)})
     game.set_building_types({"mine" : BuildingType("Mine", 2, 2, 100, (0,50)),
                              "solar" : BuildingType("Solar", 1, 2, 80, (0, 50)),
                              "radar" : BuildingType("Radar", 1, 1, 80, (50, 200)),
