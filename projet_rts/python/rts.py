@@ -38,6 +38,8 @@ class Colors(Enum):
     MINIMAP_BROWN_DARK = Color(128,64,0) # terre marron sombre pas passable (rochers)
     MINIMAP_BLUE = BLUE # eau profonde pas passable
     MINIMAP_BLUE_LIGHT = Color(113,123,255) # eau claire peu profonde mais pas passable
+    MINIMAP_FOG = Color(32, 32, 32, 128)
+    MINIMAP_BLACK = Color(0, 0, 0, 255)
 
 
 class Texture:
@@ -45,7 +47,10 @@ class Texture:
         self.name = name
         self.num = num
         if filename.__class__ == str:
-            self.img = pygame.image.load('..\\..\\assets\\tiles32x32\\' + filename).convert_alpha()
+            try:
+                self.img = pygame.image.load('..\\..\\assets\\tiles32x32\\' + filename).convert_alpha()
+            except pygame.error:
+                self.img = pygame.image.load('..\\..\\assets\\buildings\\' + filename).convert_alpha()
         elif filename.__class__ == pygame.Surface:
             self.img = filename
         self.mini = minicolor
@@ -114,31 +119,34 @@ class Engine:
         # Doodads
         global TEXTURES
         TEXTURES = {
-              1  : Texture('rock', 1, 'rock_brown.png', Colors.MINIMAP_BROWN_DARK, False),
-             25  : Texture('tree', 2, '25_arbre_1.png', Colors.MINIMAP_GREEN_DARK, False, -32, -96),
-             26  : Texture('tree', 2, '26_arbre_2.png', Colors.MINIMAP_GREEN_DARK, False, -32, -64),
+              1: Texture('rock', 1, 'rock_brown.png', Colors.MINIMAP_BROWN_DARK, False),
+             25: Texture('tree', 2, '25_arbre_1.png', Colors.MINIMAP_GREEN_DARK, False, -32, -96),
+             26: Texture('tree', 2, '26_arbre_2.png', Colors.MINIMAP_GREEN_DARK, False, -32, -64),
             # Real textures
-            100 : Texture('grass' , 200, 'grass_two_leaves.png', Colors.MINIMAP_GREEN_LIGHT),
-            200 : Texture('ground', 100, 'ground.png', Colors.MINIMAP_BROWN),
-            300 : Texture('water' , 300, 'water0.png', Colors.MINIMAP_BLUE_LIGHT, False),
+            100: Texture('grass' , 200, 'grass_two_leaves.png', Colors.MINIMAP_GREEN_LIGHT),
+            200: Texture('ground', 100, 'ground.png', Colors.MINIMAP_BROWN),
+            300: Texture('water' , 300, 'water0.png', Colors.MINIMAP_BLUE_LIGHT, False),
 
-            9100 : Texture('w1', 9100, 'w1.png', Colors.MINIMAP_BLUE_LIGHT, False),
-            9200 : Texture('w2', 9200, 'w2.png', Colors.MINIMAP_BLUE_LIGHT, False),
-            9300 : Texture('w3', 9300, 'w3.png', Colors.MINIMAP_BLUE_LIGHT, False),
-            9400 : Texture('w4', 9400, 'w4.png', Colors.MINIMAP_BLUE_LIGHT, False),
-            9500 : Texture('w5', 9500, 'w5.png', Colors.MINIMAP_BLUE_LIGHT, False),
-            9600 : Texture('w6', 9600, 'w6.png', Colors.MINIMAP_BLUE_LIGHT, False),
-            9700 : Texture('w7', 9700, 'w7.png', Colors.MINIMAP_BLUE_LIGHT, False),
-            9800 : Texture('w8', 9800, 'w8.png', Colors.MINIMAP_BLUE_LIGHT, False),
-            8100 : Texture('water741', 8100, 'water741.png', Colors.MINIMAP_BLUE_LIGHT, False),
-            8200 : Texture('x2', 8200, 'x2.png', Colors.MINIMAP_BLUE_LIGHT, False),
-            8300 : Texture('x24', 8300, 'x24.png', Colors.MINIMAP_BLUE_LIGHT, False),
-            8400 : Texture('x4', 8400, 'x4.png', Colors.MINIMAP_BLUE_LIGHT, False),
-            8500 : Texture('water85', 8500, 'water85.png', Colors.MINIMAP_BLUE_LIGHT, False),
-            8700 : Texture('water325', 8700, 'water325.png', Colors.MINIMAP_BLUE_LIGHT, False),
-            8900 : Texture('water981', 8900, 'water981.png', Colors.MINIMAP_BLUE_LIGHT, False),
+            9100: Texture('w1', 9100, 'w1.png', Colors.MINIMAP_BLUE_LIGHT, False),
+            9200: Texture('w2', 9200, 'w2.png', Colors.MINIMAP_BLUE_LIGHT, False),
+            9300: Texture('w3', 9300, 'w3.png', Colors.MINIMAP_BLUE_LIGHT, False),
+            9400: Texture('w4', 9400, 'w4.png', Colors.MINIMAP_BLUE_LIGHT, False),
+            9500: Texture('w5', 9500, 'w5.png', Colors.MINIMAP_BLUE_LIGHT, False),
+            9600: Texture('w6', 9600, 'w6.png', Colors.MINIMAP_BLUE_LIGHT, False),
+            9700: Texture('w7', 9700, 'w7.png', Colors.MINIMAP_BLUE_LIGHT, False),
+            9800: Texture('w8', 9800, 'w8.png', Colors.MINIMAP_BLUE_LIGHT, False),
+            8100: Texture('water741', 8100, 'water741.png', Colors.MINIMAP_BLUE_LIGHT, False),
+            8200: Texture('x2', 8200, 'x2.png', Colors.MINIMAP_BLUE_LIGHT, False),
+            8300: Texture('x24', 8300, 'x24.png', Colors.MINIMAP_BLUE_LIGHT, False),
+            8400: Texture('x4', 8400, 'x4.png', Colors.MINIMAP_BLUE_LIGHT, False),
+            8500: Texture('water85', 8500, 'water85.png', Colors.MINIMAP_BLUE_LIGHT, False),
+            8700: Texture('water325', 8700, 'water325.png', Colors.MINIMAP_BLUE_LIGHT, False),
+            8900: Texture('water981', 8900, 'water981.png', Colors.MINIMAP_BLUE_LIGHT, False),
 
-            10000 : Texture('brou', 10000, pygame.Surface((32, 32)), Colors.MINIMAP_BROWN_DARK, False),
+            10000: Texture('brou', 10000, pygame.Surface((32, 32)), Colors.MINIMAP_FOG, False),
+            11111: Texture('black', 11111, pygame.Surface((32, 32)), Colors.MINIMAP_BLACK, False),
+
+            'turret': Texture('turret', 20001, 'cc3by_five_archers_turret_base.png', Colors.MINIMAP_BLUE, False),
 
             # Computed textures
             # 1300 : Texture('grass_water_lm', 1200, 'grass_water_ml.png', MINIMAP_BLUE_LIGHT, False),
@@ -154,8 +162,10 @@ class Engine:
             #98 : Texture('w8', 98, 'w8.png', MINIMAP_GREEN_LIGHT, False),
         }
         # Ugly hack for fog
-        TEXTURES[10000].img.set_alpha(200 , pygame.RLEACCEL)
+        TEXTURES[10000].img.set_alpha(200, pygame.RLEACCEL)
         TEXTURES[10000].img.fill((32, 32, 32, 128))
+        TEXTURES[11111].img.set_alpha(255, pygame.RLEACCEL)
+        TEXTURES[11111].img.fill((0, 0, 0, 255))
 
         # Mixing Texture
         for a in [9100, 9200, 9300, 9400, 9500, 9600, 9700, 9800, 8100, 8200, 8300, 8400, 8500, 8700, 8900]:
@@ -409,62 +419,65 @@ class Camera:
         # Sol
         # for yy in range(0, self.player.world.size32.y):
         for yy in range(first_square[1], min(first_square[1] + self.NB_SQUARE_HEIGHT + 4, self.player.world.size32.y)): # 4 = LARGEST SPRITE HEIGHT
-            # if yy * 32 + self.y >= self.height: break
-            # for xx in range(0, self.player.world.size32.x):
             for xx in range(first_square[0], min(first_square[0] + self.NB_SQUARE_WIDTH + 3, self.player.world.size32.x)): # 3 = LARGET SPRITE WIDTH
-                # if xx * 32 + self.x >= self.width: continue
                 t = self.player.world.world_map[yy][xx]
                 d = self.player.world.passable_map[yy][xx]
-                fog = self.player.fog_map[yy][xx]  # get(self.player.fog_map, yy, xx)
-                if fog > 0:
-                    self.engine.tex(xx * 32 + self.x, yy * 32 + self.y, TEXTURES[t].img, 0)
-                    if d != 0 and d != 99: # there is visible blocking doodad, 0 = passable, 99 = invisible and not passable
-                        self.engine.tex(xx * 32 + self.x + TEXTURES[d].mod_x, yy * 32 + self.y + TEXTURES[d].mod_y, TEXTURES[d].img, 0.5)
-                        if self.dev_mode: self.engine.rect(xx * 32 + self.x, yy * 32 + self.y, 32, 32, Colors.RED, 1, 1)
-                    if fog == 1:
-                        self.engine.tex(xx * 32 + self.x + TEXTURES[10000].mod_x, yy * 32 + self.y + TEXTURES[10000].mod_y, TEXTURES[10000].img, 0.7)
-                    if fog == 2: # unit amie OK
-                        su = self.player.world.unit_map[yy][xx]
-                        if su == 0:
-                            pass # Empty
-                        elif su[0] in (-1, 1): # en mouvement, carreau reserve ou en position
-                            if su[0] == -1:
-                                self.engine.rect(xx * 32 + self.x +1, yy * 32 + self.y +1, 31, 31, Colors.HALF_RED, 1, 1)
-                            elif su[0] == 1: # en position
-                                self.engine.rect(xx * 32 + self.x +1, yy * 32 + self.y +1, 31, 31, Colors.HALF_BLUE, 1, 1)
-                            u = su[1]
-                            if u in self.selected:
-                                if len(u.orders) > 0:
-                                    lx = u.real_x + self.x
-                                    ly = u.real_y + self.y
-                                    for o in u.orders:
-                                        if o.kind == 'go':
-                                            self.engine.circle(self.x2r(o.x), self.y2r(o.y), 5, Colors.GREEN, 0, 1)
-                                            self.engine.line(lx, ly, self.x2r(o.x), self.y2r(o.y), Colors.GREEN, 1, 1)
-                                            lx = self.x2r(o.x)
-                                            ly = self.y2r(o.y)
-                                        elif o.kind == 'attack':
-                                            #pygame.draw.circle(self.screen, RED, (o.target.x*32+16 + self.x, o.target.y*32+16 + self.y), 5, 0)
-                                            self.engine.line(lx, ly, self.x2r(o.target.x), self.y2r(o.target.y), Colors.RED, 1, 1)
-                                            lx = self.x2r(o.target.x)
-                                            ly = self.y2r(o.target.y)
-                                self.engine.circle(u.real_x + self.x, u.real_y + self.y, u.size, u.player.color, 0, 1)
-                                if u.player == self.player:
-                                    self.engine.circle(u.real_x + self.x, u.real_y + self.y, u.size+3, Colors.GREEN, 2, 1)
-                                else:
-                                    self.engine.circle(u.real_x + self.x, u.real_y + self.y, u.size+3, Colors.RED, 2, 1)
-                            else:
-                                self.engine.circle(u.real_x + self.x, u.real_y + self.y, u.size, u.player.color, 0, 1)
-                        elif su[0] == 2: # Building
-                            u = su[1]
-                            if xx == u.grid_x and yy == u.grid_y:
-                                self.engine.rect(xx * 32 + self.x, yy * 32 + self.y, u.type.grid_w * 32, u.type.grid_h * 32, u.player.color, 0, 2)
-                                if u in self.selected:
-                                    self.engine.rect(u.grid_x * 32 + self.x, u.grid_y * 32 + self.y, u.type.grid_w * 32, u.type.grid_h * 32, Colors.GREEN, 2, 2)
-                            
+                dx = xx * 32 + self.x
+                dy = yy * 32 + self.y
+                # draw terrain
+                self.engine.tex(dx, dy, TEXTURES[t].img, 0)
+                if d != 0 and d != 99:  # there is visible blocking doodad, 0 = passable, 99 = invisible and not passable
+                    self.engine.tex(dx + TEXTURES[d].mod_x, dy + TEXTURES[d].mod_y, TEXTURES[d].img, 0.5)
+                    if self.dev_mode:
+                        self.engine.rect(dx, dy, 32, 32, Colors.RED, 1, 1)
+                # draw unit
+                su = self.player.world.unit_map[yy][xx]
+                if su == 0:
+                    pass  # Empty
+                elif su[0] in (-1, 1):  # en mouvement, carreau reserve ou en position
+                    if su[0] == -1:
+                        self.engine.rect(dx + 1, dy + 1, 31, 31, Colors.HALF_RED, 1, 1)
+                    elif su[0] == 1:  # en position
+                        self.engine.rect(dx + 1, dy + 1, 31, 31, Colors.HALF_BLUE, 1, 1)
+                    u = su[1]
+                    if u in self.selected:
+                        if len(u.orders) > 0:
+                            lx = u.real_x + self.x
+                            ly = u.real_y + self.y
+                            for o in u.orders:
+                                if o.kind == 'go':
+                                    self.engine.circle(self.x2r(o.x), self.y2r(o.y), 5, Colors.GREEN, 0, 1)
+                                    self.engine.line(lx, ly, self.x2r(o.x), self.y2r(o.y), Colors.GREEN, 1, 1)
+                                    lx = self.x2r(o.x)
+                                    ly = self.y2r(o.y)
+                                elif o.kind == 'attack':
+                                    #pygame.draw.circle(self.screen, RED, (o.target.x*32+16 + self.x, o.target.y*32+16 + self.y), 5, 0)
+                                    self.engine.line(lx, ly, self.x2r(o.target.x), self.y2r(o.target.y), Colors.RED, 1, 1)
+                                    lx = self.x2r(o.target.x)
+                                    ly = self.y2r(o.target.y)
+                        self.engine.circle(u.real_x + self.x, u.real_y + self.y, u.size, u.player.color, 0, 1)
+                        if u.player == self.player:
+                            self.engine.circle(u.real_x + self.x, u.real_y + self.y, u.size+3, Colors.GREEN, 2, 1)
+                        else:
+                            self.engine.circle(u.real_x + self.x, u.real_y + self.y, u.size+3, Colors.RED, 2, 1)
+                    else:
+                        self.engine.circle(u.real_x + self.x, u.real_y + self.y, u.size, u.player.color, 0, 1)
+                elif su[0] == 2:  # Building
+                    u = su[1]
+                    self.engine.tex(u.x * 32 + self.x, u.y * 32 + self.y, TEXTURES['turret'].img, 2)
+                    #if xx == u.grid_x and yy == u.grid_y:
+                    #    self.engine.rect(dx, dy, u.type.grid_w * 32, u.type.grid_h * 32, u.player.color, 0, 2)
+                    if u in self.selected:
+                        self.engine.rect(u.x * 32 + self.x, u.y * 32 + self.y, u.type.grid_w * 32, u.type.grid_h * 32, Colors.GREEN, 2, 2)
+                # draw fog or black
+                fog = self.player.fog_map[yy][xx]
+                if fog == 0:
+                    self.engine.tex(dx, dy, TEXTURES[11111].img, 10)
+                elif fog == 1:
+                    self.engine.tex(dx, dy, TEXTURES[10000].img, 10)
                 # DEBUG
                 if self.dev_mode:
-                    self.engine.text(xx * 32 + self.x, yy * 32 + self.y, "%(v)04d" % {"v" : self.player.world.debug_map[yy][xx]}, Colors.RED, 1)
+                    self.engine.text(dx, dy, "%(v)04d" % {"v": self.player.world.debug_map[yy][xx]}, Colors.RED, 1)
                 
         # Cursor
         if self.mode == 'normal':
@@ -493,20 +506,20 @@ class Camera:
     
     def render_gui(self):
         # Background
-        self.engine.rect(0, self.GUI_interface_y, self.width-1, 200, Colors.GREY, 0, 4) # fond
-        self.engine.line(0, self.GUI_interface_y, self.width-1, self.GUI_interface_y, Colors.BLUE, 1, 5)
+        self.engine.rect(0, self.GUI_interface_y, self.width-1, 200, Colors.GREY, 0, 40) # fond
+        self.engine.line(0, self.GUI_interface_y, self.width-1, self.GUI_interface_y, Colors.BLUE, 1, 50)
         for xx in range(0, 3):
             for yy in range(0, 3):
-                self.engine.rect(xx * 32, yy * 32 + self.GUI_interface_y, 32, 32, Colors.BLUE, 1, 5)
-        self.engine.line(self.GUI_minimap_x - 1, self.GUI_interface_y, self.GUI_minimap_x - 1, self.GUI_interface_y + 96, Colors.BLUE, 1, 4)
-        self.engine.line(self.GUI_minimap_x - 1, self.GUI_interface_y + 96, self.width-1, self.GUI_interface_y + 96, Colors.BLUE, 1, 4)
+                self.engine.rect(xx * 32, yy * 32 + self.GUI_interface_y, 32, 32, Colors.BLUE, 1, 50)
+        self.engine.line(self.GUI_minimap_x - 1, self.GUI_interface_y, self.GUI_minimap_x - 1, self.GUI_interface_y + 96, Colors.BLUE, 1, 40)
+        self.engine.line(self.GUI_minimap_x - 1, self.GUI_interface_y + 96, self.width-1, self.GUI_interface_y + 96, Colors.BLUE, 1, 40)
         
         # Build menu
         xs = 8
         ys = self.GUI_interface_y + 8
         for btn in self.player.game.building_types_ordered:
             bt = self.player.game.building_types[btn]
-            self.engine.text(xs, ys, bt.name[0:3], Colors.YELLOW, 4)
+            self.engine.text(xs, ys, bt.name[0:3], Colors.YELLOW, 40)
             xs += 32
             if xs > 72:
                 xs = 8
@@ -522,7 +535,7 @@ class Camera:
         else:
             text = "M : %(min)04d E : %(sol)04d" % {"min" : min, "sol" : sol}
             col = Colors.YELLOW
-        self.engine.text(5, self.GUI_interface_y+104, text, col, 5)
+        self.engine.text(5, self.GUI_interface_y+104, text, col, 50)
         
         # Minimap
         for yy in range(0, self.player.world.size32.y):
@@ -530,13 +543,18 @@ class Camera:
                 t = self.player.world.world_map[yy][xx]
                 d = self.player.world.passable_map[yy][xx]
                 if d != 0 and d != 99:
-                    self.engine.rect(xx * 3 + self.GUI_minimap_x, yy * 3 + self.GUI_interface_y +1, 3, 3, TEXTURES[d].mini, 0, 5)
+                    self.engine.rect(xx * 3 + self.GUI_minimap_x, yy * 3 + self.GUI_interface_y +1, 3, 3, TEXTURES[d].mini, 0, 50)
                 else:
-                   self.engine.rect(xx * 3 + self.GUI_minimap_x, yy * 3 + self.GUI_interface_y +1, 3, 3, TEXTURES[t].mini, 0, 5)
+                   self.engine.rect(xx * 3 + self.GUI_minimap_x, yy * 3 + self.GUI_interface_y +1, 3, 3, TEXTURES[t].mini, 0, 50)
                 u = self.player.world.unit_map[yy][xx]
                 if u != 0:
                     if u[0] == 1 or u[0] == 2:
-                       self.engine.rect(xx * 3 + self.GUI_minimap_x, yy * 3 + self.GUI_interface_y +1, 3, 3, u[1].player.color, 0, 5)
+                        self.engine.rect(xx * 3 + self.GUI_minimap_x, yy * 3 + self.GUI_interface_y +1, 3, 3, u[1].player.color, 0, 50)
+                fog = self.player.fog_map[yy][xx]
+                if fog == 0:
+                    self.engine.rect(xx * 3 + self.GUI_minimap_x, yy * 3 + self.GUI_interface_y +1, 3, 3, TEXTURES[11111].mini, 0, 50)
+                elif fog == 1:
+                    self.engine.rect(xx * 3 + self.GUI_minimap_x, yy * 3 + self.GUI_interface_y +1, 3, 3, TEXTURES[10000].mini, 0, 50)
 
 
 class Particles:
@@ -590,9 +608,10 @@ class Particle:
         self.x += math.cos(a) * self.speed
         self.y += -math.sin(a) * self.speed
         
-        if get_dist(self.x, self.y, self.tx, self.ty) < self.target.size:
+        if self.target.hit(self.x, self.y):
             ttl = 0
             self.target.life -= self.damage
+            print('Touché : ', self.target, self.target.life)
             return ttl
         
         return self.ttl
@@ -942,9 +961,9 @@ class Player:
         # put fog_map
         for yy in range(0, self.world.size32.y):
             for xx in range(0, self.world.size32.x):
-                fog = self.fog_map[yy][xx] # = get(self.fog_map, yy, xx)
+                fog = self.fog_map[yy][xx]
                 if fog == 2:
-                    self.fog_map[yy][xx] = 1 # set(self.fog_map, yy, xx, 1)
+                    self.fog_map[yy][xx] = 1
         # Update for all units?
         i = 0
         while i < len(self.units):
@@ -1015,12 +1034,13 @@ class WeaponType:
 class BuildingType:
 
     #def __init__(self, name : str, grid_h : int, grid_w : int, life : int, cost : int, build_load : BuildLoad = None, weapon_type : WeaponType = None):
-    def __init__(self, name, grid_h, grid_w, life, cost, build_load = None, weapon_type = None):
+    def __init__(self, name, grid_h, grid_w, life, cost, vision, build_load = None, weapon_type = None):
         self.name = name
         self.grid_h = grid_h
         self.grid_w = grid_w
         self.life = life
         self.cost = cost
+        self.vision = vision
         self.build_load = build_load
         self.weapon_type = weapon_type
 
@@ -1029,30 +1049,48 @@ class GameObject:
  
     seed = 0
     
-    def __init__(self):
+    def __init__(self, player):
         self.id = GameObject.seed + 1
         GameObject.seed = self.id
+        self.player = player
+
+    def light(self, x, y, w=1, h=1):
+        self.fog_effect(2, x, y, w, h)
+
+    def fog_effect(self, value, x, y, w, h):
+        # if old_x != self.x or old_y != self.y:
+        for yy in range(max(0, y - self.vision), min(self.player.world.size32.y, y + self.vision + h)):
+            for xx in range(max(0, x - self.vision), min(self.player.world.size32.x, x + self.vision + w)):
+                self.player.fog_map[yy][xx] = value
 
 
 class Building(GameObject):
 
-    #def __init__(self, player : Player, type : BuildingType, grid_x : int, grid_y : int):
-    def __init__(self, player, type, grid_x, grid_y):
-        GameObject.__init__(self)
-        self.player = player
-        self.type = type
-        self.grid_x = grid_x
-        self.grid_y = grid_y
+    # def __init__(self, player : Player, type : BuildingType, grid_x : int, grid_y : int):
+    def __init__(self, player, b_type, x, y):  # grid_x, grid_y
+        GameObject.__init__(self, player)
+        self.type = b_type
+        self.x = x
+        self.y = y
+        self.vision = b_type.vision
+        self.life = b_type.life
         
         self.orders = []
-        for i in range(grid_x, grid_x + type.grid_w):
-            for j in range(grid_y, grid_y + type.grid_h):
+        for i in range(x, x + b_type.grid_w):
+            for j in range(y, y + b_type.grid_h):
                 self.player.world.unit_map[j][i] = (2, self) # STILL, BUILDING
-    
+
+        self.light(self.x, self.y, self.type.grid_w, self.type.grid_h)
+
     def __str__(self):
         return str(id(self)) + ' (' + self.type.name + ')'
     
     def update(self):
+        if self.life <= 0:
+            for i in range(self.x, self.x + self.type.grid_w):
+                for j in range(self.y, self.y + self.type.grid_h):
+                    self.player.world.unit_map[j][i] = 0
+            return False
         if self.type.name == "Mine":
             self.player.min += 0.2
             if self.player.min > 9999:
@@ -1061,13 +1099,21 @@ class Building(GameObject):
             self.player.sol += 0.2
             if self.player.sol > 9999:
                 self.player.sol = 9999
-        return True # Very Important
+        self.light(self.x, self.y, self.type.grid_w, self.type.grid_h)
+        return True  # Very Important
     
     def order(self, o):
         self.orders = [o]
 
     def add_order(self, o):
         self.orders.append(o)
+
+    def hit(self, x, y):
+        x1 = self.x * 32
+        y1 = self.y * 32
+        w = self.type.grid_w * 32
+        h = self.type.grid_h * 32
+        return x1 <= x <= x1 + w and y1 <= y <= y1 + h
 
 
 class UnitType:
@@ -1086,9 +1132,8 @@ class UnitType:
 class Unit(GameObject):
     
     def __init__(self, utype, player, x, y):
-        GameObject.__init__(self)
+        GameObject.__init__(self, player)
         self.type = utype
-        self.player = player
         self.real_x = x * 32 + 16
         self.real_y = y * 32 + 16
         self.x = x
@@ -1117,7 +1162,6 @@ class Unit(GameObject):
 
     def __str__(self):
         return 'Unit #' + str(self.id) + ' (' + self.type.name + ')'
-        #return str(id(self)) + ' (' + self.uname + ')'
 
     def update(self):
         old_x = self.x
@@ -1144,20 +1188,9 @@ class Unit(GameObject):
         self.player.world.unit_map[self.y][self.x] = (1, self) # CODE: STILL, UNIT
 
         # fog
-        # if old_x != self.x or old_y != self.y:
-        # self.shadow(old_x, old_y)
         self.light(self.x, self.y)
 
         return True
-
-    def light(self, x, y):
-        self.fog_effect(2, x, y)
-
-    def fog_effect(self, value, x, y):
-        # if old_x != self.x or old_y != self.y:
-        for yy in range(max(0, y - self.vision), min(self.player.world.size32.y, y + self.vision)):
-            for xx in range(max(0, x - self.vision), min(self.player.world.size32.x, x + self.vision)):
-                self.player.fog_map[yy][xx] = value
 
     # def order(self, o : Order):
     def order(self, o):
@@ -1177,8 +1210,7 @@ class Unit(GameObject):
         else:
             return False
     
-    #def go(self, x : int, y : int):
-    def go(self, x, y):
+    def go(self, x: int, y: int):
         if self.cpt_move > 0:
             self.cpt_move -= 1
             return False
@@ -1237,14 +1269,15 @@ class Unit(GameObject):
                 elif going_x == -1 and going_y == -1:
                     test = (from_x, n_y, n_x, from_y)
 
-                if self.player.world.is_empty(test[0], test[1]):
-                    #print("trying : " + str(test[0]) + ", " + str(test[1]))
-                    n_x = test[0]
-                    n_y = test[1]
-                elif self.player.world.is_empty(test[2], test[3]):
-                    #print("trying : " + str(test[2]) + ", " + str(test[3]))
-                    n_x = test[2]
-                    n_y = test[3]
+                if self.player.world.is_valid(test[0], test[1]):
+                    if self.player.world.is_empty(test[0], test[1]):
+                        #print("trying : " + str(test[0]) + ", " + str(test[1]))
+                        n_x = test[0]
+                        n_y = test[1]
+                    elif self.player.world.is_empty(test[2], test[3]):
+                        #print("trying : " + str(test[2]) + ", " + str(test[3]))
+                        n_x = test[2]
+                        n_y = test[3]
                 if n_x == self.old_x and n_y == self.old_y:
                     return True  # no loop !
 
@@ -1283,9 +1316,13 @@ class Unit(GameObject):
         #print(self.x, self.y, "tr= ", self.transition, "dst= ", self.destination) # Add details on pathfinding (verbose)
         return self.x == x and self.y == y
 
-#------------------------------------------------------------------------------
+    def hit(self, x, y):
+        return get_dist(x, y, self.x * 32 + 16, self.y * 32 + 16) < self.size
+
+
+# ------------------------------------------------------------------------------
 # Scripting the world : Trigger, Zone, Condition & Action
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 class Zone:
 
@@ -1580,12 +1617,12 @@ def mod_basic(game):
     game.set_unit_types({"soldier": UnitType("Soldier", size=10, vision=3, range=10, life=100, dom=5, speed=8, reload=50),
                          "elite": UnitType("Elite", size=10, vision=4, range=10, life=100, dom=10, speed=8, reload=50),
                          "big": UnitType("Big", size=20, vision=2, range=30, life=300, dom=20, speed=8, reload=50)})
-    game.set_building_types({"mine" : BuildingType("Mine", 2, 2, 100, (0,50)),
-                             "solar" : BuildingType("Solar", 1, 2, 80, (0, 50)),
-                             "radar" : BuildingType("Radar", 1, 1, 80, (50, 200)),
-                             "barracks" : BuildingType("Barracks", 3, 2, 300, (50, 100)),
-                             "factory" : BuildingType("Factory", 3, 2, 500, (200, 200)),
-                             "laboratory" : BuildingType("Laboratory", 2, 2, 250, (100, 400)),
+    game.set_building_types({"mine" : BuildingType("Mine", 2, 2, 100, (0,50), 2),
+                             "solar" : BuildingType("Solar", 1, 2, 80, (0, 50), 2),
+                             "radar" : BuildingType("Radar", 1, 1, 80, (50, 200), 2),
+                             "barracks" : BuildingType("Barracks", 3, 2, 300, (50, 100), 2),
+                             "factory" : BuildingType("Factory", 3, 2, 500, (200, 200), 2),
+                             "laboratory" : BuildingType("Laboratory", 2, 2, 250, (100, 400), 2),
                             }, ["solar", "mine", "radar", "barracks", "factory", "laboratory"])
 
 
@@ -1640,7 +1677,8 @@ def level_E1L1(game):
     game.create_unit("Henry", 18, 14, "soldier")
     
     game.create_building("Bob", 5, 5, "mine")
-    
+    game.create_building("Henry", 22, 22, "mine")
+
     game.create_trigger('t1')
     game.create_condition('t1', 'player P control OPT1 (exactly/at least/at most) N unit of type T in Zone Z', 'Henry', 1, 0, 'all', 'everywhere')
     game.create_action('t1', 'win', 'Bob')
@@ -1654,7 +1692,11 @@ def level_E1L1(game):
 
 def configure(g, e):
     mod_basic(g)
-    level_E1L1(g)   
+    try:
+        import maps.e1l1
+        maps.e1l1.load(g, Colors)
+    except ImportError as ie:
+        level_E1L1(g)
     return Camera(e, 800, 600, 5, g.get_player_by_name("Bob"))  # x, y, scroll, player
 
 

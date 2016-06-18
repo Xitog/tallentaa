@@ -127,7 +127,9 @@ class VerbesAnglaisEssentielsRenderer(AbstractRenderer):
             <div><ol>
                 <!--<li><a href="#tindex">Index des verbes</a></li>-->
                 <li><a href="#tpronoms">Pronoms anglais</a></li>
+                <li><a href="#taux">Verbes auxiliaires</a></li>
                 <li><a href="#tsyntaxe">Constructions syntaxiques du groupe verbal anglais</a></li>
+                <li><a href="#tformes">Constructions des 5 formes des verbes anglais</a></li>
                 <li><a href="#tabreviations">Abréviations des verbes anglais</a></li>
                 <li><a href="#tnegations">Constructions contractées de la négation</a></li>
                 <li><a href="#ten">Que signifie ce verbe anglais ?</a></li>
@@ -138,6 +140,7 @@ class VerbesAnglaisEssentielsRenderer(AbstractRenderer):
         #fout.write('<div><h2 id="tindex">Index des verbes</h2></div>')
         
         fout.write(self.get_table_pronoms())
+        fout.write(self.get_table_auxiliaires())
         fout.write(self.get_table_constructions())
         fout.write(self.get_table_abreviations())
         fout.write(self.get_table_negations())
@@ -145,34 +148,6 @@ class VerbesAnglaisEssentielsRenderer(AbstractRenderer):
         self.sub_render_menu_verbs_by_letter_fr(fout, roots)
         self.sub_render_verbs_en(fout, roots)
         fout.close()
-
-
-    def get_table_constructions(self):
-        c = """
-            <div><h2 id="tsyntaxe">Constructions syntaxiques du groupe verbal anglais</h2></div>
-            <table class="mono" id="cons">
-                <tr><th>Construction</th><th>Forme</th><th>Exemple</th></tr>
-                <tr><td>Présent</td><td>base verbale ou 3<sup>e</sup> pers. sing.</td><td>They talk. She talks to Samantha.</td></tr>
-                <tr><td>Prétérit</td><td>prétérit</td><td>She talked to Samantha.</td></tr>
-                <tr><td>Futur</td><td>will / shall + base verbale</td><td>She will talk to Samantha.</td></tr>
-                <tr><td>Continu</td><td>be + participe présent</td><td>She is talking to Samantha.</td></tr>
-                <tr><td>Parfait</td><td>have + participe passé</td><td>She have talked to Samantha.</td></tr>
-                <tr><td>Passif</td><td>be + participe passé</td><td>The letter is written by Jack.</td></tr>
-                <tr><td>Autres</td><td>would / should + base verbale<br>may + base verbale<br>might + base verbale<br>can + base verbale<br>could + base verbale</td><td>She should talk to Samantha.<br>She may talk to Samantha.<br>She might talk to Samantha.<br>She can talk to Samantha.<br>She could talk to Samantha.</td></tr>
-            </table>
-            <br><br>
-            <div><h2>Constructions des 5 formes des verbes anglais</h2></div>
-            <table class="mono" id="forms">
-                <tr><th>Forme</th><th>Construction</th><th>Exemple</th></tr>
-                <tr><td>Présent, sauf 3<sup>e</sup> pers. sing.</td><td>base verbale</td><td>talk &#8594; talk</td></tr>
-                <tr><td>Présent, 3<sup>e</sup> pers. sing.</td><td>base verbale +s</td><td>talk &#8594; talks</td></tr>
-                <tr><td>Prétérit</td><td>base verbale +ed</td><td>talk &#8594; talked</td></tr>
-                <tr><td>Participe passé</td><td>base verbale +ed</td><td>talk &#8594; talked</td></tr>
-                <tr><td>Participe présent</td><td>base verbale +ing</td><td>talk &#8594; talking</td></tr>
-            </table>
-            <br><br>
-        """
-        return c
 
 
     def get_table_pronoms(self):
@@ -191,7 +166,7 @@ class VerbesAnglaisEssentielsRenderer(AbstractRenderer):
                 <tr><td>1<sup>ère</sup> personne du pluriel</td><td>we <i>(nous)</i></td><td>us <i>(nous)</i></td><td>ours <i>(le nôtre)</i></td></tr>
                 <tr><td>2<sup>e</sup> personne du pluriel</td><td>you <i>(vous)</i></td><td>you <i>(vous)</i></td><td>yours <i>(le vôtre)</i></td></tr>
                 <tr><td>3<sup>e</sup> personne du pluriel</td><td>they <i>(elles ou ils)</i></td><td>them <i>(les)</i></td><td>theirs <i>(les leur)</i></td></tr>
-                <tr><td>pronom indéfini</td><td>one <i>(on)</i></td><td>one</td><td>one's own</td></tr>
+                <tr><td>Pronom indéfini</td><td>one <i>(on)</i></td><td>one</td><td>one's own</td></tr>
             </tbody>
         </table>
         <br><br>
@@ -199,6 +174,60 @@ class VerbesAnglaisEssentielsRenderer(AbstractRenderer):
         return c
         
     
+    def get_table_auxiliaires(self):
+        c = """
+        <div><h2 id="taux">Verbes auxiliaires</h2></div>
+        <table class="mono" id="auxiliaires">
+            <thead>
+                <tr><th>Auxiliaires</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><a href="#be">be</a>, <a href="#have">have</a>, <a href="#do">do</a></td></tr>
+            </tbody>
+        </table>
+        <div><p>Les <strong>verbes auxiliaires</strong> sont utilisés dans les <a href="#tsyntaxe">constructions syntaxiques</a> où ils perdent leur sens propre. Ils peuvent être également utilisés pour leur sens, à la manière des <strong>verbes lexicaux</strong>.</p></div>
+        <br>
+        """
+        return c
+        
+        
+    def get_table_constructions(self):
+        c = """
+            <div><h2 id="tsyntaxe">Constructions syntaxiques du groupe verbal anglais</h2></div>
+            <table class="mono" id="cons">
+            <thead>
+                <tr><th>Construction</th><th>Forme</th><th>Exemple</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Présent</td><td>base verbale ou 3<sup>e</sup> pers. sing.</td><td>They talk. She talks to Samantha.</td></tr>
+                <tr><td>Prétérit</td><td>prétérit</td><td>She talked to Samantha.</td></tr>
+                <tr><td>Futur</td><td>will / shall + base verbale</td><td>She will talk to Samantha.</td></tr>
+                <tr><td>Continu</td><td>be + participe présent</td><td>She is talking to Samantha.</td></tr>
+                <tr><td>Parfait</td><td>have + participe passé</td><td>She have talked to Samantha.</td></tr>
+                <tr><td>Passif</td><td>be + participe passé</td><td>The letter is written by Jack.</td></tr>
+                <tr><td>Modes</td><td>would / should + base verbale<br>may + base verbale<br>might + base verbale<br>can + base verbale<br>could + base verbale</td><td>She should talk to Samantha.<br>She may talk to Samantha.<br>She might talk to Samantha.<br>She can talk to Samantha.<br>She could talk to Samantha.</td></tr>
+            </tbody>
+            </table>
+            <div><p>Nous regroupons dans ce tableau les <strong>temps</strong> (présent, prétérit, futur), les <strong>aspects</strong> (continu, parfait), les <strong>voix</strong> (l'active est implicite et nous explicitons ici la voix passive) et les <strong>modes</strong>.</p></div>
+            <br>
+            <div><h2 id="tformes">Constructions des 5 formes des verbes anglais</h2></div>
+            <table class="mono" id="forms">
+            <thead>
+                <tr><th>Forme</th><th>Construction</th><th>Exemple</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Présent, sauf 3<sup>e</sup> pers. sing.</td><td>base verbale</td><td>talk &#8594; talk</td></tr>
+                <tr><td>Présent, 3<sup>e</sup> pers. sing.</td><td>base verbale +s</td><td>talk &#8594; talks</td></tr>
+                <tr><td>Prétérit</td><td>base verbale +ed</td><td>talk &#8594; talked</td></tr>
+                <tr><td>Participe passé</td><td>base verbale +ed</td><td>talk &#8594; talked</td></tr>
+                <tr><td>Participe présent</td><td>base verbale +ing</td><td>talk &#8594; talking</td></tr>
+            </tbody>
+            </table>
+            <br><br>
+        """
+        return c
+
+
     def get_table_abreviations(self):
         c = """
         <div><h2 id="tabreviations">Abréviations des verbes anglais</h2></div>
@@ -252,7 +281,7 @@ class VerbesAnglaisEssentielsRenderer(AbstractRenderer):
         """
         return c
         
-    
+
     def get_table_sens_emplois(self):
         c = """
         """
@@ -293,6 +322,12 @@ class ConjugateTabularEnRenderer(AbstractRenderer):
                         color: black;
                         border-bottom: 1px solid rgb(146, 208, 80);
                         text-align: left;
+                    }
+                    
+                    p {
+                        font-size: 18px;
+                        font-family: Calibri;
+                        color: black;
                     }
                     
                     table {
@@ -419,11 +454,16 @@ class ConjugateTabularEnRenderer(AbstractRenderer):
                         font-size: 22px;
                     }
                     
-                    #cons tr:nth-child(2n+1) , #forms tr:nth-child(2n+1), #pronoms tr:nth-child(2n+1), #abreviations tr:nth-child(2n+1), #negations tr:nth-child(2n+1) {
+                    #cons tr:nth-child(2n) , 
+                    #forms tr:nth-child(2n), 
+                    #pronoms tr:nth-child(2n), 
+                    #abreviations tr:nth-child(2n), 
+                    #negations tr:nth-child(2n),
+                    #auxiliaires tr:nth-child(2n) {
                         background-color: rgb(146, 208, 80); /*rgb(213,91,94);*/
                         color: white;
                     }
-                    
+
                     #pronoms td:first-child {
                         text-align: left;
                         padding-left: 4em;
