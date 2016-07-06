@@ -69,10 +69,10 @@ class VerbesAnglaisEssentielsRenderer(AbstractRenderer):
                         irr = '&nbsp;<b>*</b>' if roots_of_this_letter.irregular else ''
                         nb_on_line += len(verbs_of_this_letter.base)
                         nb_on_line = (nb_on_line + 2) if irr != '' else nb_on_line
-                        if nb_on_line >= 80:
+                        if nb_on_line >= 75:
                             fout.write('<br>')
                             nb_on_line = 0
-                        fout.write('<a href="#' + verbs_of_this_letter.base + '">' + verbs_of_this_letter.base + '</a>' + irr + '&nbsp;&nbsp;')
+                        fout.write('<a href="#' + verbs_of_this_letter.root.root + '">' + verbs_of_this_letter.base + '</a>' + irr + '&nbsp;&nbsp;')
                 elif lang == 'fr': # fr => en
                     fout.write(roots_of_this_letter + '&nbsp;:&nbsp;')
                     for verb_en in sorted(dico[letter][roots_of_this_letter]): # on trie les traductions chasser : drive out, hunt

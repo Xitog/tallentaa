@@ -34,7 +34,13 @@ class InvokeDB:
     def check_content_trans(content, verbes_id):
         "Tests Foreign Key"
         error = False
+        ids = []
         for trans in content:
+            if trans[0] in ids:
+                print("Duplicated ID :", trans[0])
+                error = True
+            else:
+                ids.append(trans[0])
             origine = trans[1]
             vers = trans[2]
             if origine not in verbes_id or vers not in verbes_id:
@@ -799,7 +805,7 @@ def get_verbs():
         (227, 'fr', 'vérifier', 'verb', 5),
         
         (100228, 'en', 'check in', 'verb', 5),
-        (100229, 'en', 'check out', 'verb', 5),
+        (100229, 'en', 'check out', 'verb', 5), #done
         (100230, 'en', 'cheer up', 'verb', 5),
         (100231, 'en', 'come across', 'verb', 5),
         (100232, 'en', 'come forward', 'verb', 5),
@@ -855,7 +861,7 @@ def get_verbs():
         (100282, 'en', 'look after', 'verb', 5),
         (100283, 'en', 'look forward', 'verb', 5),
         (100284, 'en', 'look into', 'verb', 5),
-        (100285, 'en', 'look out', 'verb', 5),
+        (100285, 'en', 'look out', 'verb', 5), # done
         (100286, 'en', 'make up', 'verb', 5),
         (100287, 'en', 'offset', 'verb', 5),
         (100288, 'en', 'partake', 'verb', 5),
@@ -905,7 +911,7 @@ def get_verbs():
         (100332, 'en', 'tread', 'verb', 5),
         (100334, 'en', 'take off', 'verb', 5),
         (100335, 'en', 'land', 'verb', 5),
-        (100336, 'en', 'throw away', 'verb', 5),
+        (100336, 'en', 'throw away', 'verb', 5), # done
         (100337, 'en', 'turn down', 'verb', 5),
         #(100338, 'en', 'turn off', 'verb', 5),
         #(100339, 'en', 'turn on', 'verb', 5),
@@ -990,6 +996,21 @@ def get_verbs():
         (100415, 'en', 'give back', 'verb', 7),
         (190032, 'en', 'remain', 'verb', 7),
         (100416, 'en', 'explain', 'verb', 7),
+        (100417, 'en', 'trade', 'verb', 7),
+        (100418, 'en', 'bargain', 'verb', 7),
+        (100419, 'en', 'turn into', 'verb', 7),
+        (100420, 'en', 'look like', 'verb', 7),
+        (100421, 'en', 'snore', 'verb', 7),
+        (100422, 'en', 'shut up', 'verb', 7),
+        (100423, 'en', 'shut down', 'verb', 7),
+        (100424, 'en', 'cuddle', 'verb', 7),
+        (100425, 'en', 'bring in', 'verb', 7),
+        (100428, 'en', 'record', 'verb', 7),
+        (100430, 'en', 'train', 'verb', 7),
+        (100431, 'en', 'swallow', 'verb', 7),
+        (190125, 'en', 'expect', 'verb', 7),
+        (100432, 'en', 'control', 'verb', 7),
+        (100433, 'en', 'deserve', 'verb', 7),
         # Done fr
         (407, 'fr', 'retourner', 'verb', 7),
         (409, 'fr', 'inquiéter (s\')', 'verb', 7),
@@ -1001,7 +1022,26 @@ def get_verbs():
         (414, 'fr', 'surprendre', 'verb', 7),
         (415, 'fr', 'rendre', 'verb', 7),
         (416, 'fr', 'expliquer', 'verb', 7),
-        
+        (417, 'fr', 'échanger', 'verb', 7),
+        (418, 'fr', 'marchander', 'verb', 7),
+        (419, 'fr', 'se transformer', 'verb', 7),
+        (420, 'fr', 'ressembler', 'verb', 7),
+        (421, 'fr', 'ronfler', 'verb', 7),
+        (422, 'fr', 'se taire', 'verb', 7),
+        (424, 'fr', 'faire un câlin', 'verb', 7),
+        (425, 'fr', 'amener', 'verb', 7),
+        (426, 'fr', 'emprunter', 'verb', 7),
+        (427, 'fr', 'régler et quitter sa chambre d\'hôtel', 'verb', 7),
+        (428, 'fr', 'enregistrer', 'verb', 7),
+        (429, 'fr', 's\'enregistrer', 'verb', 7),
+        (430, 'fr', 's\'entraîner', 'verb', 7),
+        (90430, 'fr', 'se former', 'verb', 7),
+        (91430, 'fr', 'former', 'verb', 7),
+        (431, 'fr', 'avaler', 'verb', 7),
+        (432, 'fr', 'contrôler', 'verb', 7),
+        (90125, 'fr', 's\'attendre', 'verb', 7),
+        (433, 'fr', 'mériter', 'verb', 7),
+        (285, 'fr', 'faire attention', 'verb', 7),
         # to turn traitor : trahir (devenir traître)
         # to stand by : attendre
         # to fallback : se replier
@@ -2189,7 +2229,7 @@ def get_traductions():
 		(690000, 100073, 73, None, None), # stand up => lever (se)
 		(700000, 100074, 74, None, None), # wash => laver
 		(710000, 100075, 75, None, None), # play => jouer
-		(720000, 100076, 76, None, None), # throw => jeter
+		(720000, 100076, 76, 'jeter un projectile', None), # throw => jeter
 		(730000, 100077, 77, None, None), # invite => inviter
 		(740000, 100078, 78, None, None), # live in => habiter
 		(750000, 100079, 79, None, None), # dress => habiller (s')
@@ -2378,6 +2418,31 @@ def get_traductions():
         (630013, 100415, 415, None, None), # give back => rendre
         (630014, 190032,  32, None, None), # remain => rester
         (630015, 100416, 416, None, None), # explain => expliquer
+        (630016, 100417, 417, 'échanger qqch contre qqch : to trade qqch for qqch', None), # trade => échanger
+        (630017, 100417,  10, 'dans le sens d\'offrir à la vente', None), # trade => vendre
+        (630018, 100418, 418, 'négocier le prix', None), # bargain => marchander
+        (630019, 100336,  76, 'jeter à la poubelle', None), # throw away => jeter
+        (630020, 100419, 419, 'se transformer en qqch : to turn into smth', None), # turn => se transformer
+        (630021, 100420, 420, None, None), # look like => ressembler
+        (630022, 100421, 421, None, None), # snore => ronfler
+        (630039, 100422, 422, None, None), # shut up => se taire
+        (630023, 100423, 141, None, None), # shut down => éteindre
+        (630024, 100424, 424, 'faire un câlin à qqun : to cuddle sone', None), # to cuddle => faire un câlin
+        (630025, 100425, 425, 'amener qqun : bring sone in', None), # to bring in => amener
+        (630026, 100229, 426, 'emprunter qqchose : to check smthg out', None), # to check out => emprunter
+        (630027, 100229, 427, None, None), # to check out => régler et quitter sa chambre d'hôtel 'régler et quitter sa chambre d\'hôtel : to check out'
+        (630028, 100428, 428, None, None), # to record => enregistrer
+        (630029, 100228, 429, 's\'enregistrer à l\'hôtel ou à sur un vol : to check in', None), # to check in : s'enregistrer
+        (630030, 100430, 430, None, None), # to train => s'entraîner
+        (630031, 100431, 431, None, None), # to swallow => avaler
+        (630032, 190125, 125, None, None), # expect => attendre
+        (630033, 100432, 432, None, None), # control => contrôler
+        (630034, 100430, 90430, None, None), # to train => se former
+        (630035, 100430, 91430, 'former qqun à qqchose : to train sone in smth', None), # to train => former
+        (630036, 190125, 90125, 's\'attendre à qqchose : to expect smth', None), # to expect => s'attendre (à)
+        (630037, 100433, 433, None, None), # to deserve => mériter
+        (630038, 100285, 285, 'faire attention à qqchose : look out for smth', None), # to look out => faire attention
+        # next is 40
         #----------------------------------------------------------------------
         # VAGUE 1 TRADUCTIONS EN->EO
         #----------------------------------------------------------------------

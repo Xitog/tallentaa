@@ -227,248 +227,288 @@ Tous les verbes français
 4. #152 ajouter
 5. #137 aller
 6. #140 allumer
-7. #225 annuler
-8. #130 appeler
-9. #187 apporter
-10. #128 apprendre
-11. #129 apprécier
-12. #126 arriver
-13. #127 arrêter
-14. #150 asseoir (s')
-15. #211 attacher
-16. #125 attendre
-17. #153 attraper
-18. #154 augmenter
-19. #124 avoir
-20. #123 avoir besoin
-21. #122 avoir confiance
-22. #121 avoir peur
-23. #207 battre
-24. #120 bavarder
-25. #202 blesser
-26. #119 boire
-27. #118 bouger
-28. #155 briller
-29. #117 brûler
-30. #158 bâtir
-31. #116 cacher
-32. #115 casser
-33. #114 changer
-34. #113 chanter
-35. #156 chasser
-36. #112 chercher
-37. #111 choisir
-38. #203 combattre
-39. #110 commencer
-40. #109 comprendre
-41. #108 compter
-42. #107 conduire
-43. #106 connaître
-44. #105 construire
-45. #188 couper
-46. #104 courir
-47. #103 coûter
-48. #101 crier
-49. #100 croire
-50. #102 créer
-51. #99 cuire
-52. #98 danser
-53. #97 demander
-54. #148 descendre
-55. #189 dessiner
-56. #185 devenir
-57. #161 deviner
-58. #96 devoir
-59. #162 diminuer
-60. #95 dire
-61. #163 discuter
-62. #164 disparaître
-63. #135 donner
-64. #94 dormir
-65. #165 durer
-66. #143 décider
-67. #159 découvrir
-68. #195 dépenser
-69. #160 désirer
-70. #151 enlever
-71. #91 enseigner
-72. #90 entendre
-73. #139 entrer
-74. #89 envoyer
-75. #88 espérer
-76. #87 essayer
-77. #416 expliquer
-78. #84 faire
-79. #83 fermer
-80. #21007 fille
-81. #21006 fils
-82. #82 finir
-83. #21004 frère
-84. #81 gagner
-85. #190 garder
-86. #21008 garçon
-87. #168 glisser
-88. #80 goûter
-89. #167 gémir
-90. #79 habiller (s')
-91. #78 habiter
-92. #409 inquiéter (s')
-93. #169 intéresser
-94. #77 inviter
-95. #76 jeter
-96. #75 jouer
-97. #192 laisser
-98. #186 lancer
-99. #74 laver
-100. #170 lever
-101. #73 lever (se)
-102. #90211 lier
-103. #72 lire
-104. #21001 lit
-105. #21000 livre
-106. #171 louer
-107. #71 manger
-108. #70 manquer
-109. #69 marcher
-110. #191 mener
-111. #193 mentir
-112. #47 mettre
-113. #147 monter
-114. #48 montrer
-115. #212 mordre
-116. #49 mourir
-117. #21003 mère
-118. #50 nager
-119. #51 naître
-120. #172 nourrir
-121. #412 obéir
-122. #36 occuper (s')
-123. #52 oublier
-124. #1 ouvrir
-125. #53 pardonner
-126. #54 parler
-127. #173 partager
-128. #55 partir
-129. #56 passer
-130. #57 payer
-131. #174 pendre
-132. #58 penser
-133. #59 perdre
-134. #60 permettre
-135. #61 plaire
-136. #62 pleurer
-137. #175 plier
-138. #176 plonger
-139. #63 porter
-140. #144 poser
-141. #177 pousser
-142. #64 pouvoir
-143. #65 prendre
-144. #179 produire
-145. #67 promettre
-146. #142 proposer
-147. #66 présenter (se)
-148. #178 prêter
-149. #21002 père
-150. #68 quitter
-151. #26 raconter
-152. #27 recevoir
-153. #28 regarder
-154. #29 remercier
-155. #146 remplir
-156. #30 rencontrer
-157. #415 rendre
-158. #39 reposer (se)
-159. #32 rester
-160. #181 retenir
-161. #407 retourner
-162. #136 revenir
-163. #35 rire
-164. #145 réduire
-165. #180 réfléchir
-166. #31 répondre
-167. #33 réussir
-168. #34 réveiller (se)
-169. #182 rêver
-170. #213 saigner
-171. #37 sauter
-172. #90413 sauvegarder
-173. #413 sauver
-174. #38 savoir
-175. #41 sentir
-176. #194 signifier
-177. #138 sortir
-178. #214 souffler
-179. #42 souffrir
-180. #43 souhaiter
-181. #40 souvenir (se)
-182. #44 suivre
-183. #414 surprendre
-184. #21005 sœur
-185. #45 tenir
-186. #46 tirer
-187. #17 tomber
-188. #16 toucher
-189. #15 tourner
-190. #14 traduire
-191. #13 travailler
-192. #12 trouver
-193. #201 tuer
-194. #11 utiliser
-195. #410 vaincre
-196. #183 valoir
-197. #10 vendre
-198. #9 venir
-199. #184 vider
-200. #8 visiter
-201. #7 vivre
-202. #6 voir
-203. #5 voler
-204. #3 vouloir
-205. #2 voyager
-206. #227 vérifier
-207. #93 écouter
-208. #92 écrire
-209. #141 éteindre
-210. #85 étudier
-211. #411 éviter
-212. #86 être
-213. #197 être assis
-214. #166 être d'accord
-215. #196 être debout
+7. #425 amener
+8. #225 annuler
+9. #130 appeler
+10. #187 apporter
+11. #128 apprendre
+12. #129 apprécier
+13. #126 arriver
+14. #127 arrêter
+15. #150 asseoir (s')
+16. #211 attacher
+17. #125 attendre
+18. #153 attraper
+19. #154 augmenter
+20. #431 avaler
+21. #124 avoir
+22. #123 avoir besoin
+23. #122 avoir confiance
+24. #121 avoir peur
+25. #207 battre
+26. #120 bavarder
+27. #202 blesser
+28. #119 boire
+29. #118 bouger
+30. #155 briller
+31. #117 brûler
+32. #158 bâtir
+33. #116 cacher
+34. #115 casser
+35. #114 changer
+36. #113 chanter
+37. #156 chasser
+38. #112 chercher
+39. #111 choisir
+40. #203 combattre
+41. #110 commencer
+42. #109 comprendre
+43. #108 compter
+44. #107 conduire
+45. #106 connaître
+46. #105 construire
+47. #432 contrôler
+48. #188 couper
+49. #104 courir
+50. #103 coûter
+51. #101 crier
+52. #100 croire
+53. #102 créer
+54. #99 cuire
+55. #98 danser
+56. #97 demander
+57. #148 descendre
+58. #189 dessiner
+59. #185 devenir
+60. #161 deviner
+61. #96 devoir
+62. #162 diminuer
+63. #95 dire
+64. #163 discuter
+65. #164 disparaître
+66. #135 donner
+67. #94 dormir
+68. #165 durer
+69. #143 décider
+70. #159 découvrir
+71. #195 dépenser
+72. #160 désirer
+73. #426 emprunter
+74. #151 enlever
+75. #428 enregistrer
+76. #91 enseigner
+77. #90 entendre
+78. #139 entrer
+79. #89 envoyer
+80. #88 espérer
+81. #87 essayer
+82. #416 expliquer
+83. #84 faire
+84. #285 faire attention
+85. #424 faire un câlin
+86. #83 fermer
+87. #21007 fille
+88. #21006 fils
+89. #82 finir
+90. #91430 former
+91. #21004 frère
+92. #81 gagner
+93. #190 garder
+94. #21008 garçon
+95. #168 glisser
+96. #80 goûter
+97. #167 gémir
+98. #79 habiller (s')
+99. #78 habiter
+100. #409 inquiéter (s')
+101. #169 intéresser
+102. #77 inviter
+103. #76 jeter
+104. #75 jouer
+105. #192 laisser
+106. #186 lancer
+107. #74 laver
+108. #170 lever
+109. #73 lever (se)
+110. #90211 lier
+111. #72 lire
+112. #21001 lit
+113. #21000 livre
+114. #171 louer
+115. #71 manger
+116. #70 manquer
+117. #418 marchander
+118. #69 marcher
+119. #191 mener
+120. #193 mentir
+121. #47 mettre
+122. #147 monter
+123. #48 montrer
+124. #212 mordre
+125. #49 mourir
+126. #21003 mère
+127. #433 mériter
+128. #50 nager
+129. #51 naître
+130. #172 nourrir
+131. #412 obéir
+132. #36 occuper (s')
+133. #52 oublier
+134. #1 ouvrir
+135. #53 pardonner
+136. #54 parler
+137. #173 partager
+138. #55 partir
+139. #56 passer
+140. #57 payer
+141. #174 pendre
+142. #58 penser
+143. #59 perdre
+144. #60 permettre
+145. #61 plaire
+146. #62 pleurer
+147. #175 plier
+148. #176 plonger
+149. #63 porter
+150. #144 poser
+151. #177 pousser
+152. #64 pouvoir
+153. #65 prendre
+154. #179 produire
+155. #67 promettre
+156. #142 proposer
+157. #66 présenter (se)
+158. #178 prêter
+159. #21002 père
+160. #68 quitter
+161. #26 raconter
+162. #27 recevoir
+163. #28 regarder
+164. #29 remercier
+165. #146 remplir
+166. #30 rencontrer
+167. #415 rendre
+168. #39 reposer (se)
+169. #420 ressembler
+170. #32 rester
+171. #181 retenir
+172. #407 retourner
+173. #136 revenir
+174. #35 rire
+175. #421 ronfler
+176. #145 réduire
+177. #180 réfléchir
+178. #427 régler et quitter sa chambre d'hôtel
+179. #31 répondre
+180. #33 réussir
+181. #34 réveiller (se)
+182. #182 rêver
+183. #90125 s'attendre
+184. #429 s'enregistrer
+185. #430 s'entraîner
+186. #213 saigner
+187. #37 sauter
+188. #90413 sauvegarder
+189. #413 sauver
+190. #38 savoir
+191. #90430 se former
+192. #422 se taire
+193. #419 se transformer
+194. #41 sentir
+195. #194 signifier
+196. #138 sortir
+197. #214 souffler
+198. #42 souffrir
+199. #43 souhaiter
+200. #40 souvenir (se)
+201. #44 suivre
+202. #414 surprendre
+203. #21005 sœur
+204. #45 tenir
+205. #46 tirer
+206. #17 tomber
+207. #16 toucher
+208. #15 tourner
+209. #14 traduire
+210. #13 travailler
+211. #12 trouver
+212. #201 tuer
+213. #11 utiliser
+214. #410 vaincre
+215. #183 valoir
+216. #10 vendre
+217. #9 venir
+218. #184 vider
+219. #8 visiter
+220. #7 vivre
+221. #6 voir
+222. #5 voler
+223. #3 vouloir
+224. #2 voyager
+225. #227 vérifier
+226. #417 échanger
+227. #93 écouter
+228. #92 écrire
+229. #141 éteindre
+230. #85 étudier
+231. #411 éviter
+232. #86 être
+233. #197 être assis
+234. #166 être d'accord
+235. #196 être debout
 
 
 
 ------------------------------------------------------------------------
 Verbes non traduits
 ------------------------------------------------------------------------
-1. #225 annuler
-2. #211 attacher
-3. #207 battre
-4. #416 expliquer
-5. #21007 fille
-6. #21006 fils
-7. #21004 frère
-8. #21008 garçon
-9. #409 inquiéter (s')
-10. #90211 lier
-11. #21001 lit
-12. #21000 livre
-13. #212 mordre
-14. #21003 mère
-15. #412 obéir
-16. #21002 père
-17. #415 rendre
-18. #407 retourner
-19. #213 saigner
-20. #90413 sauvegarder
-21. #413 sauver
-22. #214 souffler
-23. #414 surprendre
-24. #21005 sœur
-25. #410 vaincre
-26. #227 vérifier
-27. #411 éviter
+1. #425 amener
+2. #225 annuler
+3. #211 attacher
+4. #431 avaler
+5. #207 battre
+6. #432 contrôler
+7. #426 emprunter
+8. #428 enregistrer
+9. #416 expliquer
+10. #285 faire attention
+11. #424 faire un câlin
+12. #21007 fille
+13. #21006 fils
+14. #91430 former
+15. #21004 frère
+16. #21008 garçon
+17. #409 inquiéter (s')
+18. #90211 lier
+19. #21001 lit
+20. #21000 livre
+21. #418 marchander
+22. #212 mordre
+23. #21003 mère
+24. #433 mériter
+25. #412 obéir
+26. #21002 père
+27. #415 rendre
+28. #420 ressembler
+29. #407 retourner
+30. #421 ronfler
+31. #427 régler et quitter sa chambre d'hôtel
+32. #90125 s'attendre
+33. #429 s'enregistrer
+34. #430 s'entraîner
+35. #213 saigner
+36. #90413 sauvegarder
+37. #413 sauver
+38. #90430 se former
+39. #422 se taire
+40. #419 se transformer
+41. #214 souffler
+42. #414 surprendre
+43. #21005 sœur
+44. #410 vaincre
+45. #227 vérifier
+46. #417 échanger
+47. #411 éviter
 
 
-Last edit on 2016-06-18 15:00:18
+Last edit on 2016-07-03 11:59:44

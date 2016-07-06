@@ -266,7 +266,7 @@ class Console:
                 for trans in verb['trans']:
                     new_verb.add_translation(verb['trans'][trans]['base'], verb['trans'][trans]['sens'])
             roots.build_reverse()
-            ConjugateTabularEnRenderer({'verbs' : verbs, 'roots' : roots}).render('./output/output2.html')
+            ConjugateTabularEnRenderer({'verbs' : verbs, 'roots' : roots}).render('./output/index.html')
         elif len(self.cmd.split(' ')) > 1:
             c_tab = self.cmd.split(' ')
             if c_tab[0] == 'select':
