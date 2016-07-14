@@ -8,176 +8,71 @@ __version__ = "$Revision: 1 $"
 # div X and Y by 32 + math.trunc -> give the square where we are
 # multiply by 32 -> give where we start to display
 
-import pygame
 import math
+from engine import *
 
 
-from pygame.locals import *
-from enum import Enum
+def load_textures(engine):
+    engine.textures = {
+        1: Texture('rock', 1, 'rock_brown.png', Colors.MINI_MAP_BROWN_DARK, False),
+        25: Texture('tree', 2, '25_arbre_1.png', Colors.MINI_MAP_GREEN_DARK, False, -32, -96),
+        26: Texture('tree', 2, '26_arbre_2.png', Colors.MINI_MAP_GREEN_DARK, False, -32, -64),
+        # Real textures
+        100: Texture('grass' , 200, 'grass_two_leaves.png', Colors.MINI_MAP_GREEN_LIGHT),
+        200: Texture('ground', 100, 'ground.png', Colors.MINI_MAP_BROWN),
+        300: Texture('water' , 300, 'water0.png', Colors.MINI_MAP_BLUE_LIGHT, False),
 
+        9100: Texture('w1', 9100, 'w1.png', Colors.MINI_MAP_BLUE_LIGHT, False),
+        9200: Texture('w2', 9200, 'w2.png', Colors.MINI_MAP_BLUE_LIGHT, False),
+        9300: Texture('w3', 9300, 'w3.png', Colors.MINI_MAP_BLUE_LIGHT, False),
+        9400: Texture('w4', 9400, 'w4.png', Colors.MINI_MAP_BLUE_LIGHT, False),
+        9500: Texture('w5', 9500, 'w5.png', Colors.MINI_MAP_BLUE_LIGHT, False),
+        9600: Texture('w6', 9600, 'w6.png', Colors.MINI_MAP_BLUE_LIGHT, False),
+        9700: Texture('w7', 9700, 'w7.png', Colors.MINI_MAP_BLUE_LIGHT, False),
+        9800: Texture('w8', 9800, 'w8.png', Colors.MINI_MAP_BLUE_LIGHT, False),
+        8100: Texture('water741', 8100, 'water741.png', Colors.MINI_MAP_BLUE_LIGHT, False),
+        8200: Texture('x2', 8200, 'x2.png', Colors.MINI_MAP_BLUE_LIGHT, False),
+        8300: Texture('x24', 8300, 'x24.png', Colors.MINI_MAP_BLUE_LIGHT, False),
+        8400: Texture('x4', 8400, 'x4.png', Colors.MINI_MAP_BLUE_LIGHT, False),
+        8500: Texture('water85', 8500, 'water85.png', Colors.MINI_MAP_BLUE_LIGHT, False),
+        8700: Texture('water325', 8700, 'water325.png', Colors.MINI_MAP_BLUE_LIGHT, False),
+        8900: Texture('water981', 8900, 'water981.png', Colors.MINI_MAP_BLUE_LIGHT, False),
 
-class Colors(Enum):
-    
-    RED = Color(255, 0, 0)
-    GREEN = Color(0, 255, 0)
-    BLUE = Color(0, 0, 255)
-    GREY = Color(200, 200, 200)
-    BLACK = Color(0, 0, 0)
-    WHITE = Color(255, 255, 255)
-    YELLOW = Color(255, 255, 0)
-    SKY_BLUE = Color(0, 255, 255)
-    HALF_RED = Color(128, 0, 0)
-    HALF_BLUE = Color(0, 0, 128)
-    HALF_GREEN = Color(0, 128, 0)
-    LIGHT_BLUE = Color(0, 128, 255)
-    DARK_BLUE = Color(0, 64, 128)
-    MINIMAP_GREEN_DARK = (0, 64, 0)
-    MINIMAP_GREEN_HALF = HALF_GREEN # terre verte
-    MINIMAP_GREEN_LIGHT = Color(1,154,1) # terre verte claire
-    MINIMAP_BROWN = Color(192,96,0) # terre marron claire
-    MINIMAP_BROWN_DARK = Color(128,64,0) # terre marron sombre pas passable (rochers)
-    MINIMAP_BLUE = BLUE # eau profonde pas passable
-    MINIMAP_BLUE_LIGHT = Color(113,123,255) # eau claire peu profonde mais pas passable
-    MINIMAP_FOG = Color(32, 32, 32, 128)
-    MINIMAP_BLACK = Color(0, 0, 0, 255)
+        10000: Texture('brou', 10000, pygame.Surface((32, 32)), Colors.MINI_MAP_FOG, False),
+        11111: Texture('black', 11111, pygame.Surface((32, 32)), Colors.MINI_MAP_BLACK, False),
 
+        'turret': Texture('turret', 20001, 'cc3by_five_archers_turret_base.png', Colors.MINI_MAP_BLUE, False),
 
-class Texture:
-    def __init__(self, name, num, filename, minicolor, passable=True, mod_x=0, mod_y=0):
-        self.name = name
-        self.num = num
-        if filename.__class__ == str:
-            try:
-                self.img = pygame.image.load('..\\..\\assets\\tiles32x32\\' + filename).convert_alpha()
-            except pygame.error:
-                self.img = pygame.image.load('..\\..\\assets\\buildings\\' + filename).convert_alpha()
-        elif filename.__class__ == pygame.Surface:
-            self.img = filename
-        self.mini = minicolor
-        self.passable = passable
-        self.mod_x = mod_x
-        self.mod_y = mod_y
+        # Computed textures
+        # 1300 : Texture('grass_water_lm', 1200, 'grass_water_ml.png', MINI_MAP_BLUE_LIGHT, False),
+        # minimap color depends !!!
 
-TEXTURES = {}
+        #91 : Texture('w1', 91, 'w1.png', MINI_MAP_GREEN_LIGHT, False),
+        #92 : Texture('w2', 92, 'w2.png', MINI_MAP_GREEN_LIGHT, False),
+        #93 : Texture('w3', 93, 'w3.png', MINI_MAP_GREEN_LIGHT, False),
+        #94 : Texture('w4', 94, 'w4.png', MINI_MAP_GREEN_LIGHT, False),
+        #95 : Texture('w5', 95, 'w5.png', MINI_MAP_GREEN_LIGHT, False),
+        #96 : Texture('w6', 96, 'w6.png', MINI_MAP_GREEN_LIGHT, False),
+        #97 : Texture('w7', 97, 'w7.png', MINI_MAP_GREEN_LIGHT, False),
+        #98 : Texture('w8', 98, 'w8.png', MINI_MAP_GREEN_LIGHT, False),
+    }
+    # Ugly hack for fog
+    engine.textures[10000].img.set_alpha(200, pygame.RLEACCEL)
+    engine.textures[10000].img.fill((32, 32, 32, 128))
+    engine.textures[11111].img.set_alpha(255, pygame.RLEACCEL)
+    engine.textures[11111].img.fill((0, 0, 0, 255))
 
-
-class Engine:
-    
-    class Keys(Enum):
-        
-        MOUSE_LEFT = 1
-        MOUSE_RIGHT = 3
-        MOUSE_MIDDLE = 2
-    
-    def __init__(self, width, height):
-        pygame.init()
-        self.size = width, height
-        self.screen = pygame.display.set_mode(self.size, pygame.DOUBLEBUF, 32)  # , pygame.FULLSCREEN | pygame.HWSURFACE)
-        self.render_orders = []
-        self.fonts = { 10 : pygame.font.SysFont("monospace", 10), 12 : pygame.font.SysFont("monospace", 12), 18 : pygame.font.SysFont("monospace", 18) }
-    
-    def stop(self):
-        pygame.quit()
-    
-    def text(self, x, y, text, color, z, center=False, size=10):
-        label = self.fonts[size].render(text, 1, color.value)
-        if center:
-            self.tex(x - label.get_width()/2, y - label.get_height()/2, label, z)
-        else:
-            self.tex(x, y, label, z)
-    
-    def tex(self, x, y, tex, z):
-        self.render_orders.append((0, x, y, tex, None, None, None, z))
-
-    def rect(self, x, y, w, h, col, thick, z):
-        self.render_orders.append((1, x, y, w, h, col, thick, z))
-    
-    def circle(self, x, y, r, col, thick, z):
-        self.render_orders.append((2, x, y, r, None, col, thick, z))
-    
-    def line(self, x1, y1, x2, y2, col, thick, z):
-        self.render_orders.append((3, x1, y1, x2, y2, col, thick, z))   
-    
-    def fill(self, col):
-        self.render_orders.append((4, col, None, None, None, None, None, -1))
-    
-    def render(self):
-        self.render_orders.sort(key=lambda elem: elem[7])
-        for o in self.render_orders:
-            if o[0] == 0: self.screen.blit(o[3], (o[1], o[2]))
-            elif o[0] == 1: pygame.draw.rect(self.screen, o[5].value, (o[1], o[2], o[3], o[4]), o[6])
-            elif o[0] == 2: pygame.draw.circle(self.screen, o[5].value, (o[1], o[2]), o[3], o[6])
-            elif o[0] == 3: pygame.draw.line(self.screen, o[5].value, (o[1], o[2]), (o[3], o[4]), o[6])
-            elif o[0] == 4: self.screen.fill(o[1].value)
-        pygame.display.flip()
-        self.render_orders.clear()
-    
-    def get_mouse_pos(self):
-        return pygame.mouse.get_pos()
-
-    def textures(self):
-        # Doodads
-        global TEXTURES
-        TEXTURES = {
-              1: Texture('rock', 1, 'rock_brown.png', Colors.MINIMAP_BROWN_DARK, False),
-             25: Texture('tree', 2, '25_arbre_1.png', Colors.MINIMAP_GREEN_DARK, False, -32, -96),
-             26: Texture('tree', 2, '26_arbre_2.png', Colors.MINIMAP_GREEN_DARK, False, -32, -64),
-            # Real textures
-            100: Texture('grass' , 200, 'grass_two_leaves.png', Colors.MINIMAP_GREEN_LIGHT),
-            200: Texture('ground', 100, 'ground.png', Colors.MINIMAP_BROWN),
-            300: Texture('water' , 300, 'water0.png', Colors.MINIMAP_BLUE_LIGHT, False),
-
-            9100: Texture('w1', 9100, 'w1.png', Colors.MINIMAP_BLUE_LIGHT, False),
-            9200: Texture('w2', 9200, 'w2.png', Colors.MINIMAP_BLUE_LIGHT, False),
-            9300: Texture('w3', 9300, 'w3.png', Colors.MINIMAP_BLUE_LIGHT, False),
-            9400: Texture('w4', 9400, 'w4.png', Colors.MINIMAP_BLUE_LIGHT, False),
-            9500: Texture('w5', 9500, 'w5.png', Colors.MINIMAP_BLUE_LIGHT, False),
-            9600: Texture('w6', 9600, 'w6.png', Colors.MINIMAP_BLUE_LIGHT, False),
-            9700: Texture('w7', 9700, 'w7.png', Colors.MINIMAP_BLUE_LIGHT, False),
-            9800: Texture('w8', 9800, 'w8.png', Colors.MINIMAP_BLUE_LIGHT, False),
-            8100: Texture('water741', 8100, 'water741.png', Colors.MINIMAP_BLUE_LIGHT, False),
-            8200: Texture('x2', 8200, 'x2.png', Colors.MINIMAP_BLUE_LIGHT, False),
-            8300: Texture('x24', 8300, 'x24.png', Colors.MINIMAP_BLUE_LIGHT, False),
-            8400: Texture('x4', 8400, 'x4.png', Colors.MINIMAP_BLUE_LIGHT, False),
-            8500: Texture('water85', 8500, 'water85.png', Colors.MINIMAP_BLUE_LIGHT, False),
-            8700: Texture('water325', 8700, 'water325.png', Colors.MINIMAP_BLUE_LIGHT, False),
-            8900: Texture('water981', 8900, 'water981.png', Colors.MINIMAP_BLUE_LIGHT, False),
-
-            10000: Texture('brou', 10000, pygame.Surface((32, 32)), Colors.MINIMAP_FOG, False),
-            11111: Texture('black', 11111, pygame.Surface((32, 32)), Colors.MINIMAP_BLACK, False),
-
-            'turret': Texture('turret', 20001, 'cc3by_five_archers_turret_base.png', Colors.MINIMAP_BLUE, False),
-
-            # Computed textures
-            # 1300 : Texture('grass_water_lm', 1200, 'grass_water_ml.png', MINIMAP_BLUE_LIGHT, False),
-            # minimap color depends !!!
-
-            #91 : Texture('w1', 91, 'w1.png', MINIMAP_GREEN_LIGHT, False),
-            #92 : Texture('w2', 92, 'w2.png', MINIMAP_GREEN_LIGHT, False),
-            #93 : Texture('w3', 93, 'w3.png', MINIMAP_GREEN_LIGHT, False),
-            #94 : Texture('w4', 94, 'w4.png', MINIMAP_GREEN_LIGHT, False),
-            #95 : Texture('w5', 95, 'w5.png', MINIMAP_GREEN_LIGHT, False),
-            #96 : Texture('w6', 96, 'w6.png', MINIMAP_GREEN_LIGHT, False),
-            #97 : Texture('w7', 97, 'w7.png', MINIMAP_GREEN_LIGHT, False),
-            #98 : Texture('w8', 98, 'w8.png', MINIMAP_GREEN_LIGHT, False),
-        }
-        # Ugly hack for fog
-        TEXTURES[10000].img.set_alpha(200, pygame.RLEACCEL)
-        TEXTURES[10000].img.fill((32, 32, 32, 128))
-        TEXTURES[11111].img.set_alpha(255, pygame.RLEACCEL)
-        TEXTURES[11111].img.fill((0, 0, 0, 255))
-
-        # Mixing Texture
-        for a in [9100, 9200, 9300, 9400, 9500, 9600, 9700, 9800, 8100, 8200, 8300, 8400, 8500, 8700, 8900]:
-            for b in [100]:
-                s = pygame.Surface((32,32))
-                s.blit(TEXTURES[b].img, (0, 0))
-                s.blit(TEXTURES[a].img, (0, 0))
-                if a > 9000:
-                    n = b*10+a-9000
-                else:
-                    n = b*10+1000+a-8000
-                TEXTURES[n] = Texture(str(n), n, s, TEXTURES[a].mini, TEXTURES[a].passable)
+    # Mixing Texture
+    for a in [9100, 9200, 9300, 9400, 9500, 9600, 9700, 9800, 8100, 8200, 8300, 8400, 8500, 8700, 8900]:
+        for b in [100]:
+            s = pygame.Surface((32,32))
+            s.blit(engine.textures[b].img, (0, 0))
+            s.blit(engine.textures[a].img, (0, 0))
+            if a > 9000:
+                n = b*10+a-9000
+            else:
+                n = b*10+1000+a-8000
+            engine.textures[n] = Texture(str(n), n, s, engine.textures[a].mini, engine.textures[a].passable)
 
 
 class CameraStorm:
@@ -202,7 +97,7 @@ class Camera:
         self.SELECT_Y = 0
         self.SELECT_R = False
         self.GUI_interface_y = 480
-        self.GUI_minimap_x = 22 * 32
+        self.GUI_mini_map_x = 22 * 32
         self.GUI_display = True
         self.selected = []
         self.left = False
@@ -233,14 +128,14 @@ class Camera:
         else:  # a zone
             for i in range(x, w):
                 for j in range(y, h):
-                    #print(i, j, self.player.world.unit_map[j][i])
+                    # print(i, j, self.player.world.unit_map[j][i])
                     u = self.player.world.get_unit_at(i, j)
-                    #print(u)
+                    # print(u)
                     if u is not None:
                         ul.append(u)
         # DEBUG
-        #for u in ul:
-            #print(u)
+        # for u in ul:
+        #    print(u)
         return ul
 
     def x2r(self, x):
@@ -253,77 +148,87 @@ class Camera:
         
         mx, my = self.engine.get_mouse_pos()
         
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+        for event in self.engine.get_events():
+            if event.type == self.engine.QUIT:
                 return False
-            elif event.type == KEYDOWN:
-                if event.key == K_ESCAPE: return False
-                elif event.key in (K_DOWN, 115): self.down = True
-                elif event.key in (K_UP, 119): self.up = True
-                elif event.key in (K_LEFT, 97): self.left = True
-                elif event.key in (K_RIGHT, 100): self.right = True
-                elif event.key == K_LSHIFT:
+            elif event.type == self.engine.EventTypes.KEY_DOWN:
+                if event.key == self.engine.Keys.ESCAPE:
+                    return False
+                elif event.key in (self.engine.Keys.DOWN, 115):
+                    self.down = True
+                elif event.key in (self.engine.Keys.UP, 119):
+                    self.up = True
+                elif event.key in (self.engine.Keys.LEFT, 97):
+                    self.left = True
+                elif event.key in (self.engine.Keys.RIGHT, 100):
+                    self.right = True
+                elif event.key == self.engine.Keys.LSHIFT:
                     print('add_mod!')
                     self.add_mod = True
-            elif event.type == KEYUP:
-                if event.key in (K_DOWN, 115): self.down = False
-                elif event.key in (K_UP, 119): self. up = False
-                elif event.key in (K_LEFT, 97): self.left = False
-                elif event.key in (K_RIGHT, 100): self.right = False
-                elif event.key == K_LSHIFT:
+            elif event.type == self.engine.EventTypes.KEY_UP:
+                if event.key in (self.engine.Keys.DOWN, 115):
+                    self.down = False
+                elif event.key in (self.engine.Keys.UP, 119):
+                    self. up = False
+                elif event.key in (self.engine.Keys.LEFT, 97):
+                    self.left = False
+                elif event.key in (self.engine.Keys.RIGHT, 100):
+                    self.right = False
+                elif event.key == self.engine.Keys.LSHIFT:
                     self.add_mod = False
                     print('stop add mod!')
-                elif event.key == K_SPACE:
+                elif event.key == self.engine.Keys.SPACE:
                     self.scroll += 1
-                elif event.key == K_b:
+                elif event.key == self.engine.Keys.B:
                     if self.mode == 'normal':
                         self.mode = 'build'
                         self.build_type = self.player.game.building_types_ordered[0]
                         self.build_size = Pair(2, 1)
                     else:
                         self.mode = 'normal'
-                    #print(self.mode)
-                elif event.key == K_TAB:
+                    # print(self.mode)
+                elif event.key == self.engine.Keys.TAB:
                     self.GUI_display = not self.GUI_display
-                    #print(self.GUI_display)
-                elif event.key == K_RETURN:
+                    # print(self.GUI_display)
+                elif event.key == self.engine.Keys.RETURN:
                     self.dev_mode = not self.dev_mode
-                    #print(self.dev_mode)
+                    # print(self.dev_mode)
                 else:
                     print(event.key)
-            elif event.type == MOUSEBUTTONDOWN:
+            elif event.type == self.engine.EventTypes.MOUSE_BUTTON_DOWN:
                 if event.button == 1:
                     if not self.SELECT_R:
                         self.SELECT_R = True
                         self.SELECT_X = mx - self.x
                         self.SELECT_Y = my - self.y
-            elif event.type == MOUSEBUTTONUP:
+            elif event.type == self.engine.EventTypes.MOUSE_BUTTON_UP:
                 self.SELECT_R = False
-                if event.button == self.engine.Keys.MOUSE_LEFT.value :  # Left Button
-                    #print(self.SELECT_Y, self.GUI_interface_y)
-                    if my > self.GUI_interface_y: # Interface click
-                        #if self.mode == 'normal':
+                if event.button == self.engine.Keys.MOUSE_LEFT:  # Left Button
+                    # print(self.SELECT_Y, self.GUI_interface_y)
+                    if my > self.GUI_interface_y:  # Interface click
+                        # if self.mode == 'normal':
                         # CLICK FOR A BUILDING
-                        if self.SELECT_Y > self.GUI_interface_y: # pour voir si on n'a pas "ripé" sur un bouton de construction ou la minimap
+                        # pour voir si on n'a pas "ripé" sur un bouton de construction ou la minimap
+                        if self.SELECT_Y > self.GUI_interface_y:
                             a = mx // 32
                             b = (my-self.GUI_interface_y) // 32
                             # print(a,b)
                             nb = a + b * 3
-                            if nb >= 0 and nb < len(self.player.game.building_types_ordered):
+                            if 0 <= nb < len(self.player.game.building_types_ordered):
                                 btn = self.player.game.building_types_ordered[nb]
                                 bt = self.player.game.building_types[btn]
                                 self.mode = 'build'
                                 self.build_type = btn
                                 self.build_size = Pair(bt.grid_w, bt.grid_h)
-                            if mx > self.GUI_minimap_x: # Minimap click
-                                a = int((mx - self.GUI_minimap_x) / 3)
+                            if mx > self.GUI_mini_map_x:  # Mini map click
+                                a = int((mx - self.GUI_mini_map_x) / 3)
                                 b = int((my - self.GUI_interface_y) / 3)
                                 if a < self.player.world.size32.x and b < self.player.world.size32.y:
-                                    #print("self x, y old", self.x, self.y)
-                                    #print("minimap", a, b)
-                                    self.x = -a * 32 + 384 # 12 * 32 (pour 800 px)
-                                    self.y = -b * 32 + 224 + 24 #  9 * 32 + 24 (600%32) (pour 600px) TODO: make generic
-                                    #print("self x, y new", self.x, self.y) 
+                                    # print("self x, y old", self.x, self.y)
+                                    # print("minimap", a, b)
+                                    self.x = -a * 32 + 384  # 12 * 32 (pour 800 px)
+                                    self.y = -b * 32 + 224 + 24  #  9 * 32 + 24 (600%32) (pour 600px) TODO: make generic
+                                    # print("self x, y new", self.x, self.y)
                     elif self.mode == 'normal':
                         deb_x = min(self.SELECT_X, mx - self.x)
                         fin_x = max(self.SELECT_X, mx - self.x)
@@ -363,7 +268,7 @@ class Camera:
                                 self.not_enough_ress = 10
                         if not self.add_mod: # multiple construction orders
                             self.mode = 'normal'
-                elif event.button == self.engine.Keys.MOUSE_RIGHT.value:  # Right Button
+                elif event.button == self.engine.Keys.MOUSE_RIGHT:  # Right Button
                     if self.mode == 'build':
                         self.mode = 'normal'
                     elif len(self.selected) == 1 and self.selected[0].player != self.player:
@@ -425,9 +330,9 @@ class Camera:
                 dx = xx * 32 + self.x
                 dy = yy * 32 + self.y
                 # draw terrain
-                self.engine.tex(dx, dy, TEXTURES[t].img, 0)
+                self.engine.tex(dx, dy, self.engine.textures[t].img, 0)
                 if d != 0 and d != 99:  # there is visible blocking doodad, 0 = passable, 99 = invisible and not passable
-                    self.engine.tex(dx + TEXTURES[d].mod_x, dy + TEXTURES[d].mod_y, TEXTURES[d].img, 0.5)
+                    self.engine.tex(dx + self.engine.textures[d].mod_x, dy + self.engine.textures[d].mod_y, self.engine.textures[d].img, 0.5)
                     if self.dev_mode:
                         self.engine.rect(dx, dy, 32, 32, Colors.RED, 1, 1)
                 # draw unit
@@ -464,7 +369,7 @@ class Camera:
                         self.engine.circle(u.real_x + self.x, u.real_y + self.y, u.size, u.player.color, 0, 1)
                 elif su[0] == 2:  # Building
                     u = su[1]
-                    self.engine.tex(u.x * 32 + self.x, u.y * 32 + self.y, TEXTURES['turret'].img, 2)
+                    self.engine.tex(u.x * 32 + self.x, u.y * 32 + self.y, self.engine.textures['turret'].img, 2)
                     #if xx == u.grid_x and yy == u.grid_y:
                     #    self.engine.rect(dx, dy, u.type.grid_w * 32, u.type.grid_h * 32, u.player.color, 0, 2)
                     if u in self.selected:
@@ -472,9 +377,9 @@ class Camera:
                 # draw fog or black
                 fog = self.player.fog_map[yy][xx]
                 if fog == 0:
-                    self.engine.tex(dx, dy, TEXTURES[11111].img, 10)
+                    self.engine.tex(dx, dy, self.engine.textures[11111].img, 10)
                 elif fog == 1:
-                    self.engine.tex(dx, dy, TEXTURES[10000].img, 10)
+                    self.engine.tex(dx, dy, self.engine.textures[10000].img, 10)
                 # DEBUG
                 if self.dev_mode:
                     self.engine.text(dx, dy, "%(v)04d" % {"v": self.player.world.debug_map[yy][xx]}, Colors.RED, 1)
@@ -511,8 +416,8 @@ class Camera:
         for xx in range(0, 3):
             for yy in range(0, 3):
                 self.engine.rect(xx * 32, yy * 32 + self.GUI_interface_y, 32, 32, Colors.BLUE, 1, 50)
-        self.engine.line(self.GUI_minimap_x - 1, self.GUI_interface_y, self.GUI_minimap_x - 1, self.GUI_interface_y + 96, Colors.BLUE, 1, 40)
-        self.engine.line(self.GUI_minimap_x - 1, self.GUI_interface_y + 96, self.width-1, self.GUI_interface_y + 96, Colors.BLUE, 1, 40)
+        self.engine.line(self.GUI_mini_map_x - 1, self.GUI_interface_y, self.GUI_mini_map_x - 1, self.GUI_interface_y + 96, Colors.BLUE, 1, 40)
+        self.engine.line(self.GUI_mini_map_x - 1, self.GUI_interface_y + 96, self.width-1, self.GUI_interface_y + 96, Colors.BLUE, 1, 40)
         
         # Build menu
         xs = 8
@@ -537,24 +442,24 @@ class Camera:
             col = Colors.YELLOW
         self.engine.text(5, self.GUI_interface_y+104, text, col, 50)
         
-        # Minimap
+        # Mini map
         for yy in range(0, self.player.world.size32.y):
             for xx in range(0, self.player.world.size32.x):
                 t = self.player.world.world_map[yy][xx]
                 d = self.player.world.passable_map[yy][xx]
                 if d != 0 and d != 99:
-                    self.engine.rect(xx * 3 + self.GUI_minimap_x, yy * 3 + self.GUI_interface_y +1, 3, 3, TEXTURES[d].mini, 0, 50)
+                    self.engine.rect(xx * 3 + self.GUI_mini_map_x, yy * 3 + self.GUI_interface_y +1, 3, 3, self.engine.textures[d].mini, 0, 50)
                 else:
-                   self.engine.rect(xx * 3 + self.GUI_minimap_x, yy * 3 + self.GUI_interface_y +1, 3, 3, TEXTURES[t].mini, 0, 50)
+                   self.engine.rect(xx * 3 + self.GUI_mini_map_x, yy * 3 + self.GUI_interface_y +1, 3, 3, self.engine.textures[t].mini, 0, 50)
                 u = self.player.world.unit_map[yy][xx]
                 if u != 0:
                     if u[0] == 1 or u[0] == 2:
-                        self.engine.rect(xx * 3 + self.GUI_minimap_x, yy * 3 + self.GUI_interface_y +1, 3, 3, u[1].player.color, 0, 50)
+                        self.engine.rect(xx * 3 + self.GUI_mini_map_x, yy * 3 + self.GUI_interface_y +1, 3, 3, u[1].player.color, 0, 50)
                 fog = self.player.fog_map[yy][xx]
                 if fog == 0:
-                    self.engine.rect(xx * 3 + self.GUI_minimap_x, yy * 3 + self.GUI_interface_y +1, 3, 3, TEXTURES[11111].mini, 0, 50)
+                    self.engine.rect(xx * 3 + self.GUI_mini_map_x, yy * 3 + self.GUI_interface_y +1, 3, 3, self.engine.textures[11111].mini, 0, 50)
                 elif fog == 1:
-                    self.engine.rect(xx * 3 + self.GUI_minimap_x, yy * 3 + self.GUI_interface_y +1, 3, 3, TEXTURES[10000].mini, 0, 50)
+                    self.engine.rect(xx * 3 + self.GUI_mini_map_x, yy * 3 + self.GUI_interface_y +1, 3, 3, self.engine.textures[10000].mini, 0, 50)
 
 
 class Particles:
@@ -620,7 +525,7 @@ class Particle:
 # unit_map can be : 0 : void, (1, u) : unit u is here, (-1, u) : unit u is moving here
 class World:
     
-    def __init__(self, world_map):
+    def __init__(self, world_map, textures_info):
         self.particles = Particles()
         if len(world_map) == 0:
             raise Exception("Empty map detected")
@@ -629,7 +534,8 @@ class World:
         self.world_map = World.create_map(self.size32.x, self.size32.y, 0)
         self.passable_map = World.create_map(self.size32.x, self.size32.y, 0)
         self.debug_map = World.create_map(self.size32.x, self.size32.y, 0)
-        # separate [128] => 100 (in world map) + 28 (in passable_map or 99 if texture not passable by default (and no doodad can be put on it))
+        # separate [128] => 100 (in world map) + 28 (in passable_map or 99
+        # if texture not passable by default (and no doodad can be put on it))
         for yy in range(0, self.size32.y):
             for xx in range(0, self.size32.x):
                 r = world_map[yy][xx]
@@ -637,10 +543,10 @@ class World:
         
         for yy in range(0, self.size32.y):
             for xx in range(0, self.size32.x):
-                r = world_map[yy][xx] # 101, 228, 312
+                r = world_map[yy][xx]  # 101, 228, 312
                 self.passable_map[yy][xx] = r % 100
-                r = self.world_map[yy][xx] # 100, 200, 300
-                if not TEXTURES[r].passable:
+                r = self.world_map[yy][xx]  # 100, 200, 300
+                if not textures_info[r].passable:  # TODO: we need the texture info only here
                     self.passable_map[yy][xx] = 99
         
         # Computation of passage from tex to tex
@@ -807,6 +713,7 @@ class Game:
         self.zones = {}
         self.players = {}
         self.triggers = {}
+        self.elem_types = {}
         self.unit_types = {}
         self.building_types = {}
         self.building_types_ordered = []
@@ -815,9 +722,12 @@ class Game:
     def set_name(self, name):
         self.name = name
     
-    def set_map(self, map):
-        self.world = World(map)
-    
+    def set_map(self, game_map):
+        self.world = World(game_map, self.elem_types)
+
+    def set_elem_types(self, elem_types):
+        self.elem_types = elem_types
+
     def set_unit_types(self, unit_types):
         self.unit_types = unit_types
     
@@ -1407,10 +1317,9 @@ class Action:
             pass
 
 
-
 # -----------------------------------------------------------------------------
 # Tools
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 def get_angle(x1, y1, x2, y2):
     dx, dy = get_diff(x1, y1, x2, y2)
@@ -1423,7 +1332,8 @@ def get_diff(x1, y1, x2, y2):
 
 def get_dist(x1, y1, x2, y2):
     return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
-    
+
+
 def xrect(x1, y1, x2, y2):
     tx = abs(x1 - x2)
     ty = abs(y1 - y2)
@@ -1435,11 +1345,12 @@ def xrect(x1, y1, x2, y2):
         ry = y2
     else:
         ry = y1
-    return Rect(rx, ry, tx, ty)
+    return pygame.Rect(rx, ry, tx, ty)
 
-#------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 # Menu
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 class Button:
@@ -1486,16 +1397,20 @@ class Menu:
     def __init__(self, engine):
         self.engine = engine
         self.buttons = []
-        self.state = {}
-        self.state['clicked'] = None
-        
+        self.state = {'clicked': None}
+
     def menu_start(self):
         def pipo():
             pass
-        self.buttons.append(Button(self, "Campaign", self.engine.size[0]/2-100, self.engine.size[1]/2-15-90, 200, 30, Colors.DARK_BLUE, Colors.YELLOW, Colors.LIGHT_BLUE, Colors.YELLOW, 18))
-        self.buttons.append(Button(self, "Skirmish", self.engine.size[0]/2-100, self.engine.size[1]/2-15-30, 200, 30, Colors.DARK_BLUE, Colors.YELLOW, Colors.LIGHT_BLUE, Colors.YELLOW, 18))
-        self.buttons.append(Button(self, "Options", self.engine.size[0]/2-100, self.engine.size[1]/2-15+30, 200, 30, Colors.DARK_BLUE, Colors.YELLOW, Colors.LIGHT_BLUE, Colors.YELLOW, 18))
-        self.buttons.append(Button(self, "Quit", self.engine.size[0]/2-100, self.engine.size[1]/2-15+90, 200, 30, Colors.DARK_BLUE, Colors.YELLOW, Colors.LIGHT_BLUE, Colors.YELLOW, 18))
+
+        self.buttons.append(Button(self, "Campaign", self.engine.size[0]/2-100, self.engine.size[1]/2-15-90, 200, 30,
+                                   Colors.DARK_BLUE, Colors.YELLOW, Colors.LIGHT_BLUE, Colors.YELLOW, 18))
+        self.buttons.append(Button(self, "Skirmish", self.engine.size[0]/2-100, self.engine.size[1]/2-15-30, 200, 30,
+                                   Colors.DARK_BLUE, Colors.YELLOW, Colors.LIGHT_BLUE, Colors.YELLOW, 18))
+        self.buttons.append(Button(self, "Options", self.engine.size[0]/2-100, self.engine.size[1]/2-15+30, 200, 30,
+                                   Colors.DARK_BLUE, Colors.YELLOW, Colors.LIGHT_BLUE, Colors.YELLOW, 18))
+        self.buttons.append(Button(self, "Quit", self.engine.size[0]/2-100, self.engine.size[1]/2-15+90, 200, 30,
+                                   Colors.DARK_BLUE, Colors.YELLOW, Colors.LIGHT_BLUE, Colors.YELLOW, 18))
         
     def menu_pause(self):
         self.buttons.append(Button(self, "Quit to main menu", self.engine.size[0]/2-100, self.engine.size[1]/2-15-90, 200, 30, Colors.DARK_BLUE, Colors.YELLOW, Colors.LIGHT_BLUE, Colors.YELLOW, 18))
@@ -1504,14 +1419,15 @@ class Menu:
         self.buttons.append(Button(self, "Quit", self.engine.size[0]/2-100, self.engine.size[1]/2-15+90, 200, 30, Colors.DARK_BLUE, Colors.YELLOW, Colors.LIGHT_BLUE, Colors.YELLOW, 18))
     
     def update(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.state['quit'] = True
-            elif event.type == KEYDOWN:
-                if event.key == K_ESCAPE: self.state['quit'] = True
-            elif event.type == MOUSEBUTTONUP:
+        for event in self.engine.get_events():
+            if event.type == self.engine.QUIT:
+                self.state['clicked'] = 'Quit'
+            elif event.type == self.engine.EventTypes.KEY_DOWN:
+                if event.key == self.engine.Keys.ESCAPE:
+                    self.state['clicked'] = 'Quit'
+            elif event.type == self.engine.EventTypes.MOUSE_BUTTON_UP:
                 mx, my = self.engine.get_mouse_pos()
-                if event.button == self.engine.Keys.MOUSE_LEFT.value :
+                if event.button == self.engine.Keys.MOUSE_LEFT:
                     for b in self.buttons:
                         if b.is_in(mx, my):
                             b.click()
@@ -1523,15 +1439,18 @@ class Menu:
         self.engine.fill(Colors.BLACK)
         for b in self.buttons:
             b.render()
-    
+
+
 def start():
     e = Engine(800, 600)
-    e.textures()
+    load_textures(e)
     while True:
         r = menu_loop(e) 
-        if not r: break
+        if not r:
+            break
     e.stop()
     print('Goodbye')  
+
 
 def menu_loop(engine):
     m = Menu(engine)
@@ -1540,7 +1459,8 @@ def menu_loop(engine):
         s = m.update()
         m.render()
         engine.render()
-        if s['clicked'] is not None: break
+        if s['clicked'] is not None:
+            break
     if s['clicked'] in ['Campaign', 'Skirmish']:
         g = Game('Test 1')
         c = configure(g, engine)
@@ -1576,17 +1496,18 @@ def game_loop(game, camera, engine):
         engine.render()
         if not res_cam:
             r = game_menu_loop(engine)
-            if r != 'Resume': break
+            if r != 'Resume':
+                break
         if not res_gam: 
             r = 'Game Finished'
             break
-        #new_time = pygame.time.get_ticks()
-        #waited = new_time - old_time
-        #old_time = new_time
-        #if waited < 60:
+        # new_time = pygame.time.get_ticks()
+        # waited = new_time - old_time
+        # old_time = new_time
+        # if waited < 60:
         #    time.sleep(1.0 / (60 - waited))
         #    print('waited: ', waited)
-        ##pygame.time.Clock().tick(30)
+        # #pygame.time.Clock().tick(30)
     if r in ('Game Finished', 'Quit'):
         print('Game has ended.')
         end_time = pygame.time.get_ticks()
@@ -1605,15 +1526,16 @@ def game_loop(game, camera, engine):
         duration_sec -= duration_min * 60
         duration_hour = duration_min // 60
         duration_min -= duration_hour * 60
-        print('Game duration: ' + str(duration_hour)+ 'h' + str(duration_min) + 'm' + str(duration_sec) + 's')
+        print('Game duration: ' + str(duration_hour) + 'h' + str(duration_min) + 'm' + str(duration_sec) + 's')
         print('Press enter to quit.')
         return False
     elif r == 'Quit to main menu':
         return True
 
 
-def mod_basic(game):
+def mod_basic(game, engine):
 
+    game.set_elem_types(engine.textures)  # TODO: pass only what we need (passable information see World class)
     game.set_unit_types({"soldier": UnitType("Soldier", size=10, vision=3, range=10, life=100, dom=5, speed=8, reload=50),
                          "elite": UnitType("Elite", size=10, vision=4, range=10, life=100, dom=10, speed=8, reload=50),
                          "big": UnitType("Big", size=20, vision=2, range=30, life=300, dom=20, speed=8, reload=50)})
@@ -1691,7 +1613,7 @@ def level_E1L1(game):
     
 
 def configure(g, e):
-    mod_basic(g)
+    mod_basic(g, e)
     try:
         import maps.e1l1
         maps.e1l1.load(g, Colors)
