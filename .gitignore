@@ -4,3 +4,4 @@ projet_format/Bioware_Aurora_KeyBIF_Format.pdf
 *.class
 java/jyx/make.bat
 java/working_buffer.txt
+projet_format/yodata/output/*.png
