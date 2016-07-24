@@ -1,3 +1,6 @@
 projet_format/2da.bif
 projet_format/Bioware_Aurora_KeyBIF_Format.pdf
 *.key
+*.class
+java/jyx/make.bat
+java/working_buffer.txt

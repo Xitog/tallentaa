@@ -15,7 +15,8 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
+import java.io.UnsupportedEncodingException;
 
 import java.nio.charset.Charset;
 
@@ -135,9 +136,12 @@ public class Jyx extends JPanel implements ActionListener {
     
     public void saveFile(File file, String content) {
         try {
-            FileWriter fw = new FileWriter(file);
-            fw.write(content);
-            fw.close();
+            FileOutputStream fos = new FileOutputStream(file);
+            byte[] bytes = content.getBytes("UTF-8");
+            fos.write(bytes);
+            fos.close();
+        } catch (UnsupportedEncodingException uee) {
+            System.err.format("EncodingException: %s%n", uee);
         } catch (IOException ioe) {
             System.err.format("IOException: %s%n", ioe);
         }
