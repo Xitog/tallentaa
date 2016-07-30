@@ -27,6 +27,7 @@ import java.nio.charset.Charset;
 public class Jyx extends JPanel implements ActionListener {
     
     JTextPane jtp;
+    JLabel jl;
     JFrame frame;
     File currentFile;
     boolean launch;
@@ -37,23 +38,24 @@ public class Jyx extends JPanel implements ActionListener {
         this.frame = frame;
         this.master = new Controller(this);
         this.hasChanged = false;
-        this.launch = true;
         
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        Border border = BorderFactory.createEtchedBorder();
-        setBorder(BorderFactory.createTitledBorder(border, "Texte"));
+        //Border border = BorderFactory.createEtchedBorder();
+        //setBorder(BorderFactory.createTitledBorder(border, "Texte"));
         
         jtp = new JTextPane();
         jtp.setDocument(new JyxDocument(this));
         //jtp.setPreferredSize(new Dimension(400, 600));
         //jtp.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
-        gbc.gridx = gbc.gridy = 0;
-        gbc.gridwidth = gbc.gridheight = 1;
+        gbc.gridx = 0; // column
+        gbc.gridy = 0; // row
+        gbc.gridwidth = 1;
+        gbc.gridheight = 1;
+        gbc.weightx = 0.95;
+        gbc.weighty = 0.99;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.weightx = 95;
-        gbc.weighty = 100;
         add(jtp, gbc);
         
         JScrollPane scrollPane = new JScrollPane(jtp);
@@ -61,19 +63,36 @@ public class Jyx extends JPanel implements ActionListener {
         gbc.gridy = 0;
         gbc.gridwidth = 1;
         gbc.gridheight = 1;
-        gbc.weightx = 5;
+        gbc.weightx = 0.05;
+        gbc.weighty = 0.99;
         add(scrollPane, gbc);
+        //scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+   
+        jl = new JLabel();
+        gbc.gridx = 0; // column
+        gbc.gridy = 1; // row
+        gbc.gridwidth = 2;
+        gbc.gridheight = 1;
+        gbc.weightx = 1.00;
+        gbc.weighty = 0.01;
+        add(jl, gbc);
+        jl.setVerticalAlignment(SwingConstants.BOTTOM);
+        jl.setText(" A little hello from Jyx");
+        //jl.setMaximumSize(new Dimension(jl.getMaximumSize().width, 20));
         
         try {
             File file = new File(JyxConfig.SAVE_BUFFER);
             if (file.exists() && !file.isDirectory()) {
-                jtp.setText(readFile(file));
-                frame.setTitle(JyxConfig.BUFFER_SAVED);
+                master.update(Controller.OPEN, file);
             }
         } catch (Exception e) {
             System.err.format("IOException: %s%n", e);
         }
         
+    }
+    
+    public void setInfo(String s) {
+        this.jl.setText(s);
     }
     
     public JFrame getFrame() {
@@ -90,15 +109,6 @@ public class Jyx extends JPanel implements ActionListener {
     
     void resetChanged() {
         this.hasChanged = false;
-    }
-    
-    boolean askAndLockLaunch() {
-        if (this.launch) {
-            this.launch = false;
-            return true;
-        } else {
-            return false;
-        }
     }
     
     JTextPane getTextPane() {
@@ -149,24 +159,43 @@ public class Jyx extends JPanel implements ActionListener {
     
     static class Controller {
         
+        // Event
         static int NEW = 1;
         static int OPEN = 2;
         static int SAVE = 3;
         static int SAVE_AS = 4;
         static int QUIT = 5;
+        static int WRITING = 6; // ING because the action to write the text is not done by the Controller
+        static int REMOVING = 6; // Same !
+        
+        // State
+        static int OPENING = 1;
+        static int WORKING = 2;
         
         Jyx jyx;
+        int current_state;
         
         Controller (Jyx jyx) {
             this.jyx = jyx;
+            current_state = Controller.WORKING;
+        }
+        
+        void setState(int new_state) {
+            this.current_state = new_state;
+        }
+        
+        int getCurrentState() {
+            return this.current_state;
         }
         
         void update(int event, File file) {
             if (event == Controller.OPEN) {
+                setState(OPENING);
                 jyx.getTextPane().setText(jyx.readFile(file));
-                jyx.getFrame().setTitle(file.getName() + " - Jyx 1.0"); 
+                jyx.getFrame().setTitle(file.getName() + " - Jyx 1.0");
                 jyx.setCurrentFile(file);
                 jyx.resetChanged();
+                setState(WORKING);
             }
         }
         
@@ -181,14 +210,91 @@ public class Jyx extends JPanel implements ActionListener {
                 String new_title;
                 if (jyx.getCurrentFile() == null) {
                     file = new File(JyxConfig.SAVE_BUFFER);
-                    new_title = JyxConfig.BUFFER_SAVED;
                 } else {
                     file = jyx.getCurrentFile();
-                    new_title = file.getName() + " - Jyx 1.0"; 
                 }
+                new_title = file.getName() + " - Jyx 1.0"; 
                 jyx.saveFile(file, jyx.getTextPane().getText());
                 jyx.resetChanged();
                 jyx.getFrame().setTitle(new_title);
+            } else if (event == Controller.WRITING) {
+                if (current_state != Controller.OPENING && !jyx.getHasChanged()) {
+                    String old_title = jyx.getFrame().getTitle();
+                    String new_title = "(Changed) " + old_title;
+                    jyx.getFrame().setTitle(new_title);
+                    jyx.setChanged();
+                }
+                Analyze ana = analyze();
+                jyx.setInfo(" " + ana.getNbChars() + " characters on " + ana.getNbLines() + " lines. Caret at " + jyx.getTextPane().getCaretPosition());
+            } else {
+                jyx.setInfo(" Unknown event : " + event);
+            }
+        }
+            
+        Analyze analyze() {
+            Analyze ana = new Analyze();
+            int nb_lines = 1;
+            int nb_chars = 0;
+            try {
+                nb_chars = jyx.getTextPane().getDocument().getLength();
+                String s = jyx.getTextPane().getDocument().getText(0, nb_chars);
+                // System.out.println("getLength() of Document : " + nb_chars + " vs length() of String : " + s.length());
+                for (int i=0; i < nb_chars; i++) {
+                    if (s.charAt(i) == '\n') {
+                        nb_lines += 1;
+                    }
+                    //System.out.println(">>> " + i + ". [" + s.charAt(i) + "]");
+                }
+            } catch (BadLocationException ble) {
+                System.out.println("Bad location exception");
+            } finally {
+                ana.setNbLines(nb_lines);
+                ana.setNbChars(nb_chars);
+            }
+            return ana;
+        }
+        
+        int getNearestTab(int offset) {
+            int nearest_tab = ((int)(offset / 4)) * 4;
+            //System.out.println("I want to delete here : " + offset + " and the nearest tab is at " + nearest_tab);
+            String s = jyx.getTextPane().getText();
+            boolean exited = false;
+            for(int i = nearest_tab; i < offset; i++) {
+                if (!Character.isWhitespace(s.charAt(i))) {
+                    exited = true;
+                    break;
+                }
+            }
+            if (exited) {
+                return -1;
+            } else {
+                return nearest_tab;
+            }
+        }
+        
+        static class Analyze {
+            int nb_lines;
+            int nb_chars;
+            
+            Analyze() {
+                this.nb_lines = 0;
+                this.nb_chars = 0;
+            }
+            
+            void setNbLines(int i) {
+                this.nb_lines = i;
+            }
+            
+            int getNbLines() {
+                return this.nb_lines;
+            }
+            
+            void setNbChars(int i) {
+                this.nb_chars = i;
+            }
+            
+            int getNbChars() {
+                return this.nb_chars;
             }
         }
         
@@ -255,31 +361,42 @@ public class Jyx extends JPanel implements ActionListener {
             try {
                 str = str.replaceAll("\t", "    ");
                 super.insertString(offs, str, a);
-                if (!panel.getHasChanged()) {
-                    String old_title = panel.getFrame().getTitle();
-                    String new_title = "(Changed) " + old_title;
-                    panel.getFrame().setTitle(new_title);
-                    if (panel.askAndLockLaunch()) {
-                        // Do nothing. it's the first insert in this case, when we open the document
-                    } else {
-                        panel.setChanged();
-                    }
-                }
+                panel.getController().update(Controller.WRITING);
+                System.out.println("Inserted : offset = " + offs + " str = " + str);
             } catch (BadLocationException ble) {
                 System.out.println("Bad location exception");
             }
     	}
         
         @Override
-        public void removeUpdate(DefaultDocumentEvent chng) {
-            super.removeUpdate(chng);
-            if (!panel.getHasChanged()) {
-                String old_title = panel.getFrame().getTitle();
-                String new_title = "(Changed) " + old_title;
-                panel.getFrame().setTitle(new_title);
-                panel.setChanged();
+        public void remove(int offs, int len) {
+            try {
+                if (len == 1) {
+                    int i = panel.getController().getNearestTab(offs);
+                    if (i == -1) {
+                        //System.out.println("I will remove only one char, at offset = " + offs);
+                    } else {
+                        len = offs-i+1;
+                        offs = i;
+                        //System.out.println("I will remove " + len + " char(s), from offset = " + offs);
+                    }
+                }
+                super.remove(offs, len);
+                panel.getController().update(Controller.REMOVING);
+                System.out.println("Removed : offset = " + offs + " len = " + len);
+            } catch (BadLocationException ble) {
+                System.out.println("Bad location exception : " + offs + " and len = " + len);
             }
         }
+        
+        /*
+        @Override
+        public void removeUpdate(DefaultDocumentEvent chng) {
+            super.removeUpdate(chng);
+            panel.getController().update(Controller.REMOVING);
+            System.out.println("Removing");
+        }
+        */
     }
     
     public static void main(String[] args) {
