@@ -9,6 +9,8 @@ import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.AbstractDocument.DefaultDocumentEvent;
+import javax.swing.event.CaretListener;
+import javax.swing.event.CaretEvent;
 
 import java.io.File;
 import java.io.BufferedReader;
@@ -24,7 +26,7 @@ import java.nio.charset.Charset;
 //import com.sun.java.swing.plaf.motif.MotifLookAndFeel;
 //import com.sun.java.swing.plaf.windows.WindowsLookAndFeel;
 
-public class Jyx extends JPanel implements ActionListener {
+public class Jyx extends JPanel implements ActionListener, CaretListener {
     
     JTextPane jtp;
     JLabel jl;
@@ -46,6 +48,7 @@ public class Jyx extends JPanel implements ActionListener {
         
         jtp = new JTextPane();
         jtp.setDocument(new JyxDocument(this));
+        jtp.addCaretListener(this);
         //jtp.setPreferredSize(new Dimension(400, 600));
         //jtp.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
         gbc.gridx = 0; // column
@@ -167,6 +170,7 @@ public class Jyx extends JPanel implements ActionListener {
         static int QUIT = 5;
         static int WRITING = 6; // ING because the action to write the text is not done by the Controller
         static int REMOVING = 6; // Same !
+        static int CARRET_MOVE = 7;
         
         // State
         static int OPENING = 1;
@@ -186,6 +190,13 @@ public class Jyx extends JPanel implements ActionListener {
         
         int getCurrentState() {
             return this.current_state;
+        }
+        
+        void update(int event, int int1, int int2) {
+            if (event == Controller.CARRET_MOVE) {
+                Analyze ana = analyze();
+                jyx.setInfo(" " + ana.getNbChars() + " characters on " + ana.getNbLines() + " lines. Caret at " + jyx.getTextPane().getCaretPosition());
+            }
         }
         
         void update(int event, File file) {
@@ -327,6 +338,20 @@ public class Jyx extends JPanel implements ActionListener {
         } else {
             JOptionPane.showMessageDialog(null, e.getActionCommand());
         }
+    }
+    
+    public void caretUpdate(CaretEvent e) {
+        transmit(e.getDot(), e.getMark());
+    }
+
+    protected void transmit(final int dot, final int mark) {
+        SwingUtilities.invokeLater(new Runnable() { // Schedule the code for execution in the event dispatching thread where we can use set text
+            public void run() {
+                getController().update(Controller.CARRET_MOVE, dot, mark);
+                // if (dot == mark) {
+                // }
+            }
+        });
     }
     
     static class JyxConfig {

@@ -31,21 +31,9 @@ class Colors(Enum):
 
 class Texture:
 
-    def __init__(self, name, num, filename, minicolor, passable=True, mod_x=0, mod_y=0):
+    def __init__(self, name, surf, mod_x=0, mod_y=0):
         self.name = name
-        self.num = num
-        if filename.__class__ == str:
-            try:
-                self.img = pygame.image.load('..\\..\\assets\\tiles32x32\\' + filename).convert_alpha()
-            except pygame.error:
-                try:
-                    self.img = pygame.image.load('..\\..\\assets\\tiles64x32\\' + filename).convert_alpha()
-                except pygame.error:
-                    self.img = pygame.image.load('..\\..\\assets\\buildings\\' + filename).convert_alpha()
-        elif filename.__class__ == pygame.Surface:
-            self.img = filename
-        self.mini = minicolor
-        self.passable = passable
+        self.surf = surf
         self.mod_x = mod_x
         self.mod_y = mod_y
 
@@ -82,6 +70,7 @@ class Engine:
         self.render_orders = []
         self.fonts = {10: pygame.font.SysFont("monospace", 10), 12: pygame.font.SysFont("monospace", 12), 18: pygame.font.SysFont("monospace", 18)}
         self.textures = {}
+        self.texture_path = None
 
     def stop(self):
         pygame.quit()
@@ -89,12 +78,15 @@ class Engine:
     def text(self, x, y, text, color, z, center=False, size=10):
         label = self.fonts[size].render(text, 1, color.value)
         if center:
-            self.tex(x - label.get_width()/2, y - label.get_height()/2, label, z)
+            self.surf(x - label.get_width()/2, y - label.get_height()/2, label, z)
         else:
-            self.tex(x, y, label, z)
+            self.surf(x, y, label, z)
+
+    def surf(self, x, y, surf, z):
+        self.render_orders.append((0, x, y, surf, None, None, None, z))
 
     def tex(self, x, y, tex, z):
-        self.render_orders.append((0, x, y, tex, None, None, None, z))
+        self.render_orders.append((0, x, y, tex.surf, None, None, None, z))
 
     def rect(self, x, y, w, h, col, thick, z):
         self.render_orders.append((1, x, y, w, h, col, thick, z))
@@ -130,3 +122,16 @@ class Engine:
     def get_events(self):
         return pygame.event.get()
 
+    def set_texture_path(self, path):
+        self.texture_path = path
+
+    def load_texture(self, name, num, filename, mod_x=0, mod_y=0):
+        if filename.__class__ == str:
+            if self.texture_path is None:
+                raise Exception("No path defined for textures. Please set texture path before loading textures.")
+            img = pygame.image.load(self.texture_path + '\\' + filename).convert_alpha()
+        elif filename.__class__ == pygame.Surface:
+            img = filename
+        else:
+            raise Exception("Unknown type for loading a texture : " + filename.__class__)
+        self.textures[num] = Texture(name, img, mod_x, mod_y)

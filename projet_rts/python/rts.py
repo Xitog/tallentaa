@@ -13,66 +13,66 @@ from engine import *
 
 
 def load_textures(engine):
-    engine.textures = {
-        1: Texture('rock', 1, 'rock_brown.png', Colors.MINI_MAP_BROWN_DARK, False),
-        25: Texture('tree', 2, '25_arbre_1.png', Colors.MINI_MAP_GREEN_DARK, False, -32, -96),
-        26: Texture('tree', 2, '26_arbre_2.png', Colors.MINI_MAP_GREEN_DARK, False, -32, -64),
-        # Real textures
-        100: Texture('grass' , 200, 'grass_two_leaves.png', Colors.MINI_MAP_GREEN_LIGHT),
-        200: Texture('ground', 100, 'ground.png', Colors.MINI_MAP_BROWN),
-        300: Texture('water' , 300, 'water0.png', Colors.MINI_MAP_BLUE_LIGHT, False),
+    engine.set_texture_path('..\\..\\assets\\tiles32x32')
+    engine.load_texture('rock', 1, 'rock_brown.png')  # Colors.MINI_MAP_BROWN_DARK, False
+    engine.load_texture('tree', 25, '25_arbre_1.png', -32, -96)  # Colors.MINI_MAP_GREEN_DARK, False
+    engine.load_texture('tree', 26, '26_arbre_2.png', -32, -64)  # Colors.MINI_MAP_GREEN_DARK, False
+    # Real textures
+    engine.load_texture('grass', 100, 'grass_two_leaves.png')  # Colors.MINI_MAP_GREEN_LIGHT
+    engine.load_texture('ground', 200, 'ground.png')  # Colors.MINI_MAP_BROWN
+    engine.load_texture('water', 300, 'water0.png')  # Colors.MINI_MAP_BLUE_LIGHT, False),
+    engine.load_texture('w1', 9100, 'w1.png')  # Colors.MINI_MAP_BLUE_LIGHT, False
+    engine.load_texture('w2', 9200, 'w2.png')  # Colors.MINI_MAP_BLUE_LIGHT, False
+    engine.load_texture('w3', 9300, 'w3.png')  # Colors.MINI_MAP_BLUE_LIGHT, False
+    engine.load_texture('w4', 9400, 'w4.png')  # Colors.MINI_MAP_BLUE_LIGHT, False
+    engine.load_texture('w5', 9500, 'w5.png')  # Colors.MINI_MAP_BLUE_LIGHT, False
+    engine.load_texture('w6', 9600, 'w6.png')  # Colors.MINI_MAP_BLUE_LIGHT, False
+    engine.load_texture('w7', 9700, 'w7.png')  # Colors.MINI_MAP_BLUE_LIGHT, False
+    engine.load_texture('w8', 9800, 'w8.png')  # Colors.MINI_MAP_BLUE_LIGHT, False
+    engine.load_texture('water741', 8100, 'water741.png')  # Colors.MINI_MAP_BLUE_LIGHT, False
+    engine.load_texture('x2', 8200, 'x2.png')  # Colors.MINI_MAP_BLUE_LIGHT, False
+    engine.load_texture('x24', 8300, 'x24.png')  # Colors.MINI_MAP_BLUE_LIGHT, False
+    engine.load_texture('x4', 8400, 'x4.png')  # Colors.MINI_MAP_BLUE_LIGHT, False
+    engine.load_texture('water85', 8500, 'water85.png')  # Colors.MINI_MAP_BLUE_LIGHT, False
+    engine.load_texture('water325', 8700, 'water325.png')  # Colors.MINI_MAP_BLUE_LIGHT, False
+    engine.load_texture('water981', 8900, 'water981.png')  # Colors.MINI_MAP_BLUE_LIGHT, False
+    # Brou & Black
+    surf_brou = pygame.Surface((32, 32))
+    surf_brou.set_alpha(200, pygame.RLEACCEL)
+    surf_brou.fill((32, 32, 32, 128))
+    engine.load_texture('brou', 10000, surf_brou)  # Colors.MINI_MAP_FOG, False
+    surf_black = pygame.Surface((32, 32))
+    surf_black.set_alpha(255, pygame.RLEACCEL)
+    surf_black.fill((0, 0, 0, 255))
+    engine.load_texture('black', 11111, surf_black)  # Colors.MINI_MAP_BLACK, False
+    # Unit
+    engine.set_texture_path('..\\..\\assets\\buildings\\')
+    engine.load_texture('turret', 20001, 'cc3by_five_archers_turret_base.png')  # Colors.MINI_MAP_BLUE, False),
 
-        9100: Texture('w1', 9100, 'w1.png', Colors.MINI_MAP_BLUE_LIGHT, False),
-        9200: Texture('w2', 9200, 'w2.png', Colors.MINI_MAP_BLUE_LIGHT, False),
-        9300: Texture('w3', 9300, 'w3.png', Colors.MINI_MAP_BLUE_LIGHT, False),
-        9400: Texture('w4', 9400, 'w4.png', Colors.MINI_MAP_BLUE_LIGHT, False),
-        9500: Texture('w5', 9500, 'w5.png', Colors.MINI_MAP_BLUE_LIGHT, False),
-        9600: Texture('w6', 9600, 'w6.png', Colors.MINI_MAP_BLUE_LIGHT, False),
-        9700: Texture('w7', 9700, 'w7.png', Colors.MINI_MAP_BLUE_LIGHT, False),
-        9800: Texture('w8', 9800, 'w8.png', Colors.MINI_MAP_BLUE_LIGHT, False),
-        8100: Texture('water741', 8100, 'water741.png', Colors.MINI_MAP_BLUE_LIGHT, False),
-        8200: Texture('x2', 8200, 'x2.png', Colors.MINI_MAP_BLUE_LIGHT, False),
-        8300: Texture('x24', 8300, 'x24.png', Colors.MINI_MAP_BLUE_LIGHT, False),
-        8400: Texture('x4', 8400, 'x4.png', Colors.MINI_MAP_BLUE_LIGHT, False),
-        8500: Texture('water85', 8500, 'water85.png', Colors.MINI_MAP_BLUE_LIGHT, False),
-        8700: Texture('water325', 8700, 'water325.png', Colors.MINI_MAP_BLUE_LIGHT, False),
-        8900: Texture('water981', 8900, 'water981.png', Colors.MINI_MAP_BLUE_LIGHT, False),
+    # Computed textures
+    # 1300 : Texture('grass_water_lm', 1200, 'grass_water_ml.png', MINI_MAP_BLUE_LIGHT, False),
+    # minimap color depends !!!
 
-        10000: Texture('brou', 10000, pygame.Surface((32, 32)), Colors.MINI_MAP_FOG, False),
-        11111: Texture('black', 11111, pygame.Surface((32, 32)), Colors.MINI_MAP_BLACK, False),
-
-        'turret': Texture('turret', 20001, 'cc3by_five_archers_turret_base.png', Colors.MINI_MAP_BLUE, False),
-
-        # Computed textures
-        # 1300 : Texture('grass_water_lm', 1200, 'grass_water_ml.png', MINI_MAP_BLUE_LIGHT, False),
-        # minimap color depends !!!
-
-        #91 : Texture('w1', 91, 'w1.png', MINI_MAP_GREEN_LIGHT, False),
-        #92 : Texture('w2', 92, 'w2.png', MINI_MAP_GREEN_LIGHT, False),
-        #93 : Texture('w3', 93, 'w3.png', MINI_MAP_GREEN_LIGHT, False),
-        #94 : Texture('w4', 94, 'w4.png', MINI_MAP_GREEN_LIGHT, False),
-        #95 : Texture('w5', 95, 'w5.png', MINI_MAP_GREEN_LIGHT, False),
-        #96 : Texture('w6', 96, 'w6.png', MINI_MAP_GREEN_LIGHT, False),
-        #97 : Texture('w7', 97, 'w7.png', MINI_MAP_GREEN_LIGHT, False),
-        #98 : Texture('w8', 98, 'w8.png', MINI_MAP_GREEN_LIGHT, False),
-    }
-    # Ugly hack for fog
-    engine.textures[10000].img.set_alpha(200, pygame.RLEACCEL)
-    engine.textures[10000].img.fill((32, 32, 32, 128))
-    engine.textures[11111].img.set_alpha(255, pygame.RLEACCEL)
-    engine.textures[11111].img.fill((0, 0, 0, 255))
+    # 91 : Texture('w1', 91, 'w1.png', MINI_MAP_GREEN_LIGHT, False),
+    # 92 : Texture('w2', 92, 'w2.png', MINI_MAP_GREEN_LIGHT, False),
+    # 93 : Texture('w3', 93, 'w3.png', MINI_MAP_GREEN_LIGHT, False),
+    # 94 : Texture('w4', 94, 'w4.png', MINI_MAP_GREEN_LIGHT, False),
+    # 95 : Texture('w5', 95, 'w5.png', MINI_MAP_GREEN_LIGHT, False),
+    # 96 : Texture('w6', 96, 'w6.png', MINI_MAP_GREEN_LIGHT, False),
+    # 97 : Texture('w7', 97, 'w7.png', MINI_MAP_GREEN_LIGHT, False),
+    # 98 : Texture('w8', 98, 'w8.png', MINI_MAP_GREEN_LIGHT, False),
 
     # Mixing Texture
     for a in [9100, 9200, 9300, 9400, 9500, 9600, 9700, 9800, 8100, 8200, 8300, 8400, 8500, 8700, 8900]:
         for b in [100]:
-            s = pygame.Surface((32,32))
-            s.blit(engine.textures[b].img, (0, 0))
-            s.blit(engine.textures[a].img, (0, 0))
+            s = pygame.Surface((32, 32))
+            s.blit(engine.textures[b].surf, (0, 0))
+            s.blit(engine.textures[a].surf, (0, 0))
             if a > 9000:
                 n = b*10+a-9000
             else:
                 n = b*10+1000+a-8000
-            engine.textures[n] = Texture(str(n), n, s, engine.textures[a].mini, engine.textures[a].passable)
+            engine.load_texture(str(n), n, s)  # engine.textures[a].mini, engine.textures[a].passable
 
 
 class CameraStorm:
@@ -330,9 +330,9 @@ class Camera:
                 dx = xx * 32 + self.x
                 dy = yy * 32 + self.y
                 # draw terrain
-                self.engine.tex(dx, dy, self.engine.textures[t].img, 0)
+                self.engine.tex(dx, dy, self.engine.textures[t], 0)
                 if d != 0 and d != 99:  # there is visible blocking doodad, 0 = passable, 99 = invisible and not passable
-                    self.engine.tex(dx + self.engine.textures[d].mod_x, dy + self.engine.textures[d].mod_y, self.engine.textures[d].img, 0.5)
+                    self.engine.tex(dx + self.engine.textures[d].mod_x, dy + self.engine.textures[d].mod_y, self.engine.textures[d], 0.5)
                     if self.dev_mode:
                         self.engine.rect(dx, dy, 32, 32, Colors.RED, 1, 1)
                 # draw unit
@@ -369,7 +369,7 @@ class Camera:
                         self.engine.circle(u.real_x + self.x, u.real_y + self.y, u.size, u.player.color, 0, 1)
                 elif su[0] == 2:  # Building
                     u = su[1]
-                    self.engine.tex(u.x * 32 + self.x, u.y * 32 + self.y, self.engine.textures['turret'].img, 2)
+                    self.engine.tex(u.x * 32 + self.x, u.y * 32 + self.y, self.engine.textures[20001], 2)
                     #if xx == u.grid_x and yy == u.grid_y:
                     #    self.engine.rect(dx, dy, u.type.grid_w * 32, u.type.grid_h * 32, u.player.color, 0, 2)
                     if u in self.selected:
@@ -377,9 +377,9 @@ class Camera:
                 # draw fog or black
                 fog = self.player.fog_map[yy][xx]
                 if fog == 0:
-                    self.engine.tex(dx, dy, self.engine.textures[11111].img, 10)
+                    self.engine.tex(dx, dy, self.engine.textures[11111], 10)
                 elif fog == 1:
-                    self.engine.tex(dx, dy, self.engine.textures[10000].img, 10)
+                    self.engine.tex(dx, dy, self.engine.textures[10000], 10)
                 # DEBUG
                 if self.dev_mode:
                     self.engine.text(dx, dy, "%(v)04d" % {"v": self.player.world.debug_map[yy][xx]}, Colors.RED, 1)
@@ -448,18 +448,18 @@ class Camera:
                 t = self.player.world.world_map[yy][xx]
                 d = self.player.world.passable_map[yy][xx]
                 if d != 0 and d != 99:
-                    self.engine.rect(xx * 3 + self.GUI_mini_map_x, yy * 3 + self.GUI_interface_y +1, 3, 3, self.engine.textures[d].mini, 0, 50)
+                    self.engine.rect(xx * 3 + self.GUI_mini_map_x, yy * 3 + self.GUI_interface_y +1, 3, 3, self.game.textures_info[d].mini, 0, 50)
                 else:
-                   self.engine.rect(xx * 3 + self.GUI_mini_map_x, yy * 3 + self.GUI_interface_y +1, 3, 3, self.engine.textures[t].mini, 0, 50)
+                   self.engine.rect(xx * 3 + self.GUI_mini_map_x, yy * 3 + self.GUI_interface_y +1, 3, 3, self.game.textures_info[t].mini, 0, 50)
                 u = self.player.world.unit_map[yy][xx]
                 if u != 0:
                     if u[0] == 1 or u[0] == 2:
                         self.engine.rect(xx * 3 + self.GUI_mini_map_x, yy * 3 + self.GUI_interface_y +1, 3, 3, u[1].player.color, 0, 50)
                 fog = self.player.fog_map[yy][xx]
                 if fog == 0:
-                    self.engine.rect(xx * 3 + self.GUI_mini_map_x, yy * 3 + self.GUI_interface_y +1, 3, 3, self.engine.textures[11111].mini, 0, 50)
+                    self.engine.rect(xx * 3 + self.GUI_mini_map_x, yy * 3 + self.GUI_interface_y +1, 3, 3, self.game.textures_info[11111].mini, 0, 50)
                 elif fog == 1:
-                    self.engine.rect(xx * 3 + self.GUI_mini_map_x, yy * 3 + self.GUI_interface_y +1, 3, 3, self.engine.textures[10000].mini, 0, 50)
+                    self.engine.rect(xx * 3 + self.GUI_mini_map_x, yy * 3 + self.GUI_interface_y +1, 3, 3, self.game.textures_info[10000].mini, 0, 50)
 
 
 class Particles:
@@ -525,7 +525,8 @@ class Particle:
 # unit_map can be : 0 : void, (1, u) : unit u is here, (-1, u) : unit u is moving here
 class World:
     
-    def __init__(self, world_map, textures_info):
+    def __init__(self, game, world_map, textures_info):
+        self.game = game
         self.particles = Particles()
         if len(world_map) == 0:
             raise Exception("Empty map detected")
@@ -546,7 +547,7 @@ class World:
                 r = world_map[yy][xx]  # 101, 228, 312
                 self.passable_map[yy][xx] = r % 100
                 r = self.world_map[yy][xx]  # 100, 200, 300
-                if not textures_info[r].passable:  # TODO: we need the texture info only here
+                if not self.game.textures_info[r].passable:  # TODO: we need the texture info only here
                     self.passable_map[yy][xx] = 99
         
         # Computation of passage from tex to tex
@@ -723,7 +724,7 @@ class Game:
         self.name = name
     
     def set_map(self, game_map):
-        self.world = World(game_map, self.elem_types)
+        self.world = World(self, game_map, self.elem_types)
 
     def set_elem_types(self, elem_types):
         self.elem_types = elem_types
@@ -1533,19 +1534,62 @@ def game_loop(game, camera, engine):
         return True
 
 
+class TextureInfo:
+
+    def __init__(self, mini_map_color, passable):
+        self.mini = mini_map_color
+        self.passable = passable
+
+
 def mod_basic(game, engine):
 
     game.set_elem_types(engine.textures)  # TODO: pass only what we need (passable information see World class)
     game.set_unit_types({"soldier": UnitType("Soldier", size=10, vision=3, range=10, life=100, dom=5, speed=8, reload=50),
                          "elite": UnitType("Elite", size=10, vision=4, range=10, life=100, dom=10, speed=8, reload=50),
                          "big": UnitType("Big", size=20, vision=2, range=30, life=300, dom=20, speed=8, reload=50)})
-    game.set_building_types({"mine" : BuildingType("Mine", 2, 2, 100, (0,50), 2),
-                             "solar" : BuildingType("Solar", 1, 2, 80, (0, 50), 2),
-                             "radar" : BuildingType("Radar", 1, 1, 80, (50, 200), 2),
-                             "barracks" : BuildingType("Barracks", 3, 2, 300, (50, 100), 2),
-                             "factory" : BuildingType("Factory", 3, 2, 500, (200, 200), 2),
-                             "laboratory" : BuildingType("Laboratory", 2, 2, 250, (100, 400), 2),
+    game.set_building_types({"mine": BuildingType("Mine", 2, 2, 100, (0,50), 2),
+                             "solar": BuildingType("Solar", 1, 2, 80, (0, 50), 2),
+                             "radar": BuildingType("Radar", 1, 1, 80, (50, 200), 2),
+                             "barracks": BuildingType("Barracks", 3, 2, 300, (50, 100), 2),
+                             "factory": BuildingType("Factory", 3, 2, 500, (200, 200), 2),
+                             "laboratory": BuildingType("Laboratory", 2, 2, 250, (100, 400), 2),
                             }, ["solar", "mine", "radar", "barracks", "factory", "laboratory"])
+
+    game.textures_info = {
+        1: TextureInfo(Colors.MINI_MAP_BROWN_DARK, False),  # mini, passable
+        25: TextureInfo(Colors.MINI_MAP_GREEN_DARK, False),
+        26: TextureInfo(Colors.MINI_MAP_GREEN_DARK, False),
+        # Real textures
+        100: TextureInfo(Colors.MINI_MAP_GREEN_LIGHT, True),
+        200: TextureInfo(Colors.MINI_MAP_BROWN, True),
+        300: TextureInfo(Colors.MINI_MAP_BLUE_LIGHT, False),
+        9100: TextureInfo(Colors.MINI_MAP_BLUE_LIGHT, False),
+        9200: TextureInfo(Colors.MINI_MAP_BLUE_LIGHT, False),
+        9300: TextureInfo(Colors.MINI_MAP_BLUE_LIGHT, False),
+        9400: TextureInfo(Colors.MINI_MAP_BLUE_LIGHT, False),
+        9500: TextureInfo(Colors.MINI_MAP_BLUE_LIGHT, False),
+        9600: TextureInfo(Colors.MINI_MAP_BLUE_LIGHT, False),
+        9700: TextureInfo(Colors.MINI_MAP_BLUE_LIGHT, False),
+        9800: TextureInfo(Colors.MINI_MAP_BLUE_LIGHT, False),
+        8100: TextureInfo(Colors.MINI_MAP_BLUE_LIGHT, False),
+        8200: TextureInfo(Colors.MINI_MAP_BLUE_LIGHT, False),
+        8300: TextureInfo(Colors.MINI_MAP_BLUE_LIGHT, False),
+        8400: TextureInfo(Colors.MINI_MAP_BLUE_LIGHT, False),
+        8500: TextureInfo(Colors.MINI_MAP_BLUE_LIGHT, False),
+        8700: TextureInfo(Colors.MINI_MAP_BLUE_LIGHT, False),
+        8900: TextureInfo(Colors.MINI_MAP_BLUE_LIGHT, False),
+        10000: TextureInfo(Colors.MINI_MAP_FOG, False),
+        11111: TextureInfo(Colors.MINI_MAP_BLACK, False),
+        20001: TextureInfo(Colors.MINI_MAP_BLUE, False),
+    }
+    # Mixing Texture
+    for a in [9100, 9200, 9300, 9400, 9500, 9600, 9700, 9800, 8100, 8200, 8300, 8400, 8500, 8700, 8900]:
+        for b in [100]:
+            if a > 9000:
+                n = b*10+a-9000
+            else:
+                n = b*10+1000+a-8000
+            game.textures_info[n] = TextureInfo(game.textures_info[a].mini, game.textures_info[a].passable)
 
 
 def level_E1L1(game):
