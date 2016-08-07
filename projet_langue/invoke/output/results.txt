@@ -377,85 +377,86 @@ Tous les verbes français
 154. #179 produire
 155. #67 promettre
 156. #142 proposer
-157. #66 présenter (se)
-158. #178 prêter
-159. #21002 père
-160. #68 quitter
-161. #26 raconter
-162. #27 recevoir
-163. #28 regarder
-164. #29 remercier
-165. #146 remplir
-166. #30 rencontrer
-167. #415 rendre
-168. #39 reposer (se)
-169. #420 ressembler
-170. #32 rester
-171. #181 retenir
-172. #407 retourner
-173. #136 revenir
-174. #35 rire
-175. #421 ronfler
-176. #145 réduire
-177. #180 réfléchir
-178. #427 régler et quitter sa chambre d'hôtel
-179. #31 répondre
-180. #33 réussir
-181. #34 réveiller (se)
-182. #182 rêver
-183. #90125 s'attendre
-184. #429 s'enregistrer
-185. #430 s'entraîner
-186. #213 saigner
-187. #37 sauter
-188. #90413 sauvegarder
-189. #413 sauver
-190. #38 savoir
-191. #90430 se former
-192. #422 se taire
-193. #419 se transformer
-194. #41 sentir
-195. #194 signifier
-196. #138 sortir
-197. #214 souffler
-198. #42 souffrir
-199. #43 souhaiter
-200. #40 souvenir (se)
-201. #44 suivre
-202. #414 surprendre
-203. #21005 sœur
-204. #45 tenir
-205. #46 tirer
-206. #17 tomber
-207. #16 toucher
-208. #15 tourner
-209. #14 traduire
-210. #13 travailler
-211. #12 trouver
-212. #201 tuer
-213. #11 utiliser
-214. #410 vaincre
-215. #183 valoir
-216. #10 vendre
-217. #9 venir
-218. #184 vider
-219. #8 visiter
-220. #7 vivre
-221. #6 voir
-222. #5 voler
-223. #3 vouloir
-224. #2 voyager
-225. #227 vérifier
-226. #417 échanger
-227. #93 écouter
-228. #92 écrire
-229. #141 éteindre
-230. #85 étudier
-231. #411 éviter
-232. #86 être
-233. #197 être assis
-234. #166 être d'accord
-235. #196 être debout
+157. #434 préparer
+158. #66 présenter (se)
+159. #178 prêter
+160. #21002 père
+161. #68 quitter
+162. #26 raconter
+163. #27 recevoir
+164. #28 regarder
+165. #29 remercier
+166. #146 remplir
+167. #30 rencontrer
+168. #415 rendre
+169. #39 reposer (se)
+170. #420 ressembler
+171. #32 rester
+172. #181 retenir
+173. #407 retourner
+174. #136 revenir
+175. #35 rire
+176. #421 ronfler
+177. #145 réduire
+178. #180 réfléchir
+179. #427 régler et quitter sa chambre d'hôtel
+180. #31 répondre
+181. #33 réussir
+182. #34 réveiller (se)
+183. #182 rêver
+184. #90125 s'attendre
+185. #429 s'enregistrer
+186. #430 s'entraîner
+187. #213 saigner
+188. #37 sauter
+189. #90413 sauvegarder
+190. #413 sauver
+191. #38 savoir
+192. #90430 se former
+193. #422 se taire
+194. #419 se transformer
+195. #41 sentir
+196. #194 signifier
+197. #138 sortir
+198. #214 souffler
+199. #42 souffrir
+200. #43 souhaiter
+201. #40 souvenir (se)
+202. #44 suivre
+203. #414 surprendre
+204. #21005 sœur
+205. #45 tenir
+206. #46 tirer
+207. #17 tomber
+208. #16 toucher
+209. #15 tourner
+210. #14 traduire
+211. #13 travailler
+212. #12 trouver
+213. #201 tuer
+214. #11 utiliser
+215. #410 vaincre
+216. #183 valoir
+217. #10 vendre
+218. #9 venir
+219. #184 vider
+220. #8 visiter
+221. #7 vivre
+222. #6 voir
+223. #5 voler
+224. #3 vouloir
+225. #2 voyager
+226. #227 vérifier
+227. #417 échanger
+228. #93 écouter
+229. #92 écrire
+230. #141 éteindre
+231. #85 étudier
+232. #411 éviter
+233. #86 être
+234. #197 être assis
+235. #166 être d'accord
+236. #196 être debout
 
 
 
@@ -487,28 +488,29 @@ Verbes non traduits
 23. #21003 mère
 24. #433 mériter
 25. #412 obéir
-26. #21002 père
-27. #415 rendre
-28. #420 ressembler
-29. #407 retourner
-30. #421 ronfler
-31. #427 régler et quitter sa chambre d'hôtel
-32. #90125 s'attendre
-33. #429 s'enregistrer
-34. #430 s'entraîner
-35. #213 saigner
-36. #90413 sauvegarder
-37. #413 sauver
-38. #90430 se former
-39. #422 se taire
-40. #419 se transformer
-41. #214 souffler
-42. #414 surprendre
-43. #21005 sœur
-44. #410 vaincre
-45. #227 vérifier
-46. #417 échanger
-47. #411 éviter
+26. #434 préparer
+27. #21002 père
+28. #415 rendre
+29. #420 ressembler
+30. #407 retourner
+31. #421 ronfler
+32. #427 régler et quitter sa chambre d'hôtel
+33. #90125 s'attendre
+34. #429 s'enregistrer
+35. #430 s'entraîner
+36. #213 saigner
+37. #90413 sauvegarder
+38. #413 sauver
+39. #90430 se former
+40. #422 se taire
+41. #419 se transformer
+42. #214 souffler
+43. #414 surprendre
+44. #21005 sœur
+45. #410 vaincre
+46. #227 vérifier
+47. #417 échanger
+48. #411 éviter
 
 
-Last edit on 2016-07-03 11:59:44
+Last edit on 2016-08-07 18:18:05

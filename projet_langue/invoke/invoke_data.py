@@ -1011,6 +1011,7 @@ def get_verbs():
         (190125, 'en', 'expect', 'verb', 7),
         (100432, 'en', 'control', 'verb', 7),
         (100433, 'en', 'deserve', 'verb', 7),
+        (100434, 'en', 'prepare', 'verb', 7),
         # Done fr
         (407, 'fr', 'retourner', 'verb', 7),
         (409, 'fr', 'inquiéter (s\')', 'verb', 7),
@@ -1042,6 +1043,7 @@ def get_verbs():
         (90125, 'fr', 's\'attendre', 'verb', 7),
         (433, 'fr', 'mériter', 'verb', 7),
         (285, 'fr', 'faire attention', 'verb', 7),
+        (434, 'fr', 'préparer', 'verb', 7),
         # to turn traitor : trahir (devenir traître)
         # to stand by : attendre
         # to fallback : se replier
@@ -2442,7 +2444,8 @@ def get_traductions():
         (630036, 190125, 90125, 's\'attendre à qqchose : to expect smth', None), # to expect => s'attendre (à)
         (630037, 100433, 433, None, None), # to deserve => mériter
         (630038, 100285, 285, 'faire attention à qqchose : look out for smth', None), # to look out => faire attention
-        # next is 40
+        (630040, 100434, 434, None, None),
+        # next is 41
         #----------------------------------------------------------------------
         # VAGUE 1 TRADUCTIONS EN->EO
         #----------------------------------------------------------------------

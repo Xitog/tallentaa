@@ -48,6 +48,8 @@ def load_textures(engine):
     # Unit
     engine.set_texture_path('..\\..\\assets\\buildings\\')
     engine.load_texture('turret', 20001, 'cc3by_five_archers_turret_base.png')  # Colors.MINI_MAP_BLUE, False),
+    engine.set_texture_path('..\\..\\assets\\32x32\\entities\\')
+    engine.load_texture('skeleton_face', 50001, 'skeleton_face.png', -16, -48)
 
     # Computed textures
     # 1300 : Texture('grass_water_lm', 1200, 'grass_water_ml.png', MINI_MAP_BLUE_LIGHT, False),
@@ -363,10 +365,13 @@ class Camera:
                         self.engine.circle(u.real_x + self.x, u.real_y + self.y, u.size, u.player.color, 0, 1)
                         if u.player == self.player:
                             self.engine.circle(u.real_x + self.x, u.real_y + self.y, u.size+3, Colors.GREEN, 2, 1)
+                            self.engine.tex(u.real_x + self.x, u.real_y + self.y, self.engine.textures[50001], 3)
                         else:
                             self.engine.circle(u.real_x + self.x, u.real_y + self.y, u.size+3, Colors.RED, 2, 1)
+                            self.engine.tex(u.real_x + self.x, u.real_y + self.y, self.engine.textures[50001], 3)
                     else:
                         self.engine.circle(u.real_x + self.x, u.real_y + self.y, u.size, u.player.color, 0, 1)
+                        self.engine.tex(u.real_x + self.x, u.real_y + self.y, self.engine.textures[50001], 3)
                 elif su[0] == 2:  # Building
                     u = su[1]
                     self.engine.tex(u.x * 32 + self.x, u.y * 32 + self.y, self.engine.textures[20001], 2)

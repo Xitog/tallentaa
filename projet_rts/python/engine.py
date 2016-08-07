@@ -86,7 +86,7 @@ class Engine:
         self.render_orders.append((0, x, y, surf, None, None, None, z))
 
     def tex(self, x, y, tex, z):
-        self.render_orders.append((0, x, y, tex.surf, None, None, None, z))
+        self.render_orders.append((0, x + tex.mod_x, y + tex.mod_y, tex.surf, None, None, None, z))
 
     def rect(self, x, y, w, h, col, thick, z):
         self.render_orders.append((1, x, y, w, h, col, thick, z))
