@@ -1,12 +1,15 @@
 __author__ = 'dgx'
 
 from engine import Engine, Colors
+from game import Map, Pair
 
 
 def load_textures(engine):
     engine.set_texture_path('..\\..\\assets\\tiles64x32')
-    engine.load_texture('cursor', 0, 'cursor_1.png')
-    engine.load_texture('grass', 1, 'grass_1.png')
+    engine.load_texture('cursor_1', 1000, 'cursor_1.png')
+    engine.load_texture('cursor_2', 1001, 'cursor_2.png')
+    engine.load_texture('grass', 0, 'grass_1.png')
+    engine.load_texture('rock', 10, 'rock_1.png', 0, -16)
     engine.load_texture('tree', 100, 'tree_1.png')  # TODO : Center better the tree
 
     # engine.textures = {
@@ -26,9 +29,32 @@ def start():
     e.stop()
     print('Goodbye')
 
+s_x = 0
+start_x = 0
+start_y = 200
+
+
+def matrix_to_screen(i, j):
+    global s_x, start_x, start_y
+    x = start_x + (j + i) * 32 + s_x
+    y = start_y + (i - j) * 16
+    return x, y
+
+
+def screen_to_matrix(x, y):
+    global s_x
+    x = x - s_x + 32 - start_x
+    y = y + 16 - start_y
+    x = int(x / 32)
+    y = int(y / 16)
+    return x, y
+
 
 def game_loop(engine):
-    s_x = 0
+    global s_x, start_x, start_y
+    xmap = Map(Pair(10, 10))
+    xmap.set_layer()
+    xmap.set(5, 5, 1, 0)
     debug = False
     while True:
         # Update + Event
@@ -48,26 +74,31 @@ def game_loop(engine):
         engine.text(100, 100, "Mini flare 0.1", Colors.YELLOW, 40)
         # Cursor
         mx, my = engine.get_mouse_pos()
-        engine.tex(mx - 32, my - 16, engine.textures[0], 15)
+        # engine.tex(mx, my, engine.textures[1001], 1000)
         # imx = int((mx - 32 - 200) / 32 - s_x)
         # imy = int((my - 16 - 200) / 16)
-        imy = int((((mx - 200 - s_x) / 32) - ((my - 200) / 16)) / 2)
-        imx = int((my - 200) / 16 + imy)  # TODO : perfect it
-        print(mx, my, imx, imy)
+        imy = int((((mx - start_x - s_x) / 32) - ((my - start_y) / 16)) / 2)
+        imx = int((my - start_y) / 16 + imy)  # TODO : perfect it
+        r = screen_to_matrix(mx, my)
+        print(mx, my, imx, imy, r[0], r[1])
         # Background
-        for i in range(0, 10):
-            for j in range(0, 10):
-                x = 200 + (j + i) * 32 + s_x
-                y = 200 + (i - j) * 16
-                engine.tex(x, y, engine.textures[1], 5)
+        cpt = 0
+        for i in range(0, xmap.size.x):
+            for j in range(0, xmap.size.y):
+                x, y = matrix_to_screen(i, j)
+                t = xmap.get(i, j)
+                engine.tex(x, y, engine.textures[0], 5)
+                if t == 1:
+                    engine.tex(x, y, engine.textures[10], 10)
                 if debug:
-                    engine.tex(x, y, engine.textures[0], 6)
-                    engine.text(x + 32, y + 16, str(i) + ':' + str(j), Colors.YELLOW, 7, True, 10)
+                    engine.tex(x, y, engine.textures[1000], 1000)
+                    engine.text(x + 32, y + 16, str(i) + ':' + str(j) + ':' + str(cpt), Colors.YELLOW, 1000, True, 10)
                 if i == 4 and j == 4:
-                    engine.tex(x, y, engine.textures[100], 10)
+                    engine.tex(x, y, engine.textures[100], 50)
                 if i == imx and j == imy:
-                    engine.tex(x, y, engine.textures[0], 8)
+                    engine.tex(x, y, engine.textures[1001], 1000)
                 # print(x, y)
+                cpt += 1
         engine.render()
 
 

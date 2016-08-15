@@ -39,7 +39,12 @@ public class Controller {
     void updateInfo() {
         int caretPos = jyx.getTextPane().getCaretPosition();
         Analyze ana = new Analyze(this.jyx.getTextPane().getDocument(), caretPos);
-        jyx.setInfo(" " + ana.getNbChars() + " characters on " + ana.getNbLines() + " lines. Caret at " + caretPos + ", line " + ana.getCarretLine() + ".");
+        jyx.setInfo(" " + ana.getNbChars() + " characters on " + ana.getNbLines() + " lines." +
+                    "Caret at" + 
+                    " char in text : " + caretPos + "/" + ana.getNbChars() + 
+                    " line in lines : " + ana.getOffsetLine() + "/" + ana.getNbLines() + 
+                    " char in line : " + ana.getOffsetPosInLine() + "/" + 
+                        ana.getOffsetLineLength() + ".");
     }
     
     void update(int event, int int1, int int2) {

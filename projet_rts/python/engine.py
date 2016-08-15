@@ -76,6 +76,8 @@ class Engine:
         pygame.quit()
 
     def text(self, x, y, text, color, z, center=False, size=10):
+        if size not in self.fonts:
+            raise Exception("Size not found in fonts.")
         label = self.fonts[size].render(text, 1, color.value)
         if center:
             self.surf(x - label.get_width()/2, y - label.get_height()/2, label, z)

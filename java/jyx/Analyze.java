@@ -3,16 +3,12 @@ package jyx;
 import java.util.ArrayList;
 import javax.swing.text.Document;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Element;
 
 public class Analyze {
     
-    int nb_lines;
-    int nb_chars;
-    ArrayList<Integer> starts_of_line;
-    int pos_line;
-    
     Analyze(Document dsd, int offset) {
-        this();
+        /*
         try {
             nb_chars = dsd.getLength();
             String s = dsd.getText(0, nb_chars);
@@ -21,73 +17,52 @@ public class Analyze {
             System.out.println("Bad location exception");
             analyze("", offset);
         }
+        */
+        analyze(dsd, offset);
     }
     
-    Analyze(String s, int offset) {
-        this();
-        this.nb_lines = 1;
-        this.nb_chars = 0;s.length();
-        this.pos_line = -1;
-        this.starts_of_line = new ArrayList<Integer>();
-        this.addStartOfLine(0);
-        analyze(s, offset);
-    }
+    Document doc;
+    int offset;
+    int offsetElementIndex;
+    Element offsetElement;
     
-    Analyze() {
-        this.nb_lines = 1;
-        this.nb_chars = 0;
-        this.pos_line = -1;
-        this.starts_of_line = new ArrayList<Integer>();
-        this.addStartOfLine(0);
-    }
-    
-    void analyze(String s, int offset) {
-        this.nb_chars = s.length();
-        // System.out.println("getLength() of Document : " + nb_chars + " vs length() of String : " + s.length());
-        for (int i=0; i < this.nb_chars; i++) {
-            if (i == offset) {
-                this.setPosLine(this.nb_lines);
-            }
-            if (s.charAt(i) == '\n') {
-                this.nb_lines += 1;
-                this.addStartOfLine(i);
-                // System.out.println(">>> New line at " + i);
-            }
-            //System.out.println(">>> " + i + ". [" + s.charAt(i) + "]");
-        }
-        if (offset == this.nb_chars) {
-            this.setPosLine(this.nb_lines);
-        }
-    }
-    
-    void setNbLines(int i) {
-        this.nb_lines = i;
-    }
-    
-    int getNbLines() {
-        return this.nb_lines;
-    }
-    
-    void setNbChars(int i) {
-        this.nb_chars = i;
+    void analyze(Document doc, int offset) {
+        this.doc = doc;
+        this.offset = offset;
+        Element root = this.doc.getDefaultRootElement();
+        //for (int i = 0; i < root.getElementCount(); i++) {
+        //    Element e = root.getElement(i);
+        //    System.out.println("" + i + ". s=" + e.getStartOffset() + " e=" + e.getEndOffset());
+        //}
+        this.offsetElementIndex = root.getElementIndex(this.offset);
+        this.offsetElement = root.getElement(offsetElementIndex);
     }
     
     int getNbChars() {
-        return this.nb_chars;
+        return this.doc.getLength();
     }
     
-    void addStartOfLine(int pos) {
-        this.starts_of_line.add(pos);
+    int getNbLines() {
+        return this.doc.getDefaultRootElement().getElementCount();
+    }
+
+    int getOffsetLine() {
+        return this.offsetElementIndex + 1;
     }
     
-    void setPosLine(int i) {
-        this.pos_line = i;
+    int getOffsetLineLength() {
+        return offsetElement.getEndOffset() - offsetElement.getStartOffset() - 1; // \n not counted
     }
     
-    int getCarretLine() {
-        return this.pos_line;
+    int getOffsetPosInLine() {
+        return this.offset - offsetElement.getStartOffset();
     }
     
+    Element getOffsetElement() {
+        return offsetElement;
+    }
+    
+    /*
     int getStartOfLine(int lineNum) {
         if (lineNum < 1) {
             System.out.println("No!"); // TODO:
@@ -95,4 +70,5 @@ public class Analyze {
         }
         return (int) this.starts_of_line.get(lineNum-1);
     }
+    */
 }

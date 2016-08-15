@@ -10,6 +10,7 @@ __version__ = "$Revision: 1 $"
 
 import math
 from engine import *
+from game import Pair
 
 
 def load_textures(engine):
@@ -692,7 +693,7 @@ class World:
         return self.passable_map[y][x] == 0 and self.unit_map[y][x] == 0
     
     def is_unit(self, x, y):
-        return self.unit_map[y][x] != 0 and self.unit_map[y][x][0] != -1 # 1 (unit) or 2 (building)
+        return self.unit_map[y][x] != 0 and self.unit_map[y][x][0] != -1  # 1 (unit) or 2 (building)
     
     def get_unit_at(self, x, y):
         if 0 <= x < self.size32.x and 0 <= y < self.size32.y:
@@ -900,36 +901,6 @@ class Order:
         self.y = y
         self.target = target
         self.kind = kind
-
-
-class Pair:
-    def __init__(self, x, y, rep=1):
-        if rep != 1 and rep != 32:
-            raise Exception("rep must be 32 or 1")
-        self.x = x
-        self.y = y
-        self.rep = rep
-
-    def set(self, x, y):
-        self.x = x
-        self.y = y
-
-    def __eq__(self, other):
-        if other is None:
-            return False
-        if self.rep != other.rep:
-            x = other.x * 32
-            y = other.y * 32
-        else:
-            x = other.x
-            y = other.y
-        return isinstance(other, self.__class__) and self.x == x and self.y == y
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-    def __str__(self):
-        return "[" + str(self.x) + ", " + str(self.y) + "]"
 
 
 class BuildLoad:

@@ -12,6 +12,8 @@ import javax.swing.text.AbstractDocument.DefaultDocumentEvent;
 import javax.swing.text.StyleContext;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
+import javax.swing.text.Document;
+import javax.swing.text.Element;
 
 import javax.swing.event.CaretListener;
 import javax.swing.event.CaretEvent;
@@ -247,29 +249,79 @@ public class Jyx extends JPanel implements ActionListener, CaretListener {
                 }
                 panel.getController().update(Controller.WRITING);
                 System.out.println("Inserted : offset = " + offs + " str = " + str);
+                this.parse(offs);
             } catch (BadLocationException ble) {
                 System.out.println("Bad location exception");
             }
     	}
         
+        public int elementLength(Element e) {
+            return e.getEndOffset() - e.getStartOffset() - 1;
+        }
+        
+        public String elementText(Element e) {
+            String s = "";
+            try {
+                s = this.getText(e.getStartOffset(), this.elementLength(e));
+            } catch (BadLocationException ble) {
+                System.out.println("Bad location exception in parse for offset = " + e.getStartOffset());
+            } finally {
+                return s;
+            }
+        }
+        
+        public void parse(int offset) {
+            Element e = this.getParagraphElement(offset);
+            int e_length = this.elementLength(e);
+            if (e_length > 1) {
+                String s = this.elementText(e);
+                if (s.charAt(0) == '-' && s.charAt(1) == '-') {
+                    this.setCharacterAttributes(e.getStartOffset(), e_length, this.getStyle("italic"), true);
+                    return;
+                }
+            }
+            this.setCharacterAttributes(e.getStartOffset(), e_length, this.getStyle("regular"), true);
+        }
+        
+        public String safeGetText() { // don't translate \n by \r\n on windows :-)
+            String text = "";
+            try {
+                int length = this.getLength();
+                text = this.getText(0, length);
+            } catch (BadLocationException ble) {
+                System.out.println("Bad location exception");
+            } finally {
+                return text;
+            }
+        }
+        
         @Override
         public void remove(int offset, int len) {
-            int backup = offset;
-            String s = panel.getTextPane().getText();
+            /*
+            int backup_offset = offset;
+            int backup_len = len;
+            String s = this.safeGetText();
             if (len == 1) {
                 Analyze ana = new Analyze(s, offset);
-                int ii = ana.getStartOfLine(ana.getCarretLine());
-                if (ii != 0) {
-                    ii += 1;
-                }
-                System.out.println("Start of line : " + ii);
+                int start_of_line = ana.getStartOfLine(ana.getCarretLine());
                 int char_count = 0;
+                for (int i = start_of_line + 1; i < s.length() && s.charAt(i) != '\n' && i < offset; i++) {
+                    char_count += 1;
+                }
+                
+                System.out.println("START of line " + ana.getCarretLine() + " @" + start_of_line);
+                int nearest_tab = 0;
+                if (offset == start_of_line || (offset - start_of_line + 1) % 4 == 0) {
+                    nearest_tab = offset;
+                }
+                System.out.println("Position of offset is @" + offset + ". Nearest TAB is @" + nearest_tab);
+                char_count = 0;
                 int tab_count = 0;
-                int last_tab_offset = ii;
+                int last_tab_offset = start_of_line;
                 int white_count = 0;
                 boolean only_white = true;
-                for (int i = ii; i < s.length() && s.charAt(i) != '\n' && i <= offset; i++) {
-                    System.out.println("My line : " + i + ". " + s.charAt(i));
+                for (int i = start_of_line; i < s.length() && s.charAt(i) != '\n' && i <= offset; i++) {
+                    System.out.println("@" + i + ". " + s.charAt(i));
                     char_count += 1;
                     if (char_count != 0 && (char_count % 4) == 0) {
                         tab_count += 1;
@@ -278,8 +330,7 @@ public class Jyx extends JPanel implements ActionListener, CaretListener {
                             white_count = 0;
                         }
                         System.out.println("TAB");
-                    } 
-                    if (Character.isWhitespace(s.charAt(i))) {
+                    } else if (Character.isWhitespace(s.charAt(i))) {
                         white_count += 1;
                     } else {
                         only_white = false;
@@ -290,15 +341,25 @@ public class Jyx extends JPanel implements ActionListener, CaretListener {
                     offset = last_tab_offset;
                     len = white_count;
                 }
-            }
+                if (len == 0) {
+                    offset = backup_offset;
+                    len = backup_len;
+                    System.out.println("0 length removal detected!");
+                }
+            }*/
             try {
-                s = this.getText(offset, len);
+                //s = this.getText(offset, len);
                 super.remove(offset, len);
+                if (offset > 1) {
+                    this.parse(offset-1);
+                } else {
+                    this.parse(0);
+                }
             } catch (BadLocationException ble) {
                 System.out.println("Bad location exception");
             }
             panel.getController().update(Controller.REMOVING);
-            System.out.println("Removed : offset = " + offset + " len = " + len + " s = [" + s + "]");
+            //System.out.println("Removed : offset = " + offset + " len = " + len + " s = [" + s + "]");
         }
         
         /*

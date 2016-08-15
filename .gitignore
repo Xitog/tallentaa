@@ -7,3 +7,5 @@ java/working_buffer.txt
 projet_format/yodata/output/*.png
 *.jar
 *.pyc
+*.jar
+*.pyc
