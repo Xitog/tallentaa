@@ -1659,8 +1659,6 @@ if __name__ == '__main__':
     #print( math.degrees(get_angle(2, 2, 1, 3))) # A -> G -135
     #print( math.degrees(get_angle(2, 2, 1, 2))) # A -> H +180 // -180
     
-    #exit()
-    
     import sys
     _maj, _min = sys.version_info[:2]
     print('Starting on Python ' + str(_maj) + "." + str(_min) + " with pygame " + pygame.version.ver)
