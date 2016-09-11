@@ -1,32 +1,21 @@
 package jyx;
 
 import java.util.ArrayList;
-import javax.swing.text.Document;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
 
 public class Analyze {
     
-    Analyze(Document dsd, int offset) {
-        /*
-        try {
-            nb_chars = dsd.getLength();
-            String s = dsd.getText(0, nb_chars);
-            analyze(s, offset);
-        } catch (BadLocationException ble) {
-            System.out.println("Bad location exception");
-            analyze("", offset);
-        }
-        */
+    Analyze(JyxDocument dsd, int offset) {
         analyze(dsd, offset);
     }
     
-    Document doc;
+    JyxDocument doc;
     int offset;
     int offsetElementIndex;
     Element offsetElement;
     
-    void analyze(Document doc, int offset) {
+    void analyze(JyxDocument doc, int offset) {
         this.doc = doc;
         this.offset = offset;
         Element root = this.doc.getDefaultRootElement();

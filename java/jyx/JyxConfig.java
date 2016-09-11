@@ -19,4 +19,10 @@ public class JyxConfig {
     static String COPY = "Copier";
     static int COPY_KEY = KeyEvent.VK_C;
     static String ABOUT = "À propos...";
+    static String PASTE = "Coller";
+    static int PASTE_KEY = KeyEvent.VK_V;
+    static String CUT = "Couper";
+    static int CUT_KEY = KeyEvent.VK_X;
+    static String UNDO = "Annuler";
+    static int UNDO_KEY = KeyEvent.VK_Z;
 }
