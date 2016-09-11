@@ -9,3 +9,4 @@ projet_format/yodata/output/*.png
 *.pyc
 *.jar
 *.pyc
+__pycache__

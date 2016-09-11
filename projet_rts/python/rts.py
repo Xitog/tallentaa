@@ -1418,96 +1418,97 @@ class Menu:
             b.render()
 
 
-def start():
-    e = Engine(800, 600)
-    load_textures(e)
-    while True:
-        r = menu_loop(e) 
-        if not r:
-            break
-    e.stop()
-    print('Goodbye')  
 
 
-def menu_loop(engine):
-    m = Menu(engine)
-    m.menu_start()
-    while True:
-        s = m.update()
-        m.render()
-        engine.render()
-        if s['clicked'] is not None:
-            break
-    if s['clicked'] in ['Campaign', 'Skirmish']:
-        g = Game('Test 1')
-        c = configure(g, engine)
-        r = game_loop(g, c, engine)
-        return r
-    elif s['clicked'] == 'Options':
-        pass
-    elif s['clicked'] == 'Quit':
-        return False
+class Application:
 
-
-def game_menu_loop(engine):
-    m = Menu(engine)
-    m.menu_pause()
-    while True:
-        s = m.update()
-        m.render()
-        engine.render()
-        if s['clicked'] is not None: break
-    if s['clicked'] == 'Options':
-        pass
-    else:
-        return s['clicked']
-       
-
-def game_loop(game, camera, engine): 
-    clock = pygame.time.Clock()
-    start_time = pygame.time.get_ticks()
-    while True:
-        res_gam = game.update()
-        res_cam = camera.update()
-        camera.render()
-        engine.render()
-        if not res_cam:
-            r = game_menu_loop(engine)
-            if r != 'Resume':
+    def __init__(self):
+        self.clock = pygame.time.Clock()
+        self.fps = 30.0
+    
+    def set_caption(self):
+        pygame.display.set_caption("RTS Project - {:.2f}".format(self.clock.get_fps()))
+    
+    def start(self):
+        e = Engine(800, 600)
+        load_textures(e)
+        while True:
+            r = self.menu_loop(e) 
+            if not r:
                 break
-        if not res_gam: 
-            r = 'Game Finished'
-            break
-        # new_time = pygame.time.get_ticks()
-        # waited = new_time - old_time
-        # old_time = new_time
-        # if waited < 60:
-        #    time.sleep(1.0 / (60 - waited))
-        #    print('waited: ', waited)
-        # #pygame.time.Clock().tick(30)
-    if r in ('Game Finished', 'Quit'):
-        print('Game has ended.')
-        end_time = pygame.time.get_ticks()
-        for p in game.get_players().values():
-            if p.victorious:
-                print('\tPlayer ' + p.name + ' is victorious!')
-            else:
-                print('\tPlayer ' + p.name + ' has been defeated.')
-        print('\tMetal = ' + str(camera.player.min))
-        print('\tEnergy = ' + str(camera.player.sol))
-        print('Game has started at ' + str(start_time))
-        print('Game had ended at ' + str(end_time))
-        duration_milli_sec = end_time - start_time
-        duration_sec = duration_milli_sec // 1000
-        duration_min = duration_sec // 60
-        duration_sec -= duration_min * 60
-        duration_hour = duration_min // 60
-        duration_min -= duration_hour * 60
-        print('Game duration: ' + str(duration_hour) + 'h' + str(duration_min) + 'm' + str(duration_sec) + 's')
-        print('Press enter to quit.')
-        return False
-    elif r == 'Quit to main menu':
-        return True
+        e.stop()
+        print('Goodbye')  
+    
+    def menu_loop(self, engine):
+        m = Menu(engine)
+        m.menu_start()
+        while True:
+            s = m.update()
+            m.render()
+            engine.render()
+            if s['clicked'] is not None:
+                break
+        if s['clicked'] in ['Campaign', 'Skirmish']:
+            g = Game('Test 1')
+            c = configure(g, engine)
+            r = self.game_loop(g, c, engine)
+            return r
+        elif s['clicked'] == 'Options':
+            pass
+        elif s['clicked'] == 'Quit':
+            return False
+    
+    def in_game_menu_loop(self, engine):
+        m = Menu(engine)
+        m.menu_pause()
+        while True:
+            s = m.update()
+            m.render()
+            engine.render()
+            if s['clicked'] is not None: break
+        if s['clicked'] == 'Options':
+            pass
+        else:
+            return s['clicked']
+       
+    def game_loop(self, game, camera, engine): 
+        start_time = pygame.time.get_ticks()
+        self.clock.tick(self.fps)
+        while True:
+            res_gam = game.update()
+            res_cam = camera.update()
+            camera.render()
+            engine.render()
+            self.clock.tick(self.fps)
+            self.set_caption()
+            if not res_cam:
+                r = self.in_game_menu_loop(engine)
+                if r != 'Resume':
+                    break
+            if not res_gam: 
+                r = 'Game Finished'
+                break
+        if r in ('Game Finished', 'Quit'):
+            print('Game has ended.')
+            end_time = pygame.time.get_ticks()
+            for p in game.get_players().values():
+                if p.victorious:
+                    print('\tPlayer ' + p.name + ' is victorious!')
+                else:
+                    print('\tPlayer ' + p.name + ' has been defeated.')
+            print('\tMetal = ' + str(camera.player.min))
+            print('\tEnergy = ' + str(camera.player.sol))
+            print('Game has started at ' + str(start_time))
+            print('Game had ended at ' + str(end_time))
+            duration_milli_sec = end_time - start_time
+            duration_sec = duration_milli_sec // 1000
+            duration_min, duration_sec = divmod(duration_sec, 60)
+            duration_hour, duration_min = divmod(duration_min, 60)
+            print('Game duration: ' + str(duration_hour) + 'h' + str(duration_min) + 'm' + str(duration_sec) + 's')
+            print('Press enter to quit.')
+            return False
+        elif r == 'Quit to main menu':
+            return True
 
 
 class TextureInfo:
@@ -1663,5 +1664,5 @@ if __name__ == '__main__':
     import sys
     _maj, _min = sys.version_info[:2]
     print('Starting on Python ' + str(_maj) + "." + str(_min) + " with pygame " + pygame.version.ver)
-    start()
+    Application().start()
     exit()
