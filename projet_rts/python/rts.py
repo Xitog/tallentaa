@@ -941,14 +941,98 @@ class GameObject:
         GameObject.seed = self.id
         self.player = player
 
-    def light(self, x, y, w=1, h=1):
-        self.fog_effect(2, x, y, w, h)
-
-    def fog_effect(self, value, x, y, w, h):
-        # if old_x != self.x or old_y != self.y:
-        for yy in range(max(0, y - self.vision), min(self.player.world.size32.y, y + self.vision + h)):
-            for xx in range(max(0, x - self.vision), min(self.player.world.size32.x, x + self.vision + w)):
-                self.player.fog_map[yy][xx] = value
+    def light(self, x, y, w, h, dist):
+        self.radius_effect(2, x, y, w, h, dist)
+    
+    def radius_effect(self, value, x, y, w, h, dist):
+        if h == 1 and w == 1:
+            # print()
+            for yy in range(max(0, y - dist -1), min(self.player.world.size32.y, y + h + dist +1)):
+                for xx in range(max(0, x - dist -1), min(self.player.world.size32.x, x + w + dist +1)):
+                    #if xx != x or yy != y:
+                    #    print("{0:.2f}".format(round(get_dist(xx, yy, x, y), 2)), ' ', end="")
+                    #else:
+                    #    print('xxxx  ', end="")
+                    d = round(get_dist(xx, yy, x, y), 2) 
+                    if  d <= dist:
+                        self.player.fog_map[yy][xx] = value
+                    elif dist < d <= dist + 1:
+                        self.player.fog_map[yy][xx] = max(1, self.player.fog_map[yy][xx])
+                # print()
+        else:
+            # print()
+            # print("x", x)
+            # print("y", y)
+            # print("dist", dist)
+            # print("yy min", max(0, y - dist))
+            # print("yy max", min(self.player.world.size32.y, y + h + dist))
+            # print("xx min", max(0, x - dist))
+            # print("xx max", min(self.player.world.size32.x, x + w + dist))
+            for yy in range(max(0, y - dist), min(self.player.world.size32.y, y + h + dist)):
+                for xx in range(max(0, x - dist), min(self.player.world.size32.x, x + w + dist)):
+                    if xx < x and yy < y:
+                        # print(xx, yy, "1:{0:.2f}".format(round(get_dist(xx, yy, x, y), 2)), ' ', end="", flush=True)
+                        d = round(get_dist(xx, yy, x, y), 2)
+                        if d <= dist:
+                            self.player.fog_map[yy][xx] = value
+                        elif dist < d <= dist + 1:
+                            self.player.fog_map[yy][xx] = max(1, self.player.fog_map[yy][xx])
+                    elif x <= xx < x+w and yy < y:
+                        # print(xx, yy, "2:{0:.2f}".format(round(get_dist(xx, yy, xx, y), 2)), ' ', end="", flush=True)
+                        d = round(get_dist(xx, yy, xx, y), 2)
+                        if d <= dist:
+                            self.player.fog_map[yy][xx] = value
+                        elif dist < d <= dist + 1:
+                            self.player.fog_map[yy][xx] = max(1, self.player.fog_map[yy][xx])
+                    elif xx >= x+w and yy < y:
+                        # print(xx, yy, "3:{0:.2f}".format(round(get_dist(xx, yy, x+w-1, y), 2)), ' ', end="", flush=True)
+                        d = round(get_dist(xx, yy, x + w - 1, y), 2)
+                        if d <= dist:
+                            self.player.fog_map[yy][xx] = value
+                        elif dist < d <= dist + 1:
+                            self.player.fog_map[yy][xx] = max(1, self.player.fog_map[yy][xx])
+                    elif xx < x and y <= yy < y+h:
+                        # print(xx, yy, "4:{0:.2f}".format(round(get_dist(xx, yy, x, yy), 2)), ' ', end="", flush=True)
+                        d = round(get_dist(xx, yy, x, yy), 2)
+                        if d <= dist:
+                            self.player.fog_map[yy][xx] = value
+                        elif dist < d <= dist + 1:
+                            self.player.fog_map[yy][xx] = max(1, self.player.fog_map[yy][xx])
+                    elif x <= xx < x+w and y <= yy < y+h:
+                        # print(xx, yy, "5:xxxx", ' ', end="")
+                        self.player.fog_map[yy][xx] = value
+                    elif xx >= x+w and y <= yy < y+h:
+                        # print(xx, yy, "6:{0:.2f}".format(round(get_dist(xx, yy, x+w-1, yy), 2)), ' ', end="", flush=True)
+                        d = round(get_dist(xx, yy, x + w - 1, yy), 2)
+                        if d <= dist:
+                            self.player.fog_map[yy][xx] = value
+                        elif dist < d <= dist + 1:
+                            self.player.fog_map[yy][xx] = max(1, self.player.fog_map[yy][xx])
+                    elif xx < x and yy >= y+h:
+                        # print(xx, yy, "7:{0:.2f}".format(round(get_dist(xx, yy, x, yy+h-1), 2)), ' ', end="", flush=True)
+                        d = round(get_dist(xx, yy, x, y + h - 1), 2)
+                        if d <= dist:
+                            self.player.fog_map[yy][xx] = value
+                        elif dist < d <= dist + 1:
+                            self.player.fog_map[yy][xx] = max(1, self.player.fog_map[yy][xx])
+                    elif x <= xx < x+w and yy >= y+h:
+                        # print(xx, yy, "8:{0:.2f}".format(round(get_dist(xx, yy, xx, y+h-1), 2)), ' ', end="", flush=True)
+                        d = round(get_dist(xx, yy, xx, y + h - 1), 2) 
+                        if d <= dist:
+                            self.player.fog_map[yy][xx] = value
+                        elif dist < d <= dist + 1:
+                            self.player.fog_map[yy][xx] = max(1, self.player.fog_map[yy][xx])
+                    elif xx >= x+w and yy >= y+h:
+                        # print(xx, yy, "9:{0:.2f}".format(round(get_dist(xx, yy, x+w-1, y+h-1), 2)), ' ', end="", flush=True)
+                        d = round(get_dist(xx, yy, x + w - 1, y + h - 1), 2) 
+                        if d <= dist:
+                            self.player.fog_map[yy][xx] = value
+                        elif dist < d <= dist + 1:
+                            self.player.fog_map[yy][xx] = max(1, self.player.fog_map[yy][xx])
+                    # else:
+                    #     print(xx, yy, "wtf  ", end="", flush=True)
+                # print()
+            # exit()
 
 
 class Building(GameObject):
@@ -967,7 +1051,8 @@ class Building(GameObject):
             for j in range(y, y + b_type.grid_h):
                 self.player.world.unit_map[j][i] = (2, self) # STILL, BUILDING
 
-        self.light(self.x, self.y, self.type.grid_w, self.type.grid_h)
+        # Fog
+        self.light(self.x, self.y, self.type.grid_w, self.type.grid_h, self.vision)
 
     def __str__(self):
         return str(id(self)) + ' (' + self.type.name + ')'
@@ -986,7 +1071,8 @@ class Building(GameObject):
             self.player.sol += 0.2
             if self.player.sol > 9999:
                 self.player.sol = 9999
-        self.light(self.x, self.y, self.type.grid_w, self.type.grid_h)
+        # Fog
+        self.light(self.x, self.y, self.type.grid_w, self.type.grid_h, self.vision)
         return True  # Very Important
     
     def order(self, o):
@@ -1045,7 +1131,8 @@ class Unit(GameObject):
         self.destination = None
         self.previous32 = None
 
-        self.light(self.x, self.y)
+        # Fog
+        self.light(self.x, self.y, 1, 1, self.vision)
 
     def __str__(self):
         return 'Unit #' + str(self.id) + ' (' + self.type.name + ')'
@@ -1074,8 +1161,8 @@ class Unit(GameObject):
                         del self.orders[0]
         self.player.world.unit_map[self.y][self.x] = (1, self) # CODE: STILL, UNIT
 
-        # fog
-        self.light(self.x, self.y)
+        # Fog
+        self.light(self.x, self.y, 1, 1, self.vision)
 
         return True
 
@@ -1252,13 +1339,14 @@ class Condition:
             return False
         elif self.kind == 'player P control OPT1 (exactly/at least/at most) N unit of type T in Zone Z': #'player X control Y unit of type Z':
             if self.params[3] == 'all':
+                    player1 = game.get_player_by_name(self.params[0])
                     if self.params[4] == 'everywhere':
                         if self.params[1] == 1:
-                            return len(game.get_player_by_name(self.params[0]).units) == self.params[2]
+                            return len(player1.units + player1.buildings) == self.params[2]
                         elif self.params[2] == 2:
-                            return len(game.get_player_by_name(self.params[0]).units) >= self.params[2]
+                            return len(player1.units + player1.buildings) >= self.params[2]
                         elif self.params[3] == 3:
-                            return len(game.get_player_by_name(self.params[0]).units) <= self.params[2]
+                            return len(player1.units + player1.buildings) <= self.params[2]
                     else:
                         ref_zone = self.params[4]
                         units = game.get_all_units_in_zone_for_player(ref_zone, self.params[0])
@@ -1662,5 +1750,26 @@ if __name__ == '__main__':
     import sys
     _maj, _min = sys.version_info[:2]
     print('Starting on Python ' + str(_maj) + "." + str(_min) + " with pygame " + pygame.version.ver)
+    
+    # No profiling
     Application().start()
+    exit()
+    
+    # For Profiling
+    import cProfile, pstats, io
+    pr = cProfile.Profile()
+    pr.enable()
+    
+    Application().start()
+    
+    pr.disable()
+    s = io.StringIO()
+    sortby = 'cumulative'
+    ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+    ps.print_stats()
+    print(s.getvalue())
+    prof = open('profile.txt', 'w')
+    prof.write(s.getvalue())
+    prof.close()
+    
     exit()
