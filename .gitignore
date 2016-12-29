@@ -12,3 +12,4 @@ projet_format/yodata/output/*.png
 __pycache__
 *.obj
 *.exe
+*.exe
