@@ -10,3 +10,5 @@ projet_format/yodata/output/*.png
 *.jar
 *.pyc
 __pycache__
+*.obj
+*.exe

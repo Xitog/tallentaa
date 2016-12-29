@@ -1,0 +1,23 @@
+
+5 + 8
+
+int abc = 5
+
+struct Person
+    int age
+    string name
+end
+
+sub Person@init(int a, string n)
+    @age = a
+    @name = n
+end
+
+sub Person@hello(Person p)
+    writeln("Hello #{p.name}, I am #{@name} and I am #{@age} years old. How are you?")
+end
+
+Person p1 = new Person(32, "Damien")
+Person p2 = new Person(30, "Kate")
+
+p1.hello(p2)
