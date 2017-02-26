@@ -1,7 +1,3 @@
-//-----------------------------------------------------------------------------
-// Libraries
-//-----------------------------------------------------------------------------
-
 #include<stdio.h>
 #include<stdlib.h>
 #include<errno.h>
@@ -10,48 +6,25 @@
 #include <stdbool.h>
 #include <assert.h>
 
-//-----------------------------------------------------------------------------
-// Lexer constants
-//-----------------------------------------------------------------------------
-
-const int MAX_TOKENS = 1024;
-const int MAX_BUFFER = 256;
-
-//-----------------------------------------------------------------------------
-// Language definition
-//-----------------------------------------------------------------------------
+#define MAX_TOKENS 1024
+#define MAX_BUFFER 256
 
 #define FLOAT_SEPARATOR '.'
 
-char * KEYWORDS[] = { "if", "else", "then", "end" };
-const int KEYWORDS_SIZE = 4;
+#define KEYWORDS { "if", "else", "then", "end" }
+#define KEYWORDS_SIZE 4
 
-char * BOOLEANS[] = { "True", "False" };
-const int BOOLEANS_SIZE = 2;
+#define SYMBOLS_OK_IN_ID { '_' }
+#define SYMBOLS_OK_IN_ID_SIZE 1
 
-char * OPERATORS_STR[] = { "and", "or", "xor", "not" };
-const int OPERATORS_STR_SIZE = 4;
+#define SYMBOLS_OK_AT_THE_END_OF_ID { '?', '!' } // TODO but only for fun!
 
-char SYMBOLS_OK_IN_ID[] = { '_' };
-const int SYMBOLS_OK_IN_ID_SIZE = 1;
-
-char SYMBOLS_OK_AT_THE_END_OF_ID[] = { '?', '!' };
-const int SYMBOLS_OK_AT_THE_END_OF_ID_SIZE = 2;
-
-char OPERATOR_CHARS[] = { '+', '-', '*', '/', '%', '=', '!', '>', '<' };
-const int OPERATOR_CHARS_SIZE = 9;
-
-char * OPERATORS[] = { "+", "-", "*", "/", "//", "**", "%", "=", "+=", "-=", "*=", "//=", "**=", "%=", "and", "or", "not", "xor", "==", "!=", ">", ">=", "<", "<=", ">>", "<<"};
-const int OPERATORS_SIZE = 26;
+#define OPERATORS { "+", "-", "*", "/", "//", "**", "%", "=", "+=", "-=", "*=", "//=", "**=", "%=", "and", "or", "not", "xor", "==", "!=", ">", ">=", "<", "<=", ">>", "<<"}
+#define OPERATORS_SIZE 26
 
 #define SEPARATORS { '(', ')', ',', '[', ']', '{', '}' }
 #define SEPARATORS_SIZE 7
 
-//-----------------------------------------------------------------------------
-// Tokens
-//-----------------------------------------------------------------------------
-
-// Type of tokens
 typedef enum {
     // Working types
     NONE,
@@ -70,7 +43,6 @@ typedef enum {
     ERROR
 } TokenType;
 
-// Type to strings
 char * token_str[] = {
     "None",
     "Number",
@@ -86,18 +58,22 @@ char * token_str[] = {
     "Error"
 };
 
-bool string_is_in(char * s, char * table[], int size) {
-    for(int i = 0; i < size; i++) {
-        if (strcmp(s, table[i]) == 0) {
+char * keywords[] = KEYWORDS;
+
+bool is_keyword(char * str) {
+    for(int i = 0; i < KEYWORDS_SIZE; i++) {
+        if (strcmp(str, keywords[i]) == 0) {
             return true;
         }
     }
     return false;
 }
 
-bool char_is_in(char c, char table[], int size) {
-    for(int i = 0; i < size; i++) {
-        if (c == table[i]) {
+char symbols_ok_in_id[] = SYMBOLS_OK_IN_ID;
+
+bool is_ok_in_id(char c) {
+    for(int i = 0; i < SYMBOLS_OK_IN_ID_SIZE; i++) {
+        if (c == symbols_ok_in_id[i]) {
             return true;
         }
     }
@@ -110,13 +86,9 @@ typedef struct {
     int line;
 } Token;
 
-//-----------------------------------------------------------------------------
-// Reader of tokens function
-//-----------------------------------------------------------------------------
-
 // Return new pos
 int read_num(char * source, long pos, Token * tokens, int * tokens_cpt, int line_cpt) {
-    printf("> Reading num\n");
+    printf(">Reading num\n");
     // Create buffer
     char * buffer = (char *) calloc(MAX_BUFFER, sizeof(char));
     int buffer_cpt = 0;
@@ -160,7 +132,7 @@ int read_num(char * source, long pos, Token * tokens, int * tokens_cpt, int line
 
 // Return new pos
 int read_id(char * source, long pos, Token * tokens, int * tokens_cpt, int line_cpt) {
-    printf("> Reading id\n");
+    printf(">Reading id\n");
     // Create buffer
     char * buffer = (char *) calloc(MAX_BUFFER, sizeof(char));
     int buffer_cpt = 0;
@@ -169,7 +141,7 @@ int read_id(char * source, long pos, Token * tokens, int * tokens_cpt, int line_
     bool end = false;
     while(!end) {
         char c = source[pos];
-        if (isalnum(c) || char_is_in(c, SYMBOLS_OK_IN_ID, SYMBOLS_OK_IN_ID_SIZE)) {
+        if (isalnum(c) || is_ok_in_id(c)) {
             buffer[buffer_cpt] = c;
             buffer_cpt += 1;
             pos++;
@@ -179,12 +151,8 @@ int read_id(char * source, long pos, Token * tokens, int * tokens_cpt, int line_
             tokens[*tokens_cpt].content = (char *) calloc(buffer_cpt, sizeof(char));
             strcpy(tokens[*tokens_cpt].content, buffer);
             tokens[*tokens_cpt].line = line_cpt;
-            if (string_is_in(tokens[*tokens_cpt].content, KEYWORDS, KEYWORDS_SIZE)) {
+            if (is_keyword(tokens[*tokens_cpt].content)) {
                 tokens[*tokens_cpt].type = KEYWORD;
-            } else if (string_is_in(tokens[*tokens_cpt].content, BOOLEANS, BOOLEANS_SIZE)) {
-                tokens[*tokens_cpt].type = BOOLEAN;
-            } else if (string_is_in(tokens[*tokens_cpt].content, OPERATORS_STR, OPERATORS_STR_SIZE)) {
-                tokens[*tokens_cpt].type = OPERATOR;
             } else {
                 tokens[*tokens_cpt].type = IDENTIFIER;
             }
@@ -197,46 +165,6 @@ int read_id(char * source, long pos, Token * tokens, int * tokens_cpt, int line_
     free(buffer);
     return rvalue;
 }
-
-// Return new pos
-int read_operator(char * source, long pos, Token * tokens, int * tokens_cpt, int line_cpt) {
-    printf("> Reading operator\n");
-    // Create buffer
-    char * buffer = (char *) calloc(MAX_BUFFER, sizeof(char));
-    int buffer_cpt = 0;
-    // Read
-    int rvalue = pos;
-    bool end = false;
-    while(!end) {
-        char c = source[pos];
-        if (char_is_in(c, OPERATOR_CHARS, OPERATOR_CHARS_SIZE)) {
-            buffer[buffer_cpt] = c;
-            buffer_cpt += 1;
-            pos++;
-        } else {
-            // Produce token
-            printf("  Producing token : %s, returning pos : %i\n", buffer, pos);
-            tokens[*tokens_cpt].content = (char *) calloc(buffer_cpt, sizeof(char));
-            strcpy(tokens[*tokens_cpt].content, buffer);
-            tokens[*tokens_cpt].line = line_cpt;
-            if (string_is_in(tokens[*tokens_cpt].content, OPERATORS, OPERATORS_SIZE)) {
-                tokens[*tokens_cpt].type = OPERATOR;
-            } else {
-                return -1; // No delete, should stop the program right away of memory leak
-            }
-            *tokens_cpt += 1;
-            rvalue = pos;
-            end = true;
-        }
-    }
-    // Destroy buffer
-    free(buffer);
-    return rvalue;
-}
-
-//-----------------------------------------------------------------------------
-// Lexer : String -> [Tokens]
-//-----------------------------------------------------------------------------
 
 void tokenize(char * source, long size, Token * tokens, int * tokens_cpt) {
     long pos = 0;
@@ -266,7 +194,7 @@ void tokenize(char * source, long size, Token * tokens, int * tokens_cpt) {
             }
             printf("Malformed end of line, found carriage return (\\r) but missing line feed (\\n).\n");
             exit(EXIT_FAILURE);
-        } else if (isalpha(c) || char_is_in(c, SYMBOLS_OK_IN_ID, SYMBOLS_OK_IN_ID_SIZE)) {
+        } else if (isalpha(c) || is_ok_in_id(c)) {
             pos = read_id(source, pos, tokens, tokens_cpt, line_cpt);
             if (pos == -1) {
                 printf("Something bad happened during reading read_id.\n");
@@ -278,22 +206,12 @@ void tokenize(char * source, long size, Token * tokens, int * tokens_cpt) {
         } else if (c == '\0') {
             printf(">End of source.\n");
             break;
-        } else if (char_is_in(c, OPERATOR_CHARS, OPERATOR_CHARS_SIZE)) {
-            pos = read_operator(source, pos, tokens, tokens_cpt, line_cpt);
-            if (pos == -1) {
-                printf("Something bad happened during reading_operator.\n");
-                exit(EXIT_FAILURE);
-            }
         } else {
             printf("Unknown char : %x\n", c);
             exit(EXIT_FAILURE);
         }
     }
 }
-
-//-----------------------------------------------------------------------------
-// Utils
-//-----------------------------------------------------------------------------
 
 void display_tokens(Token * tokens, int tokens_cpt) {
     printf("[INFO] Tokens produced : %i\n", tokens_cpt);
@@ -304,18 +222,30 @@ void display_tokens(Token * tokens, int tokens_cpt) {
     }
 }
 
-int handle_file(char * filename) {
-    printf("[INFO] opening(%s)\n", filename);
+int main(int argc, char * argv[]) {
+    //-----------------------------------------------------
+    // Test args
+    //-----------------------------------------------------
+    printf("Tokenizer v0.1\n");
+    int i = 0;
+    while (i < argc) {
+        printf("[INFO] Arg %i : %s\n", i, argv[i]);
+        i += 1;
+    }
+    if (argc < 2) {
+        printf("[ERROR] Usage : tokenizer.exe filename\n");
+        return 1;
+    }
+    printf("[INFO] opening(%s)\n", argv[1]);
     
     //-----------------------------------------------------
     // Get size of the file
     //-----------------------------------------------------
-    FILE * f = fopen(filename, "rb");
+    FILE * f = fopen(argv[1], "rb");
     fseek(f, 0, SEEK_END);
     long size = ftell(f);
     if (size == -1) {
-        printf("[ERROR] Unable to read size of the file %s\n", filename);
-        return 1;
+        printf("[ERROR] Unable to read size of the file %s\n", argv[1]);
     }
     printf("[INFO] Size of the file is : %i\n", size);
     fclose(f);
@@ -324,9 +254,9 @@ int handle_file(char * filename) {
     // Create a buffer for the entire file and fill it
     //-----------------------------------------------------
     char * source = (char *) calloc(size+1, sizeof(char));
-    f = fopen(filename, "rb");
+    f = fopen(argv[1], "rb");
     if (f == NULL) {
-        fprintf(stderr, "[ERROR] %s : %s\n", filename, strerror(errno));
+        fprintf(stderr, "[ERROR] %s : %s\n", argv[1], strerror(errno));
         return 2;
     }
     long pos = 0;
@@ -360,51 +290,25 @@ int handle_file(char * filename) {
     // Display the token
     //-----------------------------------------------------
     display_tokens(tokens, tokens_cpt);
-
-    return 0;
-}
-
-int main(int argc, char * argv[]) {
-    //-----------------------------------------------------
-    // Test args
-    //-----------------------------------------------------
-    printf("Tokenizer v0.1\n");
-    int i = 0;
-    while (i < argc) {
-        printf("[INFO] Arg %i : %s\n", i, argv[i]);
-        i += 1;
-    }
-    if (argc == 2) {
-        //printf("[ERROR] Usage : tokenizer.exe filename\n");
-        //return 1;
-        printf("[INFO] File : %s\n", argv[1]);
-        handle_file(argv[1]);
-    }
     
     //-----------------------------------------------------
     // Tests
     //-----------------------------------------------------
     
-    printf("[INFO] Tests\n");
-    Token tokens[MAX_TOKENS];
-    int tokens_cpt = 0;
-    
     // Simple integer
     char * test1 = "123456";
-    printf("\nTest 1 : %s\n", test1);
     memset(tokens, MAX_TOKENS, sizeof(Token));
     tokens_cpt = 0;
-    tokenize(test1, strlen(test1), tokens, &tokens_cpt);
+    tokenize(test1, 6, tokens, &tokens_cpt);
     display_tokens(tokens, tokens_cpt);
     assert ( tokens_cpt == 1);
     assert ( tokens[0].type == INTEGER);
     
     // Two integers
     char * test2 = "123456 294857";
-    printf("\nTest 2 : %s\n", test2);
     memset(tokens, MAX_TOKENS, sizeof(Token));
     tokens_cpt = 0;
-    tokenize(test2, strlen(test2), tokens, &tokens_cpt);
+    tokenize(test2, 13, tokens, &tokens_cpt);
     display_tokens(tokens, tokens_cpt);
     assert ( tokens_cpt == 2);
     assert ( tokens[0].type == INTEGER);
@@ -414,10 +318,9 @@ int main(int argc, char * argv[]) {
     
     // A float
     char * test3 = "1.34";
-    printf("\nTest 3 : %s\n", test3);
     memset(tokens, MAX_TOKENS, sizeof(Token));
     tokens_cpt = 0;
-    tokenize(test3, strlen(test3), tokens, &tokens_cpt);
+    tokenize(test3, 4, tokens, &tokens_cpt);
     display_tokens(tokens, tokens_cpt);
     assert ( tokens_cpt == 1);
     assert ( tokens[0].type == FLOAT);
@@ -425,10 +328,9 @@ int main(int argc, char * argv[]) {
 
     // An identifier
     char * test4 = "hello";
-    printf("\nTest 4 : %s\n", test4);
     memset(tokens, MAX_TOKENS, sizeof(Token));
     tokens_cpt = 0;
-    tokenize(test4, strlen(test4), tokens, &tokens_cpt);
+    tokenize(test4, 5, tokens, &tokens_cpt);
     display_tokens(tokens, tokens_cpt);
     assert ( tokens_cpt == 1);
     assert ( tokens[0].type == IDENTIFIER);
@@ -436,10 +338,9 @@ int main(int argc, char * argv[]) {
 
     // A keyword
     char * test5 = "then";
-    printf("\nTest 5 : %s\n", test5);
     memset(tokens, MAX_TOKENS, sizeof(Token));
     tokens_cpt = 0;
-    tokenize(test5, strlen(test5), tokens, &tokens_cpt);
+    tokenize(test5, 4, tokens, &tokens_cpt);
     display_tokens(tokens, tokens_cpt);
     assert ( tokens_cpt == 1);
     assert ( tokens[0].type == KEYWORD);
@@ -447,55 +348,13 @@ int main(int argc, char * argv[]) {
 
     // An identifier starting by '_'
     char * test6 = "_then";
-    printf("\nTest 6 : %s\n", test6);
     memset(tokens, MAX_TOKENS, sizeof(Token));
     tokens_cpt = 0;
-    tokenize(test6, strlen(test6), tokens, &tokens_cpt);
+    tokenize(test6, 5, tokens, &tokens_cpt);
     display_tokens(tokens, tokens_cpt);
     assert ( tokens_cpt == 1);
     assert ( tokens[0].type == IDENTIFIER);
     assert ( strcmp(tokens[0].content, "_then") == 0);
-    
-    // A simple operation
-    char * test7 = "2.3 + 4";
-    printf("\nTest 7 : %s\n", test7);
-    memset(tokens, MAX_TOKENS, sizeof(Token));
-    tokens_cpt = 0;
-    tokenize(test7, strlen(test7), tokens, &tokens_cpt);
-    display_tokens(tokens, tokens_cpt);
-    assert ( tokens_cpt == 3);
-    assert ( tokens[0].type == FLOAT);
-    assert ( strcmp(tokens[0].content, "2.3") == 0);
-    assert ( tokens[1].type == OPERATOR);
-    assert ( strcmp(tokens[1].content, "+") == 0);
-    assert ( tokens[2].type == INTEGER);
-    assert ( strcmp(tokens[2].content, "4") == 0);
-
-    // A boolean
-    char * test8 = "True";
-    printf("\nTest 8 : %s\n", test8);
-    memset(tokens, MAX_TOKENS, sizeof(Token));
-    tokens_cpt = 0;
-    tokenize(test8, strlen(test8), tokens, &tokens_cpt);
-    display_tokens(tokens, tokens_cpt);
-    assert ( tokens_cpt == 1);
-    assert ( tokens[0].type == BOOLEAN);
-    assert ( strcmp(tokens[0].content, "True") == 0);
-
-    // A simple operation between boolean
-    char * test9 = "True and False";
-    printf("\nTest 9 : %s\n", test9);
-    memset(tokens, MAX_TOKENS, sizeof(Token));
-    tokens_cpt = 0;
-    tokenize(test9, strlen(test9), tokens, &tokens_cpt);
-    display_tokens(tokens, tokens_cpt);
-    assert ( tokens_cpt == 3);
-    assert ( tokens[0].type == BOOLEAN);
-    assert ( strcmp(tokens[0].content, "True") == 0);
-    assert ( tokens[1].type == OPERATOR);
-    assert ( strcmp(tokens[1].content, "and") == 0);
-    assert ( tokens[2].type == BOOLEAN);
-    assert ( strcmp(tokens[2].content, "False") == 0);
 
     return 0;
     //exit(EXIT_SUCCESS);
