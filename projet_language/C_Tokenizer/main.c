@@ -44,8 +44,8 @@ const int OPERATOR_CHARS_SIZE = 9;
 char * OPERATORS[] = { "+", "-", "*", "/", "//", "**", "%", "=", "+=", "-=", "*=", "//=", "**=", "%=", "and", "or", "not", "xor", "==", "!=", ">", ">=", "<", "<=", ">>", "<<"};
 const int OPERATORS_SIZE = 26;
 
-#define SEPARATORS { '(', ')', ',', '[', ']', '{', '}' }
-#define SEPARATORS_SIZE 7
+char SEPARATORS[] = { '(', ')', ',', '[', ']', '{', '}' };
+const int SEPARATORS_SIZE = 7;
 
 //-----------------------------------------------------------------------------
 // Tokens
@@ -238,6 +238,21 @@ int read_operator(char * source, long pos, Token * tokens, int * tokens_cpt, int
 // Lexer : String -> [Tokens]
 //-----------------------------------------------------------------------------
 
+void create_token_from_string(char * content, int line_cpt, TokenType ttype, Token * tokens, int * tokens_cpt) {
+    printf("    Producing token for %s of type %s at line %i\n", content, token_str[ttype], line_cpt);
+    tokens[*tokens_cpt].content = (char *) calloc(strlen(content)+1, sizeof(char));
+    strcpy(tokens[*tokens_cpt].content, content);
+    tokens[*tokens_cpt].line = line_cpt;
+    tokens[*tokens_cpt].type = ttype;
+    *tokens_cpt += 1;
+}
+
+void create_token_from_char(char content, int line_cpt, TokenType ttype, Token * tokens, int * tokens_cpt) {
+    char buffer[2] = "\0"; // <=> { '\0', '\0' };
+    buffer[0] = content;
+    create_token_from_string(buffer, line_cpt, ttype, tokens, tokens_cpt);
+}
+
 void tokenize(char * source, long size, Token * tokens, int * tokens_cpt) {
     long pos = 0;
     int line_cpt = 1;
@@ -252,13 +267,15 @@ void tokenize(char * source, long size, Token * tokens, int * tokens_cpt) {
             }
         } else if (c == '\n') { // does not handle macos new line \n\r
             printf(">Reading linux new line (line feed) \\n at %i.\n", pos);
-            printf("  Producing token new line\n");
+            //printf("  Producing token new line\n");
+            create_token_from_char('\n', line_cpt, SEPARATOR, tokens, tokens_cpt);
             pos++;
         } else if (c == '\r') {
             printf(">Reading ms-dos new line (carriage return) \\r at %i.\n", pos);
             if (pos + 1 < size) {
                 if (source[pos + 1] == '\n') {
                     printf("  Producing token new line\n");
+                    create_token_from_char('\n', line_cpt, SEPARATOR, tokens, tokens_cpt);
                     line_cpt++;
                     pos += 2;
                     continue;
@@ -284,6 +301,9 @@ void tokenize(char * source, long size, Token * tokens, int * tokens_cpt) {
                 printf("Something bad happened during reading_operator.\n");
                 exit(EXIT_FAILURE);
             }
+        } else if (char_is_in(c, SEPARATORS, SEPARATORS_SIZE)) {
+            create_token_from_char(c, line_cpt, SEPARATOR, tokens, tokens_cpt);
+            pos++;
         } else {
             printf("Unknown char : %x\n", c);
             exit(EXIT_FAILURE);
@@ -496,6 +516,29 @@ int main(int argc, char * argv[]) {
     assert ( strcmp(tokens[1].content, "and") == 0);
     assert ( tokens[2].type == BOOLEAN);
     assert ( strcmp(tokens[2].content, "False") == 0);
+
+    // A simple operation with parenthesis
+    char * test10 = "4 * (2 + 3)\n";
+    printf("\nTest 10 : %s\n", test10);
+    memset(tokens, MAX_TOKENS, sizeof(Token));
+    tokens_cpt = 0;
+    tokenize(test10, strlen(test10), tokens, &tokens_cpt);
+    display_tokens(tokens, tokens_cpt);
+    assert ( tokens_cpt == 8);
+    assert ( tokens[0].type == INTEGER);
+    assert ( strcmp(tokens[0].content, "4") == 0);
+    assert ( tokens[1].type == OPERATOR);
+    assert ( strcmp(tokens[1].content, "*") == 0);
+    assert ( tokens[2].type == SEPARATOR);
+    assert ( strcmp(tokens[2].content, "(") == 0);
+    assert ( tokens[3].type == INTEGER);
+    assert ( strcmp(tokens[3].content, "2") == 0);
+    assert ( tokens[4].type == OPERATOR);
+    assert ( strcmp(tokens[4].content, "+") == 0);
+    assert ( tokens[5].type == INTEGER);
+    assert ( strcmp(tokens[5].content, "3") == 0);
+    assert ( tokens[6].type == SEPARATOR);
+    assert ( strcmp(tokens[6].content, ")") == 0);
 
     return 0;
     //exit(EXIT_SUCCESS);
