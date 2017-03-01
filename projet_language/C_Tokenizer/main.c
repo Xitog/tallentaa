@@ -23,8 +23,8 @@ const int MAX_BUFFER = 256;
 
 #define FLOAT_SEPARATOR '.'
 
-char * KEYWORDS[] = { "if", "else", "then", "end" };
-const int KEYWORDS_SIZE = 4;
+char * KEYWORDS[] = { "if", "else", "then", "end", "while" };
+const int KEYWORDS_SIZE = 5;
 
 char * BOOLEANS[] = { "True", "False" };
 const int BOOLEANS_SIZE = 2;
@@ -46,6 +46,9 @@ const int OPERATORS_SIZE = 26;
 
 char SEPARATORS[] = { '(', ')', ',', '[', ']', '{', '}' };
 const int SEPARATORS_SIZE = 7;
+
+char STRING_DELIMITERS[] = { '\"', '\'' };
+const int STRING_DELIMITERS_SIZE = 2;
 
 //-----------------------------------------------------------------------------
 // Tokens
@@ -234,6 +237,46 @@ int read_operator(char * source, long pos, Token * tokens, int * tokens_cpt, int
     return rvalue;
 }
 
+// Return new pos TODO
+int read_string(char * source, long pos, Token * tokens, int * tokens_cpt, int line_cpt) {
+    printf("> Reading string\n");
+    // Create buffer
+    char * buffer = (char *) calloc(MAX_BUFFER, sizeof(char));
+    int buffer_cpt = 0;
+    // Read
+    bool end = false;
+    char start;
+    bool escaped = false;
+    while(!end) {
+        char c = source[pos];
+        if (pos == 0) {
+            start = c; 
+        }
+        if (c == '\\') {
+            escaped = true;
+        } else {
+            escaped = false;
+        }
+        buffer[buffer_cpt] = c;
+        buffer_cpt += 1;
+        if (!escaped && c == start && pos > 0) {
+            // Produce token
+            // +1 for the "\0" terminator char because we are ending reading right now
+            // and adding a terminator to the content of the token
+            tokens[*tokens_cpt].content = (char *) calloc(buffer_cpt + 1, sizeof(char));
+            strcpy(tokens[*tokens_cpt].content, buffer);
+            tokens[*tokens_cpt].line = line_cpt;
+            tokens[*tokens_cpt].type = STRING;
+            *tokens_cpt += 1;
+            end = true;
+        }
+        pos++;
+    }
+    // Destroy buffer
+    free(buffer);
+    return pos;
+}
+
 //-----------------------------------------------------------------------------
 // Lexer : String -> [Tokens]
 //-----------------------------------------------------------------------------
@@ -252,7 +295,7 @@ void create_token_from_char(char content, int line_cpt, TokenType ttype, Token *
     buffer[0] = content;
     create_token_from_string(buffer, line_cpt, ttype, tokens, tokens_cpt);
 }
-
+            
 void tokenize(char * source, long size, Token * tokens, int * tokens_cpt) {
     long pos = 0;
     int line_cpt = 1;
@@ -261,10 +304,6 @@ void tokenize(char * source, long size, Token * tokens, int * tokens_cpt) {
         printf("I read : %x (%c) at %i\n", c, c, pos);
         if (isdigit(c)) {
             pos = read_num(source, pos, tokens, tokens_cpt, line_cpt);
-            if (pos == -1) {
-                printf("Something bad happened during reading read_num.\n");
-                exit(EXIT_FAILURE);
-            }
         } else if (c == '\n') { // does not handle macos new line \n\r
             printf(">Reading linux new line (line feed) \\n at %i.\n", pos);
             //printf("  Producing token new line\n");
@@ -285,10 +324,6 @@ void tokenize(char * source, long size, Token * tokens, int * tokens_cpt) {
             exit(EXIT_FAILURE);
         } else if (isalpha(c) || char_is_in(c, SYMBOLS_OK_IN_ID, SYMBOLS_OK_IN_ID_SIZE)) {
             pos = read_id(source, pos, tokens, tokens_cpt, line_cpt);
-            if (pos == -1) {
-                printf("Something bad happened during reading read_id.\n");
-                exit(EXIT_FAILURE);
-            }
         } else if (c == ' ') {
             printf(">Reading and discarding space at position %i, advancing at %i.\n", pos, pos+1);
             pos++; // Discard blank
@@ -297,13 +332,11 @@ void tokenize(char * source, long size, Token * tokens, int * tokens_cpt) {
             break;
         } else if (char_is_in(c, OPERATOR_CHARS, OPERATOR_CHARS_SIZE)) {
             pos = read_operator(source, pos, tokens, tokens_cpt, line_cpt);
-            if (pos == -1) {
-                printf("Something bad happened during reading_operator.\n");
-                exit(EXIT_FAILURE);
-            }
         } else if (char_is_in(c, SEPARATORS, SEPARATORS_SIZE)) {
             create_token_from_char(c, line_cpt, SEPARATOR, tokens, tokens_cpt);
             pos++;
+        } else if (char_is_in(c, STRING_DELIMITERS, STRING_DELIMITERS_SIZE)) {
+            pos = read_string(source, pos, tokens, tokens_cpt, line_cpt);
         } else {
             printf("Unknown char : %x\n", c);
             exit(EXIT_FAILURE);
@@ -384,27 +417,11 @@ int handle_file(char * filename) {
     return 0;
 }
 
-int main(int argc, char * argv[]) {
-    //-----------------------------------------------------
-    // Test args
-    //-----------------------------------------------------
-    printf("Tokenizer v0.1\n");
-    int i = 0;
-    while (i < argc) {
-        printf("[INFO] Arg %i : %s\n", i, argv[i]);
-        i += 1;
-    }
-    if (argc == 2) {
-        //printf("[ERROR] Usage : tokenizer.exe filename\n");
-        //return 1;
-        printf("[INFO] File : %s\n", argv[1]);
-        handle_file(argv[1]);
-    }
-    
-    //-----------------------------------------------------
-    // Tests
-    //-----------------------------------------------------
-    
+//-----------------------------------------------------------------------------
+// Tests
+//-----------------------------------------------------------------------------
+void tests() {
+
     printf("[INFO] Tests\n");
     Token tokens[MAX_TOKENS];
     int tokens_cpt = 0;
@@ -539,7 +556,52 @@ int main(int argc, char * argv[]) {
     assert ( strcmp(tokens[5].content, "3") == 0);
     assert ( tokens[6].type == SEPARATOR);
     assert ( strcmp(tokens[6].content, ")") == 0);
+    
+    // A String 1
+    char * test11 = "\"hello\"";
+    printf("\nTest 11 : %s\n", test11);
+    memset(tokens, MAX_TOKENS, sizeof(Token));
+    tokens_cpt = 0;
+    tokenize(test11, strlen(test11), tokens, &tokens_cpt);
+    display_tokens(tokens, tokens_cpt);
+    assert ( tokens_cpt == 1);
+    assert ( tokens[0].type == STRING);
+    assert ( strcmp(tokens[0].content, "\"hello\"") == 0);
+    
+    // A String2
+    char * test12 = "\"hel\'lo\"";
+    printf("\nTest 12 : %s\n", test12);
+    memset(tokens, MAX_TOKENS, sizeof(Token));
+    tokens_cpt = 0;
+    tokenize(test12, strlen(test12), tokens, &tokens_cpt);
+    printf("#tokens = %i\n", tokens_cpt);
+    display_tokens(tokens, tokens_cpt);
+    assert ( tokens_cpt == 1);
+    assert ( tokens[0].type == STRING);
+    assert ( strcmp(tokens[0].content, "\"hel\'lo\"") == 0);
+    
+    printf("\nEND OF TESTS\n");
+}
 
+int main(int argc, char * argv[]) {
+    //-----------------------------------------------------
+    // Test args
+    //-----------------------------------------------------
+    printf("Tokenizer v0.1\n");
+    int i = 0;
+    while (i < argc) {
+        printf("[INFO] Arg %i : %s\n", i, argv[i]);
+        i += 1;
+    }
+    if (argc == 2) {
+        //printf("[ERROR] Usage : tokenizer.exe filename\n");
+        //return 1;
+        printf("[INFO] File : %s\n", argv[1]);
+        handle_file(argv[1]);
+    }
+    
+    tests();
+    
     return 0;
     //exit(EXIT_SUCCESS);
     
