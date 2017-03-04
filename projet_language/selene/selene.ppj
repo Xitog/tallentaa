@@ -16,26 +16,45 @@ AS = poasm.exe#
 RC = porc.exe#
 LINK = polink.exe#
 SIGN = posign.exe#
-CCFLAGS = -std:C11 -Tx86-coff -Zi -Ot -Ob1 -fp:precise -W1 -Gd#
+CCFLAGS = -std:C11 -Tx86-coff -Zi -Ot -Ob1 -fp:precise -W1 -Gd -DPARSER -UTOKENIZER#
 ASFLAGS = -AIA32 -Zi -Gd#
 RCFLAGS = #
 LINKFLAGS = -debug -debugtype:both -subsystem:console -machine:x86 kernel32.lib advapi32.lib delayimp.lib#
-SIGNFLAGS = -timeurl:http://timestamp.verisign.com/scripts/timstamp.dll -location:CU -store:MY -errkill#
+SIGNFLAGS = -location:CU -store:MY -timeurl:http://timestamp.verisign.com/scripts/timstamp.dll -errkill#
 INCLUDE = $(PellesCDir)\Include\Win;$(PellesCDir)\Include#
 LIB = $(PellesCDir)\Lib\Win;$(PellesCDir)\Lib#
 
 # 
-# Construction de main.exe.
+# Construction de selene.exe.
 # 
-main.exe: \
-	output\main.obj
+selene.exe: \
+	output\parser.obj \
+	output\tokenizer.obj \
+	output\tokenizer_lib.obj
 	$(LINK) $(LINKFLAGS) -out:"$@" $**
 
 # 
-# Construction de main.obj.
+# Construction de parser.obj.
 # 
-output\main.obj: \
-	main.c
+output\parser.obj: \
+	parser.c \
+	tokenizer_lib.h
+	$(CC) $(CCFLAGS) "$!" -Fo"$@"
+
+# 
+# Construction de tokenizer.obj.
+# 
+output\tokenizer.obj: \
+	tokenizer.c \
+	tokenizer_lib.h
+	$(CC) $(CCFLAGS) "$!" -Fo"$@"
+
+# 
+# Construction de tokenizer_lib.obj.
+# 
+output\tokenizer_lib.obj: \
+	tokenizer_lib.c \
+	tokenizer_lib.h
 	$(CC) $(CCFLAGS) "$!" -Fo"$@"
 
 .EXCLUDEDFILES:

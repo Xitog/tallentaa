@@ -1,0 +1,8 @@
+title. Selene
+
+h1. Introduction
+
+Selene (en référence à Lua) est un triplé tokenizer/lexer + parser + émetteur de code codé en C.
+Il est la fusion de deux projets : 
+    - C_Tokenizer
+    - C_Parser (commencé et fusionné aujourd'hui)
