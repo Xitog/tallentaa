@@ -63,8 +63,16 @@ helpmenu.add_command(label="About...", command=callback)
 if mode == 'TEXT':
 
     options = {}
+    
     txt = Text(root, *options)
     txt.pack()
+    
+    def tab(arg):
+        print("tab pressed")
+        txt.insert(INSERT, " " * 4)
+        return 'break' # Prevent normal behavior
+    
+    txt.bind("<Tab>", tab)
     
 #------------------------------------------------
 # Canvas
