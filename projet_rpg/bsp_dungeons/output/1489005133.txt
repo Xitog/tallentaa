@@ -1,0 +1,105 @@
+--------
+id = 0 deep = 1
+x,y = 0,0
+w,h = 100,100
+div = horizontale
+div_pos = 38
+wall_thickness = -1
+    --------
+    id = 1 deep = 2
+    x,y = 0,0
+    w,h = 100,38
+    div = verticale
+    div_pos = 45
+    wall_thickness = -1
+        --------
+        id = 3 deep = 3
+        x,y = 0,0
+        w,h = 45,38
+        div = verticale
+        div_pos = 11
+        wall_thickness = -1
+            --------
+            id = 5 deep = 4
+            x,y = 0,0
+            w,h = 11,38
+            div = horizontale
+            div_pos = -1
+            wall_thickness = -1
+            --------
+            id = 6 deep = 4
+            x,y = 11,0
+            w,h = 34,38
+            div = horizontale
+            div_pos = -1
+            wall_thickness = -1
+        --------
+        id = 4 deep = 3
+        x,y = 45,0
+        w,h = 55,38
+        div = verticale
+        div_pos = 19
+        wall_thickness = -1
+            --------
+            id = 7 deep = 4
+            x,y = 45,0
+            w,h = 19,38
+            div = horizontale
+            div_pos = -1
+            wall_thickness = -1
+            --------
+            id = 8 deep = 4
+            x,y = 64,0
+            w,h = 36,38
+            div = horizontale
+            div_pos = -1
+            wall_thickness = -1
+    --------
+    id = 2 deep = 2
+    x,y = 0,38
+    w,h = 100,62
+    div = verticale
+    div_pos = 72
+    wall_thickness = -1
+        --------
+        id = 9 deep = 3
+        x,y = 0,38
+        w,h = 72,62
+        div = verticale
+        div_pos = 52
+        wall_thickness = -1
+            --------
+            id = 11 deep = 4
+            x,y = 0,38
+            w,h = 52,62
+            div = horizontale
+            div_pos = -1
+            wall_thickness = -1
+            --------
+            id = 12 deep = 4
+            x,y = 52,38
+            w,h = 20,62
+            div = horizontale
+            div_pos = -1
+            wall_thickness = -1
+        --------
+        id = 10 deep = 3
+        x,y = 72,38
+        w,h = 28,62
+        div = horizontale
+        div_pos = 37
+        wall_thickness = -1
+            --------
+            id = 13 deep = 4
+            x,y = 72,38
+            w,h = 28,37
+            div = horizontale
+            div_pos = -1
+            wall_thickness = -1
+            --------
+            id = 14 deep = 4
+            x,y = 72,75
+            w,h = 28,25
+            div = horizontale
+            div_pos = -1
+            wall_thickness = -1
