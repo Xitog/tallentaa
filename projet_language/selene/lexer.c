@@ -376,7 +376,7 @@ void tokenize(char * source, long size, Token * tokens, int * tokens_cpt) {
         } else if (char_is_in(c, OPERATOR_CHARS, OPERATOR_CHARS_SIZE)) {
             pos = read_operator(source, pos, tokens, tokens_cpt, line_cpt);
         } else if (char_is_in(c, SEPARATORS, SEPARATORS_SIZE)) {
-            printf("PUTAIN %s\n", token_str[SEPARATOR]);
+            printf("Separator: %s\n", token_str[SEPARATOR]);
             create_token_from_char(c, line_cpt, SEPARATOR, tokens, tokens_cpt);
             pos++;
         } else if (char_is_in(c, STRING_DELIMITERS, STRING_DELIMITERS_SIZE)) {
@@ -464,6 +464,33 @@ int handle_file(char * filename) {
 //-----------------------------------------------------------------------------
 // Tests
 //-----------------------------------------------------------------------------
+
+int test_expression1(Token * tokens) {
+    // A simple operation with parenthesis
+    char * test = "4 * (2 + 3)\n";
+    printf("\nTest 10 : %s\n", test);
+    memset(tokens, MAX_TOKENS, sizeof(Token));
+    int tokens_cpt = 0;
+    tokenize(test, strlen(test), tokens, &tokens_cpt);
+    display_tokens(tokens, tokens_cpt);
+    assert ( tokens_cpt == 8);
+    assert ( tokens[0].type == INTEGER);
+    assert ( strcmp(tokens[0].content, "4") == 0);
+    assert ( tokens[1].type == OPERATOR);
+    assert ( strcmp(tokens[1].content, "*") == 0);
+    assert ( tokens[2].type == SEPARATOR);
+    assert ( strcmp(tokens[2].content, "(") == 0);
+    assert ( tokens[3].type == INTEGER);
+    assert ( strcmp(tokens[3].content, "2") == 0);
+    assert ( tokens[4].type == OPERATOR);
+    assert ( strcmp(tokens[4].content, "+") == 0);
+    assert ( tokens[5].type == INTEGER);
+    assert ( strcmp(tokens[5].content, "3") == 0);
+    assert ( tokens[6].type == SEPARATOR);
+    assert ( strcmp(tokens[6].content, ")") == 0);
+    return tokens_cpt;
+}
+
 void tests(void) {
 
     printf("[INFO] Tests\n");
@@ -577,30 +604,9 @@ void tests(void) {
     assert ( strcmp(tokens[1].content, "and") == 0);
     assert ( tokens[2].type == BOOLEAN);
     assert ( strcmp(tokens[2].content, "False") == 0);
-
-    // A simple operation with parenthesis
-    char * test10 = "4 * (2 + 3)\n";
-    printf("\nTest 10 : %s\n", test10);
-    memset(tokens, MAX_TOKENS, sizeof(Token));
-    tokens_cpt = 0;
-    tokenize(test10, strlen(test10), tokens, &tokens_cpt);
-    display_tokens(tokens, tokens_cpt);
-    assert ( tokens_cpt == 8);
-    assert ( tokens[0].type == INTEGER);
-    assert ( strcmp(tokens[0].content, "4") == 0);
-    assert ( tokens[1].type == OPERATOR);
-    assert ( strcmp(tokens[1].content, "*") == 0);
-    assert ( tokens[2].type == SEPARATOR);
-    assert ( strcmp(tokens[2].content, "(") == 0);
-    assert ( tokens[3].type == INTEGER);
-    assert ( strcmp(tokens[3].content, "2") == 0);
-    assert ( tokens[4].type == OPERATOR);
-    assert ( strcmp(tokens[4].content, "+") == 0);
-    assert ( tokens[5].type == INTEGER);
-    assert ( strcmp(tokens[5].content, "3") == 0);
-    assert ( tokens[6].type == SEPARATOR);
-    assert ( strcmp(tokens[6].content, ")") == 0);
     
+    test_expression1(tokens);
+
     // A String 1
     char * test11 = "\"hello\"";
     printf("\nTest 11 : %s\n", test11);

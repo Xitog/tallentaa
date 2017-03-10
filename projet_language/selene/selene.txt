@@ -16,7 +16,14 @@ h1. Vieux essais
 p. Je mets ici des vieux essais de langage en pagaille. Ils me serviront à "nourrir" Selene.
 
 -----------------------------------------------------------
-h2. Hello/ZemblaVM
+h2. Cléa (création le 03/04/2016)
+-----------------------------------------------------------
+
+p. Projet jamais vraiment commencé à part sa grammaire devenu le fichier grammaire.txt.
+p. Supprimé de Git le 29/12/2016.
+
+-----------------------------------------------------------
+h2. Hello/ZemblaVM (fist and last committed on 13 Mar 2012)
 -----------------------------------------------------------
 
 p. Ce projet est décrit comme "Ruby with type" et présente la particularité d'avoir un embryon de VM.

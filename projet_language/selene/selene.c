@@ -47,6 +47,9 @@ int main(int argc, char * argv[]) {
     tokenize(test1, strlen(test1), tokens, &tokens_cpt);
     display_tokens(tokens, tokens_cpt);
 
+    tokens_cpt = test_expression1(tokens);
+    AST ast;
+    parse(tokens, tokens_cpt, &ast);
 
 }
 

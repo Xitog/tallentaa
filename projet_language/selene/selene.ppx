@@ -2,38 +2,70 @@
 <settings version="1.0">
 	<category name="lexer.c">
 		<category name="Window">
+			<property name="Left" type="integer">26</property>
+			<property name="Top" type="integer">26</property>
+			<property name="Right" type="integer">1457</property>
+			<property name="Bottom" type="integer">565</property>
+			<property name="Maximized" type="integer">0</property>
+			<property name="Active" type="integer">0</property>
+		</category>
+		<category name="Breakpoints">
+			<category name="Breakpoint1">
+				<property name="Line" type="integer">380</property>
+				<property name="Enabled" type="integer">1</property>
+				<property name="HitCount" type="integer">0</property>
+				<property name="Expression" type="string"></property>
+			</category>
+		</category>
+	</category>
+	<category name="tokenizer.c" />
+	<category name="tokenizer_lib.h" />
+	<category name="parser.c">
+		<category name="Window">
 			<property name="Left" type="integer">-8</property>
 			<property name="Top" type="integer">-31</property>
-			<property name="Right" type="integer">1689</property>
+			<property name="Right" type="integer">1701</property>
 			<property name="Bottom" type="integer">727</property>
 			<property name="Maximized" type="integer">1</property>
 			<property name="Active" type="integer">1</property>
 		</category>
-		<category name="Breakpoints">
-			<category name="Breakpoint1">
-				<property name="Line" type="integer">300</property>
-				<property name="Enabled" type="integer">1</property>
-				<property name="HitCount" type="integer">0</property>
-				<property name="Expression" type="string" />			</category>
-		</category>
 	</category>
-	<category name="tokenizer.c" />
-	<category name="tokenizer_lib.h">
+	<category name="selene.txt">
 		<category name="Window">
-			<property name="Left" type="integer">52</property>
-			<property name="Top" type="integer">52</property>
-			<property name="Right" type="integer">1483</property>
-			<property name="Bottom" type="integer">591</property>
+			<property name="Left" type="integer">208</property>
+			<property name="Top" type="integer">208</property>
+			<property name="Right" type="integer">745</property>
+			<property name="Bottom" type="integer">735</property>
 			<property name="Maximized" type="integer">0</property>
 			<property name="Active" type="integer">0</property>
 		</category>
 	</category>
-	<category name="parser.c">
+	<category name="parser.h">
 		<category name="Window">
-			<property name="Left" type="integer">78</property>
-			<property name="Top" type="integer">78</property>
-			<property name="Right" type="integer">1509</property>
-			<property name="Bottom" type="integer">617</property>
+			<property name="Left" type="integer">156</property>
+			<property name="Top" type="integer">156</property>
+			<property name="Right" type="integer">693</property>
+			<property name="Bottom" type="integer">683</property>
+			<property name="Maximized" type="integer">0</property>
+			<property name="Active" type="integer">0</property>
+		</category>
+	</category>
+	<category name="selene.c">
+		<category name="Window">
+			<property name="Left" type="integer">26</property>
+			<property name="Top" type="integer">26</property>
+			<property name="Right" type="integer">1295</property>
+			<property name="Bottom" type="integer">565</property>
+			<property name="Maximized" type="integer">0</property>
+			<property name="Active" type="integer">0</property>
+		</category>
+	</category>
+	<category name="lexer.h">
+		<category name="Window">
+			<property name="Left" type="integer">182</property>
+			<property name="Top" type="integer">182</property>
+			<property name="Right" type="integer">719</property>
+			<property name="Bottom" type="integer">709</property>
 			<property name="Maximized" type="integer">0</property>
 			<property name="Active" type="integer">0</property>
 		</category>
