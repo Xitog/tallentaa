@@ -1,5 +1,5 @@
-#ifndef TOKENIZER_LIB
-#define TOKENIZER_LIB
+#ifndef LEXER_LIB
+#define LEXER_LIB
 
 //-----------------------------------------------------------------------------
 // Libraries
@@ -14,7 +14,7 @@
 #include <assert.h>
 
 //-----------------------------------------------------------------------------
-// Lexer constants
+// Constants
 //-----------------------------------------------------------------------------
 
 extern const int MAX_TOKENS;

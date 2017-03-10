@@ -142,15 +142,3 @@ void go(void) {
 		//system("pause");
 	}
 }
-
-Cell * list_create(void) {
-	Cell * c = (Cell *) malloc(sizeof(Cell));
-	c->next = NULL;
-	c->value = NULL;
-	c->type = NONE;
-	return c;
-}
-
-void list_add(Cell * liste, void * val, short type) {
-
-}

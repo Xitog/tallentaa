@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <settings version="1.0">
-	<category name="tokenizer_lib.c">
+	<category name="lexer.c">
 		<category name="Window">
 			<property name="Left" type="integer">-8</property>
 			<property name="Top" type="integer">-31</property>
@@ -14,8 +14,7 @@
 				<property name="Line" type="integer">300</property>
 				<property name="Enabled" type="integer">1</property>
 				<property name="HitCount" type="integer">0</property>
-				<property name="Expression" type="string"></property>
-			</category>
+				<property name="Expression" type="string" />			</category>
 		</category>
 	</category>
 	<category name="tokenizer.c" />

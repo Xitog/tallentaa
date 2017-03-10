@@ -1,15 +1,5 @@
-//-----------------------------------------------------------------------------
-// Libraries
-//-----------------------------------------------------------------------------
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdbool.h>
-#include <assert.h>
-#include "tokenizer_lib.h"
+#include "lexer.h"
+#include "parser.h"
 
 #ifdef TOKENIZER
 
@@ -35,6 +25,29 @@ int main(int argc, char * argv[]) {
     return 0;
     //exit(EXIT_SUCCESS);
     
+}
+
+#endif
+
+#ifdef PARSER
+
+int main(int argc, char * argv[]) {
+    printf("Parser v0.1\n");
+
+    Token tokens[MAX_TOKENS];
+    int tokens_cpt = 0;
+    
+    tests();
+
+    // A simple Hello World
+    char * test1 = "writeln(\"Hello world!\")";
+    printf("\nTest 1 : %s\n", test1);
+    memset(tokens, MAX_TOKENS, sizeof(Token));
+    tokens_cpt = 0;
+    tokenize(test1, strlen(test1), tokens, &tokens_cpt);
+    display_tokens(tokens, tokens_cpt);
+
+
 }
 
 #endif

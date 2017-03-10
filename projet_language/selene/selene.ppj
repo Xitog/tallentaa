@@ -8,7 +8,7 @@ POC_PROJECT_TYPE = 3#
 POC_PROJECT_OUTPUTDIR = output#
 POC_PROJECT_RESULTDIR = .#
 POC_PROJECT_ARGUMENTS = #
-POC_PROJECT_WORKPATH = #
+POC_PROJECT_WORKPATH = .#
 POC_PROJECT_EXECUTOR = #
 POC_PROJECT_ZIPEXTRA = #
 CC = pocc.exe#
@@ -29,8 +29,8 @@ LIB = $(PellesCDir)\Lib\Win;$(PellesCDir)\Lib#
 # 
 selene.exe: \
 	output\parser.obj \
-	output\tokenizer.obj \
-	output\tokenizer_lib.obj
+	output\lexer.obj \
+	output\selene.obj
 	$(LINK) $(LINKFLAGS) -out:"$@" $**
 
 # 
@@ -38,25 +38,30 @@ selene.exe: \
 # 
 output\parser.obj: \
 	parser.c \
-	tokenizer_lib.h
+	lexer.h \
+	parser.h
 	$(CC) $(CCFLAGS) "$!" -Fo"$@"
 
 # 
-# Construction de tokenizer.obj.
+# Construction de lexer.obj.
 # 
-output\tokenizer.obj: \
-	tokenizer.c \
-	tokenizer_lib.h
+output\lexer.obj: \
+	lexer.c \
+	lexer.h
 	$(CC) $(CCFLAGS) "$!" -Fo"$@"
 
 # 
-# Construction de tokenizer_lib.obj.
+# Construction de selene.obj.
 # 
-output\tokenizer_lib.obj: \
-	tokenizer_lib.c \
-	tokenizer_lib.h
+output\selene.obj: \
+	selene.c \
+	lexer.h \
+	parser.h
 	$(CC) $(CCFLAGS) "$!" -Fo"$@"
 
-.EXCLUDEDFILES:
+.OTHERFILES: \
+	selene.txt
 
 .SILENT:
+
+.EXCLUDEDFILES:

@@ -1,4 +1,4 @@
-#include "tokenizer_lib.h"
+#include "lexer.h"
 
 //-----------------------------------------------------------------------------
 // Lexer constants
@@ -81,8 +81,88 @@ bool char_is_in(char c, char table[], int size) {
 // Reader of tokens function
 //-----------------------------------------------------------------------------
 
-// Return new pos
+int read_digit(char * source, long * pos, char * buffer, int * buffer_cpt) {
+    char c = ' ';
+    int nb = 0;
+    do {
+        c = source[*pos];
+        if (isdigit(c)) {
+            buffer[*buffer_cpt] = c;
+            (*buffer_cpt) += 1;
+            (*pos)++;
+            nb++;
+        }
+    } while (isdigit(c));
+    return nb;
+}
+
+//
+// number :=
+//          int
+//          int frac
+//          int exp
+//          int frac exp
+// int :=
+//          digits
+//          différences par rapport à JSON :
+//              - on peut avoir 019
+//              - de plus le - n'est pas compris dans le littéral
+// frac :=
+//          . digits
+// exp :=
+//          e digits
+// digits :=
+//          [0-9]
+//          [0-9] digits         
+//
 int read_num(char * source, long pos, Token * tokens, int * tokens_cpt, int line_cpt) {
+    printf("> Reading num\n");
+    // Create common buffer
+    char * buffer = (char *) calloc(MAX_BUFFER, sizeof(char));
+    int buffer_cpt = 0;
+    // Read
+    int nb = 0;
+    nb = read_digit(source, &pos, buffer, &buffer_cpt);
+    assert(nb > 0);
+    bool is_float = false;
+    if (source[pos] == '.') {
+        is_float = true;
+        buffer[buffer_cpt] = '.';
+        buffer_cpt++;
+        pos++;
+        read_digit(source, &pos, buffer, &buffer_cpt);
+        assert(nb > 0);
+    }
+    if (source[pos] == 'e' || source[pos] == 'E') {
+        buffer[buffer_cpt] = source[pos];
+        buffer_cpt++;
+        pos++;
+        if (source[pos] == '-' || source[pos] == '+') {
+            buffer[buffer_cpt] = source[pos];
+            buffer_cpt++;
+            pos++;
+        }
+        read_digit(source, &pos, buffer, &buffer_cpt);
+        assert(nb > 0);
+    }
+    // Produce Token
+    printf("  read_num2 : Producing token : %s, returning pos : %i\n", buffer, pos);
+    tokens[*tokens_cpt].content = (char *) calloc(buffer_cpt, sizeof(char));
+    strcpy(tokens[*tokens_cpt].content, buffer);
+    tokens[*tokens_cpt].line = line_cpt;
+    if (is_float) {
+        tokens[*tokens_cpt].type = FLOAT;
+    } else {
+        tokens[*tokens_cpt].type = INTEGER;
+    }
+    *tokens_cpt += 1;
+    // Destroy buffer
+    free(buffer);
+    return pos;
+}
+
+// Return new pos
+int read_num_old(char * source, long pos, Token * tokens, int * tokens_cpt, int line_cpt) {
     printf("> Reading num\n");
     // Create buffer
     char * buffer = (char *) calloc(MAX_BUFFER, sizeof(char));
@@ -543,6 +623,24 @@ void tests(void) {
     assert ( tokens_cpt == 1);
     assert ( tokens[0].type == STRING);
     assert ( strcmp(tokens[0].content, "\"hel\'lo\"") == 0);
+    
+    // Exp
+    char * test13 = "14e3 14.3e24 14.2E-5 13.2e+159";
+    printf("\nTest 13 : %s\n", test13);
+    memset(tokens, MAX_TOKENS, sizeof(Token));
+    tokens_cpt = 0;
+    tokenize(test13, strlen(test13), tokens, &tokens_cpt);
+    printf("#tokens = %i\n", tokens_cpt);
+    display_tokens(tokens, tokens_cpt);
+    assert ( tokens_cpt == 4);
+    assert ( tokens[0].type == INTEGER);
+    assert ( strcmp(tokens[0].content, "14e3") == 0);
+    assert ( tokens[1].type == FLOAT);
+    assert ( strcmp(tokens[1].content, "14.3e24") == 0);
+    assert ( tokens[2].type == FLOAT);
+    assert ( strcmp(tokens[2].content, "14.2E-5") == 0);
+    assert ( tokens[3].type == FLOAT);
+    assert ( strcmp(tokens[3].content, "13.2e+159") == 0);
     
     printf("\nEND OF TESTS\n");
 }

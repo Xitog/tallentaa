@@ -1,8 +1,347 @@
 title. Selene
 
+===============================================================================
 h1. Introduction
+===============================================================================
 
 Selene (en référence à Lua) est un triplé tokenizer/lexer + parser + émetteur de code codé en C.
 Il est la fusion de deux projets : 
     - C_Tokenizer
     - C_Parser (commencé et fusionné aujourd'hui)
+
+===============================================================================
+h1. Vieux essais
+===============================================================================
+
+p. Je mets ici des vieux essais de langage en pagaille. Ils me serviront à "nourrir" Selene.
+
+-----------------------------------------------------------
+h2. Hello/ZemblaVM
+-----------------------------------------------------------
+
+p. Ce projet est décrit comme "Ruby with type" et présente la particularité d'avoir un embryon de VM.
+p. Supprimé de Git le 10/03/2017.
+
+h3. Liste d'"opérateurs"
+
+p. Certains n'en sont pas. Il y en a 41 en tout.
+
+* General
+    * Comparison (3) : == != is (is : a -> @283847 <- b)
+* Integer & Float
+    * Aritmethic Operator (6) : + - / * % // **
+    * Comparison Operator (4) : > >= < <= <=> (-1,0,1)
+    * Affectation Operator (7) : = += -= /= %= //= **=
+* Boolean
+    * Binary Operator (3) : and or xor
+    * Unary  Operator (1) : not
+* Binary
+    * Binary Operator (5) : << >>	& | ^
+    * Unary  Operator (1) : ! ~(reverse)
+    * Affectation Operator (5) : &= |= ^= <<= >>=
+* Others
+    * Parenthesis (2) : ( )
+    * Separator (2) : NL	;
+    * Access Operator (1) : .
+    * Comment start (1) : #
+
+p. Je les divise ensuite par nombre de caractères (23 en tout, y a un pb)
+
+* Symbole monocaractère (4) : + - / * % NL .
+* Symbole multicaractère 2 (14) : += -= /= %= // ** == != > >= < <= << >>
+* Symbole multicaractère 3 (5) : //= **= <=> <<= >>=
+														   	
+p. Symbole ambiguë : + (2) / (4) - (2) % (2) * (4)
+
+h3. Keywords
+
+* selection : if else elsif/elif unless then end
+* iteration : while until for do
+* break return next/continue
+* is, and, or, xor, not
+* var
+* fun
+* class
+* import, module, include
+
+h3. Littéral
+
+* "str" ou 'str' ou """str"""
+* 0xHexa (hexadécimal)
+* 0b0101 (binary)
+* 092 (octal)
+* 0.5 .5 0. 0e+23 0e23 0e-23
+* v = (a : 5, b : 25) : table
+* v.a, v(:a), v("a"), v('a')
+
+h3. Déclarations
+
+p. Déjà l'idée du type de retour DANS les parenthèses.
+
+fun(int, int -> int) add = f
+fun add(int a = 3, int b = 5 -> int)
+  return a+b
+end
+class Personne < Animal
+   include walk
+   fun hello()
+      writeln("hello")
+   end
+ end
+ p = Personne.new()
+ p.hello
+ class List(T)
+ end
+
+h3. Identifiers
+
+* $global
+* Constante
+* @instancevar
+* @@classevar
+* :symbol
+
+h3. Base type
+
+p. Déjà l'idée de number regroupant float & integer. J'ai toujours les mêmes idées en fait...
+
+* bool/Boolean
+* int/Integer
+* flt/float/Float
+* lst/List
+* dict/Dict [dct aurait été marrant]
+* str/string/String, Duration, Date, Time
+* num/Number est une classe regroupant Float & Integer
+* File, Dir
+* Exception
+
+h3. Librairie de base
+
+* List : <<, ==, is, (), ()=, +/concat, -, *, & (intersection), | (union), get/at, elements, clear, zip, 
+* delete, delete_at, empty?, replace, first, last, random, flatten, include?, index, all_index, join/to_s, 
+* length/count/size, pop, push, reverse, shift (pop first), slice, sort, uniq, insert_at
+* Integer : + - * / % // ** | & << >> ^ ~ <=>, >, >=, <=, <, () -> bit x, size, to_f, to_s, to_i
+* Float : + - * / % // ** <=>, >, >=, <=, <, ceil (>= int), finite?, floor (<= int), infinite?, nan?, round (plus proche de 0.5), to_f, to_s, to_i
+* Boolean and xor or not
+* Dict
+* String
+* Duration
+* Date
+* Time
+* File
+* Dir
+* Exception
+
+h3. Liens
+
+* http://www.lysator.liu.se/c/ANSI-C-grammar-l.html
+* http://dinosaur.compilertools.net/
+* http://eli-project.sourceforge.net/EliExamples.html
+* http://www.standardpascal.org/yacclex.html
+* http://ashimg.tripod.com/Parser.html
+* http://stackoverflow.com/questions/2467020/looking-for-a-java-grammar-in-lex-yacc-format
+* http://sablecc.org/
+* http://sablecc.sourceforge.net/grammars.html
+* http://www.dabeaz.com/ply/
+* http://www.ruby-doc.org/docs/ProgrammingRuby/
+
+h3. Vieux code
+
+p. Une liste chaînée classique.
+
+typedef struct _Element
+{
+	struct _Element * next;
+	int start;
+	int length;
+	int line;
+	TokenType type;
+} Element;
+
+void add(Element ** list, int start, int length, TokenType t)
+{
+	if (*list == NULL)
+	{
+		*list = malloc(sizeof(Element));
+		(*list)->next = NULL;
+		(*list)->start = start;
+		(*list)->length = length;
+		(*list)->type = t;
+	}
+	else
+	{
+		add(&((*list)->next), start, length, t);
+	}
+}
+
+p. Une liste pour "tout type", pour stocker les objets.
+
+struct _Cell {
+	struct _Cell * next;
+	void * value;
+	short type;
+};
+
+typedef struct _Cell Cell;
+
+Cell * list_create(void);
+void list_add(Cell * liste, void * val, short type);
+
+Cell * list_create(void) {
+	Cell * c = (Cell *) malloc(sizeof(Cell));
+	c->next = NULL;
+	c->value = NULL;
+	c->type = NONE;
+	return c;
+}
+
+void list_add(Cell * liste, void * val, short type) {
+
+}
+
+h3. Vieux code de la VM
+
+// MACHINE VIRTUELLE ZEMBLA
+
+#include "zembla.h"
+
+#define LOAD_INT     0x00000001 // 1
+#define LOAD_REF_INT 0x00000002 // 2
+#define LOAD_ADDR	 0x00000003 // 3
+
+#define STORE        0x00000010 // 16
+
+#define GT           0x00000100 // 256
+
+#define JMP_FALSE    0x00001000 // 4096
+#define JUMP_NEG     0x00003000 // 12288
+
+#define END	  	     0x00010000 // 65536
+
+#define ADD_INT      0x00100000 // 1048576
+
+#define PRINT_INT	 0x01000000
+
+long a[32];
+long vars[32];
+long vars_ptr;
+long stack[32];
+long stack_ptr;
+
+// ATTENTION AUX SAUTS !!!
+void instruction_init(void) {
+	a[0] = LOAD_INT;		// i = 0					1
+	a[1] = 0x00000000;
+	a[2] = LOAD_ADDR;		//							3
+	a[3] = 0x00000000;
+	a[4] = STORE;			//							16
+	a[5] = LOAD_INT;		// while 5 > i do			1
+	a[6] = 0x00000005;
+	a[7] = LOAD_REF_INT;	//							2
+	a[8] = 0x00000000;
+	a[9] = GT;				//							256
+	a[10]= JMP_FALSE;		//							4096
+	a[11]= 0x0000000E;
+	a[12]= PRINT_INT;		// print i
+	a[13]= 0x00000000;
+	a[14]= LOAD_INT;		// i += 1					1
+	a[15]= 0x00000001;
+	a[16]= LOAD_REF_INT;	//							2
+	a[17]= 0x00000000;
+	a[18]= ADD_INT;			//							1048576
+	a[19]= LOAD_ADDR;		//							3
+	a[20]= 0x00000000;
+	a[21]= STORE;			//							16
+	a[22]= JUMP_NEG;		// end						12288
+	a[23]= 0x00000011;
+	a[24]= END;				//							65536
+}
+
+void go(void) {
+	printf("size long = %d\n\n", sizeof(long));
+
+	instruction_init();
+	long cpt = 0;
+	long val = a[cpt];
+
+	printf("instructions :\n");
+	while (val != END) {
+		printf("%d.\t0x%08.8X\n", cpt, val);
+		cpt += 1;
+		val = a[cpt];
+	}
+	printf("%d.\t0x%08.8X\n\n", cpt, val);
+
+	vars[0] = -1;
+	stack_ptr = 0;
+	cpt = 0;
+	while (1) {
+		//printf("order=%d, cpt=%d, stack_ptr=%d\n", a[cpt], cpt, stack_ptr);
+
+		val = a[cpt];
+		if (val == LOAD_INT) {
+			//printf("\tje charge %d dans la pile !\n", a[cpt+1]);
+			stack[stack_ptr] = a[cpt+1];
+			stack_ptr+=1;
+			cpt+=2;
+		} else if (val == LOAD_ADDR) {
+			//printf("\tje charge une addr\n");
+			stack[stack_ptr] = a[cpt+1];
+			stack_ptr+=1;
+			cpt+=2;
+		} else if (val == STORE) {
+			//printf("\tje store\n");
+			long addr = stack[stack_ptr-1];
+			long value = stack[stack_ptr-2];
+			vars[addr] = value;
+			stack_ptr-=2;
+			cpt+=1;
+		} else if (val == LOAD_REF_INT) {
+			stack[stack_ptr] = vars[a[cpt+1]];
+			stack_ptr+=1;
+			cpt+=2;
+		} else if (val == GT) {
+			long op1 = stack[stack_ptr-2];
+			long op2 = stack[stack_ptr-1];
+			stack_ptr-=2;
+			stack[stack_ptr] = op1 > op2;
+			stack_ptr+=1;
+			cpt+=1;
+		} else if (val == JMP_FALSE) {
+			if (!stack[stack_ptr-1]) {
+				//printf("\tje jump a %d !\n", cpt+a[cpt+1]);
+				cpt+=a[cpt+1];
+			} else {
+				cpt+=2;
+			}
+			stack_ptr-=1; // pop
+		} else if (val == ADD_INT) {
+			long op1 = stack[stack_ptr-1];
+			long op2 = stack[stack_ptr-2];
+			stack_ptr-=2;
+			stack[stack_ptr] = op1 + op2;
+			stack_ptr+=1;
+			cpt+=1;
+		} else if (val == JUMP_NEG) {
+			cpt -= a[cpt+1];
+		} else if (val == PRINT_INT) {
+			printf("%d\n", vars[a[cpt+1]]);
+			cpt+=2;
+		} else if (val == END) {
+			break;
+		}
+	
+		/*
+		long x = stack_ptr;
+		printf("\t(%d)[", stack_ptr);
+		while (x > 0) {
+			printf("%d, ", stack[x-1]);
+			x-=1;
+		}
+		printf("]\n");
+		printf("\ti=%d\n", vars[0]);
+		*/
+
+		//system("pause");
+	}
+}
