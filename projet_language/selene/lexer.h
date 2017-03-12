@@ -94,5 +94,6 @@ void display_tokens(Token * tokens, int tokens_cpt);
 int handle_file(char * filename);
 void tests(void);
 int test_expression1(Token * tokens);
+int test_expression2(Token * tokens);
 
 #endif

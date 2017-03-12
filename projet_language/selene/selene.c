@@ -46,10 +46,22 @@ int main(int argc, char * argv[]) {
     tokens_cpt = 0;
     tokenize(test1, strlen(test1), tokens, &tokens_cpt);
     display_tokens(tokens, tokens_cpt);
+    
+    printf("\n====== START OF PARSER TESTS ======\n");
 
+    printf("\n=== Test 1 ===\n");
     tokens_cpt = test_expression1(tokens);
     AST ast;
     parse(tokens, tokens_cpt, &ast);
+
+    printf("\n=== Test 2 ===\n");
+    tokens_cpt = test_expression2(tokens);
+    // reset AST
+    parse(tokens, tokens_cpt, &ast);
+    
+    printf("\n====== END OF PARSER TESTS ======\n");
+    
+    printf("\n====== END OF SELENE ======\n\n");
 
 }
 

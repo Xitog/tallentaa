@@ -116,7 +116,9 @@ int read_digit(char * source, long * pos, char * buffer, int * buffer_cpt) {
 //          [0-9] digits         
 //
 int read_num(char * source, long pos, Token * tokens, int * tokens_cpt, int line_cpt) {
-    printf("> Reading num\n");
+    #ifdef VERBOSE
+        printf("> Reading num\n");
+    #endif
     // Create common buffer
     char * buffer = (char *) calloc(MAX_BUFFER, sizeof(char));
     int buffer_cpt = 0;
@@ -146,7 +148,9 @@ int read_num(char * source, long pos, Token * tokens, int * tokens_cpt, int line
         assert(nb > 0);
     }
     // Produce Token
-    printf("  read_num2 : Producing token : %s, returning pos : %i\n", buffer, pos);
+    #ifdef VERBOSE
+        printf("  read_num : Producing token : %s, returning pos : %i\n", buffer, pos);
+    #endif
     tokens[*tokens_cpt].content = (char *) calloc(buffer_cpt, sizeof(char));
     strcpy(tokens[*tokens_cpt].content, buffer);
     tokens[*tokens_cpt].line = line_cpt;
@@ -163,7 +167,9 @@ int read_num(char * source, long pos, Token * tokens, int * tokens_cpt, int line
 
 // Return new pos
 int read_num_old(char * source, long pos, Token * tokens, int * tokens_cpt, int line_cpt) {
-    printf("> Reading num\n");
+    #ifdef VERBOSE
+        printf("> Reading num\n");
+    #endif
     // Create buffer
     char * buffer = (char *) calloc(MAX_BUFFER, sizeof(char));
     int buffer_cpt = 0;
@@ -186,7 +192,9 @@ int read_num_old(char * source, long pos, Token * tokens, int * tokens_cpt, int 
             end = true;
         } else {
             // Produce token
-            printf("  read_num : Producing token : %s, returning pos : %i\n", buffer, pos);
+            #ifdef VERBOSE
+                printf("  read_num : Producing token : %s, returning pos : %i\n", buffer, pos);
+            #endif
             tokens[*tokens_cpt].content = (char *) calloc(buffer_cpt, sizeof(char));
             strcpy(tokens[*tokens_cpt].content, buffer);
             tokens[*tokens_cpt].line = line_cpt;
@@ -207,7 +215,9 @@ int read_num_old(char * source, long pos, Token * tokens, int * tokens_cpt, int 
 
 // Return new pos
 int read_id(char * source, long pos, Token * tokens, int * tokens_cpt, int line_cpt) {
-    printf("> Reading id\n");
+    #ifdef VERBOSE
+        printf("> Reading id\n");
+    #endif
     // Create buffer
     char * buffer = (char *) calloc(MAX_BUFFER, sizeof(char));
     int buffer_cpt = 0;
@@ -222,7 +232,9 @@ int read_id(char * source, long pos, Token * tokens, int * tokens_cpt, int line_
             pos++;
         } else {
             // Produce token
-            printf("  read_id : Producing token : %s, returning pos : %i\n", buffer, pos);
+            #ifdef VERBOSE
+                printf("  read_id : Producing token : %s, returning pos : %i\n", buffer, pos);
+            #endif
             tokens[*tokens_cpt].content = (char *) calloc(buffer_cpt, sizeof(char));
             strcpy(tokens[*tokens_cpt].content, buffer);
             tokens[*tokens_cpt].line = line_cpt;
@@ -247,7 +259,9 @@ int read_id(char * source, long pos, Token * tokens, int * tokens_cpt, int line_
 
 // Return new pos
 int read_operator(char * source, long pos, Token * tokens, int * tokens_cpt, int line_cpt) {
-    printf("> Reading operator\n");
+    #ifdef VERBOSE
+        printf("> Reading operator\n");
+    #endif
     // Create buffer
     char * buffer = (char *) calloc(MAX_BUFFER, sizeof(char));
     int buffer_cpt = 0;
@@ -262,7 +276,9 @@ int read_operator(char * source, long pos, Token * tokens, int * tokens_cpt, int
             pos++;
         } else {
             // Produce token
-            printf("  read_operator : Producing token : %s, returning pos : %i\n", buffer, pos);
+            #ifdef VERBOSE
+                printf("  read_operator : Producing token : %s, returning pos : %i\n", buffer, pos);
+            #endif
             tokens[*tokens_cpt].content = (char *) calloc(buffer_cpt, sizeof(char));
             strcpy(tokens[*tokens_cpt].content, buffer);
             tokens[*tokens_cpt].line = line_cpt;
@@ -283,7 +299,9 @@ int read_operator(char * source, long pos, Token * tokens, int * tokens_cpt, int
 
 // Return new pos TODO
 int read_string(char * source, long pos, Token * tokens, int * tokens_cpt, int line_cpt) {
-    printf("> Reading string\n");
+    #ifdef VERBOSE
+        printf("> Reading string\n");
+    #endif
     // Create buffer
     char * buffer = (char *) calloc(MAX_BUFFER, sizeof(char));
     int buffer_cpt = 0;
@@ -324,7 +342,9 @@ int read_string(char * source, long pos, Token * tokens, int * tokens_cpt, int l
 //-----------------------------------------------------------------------------
 
 void create_token_from_string(char * content, int line_cpt, TokenType ttype, Token * tokens, int * tokens_cpt) {
-    printf("    create_token_from_string : Producing token for %s of type %s at line %i\n", content, token_str[ttype], line_cpt);
+    #ifdef VERBOSE
+        printf("    create_token_from_string : Producing token for %s of type %s at line %i\n", content, token_str[ttype], line_cpt);
+    #endif
     tokens[*tokens_cpt].content = (char *) calloc(strlen(content)+1, sizeof(char));
     strcpy(tokens[*tokens_cpt].content, content);
     tokens[*tokens_cpt].line = line_cpt;
@@ -333,7 +353,9 @@ void create_token_from_string(char * content, int line_cpt, TokenType ttype, Tok
 }
 
 void create_token_from_char(char content, int line_cpt, TokenType ttype, Token * tokens, int * tokens_cpt) {
-    printf("    it is a char! %c of type %s\n", content, token_str[ttype]);
+    #ifdef VERBOSE
+        printf("    it is a char! %c of type %s\n", content, token_str[ttype]);
+    #endif
     char buffer[2] = "\0"; // <=> { '\0', '\0' };
     buffer[0] = content;
     create_token_from_string(buffer, line_cpt, ttype, tokens, tokens_cpt);
@@ -344,19 +366,27 @@ void tokenize(char * source, long size, Token * tokens, int * tokens_cpt) {
     int line_cpt = 1;
     while (pos < size) {
         char c = source[pos];
-        printf("I read : %x (%c) at %i\n", c, c, pos);
+        #ifdef VERBOSE
+            printf("I read : %x (%c) at %i\n", c, c, pos);
+        #endif
         if (isdigit(c)) {
             pos = read_num(source, pos, tokens, tokens_cpt, line_cpt);
         } else if (c == '\n') { // does not handle macos new line \n\r
-            printf(">Reading linux new line (line feed) \\n at %i.\n", pos);
+            #ifdef VERBOSE
+                printf(">Reading linux new line (line feed) \\n at %i.\n", pos);
+            #endif
             //printf("  Producing token new line\n");
             create_token_from_char('\n', line_cpt, SEPARATOR, tokens, tokens_cpt);
             pos++;
         } else if (c == '\r') {
-            printf(">Reading ms-dos new line (carriage return) \\r at %i.\n", pos);
+            #ifdef VERBOSE
+                printf(">Reading ms-dos new line (carriage return) \\r at %i.\n", pos);
+            #endif
             if (pos + 1 < size) {
                 if (source[pos + 1] == '\n') {
-                    printf("  Producing token new line\n");
+                    #ifdef VERBOSE
+                        printf("  Producing token new line\n");
+                    #endif
                     create_token_from_char('\n', line_cpt, SEPARATOR, tokens, tokens_cpt);
                     line_cpt++;
                     pos += 2;
@@ -368,7 +398,9 @@ void tokenize(char * source, long size, Token * tokens, int * tokens_cpt) {
         } else if (isalpha(c) || char_is_in(c, SYMBOLS_OK_IN_ID, SYMBOLS_OK_IN_ID_SIZE)) {
             pos = read_id(source, pos, tokens, tokens_cpt, line_cpt);
         } else if (c == ' ') {
-            printf(">Reading and discarding space at position %i, advancing at %i.\n", pos, pos+1);
+            #ifdef VERBOSE
+                printf(">Reading and discarding space at position %i, advancing at %i.\n", pos, pos+1);
+            #endif
             pos++; // Discard blank
         } else if (c == '\0') {
             printf(">End of source.\n");
@@ -376,7 +408,9 @@ void tokenize(char * source, long size, Token * tokens, int * tokens_cpt) {
         } else if (char_is_in(c, OPERATOR_CHARS, OPERATOR_CHARS_SIZE)) {
             pos = read_operator(source, pos, tokens, tokens_cpt, line_cpt);
         } else if (char_is_in(c, SEPARATORS, SEPARATORS_SIZE)) {
-            printf("Separator: %s\n", token_str[SEPARATOR]);
+            #ifdef VERBOSE
+                printf("Separator: %s\n", token_str[SEPARATOR]);
+            #endif
             create_token_from_char(c, line_cpt, SEPARATOR, tokens, tokens_cpt);
             pos++;
         } else if (char_is_in(c, STRING_DELIMITERS, STRING_DELIMITERS_SIZE)) {
@@ -393,7 +427,8 @@ void tokenize(char * source, long size, Token * tokens, int * tokens_cpt) {
 //-----------------------------------------------------------------------------
 
 void display_tokens(Token * tokens, int tokens_cpt) {
-    printf("[INFO] Tokens produced : %i\n", tokens_cpt);
+    //printf("[INFO] Tokens produced : %i\n", tokens_cpt);
+    printf("Tokens produced : %i\n\n", tokens_cpt);
     int i = 0;
     while (i < tokens_cpt) {
         printf("%i : [%s] %s\n", i+1, token_str[tokens[i].type], tokens[i].content);
@@ -468,7 +503,7 @@ int handle_file(char * filename) {
 int test_expression1(Token * tokens) {
     // A simple operation with parenthesis
     char * test = "4 * (2 + 3)\n";
-    printf("\nTest 10 : %s\n", test);
+    printf("\nTest : %s\n", test);
     memset(tokens, MAX_TOKENS, sizeof(Token));
     int tokens_cpt = 0;
     tokenize(test, strlen(test), tokens, &tokens_cpt);
@@ -488,6 +523,31 @@ int test_expression1(Token * tokens) {
     assert ( strcmp(tokens[5].content, "3") == 0);
     assert ( tokens[6].type == SEPARATOR);
     assert ( strcmp(tokens[6].content, ")") == 0);
+    // 5 = \n
+    return tokens_cpt;
+}
+
+
+int test_expression2(Token * tokens) {
+    // A simple operation with parenthesis
+    char * test = "4 + 2 * 3\n";
+    printf("\nTest : %s\n", test);
+    memset(tokens, MAX_TOKENS, sizeof(Token));
+    int tokens_cpt = 0;
+    tokenize(test, strlen(test), tokens, &tokens_cpt);
+    display_tokens(tokens, tokens_cpt);
+    assert ( tokens_cpt == 6);
+    assert ( tokens[0].type == INTEGER);
+    assert ( strcmp(tokens[0].content, "4") == 0);
+    assert ( tokens[1].type == OPERATOR);
+    assert ( strcmp(tokens[1].content, "+") == 0);
+    assert ( tokens[2].type == INTEGER);
+    assert ( strcmp(tokens[2].content, "2") == 0);
+    assert ( tokens[3].type == OPERATOR);
+    assert ( strcmp(tokens[3].content, "*") == 0);
+    assert ( tokens[4].type == INTEGER);
+    assert ( strcmp(tokens[4].content, "3") == 0);
+    // 5 = \n
     return tokens_cpt;
 }
 
@@ -648,5 +708,5 @@ void tests(void) {
     assert ( tokens[3].type == FLOAT);
     assert ( strcmp(tokens[3].content, "13.2e+159") == 0);
     
-    printf("\nEND OF TESTS\n");
+    printf("\n====== END OF LEXER TESTS ======\n");
 }

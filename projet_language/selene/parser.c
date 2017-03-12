@@ -5,6 +5,7 @@ const int MAX_STACK = 128;
 typedef struct {
     int * token;
     int * priority;
+    Node * nodes;
     int head;
 } Stack;
 
@@ -12,6 +13,7 @@ Stack * stack_create(void) {
     Stack * s = (Stack *) calloc(1, sizeof(Stack));
     s->token = (int *) calloc(MAX_STACK, sizeof(int));
     s->priority = (int *) calloc(MAX_STACK, sizeof(int));
+    s->nodes = (Node *) calloc(MAX_STACK, sizeof(Node));
     s->head = 0;
     return s;
 }
@@ -20,6 +22,10 @@ void stack_add(Stack * s, int token, int priority) {
     s->token[s->head] = token;
     s->priority[s->head] = priority;
     (s->head)++;
+}
+
+int stack_size(Stack * s) {
+    return s->head;
 }
 
 int stack_max(Stack * s) {
@@ -35,13 +41,19 @@ int stack_max(Stack * s) {
     return token;
 }
 
-void stack_print_at(Stack * s, Token * tokens, int i) {
-    printf("%i. %s : prio = %i\n", s->token[i], tokens[s->token[i]].content, s->priority[i]);
+void stack_disable(Stack * s, int i) {
+    assert(i >= 0);
+    assert(i < s->head);
+    s->priority[i] = 0; // the token will never be picked up by the get max algorithm
 }
 
-void stack_print(Stack * s, Token * tokens) {
+void stack_print_at(Stack * s, Token * tokens, int i, char * level) {
+    printf("%s%i. %s : prio = %i\n", level, s->token[i], tokens[s->token[i]].content, s->priority[i]);
+}
+
+void stack_print(Stack * s, Token * tokens, char * level) {
     for(int i = 0; i < s->head; i++) {
-        stack_print_at(s,  tokens, i);
+        stack_print_at(s,  tokens, i, level);
     }
 }
 
@@ -55,7 +67,7 @@ int priority(char * operator) {
 }
 
 void parse(Token * tokens, int tokens_cpt, AST * ast) {
-    printf("\n\nParsing %i tokens\n", tokens_cpt);
+    printf("Parsing %i tokens\n\n", tokens_cpt);
     // on va dire qu'on a directement une expression
     // On calcule les priorités
     Stack * s = stack_create();
@@ -66,11 +78,16 @@ void parse(Token * tokens, int tokens_cpt, AST * ast) {
             stack_add(s, i, priority(tokens[i].content));
         }
     }
-    stack_print(s, tokens);
-    // On sélectionne la plus forte
-    printf("Max : ");
-    int token_max = stack_max(s);
-    stack_print_at(s, tokens, token_max);
+    printf("Operators detected:\n");
+    stack_print(s, tokens,  "  ");
+    // Get max algorithm : On sélectionne la plus forte
+    printf("Ordered operators: \n");
+    for(int i = 0; i < stack_size(s); i++) {
+        int token_max = stack_max(s);
+        stack_print_at(s, tokens, token_max, "  ");
+        stack_disable(s, token_max);
+    }
+    
 }
 
 void display_ast(AST * tokens) {
