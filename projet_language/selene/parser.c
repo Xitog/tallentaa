@@ -1,5 +1,18 @@
 #include "parser.h"
 
+Node * node_create(Node * root, Token * content) {
+    Node * n = (Node *) calloc(1, sizeof(Node));
+    n->root = root;
+    n->content = content;
+    n->left = NULL;
+    n->right = NULL;
+    return n;
+}
+
+bool is_leaf(Node * n) {
+    return (n->left == NULL && n->right == NULL);
+}
+
 const int MAX_STACK = 128;
 
 typedef struct {
@@ -66,7 +79,7 @@ int priority(char * operator) {
     assert(false);
 }
 
-void parse(Token * tokens, int tokens_cpt, AST * ast) {
+void parse(Token * tokens, int tokens_cpt, Node * ast) {
     printf("Parsing %i tokens\n\n", tokens_cpt);
     // on va dire qu'on a directement une expression
     // On calcule les priorités
@@ -90,6 +103,6 @@ void parse(Token * tokens, int tokens_cpt, AST * ast) {
     
 }
 
-void display_ast(AST * tokens) {
+void display_ast(Node * ast) {
     // TODO
 }

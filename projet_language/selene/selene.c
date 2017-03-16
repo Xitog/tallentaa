@@ -51,7 +51,7 @@ int main(int argc, char * argv[]) {
 
     printf("\n=== Test 1 ===\n");
     tokens_cpt = test_expression1(tokens);
-    AST ast;
+    Node ast;
     parse(tokens, tokens_cpt, &ast);
 
     printf("\n=== Test 2 ===\n");
