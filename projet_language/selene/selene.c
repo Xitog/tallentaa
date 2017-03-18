@@ -1,5 +1,6 @@
 #include "lexer.h"
 #include "parser.h"
+#include "transpiler_py.h"
 
 #ifdef TOKENIZER
 
@@ -32,37 +33,14 @@ int main(int argc, char * argv[]) {
 #ifdef PARSER
 
 int main(int argc, char * argv[]) {
-    printf("Parser v0.1\n");
+    printf("\n====== START OF SELENE ======\n\n");
+    //printf("Parser v0.1\n");
 
-    Token tokens[MAX_TOKENS];
-    int tokens_cpt = 0;
-    
-    tests();
+    tests_lexer();
+    tests_parser();
+    tests_transpiler_py();
 
-    // A simple Hello World
-    char * test1 = "writeln(\"Hello world!\")";
-    printf("\nTest 1 : %s\n", test1);
-    memset(tokens, MAX_TOKENS, sizeof(Token));
-    tokens_cpt = 0;
-    tokenize(test1, strlen(test1), tokens, &tokens_cpt);
-    display_tokens(tokens, tokens_cpt);
-    
-    printf("\n====== START OF PARSER TESTS ======\n");
-
-    printf("\n=== Test 1 ===\n");
-    tokens_cpt = test_expression1(tokens);
-    Node ast;
-    parse(tokens, tokens_cpt, &ast);
-
-    printf("\n=== Test 2 ===\n");
-    tokens_cpt = test_expression2(tokens);
-    // reset AST
-    parse(tokens, tokens_cpt, &ast);
-    
-    printf("\n====== END OF PARSER TESTS ======\n");
-    
     printf("\n====== END OF SELENE ======\n\n");
-
 }
 
 #endif

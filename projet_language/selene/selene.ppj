@@ -28,9 +28,10 @@ LIB = $(PellesCDir)\Lib\Win;$(PellesCDir)\Lib#
 # Construction de selene.exe.
 # 
 selene.exe: \
-	output\parser.obj \
 	output\lexer.obj \
-	output\selene.obj
+	output\parser.obj \
+	output\selene.obj \
+	output\transpiler_py.obj
 	$(LINK) $(LINKFLAGS) -out:"$@" $**
 
 # 
@@ -56,12 +57,24 @@ output\lexer.obj: \
 output\selene.obj: \
 	selene.c \
 	lexer.h \
-	parser.h
+	parser.h \
+	transpiler_py.h
 	$(CC) $(CCFLAGS) "$!" -Fo"$@"
 
-.OTHERFILES: \
-	selene.txt
+# 
+# Construction de transpiler_py.obj.
+# 
+output\transpiler_py.obj: \
+	transpiler_py.c \
+	lexer.h \
+	parser.h \
+	transpiler_py.h
+	$(CC) $(CCFLAGS) "$!" -Fo"$@"
+
+.EXCLUDEDFILES:
 
 .SILENT:
 
-.EXCLUDEDFILES:
+.OTHERFILES: \
+	selene.txt \
+	python.bat

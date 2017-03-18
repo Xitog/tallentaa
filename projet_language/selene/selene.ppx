@@ -2,12 +2,12 @@
 <settings version="1.0">
 	<category name="lexer.c">
 		<category name="Window">
-			<property name="Left" type="integer">-8</property>
-			<property name="Top" type="integer">-31</property>
-			<property name="Right" type="integer">1701</property>
-			<property name="Bottom" type="integer">727</property>
-			<property name="Maximized" type="integer">1</property>
-			<property name="Active" type="integer">1</property>
+			<property name="Left" type="integer">234</property>
+			<property name="Top" type="integer">234</property>
+			<property name="Right" type="integer">1503</property>
+			<property name="Bottom" type="integer">773</property>
+			<property name="Maximized" type="integer">0</property>
+			<property name="Active" type="integer">0</property>
 		</category>
 	</category>
 	<category name="tokenizer.c" />
@@ -21,17 +21,16 @@
 			<property name="Maximized" type="integer">0</property>
 			<property name="Active" type="integer">0</property>
 		</category>
-	</category>
-	<category name="selene.txt">
-		<category name="Window">
-			<property name="Left" type="integer">78</property>
-			<property name="Top" type="integer">78</property>
-			<property name="Right" type="integer">1518</property>
-			<property name="Bottom" type="integer">617</property>
-			<property name="Maximized" type="integer">0</property>
-			<property name="Active" type="integer">0</property>
+		<category name="Breakpoints">
+			<category name="Breakpoint1">
+				<property name="Line" type="integer">34</property>
+				<property name="Enabled" type="integer">1</property>
+				<property name="HitCount" type="integer">0</property>
+				<property name="Expression" type="string"></property>
+			</category>
 		</category>
 	</category>
+	<category name="selene.txt" />
 	<category name="parser.h">
 		<category name="Window">
 			<property name="Left" type="integer">104</property>
@@ -44,20 +43,40 @@
 	</category>
 	<category name="selene.c">
 		<category name="Window">
-			<property name="Left" type="integer">130</property>
-			<property name="Top" type="integer">130</property>
-			<property name="Right" type="integer">1570</property>
-			<property name="Bottom" type="integer">669</property>
-			<property name="Maximized" type="integer">0</property>
-			<property name="Active" type="integer">0</property>
+			<property name="Left" type="integer">-8</property>
+			<property name="Top" type="integer">-31</property>
+			<property name="Right" type="integer">1701</property>
+			<property name="Bottom" type="integer">727</property>
+			<property name="Maximized" type="integer">1</property>
+			<property name="Active" type="integer">1</property>
 		</category>
 	</category>
 	<category name="lexer.h">
 		<category name="Window">
-			<property name="Left" type="integer">156</property>
-			<property name="Top" type="integer">156</property>
-			<property name="Right" type="integer">1596</property>
-			<property name="Bottom" type="integer">695</property>
+			<property name="Left" type="integer">0</property>
+			<property name="Top" type="integer">0</property>
+			<property name="Right" type="integer">1269</property>
+			<property name="Bottom" type="integer">539</property>
+			<property name="Maximized" type="integer">0</property>
+			<property name="Active" type="integer">0</property>
+		</category>
+	</category>
+	<category name="transpiler_py.h">
+		<category name="Window">
+			<property name="Left" type="integer">208</property>
+			<property name="Top" type="integer">208</property>
+			<property name="Right" type="integer">1477</property>
+			<property name="Bottom" type="integer">747</property>
+			<property name="Maximized" type="integer">0</property>
+			<property name="Active" type="integer">0</property>
+		</category>
+	</category>
+	<category name="transpiler_py.c">
+		<category name="Window">
+			<property name="Left" type="integer">182</property>
+			<property name="Top" type="integer">182</property>
+			<property name="Right" type="integer">1451</property>
+			<property name="Bottom" type="integer">721</property>
 			<property name="Maximized" type="integer">0</property>
 			<property name="Active" type="integer">0</property>
 		</category>

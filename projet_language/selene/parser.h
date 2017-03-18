@@ -18,8 +18,11 @@
 typedef enum {
     BINARY_OPERATION,
     INTEGER_LITTERAL,
-    REAL_LITTERAL,
+    FLOAT_LITTERAL,
 } NodeType;
+
+// Type to strings
+extern char * node_str[];
 
 typedef struct Node {
     // TODO
@@ -30,8 +33,11 @@ typedef struct Node {
     struct Node * root;
 } Node;
 
-Node * node_create(Node * root, Token * content);
+Node * node_create(Node * root, NodeType type, Token * content);
 bool is_leaf(Node * n);
+void node_set_left(Node * root, Node * left);
+void node_set_right(Node * root, Node * right);
+NodeType token_type_to_node_type(Token token);
 
 /*
 typedef struct {
@@ -44,7 +50,8 @@ typedef struct {
 // Prototypes
 //-----------------------------------------------------------------------------
 
-void parse(Token * tokens, int tokens_cpt, Node * ast);
+Node * parse(Token * tokens, int tokens_cpt);
 void display_ast(Node * ast);
+void tests_parser(void);
 
 #endif

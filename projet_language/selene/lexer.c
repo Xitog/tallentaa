@@ -431,7 +431,7 @@ void display_tokens(Token * tokens, int tokens_cpt) {
     printf("Tokens produced : %i\n\n", tokens_cpt);
     int i = 0;
     while (i < tokens_cpt) {
-        printf("%i : [%s] %s\n", i+1, token_str[tokens[i].type], tokens[i].content);
+        printf("%i : [%s] %s\n", i, token_str[tokens[i].type], tokens[i].content);
         i += 1;
     }
 }
@@ -551,7 +551,7 @@ int test_expression2(Token * tokens) {
     return tokens_cpt;
 }
 
-void tests(void) {
+void tests_lexer(void) {
 
     printf("[INFO] Tests\n");
     Token tokens[MAX_TOKENS];
