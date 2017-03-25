@@ -4,6 +4,19 @@ char * node_str[] = {
     "Binary",
     "Integer",
     "Float",
+    "String",
+    "Identifier",
+    "Array",
+    "Table",
+    "Condition",
+    "Repetition",
+    "Affectation",
+    "Function",
+    "Class",
+    "Field",
+    "KeyValue",
+    "Parameter",
+    "NodeError",
 };
 
 Node * node_create(Node * root, NodeType type, Token * content) {
@@ -161,6 +174,57 @@ int priority(char * operator) {
         return 13;
     }
     assert(false);
+}
+
+Node * parse_array(Node * parent, Token * tokens, int tokens_cpt) {
+    return NULL;
+}
+
+Node * parse_table(Node * parent, Token * tokens, int tokens_cpt) {
+    return NULL;
+}
+
+Node * parse_key(Node * parent, Token * tokens, int tokens_cpt) {
+    return NULL;
+}
+
+Node * parse_condition(Node * parent, Token * tokens, int tokens_cpt) {
+    return NULL;
+}
+
+Node * parse_repetition(Node * parent, Token * tokens, int tokens_cpt) {
+    return NULL;
+}
+
+Node * fun_definition(Node * parent, Token * tokens, int tokens_cpt) {
+    return NULL;
+}
+
+Node * class_definition(Node * parent, Token * tokens, int tokens_cpt) {
+    return NULL;
+}
+
+Node * parse_litteral(Node * parent, Token * token) {
+    NodeType type = ERROR;
+    Node * node;
+    
+    if (token->type == INTEGER) {
+        type = INTEGER_LITTERAL;
+    } else if (token->type == FLOAT) {
+        type = FLOAT_LITTERAL;
+    } else if (token->type == IDENTIFIER) {
+        type = IDENTIFIER_LITTERAL;
+    } else if (token->type == STRING) {
+        type = STRING_LITTERAL;
+    }
+    
+    node = node_create(parent, type, token);
+    return node;
+}
+
+Node * parse_binop(Node * parent, Token * tokens, int tokens_cpt) {
+    // reprendre le code
+    return NULL;
 }
 
 Node * parse(Token * tokens, int tokens_cpt) {

@@ -8,6 +8,127 @@ Selene (en référence à Lua) est un triplé tokenizer/lexer + parser + émetteur de
 Il est la fusion de deux projets : 
     - C_Tokenizer
     - C_Parser (commencé et fusionné aujourd'hui)
+J'ai ajouté ensuite un transpileur vers Python.
+
+===============================================================================
+h1. Grammaire
+===============================================================================
+
+chunck := blocklist
+
+blocklist :=
+    | blocklist block
+    | block
+
+block :=
+    | affectation
+    | expression
+    | condition
+    | repetition
+    | definition
+
+affectation :=
+    id = expression
+
+expression :=
+    | expression binop expression
+    | unaop expression
+    | litteral
+    | call
+    | index
+    
+call := expression ( real_param_list )
+
+real_param_list :=
+    | real_param_list, expression
+    | expression
+    | _
+
+index := expression [ expression ]
+
+litteral :=
+    | id
+    | integer
+    | float
+    | string
+    | complex_litteral
+    
+complex_litteral :=
+    | array
+    | table
+
+array := [ array_list ]
+
+array_list :=
+    | array_list, expression
+    | expression
+
+table := { table_list }
+
+table_list :=
+    | table_list, key : expression
+    | key : expression
+
+key :=
+    | string
+    | id
+
+condition :=
+    | if expression (then | NL) chunck end NL
+    | if expression (then | NL) chunck else chunck end NL
+    
+répétition :=
+    | while expression (do | NL) chunck end NL
+    | while expression (do | NL) chunck else chunck end NL
+    
+definition :=
+    | fun_definition
+    | class_definition
+    
+fun_definition :=
+    | fun id ( paramètres ) fun_body end
+
+class_definition :=
+    | class id NL class_body end
+
+paramètres :=
+    | param_list -> param_end
+    | -> param_end
+    | param_list
+    | _
+
+param_list :=
+    | param_list, param
+    | param
+
+param :=
+    | id id
+    | id
+
+paramend :=
+    | id
+
+fun_body :=
+    | affectation
+    | expression
+    | condition
+    | repetition
+    | _
+
+class_body :=
+    | class_block_list
+    | _
+
+class_block_list :=
+    | class_block_list class_block
+    | class_block
+
+classblock :=
+    | field
+    | fun_definition
+
+field :=
+    | id id
 
 ===============================================================================
 h1. Vieux essais
