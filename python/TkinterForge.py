@@ -122,8 +122,17 @@ if mode == 'TEXT':
 
     options = {}
     
-    txt = Text(root, *options)
-    txt.pack()
+    frame = Frame(root, width=600, height=600)
+    frame.pack(fill="both", expand=True)
+    # ensure a consistent GUI size
+    frame.grid_propagate(False)
+    # implement stretchability
+    frame.grid_rowconfigure(0, weight=1)
+    frame.grid_columnconfigure(0, weight=1)
+    
+    txt = Text(frame, borderwidth=3, relief="sunken")
+    txt.config(font=("consolas", 12), undo=True, wrap='word')
+    txt.grid(row=0, column=0, sticky="nsew", padx=2, pady=2)
     
     def tab(arg):
         print("tab pressed")
@@ -131,6 +140,12 @@ if mode == 'TEXT':
         return 'break' # Prevent normal behavior
     
     txt.bind("<Tab>", tab)
+    
+    scrollbar = Scrollbar(frame, command=txt.yview)
+    scrollbar.grid(row=0, column=1, sticky='nsew')
+    txt['yscrollcommand'] = scrollbar.set
+    
+
     
 #------------------------------------------------
 # Canvas
