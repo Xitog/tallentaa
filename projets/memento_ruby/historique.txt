@@ -1,0 +1,26 @@
+I.
+Tout d'abord j'ai commencé à bosser dessus avec Textile (un langage de markup léger) qui me produisait le HTML.
+La dernière version du fichier Textile semble dater du 28/04/2015.
+Ce fichier s'appelle sur Git : memento.textile.txt pour le Textile en date du 28/04/2015.
+Ce fichier s'appelle sur Git  : memento.html pour l'HTML automatiquement produit en date du 19/01/2016
+Sur Git, memento_tests.rb et mod.rb sont des fichiers de tests
+
+II.
+J'ai mis le fichier HTML produit sur Ran à une date indéterminée. Sa date de dernière modification date du 21/11/2015.
+Ce fichier s'appelle sur Ran : memento.html en date du 21/11/2015
+
+III.
+J'ai continué à améliorer la version sur Git : sa dernière modification remonte au 19/01/2016, soit 2 mois de plus de travail, non mis en ligne sur Ran.
+
+IV.
+J'ai déplacé la version de Ran, ancienne, sur Free en y ajoutant le menu commun avant de me rendre compte que celle sur le Git était beaucoup plus avancé !
+Ce fichier s'appelle sur Free : aide_ruby.html
+
+V.
+J'ai donc mis sur Free une version fusionnée : elle part de celle de la version la plus à jour du Git en y ajoutant le menu commun à mes pages que j'avais rajouté à la version sur Free et en configurant le CSS pour qu'il n'y ait pas de chevauchements entre le CSS du menu/bootstrap et celui du défini par le document en respectant au plus près la version originale de Git.
+Ce fichier s'appelle : aide_ruby.html
+Mis en ligne le 12/04/2017 (peu après minuit)
+
+Je stocke le tout dans Git avec ce fichier.
+
+DGX, 12/04/2017
