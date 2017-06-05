@@ -30,22 +30,22 @@ class Layer(NamedObject):
     """
         A layer of a map.
     """
-    def __init__(self, name : str, width : int, height : int, default_value):
+    def __init__(self, name : str, width : int, height : int, default):
         NamedObject.__init__(self, name)
-        self.w = width
-        self.h = height
-        self.default_value = default_value
+        self.width = width
+        self.height = height
+        self.default = default
         self.content = []
-        for lin in range(0, self.w):
+        for lin in range(0, self.height):
             self.content.append([])
-            for col in range(0, self.h):
-                self.content[lin].append(default_value)
+            for col in range(0, self.width):
+                self.content[lin].append(default)
     
-    def get_at(self, lin, col):
-        return self.content[lin][col]
+    def get_at(self, x, y):
+        return self.content[y][x]
     
-    def set_at(self, lin, col, value):
-        self.content[lin][col] = value
+    def set_at(self, x, y, value):
+        self.content[y][x] = value
 
 
 class Map(NamedObject):
@@ -55,7 +55,7 @@ class Map(NamedObject):
         The only method to change its content is set_layer
     """
     
-    def __init__(self, name : str, size : Pair, layers : dict):
+    def __init__(self, name : str, width : int, height : int, layers : dict):
         """
         Create a new WorldMap
               - only square map are handled of %size
@@ -64,77 +64,73 @@ class Map(NamedObject):
                   %layers must be a dict of { layer_name : default_value } 
         """
         NamedObject.__init__(self, name)
-        self.name = name
-        self.size = size
+        self.width = width
+        self.height = height
         if len(layers) < 1:
             raise Exception("A map must have at least one layer!")
         self.layers = {}
         for layer_key in layers:
-            self.layers[layer_key] = Layer(layer_key, self.size.x, self.size.y, layers[layer_key])
+            self.layers[layer_key] = Layer(layer_key, self.width, self.height, layers[layer_key])
     
-    def is_valid(self, x: int, y: int):
-        return 0 <= x < self.size.x and 0 <= y < self.size.y
+    def is_valid_at(self, x: int, y: int):
+        return 0 <= x < self.width and 0 <= y < self.height
     
-    def is_valid_zone(self, x: int, y: int, w: int, h: int):
-        if 0 <= x < self.size.x and 0 <= y < self.size.y:
-            if x + w < self.size.x and y + h <= self.size.y:
+    def is_valid_rect(self, x: int, y: int, w: int, h: int):
+        if 0 <= x < self.width and 0 <= y < self.height:
+            if x + w < self.width and y + h <= self.height:
                 return True
         return False
     
-    def is_equal(self, layer: str, x: int, y: int, val):
+    def is_equal_at(self, layer: str, x: int, y: int, val):
         if layer not in self.layers:
             raise Exception("Invalid layer!")
-        if not self.is_valid(x, y):
+        if not self.is_valid_at(x, y):
             raise Exception("Out of bound!")
         return self.layers[layer].get_at(x, y,) == val
     
-    def is_equal_zone(self, layer: str, x: int, y: int, w: int, h: int, val):
+    def is_equal_rect(self, layer: str, x: int, y: int, w: int, h: int, val):
         if layer not in self.layers:
             raise Exception("Invalid layer!")
-        if not self.is_valid_zone(x, y, w, h):
+        if not self.is_valid_rect(x, y, w, h):
             raise Exception("Out of bound!")
         for i in range(x, x+w):
             for j in range(y, y+h):
-                if not self.is_equal(layer, i, j, val):
+                if not self.is_equal_at(layer, i, j, val):
                     return False
         return True
     
     def get_at(self, layer: str, x: int, y: int):
         if layer not in self.layers:
             raise Exception("Invalid layer!")
-        if not self.is_valid(x, y):
+        if not self.is_valid_at(x, y):
             raise Exception("Out of bound!")
         return self.layers[layer].get_at(x, y)
 
     def set_at(self, layer: str, x: int, y: int, val):
         if layer not in self.layers:
             raise Exception("Invalid layer!")
-        if not self.is_valid(x, y):
+        if not self.is_valid_at(x, y):
             raise Exception("Out of bound!")
         self.layers[layer].set_at(x, y, val)
 
-    def put_object(self, layer, obj):
-        """Put on object on the map."""
-        for i in range(obj.x, obj.x + obj.w):
-            for j in range(obj.y, obj.y + obj.h):
-                self.layers[layer].set_at(i, j, obj.id) 
-
-    def radius(self, layer, obj, val):
-        for i in range(obj.x1, obj.x2):
-            for j in range(obj.y1, obj.y2):
-                self.layers[layer].set_at(i, j, val)
+    def set_rect(self, layer: str, x: int, y: int, w: int, h: int, val):
+        for i in range(x, x + w):
+            for j in range(y, y + h):
+                self.layers[layer].set_at(i, j, val) 
     
-    @staticmethod
-    def create_map(lines, columns, value):
-        content = []
-        for i in range(0, lines):
-            line = []
-            for j in range(0, columns):
-                line.append(value)
-            content.append(line)
-        return content
-
-
+    def set_circle(self, layer: str, x: int, y: int, radius: int, val):
+        for i in range(x - radius, x + radius):
+            for j in range(y - radius, y + radius):
+                if abs(x-i) <= radius or abs(y-j) <= radius:
+                    self.layers[layer].set_at(i, j, val)
+    
+    def set_circle_from_rect(self, layer: str, x: int, y: int, w: int, h: int, radius: int, val):
+        for i in range(x - radius, x + w + radius):
+            for j in range(y - radius, y + h + radius):
+                if min(abs(x-i), abs(x+w-i)) <= radius or min(abs(y-j), abs(y+h-i)) <= radius:
+                    if self.is_valid_at(i, j):
+                        self.layers[layer].set_at(i, j, val)
+    
 #------------------------------------------------------------------------------
 # Units
 #------------------------------------------------------------------------------
@@ -147,35 +143,36 @@ class IdObject():
         IdObject.COUNTER_ID += 1
         self.id = IdObject.COUNTER_ID
 
-class Shadow():
+class Profile(NamedObject):
+    
+    def __init__(self, name: str, life: int, vision: int, width: int = 1, height: int = 1):
+        NamedObject.__init__(self, name)
+        self.life = life
+        self.vision = vision
+        self.width = width
+        self.height = height
 
-    def __init__(self, x1, y1, x2, y2):
-        self.x1 = x1
-        self.y1 = y1
-        self.x2 = x2
-        self.y2 = y2
+class Unit(IdObject):
 
-class Building(IdObject):
-
-    def __init__(self, x, y, w, h, max_life, vision):
+    def __init__(self, player, x, y, profile, plife):
         IdObject.__init__(self)
+        self.player = player
+        self.map = player.game.map
         self.x = x
         self.y = y
-        self.w = w
-        self.h = h
-        self.wmap = None
-        self.constructed = 0
-        self.life = max_life
-        self.max_life = max_life
-        self.vision = vision
-        self.shadow = Shadow(x- vision, y - vision, x + w + vision, y + h + vision)
+        self.width = profile.width
+        self.height = profile.height
+        self.life = int(profile.life * plife)
+        self.vision = profile.vision
+        self.profile = profile
+        self.map.set_rect("ground", self.x, self.y, self.width, self.height, self.id)
+        self.map.set_circle_from_rect("fog", self.x, self.y, self.width, self.height, self.vision, 1)
 
-    def create(self, wmap, constructed, plife):
-        self.wmap = wmap
+class Building(Unit):
+
+    def __init__(self, player, x, y, profile, constructed, plife):
+        Unit.__init__(self, player, x, y, profile, plife)
         self.constructed = constructed
-        self.life = int(self.max_life * plife)
-        self.wmap.put_object("ground", self)
-        self.wmap.radius("fog", self.shadow, 1)
 
 #------------------------------------------------------------------------------
 # Basic Textual Representation (BTR)
@@ -212,7 +209,7 @@ class Camera:
         for x in range(0, self.size):
             write(f"{x:02d} ")
             for y in range(0, self.size):
-                write(self.view[x][y] + "  ")
+                write(self.view[y][x] + "  ") # invert view
             newline()
         
     def render_map(self, raw=False):
@@ -225,13 +222,13 @@ class Camera:
     def render_layer(self, layer: Layer, raw=False):
         """Output a layer of the map on the console."""
         print(f"-- Layer {layer.get_name()}")
-        for lin in range(0, layer.w):
-            for col in range(0, layer.h):
-                val = layer.get_at(lin, col)
+        for x in range(0, layer.width):
+            for y in range(0, layer.height):
+                val = layer.get_at(x, y)
                 if raw:
-                    self.view[col][lin] = f"{val:04d}"
+                    self.view[x][y] = f"{val:04d}"
                 else:
-                    self.view[col][lin] = self.render_tile(layer, val)
+                    self.view[x][y] = self.render_tile(layer, val)
     
     def render_tile(self, layer, val):
         if layer.name == "ground":
@@ -241,15 +238,19 @@ class Camera:
                 return '_'
             elif val == 0:
                 return '~'
+            elif val == Tiles.COAST:
+                return '_'
+            elif val == Tiles.WATER:
+                return '~'
             else:
-                return '?'
+                return str(val)
         elif layer.name == "fog":
             if val == 0:
                 return '~'
             else:
                 return ' '
         else:
-            return '?'
+            return str(val)
 
 #------------------------------------------------------------------------------
 # Tests
@@ -268,29 +269,115 @@ class MapModifier:
         self.target = target
 
     def set(self, layer, x, y, val1, val2):
-        for lin in range(y-1, y+2):
-            for col in range(x-1, x+2):
-                if self.target.is_valid(x, y):
-                    if lin != y or col != x:
-                        self.target.set_at(layer, lin, col, val2.value)
-                    else:
-                        self.target.set_at(layer, x, y, val1.value)
+        self.target.set_rect(layer, x-1, y-1, 3, 3, val2)
+        self.target.set_at(layer, x, y, val1)
+
+class Army(NamedObject):
+
+    def __init__(self, name, profiles):
+        self.profiles = profiles
+
+class Mod(NamedObject):
+
+    def __init__(self, name, armies):
+        NamedObject.__init__(self, name)
+        self.armies = armies
+        self.all_profiles = {}
+        for arm in self.armies:
+            for pro in self.armies[arm].profiles:
+                if pro in self.all_profiles:
+                    raise Exception(f"Duplicated Profile {pro}!")
+                else:
+                    self.all_profiles[pro] = self.armies[arm].profiles[pro]
+
+    def get_profile(self, name):
+        if name not in self.all_profiles:
+            raise Exception(f"Unknown profile {name}!")
+        else:
+            return self.all_profiles[name]
+
+class Player(NamedObject):
+
+    def __init__(self, name, game, army, color):
+        NamedObject.__init__(self, name)
+        self.game = game
+        self.army = army
+        self.color = color
+    
+    def update(self):
+        pass
+    
+class Game:
+
+    def __init__(self, mod, mmap):
+        self.mod = mod
+        self.map = mmap
+        self.players = {}
+        self.units = []
+
+    def update(self):
+        for p in self.players:
+            p.update()
+        for u in self.units:
+            u.update()
+    
+    def create_player(self, name, army, color):
+        self.players[name] = Player(name, self, self.mod.armies[army], color)
+
+    def create_unit(self, player, profile, x, y, plife=1.0):
+        #a = self.players[player].army
+        u = Unit(self.players[player], x, y, self.mod.all_profiles[profile], plife)
+        self.units.append(u)
+
+FutureWar = Mod("Future War", {
+        "RedScum" : Army("Red Scum", {
+            "barracks" : Profile("Barracks", 300, vision=3, width=2, height=3),
+            "soldier" : Profile("Soldier", 50, vision=3),
+            "heavy" : Profile("Heavy soldier", 80, vision=3)
+        }),
+        "BlueAngels": Army("Blue Angels", {
+            "Defender" : Profile("Defender", 60, vision=3)
+        }),
+    }
+)
 
 if __name__ == "__main__":
-    world = Map("The Badlands", Pair(10, 15), {"ground" : 1000, "fog" : 0 })
+    world = Map("The Badlands", 11, 15, {"ground" : 1000, "fog" : 0 })
     viewer = Camera(world, 20)
     viewer.render()
     mm = MapModifier(world)
     mm.set("ground", 3, 3, Tiles.WATER, Tiles.COAST)
     viewer.render()
 
-    plant = Building(x=4, y=4, w=2, h=3, max_life=220, vision=4)
-    plant.create(world, 1, 0.50)
+    world.set_at("ground", 10, 1, 'x')
+    world.set_at("ground", 1, 10, 'y')
+
+    TrainingGround = Game(FutureWar, world)
+    Hicks = Player("Hicks", TrainingGround, FutureWar.armies["RedScum"], "red")
+    TrainingGround.players["Hicks"] = Hicks
+    TrainingGround.create_player("Zoltan", "BlueAngels", "blue")
+    
+    plant = Building(Hicks, x=4, y=4, profile=FutureWar.get_profile("barracks"), constructed=1, plife=0.50)
+    s1 = Unit(Hicks, x=9, y=9, profile=FutureWar.get_profile("soldier"), plife=0.50)
+    TrainingGround.create_unit("Zoltan", "Defender", 4, 7)
     writeln(f"plant life = {plant.life}")
     viewer.render()
 
+    from ctypes import *
+    STD_OUTPUT_HANDLE = -11
+    class COORD(Structure):
+        pass
+    COORD._fields_ = [("X", c_short), ("Y", c_short)]
+
+    def print_at(r, c, s):
+        h = windll.kernel32.GetStdHandle(STD_OUTPUT_HANDLE)
+        windll.kernel32.SetConsoleCursorPosition(h, COORD(c, r))
+        c = s.encode("windows-1252")
+        windll.kernel32.WriteConsoleA(h, c_char_p(c),  len(c), None, None)
+    print_at(6, 3, "Hello") # 13h46 yes !
+
 import time
-import server
+#import server
 import threading
 import queue
 
