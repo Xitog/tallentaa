@@ -1,0 +1,39 @@
+digraph G {
+    subgraph cluster0 {
+       //style=filled;
+       cleanup -> end;
+       label = "cluster";
+       color=green;
+    }
+    // Box
+    main [shape=box,label="MAIN"];
+    // Links
+    main -> parse -> execute;
+    main -> init [style=dotted];
+    //concentrate=true; // make A -> B and B -> A one edge
+    main -> cleanup [arrowhead=diamond;dir="both";arrowtail=vee];
+    //cleanup -> main [arrowhead=vee];
+    // cleanup -> end;
+    execute -> { make_string; printf } // on condense 2 liens en une declaration
+    init -> make_string;
+    edge [color=red]; // global change on EDGE
+    main -> printf [style=bold,label="100 times"];
+    node [shape=box,style=filled,color=".7 .3 1.0"] // global change on NODE
+    execute -> compare; // Quand un noeud n'existe pas, on le crée
+    compare -> zorba [label="ZORBA"];
+    zorba -> { am ; stram ; gram };
+    abc [shape=none, margin=0, label=<
+      <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4">
+        <TR><TD ROWSPAN="3"><FONT COLOR="red">hello</FONT><BR/>world</TD>
+            <TD COLSPAN="3">b</TD>
+            <TD ROWSPAN="3" BGCOLOR="lightgrey">g</TD>
+            <TD ROWSPAN="3">h</TD>
+        </TR>
+        <TR><TD>c</TD>
+            <TD PORT="here">d</TD>
+            <TD>e</TD>
+        </TR>
+        <TR><TD COLSPAN="3">f</TD>
+        </TR>
+    </TABLE>>];
+}
