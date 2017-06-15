@@ -148,9 +148,25 @@ function create_rooms(tree, matrix)
     if tree.type ~= 'node' then
         return
     end
+    
+    --[[
+    tree = {}
+    tree.x = 1
+    tree.y = 1
+    tree.h = 10
+    tree.w = 10
+    tree.wall_thickness = 1
+    tree.lid = 1
+    tree.leaf = true
+    tree.parent = {}
+    tree.parent.link = 5
+    tree.parent.div = 2
+    tree.parent.left = 22
+    tree.parent.right = tree
+    --]]
+    
     if tree.leaf then
-        wall = (tree.lid + 1) * 2
-        base =  tree.lid * 2 + 1
+        print("leaf", tree.leaf, "x", tree.x, "endx", tree.x+tree.w, "y", tree.y, "endy", tree.y+tree.h, "thickness", tree.wall_thickness, "lid", tree.lid, "div", tree.parent.div, "link", tree.parent.link, "tree", tree, "is left", tree.parent.left == tree, "is right", tree.parent.right == tree) 
         -- make the room
         for col = tree.x, tree.x + tree.w do
             for lin = tree.y, tree.y + tree.h do
@@ -159,34 +175,65 @@ function create_rooms(tree, matrix)
                     (tree.x + tree.w) - col < tree.wall_thickness or 
                     (tree.y + tree.h) - lin < tree.wall_thickness then
                     -- link
-                    if tree.parent.div == Division.verticale then
-                        if col == tree.parent.link then
-                            if tree.parent.left == tree and (tree.x + tree.w) - col < tree.wall_thickness then
-                                matrix[col][lin] = tree.id
-                            elseif tree.parent.right == tree and col - tree.x < tree.wall_thickness then
-                                matrix[col][lin] = tree.id
+                    if col - tree.x <= tree.wall_thickness then -- on est à gauche
+                        if tree.parent.div == Division.verticale then
+                            if tree.parent.right == tree then -- on est l'élément de droite
+                                if lin == tree.parent.link then -- on est à la bonne ligne (Y)
+                                    matrix[col][lin] = tree.lid
+                                else
+                                    matrix[col][lin] = tree.lid + 1000 
+                                end
                             else
-                                matrix[col][lin] = wall -- hard wall
+                                matrix[col][lin] = tree.lid + 1000 
                             end
                         else
-                            matrix[col][lin] = wall -- hard wall
+                            matrix[col][lin] = tree.lid + 1000 
                         end
-                    elseif tree.parent.div == Division.horizontale then   
-                        if lin == tree.parent.link then
-                            if tree.parent.left == tree and (tree.y + tree.h) - lin <= tree.wall_thickness then
-                                matrix[col][lin] = tree.id
-                            elseif tree.parent.right == tree and lin - tree.y <= tree.wall_thickness then
-                                matrix[col][lin] = tree.id
+                    elseif lin - tree.y <= tree.wall_thickness then -- on est en haut
+                        if tree.parent.div == Division.horizontale then
+                            if tree.parent.right == tree then -- on est l'élément du bas
+                                if col == tree.parent.link then -- on est à la bonne colonne (X)
+                                    matrix[col][lin] = tree.lid
+                                else
+                                    matrix[col][lin] = tree.lid + 1000 
+                                end
                             else
-                                matrix[col][lin] = wall -- hard wall
+                                matrix[col][lin] = tree.lid + 1000 
                             end
                         else
-                            matrix[col][lin] = wall -- hard wall
+                            matrix[col][lin] = tree.lid + 1000 
                         end
-                    end
-                    --matrix[col][lin] = wall -- hard wall
+                    elseif (tree.x + tree.w) - col <= tree.wall_thickness then -- on est à droite
+                        if tree.parent.div == Division.verticale then
+                            if tree.parent.left == tree then -- on est l'élément de gauche
+                                if lin == tree.parent.link then -- on est à la bonne ligne (Y)
+                                    matrix[col][lin] = tree.lid
+                                else
+                                    matrix[col][lin] = tree.lid + 1000 
+                                end
+                            else
+                                matrix[col][lin] = tree.lid + 1000 
+                            end
+                        else
+                            matrix[col][lin] = tree.lid + 1000 
+                        end
+                    elseif (tree.y + tree.h) - lin <= tree.wall_thickness then -- on est en bas
+                        if tree.parent.div == Division.horizontale then
+                            if tree.parent.left == tree then -- on est l'élément du haut
+                                if col == tree.parent.link then -- on est à la bonne colonne (X)
+                                    matrix[col][lin] = tree.lid
+                                else
+                                    matrix[col][lin] = tree.lid + 1000 
+                                end
+                            else
+                                matrix[col][lin] = tree.lid + 1000 
+                            end
+                        else
+                            matrix[col][lin] = tree.lid + 1000 
+                        end
+                    end 
                 else
-                    matrix[col][lin] = base
+                    matrix[col][lin] = tree.lid
                 end
             end
         end
@@ -310,14 +357,17 @@ if love ~= nil then
         love.graphics.setFont(font)
         for col=1, matrix.w do
             for lin=1, matrix.h do
-                love.graphics.draw(textures[matrix[col][lin]], (lin-1)*32, (col-1)*32)
-                --if matrix[col][lin] ~= 666 then
-                --    love.graphics.draw(textures[matrix[col][lin]], (lin-1)*32, (col-1)*32)
-                --else
-                --    love.graphics.draw(black, (lin-1)*32, (col-1)*32)
-                --end
+                local v = matrix[col][lin]
+                local g = nil
+                if v > 1000 then -- hard wall
+                    g = ((v - 1000) + 1) * 2
+                    v = v - 1000
+                else
+                    g = v * 2 + 1
+                end
+                love.graphics.draw(textures[g], (lin-1)*32, (col-1)*32)
                 love.graphics.setColor(0, 0, 0)
-                love.graphics.print(tostring(matrix[col][lin]), (lin-1)*32, (col-1)*32)
+                love.graphics.print(tostring(v), (lin-1)*32, (col-1)*32)
                 love.graphics.setColor(255, 255, 255)
             end
         end

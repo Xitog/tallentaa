@@ -118,6 +118,11 @@ class Map(NamedObject):
             for j in range(y, y + h):
                 self.layers[layer].set_at(i, j, val) 
     
+    def set_square(self, layer: str, x: int, y: int, dim: int, val):
+        for i in range(x-dim, x+dim+1):
+            for j in range(y-dim, y+dim+1):
+                self.layers[layer].set_at(i, j, val) 
+    
     def set_circle(self, layer: str, x: int, y: int, radius: int, val):
         for i in range(x - radius, x + radius):
             for j in range(y - radius, y + radius):
@@ -430,3 +435,55 @@ def main_loop():
                 fps += 1
     except KeyboardInterrupt:
         pass
+
+m = [
+    ['H', 'H', 'H', 'H', 'H'],
+    ['H', 'H', 'H', 'H', 'H'],
+    ['H', 'H', 'H', 'H', 'H'],
+    ['H', 'H', 'H', 'H', 'H'],
+    ['H', 'H', 'H', 'H', 'H'],
+]
+
+def render():
+    for lin in m:
+        for col in lin:
+            if len(col) == 1: sys.stdout.write(" " + col + "  ")
+            else: sys.stdout.write(" " + col + " ")
+        sys.stdout.write("\n")
+
+def is_trans(x, y):
+    return get(x, y)[0] == 't'
+
+def iset(x, y, v):
+    if v in ['E', 'H', 'T']:
+        set_square(x, y, 1, "t"+v)
+        set(x, y, v)
+    else:
+        if get(x, y) == "E" and v == "tE":
+            pass
+        elif get(x, y) == "tE" and v == "tE":
+            set(x, y, "E")
+        elif get(x, y) in ['E', 'H', 'T']:
+            set(x, y, v)
+
+# while True:
+    # render()
+    # command = input('>>> ')
+    # if command == 'exit':
+        # break
+    # elif command == 'help':
+        # print('set V X Y  : set a case')
+        # print('exit       : exit editor')
+    # elif command.startswith('set'):
+        # command = command.split(' ')
+        # if len(command) != 4:
+            # print('Not enough arguments')
+        # if command[1] not in ['E', 'H', 'T']:
+            # print('Value error')
+        # arg2 = int(command[2])
+        # arg3 = int(command[3])
+        # if not 0 <= arg2 < 5:
+            # print('Coordinate error')
+        # if not 0 <= arg3 < 5:
+            # print('Coordinate error')
+        # iset(arg2, arg3, command[1])
