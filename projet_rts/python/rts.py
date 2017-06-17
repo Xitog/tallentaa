@@ -1,17 +1,4 @@
-#! /usr/bin/env python
-
-__version__ = "$Revision: 1 $"
-
-# http://ezide.com/games/code_examples/example.py
-# http://pygame.org/docs/ref/draw.html#pygame.draw.rect
-
-# div X and Y by 32 + math.trunc -> give the square where we are
-# multiply by 32 -> give where we start to display
-
 import math
-from engine import *
-from game import Pair
-
 
 def load_textures(engine):
     engine.set_texture_path('..\\..\\assets\\tiles32x32')
@@ -55,16 +42,7 @@ def load_textures(engine):
     # Computed textures
     # 1300 : Texture('grass_water_lm', 1200, 'grass_water_ml.png', MINI_MAP_BLUE_LIGHT, False),
     # minimap color depends !!!
-
-    # 91 : Texture('w1', 91, 'w1.png', MINI_MAP_GREEN_LIGHT, False),
-    # 92 : Texture('w2', 92, 'w2.png', MINI_MAP_GREEN_LIGHT, False),
-    # 93 : Texture('w3', 93, 'w3.png', MINI_MAP_GREEN_LIGHT, False),
-    # 94 : Texture('w4', 94, 'w4.png', MINI_MAP_GREEN_LIGHT, False),
-    # 95 : Texture('w5', 95, 'w5.png', MINI_MAP_GREEN_LIGHT, False),
-    # 96 : Texture('w6', 96, 'w6.png', MINI_MAP_GREEN_LIGHT, False),
-    # 97 : Texture('w7', 97, 'w7.png', MINI_MAP_GREEN_LIGHT, False),
-    # 98 : Texture('w8', 98, 'w8.png', MINI_MAP_GREEN_LIGHT, False),
-
+    
     # Mixing Texture
     for a in [9100, 9200, 9300, 9400, 9500, 9600, 9700, 9800, 8100, 8200, 8300, 8400, 8500, 8700, 8900]:
         for b in [100]:
@@ -78,45 +56,21 @@ def load_textures(engine):
             engine.load_texture(str(n), n, s)  # engine.textures[a].mini, engine.textures[a].passable
 
 
-class CameraStorm:
-    pass
-
-
 class Camera:
     
     def __init__(self, engine, width, height, scroll, player):
         self.engine = engine
         self.screen = self.engine.screen
-        self.width = width
-        self.height = height
-        self.size = width, height
-        self.scroll = scroll
         self.player = player
-        self.auto_scroll_zone = 10
         self.game = player.game
-        self.x = 0
-        self.y = 0
-        self.SELECT_X = 0
-        self.SELECT_Y = 0
         self.SELECT_R = False
-        self.GUI_interface_y = 480
         self.GUI_mini_map_x = 22 * 32
-        self.GUI_display = True
         self.selected = []
-        self.left = False
-        self.right = False
-        self.up = False
-        self.down = False
         self.add_mod = False
         self.mode = 'normal'  # or build
         self.build_type = None
         self.build_size = None
         self.not_enough_ress = 0
-        self.dev_mode = False
-        self.ALLOW_BEYOND_MAP_SCROLLING = False
-        self.NB_SQUARE_WIDTH = 25
-        self.NB_SQUARE_HEIGHT = 15
-
 
     def select_zone(self, x, y, w, h):  # , player)
         x //= 32
@@ -149,39 +103,7 @@ class Camera:
 
     def update(self):
         
-        mx, my = self.engine.get_mouse_pos()
         
-        for event in self.engine.get_events():
-            if event.type == self.engine.QUIT:
-                return False
-            elif event.type == self.engine.EventTypes.KEY_DOWN:
-                if event.key == self.engine.Keys.ESCAPE:
-                    return False
-                elif event.key in (self.engine.Keys.DOWN, 115):
-                    self.down = True
-                elif event.key in (self.engine.Keys.UP, 119):
-                    self.up = True
-                elif event.key in (self.engine.Keys.LEFT, 97):
-                    self.left = True
-                elif event.key in (self.engine.Keys.RIGHT, 100):
-                    self.right = True
-                elif event.key == self.engine.Keys.LSHIFT:
-                    print('add_mod!')
-                    self.add_mod = True
-            elif event.type == self.engine.EventTypes.KEY_UP:
-                if event.key in (self.engine.Keys.DOWN, 115):
-                    self.down = False
-                elif event.key in (self.engine.Keys.UP, 119):
-                    self. up = False
-                elif event.key in (self.engine.Keys.LEFT, 97):
-                    self.left = False
-                elif event.key in (self.engine.Keys.RIGHT, 100):
-                    self.right = False
-                elif event.key == self.engine.Keys.LSHIFT:
-                    self.add_mod = False
-                    print('stop add mod!')
-                elif event.key == self.engine.Keys.SPACE:
-                    self.scroll += 1
                 elif event.key == self.engine.Keys.B:
                     if self.mode == 'normal':
                         self.mode = 'build'
@@ -292,52 +214,15 @@ class Camera:
                 elif event.button == 2:  # Middle Button
                     print('button 3')
 
-        # Scroll on border with the mouse
-        if self.left or mx < self.auto_scroll_zone:
-            self.x += self.scroll
-        if self.right or mx > self.width - self.auto_scroll_zone:
-            self.x -= self.scroll
-        if self.down or my > self.height - self.auto_scroll_zone:
-            self.y -= self.scroll
-        if self.up or my < self.auto_scroll_zone:
-            self.y += self.scroll
-        # Block scroll to the map
-        if not self.ALLOW_BEYOND_MAP_SCROLLING:
-            if self.x > 0:
-                self.x = 0
-            elif self.x < -(self.player.world.size32.x - self.NB_SQUARE_WIDTH) * 32:
-                self.x = -(self.player.world.size32.x - self.NB_SQUARE_WIDTH) * 32
-            if self.y > 0:
-                self.y = 0
-            elif self.y < -(self.player.world.size32.y - self.NB_SQUARE_HEIGHT) * 32:
-                self.y = -(self.player.world.size32.y - self.NB_SQUARE_HEIGHT) * 32
-
         return True
 
-    def render(self):
-        self.render_game()
-        if self.GUI_display:
-            self.render_gui()
+    
 
     def render_game(self):
         mx, my = pygame.mouse.get_pos()  # repeat from main_loop
-        first_square = (-self.x//32, -self.y//32)
-        self.screen.fill(Colors.BLACK.value)
+        
 
-        # Sol
-        # for yy in range(0, self.player.world.size32.y):
-        for yy in range(first_square[1], min(first_square[1] + self.NB_SQUARE_HEIGHT + 4, self.player.world.size32.y)): # 4 = LARGEST SPRITE HEIGHT
-            for xx in range(first_square[0], min(first_square[0] + self.NB_SQUARE_WIDTH + 3, self.player.world.size32.x)): # 3 = LARGET SPRITE WIDTH
-                t = self.player.world.world_map[yy][xx]
-                d = self.player.world.passable_map[yy][xx]
-                dx = xx * 32 + self.x
-                dy = yy * 32 + self.y
-                # draw terrain
-                self.engine.tex(dx, dy, self.engine.textures[t], 0)
-                if d != 0 and d != 99:  # there is visible blocking doodad, 0 = passable, 99 = invisible and not passable
-                    self.engine.tex(dx + self.engine.textures[d].mod_x, dy + self.engine.textures[d].mod_y, self.engine.textures[d], 0.5)
-                    if self.dev_mode:
-                        self.engine.rect(dx, dy, 32, 32, Colors.RED, 1, 1)
+        
                 # draw unit
                 su = self.player.world.unit_map[yy][xx]
                 if su == 0:
@@ -527,374 +412,6 @@ class Particle:
         
         return self.ttl
 
-
-# unit_map can be : 0 : void, (1, u) : unit u is here, (-1, u) : unit u is moving here
-class World:
-    
-    def __init__(self, game, world_map, textures_info):
-        self.game = game
-        self.particles = Particles()
-        if len(world_map) == 0:
-            raise Exception("Empty map detected")
-        self.size32 = Pair(len(world_map[0]), len(world_map))
-        self.unit_map = World.create_map(self.size32.x, self.size32.y, 0)
-        self.world_map = World.create_map(self.size32.x, self.size32.y, 0)
-        self.passable_map = World.create_map(self.size32.x, self.size32.y, 0)
-        self.debug_map = World.create_map(self.size32.x, self.size32.y, 0)
-        # separate [128] => 100 (in world map) + 28 (in passable_map or 99
-        # if texture not passable by default (and no doodad can be put on it))
-        for yy in range(0, self.size32.y):
-            for xx in range(0, self.size32.x):
-                r = world_map[yy][xx]
-                self.world_map[yy][xx] = (r // 100) * 100
-        
-        for yy in range(0, self.size32.y):
-            for xx in range(0, self.size32.x):
-                r = world_map[yy][xx]  # 101, 228, 312
-                self.passable_map[yy][xx] = r % 100
-                r = self.world_map[yy][xx]  # 100, 200, 300
-                if not self.game.textures_info[r].passable:  # TODO: we need the texture info only here
-                    self.passable_map[yy][xx] = 99
-        
-        # Computation of passage from tex to tex
-        world_map2 = World.create_map(self.size32.x, self.size32.y, 0)
-        for yy in range(0, self.size32.y):
-            for xx in range(0, self.size32.x):
-                r = self.world_map[yy][xx]
-                
-                # On travaille en base 2 sur 8 positions (de 0 à 7)
-                b0 = 1
-                b1 = 2
-                b2 = 4
-                b3 = 8
-                b4 = 16
-                b5 = 32
-                b6 = 64
-                b7 = 128
-                sum = 0
-                
-                # On commence en haut à gauche, puis on tourne dans le sens horaire
-                # 1 = différent 0 = égal (2 = bord : non, cela revient à pas de différence !)
-                # ligne du haut
-                if yy > 1 and xx > 1:
-                    if self.world_map[yy-1][xx-1] != r:
-                        sum += 1 * b0 # sinon 0*b0 donc rien
-                if xx > 1:
-                    if self.world_map[yy][xx-1] != r:
-                        sum += 1 * b1
-                if yy < self.size32.y - 1 and xx > 1:
-                    if self.world_map[yy+1][xx-1] != r:
-                        sum += 1 * b2
-                # ligne du milieu, gauche
-                if yy < self.size32.y - 1:
-                    if self.world_map[yy+1][xx] != r:
-                        sum += 1 * b3
-                # ligne du bas, en partant de la gauche
-                if yy < self.size32.y - 1 and xx < self.size32.x - 1:
-                    if self.world_map[yy+1][xx+1] != r:
-                        sum += 1 * b4
-                if xx < self.size32.x - 1:
-                    if self.world_map[yy][xx+1] != r:
-                        sum += 1 * b5
-                if yy > 1 and xx < self.size32.x - 1:
-                    if self.world_map[yy-1][xx+1] != r:
-                        sum += 1 * b6
-                # ligne du milieu, droit
-                if yy > 1:
-                    if self.world_map[yy-1][xx] != r:
-                        sum += 1 * b7
-                
-                self.debug_map[yy][xx] = sum
-                
-                world_map2[yy][xx] = self.world_map[yy][xx]
-                if r == 300 and sum != 0: # 0 = eau au milieu
-                    # coin
-                    if sum == 199 or sum == 135 or sum == 131: # coin haut gauche
-                        world_map2[yy][xx] = 1100
-                    elif sum == 241 or sum == 240: # coin haut droit
-                        world_map2[yy][xx] = 1300
-                    elif sum == 124 or sum == 56 or sum == 120: # coin bas droit
-                        world_map2[yy][xx] = 1500
-                    elif sum == 31 or sum == 15: # coin bas gauche
-                        world_map2[yy][xx] = 1700
-                    # milieu
-                    elif sum == 193: #2920: # milieu haut
-                        world_map2[yy][xx] = 1200
-                    elif sum == 112 or sum == 48: #3240: # milieu droit
-                        world_map2[yy][xx] = 1400
-                        #print('modified! at', yy, xx, 'to', world_map2[yy][xx])
-                    elif sum == 28: #120: # milieu bas
-                        world_map2[yy][xx] = 1600
-                    elif sum == 7 or sum == 3: #2200: # milieu gauche
-                        world_map2[yy][xx] = 1800
-                    # les coins bizarres, entre deux diag /
-                    elif sum == 1:
-                        world_map2[yy][xx] = 2200
-                    elif sum == 16:
-                        world_map2[yy][xx] = 2400
-                    elif sum == 17:
-                        world_map2[yy][xx] = 2300
-                    elif sum == 19:
-                        world_map2[yy][xx] = 2500
-                    elif sum == 49:
-                        world_map2[yy][xx] = 2700
-                    elif sum == 100:
-                        world_map2[yy][xx] = 2900
-                    elif sum == 70:
-                        world_map2[yy][xx] = 2100
-                    else:
-                        print("unidentified transition for texture :", sum, "at", xx, ":", yy)
-                
-                # if xx < self.size32.x - 1:
-                    # r_middle_right = world_map[xx+1][yy]
-                    # if r_middle_right != r:
-                        # if r_middle_right == 300:
-                            ## self.world_map[xx][yy] = 1300
-                            # self.passable_map[xx][yy] = 98
-                # if xx > 1:
-                    # r_middle_left = world_map[xx-1][yy]
-                    # if r_middle_left != r:
-                        # if r_middle_left == 300:
-                            # self.passable_map[xx][yy] = 94
-                # if yy > 1:
-                    # r_top_center = world_map[xx][yy-1]
-                    # if r_top_center != r:
-                        # if r_top_center == 300:
-                            # self.passable_map[xx][yy] = 96 # why?
-                # if yy < self.size32.y - 1:
-                    # r_bottom_center = world_map[xx][yy+1]
-                    # if r_bottom_center != r:
-                        # if r_bottom_center == 300:
-                            # self.passable_map[xx][yy] = 92 #why?
-        
-        self.world_map = world_map2
-        self.units = []
-    
-    def is_valid(self, x, y):
-        return 0 <= x < self.size32.x and 0 <= y < self.size32.y
-
-    def is_valid_zone(self, x, y, w, h):
-        if 0 <= x < self.size32.x and 0 <= y < self.size32.y:
-            if x + w < self.size32.x and y + h <= self.size32.y:
-                return True
-        return False
-    
-    def is_empty_zone(self, x, y, w, h):
-        if not self.is_valid_zone(x, y, w, h):
-            return False
-        else:
-            for i in range(x, x+w):
-                for j in range(y, y+h):
-                    if self.passable_map[j][i] != 0 and self.unit_map[j][i] != 0:
-                        return False
-            return True
-    
-    def is_empty(self, x, y):  # no unit, no blocking terrain
-        return self.passable_map[y][x] == 0 and self.unit_map[y][x] == 0
-    
-    def is_unit(self, x, y):
-        return self.unit_map[y][x] != 0 and self.unit_map[y][x][0] != -1  # 1 (unit) or 2 (building)
-    
-    def get_unit_at(self, x, y):
-        if 0 <= x < self.size32.x and 0 <= y < self.size32.y:
-            su = self.unit_map[y][x]
-            if su != 0 and su[0] != -1:
-                return su[1]
-    
-    @staticmethod
-    def create_map(lines, columns, value):
-        content = []
-        for i in range(0, lines):
-            line = []
-            for j in range(0, columns):
-                line.append(value)
-            content.append(line)
-        return content
-
-
-class Game:
-    
-    def __init__(self, name):
-        self.name = name
-        self.world = None
-        self.zones = {}
-        self.players = {}
-        self.triggers = {}
-        self.elem_types = {}
-        self.unit_types = {}
-        self.building_types = {}
-        self.building_types_ordered = []
-        self.is_live = True
-    
-    def set_name(self, name):
-        self.name = name
-    
-    def set_map(self, game_map):
-        self.world = World(self, game_map, self.elem_types)
-
-    def set_elem_types(self, elem_types):
-        self.elem_types = elem_types
-
-    def set_unit_types(self, unit_types):
-        self.unit_types = unit_types
-    
-    def set_building_types(self, building_types, order):
-        self.building_types = building_types
-        self.building_types_ordered = order
-    
-    def create_player(self, name, player_color, *ress):
-        print("creating player")
-        if name in self.players:
-            raise Exception("Already a player with this name")
-        self.players[name] = Player(self, name, player_color, ress)
-
-    def create_unit(self, player_name, x, y, unit_types_name):
-        sys.stdout.write("creating unit")
-        p = self.get_player_by_name(player_name)
-        ut = self.get_unit_types_by_name(unit_types_name)
-        if not self.world.is_valid(x, y) or not self.world.is_empty(x,y):
-            raise Exception("False or not empty coordinates : " + str(x) + ", " + str(y) + " p = " + str(self.world.passable_map[y][x]))
-        u = Unit(ut, p, x, y)
-        self.world.units.append(u)
-        p.units.append(u)
-        sys.stdout.write(' :: unit #' + str(u.id) + ' created\n')
-        return u.id
-        
-    def create_building(self, player_name, x, y, building_type_name):
-        sys.stdout.write("creating building")
-        p = self.get_player_by_name(player_name)
-        bt = self.get_building_type_by_name(building_type_name)
-        if not self.world.is_valid_zone(x, y, bt.grid_w, bt.grid_h) or not self.world.is_empty_zone(x, y, bt.grid_w, bt.grid_h):
-            raise Exception("False or not empty coordinates : " + str(x) + ", " + str(y))
-        b = Building(p, bt, x, y)
-        self.world.units.append(b) 
-        p.buildings.append(b)
-        sys.stdout.write(' :: building #' + str(b.id) + ' created\n')
-        return b.id
-        
-    def create_trigger(self, name):
-        self.triggers[name] = Trigger(name)
-        
-    def create_condition(self, ref, kind, *params):
-        self.triggers[ref].conditions.append(Condition(kind, params))
-    
-    def create_action(self, ref, kind, *params):
-        self.triggers[ref].actions.append(Action(kind, params))
-    
-    def create_zone(self, name, x1, y1, x2, y2):
-        self.zones[name] = Zone(name, x1, y1, x2, y2)
-    
-    #def order_move(self, units, x : int, y : int, add : bool):
-    def order_move(self, units, x, y, add):
-        sys.stdout.write('Move ')
-        for u in units:
-            sys.stdout.write(str(u) + ' ')
-            if add:
-                sys.stdout.write('(delayed) ')
-                u.add_order(Order('go', x, y))
-            else:
-                u.order(Order('go', x, y))
-        sys.stdout.write('to ' + str(x) + ', ' + str(y) + '\n')
-    
-    def order_attack(self, units, target, add):
-        sys.stdout.write('Attack ')
-        for u in units:
-            sys.stdout.write(str(u) + ' ')
-            if add:
-                sys.stdout.write('(delayed) ')
-                u.add_order(Order('attack', target=target))
-            else:
-                u.order(Order('attack', target=target))
-        sys.stdout.write('target => ' + str(target) + ' at ' + str(target.x) + ', ' + str(target.y) + '\n')
-    
-    def get_player_by_name(self, player_name):
-        if player_name not in self.players:
-            raise Exception("Unknown player : " + player_name)
-        return self.players[player_name]
-
-    def get_unit_types_by_name(self, unit_types_name):
-        if unit_types_name not in self.unit_types:
-            raise Exception("Unknown unit type : " + unit_types_name)
-        return self.unit_types[unit_types_name]
-        
-    def get_building_type_by_name(self, building_type_name):
-        if building_type_name not in self.building_types:
-            raise Exception("Unknown building type : " + building_type_name)
-        return self.building_types[building_type_name]
-    
-    def get_all_units_in_zone_for_player(self, ref_zone, ref_player):
-        p = self.players[ref_player]
-        z = self.zones[ref_zone]
-        units = []
-        for i in range(z.x1, z.x2):
-            for j in range(z.y1, z.y2):
-                u = self.world.get_unit_at(i, j)
-                if u is not None and u.player == p:
-                    units.append(u)
-        return units
-    
-    def get_players(self):
-        return self.players
-    
-    #def get_units_by_id(self, ids):
-    #    units = []
-    #    cpt = 0
-    #    for u in self.world.units:
-    #        if u.uid in ids:
-    #            units.append(u)
-    #            cpt += 1
-    #    if cpt != len(ids):
-    #        raise Exception("ID of unit unknown detected !!!")
-    #    return units
-    
-    def update(self):
-        # Triggers and actions
-        for key, value in self.triggers.items():
-            if value.test_all(self):
-                value.do_all(self)
-        # Particles
-        self.world.particles.update()
-        # Players & units
-        for key, value in self.players.items():
-            value.update()
-        return self.is_live
-
-
-class Player:
-    
-    def __init__(self, game, name, player_color, ress):
-        self.game = game
-        self.name = name
-        self.world = game.world
-        self.color = player_color
-        self.units = []
-        self.buildings = []
-        self.min = ress[0]
-        self.sol = ress[1]
-        self.victorious = False
-        self.fog_map = World.create_map(self.world.size32.x, self.world.size32.y, 0)  # bytearray(MAP_SIZE * MAP_SIZE)  # memoryview(bytearray(MAP_SIZE * MAP_SIZE))  #
-
-    def update(self):
-        # put fog_map
-        for yy in range(0, self.world.size32.y):
-            for xx in range(0, self.world.size32.x):
-                fog = self.fog_map[yy][xx]
-                if fog == 2:
-                    self.fog_map[yy][xx] = 1
-        # Update for all units?
-        i = 0
-        while i < len(self.units):
-        #for u in self.units:
-            if not self.units[i].update():
-                self.world.units.remove(self.units[i])
-                del self.units[i]
-                print("deleting unit")
-                # del u
-            i += 1
-        for b in self.buildings:
-            b.update()
-
-
 class Order:
     def __init__(self, kind=None, x=0, y=0, target=None):
         self.x = x
@@ -1029,10 +546,6 @@ class GameObject:
                             self.player.fog_map[yy][xx] = value
                         elif dist < d <= dist + 1:
                             self.player.fog_map[yy][xx] = max(1, self.player.fog_map[yy][xx])
-                    # else:
-                    #     print(xx, yy, "wtf  ", end="", flush=True)
-                # print()
-            # exit()
 
 
 class Building(GameObject):
@@ -1294,93 +807,6 @@ class Unit(GameObject):
         return get_dist(x, y, self.x * 32 + 16, self.y * 32 + 16) < self.size
 
 
-# ------------------------------------------------------------------------------
-# Scripting the world : Trigger, Zone, Condition & Action
-# ------------------------------------------------------------------------------
-
-class Zone:
-
-    def __init__(self, name, x1, y1, x2, y2):
-        self.name = name
-        self.x1 = x1
-        self.y1 = y1
-        self.x2 = x2
-        self.y2 = y2
-
-
-class Trigger:
-
-    def __init__(self, name):
-        self.name = name
-        self.conditions = []
-        self.actions = []
-    
-    def test_all(self, game):
-        for c in self.conditions:
-            if not c.test(game):
-                return False
-        return True
-    
-    def do_all(self, game):
-        for a in self.actions:
-            a.do(game)
-
-
-class Condition:
-
-    def __init__(self, kind, params):
-        self.kind = kind
-        self.params = params
-
-    def test(self, game):
-        if self.kind == 'always':
-            return True
-        elif self.kind == 'never':
-            return False
-        elif self.kind == 'player P control OPT1 (exactly/at least/at most) N unit of type T in Zone Z': #'player X control Y unit of type Z':
-            if self.params[3] == 'all':
-                    player1 = game.get_player_by_name(self.params[0])
-                    if self.params[4] == 'everywhere':
-                        if self.params[1] == 1:
-                            return len(player1.units + player1.buildings) == self.params[2]
-                        elif self.params[2] == 2:
-                            return len(player1.units + player1.buildings) >= self.params[2]
-                        elif self.params[3] == 3:
-                            return len(player1.units + player1.buildings) <= self.params[2]
-                    else:
-                        ref_zone = self.params[4]
-                        units = game.get_all_units_in_zone_for_player(ref_zone, self.params[0])
-                        #print(ref_zone, units, len(units), self.params[1], self.params[2])
-                        if self.params[1] == 1:
-                            return len(units) == self.params[2]
-                        elif self.params[1] == 2:
-                            return len(units) >= self.params[2]
-                        elif self.params[1] == 3:
-                            return len(units) <= self.params[2]
-        else:
-            return False
-
-class Action:
-
-    def __init__(self, kind, params):
-        self.kind = kind
-        self.params = params
-        
-    def do(self, game):
-        if self.kind == 'win':
-            game.is_live = False
-            game.get_player_by_name(self.params[0]).victorious = True
-        elif self.kind == 'give all unit of player P1 to player P2 in Zone Z':
-            if self.params[2] != 'everywhere':
-                units = game.get_all_units_in_zone_for_player(self.params[2], self.params[0])
-                receiver = game.get_player_by_name(self.params[1])
-                for u in units:
-                    u.player.units.remove(u)
-                    u.player = receiver
-                    u.player.units.append(u)
-        else:
-            pass
-
 
 # -----------------------------------------------------------------------------
 # Tools
@@ -1411,193 +837,6 @@ def xrect(x1, y1, x2, y2):
     else:
         ry = y1
     return pygame.Rect(rx, ry, tx, ty)
-
-
-# ------------------------------------------------------------------------------
-# Menu
-# ------------------------------------------------------------------------------
-
-
-class Button:
-
-    def __init__(self, menu, text, x, y, w, h, c, ctext, cover, cclicked, size):
-        self.text = text
-        self.x = x
-        self.y = y
-        self.width = w
-        self.height = h
-        self.color = c
-        self.color_text = ctext
-        self.color_over = cover
-        self.color_clicked = cclicked
-        self.size = size
-        self.clicked = False
-        self.menu = menu
-    
-    def update(self):
-        if self.clicked:
-            self.menu.state['clicked'] = self.text
-    
-    def render(self):
-        mx, my = self.menu.engine.get_mouse_pos()
-        if self.clicked:
-            c = self.color_clicked
-        elif self.is_in(mx, my):
-            c = self.color_over
-        else:
-            c = self.color
-        self.menu.engine.rect(self.x, self.y, self.width, self.height, c, 1, 1) # fond
-        self.menu.engine.rect(self.x-5, self.y-5, self.width+10, self.height+10, c, 1, 1) # fond
-        self.menu.engine.text(self.x + self.width/2, self.y + self.height/2, self.text, self.color_text, 2, True, self.size) # texte
-    
-    def is_in(self, x, y):
-        return self.x <= x < self.x + self.width and self.y <= y <= self.y + self.height
-
-    def click(self):
-        self.clicked = True
-
-
-class Menu:
-    
-    def __init__(self, engine):
-        self.engine = engine
-        self.buttons = []
-        self.state = {'clicked': None}
-
-    def menu_start(self):
-        def pipo():
-            pass
-
-        self.buttons.append(Button(self, "Campaign", self.engine.size[0]/2-100, self.engine.size[1]/2-15-90, 200, 30,
-                                   Colors.DARK_BLUE, Colors.YELLOW, Colors.LIGHT_BLUE, Colors.YELLOW, 18))
-        self.buttons.append(Button(self, "Skirmish", self.engine.size[0]/2-100, self.engine.size[1]/2-15-30, 200, 30,
-                                   Colors.DARK_BLUE, Colors.YELLOW, Colors.LIGHT_BLUE, Colors.YELLOW, 18))
-        self.buttons.append(Button(self, "Options", self.engine.size[0]/2-100, self.engine.size[1]/2-15+30, 200, 30,
-                                   Colors.DARK_BLUE, Colors.YELLOW, Colors.LIGHT_BLUE, Colors.YELLOW, 18))
-        self.buttons.append(Button(self, "Quit", self.engine.size[0]/2-100, self.engine.size[1]/2-15+90, 200, 30,
-                                   Colors.DARK_BLUE, Colors.YELLOW, Colors.LIGHT_BLUE, Colors.YELLOW, 18))
-        
-    def menu_pause(self):
-        self.buttons.append(Button(self, "Quit to main menu", self.engine.size[0]/2-100, self.engine.size[1]/2-15-90, 200, 30, Colors.DARK_BLUE, Colors.YELLOW, Colors.LIGHT_BLUE, Colors.YELLOW, 18))
-        self.buttons.append(Button(self, "Resume", self.engine.size[0]/2-100, self.engine.size[1]/2-15-30, 200, 30, Colors.DARK_BLUE, Colors.YELLOW, Colors.LIGHT_BLUE, Colors.YELLOW, 18))
-        self.buttons.append(Button(self, "Options", self.engine.size[0]/2-100, self.engine.size[1]/2-15+30, 200, 30, Colors.DARK_BLUE, Colors.YELLOW, Colors.LIGHT_BLUE, Colors.YELLOW, 18))
-        self.buttons.append(Button(self, "Quit", self.engine.size[0]/2-100, self.engine.size[1]/2-15+90, 200, 30, Colors.DARK_BLUE, Colors.YELLOW, Colors.LIGHT_BLUE, Colors.YELLOW, 18))
-    
-    def update(self):
-        for event in self.engine.get_events():
-            if event.type == self.engine.QUIT:
-                self.state['clicked'] = 'Quit'
-            elif event.type == self.engine.EventTypes.KEY_DOWN:
-                if event.key == self.engine.Keys.ESCAPE:
-                    self.state['clicked'] = 'Quit'
-            elif event.type == self.engine.EventTypes.MOUSE_BUTTON_UP:
-                mx, my = self.engine.get_mouse_pos()
-                if event.button == self.engine.Keys.MOUSE_LEFT:
-                    for b in self.buttons:
-                        if b.is_in(mx, my):
-                            b.click()
-        for b in self.buttons:
-            b.update()
-        return self.state
-    
-    def render(self):
-        self.engine.fill(Colors.BLACK)
-        for b in self.buttons:
-            b.render()
-
-
-
-
-class Application:
-
-    def __init__(self):
-        self.clock = pygame.time.Clock()
-        self.fps = 30.0
-    
-    def set_caption(self):
-        pygame.display.set_caption("RTS Project - {:.2f}".format(self.clock.get_fps()))
-    
-    def start(self):
-        e = Engine(800, 600)
-        load_textures(e)
-        while True:
-            r = self.menu_loop(e) 
-            if not r:
-                break
-        e.stop()
-        print('Goodbye')  
-    
-    def menu_loop(self, engine):
-        m = Menu(engine)
-        m.menu_start()
-        while True:
-            s = m.update()
-            m.render()
-            engine.render()
-            if s['clicked'] is not None:
-                break
-        if s['clicked'] in ['Campaign', 'Skirmish']:
-            g = Game('Test 1')
-            c = configure(g, engine)
-            r = self.game_loop(g, c, engine)
-            return r
-        elif s['clicked'] == 'Options':
-            pass
-        elif s['clicked'] == 'Quit':
-            return False
-    
-    def in_game_menu_loop(self, engine):
-        m = Menu(engine)
-        m.menu_pause()
-        while True:
-            s = m.update()
-            m.render()
-            engine.render()
-            if s['clicked'] is not None: break
-        if s['clicked'] == 'Options':
-            pass
-        else:
-            return s['clicked']
-       
-    def game_loop(self, game, camera, engine): 
-        start_time = pygame.time.get_ticks()
-        self.clock.tick(self.fps)
-        while True:
-            res_gam = game.update()
-            res_cam = camera.update()
-            camera.render()
-            engine.render()
-            self.clock.tick(self.fps)
-            self.set_caption()
-            if not res_cam:
-                r = self.in_game_menu_loop(engine)
-                if r != 'Resume':
-                    break
-            if not res_gam: 
-                r = 'Game Finished'
-                break
-        if r in ('Game Finished', 'Quit'):
-            print('Game has ended.')
-            end_time = pygame.time.get_ticks()
-            for p in game.get_players().values():
-                if p.victorious:
-                    print('\tPlayer ' + p.name + ' is victorious!')
-                else:
-                    print('\tPlayer ' + p.name + ' has been defeated.')
-            print('\tMetal = ' + str(camera.player.min))
-            print('\tEnergy = ' + str(camera.player.sol))
-            print('Game has started at ' + str(start_time))
-            print('Game had ended at ' + str(end_time))
-            duration_milli_sec = end_time - start_time
-            duration_sec = duration_milli_sec // 1000
-            duration_min, duration_sec = divmod(duration_sec, 60)
-            duration_hour, duration_min = divmod(duration_min, 60)
-            print('Game duration: ' + str(duration_hour) + 'h' + str(duration_min) + 'm' + str(duration_sec) + 's')
-            print('Press enter to quit.')
-            return False
-        elif r == 'Quit to main menu':
-            return True
-
 
 class TextureInfo:
 
@@ -1719,17 +958,6 @@ def level_E1L1(game):
     game.create_condition('t2', 'player P control OPT1 (exactly/at least/at most) N unit of type T in Zone Z', 'Bob', 2, 1, 'all', 'z1')
     #game.create_action('t2', 'win', 'Bob')
     game.create_action('t2', 'give all unit of player P1 to player P2 in Zone Z', 'Neutral', 'Bob', 'z1')
-    
-
-def configure(g, e):
-    mod_basic(g, e)
-    try:
-        import maps.e1l1
-        maps.e1l1.load(g, Colors)
-    except ImportError as ie:
-        level_E1L1(g)
-    return Camera(e, 800, 600, 5, g.get_player_by_name("Bob"))  # x, y, scroll, player
-
 
 if __name__ == '__main__': 
 
@@ -1746,14 +974,6 @@ if __name__ == '__main__':
     #print( math.degrees(get_angle(2, 2, 2, 3))) # 0 -> F -90
     #print( math.degrees(get_angle(2, 2, 1, 3))) # A -> G -135
     #print( math.degrees(get_angle(2, 2, 1, 2))) # A -> H +180 // -180
-    
-    import sys
-    _maj, _min = sys.version_info[:2]
-    print('Starting on Python ' + str(_maj) + "." + str(_min) + " with pygame " + pygame.version.ver)
-    
-    # No profiling
-    Application().start()
-    exit()
     
     # For Profiling
     import cProfile, pstats, io

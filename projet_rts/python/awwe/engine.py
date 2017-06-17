@@ -2,7 +2,9 @@ import pygame
 from pygame.locals import *
 from enum import Enum
 
-
+#-------------------------------------------------------------------------------
+# COLORS
+#-------------------------------------------------------------------------------
 class Colors(Enum):
 
     RED = Color(255, 0, 0)
@@ -28,7 +30,9 @@ class Colors(Enum):
     MINI_MAP_FOG = Color(32, 32, 32, 128)
     MINI_MAP_BLACK = Color(0, 0, 0, 255)
 
-
+#-------------------------------------------------------------------------------
+# TEXTURE
+#-------------------------------------------------------------------------------
 class Texture:
 
     def __init__(self, name, surf, mod_x=0, mod_y=0):
@@ -37,7 +41,26 @@ class Texture:
         self.mod_x = mod_x
         self.mod_y = mod_y
 
+#-------------------------------------------------------------------------------
+# SPRITE
+#-------------------------------------------------------------------------------
+class Sprite(Texture):
+    
+    def __init__(self, name, surf, mod_x, mod_y, step_w, step_h):
+        Texture.__init__(self, name, surf, mod_x, mod_y)
+        self.width = surf.get_width() // step_w
+        self.step_w = step_w
+        self.step_h = step_h
+    
+    def get_area(self, nb):
+        lin = nb // self.width
+        col = nb - (lin * self.width)
+        #print(nb, lin, col, lin * self.step_w, col * self.step_h, self.width)
+        return (col * self.step_h, lin * self.step_w, self.step_h, self.step_w)
 
+#-------------------------------------------------------------------------------
+# ENGINE
+#-------------------------------------------------------------------------------
 class Engine:
 
     QUIT = pygame.QUIT
@@ -63,14 +86,15 @@ class Engine:
         RETURN = pygame.locals.K_RETURN
         B = pygame.locals.K_b
 
-    def __init__(self, width, height):
+    def __init__(self, width, height, texture_path=None):
         pygame.init()
         self.size = width, height
         self.screen = pygame.display.set_mode(self.size, pygame.DOUBLEBUF, 32)  # , pygame.FULLSCREEN | pygame.HWSURFACE)
         self.render_orders = []
         self.fonts = {10: pygame.font.SysFont("monospace", 10), 12: pygame.font.SysFont("monospace", 12), 18: pygame.font.SysFont("monospace", 18)}
         self.textures = {}
-        self.texture_path = None
+        self.texture_path = texture_path
+        self.sprites = {}
 
     def stop(self):
         pygame.quit()
@@ -89,7 +113,10 @@ class Engine:
 
     def tex(self, x, y, tex, z):
         self.render_orders.append((0, x + tex.mod_x, y + tex.mod_y, tex.surf, None, None, None, z))
-
+    
+    def spr(self, x, y, spr, nb, z):
+        self.render_orders.append((-1, x + spr.mod_x, y + spr.mod_y, spr.surf, spr, nb, None, z))
+    
     def rect(self, x, y, w, h, col, thick, z):
         self.render_orders.append((1, x, y, w, h, col, thick, z))
 
@@ -107,6 +134,8 @@ class Engine:
         for o in self.render_orders:
             if o[0] == 0:
                 self.screen.blit(o[3], (o[1], o[2]))
+            elif o[0] == -1:
+                self.screen.blit(o[3], (o[1], o[2]), o[4].get_area(o[5]))
             elif o[0] == 1:
                 pygame.draw.rect(self.screen, o[5].value, (o[1], o[2], o[3], o[4]), o[6])
             elif o[0] == 2:
@@ -137,3 +166,14 @@ class Engine:
         else:
             raise Exception("Unknown type for loading a texture : " + filename.__class__)
         self.textures[num] = Texture(name, img, mod_x, mod_y)
+    
+    def load_sprite(self, name, filename, mod_x, mod_y, step_w, step_h):
+        if filename.__class__ == str:
+            if self.texture_path is None:
+                raise Exception("No path defined for textures. Please set texture path before loading textures.")
+            img = pygame.image.load(self.texture_path + '\\' + filename).convert_alpha()
+        elif filename.__class__ == pygame.Surface:
+            img = filename
+        else:
+            raise Exception("Unknown type for loading a texture : " + filename.__class__)
+        self.sprites[name] = Sprite(name, img, mod_x, mod_y, step_w, step_h)
