@@ -112,25 +112,8 @@ class Camera:
                     else:
                         self.mode = 'normal'
                     # print(self.mode)
-                elif event.key == self.engine.Keys.TAB:
-                    self.GUI_display = not self.GUI_display
-                    # print(self.GUI_display)
-                elif event.key == self.engine.Keys.RETURN:
-                    self.dev_mode = not self.dev_mode
-                    # print(self.dev_mode)
-                else:
-                    print(event.key)
-            elif event.type == self.engine.EventTypes.MOUSE_BUTTON_DOWN:
-                if event.button == 1:
-                    if not self.SELECT_R:
-                        self.SELECT_R = True
-                        self.SELECT_X = mx - self.x
-                        self.SELECT_Y = my - self.y
-            elif event.type == self.engine.EventTypes.MOUSE_BUTTON_UP:
-                self.SELECT_R = False
-                if event.button == self.engine.Keys.MOUSE_LEFT:  # Left Button
-                    # print(self.SELECT_Y, self.GUI_interface_y)
-                    if my > self.GUI_interface_y:  # Interface click
+                    
+                    # interface click
                         # if self.mode == 'normal':
                         # CLICK FOR A BUILDING
                         # pour voir si on n'a pas "ripé" sur un bouton de construction ou la minimap
@@ -155,24 +138,7 @@ class Camera:
                                     self.y = -b * 32 + 224 + 24  #  9 * 32 + 24 (600%32) (pour 600px) TODO: make generic
                                     # print("self x, y new", self.x, self.y)
                     elif self.mode == 'normal':
-                        deb_x = min(self.SELECT_X, mx - self.x)
-                        fin_x = max(self.SELECT_X, mx - self.x)
-                        deb_y = min(self.SELECT_Y, my - self.y)
-                        fin_y = max(self.SELECT_Y, my - self.y)
-                        ul = self.select_zone(deb_x, deb_y, fin_x, fin_y)
-                        if not self.add_mod:
-                            self.selected = []
-                        if len(ul) > 1:
-                            for u in ul:
-                                if u.player == self.player:
-                                    if u not in self.selected:
-                                        self.selected.append(u)
-                        elif len(ul) == 1:
-                            if ul[0].player == self.player:
-                                self.selected.append(ul[0])
-                            else:
-                                if not self.add_mod:
-                                    self.selected = ul # on peut selectionner une et une seule unite ennemie
+                        
                     elif self.mode == 'build':
                         # repeated code in render
                         xx = (mx - self.x) // 32
@@ -193,24 +159,6 @@ class Camera:
                                 self.not_enough_ress = 10
                         if not self.add_mod: # multiple construction orders
                             self.mode = 'normal'
-                elif event.button == self.engine.Keys.MOUSE_RIGHT:  # Right Button
-                    if self.mode == 'build':
-                        self.mode = 'normal'
-                    elif len(self.selected) == 1 and self.selected[0].player != self.player:
-                        print('1 select from other player : todo : display info')
-                        pass
-                    else:
-                        print('button right')
-                        cy = (my - self.y) // 32
-                        cx = (mx - self.x) // 32
-                        if self.player.world.is_valid(cx, cy):
-                            u = self.player.world.get_unit_at(cx, cy)
-                            if u is None:
-                                self.game.order_move(self.selected, cx, cy, self.add_mod)
-                            elif u.player == self.player:
-                                self.game.order_move(self.selected, cy, cx, self.add_mod)
-                            else: # u.player != self.player:
-                                self.game.order_attack(self.selected, u, self.add_mod)
                 elif event.button == 2:  # Middle Button
                     print('button 3')
 
@@ -276,10 +224,7 @@ class Camera:
                     self.engine.text(dx, dy, "%(v)04d" % {"v": self.player.world.debug_map[yy][xx]}, Colors.RED, 1)
                 
         # Cursor
-        if self.mode == 'normal':
-            if self.SELECT_R:
-                r = xrect(self.SELECT_X + self.x, self.SELECT_Y + self.y, mx, my)
-                self.engine.rect(r[0], r[1], r[2], r[3], Colors.WHITE, 1, 1)
+        
         elif self.mode == 'build':
             xx = (mx - self.x) // 32
             yy = (my - self.y) // 32
@@ -411,14 +356,6 @@ class Particle:
             return ttl
         
         return self.ttl
-
-class Order:
-    def __init__(self, kind=None, x=0, y=0, target=None):
-        self.x = x
-        self.y = y
-        self.target = target
-        self.kind = kind
-
 
 class BuildLoad:
 
@@ -619,72 +556,22 @@ class Unit(GameObject):
     
     def __init__(self, utype, player, x, y):
         GameObject.__init__(self, player)
-        self.type = utype
-        self.real_x = x * 32 + 16
-        self.real_y = y * 32 + 16
-        self.x = x
-        self.y = y
+        
         self.size = utype.size
-        self.range = utype.range
-        self.vision = utype.vision
-        self.life = utype.life
         self.dom = utype.dom
         self.reload = utype.reload
         
-        self.orders = []
         self.cpt = 0
-        self.cpt_move = 0
         self.speed_move = 1
         self.speed_step = utype.speed  # must be 1 or a multiple of 2 - 2 before
         self.old_x = x
         self.old_y = y
-
-        # Transitional movement system (TMS)
-        self.transition = None
-        self.destination = None
-        self.previous32 = None
-
+        
         # Fog
         self.light(self.x, self.y, 1, 1, self.vision)
 
     def __str__(self):
         return 'Unit #' + str(self.id) + ' (' + self.type.name + ')'
-
-    def update(self):
-        old_x = self.x
-        old_y = self.y
-        self.player.world.unit_map[self.y][self.x] = 0
-        # print 'update ', len(self.orders)
-        if self.life <= 0:
-            return False
-
-        if len(self.orders) > 0:
-            o = self.orders[0]
-            if o.kind == 'go':
-                r = self.go(o.x, o.y)
-                if r:
-                    del self.orders[0]
-            elif o.kind == 'attack':
-                # print(self.range, get_dist(self.x, self.y, o.target.x, o.target.y)) # check if the unit is not 'in transit'
-                if get_dist(self.x, self.y, o.target.x, o.target.y) > self.range or (self.real_x - 16) % 32 != 0 or (self.real_y - 16) % 32 != 0:
-                    self.go(o.target.x, o.target.y)
-                else:
-                    r = self.attack(o.target)
-                    if r:
-                        del self.orders[0]
-        self.player.world.unit_map[self.y][self.x] = (1, self) # CODE: STILL, UNIT
-
-        # Fog
-        self.light(self.x, self.y, 1, 1, self.vision)
-
-        return True
-
-    # def order(self, o : Order):
-    def order(self, o):
-        self.orders = [o]
-
-    def add_order(self, o):
-        self.orders.append(o)
     
     def attack(self, target):
         if self.cpt <= 0:
@@ -697,112 +584,6 @@ class Unit(GameObject):
         else:
             return False
     
-    def go(self, x: int, y: int):
-        if self.cpt_move > 0:
-            self.cpt_move -= 1
-            return False
-        else:
-            self.cpt_move = self.speed_move
-
-        if self.destination is None:
-            # 32 en 32
-            from_x = self.x
-            from_y = self.y
-            to_x = x
-            to_y = y
-
-            # print 'destination x,y = ', x,y
-            # print 'destination/32 x,y = ', to_x32, to_y32
-
-            n_x = -1
-            n_y = -1
-            going_x = 0
-            going_y = 0
-            if to_x > from_x:
-                n_x = from_x + 1
-                going_x = 1
-            elif to_x < from_x:
-                n_x = from_x - 1
-                going_x = -1
-            elif to_x == from_x:
-                n_x = from_x
-            if to_y > from_y:
-                n_y = from_y + 1
-                going_y = 1
-            elif to_y < from_y:
-                n_y = from_y - 1
-                going_y = -1
-            elif to_y == from_y:
-                n_y = from_y
-
-            if not self.player.world.is_empty(n_x, n_y):
-                print("blocked!")
-                if going_x == 1 and going_y == 1:
-                    test = (from_x, n_y, n_x, from_y)
-                elif going_x == 1 and going_y == 0:
-                    test = (n_x, n_y + 1, n_x, n_y - 1)
-                elif going_x == 1 and going_y == -1:
-                    test = (from_x, n_y, n_x, from_y)
-                elif going_x == 0 and going_y == 1:
-                    test = (from_x - 1, n_y, from_x + 1, n_y)
-                elif going_x == 0 and going_y == 0:
-                    pass  # not a move
-                elif going_x == 0 and going_y == -1:
-                    test = (from_x - 1, n_y, from_x + 1, n_y)
-                elif going_x == -1 and going_y == 1:
-                    test = (from_x, n_y, n_x, from_y)
-                elif going_x == -1 and going_y == 0:
-                    test = (n_x, n_y + 1, n_x, n_y - 1)
-                elif going_x == -1 and going_y == -1:
-                    test = (from_x, n_y, n_x, from_y)
-
-                if self.player.world.is_valid(test[0], test[1]):
-                    if self.player.world.is_empty(test[0], test[1]):
-                        #print("trying : " + str(test[0]) + ", " + str(test[1]))
-                        n_x = test[0]
-                        n_y = test[1]
-                    elif self.player.world.is_empty(test[2], test[3]):
-                        #print("trying : " + str(test[2]) + ", " + str(test[3]))
-                        n_x = test[2]
-                        n_y = test[3]
-                if n_x == self.old_x and n_y == self.old_y:
-                    return True  # no loop !
-
-            if self.player.world.is_empty(n_x, n_y):
-                self.destination = Pair(n_x * 32 + 16, n_y * 32 + 16)
-                self.player.world.unit_map[n_y][n_x] = (-1, self) # CODE: IN MOVEMENT
-
-        if self.destination is not None and self.transition is None:
-            self.transition = Pair(self.x * 32 + 16, self.y * 32 + 16)
-
-        if self.transition != self.destination:
-            if self.transition.x < self.destination.x:
-                self.transition.x += self.speed_step
-            elif self.transition.x > self.destination.x:
-                self.transition.x -= self.speed_step
-            if self.transition.y < self.destination.y:
-                self.transition.y += self.speed_step
-            elif self.transition.y > self.destination.y:
-                self.transition.y -= self.speed_step
-
-        if self.transition is not None:
-            self.real_x = self.transition.x
-            self.real_y = self.transition.y
-        else:
-            self.real_x = self.x * 32 + 16
-            self.real_y = self.y * 32 + 16
-
-        if self.destination == self.transition and self.destination is not None:
-            self.old_x = self.x
-            self.old_y = self.y
-            self.x = int((self.destination.x - 16) / 32)
-            self.y = int((self.destination.y - 16) / 32)
-            self.destination = None
-            self.transition = None
-
-        #print(self.x, self.y, "tr= ", self.transition, "dst= ", self.destination) # Add details on pathfinding (verbose)
-        return self.x == x and self.y == y
-
     def hit(self, x, y):
         return get_dist(x, y, self.x * 32 + 16, self.y * 32 + 16) < self.size
 
@@ -823,20 +604,6 @@ def get_diff(x1, y1, x2, y2):
 
 def get_dist(x1, y1, x2, y2):
     return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
-
-
-def xrect(x1, y1, x2, y2):
-    tx = abs(x1 - x2)
-    ty = abs(y1 - y2)
-    if x1 > x2:
-        rx = x2
-    else:
-        rx = x1
-    if y1 > y2:
-        ry = y2
-    else:
-        ry = y1
-    return pygame.Rect(rx, ry, tx, ty)
 
 class TextureInfo:
 
@@ -934,14 +701,6 @@ def level_E1L1(game):
         [100, 100, 100, 100, 100, 100, 100, 100, 100, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
         [100, 100, 100, 100, 100, 100, 100, 100, 100, 101, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
         ])
-    
-    game.create_player("Bob", Colors.YELLOW, 100, 100)
-    game.create_player("Henry", Colors.SKY_BLUE, 0, 0)
-    game.create_player("Neutral", Colors.GREY, 20, 20)
-    
-    game.create_unit("Bob", 1, 1, "soldier")
-    game.create_unit("Bob", 3, 3, "elite")
-    game.create_unit("Neutral", 20, 20, "soldier")
     
     game.create_unit("Henry", 12, 12, "big")
     game.create_unit("Henry", 18, 14, "soldier")

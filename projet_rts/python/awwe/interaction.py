@@ -28,24 +28,36 @@ class AudioHandler:
 # INPUTHANDLER
 #-------------------------------------------------------------------------------
 class InputHandler:
+
+    NORMAL = 0
+    BUILD = 1
     
     def __init__(self, camera, scroll=5, auto_scroll_zone=10):
         self.camera = camera
-        self.left = False
-        self.right = False
-        self.up = False
-        self.down = False
-        self.scroll = scroll
-        self.auto_scroll_zone = auto_scroll_zone
+        self.camera.handler = self
+        self.world = camera.focus
         self.engine = camera.engine
         self.actor = camera.actor
         self.add_mod = False
         self.go_on = True
+        self.mode = InputHandler.NORMAL
+        # scrolling
+        self.scroll = scroll
+        self.auto_scroll_zone = auto_scroll_zone
+        self.left = False
+        self.right = False
+        self.up = False
+        self.down = False
+        # selection
+        self.selected = []
+        self.select = False
+        self.select_x = 0
+        self.select_y = 0
     
     def resume(self):
         self.go_on = True
     
-    def handler(self):
+    def handler(self, x, y, mx, my):
         for event in self.engine.get_events():
             if event.type == self.engine.QUIT:
                 self.go_on = False
@@ -75,16 +87,67 @@ class InputHandler:
                 elif event.key == self.engine.Keys.LSHIFT:
                     self.add_mod = False
                     print('stop add mod!')
-                elif event.key == self.engine.Keys.SPACE:
+                elif event.key == self.engine.Keys.CTRL_LEFT:
                     self.scroll += 1
+                elif event.key == self.engine.Keys.CTRL_RIGHT:
+                    self.scroll = max(self.scroll-1, 0)
+                elif event.key == self.engine.Keys.SPACE:
+                    self.GUI_display = not self.GUI_display
                 elif event.key == self.engine.Keys.TAB:
                     self.camera.debug = not self.camera.debug
-    
+                else:
+                    print("Unknown key: " + str(event.key))
+            elif event.type == self.engine.EventTypes.MOUSE_BUTTON_DOWN:
+                if event.button == 1:
+                    if not self.select:
+                        self.select = True
+                        self.select_x = mx - x
+                        self.select_y = my - y
+            elif event.type == self.engine.EventTypes.MOUSE_BUTTON_UP:
+                self.select = False
+                if event.button == self.engine.Keys.MOUSE_LEFT:  # Left Button
+                    if my > self.camera.GUI_interface_y:  # Interface click
+                        pass
+                    elif self.mode == InputHandler.NORMAL:
+                        # print("%d %d %d %d" % (self.select_x // 32, self.select_y // 32, (mx - x) // 32, (my - y) // 32))
+                        units = self.world.get_uni_rect(self.select_x // 32, self.select_y // 32, (mx - x) // 32, (my - y) // 32)
+                        if not self.add_mod:
+                            self.selected = []
+                        if len(units) > 1:
+                            for u in units:
+                                if u.player == self.actor:
+                                    if u not in self.selected:
+                                        self.selected.append(u)
+                        elif len(units) == 1:
+                            if units[0].player == self.actor:
+                                self.selected.append(units[0])
+                            else:
+                                if not self.add_mod:
+                                    self.selected = units # on peut selectionner une et une seule unite ennemie
+                elif event.button == self.engine.Keys.MOUSE_RIGHT:  # Right Button
+                    if self.mode == InputHandler.BUILD:
+                        self.mode = InputHandler.NORMAL
+                    elif len(self.selected) == 1 and self.selected[0].player != self.actor:
+                        print('1 select from other player : todo : display info')
+                        pass
+                    else:
+                        print('button right')
+                        cy = (my - y) // 32
+                        cx = (mx - x) // 32
+                        if self.world.is_valid_at(cx, cy):
+                            unit = self.world.get_unit_at(cx, cy)
+                            if unit is None:
+                                self.game.order_move(self.selected, cx, cy, self.add_mod)
+                            elif unit.player == self.player:
+                                self.game.order_move(self.selected, cy, cx, self.add_mod)
+                            else: # u.player != self.player:
+                                self.game.order_attack(self.selected, unit, self.add_mod)
+                                
     def update(self):
-        
-        self.handler()
-        
+
         mx, my = self.engine.get_mouse_pos()
+        self.handler(self.camera.x, self.camera.y, mx, my)
+        
         x = 0
         y = 0
         
@@ -127,6 +190,7 @@ class Camera:
         self.engine = engine
         self.BASE = base
         self.debug = False
+        self.handler = None
     
     def is_valid_at(self, x, y):
         # Block scroll to the map
@@ -151,21 +215,50 @@ class Camera:
         # Ground
         for yy in range(first_square[1], min(first_square[1] + self.NB_SQUARE_HEIGHT + 4, self.actor.world.height)): # 4 = LARGEST SPRITE HEIGHT
             for xx in range(first_square[0], min(first_square[0] + self.NB_SQUARE_WIDTH + 3, self.actor.world.width)): # 3 = LARGET SPRITE WIDTH
-                tex = self.actor.world.get_tex(xx, yy)
-                pas = self.actor.world.get_pas(xx, yy)
+                tex = self.focus.get_tex(xx, yy)
+                pas = self.focus.get_pas(xx, yy)
+                uni = self.focus.get_uni(xx, yy)
                 dx = xx * 32 + self.x
                 dy = yy * 32 + self.y
-                # draw terrain
+                # draw ground
                 self.engine.tex(dx, dy, self.engine.textures[tex], 0)
-                if pas != 0 and d != 99:  # there is visible blocking doodad, 0 = passable, 99 = invisible and not passable
-                    self.engine.tex(dx + self.engine.textures[pas].mod_x, dy + self.engine.textures[pas].mod_y, self.engine.textures[pas], 0.5)
-                    if self.dev_mode:
-                        self.engine.rect(dx, dy, 32, 32, Colors.RED, 1, 1)
-        if not self.debug:
-            self.engine.spr(96, 96, self.engine.sprites["male"], 18, 10)
+                # draw selected
+                if uni in self.handler.selected:
+                    self.engine.tex(dx, dy, self.engine.textures[101], 0.5)
+                # draw passable
+                if self.debug:
+                    if pas != 0:
+                        self.engine.tex(dx, dy, self.engine.textures[102], 0.5)
+                    
+                    # self.engine.rect(dx, dy, 32, 32, Colors.RED, 1, 1)
+                    #if pas != 0: # there is visible blocking doodad, 0 = passable, 99 = invisible and not passable
+                    #    self.engine.tex(dx + self.engine.textures[pas].mod_x, dy + self.engine.textures[pas].mod_y, self.engine.textures[pas], 0.5)
+                        
+                # draw unit
+                if uni != 0:
+                    self.engine.spr(dx, dy, self.engine.sprites["male"], 18, 10)        
+        # Cursor
+        mx, my = self.engine.get_mouse_pos()
+        if self.handler.mode == InputHandler.NORMAL:
+            if self.handler.select:
+                r = self.xrect(self.handler.select_x + self.x, self.handler.select_y + self.y, mx, my)
+                self.engine.rect(r[0], r[1], r[2], r[3], Colors.GREEN, 1, 1)
     
     def render_gui(self):
         pass
+
+    def xrect(self, x1, y1, x2, y2): # used only once
+        tx = abs(x1 - x2) # add one?
+        ty = abs(y1 - y2) # add one?
+        if x1 > x2:
+            rx = x2
+        else:
+            rx = x1
+        if y1 > y2:
+            ry = y2
+        else:
+            ry = y1
+        return pygame.Rect(rx, ry, tx, ty)
 
 #------------------------------------------------------------------------------
 # Basic Textual Representation (BTR)

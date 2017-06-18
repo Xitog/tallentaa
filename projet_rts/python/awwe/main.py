@@ -14,28 +14,33 @@ MAP_PATH = r"..\..\..\assets\map"
 
 FutureWar = Mod("Future War", {
         "RedScum" : Army("Red Scum", {
-            "barracks" : Profile("Barracks", 300, vision=3, width=2, height=3),
-            "soldier" : Profile("Soldier", 50, vision=3),
-            "heavy" : Profile("Heavy soldier", 80, vision=3)
+            "Barracks" : Profile("Barracks", 300, vision=3, speed=0, _range=0, width=2, height=3),
+            "Soldier" : Profile("Soldier", 50, vision=3, speed=3, _range=3),
+            "Heavy" : Profile("Heavy soldier", 80, vision=3, speed=2, _range=6),
+            "Elite" : Profile("Elite soldier", 100, vision=4, speed=3, _range=2)
         }),
         "BlueAngels": Army("Blue Angels", {
-            "Defender" : Profile("Defender", 60, vision=3)
+            "Defender" : Profile("Defender", 60, vision=3, speed=3, _range=3)
         }),
     }
 )
 
 def load_textures(engine: Type[Engine]):
     engine.set_texture_path(TEXTURE_PATH)
-    engine.load_texture("darkness", -1, "black.png")
-    engine.load_texture("water", 0, "blue.png")
-    engine.load_texture("ford", 1, "light_blue.png")
-    engine.load_texture("deep water", 2, "dark_blue.png")
-    engine.load_texture("earth", 10, "brown.png")
-    engine.load_texture("mud", 20, "dark_brown.png")
-    engine.load_texture("grass", 30, "green.png")
-    engine.load_texture("dark grass", 40, "dark_green.png")
-    engine.load_texture("moutain", 50, "orange.png")
-    engine.load_texture("rock", 60, "grey.png")
+    engine.load_texture("darkness", -1, "filled_black.png")
+    engine.load_texture("water", 0, "filled_blue.png")
+    engine.load_texture("ford", 1, "filled_light_blue.png")
+    engine.load_texture("deep water", 2, "filled_dark_blue.png")
+    engine.load_texture("earth", 10, "filled_brown.png")
+    engine.load_texture("mud", 20, "filled_dark_brown.png")
+    engine.load_texture("grass", 30, "filled_green.png")
+    engine.load_texture("dark grass", 40, "filled_dark_green.png")
+    engine.load_texture("moutain", 50, "filled_orange.png")
+    engine.load_texture("rock", 60, "filled_grey.png")
+    engine.load_texture("selector yellow", 100, "empty_yellow.png")
+    engine.load_texture("selector green", 101, "empty_green.png")
+    engine.load_texture("selector red", 102, "empty_red.png")
+    engine.load_texture("selector blue", 103, "empty_blue.png")
     engine.set_texture_path(SPRITE_PATH)
     engine.load_sprite("male", "male_walkcycle.png", -16, -32, 64, 64)
 
@@ -77,15 +82,21 @@ class Application:
             #worldmap = Map.from_csv("World map", "textures", MAP_PATH + r"\smallmap.csv")
             print("worldmap width = ", worldmap.width)
             print("worldmap height = ", worldmap.height)
-            game.set_world(worldmap)
-            player1 = Player(game, "Bob", "RedScum", Colors.GREEN, (0, 0))
-            player2 = Player(game, "Hicks", "BlueAngels", Colors.BLUE, (4, 4))
+            world = game.set_world(worldmap)
+
+            player = game.create_player("Bob", "RedScum", Colors.YELLOW, 100, 100, 0, 0)
+            game.create_player("Hicks", "BlueAngels", Colors.SKY_BLUE, 0, 0, 0, 0)
+            game.create_player("Neutral", "BlueAngels", Colors.GREY, 20, 20, 0, 0)
+            
+            game.create_unit("Bob", "Soldier", 1, 1, 1.0)
+            game.create_unit("Bob", "Elite", 3, 3, 0.5)
+            game.create_unit("Neutral", "Defender", 20, 20, 1.0)
+            
             #plant = Building(Hicks, x=4, y=4, profile=FutureWar.get_profile("barracks"), constructed=1, plife=0.50)
             #s1 = Unit(Hicks, x=9, y=9, profile=FutureWar.get_profile("soldier"), plife=0.50)
-            #TrainingGround.create_unit("Zoltan", "Defender", 4, 7)
             #writeln(f"plant life = {plant.life}")
             
-            self.camera = Camera(800, 600, worldmap, player1, self.engine)
+            self.camera = Camera(800, 600, world, player, self.engine)
             self.handler = InputHandler(self.camera, auto_scroll_zone=-1)
             self.audio = AudioHandler(AUDIO_PATH)
             self.audio.play("ds.ogg")
@@ -158,7 +169,7 @@ if __name__ == '__main__':
     
     # No profiling
     Application().start()
-    exit()
+    # exit()
 
 # import time
 ## import server

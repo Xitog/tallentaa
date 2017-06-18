@@ -85,7 +85,9 @@ class Engine:
         TAB = pygame.locals.K_TAB
         RETURN = pygame.locals.K_RETURN
         B = pygame.locals.K_b
-
+        CTRL_RIGHT = pygame.locals.K_RCTRL
+        CTRL_LEFT = pygame.locals.K_LCTRL
+    
     def __init__(self, width, height, texture_path=None):
         pygame.init()
         self.size = width, height

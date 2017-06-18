@@ -22,6 +22,14 @@ class Layer(NamedObject):
     
     def get_at(self, x, y):
         return self.content[y][x]
+
+    def get_rect(self, x, y, w, h):
+        r = []
+        for lin in range(x, x+w):
+            for col in range(y, y+h):
+                if self.content[lin][col] != self.default:
+                    r.append(self.content[lin][col])
+        return r
     
     def set_at(self, x, y, value):
         self.content[y][x] = value
@@ -116,6 +124,13 @@ class Map(NamedObject):
         if not self.is_valid_at(x, y):
             raise Exception("Out of bound!")
         return self.layers[layer].get_at(x, y)
+
+    def get_rect(self, layer: str, x: int, y: int, w: int, h: int):
+        if layer not in self.layers:
+            raise Exception("Invalid layer!")
+        if not self.is_valid_rect(x, y, w, h):
+            raise Exception("Out of bound! %d %d %d %d" % (x, y, w, h))
+        return self.layers[layer].get_rect(x, y, w, h)
 
     def set_at(self, layer: str, x: int, y: int, val):
         if layer not in self.layers:
