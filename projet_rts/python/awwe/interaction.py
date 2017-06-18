@@ -137,11 +137,11 @@ class InputHandler:
                         if self.world.is_valid_at(cx, cy):
                             unit = self.world.get_unit_at(cx, cy)
                             if unit is None:
-                                self.game.order_move(self.selected, cx, cy, self.add_mod)
+                                self.world.game.order_move(self.selected, cx, cy, self.add_mod)
                             elif unit.player == self.player:
-                                self.game.order_move(self.selected, cy, cx, self.add_mod)
+                                self.world.game.order_move(self.selected, cy, cx, self.add_mod)
                             else: # u.player != self.player:
-                                self.game.order_attack(self.selected, unit, self.add_mod)
+                                self.world.game.order_attack(self.selected, unit, self.add_mod)
                                 
     def update(self):
 
@@ -222,21 +222,23 @@ class Camera:
                 dy = yy * 32 + self.y
                 # draw ground
                 self.engine.tex(dx, dy, self.engine.textures[tex], 0)
-                # draw selected
-                if uni in self.handler.selected:
-                    self.engine.tex(dx, dy, self.engine.textures[101], 0.5)
                 # draw passable
-                if self.debug:
-                    if pas != 0:
-                        self.engine.tex(dx, dy, self.engine.textures[102], 0.5)
+                if pas != 0:
+                    self.engine.tex(dx, dy, self.engine.textures[102], 0.5)
                     
                     # self.engine.rect(dx, dy, 32, 32, Colors.RED, 1, 1)
                     #if pas != 0: # there is visible blocking doodad, 0 = passable, 99 = invisible and not passable
                     #    self.engine.tex(dx + self.engine.textures[pas].mod_x, dy + self.engine.textures[pas].mod_y, self.engine.textures[pas], 0.5)
                         
                 # draw unit
-                if uni != 0:
-                    self.engine.spr(dx, dy, self.engine.sprites["male"], 18, 10)        
+                if uni != 0 and pas == 1:
+                    self.engine.spr(uni.real_x + self.x -16, uni.real_y + self.y -16, self.engine.sprites["male"], 18, 10)
+                # draw selected
+                    if uni in self.handler.selected:
+                        self.engine.tex(dx, dy, self.engine.textures[101], 0.5)
+                # debug
+                if self.debug:
+                    pass
         # Cursor
         mx, my = self.engine.get_mouse_pos()
         if self.handler.mode == InputHandler.NORMAL:

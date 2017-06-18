@@ -25,8 +25,9 @@ class Layer(NamedObject):
 
     def get_rect(self, x, y, w, h):
         r = []
-        for lin in range(x, x+w):
-            for col in range(y, y+h):
+        # print("%d %d %d %d" % (x, y, w, h))
+        for lin in range(y, y+h):
+            for col in range(x, x+w):
                 if self.content[lin][col] != self.default:
                     r.append(self.content[lin][col])
         return r

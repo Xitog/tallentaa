@@ -90,6 +90,7 @@ class Application:
             
             game.create_unit("Bob", "Soldier", 1, 1, 1.0)
             game.create_unit("Bob", "Elite", 3, 3, 0.5)
+            game.create_unit("Bob", "Heavy", 2, 5, 0.5)
             game.create_unit("Neutral", "Defender", 20, 20, 1.0)
             
             #plant = Building(Hicks, x=4, y=4, profile=FutureWar.get_profile("barracks"), constructed=1, plife=0.50)

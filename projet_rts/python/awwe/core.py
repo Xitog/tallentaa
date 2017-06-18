@@ -186,10 +186,14 @@ class Player(NamedObject):
 #-------------------------------------------------------------------------------
 class World:
     
+    HERE = 1
+    MOVING = -1
+    EMPTY = 0
+    
     def __init__(self, game, map):
         """
             map has only one layer: "textures". we will had one layer for unit, another for passable
-            before, unit layer was (x, y) where x was 1 (here) or -1 (moving here) and y the id
+            before, unit layer was (x, y) where x was 1 (here) or -1 (moving here) and y the u itself
             now unit layer has only a ref to the unit in it. The here/moving here info is in passable layer
         """
         self.game = game
@@ -201,14 +205,20 @@ class World:
         self.map.add_layer("passable", 0) # can be : 0 : passable, 1 : unit is here (see unit map), 2 : unit u is moving here (see unit map), 10 : impassable
         self.units = []
         self.EMPTY = 0
-
+    
+    def set_trace(self, x, y, u):
+        print("%d %d %d %d" % (x, y, u.x, u.y))
+        self.set_pos(u)
+        self.map.set_rect("unit", x, y, u.width, u.height, u)
+        self.map.set_rect("passable", x, y, u.width, u.height, World.MOVING)
+        
     def set_pos(self, u):
         self.map.set_rect("unit", u.x, u.y, u.width, u.height, u)
-        self.map.set_rect("passable", u.x, u.y, u.width, u.height, 1)
+        self.map.set_rect("passable", u.x, u.y, u.width, u.height, World.HERE)
 
     def unset_pos(self, u):
-        self.map.set_rect("unit", u.x, u.y, u.width, u.height, 0)
-        self.map.set_rect("passable", u.x, u.y, u.width, u.height, 0)
+        self.map.set_rect("unit", u.x, u.y, u.width, u.height, World.EMPTY)
+        self.map.set_rect("passable", u.x, u.y, u.width, u.height, World.EMPTY)
         
     def clean(self, u):
         self.unset_pos(u)
@@ -347,7 +357,8 @@ class Unit(IdObject):
         self.vision = profile.vision
         self.range = profile.range
         self.speed = profile.speed
-
+        self.speed_step = 2
+        
         self.cpt_move = 0
         self.cpt_fire = 0
 
@@ -464,11 +475,11 @@ class Unit(IdObject):
             
             if self.player.world.is_empty_at(n_x, n_y):
                 self.destination = Pair(n_x * 32 + 16, n_y * 32 + 16)
-                self.world.set_trace(n_y, n_x, self) # CODE: IN MOVEMENT
+                self.world.set_trace(n_x, n_y, self) # CODE: IN MOVEMENT
         
         if self.destination is not None and self.transition is None:
             self.transition = Pair(self.x * 32 + 16, self.y * 32 + 16)
-
+        
         if self.transition != self.destination:
             if self.transition.x < self.destination.x:
                 self.transition.x += self.speed_step
