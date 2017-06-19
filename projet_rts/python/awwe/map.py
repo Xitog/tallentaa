@@ -195,4 +195,54 @@ class Map(NamedObject):
         #print("cells = ", nbcell)
         return m
 
+#-------------------------------------------------------------------------------
+# MAPTESTS
+#-------------------------------------------------------------------------------
+class MapTests:
+
+    def __init__(self):
+        self.test_layer1()
+        self.test_layer2()
+    
+    def test_layer1(self):
+        """
+            Cover:
+                Layer#__init__
+                Layer#get_at
+                Layer#set_at
+                Layer#dump
+        """
+        print("\nTest 1 ===============================================")
+        layer = Layer("test1", 5, 5, 0)
+        print("[TEST] Layer(\"test1\", 5, 5, 0)", layer is not None)
+        print("[ACTI] layer.dump()")
+        layer.dump()
+        print("[TEST] layer.get_at(4, 4) should be equal to 0", layer.get_at(4, 4) == 0)
+        print("[TEST] layer.get_at(0, 3) should be equal to 0", layer.get_at(0, 3) == 0)
+        print("[TEST] layer.set_at(0, 3, 22)", layer.set_at(0, 3, 22) == None)
+        print("[ACTI] layer.dump()")
+        layer.dump()
+        print("[TEST] layer.get_at(0, 3) should be equal to 22", layer.get_at(0, 3) == 22)
+        
+    def test_layer2(self):
+        """
+            Cover:
+                Layer.from_content
+                Layer#get_at
+                Layer#dump
+                Layer#update
+        """
+        print("\nTest 2 ===============================================")
+        print("[ACTI] Layer.from_content(\"test2\", 4, 4, [[0, 0, 0, 0], [1, 11, 1, 1], [2, 2, 22, 2], [1, 3, 3 ,33]])")
+        layer = Layer.from_content("test2", 4, 4, [[0, 0, 0, 0], [1, 11, 1, 1], [2, 2, 22, 2], [1, 3, 3 ,33]])
+        print("[ACTI] layer.dump()")
+        layer.dump()
+        print("[ACTI] layer.update(1, 44)")
+        layer.update(1, 44)
+        print("[TEST] layer.get_at(0, 3) should be equal to 44", layer.get_at(0, 3) == 44)
+        print("[ACTI] layer.dump()")
+        layer.dump()
+
+if __name__ == '__main__':
+    MapTests()
 
