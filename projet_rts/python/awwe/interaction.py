@@ -218,24 +218,31 @@ class Camera:
                 tex = self.focus.get_tex(xx, yy)
                 pas = self.focus.get_pas(xx, yy)
                 uni = self.focus.get_uni(xx, yy)
+                fog = self.actor.fog.get_at(xx, yy)
                 dx = xx * 32 + self.x
                 dy = yy * 32 + self.y
                 # draw ground
-                self.engine.tex(dx, dy, self.engine.textures[tex], 0)
-                # draw passable
-                if pas != 0:
-                    self.engine.tex(dx, dy, self.engine.textures[102], 0.5)
+                if fog != 0:
+                    self.engine.tex(dx, dy, self.engine.textures[tex], 0)
+                    # draw passable
+                    if pas != 0:
+                        self.engine.tex(dx, dy, self.engine.textures[102], 0.5)
                     
-                    # self.engine.rect(dx, dy, 32, 32, Colors.RED, 1, 1)
-                    #if pas != 0: # there is visible blocking doodad, 0 = passable, 99 = invisible and not passable
-                    #    self.engine.tex(dx + self.engine.textures[pas].mod_x, dy + self.engine.textures[pas].mod_y, self.engine.textures[pas], 0.5)
+                        # self.engine.rect(dx, dy, 32, 32, Colors.RED, 1, 1)
+                        #if pas != 0: # there is visible blocking doodad, 0 = passable, 99 = invisible and not passable
+                        #    self.engine.tex(dx + self.engine.textures[pas].mod_x, dy + self.engine.textures[pas].mod_y, self.engine.textures[pas], 0.5)
                         
-                # draw unit
-                if uni != 0 and pas == 1:
-                    self.engine.spr(uni.real_x + self.x -16, uni.real_y + self.y -16, self.engine.sprites["male"], 18, 10)
-                # draw selected
-                    if uni in self.handler.selected:
-                        self.engine.tex(dx, dy, self.engine.textures[101], 0.5)
+                    # draw unit
+                    if uni != 0 and pas == 1:
+                        self.engine.spr(uni.real_x + self.x -16, uni.real_y + self.y -16, self.engine.sprites["male"], 18, 10)
+                    # draw selected
+                        if uni in self.handler.selected:
+                            self.engine.tex(dx, dy, self.engine.textures[101], 0.5)
+                    # draw fog
+                    if fog == 1:
+                        self.engine.tex(dx, dy, self.engine.textures[10000], 10)
+                #else # fog == 0
+                #        self.engine.tex(dx, dy, self.engine.textures[11111], 10)
                 # debug
                 if self.debug:
                     pass

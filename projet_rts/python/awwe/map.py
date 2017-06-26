@@ -62,6 +62,39 @@ class Layer(NamedObject):
                     raise e
             sys.stdout.write("\n")
     
+    def set_rect(self, x: int, y: int, w: int, h: int, val):
+        for i in range(x, x + w):
+            for j in range(y, y + h):
+                self.set_at(i, j, val)
+    
+    def set_square(self, x: int, y: int, dim: int, val):
+        for i in range(x-dim, x+dim+1):
+            for j in range(y-dim, y+dim+1):
+                self.set_at(i, j, val) 
+    
+    def set_circle(self, x: int, y: int, radius: int, val):
+        for i in range(x - radius, x + radius):
+            for j in range(y - radius, y + radius):
+                if abs(x-i) <= radius or abs(y-j) <= radius:
+                    self.set_at(i, j, val)
+    
+    def is_valid(self, x: int, y: int):
+        return 0 <= x < self.width and 0 <= y < self.height
+    
+    # Test for each set. Longer but safer. Discard non valid xx, yy UNUSED
+    def set_safe_rect(self, x: int, y: int, w: int, h: int, val):
+        for i in range(x, x + w):
+            for j in range(y, y + h):
+                if self.is_valid(i, j):
+                    self.set_at(i, j, val)
+    
+    def set_safe_circle(self, x: int, y: int, radius: int, val):
+        for i in range(x - radius, x + radius):
+            for j in range(y - radius, y + radius):
+                if abs(x-i) <= radius or abs(y-j) <= radius:
+                    if self.is_valid(i, j):
+                        self.set_at(i, j, val)
+
 #-------------------------------------------------------------------------------
 # MAP
 #-------------------------------------------------------------------------------
@@ -141,20 +174,16 @@ class Map(NamedObject):
         self.layers[layer].set_at(x, y, val)
 
     def set_rect(self, layer: str, x: int, y: int, w: int, h: int, val):
-        for i in range(x, x + w):
-            for j in range(y, y + h):
-                self.layers[layer].set_at(i, j, val) 
+        if self.is_valid_rect(x, y, w, h):
+            self.layers[layer].set_rect(x, y, w, h, val)
     
     def set_square(self, layer: str, x: int, y: int, dim: int, val):
-        for i in range(x-dim, x+dim+1):
-            for j in range(y-dim, y+dim+1):
-                self.layers[layer].set_at(i, j, val) 
+        if self.is_valid_rect(x, y, dim, dim):
+            self.layers[layer].set_square(x, y, dim, val)
     
     def set_circle(self, layer: str, x: int, y: int, radius: int, val):
-        for i in range(x - radius, x + radius):
-            for j in range(y - radius, y + radius):
-                if abs(x-i) <= radius or abs(y-j) <= radius:
-                    self.layers[layer].set_at(i, j, val)
+        if self.is_valid_rect(x-radius, y-radius, radius * 2, radius * 2):
+            self.layers[layer].set_circle(x, y, radius, val)
     
     def set_circle_from_rect(self, layer: str, x: int, y: int, w: int, h: int, radius: int, val):
         for i in range(x - radius, x + w + radius):

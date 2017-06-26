@@ -380,6 +380,8 @@ class Unit(IdObject):
             self.world.clean(self)
             return False
         
+        self.player.fog.set_safe_circle(self.x, self.y, 3, 2)
+        
         if len(self.orders) > 0:
             order = self.orders[0]
             if order.kind == 'go':
@@ -408,8 +410,9 @@ class Unit(IdObject):
             self.cpt_move -= 1
             return False
         else:
-            self.cpt_move = self.speed
-
+            self.cpt_move = 10 - self.speed
+            print(self.cpt_move)
+        
         self.world.unset_pos(self)
         
         if self.destination is None:

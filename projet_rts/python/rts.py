@@ -24,15 +24,6 @@ def load_textures(engine):
     engine.load_texture('water85', 8500, 'water85.png')  # Colors.MINI_MAP_BLUE_LIGHT, False
     engine.load_texture('water325', 8700, 'water325.png')  # Colors.MINI_MAP_BLUE_LIGHT, False
     engine.load_texture('water981', 8900, 'water981.png')  # Colors.MINI_MAP_BLUE_LIGHT, False
-    # Brou & Black
-    surf_brou = pygame.Surface((32, 32))
-    surf_brou.set_alpha(200, pygame.RLEACCEL)
-    surf_brou.fill((32, 32, 32, 128))
-    engine.load_texture('brou', 10000, surf_brou)  # Colors.MINI_MAP_FOG, False
-    surf_black = pygame.Surface((32, 32))
-    surf_black.set_alpha(255, pygame.RLEACCEL)
-    surf_black.fill((0, 0, 0, 255))
-    engine.load_texture('black', 11111, surf_black)  # Colors.MINI_MAP_BLACK, False
     # Unit
     engine.set_texture_path('..\\..\\assets\\buildings\\')
     engine.load_texture('turret', 20001, 'cc3by_five_archers_turret_base.png')  # Colors.MINI_MAP_BLUE, False),
@@ -213,12 +204,6 @@ class Camera:
                     #    self.engine.rect(dx, dy, u.type.grid_w * 32, u.type.grid_h * 32, u.player.color, 0, 2)
                     if u in self.selected:
                         self.engine.rect(u.x * 32 + self.x, u.y * 32 + self.y, u.type.grid_w * 32, u.type.grid_h * 32, Colors.GREEN, 2, 2)
-                # draw fog or black
-                fog = self.player.fog_map[yy][xx]
-                if fog == 0:
-                    self.engine.tex(dx, dy, self.engine.textures[11111], 10)
-                elif fog == 1:
-                    self.engine.tex(dx, dy, self.engine.textures[10000], 10)
                 # DEBUG
                 if self.dev_mode:
                     self.engine.text(dx, dy, "%(v)04d" % {"v": self.player.world.debug_map[yy][xx]}, Colors.RED, 1)

@@ -15,7 +15,7 @@ MAP_PATH = r"..\..\..\assets\map"
 FutureWar = Mod("Future War", {
         "RedScum" : Army("Red Scum", {
             "Barracks" : Profile("Barracks", 300, vision=3, speed=0, _range=0, width=2, height=3),
-            "Soldier" : Profile("Soldier", 50, vision=3, speed=3, _range=3),
+            "Soldier" : Profile("Soldier", 50, vision=3, speed=9, _range=3),
             "Heavy" : Profile("Heavy soldier", 80, vision=3, speed=2, _range=6),
             "Elite" : Profile("Elite soldier", 100, vision=4, speed=3, _range=2)
         }),
@@ -41,6 +41,15 @@ def load_textures(engine: Type[Engine]):
     engine.load_texture("selector green", 101, "empty_green.png")
     engine.load_texture("selector red", 102, "empty_red.png")
     engine.load_texture("selector blue", 103, "empty_blue.png")
+    # Fog & Black
+    surf_brou = pygame.Surface((32, 32))
+    surf_brou.set_alpha(200, pygame.RLEACCEL)
+    surf_brou.fill((32, 32, 32, 128))
+    engine.load_texture('fog', 10000, surf_brou)  # Colors.MINI_MAP_FOG, False
+    #surf_black = pygame.Surface((32, 32)) # no need to draw in black!
+    #surf_black.set_alpha(255, pygame.RLEACCEL)
+    #surf_black.fill((0, 0, 0, 255))
+    #engine.load_texture('black', 11111, surf_black)  # Colors.MINI_MAP_BLACK, False
     engine.set_texture_path(SPRITE_PATH)
     engine.load_sprite("male", "male_walkcycle.png", -16, -32, 64, 64)
 
@@ -100,7 +109,7 @@ class Application:
             self.camera = Camera(800, 600, world, player, self.engine)
             self.handler = InputHandler(self.camera, auto_scroll_zone=-1)
             self.audio = AudioHandler(AUDIO_PATH)
-            self.audio.play("ds.ogg")
+            #self.audio.play("ds.ogg")
             r = self.game_loop(game)
             return r
         elif s['clicked'] == 'Options':
