@@ -2,8 +2,83 @@
 
 import tkinter # as tk
 from tkinter import ttk # not found in 2.7.11 but found in 3.5.1 :-)
+from tkinter import messagebox   
 
-class Application(tkinter.Frame):
+def menu_about():
+    messagebox.showinfo(
+        "About",
+        "Jyx - Damien Gouteux, 2017. Made with ❤"
+    )
+
+def menu_new():
+    clear()
+
+def menu_exit():
+    root.destroy()
+    #root.quit()
+    #exit(0)
+
+def menu_open():
+    """Returns an opened file in read mode."""
+    options = {}
+    options['defaultextension'] = '.txt'
+    options['filetypes'] = [('all files', '.*'), ('text files', '.txt')]
+    options['initialdir'] = 'C:\\'
+    options['initialfile'] = 'myfile.txt'
+    options['parent'] = root
+    options['title'] = 'This is a title'
+    load(filedialog.askopenfilename(**options))
+
+def menu_save():
+    options = {}
+    #options['defaultextension'] = '.txt'
+    options['filetypes'] = [('all files', '.*'), ('text files', '.txt')]
+    options['initialdir'] = 'C:\\'
+    options['initialfile'] = 'myfile.txt'
+    options['parent'] = root
+    options['title'] = 'This is a title'
+    filename = filedialog.asksaveasfilename(**options)
+    if filename:
+        save(filename)
+
+class Application():
+    
+    def __init__(self):
+        # root widget, an ordinary window
+        self.root = tkinter.Tk()
+        self.root.wm_title("Forge")
+        self.root.iconbitmap(r'icons\iconyellowcube16x19_F5i_icon.ico')
+        self.root.minsize(width=800, height=600)
+        self.make_menu()
+        self.make_status_bar()
+        self.frame = MyFrame(self.root)
+    
+    def make_menu(self):
+        self.menu = tkinter.Menu(self.root)
+        self.root.config(menu=self.menu)
+        self.filemenu = tkinter.Menu(self.menu, tearoff=0)
+        self.menu.add_cascade(label="File", menu=self.filemenu)
+        self.filemenu.add_command(label="New", command=menu_new)
+        self.filemenu.add_command(label="Open...", command=menu_open)
+        self.filemenu.add_command(label="Save As...", command=menu_save)
+        self.filemenu.add_separator()
+        self.filemenu.add_command(label="Exit", command=menu_exit)
+
+        self.helpmenu = tkinter.Menu(self.menu, tearoff=0)
+        self.menu.add_cascade(label="Help", menu=self.helpmenu)
+        self.helpmenu.add_command(label="About...", command=menu_about)
+    
+    def make_status_bar(self):
+        self.status_bar = tkinter.Label(self.root, bd=1, relief=tkinter.SUNKEN, anchor=tkinter.W)
+        self.status_bar.config(text="Hello!")
+        #status_bar.update_idletasks()
+        self.status_bar.pack(side=tkinter.BOTTOM, fill=tkinter.X)
+    
+    def run(self):
+        self.frame.mainloop()
+        # root.destroy()
+
+class MyFrame(tkinter.Frame):
     """ Extend a Frame, a global container"""
     
     def __init__(self, master=None):
@@ -65,10 +140,5 @@ class Application(tkinter.Frame):
         print("hello!")
 
 if __name__ == "__main__":
-    # root widget, an ordinary window
-    root = tkinter.Tk()
-    root.wm_title("Forge")
-    root.minsize(width=800, height=600)
-    app = Application(master=root)
-    app.mainloop()
-    # root.destroy()
+    Application().run()
+
