@@ -4,7 +4,7 @@ import tkinter # as tk
 from tkinter import ttk # not found in 2.7.11 but found in 3.5.1 :-)
 from tkinter import filedialog
 from tkinter import messagebox   
-
+from tkinter import font
 
 class Application():
     
@@ -14,6 +14,8 @@ class Application():
         self.set_title()
         self.root.iconbitmap(r'icons\iconyellowcube16x19_F5i_icon.ico')
         self.root.minsize(width=800, height=600)
+        #root.title("Jyx")
+        #root.geometry("600x400")
         self.update()
         self.make_menu()
         self.make_status_bar()
@@ -21,7 +23,7 @@ class Application():
         self.text = self.frame.text
     
     def update(self):
-        print("hello")
+        #print("hello")
         self.root.after(1000, self.update)
 
     def set_title(self, filename=None):
@@ -31,6 +33,7 @@ class Application():
             self.root.wm_title("Forge - " + filename)
     
     def make_menu(self):
+        "Build the menu"
         self.menu = tkinter.Menu(self.root)
         self.root.config(menu=self.menu)
         self.filemenu = tkinter.Menu(self.menu, tearoff=0)
@@ -74,22 +77,22 @@ class Application():
         """Returns an opened file in read mode."""
         options = {}
         options['defaultextension'] = '.txt'
-        options['filetypes'] = [('all files', '.*'), ('text files', '.txt')]
+        options['filetypes'] = [('text files', '.txt'), ('python files', '.py'), ('lua files', '.lua'), ('all files', '.*')]
         options['initialdir'] = 'C:\\'
         options['initialfile'] = 'myfile.txt'
         options['parent'] = self.root
-        options['title'] = 'This is a title'
-        self.load(filedialog.askopenfilename(**options))
+        options['title'] = 'Open file...'
+        self.load(filedialog.askopenfilename(mode='r', **options))
 
     def menu_save(self):
         options = {}
         #options['defaultextension'] = '.txt'
-        options['filetypes'] = [('all files', '.*'), ('text files', '.txt')]
+        options['filetypes'] = [('text files', '.txt'), ('python files', '.py'), ('lua files', '.lua'), ('all files', '.*')]
         options['initialdir'] = 'C:\\'
         options['initialfile'] = 'myfile.txt'
         options['parent'] = self.root
-        options['title'] = 'This is a title'
-        filename = filedialog.asksaveasfilename(**options)
+        options['title'] = 'Save file...'
+        filename = filedialog.asksaveasfilename(mode='w', **options)
         if filename:
             self.save(filename)
 
@@ -110,7 +113,7 @@ class Application():
         content = f.read()
         f.close()
         self.clear()
-        self.text.insert("1.0", content)
+        self.text.insert("1.0", content) # or END, content
         self.set_title(filename)
 
     def save(self, filename : str):
@@ -120,6 +123,21 @@ class Application():
         f.close()
         self.set_title(filename)
 
+
+class Token:
+    
+    SEPARATOR = "sep"
+    KEYWORD = "kw"
+    TEXT = "txt"
+    
+    def __init__(self, content, start, length, typ):
+        self.content = content
+        self.start = start
+        self.length = length
+        self.type = typ
+
+    def __str__(self):
+        return "%s [%d +%d] (%s)" % (self.content, self.start, self.length, self.type)
 
 class MyFrame(tkinter.Frame):
     """ Extend a Frame, a global container"""
@@ -172,26 +190,90 @@ class MyFrame(tkinter.Frame):
         self.hi_there["command"] = self.hello
         self.hi_there.pack(side="bottom")
 
-    def make_text(self: tkinter.Frame): # with pack: scrollbar too big when expanding
-        self.text_frame = tkinter.Frame(self)
-        self.text_frame.pack(side=tkinter.RIGHT, fill=tkinter.BOTH, expand=tkinter.YES)
-        
-        self.text = tkinter.Text(self.text_frame)
-        self.text.config(font=("consolas", 12), undo=True, wrap='word')
-        self.text.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=tkinter.YES)
-        
-        # Tabs
-        def tab(arg):
-            print("tab pressed")
-            self.text.insert(tkinter.INSERT, " " * 4)
-            return 'break' # Prevent normal behavior
-        self.text.bind("<Tab>", tab)
-        
-        # Scrollbar
-        self.scrollbar = tkinter.Scrollbar(self.text_frame, command=self.text.yview)
-        self.scrollbar.pack(side=tkinter.RIGHT, fill=tkinter.BOTH, expand=tkinter.YES)
-        self.text['yscrollcommand'] = self.scrollbar.set
+    #def make_text(self: tkinter.Frame): # with pack: scrollbar too big when expanding
+    #    self.text_frame = tkinter.Frame(self)
+    #    self.text_frame.pack(side=tkinter.RIGHT, fill=tkinter.BOTH, expand=tkinter.YES)
+    #    
+    #    self.text = tkinter.Text(self.text_frame)
+    #    self.text.config(font=("consolas", 12), undo=True, wrap='word')
+    #    self.text.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=tkinter.YES)
+    #        
+    #    # Tabs
+    #    def tab(arg):
+    #        print("tab pressed")
+    #        self.text.insert(tkinter.INSERT, " " * 4)
+    #        return 'break' # Prevent normal behavior
+    #    self.text.bind("<Tab>", tab)
+    #    
+    #    # Scrollbar
+    #    self.scrollbar = tkinter.Scrollbar(self.text_frame, command=self.text.yview)
+    #    self.scrollbar.pack(side=tkinter.RIGHT, fill=tkinter.BOTH, expand=tkinter.YES)
+    #    self.text['yscrollcommand'] = self.scrollbar.set
 
+    def tokenizer(self):
+        content = self.text.get(1.0, tkinter.END)
+        keyword = ('if', 'else', 'for')
+        separators = (' ', '(', ')', ':', '.', ';', ',', '\n')
+        discard = (' ',)
+        replace = {'\n' : 'NEWLINE'}
+        word = ''
+        start = 0
+        tokens = []
+        for i in range(0, len(content)):
+            char = content[i]
+            if char in separators:
+                if len(word)>0:
+                    if word in keyword:
+                        tokens.append(Token(word, start, len(word), Token.KEYWORD))
+                    else:
+                        tokens.append(Token(word, start, len(word), Token.TEXT))
+                    word = ''
+                    start = i+1
+                if char not in discard and char not in replace:
+                    tokens.append(Token(char, i, 1, Token.SEPARATOR))
+                if char in replace:
+                    tokens.append(Token(replace[char], i, 1, Token.SEPARATOR))
+            else:
+                word += char
+        if len(word)>0:
+            if word in keyword:
+                tokens.append(Token(word, start, len(word), Token.KEYWORD))
+            else:
+                tokens.append(Token(word, start, len(word), Token.TEXT))
+        # Clear all tags
+        for tag in self.text.tag_names():
+            self.text.tag_remove(tag, 1.0)
+        # Put tags
+        for t in tokens:
+            #print(t)
+            if t.type == Token.KEYWORD:
+                print(t)
+                deb = '1.0+%ic' % t.start
+                print(deb)
+                end = '1.0+%ic' % (t.start + t.length)
+                print(end)
+                self.text.tag_add("keyword", deb, end)
+    
+    def key(self, event):
+        #print("pressed", repr(event.char))
+        #print(dir(event))
+        self.tokenizer()
+        s = self.text.get(1.0, tkinter.END)
+        w = ''
+        start = 0
+        for i in range(0, len(s)):
+            w += s[i]
+            if w == 'lua ':
+                print("youpi!")
+                deb = '1.0+%d chars' % start
+                print(deb)
+                end = '1.0+%d chars' % i
+                print(end)
+                self.text.tag_add("keyword", deb, end)
+                w = ''
+                start = i
+                print(w, len(w))
+                
     def make_text(self: tkinter.Frame): # with grid: ok :-)
         self.text_frame = tkinter.Frame(self, bd=2, relief=tkinter.SUNKEN)
 
@@ -215,6 +297,20 @@ class MyFrame(tkinter.Frame):
         self.yscrollbar.config(command=self.text.yview)
 
         self.text_frame.pack(side=tkinter.RIGHT, fill=tkinter.BOTH, expand=tkinter.YES)
+
+        # Tags        
+        pol_cn_bold = font.Font(family='Courier New', size=10, weight='bold')
+        tag_keyword = self.text.tag_config("keyword", foreground="blue", font=pol_cn_bold)
+        
+        # Tabs
+        def tab(arg):
+            print("tab pressed")
+            self.text.insert(tkinter.INSERT, " " * 4)
+            return 'break' # Prevent normal behavior 
+    
+        # Key bindings
+        self.text.bind("<Tab>", tab)
+        self.text.bind("<KeyRelease>", self.key)
     
     def build(self):
         self.make_tree()
