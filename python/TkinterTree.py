@@ -16,16 +16,20 @@ class Application():
         self.root.minsize(width=800, height=600)
         #root.title("Jyx")
         #root.geometry("600x400")
-        self.update()
+        self.frame = MyFrame(self)
+        self.text = self.frame.text
         self.make_menu()
         self.make_status_bar()
-        self.frame = MyFrame(self.root)
-        self.text = self.frame.text
+        self.update()
     
     def update(self):
         #print("hello")
         self.root.after(1000, self.update)
 
+    def update_status_bar(self, event):
+        s = self.text.index(tkinter.INSERT)
+        self.status_bar.config(text=s)
+        
     def set_title(self, filename=None):
         if filename is None:
             self.root.wm_title("Forge - New *")
@@ -49,8 +53,8 @@ class Application():
         self.helpmenu.add_command(label="About...", command=self.menu_about)
     
     def make_status_bar(self):
-        self.status_bar = tkinter.Label(self.root, bd=1, relief=tkinter.SUNKEN, anchor=tkinter.W)
-        self.status_bar.config(text="Hello!")
+        self.status_bar = tkinter.Label(self.root, bd=1, relief=tkinter.SUNKEN)
+        self.status_bar.config(text="Hello!", anchor=tkinter.E, padx=20)
         #status_bar.update_idletasks()
         self.status_bar.pack(side=tkinter.BOTTOM, fill=tkinter.X)
     
@@ -142,9 +146,10 @@ class Token:
 class MyFrame(tkinter.Frame):
     """ Extend a Frame, a global container"""
     
-    def __init__(self, master=None):
-        tkinter.Frame.__init__(self, master)
+    def __init__(self, app=None):
+        tkinter.Frame.__init__(self, app.root)
         self.pack(fill=tkinter.BOTH, expand=tkinter.YES) # make it visible
+        self.app = app
         self.graphics = {}
         self.build()
     
@@ -155,6 +160,11 @@ class MyFrame(tkinter.Frame):
         self.graphics['iconyellow'] = tkinter.PhotoImage(file="icons/IconYellowCube16x19.png")
         self.graphics['iconmagenta'] = tkinter.PhotoImage(file="icons/IconMagentaCube16x19.png")
         # Creating tree
+        # borderwidth seems not to work on windows
+        #ttk.Style().configure(  '.', # every class of object
+        #    relief = 'flat',  # flat ridge for separator
+        #    borderwidth = 0,  # zero width for the border
+        #)
         treeview = ttk.Treeview(self)
         treeview["columns"] = ("text",)
         treeview.column("#0", width=120)
@@ -212,6 +222,14 @@ class MyFrame(tkinter.Frame):
 
     def tokenizer(self):
         content = self.text.get(1.0, tkinter.END)
+        print('---')
+        for s in content:
+            if s == '\n':
+                s = 'NL'
+            elif s == '\r':
+                s = 'CR'
+            print('[' + s + ']')
+        print('---')
         keyword = ('if', 'else', 'for')
         separators = (' ', '(', ')', ':', '.', ';', ',', '\n')
         discard = (' ',)
@@ -228,7 +246,7 @@ class MyFrame(tkinter.Frame):
                     else:
                         tokens.append(Token(word, start, len(word), Token.TEXT))
                     word = ''
-                    start = i+1
+                start = i+1 # bug was here
                 if char not in discard and char not in replace:
                     tokens.append(Token(char, i, 1, Token.SEPARATOR))
                 if char in replace:
@@ -273,7 +291,11 @@ class MyFrame(tkinter.Frame):
                 w = ''
                 start = i
                 print(w, len(w))
-                
+
+    def update_text(self, event):
+        self.key(event)
+        self.app.update_status_bar(event)
+        
     def make_text(self: tkinter.Frame): # with grid: ok :-)
         self.text_frame = tkinter.Frame(self, bd=2, relief=tkinter.SUNKEN)
 
@@ -310,8 +332,9 @@ class MyFrame(tkinter.Frame):
     
         # Key bindings
         self.text.bind("<Tab>", tab)
-        self.text.bind("<KeyRelease>", self.key)
-    
+        self.text.bind("<KeyRelease>", self.update_text)
+        self.text.bind("<ButtonRelease-1>", self.app.update_status_bar)
+        
     def build(self):
         self.make_tree()
         # self.make_buttons()
