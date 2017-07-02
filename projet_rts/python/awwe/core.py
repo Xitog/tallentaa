@@ -340,7 +340,12 @@ class Order:
 #------------------------------------------------------------------------------
 class Unit(IdObject):
     
-    def __init__(self, player, profile, x, y, plife):
+    NORTH = 0
+    EAST = 1
+    SOUTH = 2
+    WEST = 3
+    
+    def __init__(self, player, profile, x, y, plife=1.0, orient=2): # can't use Unit.SOUTH here
         IdObject.__init__(self)
         self.player = player
         self.world = player.game.world
@@ -349,6 +354,8 @@ class Unit(IdObject):
         self.y = y
         self.real_x = x * 32 + 16
         self.real_y = y * 32 + 16
+        self.orientation = orient
+        self.cycle = 0
         
         self.width = profile.width
         self.height = profile.height
@@ -411,6 +418,8 @@ class Unit(IdObject):
             return False
         else:
             self.cpt_move = 10 - self.speed
+            self.cycle += 1
+            if self.cycle > 8: self.cycle = 0
             print(self.cpt_move)
         
         self.world.unset_pos(self)
@@ -422,6 +431,7 @@ class Unit(IdObject):
             to_x = x
             to_y = y
             
+            n_orient = self.orientation
             n_x = -1
             n_y = -1
             going_x = 0
@@ -429,17 +439,21 @@ class Unit(IdObject):
             if to_x > from_x:
                 n_x = from_x + 1
                 going_x = 1
+                n_orient = Unit.EAST
             elif to_x < from_x:
                 n_x = from_x - 1
                 going_x = -1
+                n_orient = Unit.WEST
             elif to_x == from_x:
                 n_x = from_x
             if to_y > from_y:
                 n_y = from_y + 1
                 going_y = 1
+                n_orient = Unit.SOUTH
             elif to_y < from_y:
                 n_y = from_y - 1
                 going_y = -1
+                n_orient = Unit.NORTH
             elif to_y == from_y:
                 n_y = from_y
 
@@ -474,11 +488,14 @@ class Unit(IdObject):
                         n_x = test[2]
                         n_y = test[3]
                 if n_x == self.old_x and n_y == self.old_y:
+                    self.cycle = 0
+                    self.world.set_pos(self)
                     return True  # no loop !
             
             if self.player.world.is_empty_at(n_x, n_y):
                 self.destination = Pair(n_x * 32 + 16, n_y * 32 + 16)
                 self.world.set_trace(n_x, n_y, self) # CODE: IN MOVEMENT
+                self.orientation = n_orient
         
         if self.destination is not None and self.transition is None:
             self.transition = Pair(self.x * 32 + 16, self.y * 32 + 16)
@@ -507,6 +524,7 @@ class Unit(IdObject):
             self.y = int((self.destination.y - 16) / 32)
             self.destination = None
             self.transition = None
+            self.cycle = 0
 
         self.world.set_pos(self)
         # Fog

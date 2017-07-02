@@ -1,11 +1,11 @@
 {
   "project": {
-    "projectSettingsVersion": "2.0.0",
+    "projectSettingsVersion": "3.0.0",
     "creationData": {
       "projectTypeName": "com.intel.xdk.projecttype.webapp",
       "src": "webapp/template-tab-view/sample.zip",
       "projectGuid": "30c0b17d-df8a-4937-855d-f92158ad7169",
-      "lastModifiedDate": 1458387790294,
+      "lastModifiedDate": 1499003390203,
       "creationDate": 1455379613368
     },
     "sourceDirectory": "www",
@@ -36,6 +36,7 @@
           "Fullscreen": true
         },
         "isActive_": true,
+        "certificateId_": "",
         "appName_": "Concerts Classiques",
         "appID_": "dgx.concertsclassiques",
         "appAccess_": {
@@ -79,59 +80,29 @@
         "cordovaCLIVersion_": "5.1.1",
         "appVersion_": "1.0.5",
         "appVersionCode_": "6",
-        "crosswalkVersion_": "14",
         "appAuthor_": "Damien Gouteux",
         "appDescription_": "Calendrier de concerts classiques"
-      },
-      "Android-Crosswalk": {
-        "platform_": "android",
-        "runtime_": "W3C on Crosswalk",
-        "name_": "Android-Crosswalk",
-        "preferences_": {
-          "android-minSdkVersion": "14",
-          "android-targetSdkVersion": "19",
-          "android-installLocation": "auto"
-        },
-        "isActive_": true,
-        "appName_": "ConcertsClassiques",
-        "appID_": "not.yet.specified",
-        "appAccess_": {
-          "mode": "legacy",
-          "network": [
-            "*"
-          ],
-          "intents": [],
-          "navigation": []
-        },
-        "icons_": [],
-        "splashes_": [],
-        "addlPermissions_": "",
-        "excludedLibraries_": "",
-        "iosProvs_": [],
-        "cordovaCLIVersion_": "5.1.1",
-        "appVersion_": "0.0.1",
-        "appVersionCode_": "1",
-        "crosswalkVersion_": "15",
-        "appAuthor_": "Intel XDK"
       },
       "iOS": {
         "platform_": "ios",
         "runtime_": "W3C on Cordova",
         "name_": "iOS",
         "preferences_": {
-          "ios-target": "6",
-          "ios-configuration": "adhoc"
+          "ios-configuration": "adhoc",
+          "deployment-target": "6"
         },
         "isActive_": true,
+        "certificateId_": "",
         "appName_": "ConcertsClassiques",
         "appID_": "not.yet.specified",
         "appAccess_": {
-          "mode": "legacy",
+          "mode": "whitelist",
           "network": [
             "*"
           ],
           "intents": [],
-          "navigation": []
+          "navigation": [],
+          "properties": {}
         },
         "icons_": [],
         "splashes_": [],
@@ -148,15 +119,17 @@
         "name_": "Windows8",
         "preferences_": {},
         "isActive_": true,
+        "certificateId_": "",
         "appName_": "ConcertsClassiques",
         "appID_": "not.yet.specified",
         "appAccess_": {
-          "mode": "legacy",
+          "mode": "whitelist",
           "network": [
             "*"
           ],
           "intents": [],
-          "navigation": []
+          "navigation": [],
+          "properties": {}
         },
         "icons_": [],
         "splashes_": [],
@@ -173,6 +146,7 @@
         "name_": "WebApp",
         "preferences_": {},
         "isActive_": true,
+        "certificateId_": "",
         "appName_": "ConcertsClassiques",
         "appID_": "not.yet.specified",
         "appAccess_": {
@@ -196,6 +170,7 @@
         "name_": "Firefox",
         "preferences_": {},
         "isActive_": true,
+        "certificateId_": "",
         "appName_": "ConcertsClassiques",
         "appID_": "not.yet.specified",
         "appAccess_": {
@@ -219,6 +194,7 @@
         "name_": "Chrome",
         "preferences_": {},
         "isActive_": true,
+        "certificateId_": "",
         "appName_": "ConcertsClassiques",
         "appID_": "not.yet.specified",
         "appAccess_": {
@@ -242,6 +218,7 @@
         "name_": "Facebook",
         "preferences_": {},
         "isActive_": true,
+        "certificateId_": "",
         "appName_": "ConcertsClassiques",
         "appID_": "not.yet.specified",
         "appAccess_": {
@@ -265,6 +242,7 @@
         "name_": "WP81",
         "preferences_": {},
         "isActive_": true,
+        "certificateId_": "",
         "appName_": "ConcertsClassiques",
         "appID_": "not.yet.specified",
         "appAccess_": {

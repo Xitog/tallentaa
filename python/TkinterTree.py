@@ -5,27 +5,39 @@ from tkinter import ttk # not found in 2.7.11 but found in 3.5.1 :-)
 from tkinter import filedialog
 from tkinter import messagebox   
 from tkinter import font
+import configparser
+import os.path
 
 class Application():
     
     def __init__(self):
-        # root widget, an ordinary window
-        self.root = tkinter.Tk()
-        self.set_title()
-        self.root.iconbitmap(r'icons\iconyellowcube16x19_F5i_icon.ico')
-        self.root.minsize(width=800, height=600)
-        #root.title("Jyx")
-        #root.geometry("600x400")
-        self.frame = MyFrame(self)
-        self.text = self.frame.text
-        self.make_menu()
-        self.make_status_bar()
-        self.update()
+        # config
+        self.options = {}
+        # base options
+        self.options['display_tree'] = True
+        # try to load options
+        if os.path.isfile('TkinterTree.ini'):
+            config = configparser.ConfigParser()
+            config.read('TkinterTree.ini')
+            if 'MAIN' in config:
+                if 'display_tree' in config['MAIN']:
+                    self.options['display_tree'] = (config['MAIN']['display_tree'] == 'True')
+                    print(self.options['display_tree'])
+        # create default option file
+        else:
+            self.write_options()
+        self.start()
+    
+    def write_options(self):
+        config = configparser.ConfigParser()
+        config['MAIN'] = { 'display_tree' : str(self.options['display_tree']) }
+        with open('TkinterTree.ini', 'w') as configfile:
+            config.write(configfile)
     
     def update(self):
         #print("hello")
-        self.root.after(1000, self.update)
-
+        self.after_id = self.root.after(1000, self.update)
+    
     def update_status_bar(self, event):
         s = self.text.index(tkinter.INSERT)
         self.status_bar.config(text=s)
@@ -47,7 +59,13 @@ class Application():
         self.filemenu.add_command(label="Save As...", command=self.menu_save)
         self.filemenu.add_separator()
         self.filemenu.add_command(label="Exit", command=self.menu_exit)
-
+        
+        self.options_menu = tkinter.Menu(self.menu, tearoff=0)
+        self.menu.add_cascade(label="Options", menu=self.options_menu)
+        self.display_tree = tkinter.BooleanVar()
+        self.display_tree.set(self.options['display_tree'])
+        self.options_menu.add_checkbutton(label="Display Tree", onvalue=True, offvalue=False, variable=self.display_tree, command=self.restart)
+        
         self.helpmenu = tkinter.Menu(self.menu, tearoff=0)
         self.menu.add_cascade(label="Help", menu=self.helpmenu)
         self.helpmenu.add_command(label="About...", command=self.menu_about)
@@ -58,9 +76,29 @@ class Application():
         #status_bar.update_idletasks()
         self.status_bar.pack(side=tkinter.BOTTOM, fill=tkinter.X)
     
+    def start(self):
+        # root widget, an ordinary window
+        self.root = tkinter.Tk()
+        self.set_title()
+        self.root.iconbitmap(r'icons\iconyellowcube16x19_F5i_icon.ico')
+        self.root.minsize(width=800, height=600)
+        #root.title("Jyx")
+        #root.geometry("600x400")
+        self.frame = MyFrame(self)
+        self.text = self.frame.text
+        self.make_menu()
+        self.make_status_bar()
+        self.update()
+    
+    def restart(self):
+        self.options['display_tree'] = self.display_tree.get()
+        self.root.after_cancel(self.after_id)
+        self.menu_exit()
+        self.write_options()
+        self.start()
+        
     def run(self):
         self.frame.mainloop()
-        # root.destroy()
     
     #-------------------------------------------------------
     # Menu functions
@@ -146,7 +184,7 @@ class Token:
 class MyFrame(tkinter.Frame):
     """ Extend a Frame, a global container"""
     
-    def __init__(self, app=None):
+    def __init__(self, app):
         tkinter.Frame.__init__(self, app.root)
         self.pack(fill=tkinter.BOTH, expand=tkinter.YES) # make it visible
         self.app = app
@@ -336,7 +374,8 @@ class MyFrame(tkinter.Frame):
         self.text.bind("<ButtonRelease-1>", self.app.update_status_bar)
         
     def build(self):
-        self.make_tree()
+        if self.app.options['display_tree']:
+            self.make_tree()
         # self.make_buttons()
         self.make_text()
     

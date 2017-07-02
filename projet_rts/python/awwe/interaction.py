@@ -2,6 +2,7 @@ from engine import Colors, Engine
 import os.path
 import pygame
 from typing import Type
+from core import Unit
 
 #-------------------------------------------------------------------------------
 # AUDIOHANDLER
@@ -138,8 +139,8 @@ class InputHandler:
                             unit = self.world.get_unit_at(cx, cy)
                             if unit is None:
                                 self.world.game.order_move(self.selected, cx, cy, self.add_mod)
-                            elif unit.player == self.player:
-                                self.world.game.order_move(self.selected, cy, cx, self.add_mod)
+                            elif unit.player == self.actor:
+                                self.world.game.order_move(self.selected, cx, cy, self.add_mod)
                             else: # u.player != self.player:
                                 self.world.game.order_attack(self.selected, unit, self.add_mod)
                                 
@@ -191,6 +192,7 @@ class Camera:
         self.BASE = base
         self.debug = False
         self.handler = None
+        self.orient_to_graph = {Unit.NORTH : 0, Unit.EAST : 27, Unit.SOUTH : 18, Unit.WEST : 9}
     
     def is_valid_at(self, x, y):
         # Block scroll to the map
@@ -234,7 +236,7 @@ class Camera:
                         
                     # draw unit
                     if uni != 0 and pas == 1:
-                        self.engine.spr(uni.real_x + self.x -16, uni.real_y + self.y -16, self.engine.sprites["male"], 18, 10)
+                        self.engine.spr(uni.real_x + self.x -16, uni.real_y + self.y -16, self.engine.sprites["male"], self.orient_to_graph[uni.orientation] + uni.cycle, 10)
                     # draw selected
                         if uni in self.handler.selected:
                             self.engine.tex(dx, dy, self.engine.textures[101], 0.5)
