@@ -1,17 +1,11 @@
 from zipfile import ZipFile
-filepath = PATH
-filename = ARCHIVE
-import os
-target = os.sep.join([filepath, filename])
-with ZipFile(target) as archive:
-    archive.printdir()
-    with archive.open(FILE) as file:
-        s = file.read()
-print(s[0:25])
+import os # for dir mode
+import os.path # for dir mode
+import html # for dir mode, escaping url
 
-import xml.etree.ElementTree as et
-root = et.fromstring(s)
-print(root)
+#-------------------------------------------------------------------------------
+# Utils
+#-------------------------------------------------------------------------------
 
 def find_all(root, tag, elem):
     for child in root:
@@ -19,7 +13,10 @@ def find_all(root, tag, elem):
             elem.append(child)
         find_all(child, tag, elem)
 
-
+#-------------------------------------------------------------------------------
+# Model
+#-------------------------------------------------------------------------------
+ 
 class ModelBuilder:
 
     def __init__(self, root):
@@ -123,10 +120,10 @@ class ModelBuilder:
             else:
                 self.parse(child, in_package)
 
-
-all_classes = []
-find_all(root, '', all_classes)
-
+#-------------------------------------------------------------------------------
+# Model classes
+#-------------------------------------------------------------------------------
+                
 class ArchitectureLevel:
 
     def __init__(self, name):
@@ -231,14 +228,81 @@ class Class(Type):
     def get_features(self):
         return self.features
 
-m = ModelBuilder(root)
-m.build_model()
-#m.explore()
+#-------------------------------------------------------------------------------
+# Model generic
+#-------------------------------------------------------------------------------
+
+class Leaf:
+
+    def __init__(self, name, parent=None):
+        self.name = name
+        self.parent = parent
+        if parent is not None:
+            if not issubclass(type(parent), Component):
+                raise Exception("Parent must be a Component or a subclass of it.")
+            parent.content.append(self)
+
+class Component(Leaf):
+    def __init__(self, name, parent=None):
+        Leaf.__init__(self, name, parent)
+        self.content = []
+
+    def count(self):
+        c = len(self.content)
+        for e in self.content:
+            if type(e) == Dir:
+                c += e.count()
+        return c
+
+#-------------------------------------------------------------------------------
+# Model for file system exploration
+#-------------------------------------------------------------------------------
+
+class File(Leaf):
+
+    def __init__(self, name, parent=None):
+        Leaf.__init__(self, name, parent)
+        if parent is not None and type(parent) != Dir:
+            raise Exception("Parent must be a Dir.")
+        self.ext = os.path.splitext(name)[1]
+
+class Dir(Component):
+
+    def __init__(self, path, parent=None):
+        Leaf.__init__(self, os.path.basename(path), parent)
+        self.path = path
+        self.content = []
+    
+    def __str__(self):
+        return f"{self.name} ({self.count()})"
+    
+    def add(self, elem):
+        if type(elem) not in [Dir, File]:
+            raise Exception("Unknown type. Must be Dir or File.")
+        if elem.parent != self:
+            elem.parent = self
+        if elem not in self.content:
+            self.content.append(elem)
+
+    def build(rep):
+        for elem in os.listdir(rep.path):
+            fullpath = os.path.join(rep.path, elem)
+            if os.path.isdir(fullpath):
+                d = Dir(fullpath)
+                rep.add(d)
+                d.build()
+            else:
+                f = File(elem)
+                rep.add(f)
+
+#-------------------------------------------------------------------------------
+# View / output
+#-------------------------------------------------------------------------------
 
 class HTMLOutput:
 
     def __init__(self, model, name):
-        template = """
+        self.template = """
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
   <head>
@@ -253,9 +317,8 @@ class HTMLOutput:
       <script type="text/javascript">
       <!--
         d = new dTree('d');
-        d.icon.root = 'img/root_mel.png';
 __SOMETHING__
-	document.write(d);
+        document.write(d);
       //-->
       </script>
     </div>
@@ -263,6 +326,40 @@ __SOMETHING__
   </body>
 </html>
         """
+        if type(model) == ModelBuilder:
+            self.export_modelcapella(model)
+        else:
+            self.export_dirtree(model)
+
+    def export_dirtree(self, model):
+        lines = [f"d.icon.root = 'img/folderopen.gif';"]
+        known_types = { '.py' : 'img/py.png', '.rb' : 'img/rb.png', '.html' : 'img/html.png', '.xml' : 'img/xml.png'}
+        def xplore(rep, base, last_num):
+            num = last_num + 1
+            lines.append(f"        d.add({num}, {base}, '{rep}', '', '', '', 'img/folder.gif', 'img/folderopen.gif');")
+            base = num
+            for elem in rep.content:
+                if type(elem) == File:
+                    #print('File', num)
+                    num += 1
+                    icon = 'img/page.gif'
+                    if elem.ext in known_types:
+                        icon = known_types[elem.ext]
+                    target = 'file:///' + html.escape(os.path.join(rep.path, elem.name)).replace('\\', '/')
+                    #target = 'file:///C:/jeux/pipo.txt'
+                    lines.append(f"        d.add({num}, {base}, '{elem.name}', '{target}', '', '', '{icon}', '{icon}');")
+                elif type(elem) == Dir:
+                    #print('Dir', num)
+                    num = xplore(elem, base, num)
+            return num
+        xplore(model, -1, -1)
+        f = open("tree" + os.sep + model.name + ".html", 'w')
+        template = self.template.replace('__SOMETHING__', '\n'.join(lines))
+        f.write(template)
+        f.close()
+    
+    def export_modelcapella(self, model):
+
         def xplore(pkg, base=0, last_num=0):
             last_num += 1
             if type(pkg) == Package:
@@ -292,7 +389,9 @@ __SOMETHING__
                 last_num += 1
                 last_num = xplore(sub, base, last_num)
             return last_num
-        lines = [f"        d.add(0,-1,'{model.name}');"]
+        lines = [f"d.icon.root = 'img/root_mel.png';",
+                 f"        d.add(0,-1,'{model.name}');"
+        ]
         last_num = 0
         #for pak in m.packages.values():
         for lvl in m.levels:
@@ -301,11 +400,43 @@ __SOMETHING__
             for pak in lvl.packages:
                 last_num = xplore(pak, last_num, last_num)
         f = open("tree" + os.sep + name + ".html", 'w')
-        template = template.replace('__SOMETHING__', '\n'.join(lines))
+        template = self.template.replace('__SOMETHING__', '\n'.join(lines))
         f.write(template)
         f.close()
 
-HTMLOutput(m, "test")
+#-------------------------------------------------------------------------------
+# Controller
+#-------------------------------------------------------------------------------
+
+mode = 'dir'
+
+if mode == 'file':
+    filepath = PATH
+    filename = ARCHIVE
+    import os
+    target = os.sep.join([filepath, filename])
+    with ZipFile(target) as archive:
+        archive.printdir()
+        with archive.open(FILE) as file:
+            s = file.read()
+    print(s[0:25])
+
+    import xml.etree.ElementTree as et
+    root = et.fromstring(s)
+    print(root)
+            
+    all_classes = []
+    find_all(root, '', all_classes)
+
+    m = ModelBuilder(root)
+    m.build_model()
+    #m.explore()
+    HTMLOutput(m, "test")
+elif mode == 'dir':
+    rootpath = r"C:\Users\vince\Documents\Damien\GitHub\tallentaa"
+    root = Dir(rootpath)
+    root.build()
+    HTMLOutput(root, "test")
 
 # 14h21 zip working!
 # 15h04 parcours ok!
