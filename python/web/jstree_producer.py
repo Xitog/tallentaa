@@ -2,7 +2,8 @@ from zipfile import ZipFile
 import os # for dir mode
 import os.path # for dir mode
 import html # for dir mode, escaping url
-import math
+
+from model import *
 
 #-------------------------------------------------------------------------------
 # Utils
@@ -229,89 +230,7 @@ class Class(Type):
     def get_features(self):
         return self.features
 
-#-------------------------------------------------------------------------------
-# Model generic
-#-------------------------------------------------------------------------------
 
-class Leaf:
-
-    def __init__(self, name, parent=None, icon=None):
-        self.name = name
-        self.parent = parent
-        if parent is not None:
-            if not issubclass(type(parent), Component):
-                raise Exception("Parent must be a Component or a subclass of it.")
-            parent.content.append(self)
-        self.icon = icon
-    
-    def __str__(self):
-        return self.name
-
-class Component(Leaf):
-    def __init__(self, name, parent=None, icon=None, display_count=False, count_tag=None, level_count=math.inf):
-        Leaf.__init__(self, name, parent, icon)
-        self.content = []
-        self.display_count = display_count
-        self.count_tag = count_tag
-        self.level_count = level_count
-    
-    def count(self, lvl=1):
-        c = len(self.content)
-        if lvl < self.level_count:
-            for e in self.content:
-                if issubclass(type(e), Component):
-                    c += e.count(lvl+1)
-        return c
-    
-    def __str__(self):
-        if self.display_count:
-            if self.count_tag is None:
-                return f"{self.name} ({self.count()})"
-            else:
-                return f"{self.name} ({self.count()} {self.count_tag})"
-        else:
-            return Leaf.__str__(self)
-
-#-------------------------------------------------------------------------------
-# Model for file system exploration
-#-------------------------------------------------------------------------------
-
-class File(Leaf):
-
-    def __init__(self, name, parent=None):
-        Leaf.__init__(self, name, parent)
-        if parent is not None and type(parent) != Dir:
-            raise Exception("Parent must be a Dir.")
-        self.ext = os.path.splitext(name)[1]
-
-class Dir(Component):
-
-    def __init__(self, path, parent=None):
-        Leaf.__init__(self, os.path.basename(path), parent)
-        self.path = path
-        self.content = []
-    
-    def __str__(self):
-        return f"{self.name} ({self.count()})"
-    
-    def add(self, elem):
-        if type(elem) not in [Dir, File]:
-            raise Exception("Unknown type. Must be Dir or File.")
-        if elem.parent != self:
-            elem.parent = self
-        if elem not in self.content:
-            self.content.append(elem)
-
-    def build(rep):
-        for elem in os.listdir(rep.path):
-            fullpath = os.path.join(rep.path, elem)
-            if os.path.isdir(fullpath):
-                d = Dir(fullpath)
-                rep.add(d)
-                d.build()
-            else:
-                f = File(elem)
-                rep.add(f)
 
 #-------------------------------------------------------------------------------
 # View / output
@@ -325,6 +244,7 @@ class HTMLOutput:
 <html>
   <head>
     <title>Symphony</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link rel="StyleSheet" href="dtree.css" type="text/css" />
     <style>
         a {
@@ -338,26 +258,40 @@ class HTMLOutput:
     </style>
     <script type="text/javascript" src="dtree.js"></script>
   </head>
-  <body style="margin: 0px; padding: 0px; width: 100%;">
-    <!--<h1>Tree</h1>-->
-    <div class="actions" width="30%" style="margin: 0px; padding: 0px; border: 1px solid grey; width: 30%; border-bottom: None;">
-        <a href="javascript: d.openAll();">open all</a> | <a href="javascript: d.closeAll();">close all</a>
-    </div>
-    <div class="dtree" style="border: 1px solid grey; width: 30%;">
-      <script type="text/javascript">
-      <!--
-        d = new dTree('d');
+  <body style="margin: 0px; padding: 0px; width: 100%; height: 100vh;">
+    <table width="100%" height="100%">
+      <tr>
+        <td width="30%" height="100%" valign="top">
+          <div class="actions" style="text-align:right; margin: 0px; padding: 0px; border: 1px solid grey; width: 100%; border-bottom: None;">
+            <a href="javascript: d.openAll();">open all</a> | <a href="javascript: d.closeAll();">close all</a>&nbsp;&nbsp;
+          </div>
+          <div class="dtree" style="border: 1px solid grey; width: 100%;">
+            <script type="text/javascript">
+            <!--
+              function zorba() {
+                  alert("ZORBA!");
+              }
+              d = new dTree('d');
+              d.config.inOrder = true;
 __SOMETHING__
-        document.write(d);
-      //-->
-      </script>
-    </div>
+              document.write(d);
+            //-->
+            </script>
+          </div>
+        </td>
+        <td width="70%" height="100%">
+          <iframe id="panel" width="100%" height="100%" name="panel" src="https://www.w3schools.com"></iframe>
+          <!--<div id="pipo">PIPO</div>-->
+        </td>
+      </tr>
+    </table>
   </body>
 </html>
         """
         self.icons = {
             'add' : 'img/add.png',
             'addons' : 'img/addons.png',
+            'addon' : 'img/addon.png',
             'archive' : 'img/archive.png',
             'computer' : 'img/computer.png',
             'folder' : 'img/folder.png',
@@ -371,6 +305,13 @@ __SOMETHING__
             'page' : 'img/page.png',
             'user' : 'img/user.png',
             'user_matrix' : 'img/user_matrix.png',
+            'project' : 'img/project.png',
+            'py' : 'img/file_types/py.png',
+            'rb' : 'img/file_types/rb.png',
+            'html' : 'img/file_types/html.png',
+            'xml' : 'img/file_types/xml.png',
+            'folder' : 'img/file_types/folder.png',
+            'zip' : 'img/file_types/archive.png'
         }
         self.lines = []
         if type(model) == ModelBuilder:
@@ -391,11 +332,14 @@ __SOMETHING__
     
     def export(self, root, base=-1, last_num=-1):
         num = last_num + 1
+        target = ''
+        if hasattr(root, 'target'):
+            target = root.target
         icon = self.icons['page']
         if hasattr(root, 'icon'):
             if root.icon in self.icons:
                 icon = self.icons[root.icon]
-        self.lines.append(f"        d.add({num}, {base}, '{root}', '', '', '', '{icon}', '{icon}');")
+        self.lines.append(f"        d.add({num}, {base}, '{root}', '{target}', '', '', '{icon}', '{icon}');")
         base = num
         if issubclass(type(root), Component):
             for c in root.content:
@@ -482,17 +426,44 @@ __SOMETHING__
 mode = 'zorba'
 
 if mode == 'zorba':
-    root = Component('Explorer', icon='home')
-    machines = Component('Machines', root, 'computer')
+    f = open("maestro.json")
+    c = f.read()
+    f.close()
+    import json
+    def explore(name, dic, parent=None):
+        root = Component(name, parent)
+        for k,v in dic.items():
+            #print(k, v)
+            if k == "icon":
+                root.icon = v
+            elif k == "display_count":
+                root.display_count=(v == 'True')
+            elif k == "count_tag":
+                root.count_tag = v
+            elif k == "level_count":
+                root.level_count = v
+            elif k == "target":
+                root.target = v
+            elif k == "__BUILD__":
+                rootdir = Dir(v)
+                rootdir.build()
+                root.content = rootdir.content
+            elif type(v) == dict:
+                explore(k, v, root)
+            else:
+                pass
+        return root
+    c = json.loads(c)
+    root = explore(list(c.keys())[0], list(c.values())[0])
     HTMLOutput(root)
 elif mode == 'file':
-    filepath = PATH
-    filename = ARCHIVE
+    filepath = r"\\tlstore04\vm_melodyteam_archives\SPACEGATE\model"
+    filename = "sgTeam_20170626_090200.zip"
     import os
     target = os.sep.join([filepath, filename])
     with ZipFile(target) as archive:
         archive.printdir()
-        with archive.open(FILE) as file:
+        with archive.open('sgTeam/sg.melodymodeller') as file:
             s = file.read()
     print(s[0:25])
 
