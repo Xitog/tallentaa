@@ -1,0 +1,94 @@
+================================================================================
+FPS 2.5 Woolfy
+31/08/2017
+================================================================================
+
+-- Innovations == (for multiline comment) | (for different type) get/sub/fun (instead of def) -> inside the () @param (@attr = param auto)
+
+-- Types used: 
+--      File
+--      String
+--      Data
+--      Application
+--      Input
+--      Draw
+
+class Level
+
+    get xmax, ymax
+    
+    sub init(from : File | String)
+        if from is File then
+            @file = from
+        else
+            if File.exist(from)
+                @file = new File(from)
+            else
+                raise "Level file not found: " + from
+            end
+        end
+        @data = Data.json(@file)
+        @xmax = @data["xmax"]
+        @ymax = @data["ymax"]
+    end
+    
+    fun get(x : int, y : int -> int)
+        return @data["content"][y][x]
+    end
+    
+end
+
+class Player
+
+    get x, y
+    set x, y
+    
+    sub init(@x : int, @y : int)
+    end
+    
+end
+
+-- The main class
+class MyApplication < Application
+    
+    SQUARE_SIZE = 32
+    
+    sub init
+        super("FPS 2.5D", GRAPHICS, 640, 480)
+        @level = new Level("level.map")
+        @player = new Player(20, 20)
+    end
+    
+    sub update
+        if Input.key(Intput.RELEASED, Input.KEY_ESCAPE)
+            quit
+        end
+        if Input.key(Intput.PRESSED, Input.KEY_UP)
+            @player.y -= 5
+        end
+        if Input.key(Intput.PRESSED, Input.KEY_DOWN)
+            @player.y += 5
+        end
+        if Input.key(Intput.PRESSED, Input.KEY_LEFT)
+            @player.x -= 5
+        end
+        if Input.key(Intput.PRESSED, Input.KEY_RIGHT)
+            @player.x += 5
+        end
+    end
+    
+    sub render
+        for ym in 0..@level.ymax do
+            for xm in 0..@level.xmax do
+                if @.level.get(xm, ym) != 0
+                    Draw.rect(xm * SQUARE_SIZE, ym * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, Color.Red, Draw.PLAIN)
+                end
+            end
+        end
+        Draw.circle(@player.x, @player.y, 3, Color.Green, PLAIN)
+    end
+    
+end
+
+new MyApplication.start
+writeln("Script has ended.")

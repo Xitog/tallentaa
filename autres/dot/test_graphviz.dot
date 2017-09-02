@@ -1,0 +1,11 @@
+// http://graphviz.org/pdf/dotguide.pdf
+
+digraph Language {
+    start -> id [label=" [@_a-zA-Z] "] ;
+    start -> num [label=" [0-9] "] ;
+    start -> operator [label= " [=><+-*/%] "] ;
+    
+    id -> id [label=" [@_0-9a-zA-Z] "] ;
+    num -> num [label=" [0-9] "] ;
+    
+}
