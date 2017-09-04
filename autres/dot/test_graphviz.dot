@@ -1,6 +1,11 @@
 // http://graphviz.org/pdf/dotguide.pdf
 
 digraph Language {
+    
+    //---------------------
+    // Test for a language
+    //---------------------
+    
     start -> id [label=" [@_a-zA-Z] "] ;
     start -> num [label=" [0-9] "] ;
     start -> operator [label= " [=><+-*/%] "] ;
@@ -8,4 +13,19 @@ digraph Language {
     id -> id [label=" [@_0-9a-zA-Z] "] ;
     num -> num [label=" [0-9] "] ;
     
+    //----------------------------------
+    // Test for a Fighting Fantasy Book
+    //----------------------------------
+    
+    node [shape=box]; 
+    1 [color=orange,style=filled];
+    2 [color=blue];
+    1 -> 2 [style=dotted,label=" go "];
+    
+    subgraph clusterPipo {
+        3 -> 4;
+        color=pink;
+        style=filled;
+        label= "clusterPipo";
+    }
 }
