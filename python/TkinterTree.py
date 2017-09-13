@@ -8,13 +8,64 @@ from tkinter import font
 import configparser
 import os.path
 
-class Application():
+class Logger:
+    
+    def __init__(self, exit_on_error = True):
+        self.exit_on_error = exit_on_error
+    
+    def warn(self, msg):
+        print('[WARNING] ' + str(msg))
+    
+    def info(self, msg):
+        print('[INFO] ' + str(msg))
+    
+    def error(self, msg):
+        print('[ERROR] ' + str(msg))
+        if self.exit_on_error:
+            exit()
+
+
+class RessourceManager:
+    
+    def __init__(self, logger):
+        self.ressources = {}
+        self.log = logger
+    
+    def from_file(self, filepath):
+        key = os.path.splitext(os.path.basename(filepath))[0] # suppress .extension
+        if os.path.isfile(filepath):
+            self.ressources[key] = filepath
+            self.log.info('Ressource registered from file: ' + filepath)
+        else:
+            self.ressources[key] = None
+            self.log.error('Ressource could not be found: ' + filepath)
+    
+    def get(self, key):
+        return self.ressources[key]
+    
+    def getAsImage(self, key):
+        if self.found(key):
+            return tkinter.PhotoImage(file=self.ressources[key])
+        else:
+            raise Exception("Ressource could not be found")
+    
+    def found(self, key):
+        return self.ressources[key] is not None
+
+
+class Application:
     
     def __init__(self):
+        self.log = Logger(False)
+        self.rc = RessourceManager(self.log)
+        self.rc.from_file(r'icons\iconyellowcube16x19_F5i_icon.ico')
+        self.title = 'Pyx'
+        
         # config
         self.options = {}
         # base options
         self.options['display_tree'] = True
+        self.options['lang'] = 'txt'
         # try to load options
         if os.path.isfile('TkinterTree.ini'):
             config = configparser.ConfigParser()
@@ -22,7 +73,7 @@ class Application():
             if 'MAIN' in config:
                 if 'display_tree' in config['MAIN']:
                     self.options['display_tree'] = (config['MAIN']['display_tree'] == 'True')
-                    print(self.options['display_tree'])
+                    self.log.info('Display tree is : ' + str(self.options['display_tree']))
         # create default option file
         else:
             self.write_options()
@@ -35,7 +86,6 @@ class Application():
             config.write(configfile)
     
     def update(self):
-        #print("hello")
         self.after_id = self.root.after(1000, self.update)
     
     def update_status_bar(self, event):
@@ -44,9 +94,9 @@ class Application():
         
     def set_title(self, filename=None):
         if filename is None:
-            self.root.wm_title("Forge - New *")
+            self.root.wm_title(self.title + " - New *")
         else:
-            self.root.wm_title("Forge - " + filename)
+            self.root.wm_title(self.title + " - " + filename)
     
     def make_menu(self):
         "Build the menu"
@@ -54,33 +104,67 @@ class Application():
         self.root.config(menu=self.menu)
         self.filemenu = tkinter.Menu(self.menu, tearoff=0)
         self.menu.add_cascade(label="File", menu=self.filemenu)
-        self.filemenu.add_command(label="New", command=self.menu_new)
-        self.filemenu.add_command(label="Open...", command=self.menu_open)
-        self.filemenu.add_command(label="Save As...", command=self.menu_save)
+        self.filemenu.add_command(label="New", command=self.menu_new, accelerator="Ctrl+N")
+        self.filemenu.add_command(label="Open...", command=self.menu_open, accelerator="Ctrl+O")
+        self.filemenu.add_command(label="Save As...", command=self.menu_save, accelerator="Ctrl+S")
         self.filemenu.add_separator()
-        self.filemenu.add_command(label="Exit", command=self.menu_exit)
+        self.filemenu.add_command(label="Exit", command=self.menu_exit, accelerator="Ctrl+Q")
+        
+        self.editmenu = tkinter.Menu(self.menu, tearoff=0)
+        self.menu.add_cascade(label="Edit", menu=self.editmenu)
+        self.editmenu.add_command(label="Undo", command=self.menu_undo, accelerator="Ctrl+Z")
+        self.editmenu.add_command(label="Redo", command=self.menu_redo, accelerator="Ctrl+Y")
+        self.editmenu.add_separator()
+        self.editmenu.add_command(label="Cut", command=self.menu_cut, accelerator="Ctrl+X")
+        self.editmenu.add_command(label="Copy", command=self.menu_copy, accelerator="Ctrl+C")
+        self.editmenu.add_command(label="Paste", command=self.menu_paste, accelerator="Ctrl+V")
+        self.editmenu.add_command(label="Select All", command=self.menu_select_all, accelerator="Ctrl+A")
+        
+        self.display_tree = tkinter.BooleanVar()
+        self.display_tree.set(self.options['display_tree'])
         
         self.options_menu = tkinter.Menu(self.menu, tearoff=0)
         self.menu.add_cascade(label="Options", menu=self.options_menu)
-        self.display_tree = tkinter.BooleanVar()
-        self.display_tree.set(self.options['display_tree'])
         self.options_menu.add_checkbutton(label="Display Tree", onvalue=True, offvalue=False, variable=self.display_tree, command=self.restart)
+        
+        self.lang = tkinter.StringVar()
+        self.lang.set(self.options['lang'])
+        
+        self.langmenu = tkinter.Menu(self.menu, tearoff=0)
+        self.menu.add_cascade(label="Language", menu=self.langmenu)
+        self.langmenu.add_radiobutton(label="Plain text", variable=self.lang, value="txt", command=self.update_lang)#, indicatoron=0
+        self.langmenu.add_separator()
+        self.langmenu.add_radiobutton(label="Python", variable=self.lang, value="py", command=self.update_lang)#, indicatoron=0
+        self.langmenu.add_separator()
+        self.langmenu.add_radiobutton(label="JSON", variable=self.lang, value="json", command=self.update_lang)#, indicatoron=0
+        self.langmenu.add_radiobutton(label="XML", variable=self.lang, value="xml", command=self.update_lang)#, indicatoron=0
         
         self.helpmenu = tkinter.Menu(self.menu, tearoff=0)
         self.menu.add_cascade(label="Help", menu=self.helpmenu)
         self.helpmenu.add_command(label="About...", command=self.menu_about)
-    
+        
+        self.root.bind('<Control-n>', self.menu_new)
+        self.root.bind('<Control-o>', self.menu_open)
+        self.root.bind('<Control-s>', self.menu_save)
+        self.root.bind('<Control-q>', self.menu_exit)
+        self.root.bind('<Control-a>', self.menu_select_all)
+        
     def make_status_bar(self):
         self.status_bar = tkinter.Label(self.root, bd=1, relief=tkinter.SUNKEN)
         self.status_bar.config(text="Hello!", anchor=tkinter.E, padx=20)
         #status_bar.update_idletasks()
         self.status_bar.pack(side=tkinter.BOTTOM, fill=tkinter.X)
     
+    def update_lang(self):
+        #self.log.info("self.lang = " + self.lang.get())
+        self.options['lang'] = self.lang.get()
+    
     def start(self):
         # root widget, an ordinary window
         self.root = tkinter.Tk()
         self.set_title()
-        self.root.iconbitmap(r'icons\iconyellowcube16x19_F5i_icon.ico')
+        if self.rc.found('iconyellowcube16x19_F5i_icon'):
+            self.root.iconbitmap(self.rc.get('iconyellowcube16x19_F5i_icon'))
         self.root.minsize(width=800, height=600)
         #root.title("Jyx")
         #root.geometry("600x400")
@@ -91,11 +175,13 @@ class Application():
         self.update()
     
     def restart(self):
+        content = self.text.get(1.0, tkinter.END)
         self.options['display_tree'] = self.display_tree.get()
         self.root.after_cancel(self.after_id)
         self.menu_exit()
         self.write_options()
         self.start()
+        self.text.insert("1.0", content)
         
     def run(self):
         self.frame.mainloop()
@@ -105,17 +191,17 @@ class Application():
     #-------------------------------------------------------
     
     def menu_about(self):
-        messagebox.showinfo("About", "Jyx - Damien Gouteux, 2017. Made with ❤")
+        messagebox.showinfo("About", self.title + " - Damien Gouteux, 2017\nMade with ❤")
 
-    def menu_exit(self):
+    def menu_exit(self, event=None):
         self.root.destroy()
         #root.quit()
         #exit(0)
 
-    def menu_new(self):
+    def menu_new(self, event=None):
         self.new()
     
-    def menu_open(self):
+    def menu_open(self, event=None):
         """Returns an opened file in read mode."""
         options = {}
         options['defaultextension'] = '.txt'
@@ -124,9 +210,9 @@ class Application():
         options['initialfile'] = 'myfile.txt'
         options['parent'] = self.root
         options['title'] = 'Open file...'
-        self.load(filedialog.askopenfilename(mode='r', **options))
+        self.load(filedialog.askopenfilename(**options)) # mode='r', 
 
-    def menu_save(self):
+    def menu_save(self, event=None):
         options = {}
         #options['defaultextension'] = '.txt'
         options['filetypes'] = [('text files', '.txt'), ('python files', '.py'), ('lua files', '.lua'), ('all files', '.*')]
@@ -134,10 +220,35 @@ class Application():
         options['initialfile'] = 'myfile.txt'
         options['parent'] = self.root
         options['title'] = 'Save file...'
-        filename = filedialog.asksaveasfilename(mode='w', **options)
+        filename = filedialog.asksaveasfilename(**options) # mode='w', 
         if filename:
             self.save(filename)
-
+    
+    def menu_undo(self, event=None):
+        try:
+            self.text.edit_undo()
+        except tkinter.TclError as tk:
+            self.log.warn("Nothing to undo")
+    
+    def menu_redo(self, event=None):
+        try:
+            self.text.edit_redo()
+        except tkinter.TclError as tk:
+            self.log.warn("Nothing to redo")
+    
+    def menu_cut(self, event=None):
+        self.text.event_generate("<<Cut>>")
+    
+    def menu_copy(self, event=None):
+        self.text.event_generate("<<Copy>>")
+    
+    def menu_paste(self, event=None):
+        self.text.event_generate("<<Paste>>")
+    
+    def menu_select_all(self, event=None):
+        self.frame.escape_refresh(2)
+        self.text.tag_add(tkinter.SEL, "1.0", tkinter.END)
+    
     #-------------------------------------------------------
     # Text functions
     #-------------------------------------------------------
@@ -171,6 +282,7 @@ class Token:
     SEPARATOR = "sep"
     KEYWORD = "kw"
     TEXT = "txt"
+    STRING = "str"
     
     def __init__(self, content, start, length, typ):
         self.content = content
@@ -181,85 +293,13 @@ class Token:
     def __str__(self):
         return "%s [%d +%d] (%s)" % (self.content, self.start, self.length, self.type)
 
-class MyFrame(tkinter.Frame):
-    """ Extend a Frame, a global container"""
-    
-    def __init__(self, app):
-        tkinter.Frame.__init__(self, app.root)
-        self.pack(fill=tkinter.BOTH, expand=tkinter.YES) # make it visible
-        self.app = app
-        self.graphics = {}
-        self.build()
-    
-    def make_tree(self: tkinter.Frame):
-        # Loading icons
-        self.graphics['pi'] = tkinter.PhotoImage(file="icons/Crystal_Clear_device_blockdevice16.png")
-        self.graphics['iconblue'] = tkinter.PhotoImage(file="icons/IconBlueCube16x19.png")
-        self.graphics['iconyellow'] = tkinter.PhotoImage(file="icons/IconYellowCube16x19.png")
-        self.graphics['iconmagenta'] = tkinter.PhotoImage(file="icons/IconMagentaCube16x19.png")
-        # Creating tree
-        # borderwidth seems not to work on windows
-        #ttk.Style().configure(  '.', # every class of object
-        #    relief = 'flat',  # flat ridge for separator
-        #    borderwidth = 0,  # zero width for the border
-        #)
-        treeview = ttk.Treeview(self)
-        treeview["columns"] = ("text",)
-        treeview.column("#0", width=120)
-        treeview.heading("#0", text="Nodes")
-        treeview.column("text", width=80)
-        treeview.heading("text", text="Tag")
-        treeview.insert("", 0, text="First entry")
-        treeview.insert("", 1, text=" Second entry", image=self.graphics['pi'])
-        sub1 = treeview.insert("", 2, text=" Third entry", image=self.graphics['iconyellow'])
-        treeview.insert(sub1, 0, text=" 2-1 Entry", image=self.graphics['iconblue'])
-        treeview.insert(sub1, 1, text=" 2-2 Entry", image=self.graphics['iconmagenta'])
-        # or
-        treeview.insert("", 3, "sub2", text="Fourth entry")
-        treeview.insert("sub2", 0, text=" 3-1 Entry", image=self.graphics['iconyellow'])
-        
-        treeview.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=tkinter.YES)
-        
-    def make_buttons(self: tkinter.Frame):
-        # this label widget is a child of the frame widget
-        label = tkinter.Label(self, text="Hello, world!")
-        # size itself and make it visible. pack it relative to its parent
-        label.pack(side=tkinter.RIGHT)
-    
-        button2 = tkinter.Button(self, text="Do it", fg="green", command=Application.hello)
-        button2.pack(side=tkinter.BOTTOM)
-        
-        # this button widget is a child of the frame widget. fg = foreground.
-        button = tkinter.Button(self, text="QUIT", fg="red", command=self.quit) # or root.destroy?
-        button.pack(side=tkinter.BOTTOM)
-    
-        self.hi_there = tkinter.Button(self)
-        self.hi_there["text"] = "Hello World\n(click me)"
-        self.hi_there["command"] = self.hello
-        self.hi_there.pack(side="bottom")
 
-    #def make_text(self: tkinter.Frame): # with pack: scrollbar too big when expanding
-    #    self.text_frame = tkinter.Frame(self)
-    #    self.text_frame.pack(side=tkinter.RIGHT, fill=tkinter.BOTH, expand=tkinter.YES)
-    #    
-    #    self.text = tkinter.Text(self.text_frame)
-    #    self.text.config(font=("consolas", 12), undo=True, wrap='word')
-    #    self.text.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=tkinter.YES)
-    #        
-    #    # Tabs
-    #    def tab(arg):
-    #        print("tab pressed")
-    #        self.text.insert(tkinter.INSERT, " " * 4)
-    #        return 'break' # Prevent normal behavior
-    #    self.text.bind("<Tab>", tab)
-    #    
-    #    # Scrollbar
-    #    self.scrollbar = tkinter.Scrollbar(self.text_frame, command=self.text.yview)
-    #    self.scrollbar.pack(side=tkinter.RIGHT, fill=tkinter.BOTH, expand=tkinter.YES)
-    #    self.text['yscrollcommand'] = self.scrollbar.set
-
-    def tokenizer(self):
-        content = self.text.get(1.0, tkinter.END)
+class Tokenizer:
+    
+    def __init__(self):
+        pass
+    
+    def lex(self, content):
         print('---')
         for s in content:
             if s == '\n':
@@ -296,12 +336,88 @@ class MyFrame(tkinter.Frame):
                 tokens.append(Token(word, start, len(word), Token.KEYWORD))
             else:
                 tokens.append(Token(word, start, len(word), Token.TEXT))
+        return tokens
+
+
+class MyFrame(tkinter.Frame):
+    """ Extend a Frame, a global container"""
+    
+    def __init__(self, app):
+        tkinter.Frame.__init__(self, app.root)
+        self.pack(fill=tkinter.BOTH, expand=tkinter.YES) # make it visible
+        self.app = app
+        self.build()
+        self._escape_refresh = 0
+        
+    def make_tree(self: tkinter.Frame):
+        # Loading icons
+        self.app.rc.from_file("icons/Crystal_Clear_device_blockdevice16.png")
+        self.app.rc.from_file("icons/IconBlueCube16x19.png")
+        self.app.rc.from_file("icons/IconYellowCube16x19.png")
+        self.app.rc.from_file("icons/IconMagentaCube16x19.png")
+        # Creating tree
+        # borderwidth seems not to work on windows
+        #ttk.Style().configure(  '.', # every class of object
+        #    relief = 'flat',  # flat ridge for separator
+        #    borderwidth = 0,  # zero width for the border
+        #)
+        treeview = ttk.Treeview(self)
+        treeview["columns"] = ("text",)
+        treeview.column("#0", width=120)
+        treeview.heading("#0", text="Nodes")
+        treeview.column("text", width=80)
+        treeview.heading("text", text="Tag")
+        treeview.insert("", 0, text="First entry")
+        if self.app.rc.found('Crystal_Clear_device_blockdevice16'):
+            treeview.insert("", 1, text=" Second entry", image=self.app.rc.getAsImage(Crystal_Clear_device_blockdevice16))
+        else:
+            treeview.insert("", 1, text=" Second entry")
+        if self.app.rc.found('IconYellowCube16x19'):
+            sub1 = treeview.insert("", 2, text=" Third entry", image=self.app.rc.getAsImage('IconYellowCube16x19'))
+        else:
+            sub1 = treeview.insert("", 2, text=" Third entry")
+        if self.app.rc.found('IconBlueCube16x19'):
+            treeview.insert(sub1, 0, text=" 2-1 Entry", image=self.app.rc.getAsImage('IconBlueCube16x19'))
+        else:
+            treeview.insert(sub1, 0, text=" 2-1 Entry")
+        if self.app.rc.found('IconMagentaCube16x19'):
+            treeview.insert(sub1, 1, text=" 2-2 Entry", image=self.app.rc.getAsImage('IconMagentaCube16x19'))
+        else:
+            treeview.insert(sub1, 1, text=" 2-2 Entry")
+        # or
+        treeview.insert("", 3, "sub2", text="Fourth entry")
+        if self.app.rc.found('IconYellowCube16x19'):
+            treeview.insert("sub2", 0, text=" 3-1 Entry", image=self.app.rc.getAsImage('IconYellowCube16x19'))
+        else:
+            treeview.insert("sub2", 0, text=" 3-1 Entry")
+        treeview.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=tkinter.YES)
+        
+    def make_buttons(self: tkinter.Frame):
+        # this label widget is a child of the frame widget
+        label = tkinter.Label(self, text="Hello, world!")
+        # size itself and make it visible. pack it relative to its parent
+        label.pack(side=tkinter.RIGHT)
+    
+        button2 = tkinter.Button(self, text="Do it", fg="green", command=Application.hello)
+        button2.pack(side=tkinter.BOTTOM)
+        
+        # this button widget is a child of the frame widget. fg = foreground.
+        button = tkinter.Button(self, text="QUIT", fg="red", command=self.quit) # or root.destroy?
+        button.pack(side=tkinter.BOTTOM)
+    
+        self.hi_there = tkinter.Button(self)
+        self.hi_there["text"] = "Hello World\n(click me)"
+        self.hi_there["command"] = self.hello
+        self.hi_there.pack(side="bottom")
+    
+    def tokenizer(self):
+        content = self.text.get(1.0, tkinter.END)
+        tokens = Tokenizer().lex(content)
         # Clear all tags
         for tag in self.text.tag_names():
             self.text.tag_remove(tag, 1.0)
         # Put tags
         for t in tokens:
-            #print(t)
             if t.type == Token.KEYWORD:
                 print(t)
                 deb = '1.0+%ic' % t.start
@@ -310,9 +426,18 @@ class MyFrame(tkinter.Frame):
                 print(end)
                 self.text.tag_add("keyword", deb, end)
     
+    # There is a bug when doing Ctrl+A : the refresh (call to key function) "let" the first character outside the selected area!
+    # To prevent this, we do this
+    def escape_refresh(self, nb):
+        self._escape_refresh = nb
+    
     def key(self, event):
         #print("pressed", repr(event.char))
         #print(dir(event))
+        print('>>>', self._escape_refresh)
+        if self._escape_refresh > 0:
+            self._escape_refresh -= 1
+            return
         self.tokenizer()
         s = self.text.get(1.0, tkinter.END)
         w = ''
@@ -376,11 +501,8 @@ class MyFrame(tkinter.Frame):
     def build(self):
         if self.app.options['display_tree']:
             self.make_tree()
-        # self.make_buttons()
         self.make_text()
-    
-    def hello(self):
-        print("hello!")
+
 
 if __name__ == "__main__":
     Application().run()
