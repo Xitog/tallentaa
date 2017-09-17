@@ -8,19 +8,94 @@ from tkinter import font
 import configparser
 import os.path
 
+
+class Fonts:
+    COURRIER_NEW_10_BOLD = None
+    COURRIER_NEW_10 = None
+
+class KeyConstants:
+    
+    MASK_CONTROL = 0x0004
+    
+    KEY_A = 65
+    KEY_B = 66
+    KEY_C = 67
+    KEY_D = 68
+    KEY_E = 69
+    KEY_F = 70
+    KEY_G = 71
+    KEY_H = 72
+    KEY_I = 73
+    KEY_J = 74
+    KEY_K = 75
+    KEY_L = 76
+    KEY_M = 77
+    KEY_N = 78
+    KEY_O = 79
+    KEY_P = 80
+    KEY_Q = 81
+    KEY_R = 82
+    KEY_S = 83
+    KEY_T = 84
+    KEY_U = 85
+    KEY_V = 86
+    KEY_W = 87
+    KEY_X = 88
+    KEY_Y = 89
+    KEY_Z = 90
+    
+    KEY_TAB = 9
+    KEY_SHIFT = 16
+    KEY_CONTROL = 17
+    KEY_ALT = 18
+    KEY_VERR_MAJ = 20
+    
+    CONTROL_KEYS = [KEY_SHIFT, KEY_CONTROL, KEY_ALT, KEY_VERR_MAJ]
+
 class Logger:
+    
+    INFO = 0
+    WARNING = 1
+    ERROR = 2
+    
+    SILENT = 0
+    CONSOLE = 1
+    POPUP = 2
     
     def __init__(self, exit_on_error = True):
         self.exit_on_error = exit_on_error
+        self.flux = {
+            Logger.INFO : Logger.CONSOLE,
+            Logger.WARNING : Logger.CONSOLE,
+            Logger.ERROR : Logger.CONSOLE,
+        }
+    
+    def set_warn(self, val):
+        self.flux[Logger.WARNING] = val
+    
+    def set_info(self, val):
+        self.flux[Logger.INFO] = val
+    
+    def set_error(self, val):
+        self.flux[Logger.ERROR] = val
     
     def warn(self, msg):
-        print('[WARNING] ' + str(msg))
+        if self.flux[Logger.WARNING] == Logger.CONSOLE:
+            print('[WARNING] ' + str(msg))
+        elif self.flux[Logger.WARNING] == Logger.POPUP:
+            messagebox.showwarning("Warning", str(msg))
     
     def info(self, msg):
-        print('[INFO] ' + str(msg))
+        if self.flux[Logger.INFO] == Logger.CONSOLE:
+            print('[INFO] ' + str(msg))
+        elif self.flux[Logger.INFO] == Logger.POPUP:
+            messagebox.showinfo("Information", str(msg))
     
     def error(self, msg):
-        print('[ERROR] ' + str(msg))
+        if self.flux[Logger.ERROR] == Logger.CONSOLE:
+            print('[ERROR] ' + str(msg))
+        elif self.flux[Logger.ERROR] == Logger.POPUP:
+            messagebox.showerror("Error", str(msg))
         if self.exit_on_error:
             exit()
 
@@ -60,7 +135,7 @@ class Application:
         self.rc = RessourceManager(self.log)
         self.rc.from_file(r'icons\iconyellowcube16x19_F5i_icon.ico')
         self.title = 'Pyx'
-        
+        self.version = '0.0.1'
         # config
         self.options = {}
         # base options
@@ -89,14 +164,21 @@ class Application:
         self.after_id = self.root.after(1000, self.update)
     
     def update_status_bar(self, event):
-        s = self.text.index(tkinter.INSERT)
+        s = self.frame.get_current_text().index(tkinter.INSERT)
         self.status_bar.config(text=s)
         
-    def set_title(self, filename=None):
-        if filename is None:
-            self.root.wm_title(self.title + " - New *")
-        else:
-            self.root.wm_title(self.title + " - " + filename)
+    def set_title(self):
+        current = self.frame.notebook.index("current")
+        for i in range(0, self.frame.notebook.index('end')):
+            file = self.frame.get_path(i)
+            if file is None:
+                file = "New"
+            dirty = ""
+            if self.frame.get_dirty(i):
+                dirty = " *"
+            if i == current:
+                self.root.wm_title(self.title + " " + self.version + " - " + file + dirty)
+            self.frame.notebook.tab(i, text=os.path.basename(file) + dirty)
     
     def make_menu(self):
         "Build the menu"
@@ -105,8 +187,11 @@ class Application:
         self.filemenu = tkinter.Menu(self.menu, tearoff=0)
         self.menu.add_cascade(label="File", menu=self.filemenu)
         self.filemenu.add_command(label="New", command=self.menu_new, accelerator="Ctrl+N")
+        self.filemenu.add_command(label="New Tab", command=self.menu_new_tab, accelerator="Ctrl+T")
         self.filemenu.add_command(label="Open...", command=self.menu_open, accelerator="Ctrl+O")
         self.filemenu.add_command(label="Save As...", command=self.menu_save, accelerator="Ctrl+S")
+        self.filemenu.add_separator()
+        self.filemenu.add_command(label="Run Script", command=self.menu_exec, accelerator="F5")
         self.filemenu.add_separator()
         self.filemenu.add_command(label="Exit", command=self.menu_exit, accelerator="Ctrl+Q")
         
@@ -132,22 +217,42 @@ class Application:
         
         self.langmenu = tkinter.Menu(self.menu, tearoff=0)
         self.menu.add_cascade(label="Language", menu=self.langmenu)
-        self.langmenu.add_radiobutton(label="Plain text", variable=self.lang, value="txt", command=self.update_lang)#, indicatoron=0
+        # Plain text
+        self.langmenu.add_radiobutton(label="Plain text (.txt)", variable=self.lang, value="txt", command=self.update_lang)#, indicatoron=0
         self.langmenu.add_separator()
-        self.langmenu.add_radiobutton(label="Python", variable=self.lang, value="py", command=self.update_lang)#, indicatoron=0
+        # Lightweight markup language
+        self.langmenu.add_radiobutton(label="DG Log (.dgl)", variable=self.lang, value="dgl", command=self.update_lang)
+        self.langmenu.add_radiobutton(label="Textile (.txl)", variable=self.lang, value="txl", command=self.update_lang)
         self.langmenu.add_separator()
-        self.langmenu.add_radiobutton(label="JSON", variable=self.lang, value="json", command=self.update_lang)#, indicatoron=0
-        self.langmenu.add_radiobutton(label="XML", variable=self.lang, value="xml", command=self.update_lang)#, indicatoron=0
+        # Script language
+        self.langmenu.add_radiobutton(label="JavaScript (.js)", variable=self.lang, value="js", command=self.update_lang)
+        self.langmenu.add_radiobutton(label="Lua (.lua)", variable=self.lang, value="lua", command=self.update_lang)
+        self.langmenu.add_radiobutton(label="Python (.py)", variable=self.lang, value="py", command=self.update_lang)#, indicatoron=0
+        self.langmenu.add_radiobutton(label="Rey (.rey)", variable=self.lang, value="rb", command=self.update_lang)
+        self.langmenu.add_radiobutton(label="Ruby (.rb)", variable=self.lang, value="rb", command=self.update_lang)
+        self.langmenu.add_separator()
+        # Compiled language
+        self.langmenu.add_radiobutton(label="C (.c, .h)", variable=self.lang, value="js", command=self.update_lang)
+        self.langmenu.add_radiobutton(label="Java (.java)", variable=self.lang, value="js", command=self.update_lang)
+        self.langmenu.add_separator()
+        # Data format
+        self.langmenu.add_radiobutton(label="INI (.ini)", variable=self.lang, value="ini", command=self.update_lang)
+        self.langmenu.add_radiobutton(label="JSON (.json)", variable=self.lang, value="json", command=self.update_lang)#, indicatoron=0
+        self.langmenu.add_radiobutton(label="XML (.xml, .xsd)", variable=self.lang, value="xml", command=self.update_lang)#, indicatoron=0
         
         self.helpmenu = tkinter.Menu(self.menu, tearoff=0)
         self.menu.add_cascade(label="Help", menu=self.helpmenu)
         self.helpmenu.add_command(label="About...", command=self.menu_about)
         
         self.root.bind('<Control-n>', self.menu_new)
+        self.root.bind('<Control-t>', self.menu_new_tab)
         self.root.bind('<Control-o>', self.menu_open)
         self.root.bind('<Control-s>', self.menu_save)
         self.root.bind('<Control-q>', self.menu_exit)
         self.root.bind('<Control-a>', self.menu_select_all)
+        self.root.bind('<Control-z>', self.menu_undo)
+        self.root.bind('<Control-y>', self.menu_redo)
+        self.root.bind('<F5>', self.menu_exec)
         
     def make_status_bar(self):
         self.status_bar = tkinter.Label(self.root, bd=1, relief=tkinter.SUNKEN)
@@ -162,27 +267,51 @@ class Application:
     def start(self):
         # root widget, an ordinary window
         self.root = tkinter.Tk()
-        self.set_title()
+        # Fonts
+        Fonts.COURRIER_NEW_10 = font.Font(family='Courier New', size=10)
+        Fonts.COURRIER_NEW_10_BOLD = font.Font(family='Courier New', size=10, weight='bold')
+        # Ressources
         if self.rc.found('iconyellowcube16x19_F5i_icon'):
             self.root.iconbitmap(self.rc.get('iconyellowcube16x19_F5i_icon'))
         self.root.minsize(width=800, height=600)
         #root.title("Jyx")
         #root.geometry("600x400")
         self.frame = MyFrame(self)
-        self.text = self.frame.text
         self.make_menu()
         self.make_status_bar()
+        self.set_title()
         self.update()
+        self.log.set_error(Logger.POPUP) # if we do that before initialize Tk, an empty window appear
+        # self.log.set_warn(Logger.POPUP)
     
     def restart(self):
-        content = self.text.get(1.0, tkinter.END)
+        # Save
+        f = self.frame
+        contents = []
+        paths = []
+        dirtyness = []
+        nb = f.notebook.index('end')
+        current = f.notebook.index("current")
+        for i in range(0, nb):
+            contents.append(f.get_content(i))
+            paths.append(f.get_path(i))
+            dirtyness.append(f.get_dirty(i))
+        del f
         self.options['display_tree'] = self.display_tree.get()
         self.root.after_cancel(self.after_id)
         self.menu_exit()
         self.write_options()
         self.start()
-        self.text.insert("1.0", content)
-        
+        f = self.frame # new value!
+        for i in range(0, nb):
+            if i > 0:
+                self.new_tab()
+            f.set_content(i, contents[i])
+            f.set_path(i, paths[i])
+            f.set_dirty(i, dirtyness[i])
+        self.set_title()
+        self.frame.notebook.select(current)
+    
     def run(self):
         self.frame.mainloop()
     
@@ -191,8 +320,8 @@ class Application:
     #-------------------------------------------------------
     
     def menu_about(self):
-        messagebox.showinfo("About", self.title + " - Damien Gouteux, 2017\nMade with ❤")
-
+        messagebox.showinfo("About", self.title + " - " + self.version + "\nMade with ❤\nDamien Gouteux, 2017\n")
+    
     def menu_exit(self, event=None):
         self.root.destroy()
         #root.quit()
@@ -201,13 +330,16 @@ class Application:
     def menu_new(self, event=None):
         self.new()
     
+    def menu_new_tab(self, event=None):
+        self.new_tab()
+    
     def menu_open(self, event=None):
         """Returns an opened file in read mode."""
         options = {}
-        options['defaultextension'] = '.txt'
-        options['filetypes'] = [('text files', '.txt'), ('python files', '.py'), ('lua files', '.lua'), ('all files', '.*')]
+        #options['defaultextension'] = '.txt'
+        options['filetypes'] = [('all files', '.*'), ('lua files', '.lua'), ('python files', '.py'), ('text files', '.txt')]
         options['initialdir'] = 'C:\\'
-        options['initialfile'] = 'myfile.txt'
+        options['initialfile'] = 'myfile.' + self.options['lang']
         options['parent'] = self.root
         options['title'] = 'Open file...'
         self.load(filedialog.askopenfilename(**options)) # mode='r', 
@@ -215,9 +347,9 @@ class Application:
     def menu_save(self, event=None):
         options = {}
         #options['defaultextension'] = '.txt'
-        options['filetypes'] = [('text files', '.txt'), ('python files', '.py'), ('lua files', '.lua'), ('all files', '.*')]
+        options['filetypes'] = [('all files', '.*'), ('lua files', '.lua'), ('python files', '.py'), ('text files', '.txt')]
         options['initialdir'] = 'C:\\'
-        options['initialfile'] = 'myfile.txt'
+        options['initialfile'] = 'myfile.' + self.options['lang']
         options['parent'] = self.root
         options['title'] = 'Save file...'
         filename = filedialog.asksaveasfilename(**options) # mode='w', 
@@ -226,28 +358,40 @@ class Application:
     
     def menu_undo(self, event=None):
         try:
-            self.text.edit_undo()
+            self.frame.get_current_text().edit_undo()
+            self.state_change()
         except tkinter.TclError as tk:
             self.log.warn("Nothing to undo")
-    
+        
     def menu_redo(self, event=None):
         try:
-            self.text.edit_redo()
+            self.frame.get_current_text().edit_redo()
+            self.state_change()
         except tkinter.TclError as tk:
             self.log.warn("Nothing to redo")
     
     def menu_cut(self, event=None):
-        self.text.event_generate("<<Cut>>")
+        self.frame.get_current_text().event_generate("<<Cut>>")
+        self.state_change()
     
     def menu_copy(self, event=None):
-        self.text.event_generate("<<Copy>>")
+        self.frame.get_current_text().event_generate("<<Copy>>")
     
     def menu_paste(self, event=None):
-        self.text.event_generate("<<Paste>>")
+        self.frame.get_current_text().event_generate("<<Paste>>")
+        self.state_change()
     
     def menu_select_all(self, event=None):
         self.frame.escape_refresh(2)
-        self.text.tag_add(tkinter.SEL, "1.0", tkinter.END)
+        self.frame.get_current_text().tag_add(tkinter.SEL, "1.0", tkinter.END)
+    
+    def menu_exec(self, event=None):
+        filepath = self.filepath
+        if filepath is None:
+            filepath = os.path.join(os.getcwd(), 'temp.' + self.options['lang'])
+            self.save(filepath)
+        self.log.info('Executing: ' + filepath)
+        os.startfile(filepath)
     
     #-------------------------------------------------------
     # Text functions
@@ -255,26 +399,52 @@ class Application:
 
     def new(self):
         self.clear()
+        self.state_restart(None)
+    
+    def new_tab(self):
+        self.frame.make_text()
         self.set_title()
+        # Select last tab
+        self.frame.notebook.select(self.frame.notebook.index('end')-1)
     
     def clear(self):
-        self.text.delete("1.0", tkinter.END)
-
+        self.frame.get_current_text().delete("1.0", tkinter.END)
+    
     def load(self, filename : str):
-        self.text.delete("1.0", tkinter.END)
-        f = open(filename, mode='r')
-        content = f.read()
+        f = open(filename, mode='r', encoding='utf8')
+        try:
+            content = f.read()
+        except UnicodeDecodeError as ude:
+            self.log.error("Encoding error: unable to open file: " + filename)
+            print(ude)
+            return
         f.close()
         self.clear()
-        self.text.insert("1.0", content) # or END, content
-        self.set_title(filename)
+        self.frame.get_current_text().insert("1.0", content) # or END
+        self.state_restart(filename)
 
     def save(self, filename : str):
         f = open(filename, mode='w')
-        content = self.text.get(1.0, tkinter.END)
+        content = self.frame.get_current_text().get(1.0, tkinter.END)
         f.write(content)
         f.close()
-        self.set_title(filename)
+        self.state_restart(filename)
+
+    #-------------------------------------------------------
+    # State functions
+    #-------------------------------------------------------
+    
+    def state_restart(self, filename):
+        self.log.info("State restared")
+        self.frame.set_current_dirty(False)
+        self.frame.set_current_path(filename)
+        self.set_title()
+    
+    def state_change(self):
+        if not self.frame.get_current_dirty():
+            self.log.info("State changed to dirty")
+            self.frame.set_current_dirty(True)
+            self.set_title()
 
 
 class Token:
@@ -300,14 +470,14 @@ class Tokenizer:
         pass
     
     def lex(self, content):
-        print('---')
+        #print('---')
         for s in content:
             if s == '\n':
                 s = 'NL'
             elif s == '\r':
                 s = 'CR'
-            print('[' + s + ']')
-        print('---')
+            #print('[' + s + ']')
+        #print('---')
         keyword = ('if', 'else', 'for')
         separators = (' ', '(', ')', ':', '.', ';', ',', '\n')
         discard = (' ',)
@@ -349,6 +519,43 @@ class MyFrame(tkinter.Frame):
         self.build()
         self._escape_refresh = 0
         
+    def get_current_text(self):
+        return self.text[self.notebook.index("current")]
+    
+    def get_text(self, i):
+        return self.text[i]
+    
+    def get_content(self, i):
+        return self.text[i].get(1.0, tkinter.END)
+    
+    # no clean...
+    def set_content(self, i, content):
+        self.text[i].insert("1.0", content)
+    
+    def get_current_dirty(self):
+        return self.dirty[self.notebook.index("current")]
+    
+    def set_current_dirty(self, value):
+        self.dirty[self.notebook.index("current")] = value
+    
+    def get_dirty(self, i):
+        return self.dirty[i] 
+    
+    def set_dirty(self, i, value):
+        self.dirty[i] = value
+    
+    def get_current_path(self):
+        return self.filepaths[self.notebook.index("current")]
+    
+    def set_current_path(self, value):
+        self.filepaths[self.notebook.index("current")] = value
+    
+    def get_path(self, i):
+        return self.filepaths[i]
+    
+    def set_path(self, i, path):
+        self.filepaths[i] = path
+    
     def make_tree(self: tkinter.Frame):
         # Loading icons
         self.app.rc.from_file("icons/Crystal_Clear_device_blockdevice16.png")
@@ -411,11 +618,12 @@ class MyFrame(tkinter.Frame):
         self.hi_there.pack(side="bottom")
     
     def tokenizer(self):
-        content = self.text.get(1.0, tkinter.END)
+        text = self.get_current_text()
+        content = text.get(1.0, tkinter.END)
         tokens = Tokenizer().lex(content)
         # Clear all tags
-        for tag in self.text.tag_names():
-            self.text.tag_remove(tag, 1.0)
+        for tag in text.tag_names():
+            text.tag_remove(tag, 1.0)
         # Put tags
         for t in tokens:
             if t.type == Token.KEYWORD:
@@ -424,7 +632,7 @@ class MyFrame(tkinter.Frame):
                 print(deb)
                 end = '1.0+%ic' % (t.start + t.length)
                 print(end)
-                self.text.tag_add("keyword", deb, end)
+                text.tag_add("keyword", deb, end)
     
     # There is a bug when doing Ctrl+A : the refresh (call to key function) "let" the first character outside the selected area!
     # To prevent this, we do this
@@ -432,14 +640,22 @@ class MyFrame(tkinter.Frame):
         self._escape_refresh = nb
     
     def key(self, event):
-        #print("pressed", repr(event.char))
+        text = self.get_current_text()
+        # no refresh on control keys
+        if event.keycode in KeyConstants.CONTROL_KEYS:
+            return
+        #print("pressed", "char", repr(event.char), "keycode", event.keycode, "state", event.state, "type", event.type, "ctrl", event.state & KeyConstants.MASK_CONTROL)
         #print(dir(event))
-        print('>>>', self._escape_refresh)
+        #print('>>>', self._escape_refresh)
+        # and event.type == tkinter.EventType.KeyRelease:
+        if event.state & KeyConstants.MASK_CONTROL and event.keycode not in [ KeyConstants.KEY_X, KeyConstants.KEY_V]:
+            return
         if self._escape_refresh > 0:
             self._escape_refresh -= 1
             return
+        self.app.state_change()    
         self.tokenizer()
-        s = self.text.get(1.0, tkinter.END)
+        s = text.get(1.0, tkinter.END)
         w = ''
         start = 0
         for i in range(0, len(s)):
@@ -450,7 +666,7 @@ class MyFrame(tkinter.Frame):
                 print(deb)
                 end = '1.0+%d chars' % i
                 print(end)
-                self.text.tag_add("keyword", deb, end)
+                text.tag_add("keyword", deb, end)
                 w = ''
                 start = i
                 print(w, len(w))
@@ -459,51 +675,66 @@ class MyFrame(tkinter.Frame):
         self.key(event)
         self.app.update_status_bar(event)
         
+    def make_notebook(self: tkinter.Frame):
+        self.notebook = ttk.Notebook(self)
+        self.text_frames = []
+        self.text_scrollbars = []
+        self.text = []
+        self.filepaths = []
+        self.dirty = []
+        self.make_text()
+    
     def make_text(self: tkinter.Frame): # with grid: ok :-)
-        self.text_frame = tkinter.Frame(self, bd=2, relief=tkinter.SUNKEN)
-
-        self.text_frame.grid_rowconfigure(0, weight=1)
-        self.text_frame.grid_columnconfigure(0, weight=1)
-
+        frame = tkinter.Frame(self.notebook, bd=2, relief=tkinter.SUNKEN)
+        frame.grid_rowconfigure(0, weight=1)
+        frame.grid_columnconfigure(0, weight=1)
+        
         #self.xscrollbar = tkinter.Scrollbar(self.text_frame, orient=tkinter.HORIZONTAL)
         #self.xscrollbar.grid(row=1, column=0, sticky=tkinter.E+tkinter.W)
 
-        self.yscrollbar = tkinter.Scrollbar(self.text_frame)
-        self.yscrollbar.grid(row=0, column=1, sticky=tkinter.N+tkinter.S)
-
-        self.text = tkinter.Text(self.text_frame, wrap=tkinter.NONE, bd=0,
-                    #xscrollcommand=self.xscrollbar.set,
-                    yscrollcommand=self.yscrollbar.set)
-        self.text.config(font=("consolas", 12), undo=True, wrap='word')
+        yscrollbar = tkinter.Scrollbar(frame)
+        yscrollbar.grid(row=0, column=1, sticky=tkinter.N+tkinter.S)
         
-        self.text.grid(row=0, column=0, sticky=tkinter.N+tkinter.S+tkinter.E+tkinter.W)
+        text = tkinter.Text(frame, wrap=tkinter.NONE, bd=0,
+                    #xscrollcommand=self.xscrollbar.set,
+                    yscrollcommand=yscrollbar.set)
+        text.config(font=("consolas", 12), undo=True, wrap='word')
+        
+        text.grid(row=0, column=0, sticky=tkinter.N+tkinter.S+tkinter.E+tkinter.W)
 
         #self.xscrollbar.config(command=self.text.xview)
-        self.yscrollbar.config(command=self.text.yview)
-
-        self.text_frame.pack(side=tkinter.RIGHT, fill=tkinter.BOTH, expand=tkinter.YES)
-
+        yscrollbar.config(command=text.yview)
+        
+        self.text_frames.append(frame)
+        self.text_scrollbars.append(yscrollbar)
+        self.text.append(text)
+        self.filepaths.append(None)
+        self.dirty.append(False)
+        
+        # Notebook
+        self.notebook.add(frame)
+        self.notebook.pack(side=tkinter.RIGHT, fill=tkinter.BOTH, expand=tkinter.YES)
+        
         # Tags        
-        pol_cn_bold = font.Font(family='Courier New', size=10, weight='bold')
-        tag_keyword = self.text.tag_config("keyword", foreground="blue", font=pol_cn_bold)
+        tag_keyword = text.tag_config("keyword", foreground="blue", font=Fonts.COURRIER_NEW_10_BOLD)
         
         # Tabs
-        def tab(arg):
-            print("tab pressed")
-            self.text.insert(tkinter.INSERT, " " * 4)
+        def tab(event):
+            if event.state & KeyConstants.MASK_CONTROL:
+                return
+            self.get_current_text().insert(tkinter.INSERT, " " * 4)
             return 'break' # Prevent normal behavior 
-    
+        
         # Key bindings
-        self.text.bind("<Tab>", tab)
-        self.text.bind("<KeyRelease>", self.update_text)
-        self.text.bind("<ButtonRelease-1>", self.app.update_status_bar)
+        text.bind("<Tab>", tab)
+        text.bind("<KeyRelease>", self.update_text)
+        text.bind("<ButtonRelease-1>", self.app.update_status_bar)
         
     def build(self):
         if self.app.options['display_tree']:
             self.make_tree()
-        self.make_text()
-
+        self.make_notebook()
+    
 
 if __name__ == "__main__":
     Application().run()
-
