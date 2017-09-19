@@ -134,7 +134,7 @@ class Application:
         self.log = Logger(False)
         self.rc = RessourceManager(self.log)
         self.rc.from_file(r'icons\iconyellowcube16x19_F5i_icon.ico')
-        self.title = 'Pyx'
+        self.title = 'Jyx'
         self.version = '0.0.1'
         # config
         self.options = {}
@@ -142,9 +142,9 @@ class Application:
         self.options['display_tree'] = True
         self.options['lang'] = 'txt'
         # try to load options
-        if os.path.isfile('TkinterTree.ini'):
+        if os.path.isfile(self.title + '.ini'):
             config = configparser.ConfigParser()
-            config.read('TkinterTree.ini')
+            config.read(self.title + '.ini')
             if 'MAIN' in config:
                 if 'display_tree' in config['MAIN']:
                     self.options['display_tree'] = (config['MAIN']['display_tree'] == 'True')
@@ -157,7 +157,7 @@ class Application:
     def write_options(self):
         config = configparser.ConfigParser()
         config['MAIN'] = { 'display_tree' : str(self.options['display_tree']) }
-        with open('TkinterTree.ini', 'w') as configfile:
+        with open(self.title + '.ini', 'w') as configfile:
             config.write(configfile)
     
     def update(self):
