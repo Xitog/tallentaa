@@ -1,3 +1,5 @@
+// kernel32.lib advapi32.lib delayimp.lib SDL2.lib SDL2main.lib
+
 #include "SDL.h"
 #include <stdio.h>
 #include <stdbool.h>

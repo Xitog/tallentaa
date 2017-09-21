@@ -1,0 +1,83 @@
+<html>
+  
+  <head>
+    <meta charset="UTF-8"/>
+    <title>Raycasting</title>
+  </head>
+  
+  <body>
+    
+    <h1>Raycasting</h1>
+    
+    <h2>Sommaire</h2>
+    <ol>
+        <li><a href="#intro">Introduction</a></li>
+        <li><a href="#historique">Historique</a></li>
+        <li><a href="#liens">Liens</a></li>
+    </ol>
+    
+    <h2 id="intro">Introduction</h2>
+
+    <p>Le <a href="https://en.wikipedia.org/wiki/Ray_casting">raycasting</a> (lancer de rayons) est une technique dans les jeux vidéo pour, à partir d'une carte 2D, afficher en temps réel un environnement qui à l'apparence d'une 3D rudimentaire. On appelle parfois cette technique et ce rendu de la « <a href="https://en.wikipedia.org/wiki/2.5D">2.5D</a> », terme qui regroupe également d'autres techniques de représentation d'un environnement 3D.</p>
+    
+    <h2 id="historique">Historique</h2>
+    
+    <p>Le jeu qui a popularisé cette technique est <a href="https://en.wikipedia.org/wiki/Wolfenstein_3D">Wolfenstein 3D</a>, d'id Software, sorti le 5 mai 1992. Le raycasting était une technique bien adaptée à la puissance des machines de l'époque, codée avec brio par <a href="https://en.wikipedia.org/wiki/John_Carmack">John Carmack</a>, et mis au service dans ce jeu d'un gameplay simple et rapide, dans une direction artistique faisant la part belle à la violence (pour l'époque) et aux décorations nazies, les ennemis du jeu.</p>
+    
+    <p>Le moteur qui implémente le raycasting dans Wolfenstein 3D propose néanmoins des fonctionnalités très rudimentaires : le niveau est stocké dans un tableau. Tous les murs ont la même hauteur, ont une longueur qui est toujours un multiple d'une valeur de base, ils se croisent toujours perpendiculairement, le sol et le plafond ne sont pas texturés, la lumière est statique. Le moteur offre néanmoins des murs texturés, des portes, des sprites pour les ennemis, les objets et les lumières statiques.</p>
+    
+    <p>Avant Wolfenstein 3D, John Carmack avait développé en 1991 le moteur de Hovertank 3D pour son précédent employeur, Softdisk. Celui-ci fut amélioré pour Catacomb 3-D en 1991. Un autre développeur, Blue Sky Productions était lui en train de programmer Ultima Underworld: The Stygian Abyss, un autre jeu utilisant le raycasting comme principe.</p>
+    
+    <p>id Software a vendu le moteur de Wolfenstein 3D à différentes équipes de développement, qui en retour l'ont utilisé dans différents jeux, parfois en le changeant profondemment :</p>
+    <ul>
+      <li><a href="https://en.wikipedia.org/wiki/Blake_Stone:_Aliens_of_Gold">Blake Stone: Aliens of Gold</a> (JAM Productions, 1993)</li>
+      <li><a href="https://en.wikipedia.org/wiki/Blake_Stone:_Planet_Strike">Blake Stone: Planet Strike</a> (JAM Productions, 1994)</li>
+      <li>Corridor 7</li>
+      <li>Operation Body Count</li>
+      <li>Super 3D Noah's Ark</li>
+      <li><a href="https://en.wikipedia.org/wiki/Rise_of_the_Triad">Rise of the Triad</a> (Apogee Software, 1994)</li>
+    </ul>
+    
+    <p>Avec la sortie du jeu suivant d'id Software, Doom, en XXXX, le moteur de Wolfenstein 3D prend un sérieux coup de vieux. Les derniers feux du raycasting brilleront avec Dark Forces, Duke Nukem 3D, Shadow Warrior et Blood, ces trois derniers utilisant le Build engine comme moteur.</p>
+    
+    <h2 id="liens">Liens</h2>
+    
+    <p>De nombreux sites et vidéos traitent de ce sujet. En particulier, je tiens à remercier Lode Vandevenne pour sa <a href="http://lodev.org/cgtutor/">série d'articles sur le Raycasting</a> et bien sûr les contributeurs anonymes de Wikipédia.</p>
+    <ul>
+      <li><a href="https://www.youtube.com/watch?v=-5nhdEDGaws">Vidéo d'un moteur avancé</a> basé sur le tutoriel de Lode Vandevenne qui rajoute des plusieurs niveaux, des murs fins, un ciel panoramique et du brouillard.</li>
+    </ul>
+    
+    <p>Bibliothèques pour programmer des jeux :</p>
+    <ul>
+      <li>C
+        <ul>
+          <li><a href="http://liballeg.org/">Allegro</a></li>
+          <li><a href="https://www.libsdl.org/">SDL 1 et 2</a></li>
+          <li><a href="https://www.sfml-dev.org">SFML</a></li>
+        </ul>
+      </li>
+      <li>Lua
+        <ul>
+          <li>Löve</li>
+        </ul>
+      </li>
+      <li>Python
+        <ul>
+          <li><a href="http://www.pygame.org">Pygame</a></li>
+          <li><a href="https://python-sfml.org/">SFML</a></li>
+        </ul>
+      </li>
+      <li>Ruby
+        <ul>
+          <li>Gosu</li>
+          <li>SFML</li>
+        </ul>
+      </li>
+    </ul>
+    
+    <p>Le jeu est <a href="http://3d.wolfenstein.com/game_EU.php">jouable en ligne</a> dans une version codée en JavaScript.</p>
+    
+  </body>
+</html>
+
+<!-- Les moteurs des jeux Doom (-->

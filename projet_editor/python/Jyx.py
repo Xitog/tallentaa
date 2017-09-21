@@ -118,7 +118,7 @@ class RessourceManager:
     def get(self, key):
         return self.ressources[key]
     
-    def getAsImage(self, key):
+    def get_as_image(self, key):
         if self.found(key):
             return tkinter.PhotoImage(file=self.ressources[key])
         else:
@@ -267,6 +267,7 @@ class Application:
     def start(self):
         # root widget, an ordinary window
         self.root = tkinter.Tk()
+        self.root.protocol("WM_DELETE_WINDOW", self.menu_exit)
         # Fonts
         Fonts.COURRIER_NEW_10 = font.Font(family='Courier New', size=10)
         Fonts.COURRIER_NEW_10_BOLD = font.Font(family='Courier New', size=10, weight='bold')
@@ -323,9 +324,7 @@ class Application:
         messagebox.showinfo("About", self.title + " - " + self.version + "\nMade with ❤\nDamien Gouteux, 2017\n")
     
     def menu_exit(self, event=None):
-        self.root.destroy()
-        #root.quit()
-        #exit(0)
+        self.exit()
 
     def menu_new(self, event=None):
         self.new()
@@ -429,6 +428,15 @@ class Application:
         f.write(content)
         f.close()
         self.state_restart(filename)
+
+    def exit(self):
+        if self.frame.is_dirty():
+            if messagebox.askyesno("Unsaved changes", "There are unsaved changes. Do you really want to quit " + self.title + "?", default=messagebox.NO):
+                self.root.destroy()
+        else:
+            self.root.destroy()
+        #root.quit()
+        #exit(0)
 
     #-------------------------------------------------------
     # State functions
@@ -543,6 +551,12 @@ class MyFrame(tkinter.Frame):
     
     def set_dirty(self, i, value):
         self.dirty[i] = value
+
+    def is_dirty(self):
+        for i in self.dirty:
+            if i:
+                return True
+        return False
     
     def get_current_path(self):
         return self.filepaths[self.notebook.index("current")]
@@ -568,36 +582,35 @@ class MyFrame(tkinter.Frame):
         #    relief = 'flat',  # flat ridge for separator
         #    borderwidth = 0,  # zero width for the border
         #)
-        treeview = ttk.Treeview(self)
-        treeview["columns"] = ("text",)
-        treeview.column("#0", width=120)
-        treeview.heading("#0", text="Nodes")
-        treeview.column("text", width=80)
-        treeview.heading("text", text="Tag")
-        treeview.insert("", 0, text="First entry")
+        self.treeview = ttk.Treeview(self)
+        self.treeview["columns"] = ("text",)
+        self.treeview.column("#0", width=120)
+        self.treeview.heading("#0", text="Nodes")
+        self.treeview.column("text", width=80)
+        self.treeview.heading("text", text="Tag")
+        self.treeview.insert("", 0, text="First entry")
         if self.app.rc.found('Crystal_Clear_device_blockdevice16'):
-            treeview.insert("", 1, text=" Second entry", image=self.app.rc.getAsImage(Crystal_Clear_device_blockdevice16))
+            self.treeview.insert("", 1, text=" Second entry", image=self.app.rc.get_as_image('Crystal_Clear_device_blockdevice16'))
         else:
-            treeview.insert("", 1, text=" Second entry")
+            self.treeview.insert("", 1, text=" Second entry")
         if self.app.rc.found('IconYellowCube16x19'):
-            sub1 = treeview.insert("", 2, text=" Third entry", image=self.app.rc.getAsImage('IconYellowCube16x19'))
+            sub1 = self.treeview.insert("", 2, text=" Third entry", image=self.app.rc.get_as_image('IconYellowCube16x19'))
         else:
-            sub1 = treeview.insert("", 2, text=" Third entry")
+            sub1 = self.treeview.insert("", 2, text=" Third entry")
         if self.app.rc.found('IconBlueCube16x19'):
-            treeview.insert(sub1, 0, text=" 2-1 Entry", image=self.app.rc.getAsImage('IconBlueCube16x19'))
+            self.treeview.insert(sub1, 0, text=" 2-1 Entry", image=self.app.rc.get_as_image('IconBlueCube16x19'))
         else:
-            treeview.insert(sub1, 0, text=" 2-1 Entry")
+            self.treeview.insert(sub1, 0, text=" 2-1 Entry")
         if self.app.rc.found('IconMagentaCube16x19'):
-            treeview.insert(sub1, 1, text=" 2-2 Entry", image=self.app.rc.getAsImage('IconMagentaCube16x19'))
+            self.treeview.insert(sub1, 1, text=" 2-2 Entry", image=self.app.rc.get_as_image('IconMagentaCube16x19'))
         else:
-            treeview.insert(sub1, 1, text=" 2-2 Entry")
+            self.treeview.insert(sub1, 1, text=" 2-2 Entry")
         # or
-        treeview.insert("", 3, "sub2", text="Fourth entry")
+        self.treeview.insert("", 3, "sub2", text="Fourth entry")
         if self.app.rc.found('IconYellowCube16x19'):
-            treeview.insert("sub2", 0, text=" 3-1 Entry", image=self.app.rc.getAsImage('IconYellowCube16x19'))
+            self.treeview.insert("sub2", 0, text=" 3-1 Entry", image=self.app.rc.get_as_image('IconYellowCube16x19'))
         else:
-            treeview.insert("sub2", 0, text=" 3-1 Entry")
-        treeview.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=tkinter.YES)
+            self.treeview.insert("sub2", 0, text=" 3-1 Entry")
         
     def make_buttons(self: tkinter.Frame):
         # this label widget is a child of the frame widget
@@ -710,11 +723,10 @@ class MyFrame(tkinter.Frame):
         self.text.append(text)
         self.filepaths.append(None)
         self.dirty.append(False)
-        
-        # Notebook
+
+        # Notebook parent
         self.notebook.add(frame)
-        self.notebook.pack(side=tkinter.RIGHT, fill=tkinter.BOTH, expand=tkinter.YES)
-        
+                
         # Tags        
         tag_keyword = text.tag_config("keyword", foreground="blue", font=Fonts.COURRIER_NEW_10_BOLD)
         
@@ -733,8 +745,16 @@ class MyFrame(tkinter.Frame):
     def build(self):
         if self.app.options['display_tree']:
             self.make_tree()
-        self.make_notebook()
-    
+            self.make_notebook()
+            #self.treeview.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=tkinter.YES)
+            #self.notebook.pack(side=tkinter.RIGHT, fill=tkinter.BOTH, expand=tkinter.YES)
+            self.treeview.place( relx = 0.0, rely = 0.0, relwidth = 0.2, relheight = 1.0 )
+            self.notebook.place( relx = 0.2, rely = 0.0, relwidth = 0.8, relheight = 1.0 )
+        else:
+            self.make_notebook()
+            #self.notebook.pack(side=tkinter.RIGHT, fill=tkinter.BOTH, expand=tkinter.YES)
+            self.notebook.place( relx = 0.0, rely = 0.0, relwidth = 1.0, relheight = 1.0 )
+
 
 if __name__ == "__main__":
     Application().run()

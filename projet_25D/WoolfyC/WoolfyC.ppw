@@ -1,0 +1,10 @@
+# 
+# WORKSPACE FILE construit par "Pelles C pour Windows, version 8.00".
+# AVERTISSEMENT! NE PAS MODIFIER CE FICHIER.
+# 
+
+POC_WORKSPACE_VERSION = 1.00
+
+PROJECT = ..\..\c\sdl2.ppj
+PROJECT = WoolfyC.ppj
+
