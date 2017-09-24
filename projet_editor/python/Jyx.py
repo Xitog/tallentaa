@@ -423,7 +423,7 @@ class Application:
         self.state_restart(filename)
 
     def save(self, filename : str):
-        f = open(filename, mode='w')
+        f = open(filename, mode='w', encoding='utf8')
         content = self.frame.get_current_text().get(1.0, tkinter.END)
         f.write(content)
         f.close()
