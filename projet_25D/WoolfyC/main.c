@@ -1,4 +1,5 @@
-// kernel32.lib advapi32.lib delayimp.lib SDL2.lib SDL2main.lib
+// Simple Woolfy
+// this project needs: kernel32.lib advapi32.lib delayimp.lib SDL2.lib SDL2main.lib
 
 #include "SDL.h"
 #include <stdio.h>
@@ -438,6 +439,19 @@ int texture[4096] = {8158332, 8158332, 8158332, 4732952, 5520412, 6045728, 60457
     
  */
 
+// Me Calc
+
+// only work if -2 * M_PI < add < 2 * M_PI
+float angle_op(float angle, float add) {
+    angle += add;
+    if (angle > 2 * M_PI) {
+        angle -= 2 * M_PI;
+    } else if (angle < 0) {
+        angle += 2 * M_PI;
+    }
+    return angle;
+}
+
 int main(int argc, char *argv[]) {
     //int gogogo = 1;
     //SDL_Event event;
@@ -452,6 +466,7 @@ int main(int argc, char *argv[]) {
     //const int SCREEN_FPS = 60;
     //const int SCREEN_TICKS_PER_FRAME = 1000 / SCREEN_FPS;
     
+    const int MAP_SIZE = 24;
     int area[24][24] = {
         {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
         {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
@@ -483,7 +498,13 @@ int main(int argc, char *argv[]) {
     float position[2] = {22.0,12.0};       // position vector (point)
     float direction[2] = {-1.0,0.0};       // direction vector
     float camera[2] = {0.0, 0.66};     // camera plane (orthogonal to direction vector) 2 * atan(0.66/1.0)=66
-    
+
+    // me calc
+    int MAP_ZOOM = 10;
+    float angle = 0.0; 
+    float fx = 22.0;
+    float fy = 12.0;
+
     //The window we'll be rendering to
     SDL_Window* window = NULL;
     SDL_Renderer * renderer;
@@ -572,42 +593,72 @@ int main(int argc, char *argv[]) {
                 
                 // rotate to the right
                 if (right) {
-                   // both camera direction and camera plane must be rotated
-                   //printf("before direction : %f, %f\n", direction[0], direction[1]);
-                   //printf("before camera : %f, %f\n", camera[0], camera[1]);
-                   oldDirX = direction[0];
-                   direction[0] = direction[0] * cos(-rotSpeed) - direction[1] * sin(-rotSpeed);
-                   direction[1] = oldDirX * sin(-rotSpeed) + direction[1] * cos(-rotSpeed);
-                   oldPlaneX = camera[0];
-                   camera[0] = camera[0] * cos(-rotSpeed) - camera[1] * sin(-rotSpeed);
-                   camera[1] = oldPlaneX * sin(-rotSpeed) + camera[1] * cos(-rotSpeed);
-                   //printf("after direction : %f, %f\n", direction[0], direction[1]);
-                   //printf("after camera : %f, %f\n", camera[0], camera[1]);
+                    // both camera direction and camera plane must be rotated
+                    //printf("before direction : %f, %f\n", direction[0], direction[1]);
+                    printf("before camera : %f, %f\n", camera[0], camera[1]);
+                    oldDirX = direction[0];
+                    direction[0] = direction[0] * cos(-rotSpeed) - direction[1] * sin(-rotSpeed);
+                    direction[1] = oldDirX * sin(-rotSpeed) + direction[1] * cos(-rotSpeed);
+                    oldPlaneX = camera[0];
+                    camera[0] = camera[0] * cos(-rotSpeed) - camera[1] * sin(-rotSpeed);
+                    camera[1] = oldPlaneX * sin(-rotSpeed) + camera[1] * cos(-rotSpeed);
+                    //printf("after direction : %f, %f\n", direction[0], direction[1]);
+                    printf("after camera : %f, %f\n", camera[0], camera[1]);
+                    //me calc
+                    angle = angle_op(angle, -rotSpeed);
+                    printf("angle : %f\n", angle);
                 }
                 if (left) {
-                   // both camera direction and camera plane must be rotated
-                   //printf("before direction : %f, %f\n", direction[0], direction[1]);
-                   //printf("before camera : %f, %f\n", camera[0], camera[1]);
-                   oldDirX = direction[0];
-                   direction[0] = direction[0] * cos(rotSpeed) - direction[1] * sin(rotSpeed);
-                   direction[1] = oldDirX * sin(rotSpeed) + direction[1] * cos(rotSpeed);
-                   oldPlaneX = camera[0];
-                   camera[0] = camera[0] * cos(rotSpeed) - camera[1] * sin(rotSpeed);
-                   camera[1] = oldPlaneX * sin(rotSpeed) + camera[1] * cos(rotSpeed);
-                   //printf("after direction : %f, %f\n", direction[0], direction[1]);
-                   //printf("after camera : %f, %f\n", camera[0], camera[1]);
+                    // both camera direction and camera plane must be rotated
+                    //printf("before direction : %f, %f\n", direction[0], direction[1]);
+                    printf("before camera : %f, %f\n", camera[0], camera[1]);
+                    oldDirX = direction[0];
+                    direction[0] = direction[0] * cos(rotSpeed) - direction[1] * sin(rotSpeed);
+                    direction[1] = oldDirX * sin(rotSpeed) + direction[1] * cos(rotSpeed);
+                    oldPlaneX = camera[0];
+                    camera[0] = camera[0] * cos(rotSpeed) - camera[1] * sin(rotSpeed);
+                    camera[1] = oldPlaneX * sin(rotSpeed) + camera[1] * cos(rotSpeed);
+                    //printf("after direction : %f, %f\n", direction[0], direction[1]);
+                    printf("after camera : %f, %f\n", camera[0], camera[1]);
+                    //me calc
+                    angle = angle_op(angle, rotSpeed);
+                    printf("angle : %f\n", angle);
                 }
                 if (up) {
-                   //printf("before position : %f, %f\n", position[0], position[1]);
-                   if (area[(int) (position[0] + direction[0] * moveSpeed)][(int) (position[1])] == 0) { position[0] += direction[0] * moveSpeed; }
-                   if (area[(int) (position[0])][(int) (position[1] + direction[1] * moveSpeed)] == 0) { position[1] += direction[1] * moveSpeed; }
-                   //printf("after position : %f, %f\n", position[0], position[1]);
+                    //printf("before position : %f, %f\n", position[0], position[1]);
+                    if (area[(int) (position[0] + direction[0] * moveSpeed)][(int) (position[1])] == 0) { position[0] += direction[0] * moveSpeed; }
+                    if (area[(int) (position[0])][(int) (position[1] + direction[1] * moveSpeed)] == 0) { position[1] += direction[1] * moveSpeed; }
+                    //printf("after position : %f, %f\n", position[0], position[1]);
+                    // me calc
+                    float nx = fx + moveSpeed * -cos(angle);
+                    float ny = fy + moveSpeed * -sin(angle);
+                    if (area[(int) nx][(int) ny] == 0) {
+                        fx = nx;
+                        fy = ny;
+                    } else if (area[(int) nx][(int) fy] == 0) {
+                        fx = nx;
+                    } else if (area[(int) fx][(int) ny] == 0) {
+                        fy = ny;
+                    }
+                    printf("after position : %d, %d\n", (int) fx, (int) fy);
                 }
                 if (down) {
-                   //printf("before position : %f, %f\n", position[0], position[1]);
-                   if (area[(int) (position[0] - direction[0] * moveSpeed)][(int) (position[1])] == 0) { position[0] -= direction[0] * moveSpeed; }
-                   if (area[(int) (position[0])][(int) (position[1] - direction[1] * moveSpeed)] == 0) { position[1] -= direction[1] * moveSpeed; }
-                   //printf("after position : %f, %f\n", position[0], position[1]);
+                    //printf("before position : %f, %f\n", position[0], position[1]);
+                    if (area[(int) (position[0] - direction[0] * moveSpeed)][(int) (position[1])] == 0) { position[0] -= direction[0] * moveSpeed; }
+                    if (area[(int) (position[0])][(int) (position[1] - direction[1] * moveSpeed)] == 0) { position[1] -= direction[1] * moveSpeed; }
+                    //printf("after position : %f, %f\n", position[0], position[1]);
+                    // me calc
+                    float nx = fx - moveSpeed * -cos(angle);
+                    float ny = fy - moveSpeed * -sin(angle);
+                    if (area[(int) nx][(int) ny] == 0) {
+                        fx = nx;
+                        fy = ny;
+                    } else if (area[(int) nx][(int) fy] == 0) {
+                        fx = nx;
+                    } else if (area[(int) fx][(int) ny] == 0) {
+                        fy = ny;
+                    }
+                    printf("after position : %d, %d\n", (int) fx, (int) fy);
                 }
                 
                 // RENDER
@@ -635,7 +686,7 @@ int main(int argc, char *argv[]) {
                 
                 for(int s = 0; s < SCREEN_WIDTH; s++) {
                     
-                        // calculate ray position and direction 
+                    // calculate ray position and direction 
                     float cameraX = 2 * s / (float) SCREEN_WIDTH - 1; // x-coordinate in camera space
                     float rayPosX = position[0];
                     float rayPosY = position[1];
@@ -777,6 +828,36 @@ int main(int argc, char *argv[]) {
                         }
                     }
                 }
+                
+                // Me Calc
+
+                SDL_Rect rect;
+                rect.w = MAP_ZOOM;
+                rect.h = MAP_ZOOM;
+
+                // Map
+                for(int line=0; line < MAP_SIZE; line++) {
+                    for(int column=0; column < MAP_SIZE; column++) {
+                        rect.x = line * MAP_ZOOM;
+                        rect.y = column * MAP_ZOOM;    
+                        if (area[line][column] != 0) {
+                            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+                            SDL_RenderDrawRect(renderer, &rect);
+                        } else {
+                            SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+                            SDL_RenderDrawRect(renderer, &rect);
+                        }
+                    }
+                }
+
+                // Player
+                SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+                rect.x = fx * MAP_ZOOM;
+                rect.y = fy * MAP_ZOOM;
+                rect.w = 3;
+                rect.h = 3;
+                SDL_RenderDrawRect(renderer, &rect);
+                SDL_RenderDrawLine(renderer, fx*MAP_ZOOM+1, fy*MAP_ZOOM+1, fx*MAP_ZOOM+1 - cos(angle) * 6, fy*MAP_ZOOM+1  - sin(angle) * 6);
 
                 SDL_RenderPresent(renderer);
                 
