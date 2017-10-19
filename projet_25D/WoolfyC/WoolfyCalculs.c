@@ -7,8 +7,9 @@
 #include <stdlib.h> // for exit
 #include <math.h>
 
-#define FLOOR
-#define CEILING
+//#define DEBUG
+
+#ifdef DEBUG
 
 /*
 Uint32 getpixel(SDL_Surface *surface, int x, int y)
@@ -430,6 +431,15 @@ int texture[4096] = {8158332, 8158332, 8158332, 4732952, 5520412, 6045728, 60457
     
  */
 
+//Screen dimension constants
+const int SCREEN_WIDTH = 640;
+const int SCREEN_HEIGHT = 480;
+const int TEX_WIDTH = 64;
+const int TEX_HEIGHT = 64;
+
+float wall_buffer_lode[640];
+float wall_buffer_dgx[640];
+
 // Me Calc
 
 // only work if -2 * M_PI < add < 2 * M_PI
@@ -443,17 +453,277 @@ float angle_op(float angle, float add) {
     return angle;
 }
 
+typedef struct {
+    float perpWallDist;
+    int lineHeight;
+    float wallX;
+    int texX;
+    float floorXWall;
+    float floorYWall;
+    int height;
+} Result;
+
+void render_calc_dgx (int column, int (* area)[24], int (* height_map)[24], // common
+                  float * position, float * direction, float * camera, // Lode calc
+                  float angle_prog, float angle_start, bool dump, FILE * dump_file, float fx, float fy, // My calc
+                  Result * outResult) {
+
+    // 15h31 je remplace son calcul par le mien... Et bien c'est pas dégueux !
+    // Alors le repère est complètement changé, on se déplace n'importe comment et on retrouve l'effet oeil de poisson
+
+    float rayPosX = fx; //position[0];
+    float rayPosY = fy; //position[1];
+    
+    // Bon, cela finit toujours par diverger... De très peu, mais ça diverge. C'est trop chiant !
+    if (roundf(fx * 100) != roundf(position[0] * 100) || roundf(fy * 100) != roundf(position[1] * 100)) {
+        if (roundf(fx * 100) != roundf(position[0] * 100)) {
+            printf("fx and position[0] difference : %f vs %f\n", fx, position[0]);
+        }
+        if (roundf(fy * 100) != roundf(position[1] * 100)) {
+            printf("fy and position[1] difference : %f vs %f\n", fy, position[1]);
+        }
+        system("pause");
+        exit(1);
+    }
+
+    // old calc    
+    float cameraX = 2 * column / (float) SCREEN_WIDTH - 1; // x-coordinate in camera space
+    float oldRayDirX = direction[0] + camera[0] * cameraX;
+    float oldRayDirY = direction[1] + camera[1] * cameraX;
+
+    // new me calc
+    float rayDirX = -cos(angle_op(angle_start, angle_prog * column));
+    float rayDirY = sin(angle_op(angle_start, angle_prog * column));
+    
+    // which box of the map we're in  
+    int mapX = (int) rayPosX;
+    int mapY = (int) rayPosY;
+
+    // length of ray from current position to next x or y-side
+    float sideDistX = 0.0;
+    float sideDistY = 0.0;
+
+    // Length of ray from one x or y-side to next x or y-side
+    float deltaDistX = sqrt(1 + (rayDirY * rayDirY) / (rayDirX * rayDirX));
+    float deltaDistY = sqrt(1 + (rayDirX * rayDirX) / (rayDirY * rayDirY));
+    float perpWallDist = 0.0;
+        
+    // What direction to step in x or y-direction (either +1 or -1)
+    int stepX = 0;
+    int stepY = 0;
+  
+    int hit = 0; // was there a wall hit?
+    int side = 0; // was a NS or a EW wall hit?
+  
+    // calculate step and initial sideDist
+    if (rayDirX < 0) {
+        stepX = -1;
+        sideDistX = (rayPosX - mapX) * deltaDistX;
+    } else {
+        stepX = 1;
+        sideDistX = (mapX + 1.0 - rayPosX) * deltaDistX;
+    }
+    if (rayDirY < 0) {
+        stepY = -1;
+        sideDistY = (rayPosY - mapY) * deltaDistY;
+    } else {
+        stepY = 1;
+        sideDistY = (mapY + 1.0 - rayPosY) * deltaDistY;
+    }
+  
+    // perform DDA
+    while (hit == 0) {
+        // jump to next map square, OR in x-direction, OR in y-direction
+        if (sideDistX < sideDistY) {
+            sideDistX += deltaDistX;
+            mapX += stepX;
+            side = 0;
+        } else {
+            sideDistY += deltaDistY;
+            mapY += stepY;
+            side = 1;
+        }
+        // Check if ray has hit a wall
+        if (area[mapX][mapY] > 0) {
+            hit = 1;
+        }
+    }
+    
+    // Calculate distance projected on camera direction (oblique distance will give fisheye effect!)
+    if (side == 0) {
+        perpWallDist = fabs((mapX - rayPosX + (1 - stepX) / 2) / rayDirX); // fabs
+    } else {
+        perpWallDist = fabs((mapY - rayPosY + (1 - stepY) / 2) / rayDirY); // fabs
+    }
+    // Me calc BEGIN
+    //perpWallDist = sqrt(pow(rayPosX - fx, 2) + pow(rayPosY - fy, 2));
+    // Pas ça encore...
+    perpWallDist = sqrt(pow(mapX - fx, 2) + pow(mapY - fy, 2));
+    //perpWallDist = cos(angle_op(angle_prog * column, angle_start)) * perpWallDist;
+    // Me calc END
+
+    // Calculate height of line to draw on screen
+    int lineHeight = (int) ( ((float) SCREEN_HEIGHT) / perpWallDist); // ne marche pas ??? bah, si...
+    wall_buffer_dgx[column] = lineHeight;
+
+    // No textured calculus right now
+}
+
+void render_calc_lode (int column, int (* area)[24], int (* height_map)[24], // common
+                  float * position, float * direction, float * camera, // Lode calc
+                  float angle_prog, float angle_start, bool dump, FILE * dump_file, float fx, float fy, // My calc
+                  Result * outResult) {
+  
+                    // calculate ray position and direction 
+                    float cameraX = 2 * column / (float) SCREEN_WIDTH - 1; // x-coordinate in camera space
+                    float rayPosX = position[0];
+                    float rayPosY = position[1];
+                    float rayDirX = direction[0] + camera[0] * cameraX;
+                    float rayDirY = direction[1] + camera[1] * cameraX;
+                    
+                    // me
+                    float neoRayDirX = -cos(angle_op(angle_prog * column, angle_start));
+                    float neoRayDirY = sin(angle_op(angle_prog * column, angle_start));
+
+                    // which box of the map we're in  
+                    int mapX = (int) rayPosX;
+                    int mapY = (int) rayPosY;
+                  
+                    // length of ray from current position to next x or y-side
+                    float sideDistX = 0.0;
+                    float sideDistY = 0.0;
+                  
+                    // Added by me. Is it still useful?
+                    if (rayDirX == 0) { rayDirX = 0.00001; }
+                    if (rayDirY == 0) { rayDirY = 0.00001; }
+                  
+                    // Length of ray from one x or y-side to next x or y-side
+                    float deltaDistX = sqrt(1 + (rayDirY * rayDirY) / (rayDirX * rayDirX));
+                    float deltaDistY = sqrt(1 + (rayDirX * rayDirX) / (rayDirY * rayDirY));
+                    float perpWallDist = 0.0;
+                        
+                    // What direction to step in x or y-direction (either +1 or -1)
+                    int stepX = 0;
+                    int stepY = 0;
+                  
+                    int hit = 0; // was there a wall hit?
+                    int side = 0; // was a NS or a EW wall hit?
+                  
+                    // calculate step and initial sideDist
+                    if (rayDirX < 0) {
+                        stepX = -1;
+                        sideDistX = (rayPosX - mapX) * deltaDistX;
+                    } else {
+                        stepX = 1;
+                        sideDistX = (mapX + 1.0 - rayPosX) * deltaDistX;
+                    }
+                    if (rayDirY < 0) {
+                        stepY = -1;
+                        sideDistY = (rayPosY - mapY) * deltaDistY;
+                    } else {
+                        stepY = 1;
+                        sideDistY = (mapY + 1.0 - rayPosY) * deltaDistY;
+                    }
+                  
+                    // perform DDA
+                    while (hit == 0) {
+                        // jump to next map square, OR in x-direction, OR in y-direction
+                        if (sideDistX < sideDistY) {
+                            sideDistX += deltaDistX;
+                            mapX += stepX;
+                            side = 0;
+                        } else {
+                            sideDistY += deltaDistY;
+                            mapY += stepY;
+                            side = 1;
+                        }
+                        // Check if ray has hit a wall
+                        if (area[mapX][mapY] > 0) {
+                            hit = 1;
+                        }
+                    }
+                    
+                    // Calculate distance projected on camera direction (oblique distance will give fisheye effect!)
+                    if (side == 0) {
+                        perpWallDist = fabs((mapX - rayPosX + (1 - stepX) / 2) / rayDirX); // fabs
+                    } else {
+                        perpWallDist = fabs((mapY - rayPosY + (1 - stepY) / 2) / rayDirY); // fabs
+                    }
+
+                    // Calculate height of line to draw on screen
+                    //int lineHeight = (int) fabs(((float) SCREEN_HEIGHT / (float) perpWallDist)); // float
+                    int lineHeight = (int) ( ((float) SCREEN_HEIGHT) / perpWallDist); // ne marche pas ??? bah, si...
+                    // me
+                    wall_buffer_lode[column] = lineHeight;
+
+                    if(dump) {
+                        fprintf(dump_file, "[%d] cameraX: %f, position[0]: %f, position[1]: %f, rayDirX: %f, rayDirY: %f, perpWallDist: %f, lineHeight: %d\n", column, cameraX, position[0], position[1], rayDirX, rayDirY, perpWallDist, lineHeight);
+                        fprintf(dump_file, "[%d] cameraX: %f, nx:          %f, ny:          %f, rayDirX: %f, rayDirY: %f, diffX: %f, diffY: %f\n", column, cameraX, fx, fy, neoRayDirX, neoRayDirY, fabs(rayDirX-neoRayDirX), fabs(rayDirY-neoRayDirY));
+                    }
+
+                    //---------------------------------------------------------
+                    // only for textured walls
+                    //---------------------------------------------------------
+                    
+                    // calculate value of wallX
+                    float wallX = 0.0; // where exactly the wall was hit
+                    if (side == 1) {
+                        wallX = rayPosX + ((mapY - rayPosY + (1 - stepY) / 2) / rayDirY) * rayDirX;
+                    } else {
+                        wallX = rayPosY + ((mapX - rayPosX + (1 - stepX) / 2) / rayDirX) * rayDirY;
+                    }
+                    wallX -= floor(wallX); // on ne récupère que le flottant !!!
+                    
+                    // x coordinate on the texture
+                    int texX = (int) (wallX * TEX_WIDTH);
+                        
+                    if (side == 0 && rayDirX > 0) { texX = TEX_WIDTH - texX - 1; }
+                    if (side == 1 && rayDirY < 0) { texX = TEX_WIDTH - texX - 1; }
+
+                    //---------------------------------------------------------
+                    // only for textured floor/ceiling
+                    //---------------------------------------------------------
+                    
+                    //x, y position of the floor texel at the bottom of the wall
+                    double floorXWall, floorYWall; 
+                    
+                    //4 different wall directions possible
+                    if(side == 0 && rayDirX > 0)
+                    {
+                        floorXWall = mapX;
+                        floorYWall = mapY + wallX;
+                    }
+                    else if(side == 0 && rayDirX < 0)
+                    {
+                        floorXWall = mapX + 1.0;
+                        floorYWall = mapY + wallX;
+                    }
+                    else if(side == 1 && rayDirY > 0)
+                    {
+                        floorXWall = mapX + wallX;
+                        floorYWall = mapY;
+                    }
+                    else
+                    {
+                        floorXWall = mapX + wallX;
+                        floorYWall = mapY + 1.0;
+                    }
+
+                    outResult->perpWallDist = perpWallDist;
+                    outResult->lineHeight = lineHeight;
+                    outResult->wallX = wallX;
+                    outResult->texX = texX;
+                    outResult->floorXWall = floorXWall;
+                    outResult->floorYWall = floorYWall;
+                    outResult->height = height_map[mapX][mapY] - 1;
+}
+
 int main(int argc, char *argv[]) {
     //SDL_Event event;
     
-    //Screen dimension constants
-    const int SCREEN_WIDTH = 640;
-    const int SCREEN_HEIGHT = 480;
     const int MID_SCREEN_HEIGHT = SCREEN_HEIGHT / 2;
-    const int TEX_WIDTH = 64;
-    const int TEX_HEIGHT = 64;
     bool TEXTURED = true;
-    
+
     const int MAP_SIZE = 24;
     int area[24][24] = {
         {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
@@ -539,9 +809,7 @@ int main(int argc, char *argv[]) {
     {
         //Create window
         //window = SDL_CreateWindow( "SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
-        //int flags = SDL_WINDOW_FULLSCREEN;
-        int flags = 0;
-        SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_HEIGHT, flags, &window, &renderer);
+        SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_HEIGHT, 0, &window, &renderer);
         if( window == NULL )
         {
             printf( "Window could not be created! SDL_Error: %s\n", SDL_GetError() );
@@ -607,9 +875,6 @@ int main(int argc, char *argv[]) {
                         if (event.key.keysym.sym == SDLK_DOWN) {
                             down = true;
                         }
-                        if (event.key.keysym.sym == SDLK_ESCAPE) {
-                            quit = true;
-                        }
                     } else if (event.type == SDL_KEYUP) {
                         if (event.key.keysym.sym == SDLK_RIGHT) {
                             right = false;
@@ -643,7 +908,7 @@ int main(int argc, char *argv[]) {
                     //printf("after direction : %f, %f\n", direction[0], direction[1]);
                     printf("after camera : %f, %f\n", camera[0], camera[1]);
                     //me calc
-                    angle = angle_op(angle, -rotSpeed);
+                    angle = angle_op(angle, rotSpeed);
                     angle_start = angle_op(angle, -M_PI / 4);
                     angle_end = angle_op(angle, M_PI / 4);
                     printf("angle : %f\n", angle);
@@ -661,7 +926,7 @@ int main(int argc, char *argv[]) {
                     //printf("after direction : %f, %f\n", direction[0], direction[1]);
                     printf("after camera : %f, %f\n", camera[0], camera[1]);
                     //me calc
-                    angle = angle_op(angle, rotSpeed);
+                    angle = angle_op(angle, -rotSpeed);
                     angle_start = angle_op(angle, -M_PI / 4);
                     angle_end = angle_op(angle, M_PI / 4);
                     printf("info ang = %f, pos = %f, %f matrix = [%d, %d]\n", angle, fx, fy, (int) fx, (int) fy);
@@ -670,12 +935,13 @@ int main(int argc, char *argv[]) {
                     //printf("before position : %f, %f\n", position[0], position[1]);
                     float nx = position[0] + direction[0] * moveSpeed;
                     float ny = position[1] + direction[1] * moveSpeed;
-                    if (area[(int) nx][(int) (position[1])] == 0) { position[0] = nx; }
-                    if (area[(int) (position[0])][(int) ny] == 0) { position[1] = ny; }
+                    if (area[(int) nx][(int) ny] == 0) { position[0] = nx; position[1] = ny; }
+                    else if (area[(int) nx][(int) (position[1])] == 0) { position[0] = nx; }
+                    else if (area[(int) (position[0])][(int) ny] == 0) { position[1] = ny; }
                     //printf("after position : %f, %f\n", position[0], position[1]);
                     // me calc
                     nx = fx + moveSpeed * -cos(angle);
-                    ny = fy + moveSpeed * -sin(angle);
+                    ny = fy + moveSpeed * sin(angle);
                     if (area[(int) nx][(int) ny] == 0) {
                         fx = nx;
                         fy = ny;
@@ -690,12 +956,13 @@ int main(int argc, char *argv[]) {
                     //printf("before position : %f, %f\n", position[0], position[1]);
                     float nx = position[0] - direction[0] * moveSpeed;
                     float ny = position[1] - direction[1] * moveSpeed;
-                    if (area[(int) nx][(int) (position[1])] == 0) { position[0] = nx; }
-                    if (area[(int) (position[0])][(int) ny] == 0) { position[1] = ny; }
+                    if (area[(int) nx][(int) ny] == 0) { position[0] = nx; position[1] = ny; }
+                    else if (area[(int) nx][(int) (position[1])] == 0) { position[0] = nx; }
+                    else if (area[(int) (position[0])][(int) ny] == 0) { position[1] = ny; }
                     //printf("after position : %f, %f\n", position[0], position[1]);
                     // me calc
                     nx = fx - moveSpeed * -cos(angle);
-                    ny = fy - moveSpeed * -sin(angle);
+                    ny = fy - moveSpeed * sin(angle);
                     if (area[(int) nx][(int) ny] == 0) {
                         fx = nx;
                         fy = ny;
@@ -729,107 +996,26 @@ int main(int argc, char *argv[]) {
 
                 //Fill the surface white
                 //SDL_FillRect( screenSurface, NULL, SDL_MapRGB( screenSurface->format, 0x00, 0x00, 0x00 ) );
+                
+                Result res;
 
                 for(int s = 0; s < SCREEN_WIDTH; s++) {
                     
-                    // calculate ray position and direction 
-                    float cameraX = 2 * s / (float) SCREEN_WIDTH - 1; // x-coordinate in camera space
-                    float rayPosX = position[0];
-                    float rayPosY = position[1];
-                    float rayDirX = direction[0] + camera[0] * cameraX;
-                    float rayDirY = direction[1] + camera[1] * cameraX;
-                    
-                    // Me calc BEGIN
-                    float neoRayDirX = -cos(angle_op(angle_prog * s, angle_start));
-                    float neoRayDirY = sin(angle_op(angle_prog * s, angle_start));
-                    // 15h31 je remplace son calcul par le lien... Et bien c'est pas dégueux !
-                    // Alors le repère est complètement changé, on se déplace n'importe comment et on retrouve l'effet oeil de poisson
-                    //rayDirX = neoRayDirX;
-                    //rayDirY = neoRayDirY;
-                    // Me calc END
-
-                    // which box of the map we're in  
-                    int mapX = (int) rayPosX;
-                    int mapY = (int) rayPosY;
-                  
-                    // length of ray from current position to next x or y-side
-                    float sideDistX = 0.0;
-                    float sideDistY = 0.0;
-                  
-                    // Added by me. Is it still useful?
-                    if (rayDirX == 0) { rayDirX = 0.00001; }
-                    if (rayDirY == 0) { rayDirY = 0.00001; }
-                  
-                    // Length of ray from one x or y-side to next x or y-side
-                    float deltaDistX = sqrt(1 + (rayDirY * rayDirY) / (rayDirX * rayDirX));
-                    float deltaDistY = sqrt(1 + (rayDirX * rayDirX) / (rayDirY * rayDirY));
-                    float perpWallDist = 0.0;
-                        
-                    // What direction to step in x or y-direction (either +1 or -1)
-                    int stepX = 0;
-                    int stepY = 0;
-                  
-                    int hit = 0; // was there a wall hit?
-                    int side = 0; // was a NS or a EW wall hit?
-                  
-                    // calculate step and initial sideDist
-                    if (rayDirX < 0) {
-                        stepX = -1;
-                        sideDistX = (rayPosX - mapX) * deltaDistX;
-                    } else {
-                        stepX = 1;
-                        sideDistX = (mapX + 1.0 - rayPosX) * deltaDistX;
-                    }
-                    if (rayDirY < 0) {
-                        stepY = -1;
-                        sideDistY = (rayPosY - mapY) * deltaDistY;
-                    } else {
-                        stepY = 1;
-                        sideDistY = (mapY + 1.0 - rayPosY) * deltaDistY;
-                    }
-                  
-                    // perform DDA
-                    while (hit == 0) {
-                        // jump to next map square, OR in x-direction, OR in y-direction
-                        if (sideDistX < sideDistY) {
-                            sideDistX += deltaDistX;
-                            mapX += stepX;
-                            side = 0;
-                        } else {
-                            sideDistY += deltaDistY;
-                            mapY += stepY;
-                            side = 1;
-                        }
-                        // Check if ray has hit a wall
-                        if (area[mapX][mapY] > 0) {
-                            hit = 1;
-                        }
-                    }
-                    
-                    // Calculate distance projected on camera direction (oblique distance will give fisheye effect!)
-                    if (side == 0) {
-                        perpWallDist = fabs((mapX - rayPosX + (1 - stepX) / 2) / rayDirX); // fabs
-                    } else {
-                        perpWallDist = fabs((mapY - rayPosY + (1 - stepY) / 2) / rayDirY); // fabs
-                    }
-                    // Me calc BEGIN
-                    //perpWallDist *= acos(angle_op(angle_prog * s, angle_start));
-                    // Me calc END
-
-                    // Calculate height of line to draw on screen
-                    //int lineHeight = (int) fabs(((float) SCREEN_HEIGHT / (float) perpWallDist)); // float
-                    int lineHeight = (int) ( ((float) SCREEN_HEIGHT) / perpWallDist); // me marche pas
-
-                    if(dump) {
-                        fprintf(dump_file, "[%d] cameraX: %f, position[0]: %f, position[1]: %f, rayDirX: %f, rayDirY: %f, perpWallDist: %f, lineHeight: %d\n", s, cameraX, position[0], position[1], rayDirX, rayDirY, perpWallDist, lineHeight);
-                        fprintf(dump_file, "[%d] cameraX: %f, nx:          %f, ny:          %f, rayDirX: %f, rayDirY: %f, diffX: %f, diffY: %f\n", s, cameraX, fx, fy, neoRayDirX, neoRayDirY, fabs(rayDirX-neoRayDirX), fabs(rayDirY-neoRayDirY));
-                    }
+                    render_calc_lode (s, area, height_map, position, direction, camera, angle_prog, angle_start, dump, dump_file, fx, fy, &res);
+                    float perpWallDist = res.perpWallDist;
+                    int lineHeight = res.lineHeight;
+                    //float wallX = res.wallX;
+                    int texX = res.texX;
+                    float floorXWall = res.floorXWall;
+                    float floorYWall = res.floorYWall;
+                    int height = res.height;
+                    render_calc_dgx (s, area, height_map, position, direction, camera, angle_prog, angle_start, dump, dump_file, fx, fy, &res);
 
                     // Calculate lowest and highest pixel to fill in current stripe
                     // - lineHeight : 15h10 double level! Mais les textures n'ont pas été faites pour...
                     // - lineHeight * 2 : gros bug d'affichage, pourquoi ? ok, c'était l'algo du texturage qui n'était pas fait pour :-)
                     // 15h44 : height_map :-) 15h45 : algo pour texture "universel"
-                    int modifier = lineHeight * (height_map[mapX][mapY] - 1);
+                    int modifier = lineHeight * (height);
                     
                     int drawStart = MID_SCREEN_HEIGHT - lineHeight / 2 - modifier;
                     if (drawStart < 0) { drawStart = 0; }
@@ -843,20 +1029,7 @@ int main(int argc, char *argv[]) {
                         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
                         SDL_RenderDrawLine(renderer, s, drawStart, s, drawEnd);
                     } else {
-                        // calculate value of wallX
-                        float wallX = 0.0; // where exactly the wall was hit
-                        if (side == 1) {
-                            wallX = rayPosX + ((mapY - rayPosY + (1 - stepY) / 2) / rayDirY) * rayDirX;
-                        } else {
-                            wallX = rayPosY + ((mapX - rayPosX + (1 - stepX) / 2) / rayDirX) * rayDirY;
-                        }
-                        wallX -= floor(wallX); // on ne récupère que le flottant !!!
-                        
-                        // x coordinate on the texture
-                        int texX = (int) (wallX * TEX_WIDTH);
-                        
-                        if (side == 0 && rayDirX > 0) { texX = TEX_WIDTH - texX - 1; }
-                        if (side == 1 && rayDirY < 0) { texX = TEX_WIDTH - texX - 1; }
+                        // Calc of WallX and texX
                         
                         // ME Now y
                         for (int yy = drawStart; yy < drawEnd; yy++) {
@@ -899,29 +1072,6 @@ int main(int argc, char *argv[]) {
                         }
                         
                         //FLOOR CASTING 17h14 : le sol marche :-) 17h16 : le plafond aussi, mais j'ai plus les colonnes.
-                        double floorXWall, floorYWall; //x, y position of the floor texel at the bottom of the wall
-
-                        //4 different wall directions possible
-                        if(side == 0 && rayDirX > 0)
-                        {
-                            floorXWall = mapX;
-                            floorYWall = mapY + wallX;
-                        }
-                        else if(side == 0 && rayDirX < 0)
-                        {
-                            floorXWall = mapX + 1.0;
-                            floorYWall = mapY + wallX;
-                        }
-                        else if(side == 1 && rayDirY > 0)
-                        {
-                            floorXWall = mapX + wallX;
-                            floorYWall = mapY;
-                        }
-                        else
-                        {
-                            floorXWall = mapX + wallX;
-                            floorYWall = mapY + 1.0;
-                        }
 
                         double distWall, distPlayer, currentDist;
 
@@ -960,12 +1110,8 @@ int main(int argc, char *argv[]) {
                             short red = (pixel >> 16) & 0x000000ff;
                             short alpha = 255;
                             SDL_SetRenderDrawColor(renderer, red, green, blue, alpha);
-#ifdef FLOOR
                             SDL_RenderDrawPoint(renderer, s, y); // floor
-#endif
-#ifdef CEILING
                             SDL_RenderDrawPoint(renderer, s, SCREEN_HEIGHT - y); // ceiling
-#endif
                         }
 
                     } // end wall drawing
@@ -999,16 +1145,31 @@ int main(int argc, char *argv[]) {
                     }
                 
                     // Player
-                    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+                    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+                    rect.x = (int) (position[0] * MAP_ZOOM);
+                    rect.y = (int) (position[1] * MAP_ZOOM);
+                    rect.w = 3;
+                    rect.h = 3;
+                    SDL_RenderDrawRect(renderer, &rect);
+
+                    SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
                     rect.x = (int) (fx * MAP_ZOOM);
                     rect.y = (int) (fy * MAP_ZOOM);
                     rect.w = 1;
                     rect.h = 1;
                     SDL_RenderDrawRect(renderer, &rect);
-                    SDL_RenderDrawLine(renderer, fx*MAP_ZOOM, fy*MAP_ZOOM, fx*MAP_ZOOM - cos(angle) * 6, fy*MAP_ZOOM - sin(angle) * 6);
+                    SDL_RenderDrawLine(renderer, fx*MAP_ZOOM, fy*MAP_ZOOM, fx*MAP_ZOOM - cos(angle) * 6, fy*MAP_ZOOM + sin(angle) * 6);
                 
-                    SDL_RenderDrawLine(renderer, fx*MAP_ZOOM, fy*MAP_ZOOM, fx*MAP_ZOOM - cos(angle_start) * 10, fy*MAP_ZOOM - sin(angle_start) * 10);
-                    SDL_RenderDrawLine(renderer, fx*MAP_ZOOM, fy*MAP_ZOOM, fx*MAP_ZOOM - cos(angle_end) * 10, fy*MAP_ZOOM - sin(angle_end) * 10);
+                    SDL_RenderDrawLine(renderer, fx*MAP_ZOOM, fy*MAP_ZOOM, fx*MAP_ZOOM - cos(angle_start) * 10, fy*MAP_ZOOM + sin(angle_start) * 10);
+                    SDL_RenderDrawLine(renderer, fx*MAP_ZOOM, fy*MAP_ZOOM, fx*MAP_ZOOM - cos(angle_end) * 10, fy*MAP_ZOOM + sin(angle_end) * 10);
+
+                    // Wall buffer
+                    for (int s=0; s < SCREEN_WIDTH; s++) {
+                        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+                        SDL_RenderDrawPoint(renderer, s, MID_SCREEN_HEIGHT + wall_buffer_lode[s] / 2);
+                        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+                        SDL_RenderDrawPoint(renderer, s, MID_SCREEN_HEIGHT + wall_buffer_dgx[s] / 2);
+                    }
                 }
 
                 SDL_RenderPresent(renderer);
@@ -1030,3 +1191,71 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
+
+// http://lodev.org/cgtutor/raycasting3.html#Code
+/*
+  //SPRITE CASTING
+    //sort sprites from far to close
+    for(int i = 0; i < numSprites; i++)
+    {
+      spriteOrder[i] = i;
+      spriteDistance[i] = ((posX - sprite[i].x) * (posX - sprite[i].x) + (posY - sprite[i].y) * (posY - sprite[i].y)); //sqrt not taken, unneeded
+    }
+    combSort(spriteOrder, spriteDistance, numSprites);
+
+    //after sorting the sprites, do the projection and draw them
+    for(int i = 0; i < numSprites; i++)
+    {
+      //translate sprite position to relative to camera
+      double spriteX = sprite[spriteOrder[i]].x - posX;
+      double spriteY = sprite[spriteOrder[i]].y - posY;
+
+      //transform sprite with the inverse camera matrix
+      // [ planeX   dirX ] -1                                       [ dirY      -dirX ]
+      // [               ]       =  1/(planeX*dirY-dirX*planeY) *   [                 ]
+      // [ planeY   dirY ]                                          [ -planeY  planeX ]
+
+      double invDet = 1.0 / (planeX * dirY - dirX * planeY); //required for correct matrix multiplication
+
+      double transformX = invDet * (dirY * spriteX - dirX * spriteY);
+      double transformY = invDet * (-planeY * spriteX + planeX * spriteY); //this is actually the depth inside the screen, that what Z is in 3D
+
+      int spriteScreenX = int((w / 2) * (1 + transformX / transformY));
+
+      //calculate height of the sprite on screen
+      int spriteHeight = abs(int(h / (transformY))); //using "transformY" instead of the real distance prevents fisheye
+      //calculate lowest and highest pixel to fill in current stripe
+      int drawStartY = -spriteHeight / 2 + h / 2;
+      if(drawStartY < 0) drawStartY = 0;
+      int drawEndY = spriteHeight / 2 + h / 2;
+      if(drawEndY >= h) drawEndY = h - 1;
+
+      //calculate width of the sprite
+      int spriteWidth = abs( int (h / (transformY)));
+      int drawStartX = -spriteWidth / 2 + spriteScreenX;
+      if(drawStartX < 0) drawStartX = 0;
+      int drawEndX = spriteWidth / 2 + spriteScreenX;
+      if(drawEndX >= w) drawEndX = w - 1;
+
+      //loop through every vertical stripe of the sprite on screen
+      for(int stripe = drawStartX; stripe < drawEndX; stripe++)
+      {
+        int texX = int(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * texWidth / spriteWidth) / 256;
+        //the conditions in the if are:
+        //1) it's in front of camera plane so you don't see things behind you
+        //2) it's on the screen (left)
+        //3) it's on the screen (right)
+        //4) ZBuffer, with perpendicular distance
+        if(transformY > 0 && stripe > 0 && stripe < w && transformY < ZBuffer[stripe])
+        for(int y = drawStartY; y < drawEndY; y++) //for every pixel of the current stripe
+        {
+          int d = (y) * 256 - h * 128 + spriteHeight * 128; //256 and 128 factors to avoid floats
+          int texY = ((d * texHeight) / spriteHeight) / 256;
+          Uint32 color = texture[sprite[spriteOrder[i]].texture][texWidth * texY + texX]; //get current color from the texture
+          if((color & 0x00FFFFFF) != 0) buffer[y][stripe] = color; //paint pixel if it isn't black, black is the invisible color
+        }
+      }
+    }
+*/
+
+#endif

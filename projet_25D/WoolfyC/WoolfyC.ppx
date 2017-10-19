@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <settings version="1.0">
 	<category name="SDL\include\SDL.h" />
-	<category name="main.c">
+	<category name="main.c" />
+	<category name="WoolfyCalculs.c">
 		<category name="Foldings">
-			<property name="Line1" type="integer">46</property>
-			<property name="Line2" type="integer">234</property>
+			<property name="Line1" type="integer">47</property>
+			<property name="Line2" type="integer">235</property>
 		</category>
+		<category name="Window">
+			<property name="Left" type="integer">52</property>
+			<property name="Top" type="integer">52</property>
+			<property name="Right" type="integer">1321</property>
+			<property name="Bottom" type="integer">591</property>
+			<property name="Maximized" type="integer">0</property>
+			<property name="Active" type="integer">0</property>
+		</category>
+	</category>
+	<category name="WoolfyStandard.c">
 		<category name="Window">
 			<property name="Left" type="integer">-8</property>
 			<property name="Top" type="integer">-31</property>
