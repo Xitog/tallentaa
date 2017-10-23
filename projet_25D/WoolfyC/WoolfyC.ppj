@@ -19,18 +19,18 @@ SIGN = posign.exe#
 CCFLAGS = -std:C11 -Tx86-coff -Ot -Ob1 -fp:precise -W1 -Gd -Ze#
 ASFLAGS = -AIA32 -Gd#
 RCFLAGS = #
-LINKFLAGS = -subsystem:console -machine:x86 kernel32.lib advapi32.lib delayimp.lib SDL2.lib SDL2main.lib#
+LINKFLAGS = -subsystem:console -machine:x86 kernel32.lib advapi32.lib delayimp.lib SDL2.lib SDL2main.lib SDL2_ttf.lib#
 SIGNFLAGS = -timeurl:http://timestamp.verisign.com/scripts/timstamp.dll -location:CU -store:MY -errkill#
-INCLUDE = $(PellesCDir)\Include\Win;$(PellesCDir)\Include;..\..\librairies\SDL_2_0_4\include#
-LIB = $(PellesCDir)\Lib\Win;$(PellesCDir)\Lib;..\..\librairies\SDL_2_0_4\lib\x86#
+INCLUDE = $(PellesCDir)\Include\Win;$(PellesCDir)\Include;..\..\librairies\SDL_2_0_4\include;..\..\librairies\SDL2_ttf-2.0.14\include#
+LIB = $(PellesCDir)\Lib\Win;$(PellesCDir)\Lib;..\..\librairies\SDL_2_0_4\lib\x86;..\..\librairies\SDL2_ttf-2.0.14\lib\x86#
 
 # 
 # Construction de WoolfyC.exe.
 # 
 WoolfyC.exe: \
 	output\main.obj \
-	output\WoolfyStandard.obj \
-	output\WoolfyCalculs.obj
+	output\WoolfyCalculs.obj \
+	output\WoolfyStandard.obj
 	$(LINK) $(LINKFLAGS) -out:"$@" $**
 
 # 
@@ -137,7 +137,10 @@ output\WoolfyStandard.obj: \
 	..\..\librairies\SDL_2_0_4\include\SDL_timer.h \
 	..\..\librairies\SDL_2_0_4\include\SDL_touch.h \
 	..\..\librairies\SDL_2_0_4\include\SDL_version.h \
-	..\..\librairies\SDL_2_0_4\include\SDL_video.h
+	..\..\librairies\SDL_2_0_4\include\SDL_video.h \
+	..\..\librairies\SDL2_ttf-2.0.14\include\SDL_ttf.h
 	$(CC) $(CCFLAGS) "$!" -Fo"$@"
+
+.EXCLUDEDFILES:
 
 .SILENT:

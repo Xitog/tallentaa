@@ -2,50 +2,26 @@
 // this project needs: kernel32.lib advapi32.lib delayimp.lib SDL2.lib SDL2main.lib
 
 #include "SDL.h"
+#include "SDL_ttf.h"
 #include <stdio.h>
 #include <stdbool.h> // for bool
 #include <stdlib.h> // for exit
 #include <math.h>
 
-#define FLOOR
-#define CEILING
-
-//#define DEBUG
+// #define FLOOR
+// #define CEILING
+// #define DEBUG
 
 #ifndef DEBUG
 
-/*
-Uint32 getpixel(SDL_Surface *surface, int x, int y)
-{
-    int bpp = surface->format->BytesPerPixel;
-    // Here p is the address to the pixel we want to retrieve
-    Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
+const int SCREEN_WIDTH = 640;
+const int SCREEN_HEIGHT = 480;
 
-    switch(bpp) {
-    case 1:
-        return *p;
-        break;
+const int TEX_WIDTH = 64;
+const int TEX_HEIGHT = 64;
 
-    case 2:
-        return *(Uint16 *)p;
-        break;
-
-    case 3:
-        if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
-            return p[0] << 16 | p[1] << 8 | p[2];
-        else
-            return p[0] | p[1] << 8 | p[2] << 16;
-        break;
-
-    case 4:
-        return *(Uint32 *)p;
-        break;
-
-    default:
-        return 0;       // shouldn't happen, but avoids warnings
-    }
-}
-*/
+#define MAP_WIDTH 24
+#define MAP_HEIGHT 24
 
 int texture[4096] = {8158332, 8158332, 8158332, 4732952, 5520412, 6045728, 6045728, 7621672, 6045728, 6045728, 6045728, 6045728, 6045728, 6045728, 6045728, 6045728, 6045728, 6045728, 6045728, 6045728,
  6045728, 6045728, 5520412, 4206616, 4732952, 6045728, 6045728, 6045728, 6045728, 5520412, 5520412, 4732952, 5526612, 6579300, 8158332, 8158332, 7368816, 7368816, 7368816, 7368816, 2894892, 2894892,
@@ -434,105 +410,86 @@ int texture[4096] = {8158332, 8158332, 8158332, 4732952, 5520412, 6045728, 60457
     
  */
 
-// Me Calc
-
-// only work if -2 * M_PI < add < 2 * M_PI
-float angle_op(float angle, float add) {
-    angle += add;
-    if (angle > 2 * M_PI) {
-        angle -= 2 * M_PI;
-    } else if (angle < 0) {
-        angle += 2 * M_PI;
-    }
-    return angle;
-}
-
 int main(int argc, char *argv[]) {
-    //SDL_Event event;
     
-    //Screen dimension constants
-    const int SCREEN_WIDTH = 640;
-    const int SCREEN_HEIGHT = 480;
     const int MID_SCREEN_HEIGHT = SCREEN_HEIGHT / 2;
-    const int TEX_WIDTH = 64;
-    const int TEX_HEIGHT = 64;
     bool TEXTURED = true;
-    
-    const int MAP_SIZE = 24;
-    int area[24][24] = {
-        {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,2,2,2,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
-        {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,3,0,0,0,3,0,0,0,1},
-        {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,2,2,0,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,5,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,7,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,7,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,7,0,0,0,0,1},
-        {1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,4,0,0,0,0,5,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,4,0,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-    };
-    int height_map[24][24] = {
-        {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,2,2,2,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
-        {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,3,0,0,0,3,0,0,0,1},
-        {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,2,2,0,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,5,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,7,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,7,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,7,0,0,0,0,1},
-        {1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,4,0,0,0,0,5,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,4,0,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-    };
-    printf("Area 23,23 = %d\n", area[23][23]);
-    
-    float position[2] = {22.0,12.0};       // position vector (point)
-    float direction[2] = {-1.0,0.0};       // direction vector
-    float camera[2] = {0.0, 0.66};     // camera plane (orthogonal to direction vector) 2 * atan(0.66/1.0)=66
 
-    // me calc
-    int MAP_ZOOM = 20;
-    float angle = 0.0;
-    float angle_start = angle_op(angle, -M_PI / 4);
-    float angle_end = angle_op(angle, M_PI / 4);
-    float angle_prog = M_PI / 2 / SCREEN_WIDTH;
-    printf("Angle prog: %f\n", angle_prog);
-    float fx = 22.0;
-    float fy = 12.0;
+    int area[MAP_WIDTH][MAP_HEIGHT] = {
+        {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,2,2,2,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
+        {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,3,0,0,0,3,0,0,0,1},
+        {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,2,2,0,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,5,0,0,0,0,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,7,0,0,0,0,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,7,0,0,0,0,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,7,0,0,0,0,1},
+        {1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,4,0,0,0,0,5,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,4,0,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+    };
+    int height_map[MAP_WIDTH][MAP_HEIGHT] = {
+        {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,2,2,2,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
+        {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,3,0,0,0,3,0,0,0,1},
+        {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,2,2,0,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,5,0,0,0,0,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,7,0,0,0,0,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,7,0,0,0,0,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,7,0,0,0,0,1},
+        {1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,4,0,0,0,0,5,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,4,0,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+    };
+    
+    // position vector
+    double posX = 22.0;
+    double posY = 12.0;
+
+    // direction vector
+    double dirX = -1.0;
+    double dirY =  0.0;
+
+    // camera plane (orthogonal to direction vector) 2 * atan(0.66/1.0)=66
+    double planeX = 0.0;
+    double planeY = 0.66; 
+
+    // minimap
+    const int MAP_ZOOM = 20;
 
     //The window we'll be rendering to
     SDL_Window* window = NULL;
     SDL_Renderer * renderer;
-
-    //The surface contained by the window
-    //SDL_Surface* screenSurface = NULL;
+    
+    // Text
+    SDL_Surface * textSurface;
+    SDL_Texture * message;
 
     //Initialize SDL
     if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
@@ -541,8 +498,6 @@ int main(int argc, char *argv[]) {
     }
     else
     {
-        //Create window
-        //window = SDL_CreateWindow( "SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
         //int flags = SDL_WINDOW_FULLSCREEN;
         int flags = 0;
         SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_HEIGHT, flags, &window, &renderer);
@@ -553,20 +508,27 @@ int main(int argc, char *argv[]) {
         else
         {
             SDL_SetWindowTitle(window, "WoolfyC");
-
+            SDL_Event event;
             // SDL_Surface * tex = SDL_LoadBMP( "textures/eagle.png" );
             
-            //Main loop flag
-            bool quit = false;
+            // Text
+            TTF_Init();
+            TTF_Font * Sans = TTF_OpenFont("C:\\Windows\\Fonts\\verdana.ttf", 24);
+            SDL_Color White = {255, 255, 255};
+            textSurface = TTF_RenderText_Solid( Sans, "hello", White);
+            message = SDL_CreateTextureFromSurface(renderer, textSurface);
+            SDL_FreeSurface(textSurface);
+            SDL_Rect Message_rect; //create a rect
+            Message_rect.x = 0;  //controls the rect's x coordinate 
+            Message_rect.y = 0; // controls the rect's y coordinte
+            Message_rect.w = 100; // controls the width of the rect
+            Message_rect.h = 100; // controls the height of the rect
 
-            //Event handler
-            SDL_Event event;
-
+            bool done = false;
             bool right = false;
             bool left = false;
             bool up = false;
             bool down = false;
-
             bool show_map = false;
             bool dump = true;
             FILE * dump_file = fopen("dump.txt", "w");
@@ -575,14 +537,13 @@ int main(int argc, char *argv[]) {
                 printf("Error opening file!\n");
                 exit(1);
             }
-            
-            float oldDirX = 0.0;
-            float oldPlaneX = 0.0;
+            double allRayDirX[SCREEN_WIDTH];
+            double allRayDirY[SCREEN_WIDTH];
 
             Uint32 old = SDL_GetTicks();
 
             //While application is running
-            while( !quit )
+            while( !done )
             {
                 Uint32 elapsed = SDL_GetTicks() - old;
                 old = SDL_GetTicks();
@@ -591,13 +552,13 @@ int main(int argc, char *argv[]) {
                 float rotSpeed = frameTime * 3.0;
                 float moveSpeed = frameTime * 5.0;
                 
-                //Handle events on queue
+                // Events
+                //-------------------------------------------------------------
                 while( SDL_PollEvent( &event ) != 0 )
                 {
-                    //User requests quit
                     if( event.type == SDL_QUIT )
                     {
-                        quit = true;
+                        done = true;
                     } else if (event.type == SDL_KEYDOWN) {
                         if (event.key.keysym.sym == SDLK_RIGHT) {
                             right = true;
@@ -612,7 +573,7 @@ int main(int argc, char *argv[]) {
                             down = true;
                         }
                         if (event.key.keysym.sym == SDLK_ESCAPE) {
-                            quit = true;
+                            done = true;
                         }
                     } else if (event.type == SDL_KEYUP) {
                         if (event.key.keysym.sym == SDLK_RIGHT) {
@@ -636,82 +597,36 @@ int main(int argc, char *argv[]) {
                 // rotate to the right
                 if (right) {
                     // both camera direction and camera plane must be rotated
-                    //printf("before direction : %f, %f\n", direction[0], direction[1]);
-                    printf("before camera : %f, %f\n", camera[0], camera[1]);
-                    oldDirX = direction[0];
-                    direction[0] = direction[0] * cos(-rotSpeed) - direction[1] * sin(-rotSpeed);
-                    direction[1] = oldDirX * sin(-rotSpeed) + direction[1] * cos(-rotSpeed);
-                    oldPlaneX = camera[0];
-                    camera[0] = camera[0] * cos(-rotSpeed) - camera[1] * sin(-rotSpeed);
-                    camera[1] = oldPlaneX * sin(-rotSpeed) + camera[1] * cos(-rotSpeed);
-                    //printf("after direction : %f, %f\n", direction[0], direction[1]);
-                    printf("after camera : %f, %f\n", camera[0], camera[1]);
-                    //me calc
-                    angle = angle_op(angle, -rotSpeed);
-                    angle_start = angle_op(angle, -M_PI / 4);
-                    angle_end = angle_op(angle, M_PI / 4);
-                    printf("angle : %f\n", angle);
+                    double oldDirX = dirX;
+                    dirX = dirX * cos(-rotSpeed) - dirY * sin(-rotSpeed);
+                    dirY = oldDirX * sin(-rotSpeed) + dirY * cos(-rotSpeed);
+                    double oldPlaneX = planeX;
+                    planeX = planeX * cos(-rotSpeed) - planeY * sin(-rotSpeed);
+                    planeY = oldPlaneX * sin(-rotSpeed) + planeY * cos(-rotSpeed);
                 }
                 if (left) {
                     // both camera direction and camera plane must be rotated
-                    //printf("before direction : %f, %f\n", direction[0], direction[1]);
-                    printf("before camera : %f, %f\n", camera[0], camera[1]);
-                    oldDirX = direction[0];
-                    direction[0] = direction[0] * cos(rotSpeed) - direction[1] * sin(rotSpeed);
-                    direction[1] = oldDirX * sin(rotSpeed) + direction[1] * cos(rotSpeed);
-                    oldPlaneX = camera[0];
-                    camera[0] = camera[0] * cos(rotSpeed) - camera[1] * sin(rotSpeed);
-                    camera[1] = oldPlaneX * sin(rotSpeed) + camera[1] * cos(rotSpeed);
-                    //printf("after direction : %f, %f\n", direction[0], direction[1]);
-                    printf("after camera : %f, %f\n", camera[0], camera[1]);
-                    //me calc
-                    angle = angle_op(angle, rotSpeed);
-                    angle_start = angle_op(angle, -M_PI / 4);
-                    angle_end = angle_op(angle, M_PI / 4);
-                    printf("info ang = %f, pos = %f, %f matrix = [%d, %d]\n", angle, fx, fy, (int) fx, (int) fy);
+                    double oldDirX = dirX;
+                    dirX = dirX * cos(rotSpeed) - dirY * sin(rotSpeed);
+                    dirY = oldDirX * sin(rotSpeed) + dirY * cos(rotSpeed);
+                    double oldPlaneX = planeX;
+                    planeX = planeX * cos(rotSpeed) - planeY * sin(rotSpeed);
+                    planeY = oldPlaneX * sin(rotSpeed) + planeY * cos(rotSpeed);
                 }
                 if (up) {
-                    //printf("before position : %f, %f\n", position[0], position[1]);
-                    float nx = position[0] + direction[0] * moveSpeed;
-                    float ny = position[1] + direction[1] * moveSpeed;
-                    if (area[(int) nx][(int) (position[1])] == 0) { position[0] = nx; }
-                    if (area[(int) (position[0])][(int) ny] == 0) { position[1] = ny; }
-                    //printf("after position : %f, %f\n", position[0], position[1]);
-                    // me calc
-                    nx = fx + moveSpeed * -cos(angle);
-                    ny = fy + moveSpeed * -sin(angle);
-                    if (area[(int) nx][(int) ny] == 0) {
-                        fx = nx;
-                        fy = ny;
-                    } else if (area[(int) nx][(int) fy] == 0) {
-                        fx = nx;
-                    } else if (area[(int) fx][(int) ny] == 0) {
-                        fy = ny;
-                    }
-                    printf("info ang = %f, pos = %f, %f matrix = [%d, %d]\n", angle, fx, fy, (int) fx, (int) fy);
+                    float nx = posX + dirX * moveSpeed;
+                    float ny = posY + dirY * moveSpeed;
+                    if (area[(int) nx][(int) (posY)] == 0) { posX = nx; }
+                    if (area[(int) (posX)][(int) ny] == 0) { posY = ny; }
                 }
                 if (down) {
-                    //printf("before position : %f, %f\n", position[0], position[1]);
-                    float nx = position[0] - direction[0] * moveSpeed;
-                    float ny = position[1] - direction[1] * moveSpeed;
-                    if (area[(int) nx][(int) (position[1])] == 0) { position[0] = nx; }
-                    if (area[(int) (position[0])][(int) ny] == 0) { position[1] = ny; }
-                    //printf("after position : %f, %f\n", position[0], position[1]);
-                    // me calc
-                    nx = fx - moveSpeed * -cos(angle);
-                    ny = fy - moveSpeed * -sin(angle);
-                    if (area[(int) nx][(int) ny] == 0) {
-                        fx = nx;
-                        fy = ny;
-                    } else if (area[(int) nx][(int) fy] == 0) {
-                        fx = nx;
-                    } else if (area[(int) fx][(int) ny] == 0) {
-                        fy = ny;
-                    }
-                    printf("info ang = %f, pos = %f, %f matrix = [%d, %d]\n", angle, fx, fy, (int) fx, (int) fy);
+                    float nx = posX - dirX * moveSpeed;
+                    float ny = posY - dirY * moveSpeed;
+                    if (area[(int) nx][(int) (posY)] == 0) { posX = nx; }
+                    if (area[(int) (posX)][(int) ny] == 0) { posY = ny; }
                 }
                 
-                // RENDER
+                // Rendering
                 //-------------------------------------------------------------
                 SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
                 SDL_RenderClear(renderer);
@@ -727,47 +642,33 @@ int main(int argc, char *argv[]) {
                 SDL_RenderFillRect( renderer, &fillRect2 );
                 
                 // Murs
-                
-                //Get window surface
-                //screenSurface = SDL_GetWindowSurface( window );
-
-                //Fill the surface white
-                //SDL_FillRect( screenSurface, NULL, SDL_MapRGB( screenSurface->format, 0x00, 0x00, 0x00 ) );
-
                 for(int s = 0; s < SCREEN_WIDTH; s++) {
                     
                     // calculate ray position and direction 
-                    float cameraX = 2 * s / (float) SCREEN_WIDTH - 1; // x-coordinate in camera space
-                    float rayPosX = position[0];
-                    float rayPosY = position[1];
-                    float rayDirX = direction[0] + camera[0] * cameraX;
-                    float rayDirY = direction[1] + camera[1] * cameraX;
+                    double cameraX = 2 * s / (float) SCREEN_WIDTH - 1; // x-coordinate in camera space
+                    double rayPosX = posX;
+                    double rayPosY = posY;
+                    double rayDirX = dirX + planeX * cameraX;
+                    double rayDirY = dirY + planeY * cameraX;
+                    allRayDirX[s] = rayDirX;
+                    allRayDirY[s] = rayDirY;
                     
-                    // Me calc BEGIN
-                    float neoRayDirX = -cos(angle_op(angle_prog * s, angle_start));
-                    float neoRayDirY = sin(angle_op(angle_prog * s, angle_start));
-                    // 15h31 je remplace son calcul par le lien... Et bien c'est pas dégueux !
-                    // Alors le repère est complètement changé, on se déplace n'importe comment et on retrouve l'effet oeil de poisson
-                    //rayDirX = neoRayDirX;
-                    //rayDirY = neoRayDirY;
-                    // Me calc END
-
                     // which box of the map we're in  
                     int mapX = (int) rayPosX;
                     int mapY = (int) rayPosY;
-                  
+                    
                     // length of ray from current position to next x or y-side
-                    float sideDistX = 0.0;
-                    float sideDistY = 0.0;
+                    double sideDistX = 0.0;
+                    double sideDistY = 0.0;
                   
                     // Added by me. Is it still useful?
                     if (rayDirX == 0) { rayDirX = 0.00001; }
                     if (rayDirY == 0) { rayDirY = 0.00001; }
                   
                     // Length of ray from one x or y-side to next x or y-side
-                    float deltaDistX = sqrt(1 + (rayDirY * rayDirY) / (rayDirX * rayDirX));
-                    float deltaDistY = sqrt(1 + (rayDirX * rayDirX) / (rayDirY * rayDirY));
-                    float perpWallDist = 0.0;
+                    double deltaDistX = sqrt(1 + (rayDirY * rayDirY) / (rayDirX * rayDirX));
+                    double deltaDistY = sqrt(1 + (rayDirX * rayDirX) / (rayDirY * rayDirY));
+                    double perpWallDist = 0.0;
                         
                     // What direction to step in x or y-direction (either +1 or -1)
                     int stepX = 0;
@@ -812,27 +713,19 @@ int main(int argc, char *argv[]) {
                     
                     // Calculate distance projected on camera direction (oblique distance will give fisheye effect!)
                     if (side == 0) {
-                        perpWallDist = fabs((mapX - rayPosX + (1 - stepX) / 2) / rayDirX); // fabs
+                        perpWallDist = fabs((mapX - rayPosX + (1 - stepX) / 2) / rayDirX);
                     } else {
-                        perpWallDist = fabs((mapY - rayPosY + (1 - stepY) / 2) / rayDirY); // fabs
+                        perpWallDist = fabs((mapY - rayPosY + (1 - stepY) / 2) / rayDirY);
                     }
-                    // Me calc BEGIN
-                    //perpWallDist *= acos(angle_op(angle_prog * s, angle_start));
-                    // Me calc END
 
                     // Calculate height of line to draw on screen
-                    //int lineHeight = (int) fabs(((float) SCREEN_HEIGHT / (float) perpWallDist)); // float
-                    int lineHeight = (int) ( ((float) SCREEN_HEIGHT) / perpWallDist); // me marche pas
+                    int lineHeight = (int) ( ((float) SCREEN_HEIGHT) / perpWallDist);
 
                     if(dump) {
-                        fprintf(dump_file, "[%d] cameraX: %f, position[0]: %f, position[1]: %f, rayDirX: %f, rayDirY: %f, perpWallDist: %f, lineHeight: %d\n", s, cameraX, position[0], position[1], rayDirX, rayDirY, perpWallDist, lineHeight);
-                        fprintf(dump_file, "[%d] cameraX: %f, nx:          %f, ny:          %f, rayDirX: %f, rayDirY: %f, diffX: %f, diffY: %f\n", s, cameraX, fx, fy, neoRayDirX, neoRayDirY, fabs(rayDirX-neoRayDirX), fabs(rayDirY-neoRayDirY));
+                        //fprintf(dump_file, "[%d] cameraX: %f, position[0]: %f, position[1]: %f, rayDirX: %f, rayDirY: %f, perpWallDist: %f, lineHeight: %d\n", s, cameraX, position[0], position[1], rayDirX, rayDirY, perpWallDist, lineHeight);
+                        //fprintf(dump_file, "[%d] cameraX: %f, nx:          %f, ny:          %f, rayDirX: %f, rayDirY: %f, diffX: %f, diffY: %f\n", s, cameraX, fx, fy, neoRayDirX, neoRayDirY, fabs(rayDirX-neoRayDirX), fabs(rayDirY-neoRayDirY));
                     }
 
-                    // Calculate lowest and highest pixel to fill in current stripe
-                    // - lineHeight : 15h10 double level! Mais les textures n'ont pas été faites pour...
-                    // - lineHeight * 2 : gros bug d'affichage, pourquoi ? ok, c'était l'algo du texturage qui n'était pas fait pour :-)
-                    // 15h44 : height_map :-) 15h45 : algo pour texture "universel"
                     int modifier = lineHeight * (height_map[mapX][mapY] - 1);
                     
                     int drawStart = MID_SCREEN_HEIGHT - lineHeight / 2 - modifier;
@@ -865,24 +758,12 @@ int main(int argc, char *argv[]) {
                         // ME Now y
                         for (int yy = drawStart; yy < drawEnd; yy++) {
                             int dd = yy * 256 - SCREEN_HEIGHT * 128 + lineHeight * 128; // 256 and 128 factors to avoid floats
-                            int texY = (int) (((dd * TEX_HEIGHT) / lineHeight) / 256); // Py3.x error : it must be an int and not a float
-                            // ME Hum... Normalement les textures font 64 !!!
+                            int texY = (int) (((dd * TEX_HEIGHT) / lineHeight) / 256);
                             if (texY < 0 || texY > 63) {
-                                //if (texY < -64) {
-                                //    texY = 128 + texY;
-                                //} else if (texY < 0) {
-                                //    texY = 64 + texY;
-                                //} else {
-                                    texY = texY & 63;
-                                //}
+                                texY = texY & 63;
                             }
                             // get pixel color from texture
                             int pixel = texture[texX + texY * TEX_HEIGHT];
-                            
-                            //const SDL_PixelFormat pxf = SDL_GetWindowPixelFormat(window); 
-                            //SDL_GetRGB(pixel, &pxf, &red, &green, &blue);
-                            
-                            //pixel = 3684408; // or unsigned char ?
                             short blue = pixel & 0x000000ff;
                             short green = (pixel >> 8) & 0x000000ff;
                             short red = (pixel >> 16) & 0x000000ff;
@@ -902,7 +783,6 @@ int main(int argc, char *argv[]) {
                             */
                         }
                         
-                        //FLOOR CASTING 17h14 : le sol marche :-) 17h16 : le plafond aussi, mais j'ai plus les colonnes.
                         double floorXWall, floorYWall; //x, y position of the floor texel at the bottom of the wall
 
                         //4 different wall directions possible
@@ -941,8 +821,8 @@ int main(int argc, char *argv[]) {
 
                             double weight = (currentDist - distPlayer) / (distWall - distPlayer);
 
-                            double currentFloorX = weight * floorXWall + (1.0 - weight) * position[0];
-                            double currentFloorY = weight * floorYWall + (1.0 - weight) * position[1];
+                            double currentFloorX = weight * floorXWall + (1.0 - weight) * posX;
+                            double currentFloorY = weight * floorYWall + (1.0 - weight) * posY;
 
                             int floorTexX, floorTexY;
                             floorTexX = (int)(currentFloorX * TEX_WIDTH) % TEX_WIDTH;
@@ -987,8 +867,8 @@ int main(int argc, char *argv[]) {
                     rect.h = MAP_ZOOM;
 
                     // Map
-                    for(int line=0; line < MAP_SIZE; line++) {
-                        for(int column= MAP_SIZE - 1; column >= 0; column--) {
+                    for(int line=0; line < MAP_WIDTH; line++) {
+                        for(int column = MAP_HEIGHT - 1; column >= 0; column--) {
                             rect.x = line * MAP_ZOOM;
                             rect.y = column * MAP_ZOOM;    
                             if (area[line][column] != 0) {
@@ -1003,16 +883,23 @@ int main(int argc, char *argv[]) {
                     }
                 
                     // Player
+                    
+                    //rect.x = (int) (posX * MAP_ZOOM);
+                    //rect.y = (int) (posY * MAP_ZOOM);
+                    //rect.w = 1;
+                    //rect.h = 1;
+                    //SDL_RenderDrawRect(renderer, &rect);
+                    for(int s = 0; s < SCREEN_WIDTH; s++) {
+                        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+                        SDL_RenderDrawLine(renderer, posX*MAP_ZOOM, posY*MAP_ZOOM, (posX + allRayDirX[s]) * MAP_ZOOM, (posY + allRayDirY[s]) * MAP_ZOOM);
+                    }
                     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-                    rect.x = (int) (fx * MAP_ZOOM);
-                    rect.y = (int) (fy * MAP_ZOOM);
-                    rect.w = 1;
-                    rect.h = 1;
-                    SDL_RenderDrawRect(renderer, &rect);
-                    SDL_RenderDrawLine(renderer, fx*MAP_ZOOM, fy*MAP_ZOOM, fx*MAP_ZOOM - cos(angle) * 6, fy*MAP_ZOOM - sin(angle) * 6);
-                
-                    SDL_RenderDrawLine(renderer, fx*MAP_ZOOM, fy*MAP_ZOOM, fx*MAP_ZOOM - cos(angle_start) * 10, fy*MAP_ZOOM - sin(angle_start) * 10);
-                    SDL_RenderDrawLine(renderer, fx*MAP_ZOOM, fy*MAP_ZOOM, fx*MAP_ZOOM - cos(angle_end) * 10, fy*MAP_ZOOM - sin(angle_end) * 10);
+                    SDL_RenderDrawLine(renderer, posX*MAP_ZOOM, posY*MAP_ZOOM, (posX + dirX) * MAP_ZOOM, (posY + dirY) * MAP_ZOOM);
+                    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+                    SDL_RenderDrawLine(renderer, (posX + dirX) * MAP_ZOOM, (posY + dirY) * MAP_ZOOM, (posX + dirX + planeX) * MAP_ZOOM, (posY + dirY + planeY) * MAP_ZOOM);
+
+                    // Text
+                    SDL_RenderCopy(renderer, message, NULL, &Message_rect);
                 }
 
                 SDL_RenderPresent(renderer);
@@ -1020,16 +907,15 @@ int main(int argc, char *argv[]) {
                 //Update the surface
                 SDL_UpdateWindowSurface( window );
             }
-            
-            //Wait two seconds
-            //SDL_Delay( 2000 );
         }
     }
-    SDL_DestroyRenderer(renderer);
-    //Destroy window
-    SDL_DestroyWindow( window );
+    // Text
+    SDL_DestroyTexture(message);
+    TTF_Quit();
 
-    //Quit SDL subsystems
+    // SDL
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow( window );
     SDL_Quit();
 
     return 0;
