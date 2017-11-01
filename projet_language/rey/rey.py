@@ -1,18 +1,32 @@
 ﻿import os.path
 
+"""
+    Rey
+    A simple lexer / parser / interpreter / python transpiler for a small language inspired by Lua/Ruby
+    - Tokenizer is working ***
+    - Parser is *
+    - Interpreter is *
+    - Python transpiler is none
+    Developed in 2017
+"""
+
 #-------------------------------------------------------------------------------
 # Tokenizer/Lexer
 #-------------------------------------------------------------------------------
 
 class Token:
+    """
+        +typ:enum the type of the token
+        +val:string the actual string of the token
+    """
     
-    NUM = 0
-    ID = 1
-    STR = 2
-    NL = 3
-    OP = 4
-    SEP = 5
-    KW = 6
+    NUM = 0 # Number
+    ID = 1  # Identifier
+    STR = 2 # String
+    NL = 3  # New line
+    OP = 4  # Operator
+    SEP = 5 # Separator
+    KW = 6  # Keyword
     
     def __init__(self, typ, val):
         self.typ = typ
@@ -263,7 +277,11 @@ class Block:
     def to_s(self, level=0):
         output = "block\n"
         for elem in self.actions:
-            output += elem.to_s(level+1)
+            print(elem)
+            if elem is None:
+                output += 'None elem detected'
+            else:
+                output += elem.to_s(level+1)
         return output
 
 class Terminal:
@@ -297,8 +315,12 @@ class If:
         self.alter = alter
 
     def to_s(self, level=0):
-        if self.alter is not None:
+        if self.alter is not None: # :TODO: alter???
             return "    " * level + f"if {self.cond} then \n" + self.action.to_s(level+1) + "    " * level + "end \n"
+        elif self.action is not None:
+            return "    " * level + f"if {self.cond} then \n" + self.action.to_s(level+1) + "    " * level + "end \n"
+        else:
+            return "    " * level + f"if {self.cond} then \n" + "    " * (level + 1) + "No action" + "    " * level + "end \n"
 
 class Parser:
     
@@ -306,8 +328,20 @@ class Parser:
         pass
     
     def read_if(self, tokens, index):
-        return 99
-
+        if len(tokens) <= index:
+            raise Exception("Unfinished If")
+        else:
+            index, cond = self.read_expr(tokens, index + 1)
+            if len(tokens) <= index:
+                raise Exception("Unfinished If")
+            else:
+                if tokens[index].typ == Token.NL or \
+                   tokens[index].typ == Token.KW and tokens[index].val == "then":
+                    index = index + 1
+                    index, action = self.read_expr(tokens, index) # :TODO: read block !
+            node = If(cond, None, None) # action!
+            return index, node
+    
     def read_while(self, tokens, index):
         return 99
 
@@ -332,12 +366,12 @@ class Parser:
         while index < len(tokens):
             if tokens[index].typ == Token.KW:
                 if tokens[index].val == 'if':
-                    index = self.read_if(tokens, index)
+                    index, node = self.read_if(tokens, index)
             elif tokens[index].typ in [Token.NUM, Token.ID]:
-                index, n = self.read_expr(tokens, index)
-                ast.root.add(n)
+                index, node = self.read_expr(tokens, index)
             else:
                 raise Exception("What to do? tokens = " + str(tokens[index]))
+            ast.root.add(node)
         return ast
 
 #-------------------------------------------------------------------------------
@@ -359,19 +393,40 @@ class TranspilerPython:
 class Interpreter:
     
     def __init__(self):
-        pass
+        self.vars = {}
         
-    def do_elem(self, elem):
+    def do_elem(self, elem, aff=False):
         if type(elem) == Operation:
             if elem.op.content.val == '+':
                 return self.do_elem(elem.left) + self.do_elem(elem.right)
-            elif elem.op.content == '-':
+            elif elem.op.content.val == '-':
                 return self.do_elem(elem.left) - self.do_elem(elem.right)
+            elif elem.op.content.val == '*':
+                return self.do_elem(elem.left) * self.do_elem(elem.right)
+            elif elem.op.content.val == '/':
+                return self.do_elem(elem.left) / self.do_elem(elem.right)
+            elif elem.op.content.val == '%':
+                return self.do_elem(elem.left) % self.do_elem(elem.right)
+            # Affectation
+            elif elem.op.content.val == '=':
+                val = self.do_elem(elem.right)
+                self.vars[self.do_elem(elem.left, aff=True)] = val
+                return val
+            # Comparison
+            elif elem.op.content.val == '==':
+                return self.do_elem(elem.left) == self.do_elem(elem.right)
             else:
                 raise Exception("Operator not known: " + elem.op.content.val)
+        elif type(elem) == If:
+            print("It's an if!") # :TODO:
         elif type(elem) == Terminal:
             if elem.content.typ == Token.NUM:
                 return int(elem.content.val)
+            elif elem.content.typ == Token.ID:
+                if aff == True:
+                    return elem.content.val
+                else:
+                    return self.vars[elem.content.val]
             else:
                 raise Exception("Terminal not known:" + Token.typ2str(elem.content.typ))
         else:
@@ -387,30 +442,46 @@ class Interpreter:
 # Tests
 #-------------------------------------------------------------------------------
 
-print('--- Unitary Test n°1 : Simple Addition ---')
+results = {}
+
+title = 'Unitary Test n°1 : Simple Addition'
+print('--- %s ---' % (title,))
 res = Tokenizer().tokenize('5 + 6') # 5 + 6 NL
 assert len(res) == 4, "[ERROR] 4 tokens should have been produced! instead:" + str(len(res))
 assert type(res[0]) == Token and res[0].val == '5' and res[0].typ == Token.NUM, "[ERROR] Token 1 should be NUM, with the value of '5'"
 assert type(res[1]) == Token and res[1].val == '+' and res[1].typ == Token.OP, "[ERROR] Token 2 should be OP, with the value of '+'"
 ast = Parser().parse(res)
 print(ast)
-print(Interpreter().do(ast))
+res = Interpreter().do(ast)
+print(res)
+assert res == 11, "[ERROR] Result is not equal to 11"
+print("OK")
+results[title] = 'OK'
 print()
 
-print('--- Unitary Test n°2 : Double Addition ---')
+title = 'Unitary Test n°2 : Double Addition'
+print('--- %s ---' % (title,))
 res = Tokenizer().tokenize('5 + 6 \n 2 - 1') # 5 + 6 NL
 assert len(res) == 8, "[ERROR] 8 tokens should have been produced! instead:" + str(len(res))
 assert type(res[4]) == Token and res[4].val == '2' and res[0].typ == Token.NUM, "[ERROR] Token 4 should be NUM, with the value of '2'"
 assert type(res[5]) == Token and res[5].val == '-' and res[5].typ == Token.OP, "[ERROR] Token 5 should be OP, with the value of '-'"
 ast = Parser().parse(res)
 print(ast)
+res = Interpreter().do(ast)
+print(res)
+assert res == 1, "[ERROR] Result is not equal to 1"
+results[title] = 'OK'
 print()
 
-print('--- Unitary Test n°3 : Simple If ---')
+title = 'Unitary Test n°3 : Simple If'
+print('--- %s ---' % (title,))
 res = Tokenizer().tokenize('a = 5 \n if a == 5 then \n writeln("Hello!") \n end')
 assert len(res) == 17, "[ERROR] 17 tokens should have been produced! instead:" + str(len(res))
 assert type(res[0]) == Token and res[0].val == 'a' and res[0].typ == Token.ID, "[ERROR] Token 1 should be ID, with the value of 'a'"
 ast = Parser().parse(res)
+print(ast)
+res = Interpreter().do(ast)
+print(res)
 print()
 
 print('--- Unitary Test n°4 : Simple Elif ---')
@@ -438,6 +509,12 @@ print()
 
 print('--- File Test n°1 ---')
 Tokenizer().tokenize('woolfy.blu')
+print()
+
+print('+------------------------------------+----+')
+for r in sorted(results.keys()):
+    print('| ', r, ' | ', results[r], ' |', sep='')
+print('+------------------------------------+----+')
 print()
 
 print('Script has ended.')
