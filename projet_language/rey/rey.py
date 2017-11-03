@@ -353,17 +353,31 @@ class FunCall:
     def __str__(self):
         return self.to_s()
 
-class If:
+class Statement:
 
-    def __init__(self, cond, action, alter):
+    def __init__(self, cond, action, alter=None, loop=False, on_false=False):
         self.cond = cond
         self.action = action
         self.alter = alter
+        self.loop = loop
+        self.on_false = on_false
 
+    def get_name(self):
+        if not self.on_false and not self.loop:
+            return 'if'
+        elif not self.on_false and self.loop:
+            return 'while'
+        elif self.on_false and not self.loop:
+            return 'unless'
+        elif self.on_false and self.loop:
+            return 'until'
+        else:
+            raise Exception('Statement is not in a valid state')
+    
     def to_s(self, level=1):
         start = "    " * level
         block = "    " * (level + 1)
-        s = start + 'if\n' + block + 'Cond:\n' + self.cond.to_s(level + 2)
+        s = start + self.get_name() + '\n' + block + 'Cond:\n' + self.cond.to_s(level + 2)
         s += block + 'Action:\n' + self.action.to_s(level + 2)
         if self.alter is not None:
             s += block + 'Else:\n' + self.alter.to_s(level + 2)
@@ -371,9 +385,25 @@ class If:
         return s
 
     def __str__(self):
-        return 'if'
+        return self.get_name()
+
 
 class Parser:
+    
+    PRIORITIES = { 
+        ')' : 0, ',' : 1,
+        'and' : 5, 'or' : 5, 'xor' : 5, 
+        '>' : 8, '<' : 8, '>=' : 8, '<=' : 8, '==' : 8, '!=' : 8, '<=>' : 8, 
+        '<<': 9, '>>' : 9,
+        '+' : 10, '-' : 10,
+        '*' : 20, '/' : 20, '//' : 20,
+        '**' : 30, '%' : 30,
+        'call' : 35,
+        '.' : 40,
+        'unary-' : 50,
+        'call(' : 51,
+        'expr(' : 60
+    }
     
     def __init__(self):
         self.level_of_ana = 0
@@ -411,7 +441,8 @@ class Parser:
             elif tokens[index].typ == Token.Keyword and tokens[index].val in ['while', 'until']:
                 level += 1
                 #self.puts('||| :: While/until')
-                raise Exception('While')
+                index, node = self.read_while(tokens, index + 1)
+                block.add(node)
             elif tokens[index].typ == Token.Keyword and tokens[index].val == 'end':
                 level -= 1
                 self.puts('||| :: End')
@@ -445,7 +476,7 @@ class Parser:
             if tokens[end_index].typ == Token.NewLine or \
                 tokens[end_index].typ == Token.Keyword and tokens[end_index].val == "then":
                 break
-            end_index += 1                
+            end_index += 1
         index, cond = self.read_expr(tokens, index, end_index)
         while end_index < len(tokens):
             if tokens[end_index].typ == Token.Keyword and tokens[end_index].val in ["else", "elif", "end"]:
@@ -455,14 +486,33 @@ class Parser:
         else_action = None
         if tokens[index - 1].typ == Token.Keyword and tokens[index - 1].val == 'else':
             index, else_action = self.read_block(tokens, index, True)
-        node = If(cond, action, else_action) # action!
+        node = Statement(cond, action, else_action)
         self.puts('< End If @' + str(index) + '>')
         self.level_of_ana -= 1
         return index, node
     
     def read_while(self, tokens, index):
-        return 99
-
+        self.level_of_ana += 1
+        self.puts('< While >')
+        if len(tokens) <= index:
+            raise Exception("Unfinished While")
+        end_index = index
+        while end_index < len(tokens):
+            if tokens[end_index].typ == Token.NewLine or \
+                tokens[end_index].typ == Token.Keyword and tokens[end_index].val == "do":
+                break
+            end_index += 1
+        index, cond = self.read_expr(tokens, index, end_index)
+        while end_index < len(tokens):
+            if tokens[end_index].typ == Token.Keyword and tokens[end_index].val == "end":
+                break
+            end_index += 1
+        index, action = self.read_block(tokens, index, True)
+        node = Statement(cond, action, loop=True)
+        self.puts('< End If @' + str(index) + '>')
+        self.level_of_ana -= 1
+        return index, node
+    
     def read_for(self, tokens, index):
         return 99
 
@@ -500,7 +550,38 @@ class Parser:
         self.puts('< End Expr @' + str(results[0]) + '>')
         self.level_of_ana -= 1
         return results
-
+    
+    def first_op(tokens):
+        """Fetch the operator with the highest priority"""
+        i = 0
+        best = -1
+        best_prio = -1
+        lvl = 1
+        while i < len(tokens):
+            token = tokens[i]
+            if token.terminal() and token.kind in [Operator, Separator]:
+                if best == -1:
+                    best = i
+                    best_prio = Parser.PRIORITIES[token.val]*lvl
+                else:
+                    if Parser.PRIORITIES[token.val]*lvl > best_prio:
+                        best = i
+                        best_prio = Parser.PRIORITIES[token.val]*lvl
+                # () for others
+                if token.val in ['call(', 'expr(']:
+                    lvl*=10
+                elif token.val == ')':
+                    lvl/=10
+            elif token.val == 'call(': # not terminal
+                if Parser.PRIORITIES[token.val]*lvl > best_prio:
+                    best = i
+                    best_prio = Parser.PRIORITIES[token.val]*lvl
+            i+=1
+        
+        if best == -1:
+            raise Exception("[ERROR] Incorrect expression")
+        return best
+    
     def parse(self, tokens):
         print('[INFO] Start parsing')
         if tokens is None:
@@ -550,13 +631,32 @@ class Interpreter:
             # Affectation
             elif elem.op.content.val == '=':
                 val = self.do_elem(elem.right)
-                self.vars[self.do_elem(elem.left, aff=True)] = val
-                return val
+                ids = self.do_elem(elem.left, aff=True)
+                self.vars[ids] = val
+                return self.vars[ids]
+            elif elem.op.content.val == '+=':
+                val = self.do_elem(elem.right)
+                ids = self.do_elem(elem.left, aff=True)
+                self.vars[ids] += val
+                return self.vars[ids]
+            elif elem.op.content.val == '-=':
+                val = self.do_elem(elem.right)
+                ids = self.do_elem(elem.left, aff=True)
+                self.vars[ids] -= val
+                return self.vars[ids]
             # Comparison
             elif elem.op.content.val == '==':
                 return self.do_elem(elem.left) == self.do_elem(elem.right)
             elif elem.op.content.val == '!=':
                 return self.do_elem(elem.left) != self.do_elem(elem.right)
+            elif elem.op.content.val == '<':
+                return self.do_elem(elem.left) < self.do_elem(elem.right)
+            elif elem.op.content.val == '<=':
+                return self.do_elem(elem.left) <= self.do_elem(elem.right)
+            elif elem.op.content.val == '>=':
+                return self.do_elem(elem.left) >= self.do_elem(elem.right)
+            elif elem.op.content.val == '>':
+                return self.do_elem(elem.left) > self.do_elem(elem.right)
             # Boolean
             elif elem.op.content.val == 'and':
                 return self.do_elem(elem.left) and self.do_elem(elem.right)
@@ -564,14 +664,19 @@ class Interpreter:
                 return self.do_elem(elem.left) or self.do_elem(elem.right)
             else:
                 raise Exception("Operator not known: " + elem.op.content.val)
-        elif type(elem) == If:
+        elif type(elem) == Statement:
             cond = self.do_elem(elem.cond)
-            if cond:
-                return self.do_elem(elem.action)
-            elif elem.alter is not None:
+            executed = 0
+            result = False
+            while cond and (executed == 0 or elem.loop):
+                result = self.do_elem(elem.action)
+                executed += 1
+                if elem.loop:
+                    cond = self.do_elem(elem.cond)
+            if executed == 0 and elem.alter is not None:
                 return self.do_elem(elem.alter)
             else:
-                return None
+                return result
         elif type(elem) == Terminal:
             if elem.content.typ == Token.Integer:
                 return int(elem.content.val)
@@ -592,7 +697,7 @@ class Interpreter:
             if elem.name.content.val == 'writeln':
                 arg = self.do_elem(elem.arg)
                 print(arg)
-                return len(arg)
+                return len(str(arg))
             else:
                 raise Exception("Function not known: " + str(elem.name))
         elif elem is None:
