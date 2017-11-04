@@ -1,4 +1,5 @@
 ﻿import os.path
+import copy # only once for read_expr
 
 """
     Rey
@@ -32,10 +33,18 @@
 #-------------------------------------------------------------------------------
 
 class TokenType:
+    
     def __init__(self, name: str):
         self.name = name
+    
     def __str__(self):
         return self.name
+    
+    def __eq__(self, obj):
+        if not isinstance(obj, TokenType):
+            raise Exception("Cannot compare to objet of type " + str(type(obj)))
+        return self.name == obj.name
+
 
 class Token:
     """
@@ -62,6 +71,10 @@ class Token:
     
     def __str__(self):
         return f":{self.typ}: [{self.val}]"
+    
+    def to_s(self, level=1):
+        return "    " * level + "{Token} " + str(self)
+
 
 class Tokenizer:
 
@@ -292,7 +305,42 @@ class AST:
     def to_s(self, level=1):
         return self.root.to_s()
 
-class Block:
+
+class Node:
+
+    Terminal = "Terminal" # content is Token, right and left None
+    Operation = "Operation" # content is Token.Operator, right and left are operands
+    
+    def __init__(self, content : Token, typ=None, right=None, left=None):
+        if typ is None:
+            if right is None and left is None:
+                self.typ = Node.Terminal
+            else:
+                raise Exception("[ERROR] Cannot guess Node type")
+        self.typ = typ
+        self.content = content
+        self.right = right
+        self.left = left
+    
+    def to_s(self, level=1):
+        s = "    " * level + "{Terminal}\n"
+        s += self.content.to_s(level + 1)
+        return s
+    
+    def __str__(self):
+         return self.to_s()
+
+    def is_terminal(self):
+        return self.right is None and self.left is None
+
+
+class Terminal(Node):
+    
+    def __init__(self, content):
+        Node.__init__(self, content, Node.Terminal)
+
+
+class Block(Node):
 
     def __init__(self):
         self.actions = []
@@ -301,45 +349,39 @@ class Block:
         self.actions.append(action)
 
     def to_s(self, level=1):
-        output = "    " * level + "Block\n"
+        output = "    " * level + "{Block}\n"
         for elem in self.actions:
-            #print(elem)
             if elem is None:
-                output += 'None elem detected'
-                raise Exception('ZORBA')
-            else:
-                output += elem.to_s(level+1)
-                if output[-1] != '\n':
-                    output += '\n'
+                raise Exception('None element in Block detected')
+            output += elem.to_s(level+1)
+            if output[-1] != '\n':
+                output += '\n'
         return output
-
-class Terminal:
     
-    def __init__(self, content):
-        self.content = content
+    def is_terminal(self):
+        return len(self.actions) == 0
+
+
+class Operation(Node):
+
+    def __init__(self, operator : Token, left=None, right=None):
+        Node.__init__(self, operator, Node.Operation, right, left)
+        self.operator = self.content
+        assert self.operator.is_terminal() and self.operator.content.typ == Token.Operator, "Operator should be of type Token.Operator"
     
     def to_s(self, level=1):
-        return "    " * level + str(self.content)
-    
-    def __str__(self):
-         return self.to_s()
+        name = "{Operation} Binary Operation" if self.left is not None and self.right is not None else "Unary Operation"
+        s = "    " * level + f"{name} ({self.content.content.val})\n"
+        if self.right is not None:
+            s += "    " * (level + 2) + ".right =\n"
+            s += self.right.to_s(level + 3) + "\n"
+        if self.left is not None:
+            s += "    " * (level + 2) + ".left =\n"
+            s += self.left.to_s(level + 3) + "\n"
+        return s
 
-class Operation:
-    
-    def __init__(self, left, op, right):
-        assert type(op) == Terminal and op.content.typ == Token.Operator, "Operator should be of type Token.OP"
-        self.left = left
-        self.right = right
-        self.op = op
-    
-    def to_s(self, level=1):
-        name = "BinOp" if self.left is not None and self.right is not None else "unaop"
-        return "    " * level + f"{name} {self.left} {self.op} {self.right} \n"
 
-    def __str__(self):
-        return self.to_s()
-
-class FunCall:
+class FunCall(Node):
 
     def __init__(self, name, arg): # mono arg
         assert type(name) == Terminal and name.content.typ == Token.Identifier, "Name of a function should be an identifier"
@@ -347,13 +389,14 @@ class FunCall:
         self.arg = arg
 
     def to_s(self, level=1):
-        typ = "FunCall"
+        typ = "{Function Call}"
         return "    " * level + f"{typ} {self.name} {self.arg.to_s()} \n"
     
-    def __str__(self):
-        return self.to_s()
+    def is_terminal(self):
+        return True
 
-class Statement:
+
+class Statement(Node):
 
     def __init__(self, cond, action, alter=None, loop=False, on_false=False):
         self.cond = cond
@@ -364,13 +407,13 @@ class Statement:
 
     def get_name(self):
         if not self.on_false and not self.loop:
-            return 'if'
+            return '{Statement} if'
         elif not self.on_false and self.loop:
-            return 'while'
+            return '{Statement} while'
         elif self.on_false and not self.loop:
-            return 'unless'
+            return '{Statement} unless'
         elif self.on_false and self.loop:
-            return 'until'
+            return '{Statement} until'
         else:
             raise Exception('Statement is not in a valid state')
     
@@ -391,10 +434,11 @@ class Statement:
 class Parser:
     
     PRIORITIES = { 
+        '=' : -1, '+=' : -1, '-=' : -1,
         ')' : 0, ',' : 1,
         'and' : 5, 'or' : 5, 'xor' : 5, 
         '>' : 8, '<' : 8, '>=' : 8, '<=' : 8, '==' : 8, '!=' : 8, '<=>' : 8, 
-        '<<': 9, '>>' : 9,
+        '<<': 9, '>>' : 9, '..' : 9, '..<' : 9,
         '+' : 10, '-' : 10,
         '*' : 20, '/' : 20, '//' : 20,
         '**' : 30, '%' : 30,
@@ -402,7 +446,7 @@ class Parser:
         '.' : 40,
         'unary-' : 50,
         'call(' : 51,
-        'expr(' : 60
+        'expr(' : 60,
     }
     
     def __init__(self):
@@ -515,72 +559,118 @@ class Parser:
     
     def read_for(self, tokens, index):
         return 99
-
+    
     def read_expr(self, tokens, index, end_index):
+        # sorting operators
+        working_list = copy.deepcopy(tokens[index:end_index])
+        sorted_operators = []
+        prio_values = []
+        lvl = 1
+        index = 0
+        while index < len(working_list):
+            token = working_list[index]
+            self.puts("    working_list " + str(index) + '. ' + str(token) + " lvl=" + str(lvl))
+            if token.typ in [Token.Operator, Token.Separator]:
+                # Handling of ( )
+                if token.val == '(':
+                    if index >= 1 and working_list[index - 1].typ != Token.Operator: # not the first and not after an Operator
+                        token.val = 'call('
+                        token.typ = Token.Operator
+                    else:
+                        lvl *= 10
+                        del working_list[index]
+                        continue
+                elif token.val == ')':
+                    lvl /= 10
+                    del working_list[index]
+                    continue
+                # Handling of Operators
+                if token.typ == Token.Operator:
+                    if len(sorted_operators) == 0:
+                        self.puts('    adding the first operator')
+                        sorted_operators.append(index)
+                        prio_values.append(Parser.PRIORITIES[token.val] * lvl)
+                    else:
+                        self.puts('    adding another operator')
+                        computed_prio = Parser.PRIORITIES[token.val] * lvl
+                        ok = False
+                        for i in range(0, len(sorted_operators)):
+                            if prio_values[i] < computed_prio:
+                                sorted_operators.insert(i, index)
+                                prio_values.insert(i, computed_prio)
+                                ok = True
+                                break
+                        if not ok:
+                            sorted_operators.append(index)
+                            prio_values.append(computed_prio)
+            index += 1
+        if len(sorted_operators) == 0 and len(working_list) > 1:
+            raise Exception("[ERROR] Incorrect expression len(sorted_operators) == 0")
+        # Resolving operators
+        length = len(working_list)
         self.level_of_ana += 1
-        self.puts('< Expr length=' + str(end_index - index) + '>')
-        for i in range(index, end_index):
-            if tokens[i].typ == Token.NewLine:
-                 self.puts('    ' + str(i) +' -> (discarded) ' + str(tokens[i]))
-            else:
-                self.puts('    ' + str(i) +' -> ' + str(tokens[i]))
-        length = end_index - index
+        self.puts(f'< Expr length={length}>')
         if length <= 0:
-            raise Exception("Expression Error: " + str(length))
+            raise Exception("[ERROR] Empty expression of length = " + str(length))
         elif length == 1:
-            if tokens[index].typ in [Token.Boolean, Token.Float, Token.Integer]:
-                node = Terminal(tokens[index])
-                results = index + 1, node
+            if working_list[0].typ in [Token.Boolean, Token.Float, Token.Integer]:
+                node = Terminal(working_list[0])
+                results = end_index + 1, node
             else:
-                raise Exception("Expression Error: the expression of length 1 is not valid.")
+                raise Exception("[ERROR] Expression of length 1 is not valid we have: " + str(working_list[0]))
         else:
-            while tokens[index].typ == Token.NewLine:
-                self.puts('    discard new line')
-                index += 1
-            if tokens[index + 1].typ == Token.Operator:
+            modifier = 0
+            while len(sorted_operators) > 0:
+                # Debug Display
+                self.puts('====================')
+                self.puts('    Sorted Operators')
+                for so in range(0, len(sorted_operators)):
+                    self.puts('        ' + str(so) + '. ' + str(sorted_operators[so]) + ' -> ' + str(working_list[sorted_operators[so] + modifier]) + ' modifier = ' + str(modifier))
+                self.puts('    Starting to resolve')
+                self.puts('    Working copy (start):')
+                for j in range(0, len(working_list)):
+                    self.puts('        ' + str(j) + '. ' + str(working_list[j]))
+                # End of Debug Display
+                operator_index = sorted_operators[0] + modifier
+                self.puts(f'    Resolving 0. in sorted_operators is : {operator_index} referencing token : {working_list[operator_index]}')
+                left = working_list[operator_index - 1]
+                if not isinstance(left, Node):
+                    left = Terminal(left)
+                right = working_list[operator_index + 1]
+                if not isinstance(right, Node):
+                    right = Terminal(right)
+                op = Terminal(working_list[operator_index])
                 self.puts('    < BinOp />')
-                node = Operation(Terminal(tokens[index]), Terminal(tokens[index + 1]), Terminal(tokens[index + 2]))
-                results = index + 3 + 1, node # +1 for NL :TODO: Better handling
-            elif tokens[index + 1].typ == Token.Separator and tokens[index + 1].val == '(':
-                self.puts('    < FunCall />')
-                node = FunCall(Terminal(tokens[index]), Terminal(tokens[index + 2])) # writeln ( "Hello!" ) 0 1 2
-                results = index + 4, node # +1 for ")"
-            else:
-                raise Exception("Non valid expression: " + str(tokens[index]))
+                node = Operation(
+                    op,
+                    left,
+                    right
+                )
+                # update working list
+                del working_list[operator_index - 1]
+                del working_list[operator_index - 1]
+                del working_list[operator_index - 1]
+                working_list.insert(operator_index - 1, node)
+                # update sorted operators
+                del sorted_operators[0]
+                for so in range(0, len(sorted_operators)):
+                    if sorted_operators[so] > operator_index:
+                        sorted_operators[so] -= 2
+            results = end_index + 1, node
+        
+        #    elif tokens[index + 1].typ == Token.Separator and tokens[index + 1].val == '(':
+        #        self.puts('    < FunCall />')
+        #        node = FunCall(Terminal(tokens[index]), Terminal(tokens[index + 2])) # writeln ( "Hello!" ) 0 1 2
+        #        results = index + 4, node # +1 for ")"
+        #    else:
+        #        raise Exception("Non valid expression: " + str(tokens[index]))
         self.puts('< End Expr @' + str(results[0]) + '>')
         self.level_of_ana -= 1
         return results
     
-    def first_op(tokens):
-        """Fetch the operator with the highest priority"""
-        i = 0
-        best = -1
-        best_prio = -1
-        lvl = 1
-        while i < len(tokens):
-            token = tokens[i]
-            if token.terminal() and token.kind in [Operator, Separator]:
-                if best == -1:
-                    best = i
-                    best_prio = Parser.PRIORITIES[token.val]*lvl
-                else:
-                    if Parser.PRIORITIES[token.val]*lvl > best_prio:
-                        best = i
-                        best_prio = Parser.PRIORITIES[token.val]*lvl
-                # () for others
-                if token.val in ['call(', 'expr(']:
-                    lvl*=10
-                elif token.val == ')':
-                    lvl/=10
-            elif token.val == 'call(': # not terminal
-                if Parser.PRIORITIES[token.val]*lvl > best_prio:
-                    best = i
-                    best_prio = Parser.PRIORITIES[token.val]*lvl
-            i+=1
-        
-        if best == -1:
-            raise Exception("[ERROR] Incorrect expression")
-        return best
+    def sort_operators(self, tokens):
+        """Sort the operator by priority"""
+
     
     def parse(self, tokens):
         print('[INFO] Start parsing')
@@ -607,63 +697,88 @@ class TranspilerPython:
 # Interpreter
 #-------------------------------------------------------------------------------
 
+def writeln(arg):
+    print(arg)
+    return len(str(arg))
+
 class Interpreter:
     
     def __init__(self):
         self.vars = {}
-        
-    def do_elem(self, elem, aff=False):
+        self.vars['writeln'] = writeln
+    
+    def do_elem(self, elem, aff=False, Scope=None):
         if type(elem) == Operation:
-            if elem.op.content.val == '+':
+            #print('do operation', elem)
+            if elem.operator.content.val == '+':
                 return self.do_elem(elem.left) + self.do_elem(elem.right)
-            elif elem.op.content.val == '-':
+            elif elem.operator.content.val == '-':
                 return self.do_elem(elem.left) - self.do_elem(elem.right)
-            elif elem.op.content.val == '*':
+            elif elem.operator.content.val == '*':
                 return self.do_elem(elem.left) * self.do_elem(elem.right)
-            elif elem.op.content.val == '/':
+            elif elem.operator.content.val == '/':
                 return self.do_elem(elem.left) / self.do_elem(elem.right)
-            elif elem.op.content.val == '%':
+            elif elem.operator.content.val == '%':
                 return self.do_elem(elem.left) % self.do_elem(elem.right)
-            elif elem.op.content.val == '**':
+            elif elem.operator.content.val == '**':
                 return self.do_elem(elem.left) ** self.do_elem(elem.right)
-            elif elem.op.content.val == '//':
+            elif elem.operator.content.val == '//':
                 return self.do_elem(elem.left) // self.do_elem(elem.right)
             # Affectation
-            elif elem.op.content.val == '=':
+            elif elem.operator.content.val == '=':
                 val = self.do_elem(elem.right)
                 ids = self.do_elem(elem.left, aff=True)
                 self.vars[ids] = val
                 return self.vars[ids]
-            elif elem.op.content.val == '+=':
+            elif elem.operator.content.val == '+=':
                 val = self.do_elem(elem.right)
                 ids = self.do_elem(elem.left, aff=True)
                 self.vars[ids] += val
                 return self.vars[ids]
-            elif elem.op.content.val == '-=':
+            elif elem.operator.content.val == '-=':
                 val = self.do_elem(elem.right)
                 ids = self.do_elem(elem.left, aff=True)
                 self.vars[ids] -= val
                 return self.vars[ids]
             # Comparison
-            elif elem.op.content.val == '==':
+            elif elem.operator.content.val == '==':
                 return self.do_elem(elem.left) == self.do_elem(elem.right)
-            elif elem.op.content.val == '!=':
+            elif elem.operator.content.val == '!=':
                 return self.do_elem(elem.left) != self.do_elem(elem.right)
-            elif elem.op.content.val == '<':
+            elif elem.operator.content.val == '<':
                 return self.do_elem(elem.left) < self.do_elem(elem.right)
-            elif elem.op.content.val == '<=':
+            elif elem.operator.content.val == '<=':
                 return self.do_elem(elem.left) <= self.do_elem(elem.right)
-            elif elem.op.content.val == '>=':
+            elif elem.operator.content.val == '>=':
                 return self.do_elem(elem.left) >= self.do_elem(elem.right)
-            elif elem.op.content.val == '>':
+            elif elem.operator.content.val == '>':
                 return self.do_elem(elem.left) > self.do_elem(elem.right)
             # Boolean
-            elif elem.op.content.val == 'and':
+            elif elem.operator.content.val == 'and':
                 return self.do_elem(elem.left) and self.do_elem(elem.right)
-            elif elem.op.content.val == 'or':
+            elif elem.operator.content.val == 'or':
                 return self.do_elem(elem.left) or self.do_elem(elem.right)
+            # Function Call
+            elif elem.operator.content.val == 'call(':
+                a = self.do_elem(elem.left)
+                return self.do_elem(elem.left).__call__(self.do_elem(elem.right))
+            # Range create
+            elif elem.operator.content.val == '..':
+                a = self.do_elem(elem.left)
+                b = self.do_elem(elem.right)
+                return range(a, b)
+            # Call
+            elif elem.operator.content.val == '.':
+                a = self.do_elem(elem.left)
+                #b = self.do_elem(elem.right, scope={random})
+                b = elem.right.content.val
+                if b == 'random' and type(a) == range:
+                    import random
+                    return random.sample(a, 1)[0]
+                else:
+                    raise Exception("not implemented yet")
             else:
-                raise Exception("Operator not known: " + elem.op.content.val)
+                raise Exception("Operator not known: " + elem.operator.content.val)
         elif type(elem) == Statement:
             cond = self.do_elem(elem.cond)
             executed = 0
@@ -692,14 +807,14 @@ class Interpreter:
                 else:
                     return self.vars[elem.content.val]
             else:
-                raise Exception(f"Terminal not known: {elem.content.typ}")
-        elif type(elem) == FunCall:
-            if elem.name.content.val == 'writeln':
-                arg = self.do_elem(elem.arg)
-                print(arg)
-                return len(str(arg))
-            else:
-                raise Exception("Function not known: " + str(elem.name))
+                raise Exception(f"Terminal not known:\nelem.content.typ = {elem.content.typ} and type(elem) = {type(elem)}")
+        #elif type(elem) == FunCall:
+        #    if elem.name.content.val == 'writeln':
+        #        arg = self.do_elem(elem.arg)
+        #        print(arg)
+        #        return len(str(arg))
+        #    else:
+        #        raise Exception("Function not known: " + str(elem.name))
         elif elem is None:
             return None
         elif type(elem) == Block:
