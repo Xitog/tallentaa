@@ -23,6 +23,8 @@ class Test:
     def execute(self):
         print(f'--- {self.title} ---')
         res = Tokenizer().tokenize(self.command)
+        for itoken in range(0, len(res)):
+            print(itoken, '. ', res[itoken], sep='')
         if self.length is not None:
             assert len(res) == self.length, f"[ERROR] {self.length} tokens should have been producted! Instead: {str(len(res))}"
         if self.assertions is not None and type(self.assertions) == dict:
@@ -90,6 +92,22 @@ tests.append(Test('Unitary Test n°11 : Double Addition', '5 + 6 \n 2 - 1', 1, 8
     Assertion(7, Tokenizer.NEWLINE, Token.NewLine)
     ]))
 
+tests.append(Test('Unitary Test n°FUN01 : Function call, one arg, no caller', 'writeln("Hello!")', 6, 5, [
+    Assertion(0, 'writeln', Token.Identifier),
+    ]))
+
+tests.append(Test('Unitary Test n°FUN02 : Function call, two args, no caller', 'writeln("Hello", "World!")', 6, 7, [
+    Assertion(0, 'writeln', Token.Identifier),
+    ]))
+
+tests.append(Test('Unitary Test n°FUN03 : Function call, three args, no caller, writeln', 'writeln("Hello", "World!", 2+3)', expected=1, length=11, assertions=[
+    Assertion(0, 'writeln', Token.Identifier),
+    ]))
+
+tests.append(Test('Unitary Test n°FUN04 : Function call, three args, no caller, write', 'write("Hello", "World!", 2+3, "\\n")', expected=13, length=13, assertions=[
+    Assertion(0, 'writeln', Token.Identifier),
+    ]))
+
 tests.append(Test('Unitary Test n°30 : Simple If, One action', 'a = 5 \n if a == 5 then \n writeln("Hello") \n end', 5, 17, [
     Assertion(0, 'a', Token.Identifier),
     ]))
@@ -126,21 +144,30 @@ tests.append(Test('Unitary Test n°51 : Guess Game with While', 'target = (1..6)
 # Range#random
 # writeln
 
+todo = [
+    'Unitary Test n°FUN01 : Function call, one arg, no caller',
+    'Unitary Test n°FUN02 : Function call, two args, no caller',
+    'Unitary Test n°FUN03 : Function call, three args, no caller, writeln',
+    'Unitary Test n°FUN04 : Function call, three args, no caller, write',
+]
+
 results = {}
+restrict = False
 for t in tests:
-    results[t.title] = t.execute()
+    if t.title in todo or not restrict:
+        results[t.title] = t.execute()
 
 print('--- File Test n°1 ---')
 Tokenizer().tokenize('woolfy.blu')
 print()
 
 i = 0
-print('+---+--------------------------------------------------------------+-------+')
+print('+---+------------------------------------------------------------------------+-------+')
 for r in sorted(results.keys()):
     i += 1
-    print(f'|{i:3}| {r:60} | {results[r]:^5} |')
+    print(f'|{i:3}| {r:70} | {results[r]:^5} |')
 
-print('+---+--------------------------------------------------------------+-------+')
+print('+---+------------------------------------------------------------------------+-------+')
 print()
 print(f'{i} tests has been passed.')
 print()

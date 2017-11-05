@@ -85,8 +85,8 @@ class Tokenizer:
     END_OF_STRING = ['?', '!']
     
     SEPARATORS = [
-        '(', ')', '[', ']', '{', '}',
-        ',', ';',
+        '(', ')', '[', ']', '{', '}'
+        #',', ';',
     ]
     
     OPERATORS = [
@@ -97,7 +97,8 @@ class Tokenizer:
         'not', 'in',
         '.', '..', '..<',
         ':', '|', '->',
-        '<<', '>>'
+        '<<', '>>',
+        ',', ';' # concat : , for expression, ; for stratement
     ]
 
     KEYWORDS = [
@@ -217,7 +218,7 @@ class Tokenizer:
         index += 1
         escaped = False
         word = ''
-        while index < len(line) and ((not escaped) and line[index] != terminator):
+        while index < len(line) and (escaped or line[index] != terminator):
             if line[index] == '\\' and not escaped:
                 escaped = True
             else:
@@ -226,6 +227,8 @@ class Tokenizer:
             index += 1
         if index >= len(line):
             raise Exception("Terminator char not found for string!")
+        if word == '\\n':
+            word = '\n'
         t = Token(Token.String, word)
         if self.debug:
             print("    " + f'Creating token {t} n°{len(self.tokens)}')
@@ -434,8 +437,8 @@ class Statement(Node):
 class Parser:
     
     PRIORITIES = { 
-        '=' : -1, '+=' : -1, '-=' : -1,
-        ')' : 0, ',' : 1,
+        '=' : 1, '+=' : 1, '-=' : 1,
+        ',' : 2,
         'and' : 5, 'or' : 5, 'xor' : 5, 
         '>' : 8, '<' : 8, '>=' : 8, '<=' : 8, '==' : 8, '!=' : 8, '<=>' : 8, 
         '<<': 9, '>>' : 9, '..' : 9, '..<' : 9,
@@ -567,7 +570,11 @@ class Parser:
         prio_values = []
         lvl = 1
         index = 0
+        after_aug = False
         while index < len(working_list):
+            if after_aug:
+                after_aug = False
+                lvl *= 100
             token = working_list[index]
             self.puts("    working_list " + str(index) + '. ' + str(token) + " lvl=" + str(lvl))
             if token.typ in [Token.Operator, Token.Separator]:
@@ -576,12 +583,13 @@ class Parser:
                     if index >= 1 and working_list[index - 1].typ != Token.Operator: # not the first and not after an Operator
                         token.val = 'call('
                         token.typ = Token.Operator
+                        after_aug = True
                     else:
-                        lvl *= 10
+                        lvl *= 100
                         del working_list[index]
                         continue
                 elif token.val == ')':
-                    lvl /= 10
+                    lvl /= 100
                     del working_list[index]
                     continue
                 # Handling of Operators
@@ -698,14 +706,31 @@ class TranspilerPython:
 #-------------------------------------------------------------------------------
 
 def writeln(arg):
-    print(arg)
-    return len(str(arg))
+    if isinstance(arg, list):
+        res = None
+        for i in arg:
+            res = writeln(i)
+        return res
+    else:
+        print(arg)
+        return len(str(arg))
+
+def write(arg):
+    if isinstance(arg, list):
+        res = 0
+        for i in arg:
+            res += write(i)
+        return res
+    else:
+        print(arg, end='')
+        return len(str(arg))
 
 class Interpreter:
     
     def __init__(self):
         self.vars = {}
         self.vars['writeln'] = writeln
+        self.vars['write'] = write
     
     def do_elem(self, elem, aff=False, Scope=None):
         if type(elem) == Operation:
@@ -777,6 +802,16 @@ class Interpreter:
                     return random.sample(a, 1)[0]
                 else:
                     raise Exception("not implemented yet")
+            # Concat expression
+            elif elem.operator.content.val == ',':
+                args = []
+                args.append(self.do_elem(elem.left))
+                right = self.do_elem(elem.right)
+                if isinstance(right, list):
+                    args.extend(right)
+                else:
+                    args.extend([right])
+                return args
             else:
                 raise Exception("Operator not known: " + elem.operator.content.val)
         elif type(elem) == Statement:
