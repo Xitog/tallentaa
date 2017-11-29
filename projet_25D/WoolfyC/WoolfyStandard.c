@@ -717,7 +717,7 @@ int main(int argc, char *argv[]) {
                     } else {
                         perpWallDist = fabs((mapY - rayPosY + (1 - stepY) / 2) / rayDirY);
                     }
-
+                    
                     // Calculate height of line to draw on screen
                     int lineHeight = (int) ( ((float) SCREEN_HEIGHT) / perpWallDist);
 

@@ -4,21 +4,26 @@
 #include <stdlib.h> // for abs
 #include <math.h> // for M_PI
 
-const int NONE = -1;
-
-const short VERTICAL = 1;
-const short HORIZONTAL = 2;
+typedef enum {
+	NONE = 0,
+	VERTICAL = 1,
+	HORIZONTAL = 2,
+} WallType;
 
 typedef struct {
+	bool used;
     int x1;
     int y1;
     int x2;
     int y2;
-    short type;
-} wall;
+	int x;
+	int y;
+    WallType type;
+} Wall;
 
-wall walls_data[100];
-int walls_id[100];
+#define MAX_WALL 100
+
+Wall walls[MAX_WALL];
 
 int max(int a, int b) {
     if (a > b) {
@@ -37,6 +42,7 @@ int min(int a, int b) {
 
 bool collision_point(int x, int y) {
     bool res = false;
+	/*
     for(int i = 0; i < 100; i++) {
         if (walls_id[i] != NONE) {
             if (walls_data[i].type == VERTICAL) {
@@ -48,6 +54,7 @@ bool collision_point(int x, int y) {
             }
         }
     }
+	*/
     return res;
 }
 
@@ -71,24 +78,52 @@ bool collision(int prevx, int prevy, int nextx, int nexty) {
     //return false;
 }
 
-void init_wall(void) {
+void wall_init(void) {
     for(int i = 0; i < 100; i++) {
-        walls_id[i] = NONE;
+        walls[i].used = false;
+		walls[i].x1 = 0;
+		walls[i].y1 = 0;
+		walls[i].x2 = 0;
+		walls[i].y2 = 0;
+		walls[i].x = 0;
+		walls[i].y = 0;
+		walls[i].type = NONE;
     }
     int i = 0;
-    walls_id[i] = 0;
-    walls_data[i].x1 = 100;
-    walls_data[i].y1 = 10;
-    walls_data[i].x2 = 100;
-    walls_data[i].y2 = 100;
-    walls_data[i].type = VERTICAL;
+    walls[i].used = true;
+    walls[i].x1 = 32;
+    walls[i].y1 = 32;
+    walls[i].x2 = 256;
+    walls[i].y2 = 32;
+	walls[i].y = 32;
+    walls[i].type = HORIZONTAL;
+
     i = 1;
-    walls_id[i] = 1;
-    walls_data[i].x1 = 10;
-    walls_data[i].y1 = 100;
-    walls_data[i].x2 = 100;
-    walls_data[i].y2 = 100;
-    walls_data[i].type = HORIZONTAL;
+    walls[i].used = true;
+    walls[i].x1 = 32;
+    walls[i].y1 = 32;
+    walls[i].x2 = 32;
+    walls[i].y2 = 256;
+	walls[i].x = 32;
+    walls[i].type = VERTICAL;
+
+    i = 2;
+    walls[i].used = true;
+    walls[i].x1 = 256;
+    walls[i].y1 = 32;
+    walls[i].x2 = 256;
+    walls[i].y2 = 256;
+	walls[i].x = 256;
+    walls[i].type = VERTICAL;
+
+    i = 3;
+    walls[i].used = true;
+    walls[i].x1 = 32;
+    walls[i].y1 = 256;
+    walls[i].x2 = 256;
+    walls[i].y2 = 256;
+	walls[i].y = 256;
+    walls[i].type = HORIZONTAL;
 }
 
 typedef struct {
@@ -114,19 +149,21 @@ typedef struct {
     bool left;
     bool up;
     bool down;
+    // Dump for debug
+    bool dump;
     // Loop
     bool done;
     Uint32 old;
 } GameState;
 
-void init_game(GameState * game) {
-    game->x = 150;
+void game_init(GameState * game) {
+    game->x = 220;
     game->y = 150;
     game->cameraDirectionX = 0;
     game->cameraDirectionY = -1;
     game->screenPlaneX = 1;
     game->screenPlaneY = 0;
-    game->screenSize = 100;
+    game->screenSize = 640;
 
     game->speed = 30;
 
@@ -134,24 +171,31 @@ void init_game(GameState * game) {
     game->left = false;
     game->up = false;
     game->down = false;
+    game->dump = true;
 
     game->done = false;
     game->old = 0;
 }
 
-void start_game(GameState * game) {
+void game_start(GameState * game) {
     game->old = SDL_GetTicks();
 }
 
 int SQUARE_SIZE = 32;
-int MAP_SIZE = 10;
+int MAP_SIZE = 11;
 
-int Map[10][10] = {
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+int Map[11][11] = {
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 };
 
 void process_input(GameState * game) {
@@ -175,6 +219,9 @@ void process_input(GameState * game) {
             if (event.key.keysym.sym == SDLK_ESCAPE) {
                 game->done = true;
             }
+            if (event.key.keysym.sym == SDLK_TAB) {
+                game->dump = true;
+            }
         } else if (event.type == SDL_KEYUP) {
             if (event.key.keysym.sym == SDLK_RIGHT) {
                 game->right = false;
@@ -188,39 +235,35 @@ void process_input(GameState * game) {
             if (event.key.keysym.sym == SDLK_DOWN) {
                 game->down = false;
             }
-            //if (event.key.keysym.sym == SDLK_TAB) {
-            //    game->show_map = !show_map;
-            //}
+            if (event.key.keysym.sym == SDLK_TAB) {
+                game->dump = false;
+            }
         }
     }
 }
 
 void update(GameState * game) {
-    //Uint32 elapsed = SDL_GetTicks() - game->old;
-    //float delta = elapsed / 1000.0;
+    Uint32 elapsed = SDL_GetTicks() - game->old;
+    float delta = elapsed / 1000.0;
     game->old = SDL_GetTicks();
     //double nx = game->x;
     //double ny = game->y;
-    //double change = game->speed * delta;
+    double change = game->speed * delta;
     if (game->right) {
-        //game->screen_x += change; //nx = game->x + change;
-        //game->x += change;
-        //game->screen_i += change;
+        //nx = game->x + change;
+        game->x += change;
     }
     if (game->left) {
-        //game->screen_x -= change; //nx = game->x - change;
-        //game->x -= change;
-        //game->screen_i -= change;
+        game->x -= change;
+        //nx = game->x - change;
     }
     if (game->up) {
         //ny = game->y - change;
-        //game->screen_y -= change;
-        //game->y -= change;
+        game->y -= change;
     }
     if (game->down) {
         //ny = game->y + change;
-        //game->screen_y += change;
-        //game->y += change;
+        game->y += change;
     }
     /*
     printf("down nx=%f x=%f ny=%f y=%f collision=%i\n", nx, game->x, ny, game->y, collision(game->x, game->y, nx, ny));
@@ -246,21 +289,18 @@ void draw_matrix(GameState * game, Application * app) {
 }
 
 void clear(Application * app) {
+	//SDL_Rect fillRect = { 0, 0, app->SCREEN_WIDTH, app->SCREEN_HEIGHT}; &fillRect bellow is not needed: NULL 
     SDL_SetRenderDrawColor(app->renderer, 0, 0, 0, 255);
     SDL_RenderFillRect(app->renderer, NULL);
 }
 
 void draw_walls(GameState * game, Application * app) {
-    SDL_Rect fillRect = { 0, 0, app->SCREEN_WIDTH, app->SCREEN_HEIGHT};
-    SDL_SetRenderDrawColor(app->renderer, 0, 0, 0, 255);
-    SDL_RenderFillRect(app->renderer, &fillRect );
-
     SDL_SetRenderDrawColor(app->renderer, 255, 0, 0, 255);
     SDL_RenderDrawPoint(app->renderer, game->x, game->y);
     SDL_SetRenderDrawColor(app->renderer, 0, 255, 0, 255);
     for(int i = 0; i < 100; i++) {
-        if (walls_id[i] != NONE) {
-            SDL_RenderDrawLine(app->renderer, walls_data[i].x1, walls_data[i].y1, walls_data[i].x2, walls_data[i].y2);
+        if (walls[i].used) {
+            SDL_RenderDrawLine(app->renderer, walls[i].x1, walls[i].y1, walls[i].x2, walls[i].y2);
         }
     }
 }
@@ -270,63 +310,142 @@ void draw_camera(GameState * game, Application * app) {
     SDL_Rect fillRect = { game->x - 1, game->y -1, 3, 3};
     SDL_SetRenderDrawColor(app->renderer, 255, 0, 0, 255);
     SDL_RenderFillRect(app->renderer, &fillRect );
+    //int midscreen = app->SCREEN_WIDTH / 2;
     // Rays
-    SDL_SetRenderDrawColor(app->renderer, 255, 255, 0, 255);
-    for (int i=0; i < game->screenSize; i++) {
-        double rayDirX = game->x + game->cameraDirectionX * 50 - game->screenPlaneX * 50 + game->screenPlaneX * i;
-        double rayDirY = game->y + game->cameraDirectionY * 50 - game->screenPlaneY * 50 + game->screenPlaneY * i;
-        SDL_RenderDrawLine(app->renderer, game->x, game->y, rayDirX, rayDirY);
+    int dist[game->screenSize];
+    int wall[game->screenSize]; // H or V
+    double xcos[game->screenSize];
+    const int STEP = 1;
+    for (int i=0; i < game->screenSize; i+=STEP) {
+        double rayDirYY = (game->cameraDirectionY  + ( ((double)i/game->screenSize) - 0.5) * game->screenPlaneY);
+        double rayDirXX = (game->cameraDirectionX  + ( ((double)i/game->screenSize) - 0.5) * game->screenPlaneX);
+        /*
+        printf("===== %d ====\n", i);
+        printf("Player : x = %f, y = %f\n", game->x, game->y);
+        printf("Rayon X : %f\n", rayDirXX);
+        printf("Rayon Y : %f\n", rayDirYY);
+        */
+        dist[i] = 0;
+        wall[i] = NONE;
+        for(int w=0; w < MAX_WALL; w++) {
+            if (!walls[w].used) {
+                break;
+            }
+		    if (walls[w].type == HORIZONTAL) { // y est FIXE, x varie entre 2 bornes. y = a * x + b donc x = (y-b) / a
+                if ( (walls[w].y > game->y && rayDirYY < 0) || (walls[w].y < game->y && rayDirYY > 0)) {
+                    continue;
+                }
+			    double diffBetweenY = walls[w].y - game->y;
+                if (rayDirYY != 0) {
+                    double factor = abs(diffBetweenY / rayDirYY);
+                    if (factor > 0.0000000001) {
+                        double xnew = game->x + rayDirXX * factor;
+			            //printf("i/w = %f, diffy = %f, rayDirX = %f, rayDirY = %f, factor = %f, xnew = %f\n", ((double)i/game->screenSize), diffBetweenY, rayDirXX, rayDirYY, factor, xnew);
+			            if (xnew > walls[w].x1 && xnew < walls[w].x2) {
+                            //printf("Mur touche : %d %d-%d %d-%d @x=%f\n", w, walls[w].x1, walls[w].y1, walls[w].x2, walls[w].y2, xnew);
+                            double produitScalaire = game->cameraDirectionX * abs(game->x - xnew) + game->cameraDirectionY * abs(game->y - walls[w].y);
+                            //double normeCameraVector = sqrt(pow(game->cameraDirectionX, 2) + pow(game->cameraDirectionY, 2));
+                            double normeDistance = sqrt(pow(game->x - xnew, 2)+pow(game->y - walls[w].y, 2));
+                            //double cosVecteurs = produitScalaire / (normeCameraVector * normeDistance);
+                            double cosVecteurs = produitScalaire / normeDistance;
+                            //
+                            double orthoDist = abs(normeDistance * cosVecteurs);
+                            if (orthoDist > 0 && (dist[i] == 0 || dist[i] > orthoDist)) {
+                                dist[i] = orthoDist;
+                                wall[i] = HORIZONTAL;
+                                xcos[i] = cosVecteurs;
+                                // Draw
+                                SDL_SetRenderDrawColor(app->renderer, 255, 0, 0, 255);
+				                SDL_RenderDrawLine(app->renderer, game->x, game->y, xnew, walls[w].y); // 2D
+                            }
+                        }
+                    }
+			    }
+            } else if (walls[w].type == VERTICAL) {
+                if ( (walls[w].x > game->x && rayDirXX < 0) || (walls[w].x < game->x && rayDirXX > 0)) {
+                    continue;
+                }
+                double diffBetweenX = walls[w].x - game->x;
+                if (rayDirXX != 0) {
+                    double factor = abs(diffBetweenX / rayDirXX);
+                    if (factor > 0.0000000001) {
+                        double ynew = game->y + rayDirYY * factor;
+                        if (ynew > walls[w].y1 && ynew < walls[w].y2) {
+                            //printf("Mur touche : %d %d-%d %d-%d @ y=%f\n", w, walls[w].x1, walls[w].y1, walls[w].x2, walls[w].y2, ynew);
+                            // COS
+                            double produitScalaire = game->cameraDirectionX * abs(game->x - walls[w].x) + game->cameraDirectionY * abs(game->y - ynew);
+                            //double normeCameraVector = sqrt(pow(game->cameraDirectionX, 2) + pow(game->cameraDirectionY, 2)); normeCameraVector=TOUJOURS 1!
+                            double normeDistance = sqrt(pow(game->x - walls[w].x, 2)+pow(game->y - ynew, 2));
+                            //double cosVecteurs = produitScalaire / (normeCameraVector * normeDistance); normeCameraVector=TOUJOURS 1!
+                            double cosVecteurs = produitScalaire / normeDistance;
+                            // PROJ ORTHO
+                            double orthoDist = abs(normeDistance * cosVecteurs);
+                            if (orthoDist > 0 && (dist[i] == 0 || dist[i] > orthoDist)) {
+                                dist[i] = orthoDist;
+                                wall[i] = VERTICAL;
+                                xcos[i] = cosVecteurs;
+                                // Draw
+                                SDL_SetRenderDrawColor(app->renderer, 255, 255, 0, 255);
+				                SDL_RenderDrawLine(app->renderer, game->x, game->y, walls[w].x, ynew); // 2D
+                            }
+                        }
+                    }
+                }
+            }
+		}
+    }
+    int SCREEN_CENTER = 300;
+    int SCREEN_HEIGHT = 200;
+    for (int i=0; i < game->screenSize; i+=STEP) {
+        if (dist[i] > 0) {
+            //dist[i] = ( ((float) 300) / dist[i]);
+            if (wall[i] == HORIZONTAL) {
+                SDL_SetRenderDrawColor(app->renderer, 255, 0, 0, 255);
+            } else if (wall[i] == VERTICAL) {
+                SDL_SetRenderDrawColor(app->renderer, 255, 255, 0, 255);
+            }
+            //int wallheight = 100 - 100 / dist[i];
+            double divider = (double) dist[i] / 32; // 20h45 : il a suffit d'ajouter (double) pour que... ça marche !!! Yeepi ! 20h49 : cela ne dépasse plus de "l'écran" virtuel.
+            if (divider == 0) {
+                divider = 0.00000001;
+            }
+            int wallheight = SCREEN_HEIGHT / divider;
+            int drawStart = max(200, SCREEN_CENTER - wallheight / 2);
+            int drawEnd = min(400, SCREEN_CENTER + wallheight / 2);
+            SDL_RenderDrawLine(app->renderer, i, drawStart, i, drawEnd);
+        }
+    }
+    SDL_SetRenderDrawColor(app->renderer, 255, 255, 255, 255);
+    SDL_RenderDrawLine(app->renderer, 0, 200, app->SCREEN_WIDTH, 200);
+    SDL_RenderDrawLine(app->renderer, 0, 400, app->SCREEN_WIDTH, 400);
+    if (game->dump) {
+        FILE * f = fopen("dump.txt", "w");
+        for (int i=0; i < game->screenSize; i+=STEP) {
+            if (dist[i] > 0) {
+                fprintf(f, "%d. dist = %d 200 - dist = %d cos = %f\n", i, dist[i], 200 - dist[i], xcos[i]);
+            } else {
+                fprintf(f, "dist < 0\n");
+            }
+        }
+        fclose(f);
+        game->dump = false;
+        //exit(EXIT_FAILURE);
     }
     // Screen
     SDL_SetRenderDrawColor(app->renderer, 0, 0, 255, 255);
-    int start_of_screen_x = game->x + game->cameraDirectionX * 50 - game->screenPlaneX * (game->screenSize / 2);
-    int start_of_screen_y = game->y + game->cameraDirectionY * 50 - game->screenPlaneY * (game->screenSize / 2);
-    SDL_RenderDrawLine(app->renderer, start_of_screen_x, start_of_screen_y, start_of_screen_x + game->screenSize, start_of_screen_y);
-}
-
-void draw_rays(GameState * game, Application * app) {
-    /*
-    int rays[100];
-    SDL_SetRenderDrawColor(app->renderer, 255, 255, 0, 255);
-    //for (int start_ray_x = game->screen_x; start_ray_x < game->screen_i; start_ray_x++) {
-    for(int nb = 0; nb < game->screen_size; nb++) {
-        int start_ray_x = ((int) game->screen_x) + nb;
-        int start_ray_y = (int) game->screen_y;
-        int i = start_ray_x;
-        int j = start_ray_y;
-        int x32 = i >> 5;
-        int y32 = j >> 5;
-        while (y32 > 0 && Map[y32][x32] == 0) {
-            j -= 32;
-            x32 = i >> 5;
-            y32 = j >> 5;
-        }
-        // Which side is hit?
-        int start_ray_x32 = start_ray_x >> 5;
-        int start_ray_y32 = start_ray_y >> 5;
-        int eol = 666;
-        if (start_ray_x32 == x32) {
-            if (start_ray_y32 > y32) { // straight hit by under
-                eol = (y32+1) << 5;
-            }
-        }
-        rays[nb] = (int) (((float) app->SCREEN_HEIGHT) / abs(eol-game->screen_y));
-        SDL_RenderDrawLine(app->renderer, i, game->screen_y, i, eol);
-    }
-    // draw wall
-    SDL_SetRenderDrawColor(app->renderer, 255, 0, 0, 255);
-    SDL_RenderDrawLine(app->renderer, 0, app->SCREEN_HEIGHT >> 1, app->SCREEN_WIDTH, app->SCREEN_HEIGHT >> 1);
-    for (int i = 0; i < 100; i++) {
-        SDL_RenderDrawLine(app->renderer, 400+i, 240 - rays[i], 400+i, 240 + rays[i]);
-    }
-    */
+    int start_of_screen_x = game->x + game->cameraDirectionX * 10 - 5 * game->screenPlaneX;
+    int end_of_screen_x = game->x + game->cameraDirectionX * 10 + 5 * game->screenPlaneX;
+    int start_of_screen_y = game->y + game->cameraDirectionY * 10 - 5 * game->screenPlaneY;
+    int end_of_screen_y = game->y + game->cameraDirectionY * 10 + 5 * game->screenPlaneY;
+    SDL_RenderDrawLine(app->renderer, start_of_screen_x, start_of_screen_y, end_of_screen_x, end_of_screen_y);
 }
 
 // global : walls_id, walls_data
 void draw(GameState * game, Application * app) {
     clear(app);
-    draw_matrix(game, app);
-    draw_rays(game, app);
+    //draw_matrix(game, app);
+	draw_walls(game, app);
+    //draw_rays(game, app);
     draw_camera(game, app);
     SDL_RenderPresent(app->renderer);
     SDL_UpdateWindowSurface(app->window);
@@ -361,10 +480,10 @@ int main(int argc, char *argv[]) {
     printf("Hello\n");
     Application app;
     GameState game;
-    init_game(&game);
-    init_wall();
+    game_init(&game);
+    wall_init();
     application_start(&app, 640, 480, "WoolfyC-2");
-    start_game(&game);
+    game_start(&game);
     while(!game.done) {
         process_input(&game);
         update(&game);
@@ -374,4 +493,3 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-SDL_Event event;
