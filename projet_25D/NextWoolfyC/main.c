@@ -11,6 +11,13 @@ typedef enum {
 } WallType;
 
 typedef struct {
+    Uint8 r;
+    Uint8 g;
+    Uint8 b;
+    Uint8 a;
+} Color;
+
+typedef struct {
 	bool used;
     int x1;
     int y1;
@@ -19,6 +26,7 @@ typedef struct {
 	int x;
 	int y;
     WallType type;
+    Color color;
 } Wall;
 
 #define MAX_WALL 100
@@ -88,6 +96,10 @@ void wall_init(void) {
 		walls[i].x = 0;
 		walls[i].y = 0;
 		walls[i].type = NONE;
+        walls[i].color.r = 0;
+        walls[i].color.g = 0;
+        walls[i].color.b = 0;
+        walls[i].color.a = 255;
     }
     int i = 0;
     walls[i].used = true;
@@ -97,6 +109,7 @@ void wall_init(void) {
     walls[i].y2 = 32;
 	walls[i].y = 32;
     walls[i].type = HORIZONTAL;
+    walls[i].color.r = 255;
 
     i = 1;
     walls[i].used = true;
@@ -106,6 +119,8 @@ void wall_init(void) {
     walls[i].y2 = 256;
 	walls[i].x = 32;
     walls[i].type = VERTICAL;
+    walls[i].color.r = 255;
+    walls[i].color.g = 255;
 
     i = 2;
     walls[i].used = true;
@@ -115,6 +130,7 @@ void wall_init(void) {
     walls[i].y2 = 256;
 	walls[i].x = 256;
     walls[i].type = VERTICAL;
+    walls[i].color.b = 255;
 
     i = 3;
     walls[i].used = true;
@@ -124,6 +140,7 @@ void wall_init(void) {
     walls[i].y2 = 256;
 	walls[i].y = 256;
     walls[i].type = HORIZONTAL;
+    walls[i].color.g = 255;
 }
 
 typedef struct {
@@ -145,8 +162,10 @@ typedef struct {
     double speed;
 
     // Direction
-    bool right;
-    bool left;
+    bool turn_right;
+    bool turn_left;
+    bool step_right;
+    bool step_left;
     bool up;
     bool down;
     // Dump for debug
@@ -167,8 +186,10 @@ void game_init(GameState * game) {
 
     game->speed = 30;
 
-    game->right = false;
-    game->left = false;
+    game->turn_right = false;
+    game->turn_left = false;
+    game->step_right = false;
+    game->step_left = false;
     game->up = false;
     game->down = false;
     game->dump = true;
@@ -199,21 +220,27 @@ int Map[11][11] = {
 };
 
 void process_input(GameState * game) {
+    int TURN_RIGHT = SDLK_d; // SDLK_RIGHT
+    int TURN_LEFT = SDLK_q; // SDLK_LEFT
+    int FORWARD = SDLK_z; // SDLK_UP
+    int BACKWARD = SDLK_s; // SDLK_DOWN
+    int STEP_RIGHT = SDLK_e;
+    int STEP_LEFT = SDLK_a;
     SDL_Event event;
     while( SDL_PollEvent( &event ) != 0 ) {
         if( event.type == SDL_QUIT ) {
             game->done = true;
         } else if (event.type == SDL_KEYDOWN) {
-            if (event.key.keysym.sym == SDLK_RIGHT) {
-                game->right = true;
+            if (event.key.keysym.sym == TURN_RIGHT) {
+                game->turn_right = true;
             } 
-            if (event.key.keysym.sym == SDLK_LEFT) {
-                game->left = true;
+            if (event.key.keysym.sym == TURN_LEFT) {
+                game->turn_left = true;
             }
-            if (event.key.keysym.sym == SDLK_UP) {
+            if (event.key.keysym.sym == FORWARD) {
                 game->up = true;
             }
-            if (event.key.keysym.sym == SDLK_DOWN) {
+            if (event.key.keysym.sym == BACKWARD) {
                 game->down = true;
             }
             if (event.key.keysym.sym == SDLK_ESCAPE) {
@@ -222,21 +249,33 @@ void process_input(GameState * game) {
             if (event.key.keysym.sym == SDLK_TAB) {
                 game->dump = true;
             }
+            if (event.key.keysym.sym == STEP_RIGHT) {
+                game->step_right = true;
+            } 
+            if (event.key.keysym.sym == STEP_LEFT) {
+                game->step_left = true;
+            }
         } else if (event.type == SDL_KEYUP) {
-            if (event.key.keysym.sym == SDLK_RIGHT) {
-                game->right = false;
+            if (event.key.keysym.sym == TURN_RIGHT) {
+                game->turn_right = false;
             }
-            if (event.key.keysym.sym == SDLK_LEFT) {
-                game->left = false;
+            if (event.key.keysym.sym == TURN_LEFT) {
+                game->turn_left = false;
             }
-            if (event.key.keysym.sym == SDLK_UP) {
+            if (event.key.keysym.sym == FORWARD) {
                 game->up = false;
             }
-            if (event.key.keysym.sym == SDLK_DOWN) {
+            if (event.key.keysym.sym == BACKWARD) {
                 game->down = false;
             }
             if (event.key.keysym.sym == SDLK_TAB) {
                 game->dump = false;
+            }
+            if (event.key.keysym.sym == STEP_RIGHT) {
+                game->step_right = false;
+            } 
+            if (event.key.keysym.sym == STEP_LEFT) {
+                game->step_left = false;
             }
         }
     }
@@ -249,11 +288,15 @@ void update(GameState * game) {
     //double nx = game->x;
     //double ny = game->y;
     double change = game->speed * delta;
-    if (game->right) {
+    if (game->turn_right) {
+    }
+    if (game->turn_left) {
+    }
+    if (game->step_right) {
         //nx = game->x + change;
         game->x += change;
     }
-    if (game->left) {
+    if (game->step_left) {
         game->x -= change;
         //nx = game->x - change;
     }
@@ -313,7 +356,7 @@ void draw_camera(GameState * game, Application * app) {
     //int midscreen = app->SCREEN_WIDTH / 2;
     // Rays
     int dist[game->screenSize];
-    int wall[game->screenSize]; // H or V
+    int wall[game->screenSize]; // id of wall
     double xcos[game->screenSize];
     const int STEP = 1;
     for (int i=0; i < game->screenSize; i+=STEP) {
@@ -352,7 +395,7 @@ void draw_camera(GameState * game, Application * app) {
                             double orthoDist = abs(normeDistance * cosVecteurs);
                             if (orthoDist > 0 && (dist[i] == 0 || dist[i] > orthoDist)) {
                                 dist[i] = orthoDist;
-                                wall[i] = HORIZONTAL;
+                                wall[i] = w;
                                 xcos[i] = cosVecteurs;
                                 // Draw
                                 SDL_SetRenderDrawColor(app->renderer, 255, 0, 0, 255);
@@ -382,7 +425,7 @@ void draw_camera(GameState * game, Application * app) {
                             double orthoDist = abs(normeDistance * cosVecteurs);
                             if (orthoDist > 0 && (dist[i] == 0 || dist[i] > orthoDist)) {
                                 dist[i] = orthoDist;
-                                wall[i] = VERTICAL;
+                                wall[i] = w;
                                 xcos[i] = cosVecteurs;
                                 // Draw
                                 SDL_SetRenderDrawColor(app->renderer, 255, 255, 0, 255);
@@ -399,11 +442,11 @@ void draw_camera(GameState * game, Application * app) {
     for (int i=0; i < game->screenSize; i+=STEP) {
         if (dist[i] > 0) {
             //dist[i] = ( ((float) 300) / dist[i]);
-            if (wall[i] == HORIZONTAL) {
-                SDL_SetRenderDrawColor(app->renderer, 255, 0, 0, 255);
-            } else if (wall[i] == VERTICAL) {
-                SDL_SetRenderDrawColor(app->renderer, 255, 255, 0, 255);
-            }
+            //if (walls[wall[i]].type == HORIZONTAL) {
+                SDL_SetRenderDrawColor(app->renderer, walls[wall[i]].color.r, walls[wall[i]].color.g, walls[wall[i]].color.b, 255);
+            //} else if (walls[wall[i]].type == VERTICAL) {
+            //    SDL_SetRenderDrawColor(app->renderer, 255, 255, 0, 255);
+            //}
             //int wallheight = 100 - 100 / dist[i];
             double divider = (double) dist[i] / 32; // 20h45 : il a suffit d'ajouter (double) pour que... ça marche !!! Yeepi ! 20h49 : cela ne dépasse plus de "l'écran" virtuel.
             if (divider == 0) {
