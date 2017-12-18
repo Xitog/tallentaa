@@ -148,6 +148,9 @@ typedef struct {
     int SCREEN_HEIGHT;
     SDL_Window * window;
     SDL_Renderer * renderer;
+    int SCREEN_START_OF_25D_RENDERING;
+    int SCREEN_CENTER_25D_RENDERING;
+    int SCREEN_HEIGHT_25D_RENDERING;
 } Application;
 
 typedef struct {
@@ -288,9 +291,22 @@ void update(GameState * game) {
     //double nx = game->x;
     //double ny = game->y;
     double change = game->speed * delta;
-    if (game->turn_right) {
-    }
+    double rotChange = 2.0 * delta;
     if (game->turn_left) {
+        double oldDirX = game->cameraDirectionX;
+        game->cameraDirectionX = oldDirX * cos(-rotChange) - game->cameraDirectionY * sin(-rotChange);
+        game->cameraDirectionY = oldDirX * sin(-rotChange) + game->cameraDirectionY * cos(-rotChange);
+        double oldPlaneX = game->screenPlaneX;
+        game->screenPlaneX = oldPlaneX * cos(-rotChange) - game->screenPlaneY * sin(-rotChange);
+        game->screenPlaneY = oldPlaneX * sin(-rotChange) + game->screenPlaneY * cos(-rotChange);
+    }
+    if (game->turn_right) {
+        double oldDirX = game->cameraDirectionX;
+        game->cameraDirectionX = oldDirX * cos(rotChange) - game->cameraDirectionY * sin(rotChange);
+        game->cameraDirectionY = oldDirX * sin(rotChange) + game->cameraDirectionY * cos(rotChange);
+        double oldPlaneX = game->screenPlaneX;
+        game->screenPlaneX = oldPlaneX * cos(rotChange) - game->screenPlaneY * sin(rotChange);
+        game->screenPlaneY = oldPlaneX * sin(rotChange) + game->screenPlaneY * cos(rotChange);
     }
     if (game->step_right) {
         //nx = game->x + change;
@@ -301,12 +317,20 @@ void update(GameState * game) {
         //nx = game->x - change;
     }
     if (game->up) {
-        //ny = game->y - change;
-        game->y -= change;
+        //game->y -= change;
+        float nx = game->x + game->cameraDirectionX * change;
+        float ny = game->y + game->cameraDirectionY * change;
+        //if (area[(int) nx][(int) (posY)] == 0) { posX = nx; }
+        //if (area[(int) (posX)][(int) ny] == 0) { posY = ny; }
+        game->x = nx;
+        game->y = ny;
     }
     if (game->down) {
-        //ny = game->y + change;
-        game->y += change;
+        //game->y += change;
+        float nx = game->x - game->cameraDirectionX * change;
+        float ny = game->y - game->cameraDirectionY * change;
+        game->x = nx;
+        game->y = ny;
     }
     /*
     printf("down nx=%f x=%f ny=%f y=%f collision=%i\n", nx, game->x, ny, game->y, collision(game->x, game->y, nx, ny));
@@ -358,7 +382,7 @@ void draw_camera(GameState * game, Application * app) {
     int dist[game->screenSize];
     int wall[game->screenSize]; // id of wall
     double xcos[game->screenSize];
-    const int STEP = 1;
+    const int STEP = 100;
     for (int i=0; i < game->screenSize; i+=STEP) {
         double rayDirYY = (game->cameraDirectionY  + ( ((double)i/game->screenSize) - 0.5) * game->screenPlaneY);
         double rayDirXX = (game->cameraDirectionX  + ( ((double)i/game->screenSize) - 0.5) * game->screenPlaneX);
@@ -437,30 +461,22 @@ void draw_camera(GameState * game, Application * app) {
             }
 		}
     }
-    int SCREEN_CENTER = 300;
-    int SCREEN_HEIGHT = 200;
     for (int i=0; i < game->screenSize; i+=STEP) {
         if (dist[i] > 0) {
-            //dist[i] = ( ((float) 300) / dist[i]);
-            //if (walls[wall[i]].type == HORIZONTAL) {
-                SDL_SetRenderDrawColor(app->renderer, walls[wall[i]].color.r, walls[wall[i]].color.g, walls[wall[i]].color.b, 255);
-            //} else if (walls[wall[i]].type == VERTICAL) {
-            //    SDL_SetRenderDrawColor(app->renderer, 255, 255, 0, 255);
-            //}
-            //int wallheight = 100 - 100 / dist[i];
+            SDL_SetRenderDrawColor(app->renderer, walls[wall[i]].color.r, walls[wall[i]].color.g, walls[wall[i]].color.b, 255);
             double divider = (double) dist[i] / 32; // 20h45 : il a suffit d'ajouter (double) pour que... ça marche !!! Yeepi ! 20h49 : cela ne dépasse plus de "l'écran" virtuel.
             if (divider == 0) {
                 divider = 0.00000001;
             }
-            int wallheight = SCREEN_HEIGHT / divider;
-            int drawStart = max(200, SCREEN_CENTER - wallheight / 2);
-            int drawEnd = min(400, SCREEN_CENTER + wallheight / 2);
+            int wallheight = app->SCREEN_HEIGHT_25D_RENDERING / divider;
+            int drawStart = max(app->SCREEN_START_OF_25D_RENDERING, app->SCREEN_CENTER_25D_RENDERING - wallheight / 2);
+            int drawEnd = min(app->SCREEN_START_OF_25D_RENDERING + app->SCREEN_HEIGHT_25D_RENDERING, app->SCREEN_CENTER_25D_RENDERING + wallheight / 2);
             SDL_RenderDrawLine(app->renderer, i, drawStart, i, drawEnd);
         }
     }
     SDL_SetRenderDrawColor(app->renderer, 255, 255, 255, 255);
-    SDL_RenderDrawLine(app->renderer, 0, 200, app->SCREEN_WIDTH, 200);
-    SDL_RenderDrawLine(app->renderer, 0, 400, app->SCREEN_WIDTH, 400);
+    SDL_RenderDrawLine(app->renderer, 0, app->SCREEN_START_OF_25D_RENDERING, app->SCREEN_WIDTH, app->SCREEN_START_OF_25D_RENDERING);
+    SDL_RenderDrawLine(app->renderer, 0, app->SCREEN_START_OF_25D_RENDERING + app->SCREEN_HEIGHT_25D_RENDERING, app->SCREEN_WIDTH, app->SCREEN_START_OF_25D_RENDERING + app->SCREEN_HEIGHT_25D_RENDERING);
     if (game->dump) {
         FILE * f = fopen("dump.txt", "w");
         for (int i=0; i < game->screenSize; i+=STEP) {
@@ -498,6 +514,9 @@ void application_start(Application * app, int w, int h, char * title) {
     app->window = NULL;
     app->SCREEN_WIDTH = w;
     app->SCREEN_HEIGHT = h;
+    app->SCREEN_START_OF_25D_RENDERING = 250;
+    app->SCREEN_HEIGHT_25D_RENDERING = 200;
+    app->SCREEN_CENTER_25D_RENDERING = 350;
     if( SDL_Init( SDL_INIT_VIDEO ) < 0 ) {
         printf( "SDL could not initialize! SDL_Error: %s\n", SDL_GetError() );
         exit(EXIT_FAILURE);
