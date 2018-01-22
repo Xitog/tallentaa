@@ -13,11 +13,14 @@ with open('titres-FR-2017-10-20-01.tsv', mode='r', encoding='utf-8') as datafile
     all_fields = {}
     #title_with_column = 0
     #title_with_question = 0
-    look_for = {'!' : 0, ':' : 0, '?' : 0, '«' : 0, '»' : 0, '"' : 0, "'" : 0}
+    #look_for = {'!' : 0, ':' : 0, '?' : 0, '«' : 0, '»' : 0, '"' : 0, "'" : 0, '.' : 0}
+    look_for = {'!' : 0, ':' : 0, '?' : 0, '.' : 0, ';' : 0}
+    look_for_end = {'!' : 0, ':' : 0, '?' : 0, '.' : 0, ';' : 0}
     lengths = []
     types = {}
     three_after = {}
     guillemet_error = 0
+    segmented = {}
     
     for line in lines:
         id, title, typ, year, nb_authors, field, subfields = line.split('\t')
@@ -26,9 +29,19 @@ with open('titres-FR-2017-10-20-01.tsv', mode='r', encoding='utf-8') as datafile
         elems = title.split(' ')
         lengths.append(len(elems))
         # elements
+        if title[-1] in look_for:
+            look_for_end[title[-1]] += 1
+        nb_of_seg = 0
         for k in look_for:
             if k in title:
                 look_for[k] += 1
+                # sauf pour le point final
+                if k not in look_for or title[-1] != k:
+                    nb_of_seg += 1
+        if nb_of_seg not in segmented:
+            segmented[nb_of_seg] = 1
+        else:
+            segmented[nb_of_seg] += 1
         if ('»' in title and '«' not in title) or ('«' in title and '»' not in title):
             # print('guillemets ERROR', title)
             guillemet_error += 1
@@ -89,9 +102,14 @@ with open('titres-FR-2017-10-20-01.tsv', mode='r', encoding='utf-8') as datafile
     #print("Number of titles with '?':", title_with_question, '(', round((title_with_question / len(lines))*100, 2), '%)')
     for k in look_for:
         print("Number of titles with", k, look_for[k], '(', round((look_for[k] / len(lines)) * 100, 2), '%)')
+        print("Number of titles with", k, "at the end", look_for_end[k], '(', round((look_for_end[k] / look_for[k]) * 100, 2), '%')
     print("Longueur moyenne :", int(moyenne))
-    print("Guillemets error :", guillemet_error)   
+    print("Guillemets error :", guillemet_error)
     print()
+
+    # Segmented
+    for s in segmented:
+        print("Number of titles segmented", s, "fois :", segmented[s])
     
     #
     # Fields
