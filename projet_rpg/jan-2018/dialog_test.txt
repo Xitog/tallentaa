@@ -1,0 +1,19 @@
+[6000] : Bonjour étranger ! Vous semblez un peu perdu, puis-je vous aider ?
+    ? [Dégage, manant ! -> 6001
+        [6001] : Imbécile ! EOD
+    ? [Oui, mon nom est #PLAYER_NAME# et je cherche Jaïna. -> 6002
+        [6002] : Jaïna se trouve à l'auberge du Cheval blanc, là-bas à côté de la rivière.
+            ? [Merci, au revoir ! -> 6004
+                [6004] : Au revoir étranger ! EOD
+            ? [Pourriez-vous m'indiquer un marchand ? -> 6005
+                [6005] : Igor pourra vous vendre des armes et des potions. Il est au centre du village.
+                    ? [Merci, au revoir ! -> 6004
+                        [6004] : Au revoir étranger ! EOD
+    ? [Pourriez-vous m'indiquer un marchand ? -> 6003
+        [6003] : Igor pourra vous vendre des armes et des potions. Il est au centre du village.
+            ? [Je cherche Jaïna également. -> 6006
+                [6006] : Jaïna se trouve à l'auberge du Cheval blanc, là-bas à côté de la rivière.
+                    ? [Merci, au revoir ! -> 6004
+                        [6004] : Au revoir étranger ! EOD
+            ? [Merci, au revoir ! -> 6004
+                [6004] : Au revoir étranger ! EOD
