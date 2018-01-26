@@ -1,0 +1,188 @@
+https://www.lua.org/pil/contents.html
+Part I · The Language
+    [ok] 1 – Getting Started
+    2 – Types and Values
+    3 – Expressions
+    4 – Statements
+    5 – Functions
+    6 – More about Functions
+    7 – Iterators and the Generic for
+    8 – Compilation, Execution, and Errors
+    9 – Coroutines
+    10 – Complete Examples
+Part II · Tables and Objects
+    11 – Data Structures
+    12 – Data Files and Persistence
+    13 – Metatables and Metamethods
+    14 – The Environment
+    15 – Packages
+    16 – Object-Oriented Programming
+    17 – Weak Tables
+Part III · The Standard Libraries
+    18 – The Mathematical Library
+    19 – The Table Library
+    20 – The String Library
+    21 – The I/O Library
+    22 – The Operating System Library
+    23 – The Debug Library
+Part IV · The C API
+    24 – An Overview of the C API
+    25 – Extending your Application
+    26 – Calling C from Lua
+    27 – Techniques for Writing C Functions
+    28 – User-Defined Types in C
+    29 – Managing Resources
+    
+Pour C, Expat est une lib de gestion du XML.
+It implements SAX, the Simple API for XML. (stream oriented)
+https://libexpat.github.io/
+https://www.xml.com/pub/1999/09/expat/index.html
+https://www.xml.com/
+http://www.saxonica.com/saxon-c/index.xml
+https://en.wikipedia.org/wiki/Simple_API_for_XML
+
+TREX + RELAX = RELAX NG
+https://en.wikipedia.org/wiki/TREX
+https://en.wikipedia.org/wiki/RELAX
+https://en.wikipedia.org/wiki/RELAX_NG
+element book {
+    element page { text }+
+}
+https://en.wikipedia.org/wiki/Simple_Outline_XML
+html>
+    xmlns=http://www.w3.org/1999/xhtml
+    head>
+        title> Sample page
+    body>
+        p> A very brief page
+https://en.wikipedia.org/wiki/Haml
+https://en.wikipedia.org/wiki/ERuby
+https://en.wikipedia.org/wiki/RuleML
+https://en.wikipedia.org/wiki/Schematron
+https://en.wikipedia.org/wiki/Web_Ontology_Language
+
+1. Démarrer avec Rey
+
+1.1 Lancer Rey
+
+Pour lancer coder avec Rey, il existe trois façons :
+- Via l'interpréteur interactif en lançant rey.exe sans argument. La forme générale est rey.exe [arguments] [script] [arguments du script]. L'invite de commande >>> apparaît et on peut directement écrire à la suite des instructions et des expressions qui seront immédiatement évaluées. Il faut taper exit pour sortir de l'interpréteur. Si voulez exécuter un script depuis l'interpréteur, il faut employer la fonction exec('chemin du script') qui exécutera le script dans l'espace de noms actuels. Pour exécuter directement une ligne utiliser l'option -e puis entre guillemets le code.
+rey.exe
+- Via l'exécution d'un script, stocké dans un fichier .rey (ex : pipo.rey). On lance rey.exe en passant le chemin vers le ficher en paramètre. Si vous voulez utilise l'interpréteur à la suite de cette exécution, il faut utiliser l'option i. On peut passer des arguments au script après celui-ci.
+rey.exe pipo.rey
+rey.ex -i pipo.rey
+- Via l'exécution d'un script, stocké dans un fichier .rey, qu'on transpile en Python à l'aide de rey.exe. On exécute ensuite le script Python produit à l'aide de l'interpréteur Python.
+rey.exe -transpy pipo.rey
+python pipo.py
+
+Les arguments sont stockés dans une liste. 0 est le nom du script. En nég, les options préalables. En pos, les options du script.
+
+1.2 Votre premier programme
+
+La tradition veut qu'on affiche "Bonjour le monde !" sur la sortie standard. Pour cela, il faut lancer l'interpréteur interactif
+rey.exe
+Puis tapez :
+writeln("Hello World!")
+
+Une autre tradition est le calcul d'une factorielle. Ouvrez un fichier texte, enregistrez-le sous le nom de fact.rey puis tapez dedans :
+-- fonction factorielle récursive
+fun fact(nb : int)
+    if nb == 0 then
+        return 1
+    elif nb > 0 then
+        return nb * fact(nb - 1)
+    else
+        raise Exception("Invalid number")
+    end
+end
+nb = input('enter a number:')
+writeln(fact(nb))
+
+1.3 Bloc
+
+Un bloc est un ensemble d'instructions ou d'expressions. Les instructions et expressions sont séparées par des nouvelles lignes ou des points virgules.
+a = 1 + 4
+2              -- valide
+a = 1 + 4 ; 2  -- valide (équivalent aux 2 lignes du dessus)
+a = 1 + 4 2    -- ceci n'est pas valide en Rey
+
+1.4 Variables globales
+
+nom de variable : 
+(@/_A-Za-z)(0-9A-Za-z)
+
+_ is for dummy variable or the last expression. utf-8 variable are supported.
+
+following word are reserved because they are keyword.
+
+lua is case sensitive.
+
+-- comment
+--[[ start of multi line
+]] end of multi line
+
+defined?(tst) --> nil
+tst = nil --> variable defined with value
+if tst is nil then
+    writeln('tst is nil')
+end
+tst = 22
+writeln(tst)  --> 2
+
+A variable is automatically cleaned after its containing scope is destroy (function or prog body).
+
+2. Types et valeurs
+
+
+
+
+
+! Lua : a variable can exist with a nil value.
+
+séparateur d'expression :
+Lua : \n, ;, rien
+Rey : \n, ;
+exécuter un fichie r:
+Lua : dofile(str)
+Rey : exec(str)
+
+> fichier de backup de NeoAvio dans workspace de l'importer : pourquoi ?
+> ouvrir un post sur le forum pour savoir comment ils font l'import avec LDAP
+> orga session de W avec Wilfrid
+> conf bvpv faire un serveur
+> démo user profile
+> faire une réunion pour le status de MPP 
+> Nathalie pas là lundi et mardi
+> Répondre à Eli et Mar
+
+c'est moi la rapporteuse
+
+là ça m'énerve ce carré, j'aime autant vous dire...
+
+OWL2 Functional Syntax
+Ontology(<http://example.org/tea.owl>
+  Declaration( Class( :Tea ) )
+)
+
+OWL2 XML Syntax
+<Ontology ontologyIRI="http://example.org/tea.owl" ...>
+   <Prefix name="owl" IRI="http://www.w3.org/2002/07/owl#"/>
+   <Declaration>
+     <Class IRI="Tea"/>
+   </Declaration>
+</Ontology>
+
+Manchester Syntax
+Ontology: <http://example.org/tea.owl>
+Class: Tea
+
+<rdf:RDF ...>
+    <owl:Ontology rdf:about=""/>
+    <owl:Class rdf:about="#Tea"/>
+</rdf:RDF>
+
+https://en.wikipedia.org/wiki/XHTML_Basic
+https://en.wikipedia.org/wiki/XUL
+https://en.wikipedia.org/wiki/List_of_XML_markup_languages
+
+https://en.wikipedia.org/wiki/Geography_Markup_Language
