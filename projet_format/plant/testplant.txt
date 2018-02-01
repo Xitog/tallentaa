@@ -1,0 +1,120 @@
+@startuml
+
+namespace core #EEEEEE {
+    
+    class Position {
+        x : Integer
+        y : Integer
+    }
+    
+    class Game {
+    }
+    Game --> "1" Map
+    Game "1" -- "*" Player
+    Game --> "1" Mod
+    
+    class Map {
+    }
+    Map *--> Layer : layers >
+
+    class Layer {
+    }
+    
+    class Player {
+        -name : String
+        -start : Position
+    }
+    Player --> "1" Faction
+    Player "1" -- "*" Unit : units >
+    Player --> "10" Group : groups
+    
+    class Faction {
+        -name : String
+    }
+    Faction --> "*" ActionType
+    
+    class Action {
+    }
+    Action --> "1" ActionType
+    
+    class ActionType {
+        +name : String
+    }
+    
+    class Group {
+    }
+    Group --> "12" Unit
+    
+    class Unit {
+        -pos : Position
+        -life : Integer
+        -shield : Integer
+        -vision : Integer
+        -reload : Integer
+        -shadow : Boolean
+        -detect : Boolean
+    }
+    Unit --> "1" UnitType : type >
+    Unit --> "*" Action : orders >
+    Unit --> "*" Status : status >
+    
+    class Status {
+        +start()
+        +update()
+        +end()
+    }
+    Status --> "1" StatusType : type >
+    
+    class StatusType {
+        -length : Integer
+    }
+    
+    class UnitType {
+        +name : String
+        +life_max : Integer
+        +shield_max : Integer
+        +regen_life : Integer
+        +regen_shield : Integer
+        +vision : Integer
+        +height : Integer
+        +width : Integer
+        +move_speed : Integer
+        +building : Boolean
+        +shadow : Boolean
+        +detect : Boolean
+    }
+    UnitType --> "*" ActionType : actions >
+    UnitType --> "1" Weapon : weapon >
+    UnitType --> "1" UnitSubType : subtype >
+    
+    enum UnitSubType {
+      LAND
+      SEA
+      AMPHIBIOUS
+    }
+    
+    class Weapon {
+        +name : String
+        +damage : Integer
+        +reload_length : Integer
+        +reload_speed : Integer
+        +range : Integer
+    }
+    
+    class Upgrade {
+    }
+    
+    class UnitTypeUpgrade {
+    }
+    UnitTypeUpgrade --|> Upgrade
+    
+    class Mod {
+        +name : String
+    }
+    Mod --> "*" UnitType
+    Mod --> "*" Weapon
+    Mod --> "*" ActionType
+    Mod --> "*" Faction
+}
+
+@enduml
