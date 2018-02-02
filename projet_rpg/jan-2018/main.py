@@ -20,6 +20,7 @@ class Application:
         self.up = False
         self.right = False
         self.left = False
+        self.grid = False
         self.cam_x = 0
         self.cam_y = 0
         self.tiles = {}
@@ -41,44 +42,106 @@ class Application:
         self.mapx_w = ground.nrows
         self.mapx_h = ground.ncols
         self.mapx = []
+        #self.transx = []
         self.doodads = []
         for row in range(0, ground.nrows):
             self.mapx.append([])
+            #self.transx.append([])
             for col in range(0, ground.ncols):
                 self.mapx[row].append(int(ground.cell_value(row, col)))
+                #self.transx[row].append(0)
                 d = doodad.cell_value(row, col)
                 if d != '':
                     self.doodads.append((row, col, d))
         # transitions
-        WATER = 2
-        GROUND = 3
+        WATER  = 0b0000000100000000 #  256
+        GROUND = 0b0000001000000000 #  512
+        GRASS  = 0b0000010000000000 # 1024
         for row in range(0, self.mapx_h):
             for col in range(0, self.mapx_w):
-                if self.mapx[row][col] == WATER:
-                    # test
+                me = self.mapx[row][col]
+                # tests
+                if me not in [WATER, GROUND, GRASS]:
+                    raise Exception('Value not correct: ' + str(me) + ' @ ' + str(row) + ', ' + str(col))
+                if me == WATER:
                     if row - 1 >= 0 and self.mapx[row - 1][col] == GROUND:
                         if row + 1 < self.mapx_h and self.mapx[row + 1][col] == GROUND:
                             raise Exception(f"Invalid map. Error at: {col}, {row}.")
                     if col - 1 >= 0 and self.mapx[row][col - 1] == GROUND:
                         if col + 1 < self.mapx_w and self.mapx[row][col + 1] == GROUND:
                             raise Exception(f"Invalid map. Error at: {col}, {row}.")
-                    # custom
-                    if row + 1 < self.mapx_h:
-                        if self.mapx[row + 1][col] == GROUND:
-                            self.mapx[row][col] = 101
-                    if col - 1 >= 0:
-                        if self.mapx[row][col - 1] == GROUND:
-                            self.mapx[row][col] = 103
-                    if row - 1 >= 0:
-                        if self.mapx[row - 1][col] == GROUND:
-                            self.mapx[row][col] = 105
-                    if col + 1 < self.mapx_w:
-                        if self.mapx[row][col + 1] == GROUND:
-                            self.mapx[row][col] = 107
+                # transitions
+                if me == WATER:
+                    opposed = GROUND
+                elif me == GROUND:
+                    opposed = GRASS
+                else:
+                    opposed = None
+                if opposed is not None:
+                    value = me
+                    SOUTH_WEST = 0b0000000000000001 # 1
+                    SOUTH_EAST = 0b0000000000000010 # 2
+                    NORTH_EAST = 0b0000000000000100 # 4
+                    NORTH_WEST = 0b0000000000001000 # 8
                     if row + 1 < self.mapx_h and col - 1 >= 0:
-                        if self.mapx[row + 1][col - 1] == GROUND:
-                            self.mapx[row][col] = 102
-
+                        if self.mapx[row + 1][col - 1] & opposed:
+                            if not self.mapx[row + 1][col - 1] & me:
+                                value |= SOUTH_WEST | opposed
+                    if row + 1 < self.mapx_h and col + 1 < self.mapx_w:
+                        if self.mapx[row + 1][col + 1] & opposed:
+                            if not self.mapx[row + 1][col + 1] & me:
+                                value |= SOUTH_EAST | opposed
+                    if row - 1 >= 0 and col - 1 >= 0:
+                        if self.mapx[row - 1][col - 1] & opposed:
+                            if not self.mapx[row - 1][col - 1] & me:
+                                value |= NORTH_WEST | opposed
+                    if row - 1 >= 0 and col + 1 < self.mapx_h:
+                        if self.mapx[row - 1][col + 1] & opposed:
+                            if not self.mapx[row - 1][col + 1] & me:
+                                value |= NORTH_EAST | opposed
+                    backup = value
+                    value = me
+                    # N E S W
+                    NORTH = 0b0000000010000000 # 128
+                    EAST  = 0b0000000001000000 #  64
+                    SOUTH = 0b0000000000100000 #  32
+                    WEST  = 0b0000000000010000 #  16
+                    if row + 1 < self.mapx_h:
+                        if self.mapx[row + 1][col] & opposed:
+                            if not self.mapx[row + 1][col] & me:
+                                value |= SOUTH | opposed
+                    if row - 1 >= 0:
+                        if self.mapx[row - 1][col] & opposed:
+                            if not self.mapx[row - 1][col] & me:
+                                value |= NORTH | opposed
+                    if col - 1 >= 0:
+                        if self.mapx[row][col - 1] & opposed:
+                            if not self.mapx[row][col - 1] & me:
+                                value |= WEST | opposed
+                    if col + 1 < self.mapx_w:
+                        if self.mapx[row][col + 1] & opposed:
+                            if not self.mapx[row][col + 1] & me:
+                                value |= EAST | opposed
+                    if value == me: # no border modifications, relying on corner modifications
+                        self.mapx[row][col] = backup
+                        #self.transx[row][col] = backup
+                    else:
+                        self.mapx[row][col] = value
+                        #self.transx[row][col] = value
+                    if self.mapx[row][col] not in [256, 512, 1024, 769, 770, 772, 776, 784, 800, 816, 832, 864, 896, 912, 960, 1537, 1538, 1540, 1544, 1552, 1568, 1584, 1600, 1632, 1664, 1680, 1728]:
+                        self.mapx[row][col] = 0
+                        #self.transx[row][col] = 0
+                    #    #raise Exception(f"Blurp : {self.mapx[row][col]} @ {row+1}, {col+1}")
+                else:
+                    #self.transx[row][col] = me
+                    self.mapx[row][col] = me
+        #del self.mapx
+        #self.mapx = self.transx
+        #for row in range(0, self.mapx_h):
+        #    for col in range(0, self.mapx_w):
+        #        print(f'{self.mapx[row][col]:4d}', '', end='')
+        #    print()
+    
     def load_ressource(self, filename):
         ress_name = filename[:-4]
         ress = ress_name.split('_')
@@ -109,9 +172,13 @@ class Application:
         self.mainloop()
     
     def mainloop(self):
+        old = pygame.time.get_ticks()
         while self.loop:
             self.update()
             self.render()
+            while pygame.time.get_ticks() - old < 8: #10: #16:
+                pass
+            old = pygame.time.get_ticks()
 
     def update(self):
         # input
@@ -127,6 +194,10 @@ class Application:
                     self.left = False
                 if e.key == pygame.K_RIGHT:
                     self.right = False
+                if e.key == pygame.K_ESCAPE:
+                    self.loop = False
+                if e.key == pygame.K_TAB:
+                    self.grid = not self.grid
             elif e.type == pygame.KEYDOWN:
                 if e.key == pygame.K_DOWN:
                     self.down = True
@@ -166,6 +237,8 @@ class Application:
             for col in range(cam_map_start_col, cam_map_start_col + 21):
                 if 0 <= col < self.mapx_w and 0 <= lin < self.mapx_h:
                     self.screen.blit(self.tiles[self.mapx[lin][col]], (-start_col + (i_col << 5), -start_lin + (i_lin << 5)))
+                    if self.grid:
+                        pygame.draw.rect(self.screen, self.color, (-start_col + (i_col << 5), -start_lin + (i_lin << 5), 32, 32), 1)
                 i_col += 1
             i_lin += 1
         # doodad
