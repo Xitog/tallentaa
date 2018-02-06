@@ -1,9 +1,19 @@
+#-------------------------------------------------------------------------------
+# Imports
+#-------------------------------------------------------------------------------
+
+# Personal libs
+from matrix_map import MatrixMap
+# External libs
 import pygame
+# Standard libs
 import random
 import sys
 import os
 
-import xlrd
+#-------------------------------------------------------------------------------
+# Classes
+#-------------------------------------------------------------------------------
 
 class Application:
 
@@ -26,49 +36,26 @@ class Application:
         self.tiles = {}
         self.mods = {}
         self.ress_dir = ress_dir
-
-    def load_map(self):
-        file_name = os.path.join(r'..\..\assets\map', 'map01.xlsx')
-        workbook = xlrd.open_workbook(file_name, on_demand=False)
-        for s in workbook.sheets():
-            if s.name == "ground":
-                ground = s
-            elif s.name == "doodad":
-                doodad = s
-            elif s.name == "info":
-                pass
-            else:
-                raise Exception("Incorrect Map File: Sheet unknown: " + s.name)
-        self.mapx_w = ground.nrows
-        self.mapx_h = ground.ncols
-        self.mapx = []
-        #self.transx = []
-        self.doodads = []
-        for row in range(0, ground.nrows):
-            self.mapx.append([])
-            #self.transx.append([])
-            for col in range(0, ground.ncols):
-                self.mapx[row].append(int(ground.cell_value(row, col)))
-                #self.transx[row].append(0)
-                d = doodad.cell_value(row, col)
-                if d != '':
-                    self.doodads.append((row, col, d))
+        self.time_step = 5
+        self.game_map = None
+    
+    def transitions(self):
         # transitions
         WATER  = 0b0000000100000000 #  256
         GROUND = 0b0000001000000000 #  512
         GRASS  = 0b0000010000000000 # 1024
-        for row in range(0, self.mapx_h):
-            for col in range(0, self.mapx_w):
-                me = self.mapx[row][col]
+        for row in range(0, self.game_map.rows):
+            for col in range(0, self.game_map.columns):
+                me, doo = self.game_map.get(row, col)
                 # tests
                 if me not in [WATER, GROUND, GRASS]:
                     raise Exception('Value not correct: ' + str(me) + ' @ ' + str(row) + ', ' + str(col))
                 if me == WATER:
-                    if row - 1 >= 0 and self.mapx[row - 1][col] == GROUND:
-                        if row + 1 < self.mapx_h and self.mapx[row + 1][col] == GROUND:
+                    if row - 1 >= 0 and self.game_map.get(row - 1, col, 0) == GROUND:
+                        if row + 1 < self.game_map.rows and self.game_map.get(row + 1, col, 0) == GROUND:
                             raise Exception(f"Invalid map. Error at: {col}, {row}.")
-                    if col - 1 >= 0 and self.mapx[row][col - 1] == GROUND:
-                        if col + 1 < self.mapx_w and self.mapx[row][col + 1] == GROUND:
+                    if col - 1 >= 0 and self.game_map.get(row, col - 1, 0) == GROUND:
+                        if col + 1 < self.game_map.columns and self.game_map.get(row, col + 1, 0) == GROUND:
                             raise Exception(f"Invalid map. Error at: {col}, {row}.")
                 # transitions
                 if me == WATER:
@@ -83,21 +70,21 @@ class Application:
                     SOUTH_EAST = 0b0000000000000010 # 2
                     NORTH_EAST = 0b0000000000000100 # 4
                     NORTH_WEST = 0b0000000000001000 # 8
-                    if row + 1 < self.mapx_h and col - 1 >= 0:
-                        if self.mapx[row + 1][col - 1] & opposed:
-                            if not self.mapx[row + 1][col - 1] & me:
+                    if row + 1 < self.game_map.rows and col - 1 >= 0:
+                        if self.game_map.get(row + 1, col - 1, 0) & opposed:
+                            if not self.game_map.get(row + 1, col - 1, 0) & me:
                                 value |= SOUTH_WEST | opposed
-                    if row + 1 < self.mapx_h and col + 1 < self.mapx_w:
-                        if self.mapx[row + 1][col + 1] & opposed:
-                            if not self.mapx[row + 1][col + 1] & me:
+                    if row + 1 < self.game_map.rows and col + 1 < self.game_map.columns:
+                        if self.game_map.get(row + 1, col + 1, 0) & opposed:
+                            if not self.game_map.get(row + 1, col + 1, 0) & me:
                                 value |= SOUTH_EAST | opposed
                     if row - 1 >= 0 and col - 1 >= 0:
-                        if self.mapx[row - 1][col - 1] & opposed:
-                            if not self.mapx[row - 1][col - 1] & me:
+                        if self.game_map.get(row - 1, col - 1, 0) & opposed:
+                            if not self.game_map.get(row - 1, col - 1, 0) & me:
                                 value |= NORTH_WEST | opposed
-                    if row - 1 >= 0 and col + 1 < self.mapx_h:
-                        if self.mapx[row - 1][col + 1] & opposed:
-                            if not self.mapx[row - 1][col + 1] & me:
+                    if row - 1 >= 0 and col + 1 < self.game_map.columns:
+                        if self.game_map.get(row - 1, col + 1, 0) & opposed:
+                            if not self.game_map.get(row - 1, col + 1, 0) & me:
                                 value |= NORTH_EAST | opposed
                     backup = value
                     value = me
@@ -106,62 +93,63 @@ class Application:
                     EAST  = 0b0000000001000000 #  64
                     SOUTH = 0b0000000000100000 #  32
                     WEST  = 0b0000000000010000 #  16
-                    if row + 1 < self.mapx_h:
-                        if self.mapx[row + 1][col] & opposed:
-                            if not self.mapx[row + 1][col] & me:
+                    if row + 1 < self.game_map.rows:
+                        if self.game_map.get(row + 1, col, 0) & opposed:
+                            if not self.game_map.get(row + 1, col, 0) & me:
                                 value |= SOUTH | opposed
                     if row - 1 >= 0:
-                        if self.mapx[row - 1][col] & opposed:
-                            if not self.mapx[row - 1][col] & me:
+                        if self.game_map.get(row - 1, col, 0) & opposed:
+                            if not self.game_map.get(row - 1, col, 0) & me:
                                 value |= NORTH | opposed
                     if col - 1 >= 0:
-                        if self.mapx[row][col - 1] & opposed:
-                            if not self.mapx[row][col - 1] & me:
+                        if self.game_map.get(row, col - 1, 0) & opposed:
+                            if not self.game_map.get(row, col - 1, 0) & me:
                                 value |= WEST | opposed
-                    if col + 1 < self.mapx_w:
-                        if self.mapx[row][col + 1] & opposed:
-                            if not self.mapx[row][col + 1] & me:
+                    if col + 1 < self.game_map.columns:
+                        if self.game_map.get(row, col + 1, 0) & opposed:
+                            if not self.game_map.get(row, col + 1, 0) & me:
                                 value |= EAST | opposed
                     if value == me: # no border modifications, relying on corner modifications
-                        self.mapx[row][col] = backup
-                        #self.transx[row][col] = backup
+                        self.game_map.set(backup, row, col, 0)
                     else:
-                        self.mapx[row][col] = value
-                        #self.transx[row][col] = value
-                    if self.mapx[row][col] not in [256, 512, 1024, 769, 770, 772, 776, 784, 800, 816, 832, 864, 896, 912, 960, 1537, 1538, 1540, 1544, 1552, 1568, 1584, 1600, 1632, 1664, 1680, 1728]:
-                        self.mapx[row][col] = 0
-                        #self.transx[row][col] = 0
-                    #    #raise Exception(f"Blurp : {self.mapx[row][col]} @ {row+1}, {col+1}")
+                        self.game_map.set(value, row, col, 0)
+                    if self.game_map.get(row, col, 0) not in [256, 512, 1024, 769, 770, 772, 776, 784, 800, 816, 832, 864, 896, 912, 960, 1537, 1538, 1540, 1544, 1552, 1568, 1584, 1600, 1632, 1664, 1680, 1728]:
+                        self.game_map.set(0, row, col, 0)
                 else:
-                    #self.transx[row][col] = me
-                    self.mapx[row][col] = me
-        #del self.mapx
-        #self.mapx = self.transx
-        #for row in range(0, self.mapx_h):
-        #    for col in range(0, self.mapx_w):
-        #        print(f'{self.mapx[row][col]:4d}', '', end='')
-        #    print()
+                    self.game_map.set(me, row, col, 0)
     
-    def load_ressource(self, filename):
-        ress_name = filename[:-4]
+    def load_ressource(self, dir_path, file_name):
+        ress_name = file_name[:-4]
         ress = ress_name.split('_')
         idr = int(ress[0])
-        self.tiles[idr] = pygame.image.load(os.path.join(self.ress_dir, filename)).convert()
+        self.tiles[idr] = pygame.image.load(os.path.join(dir_path, file_name)).convert_alpha()
         if len(ress) > 2:
             mods = ress[2].split('x')
             self.mods[idr] = (int(mods[1]), int(mods[0]))
-            #print(ress_name, self.mods[idr])
-        print('Loading: ' + filename)
+        else:
+            self.mods[idr] = (0, 0)
+        print('  Loading: ' + file_name)
+
+    def load_dir(self, dir_path):
+        """Load a dir of pictures."""
+        print('Loading directory: ' + dir_path)
+        for filename in os.listdir(dir_path):
+            if filename[-4:] == '.png':
+                self.load_ressource(dir_path, filename)
+
+    def load_map(self, dir_path, file_name):
+        self.game_map = MatrixMap.load_map(dir_path, file_name)
+        self.transitions()
     
     def load(self):
         # Load textures for tiles
-        for filename in os.listdir(self.ress_dir):
-            if filename[-4:] == ".png":
-                self.load_ressource(filename)
+        self.load_dir(os.path.join(self.ress_dir, 'tiles'))
+        self.load_dir(os.path.join(self.ress_dir, 'doodads'))
+        self.load_dir(os.path.join(self.ress_dir, 'sprites'))
         # Load font
         self.font = pygame.font.SysFont(pygame.font.get_default_font(), 12)
         # Load map
-        self.load_map()
+        self.load_map(r'..\..\assets\map', 'map01.xlsx')
     
     def start(self):
         print("Start of Application Dungeon of Darkness")
@@ -176,7 +164,7 @@ class Application:
         while self.loop:
             self.update()
             self.render()
-            while pygame.time.get_ticks() - old < 8: #10: #16:
+            while pygame.time.get_ticks() - old < self.time_step: #8: #10: #16:
                 pass
             old = pygame.time.get_ticks()
 
@@ -232,46 +220,23 @@ class Application:
         start_col = self.cam_x % 32
         start_lin = self.cam_y % 32
         i_lin = 0
-        for lin in range(cam_map_start_lin, cam_map_start_lin + 16):
-            i_col = 0
-            for col in range(cam_map_start_col, cam_map_start_col + 21):
-                if 0 <= col < self.mapx_w and 0 <= lin < self.mapx_h:
-                    self.screen.blit(self.tiles[self.mapx[lin][col]], (-start_col + (i_col << 5), -start_lin + (i_lin << 5)))
+        for lin in range(cam_map_start_lin, cam_map_start_lin + 16 + 5): # +5 in order to display higher doodad
+            i_col = -1 # larger doodad
+            for col in range(cam_map_start_col - 1, cam_map_start_col + 21 + 1): # -1/+1 in order to display smoothly larger doodad. #BUG# -1 is not working
+                if 0 <= col < self.game_map.columns and 0 <= lin < self.game_map.rows:
+                    tex, doo = self.game_map.get(lin, col)
+                    # Textures
+                    self.screen.blit(self.tiles[tex], (-start_col + (i_col << 5), -start_lin + (i_lin << 5)))
                     if self.grid:
                         pygame.draw.rect(self.screen, self.color, (-start_col + (i_col << 5), -start_lin + (i_lin << 5), 32, 32), 1)
+                    # Doodads
+                    if doo != 0:
+                        self.screen.blit(self.tiles[doo], (self.mods[doo][1] - start_col + (i_col << 5), self.mods[doo][0] - start_lin + (i_lin << 5)))
                 i_col += 1
             i_lin += 1
-        # doodad
-        for d in self.doodads:
-            lin = (d[0] - cam_map_start_lin << 5) + self.mods[5][0] - start_lin
-            col = (d[1] - cam_map_start_col << 5) + self.mods[5][1] - start_col
-            #print(lin, col)
-            self.screen.blit(self.tiles[5], (col, lin))
-            #self.screen.blit(self.tiles[5], (-start_col + self.mods[5][0] + (lin << 5), -start_lin + self.mods[5][1] + (col << 5)))
         self.screen.blit(self.font.render("Youpi", False, self.color), (30, 30))
         pygame.display.update()
-    
-    def render2(self):
-        self.screen.fill(self.background)
-        for lin in range(0, 15):
-            for col in range(0, 20):
-                self.screen.blit(self.tiles[self.mapx[lin][col]], ((col << 5) + self.cam_x, (lin << 5) + self.cam_y))
-        pygame.display.update()
-        
-    def render3(self):
-        self.screen.fill(self.background)
-        map_col_start = self.cam_x >> 5
-        map_lin_start = self.cam_y >> 5
-        i_lin = 0
-        for lin in range(map_lin_start, map_lin_start + 15):
-            i_col = 0
-            for col in range(map_col_start, map_col_start + 20):
-                if 0 <= col < mapx_w and 0 <= lin < mapx_h:
-                    self.screen.blit(self.tiles[self.mapx[lin][col]], (i_col << 5, i_lin << 5))
-                i_col += 1
-            i_lin += 1
-        pygame.display.update()
-        
+
     def clean(self):
         pygame.quit()
 

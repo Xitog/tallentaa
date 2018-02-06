@@ -1,3 +1,7 @@
+# External libs
+import xlrd
+import os
+
 class MatrixMap:
     
     def __init__(self, name, content):
@@ -13,6 +17,32 @@ class MatrixMap:
             self.layers = len(self.content[0][0])
         else:
             self.layers = 1
+    
+    #-------
+    # load
+    #-------
+
+    @staticmethod
+    def load_map(dir_path, file_name):
+        workbook = xlrd.open_workbook(os.path.join(dir_path, file_name), on_demand=False)
+        for s in workbook.sheets():
+            if s.name == "ground":
+                ground = s
+            elif s.name == "doodad":
+                doodad = s
+            elif s.name == "info":
+                pass
+            else:
+                raise Exception("Incorrect Map File: Sheet unknown: " + s.name)
+        content = []
+        for row in range(0, ground.nrows):
+            content.append([])
+            for col in range(0, ground.ncols):
+                tex = int(ground.cell_value(col, row))
+                doo = doodad.cell_value(col, row)
+                doo = int(doo) if doo != '' else 0
+                content[row].append([tex, doo])
+        return MatrixMap(file_name, content)
     
     #-------
     # tests
@@ -33,13 +63,20 @@ class MatrixMap:
     #-----
     
     def get(self, col, row, lay=None):
-        #print('x=', col, 'y=', row)
         if lay is None:
             return self.content[row][col]
         else:
-            lay = max(0, lay)
-            lay = min(lay, self.layers - 1)
             return self.content[row][col][lay]
+        
+    #-----
+    # set
+    #-----
+    
+    def set(self, val, col, row, lay=None):
+        if lay is None:
+            self.content[row][col] = val
+        else:
+            self.content[row][col][lay] = val
     
     #----------
     # display
