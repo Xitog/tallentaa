@@ -23,7 +23,8 @@ class MatrixMap:
     #-------
 
     @staticmethod
-    def load_map(dir_path, file_name):
+    def load_map(dir_path, file_name, debug=False):
+        print(f'Opening map file: {file_name}')
         workbook = xlrd.open_workbook(os.path.join(dir_path, file_name), on_demand=False)
         for s in workbook.sheets():
             if s.name == "ground":
@@ -38,8 +39,10 @@ class MatrixMap:
         for row in range(0, ground.nrows):
             content.append([])
             for col in range(0, ground.ncols):
-                tex = int(ground.cell_value(col, row))
-                doo = doodad.cell_value(col, row)
+                if debug:
+                    print("col =", col, "row =", row)
+                tex = int(ground.cell_value(row, col))
+                doo = doodad.cell_value(row, col)
                 doo = int(doo) if doo != '' else 0
                 content[row].append([tex, doo])
         return MatrixMap(file_name, content)
@@ -62,7 +65,7 @@ class MatrixMap:
     # get
     #-----
     
-    def get(self, col, row, lay=None):
+    def get(self, row, col, lay=None):
         if lay is None:
             return self.content[row][col]
         else:
@@ -72,7 +75,7 @@ class MatrixMap:
     # set
     #-----
     
-    def set(self, val, col, row, lay=None):
+    def set(self, val, row, col, lay=None):
         if lay is None:
             self.content[row][col] = val
         else:

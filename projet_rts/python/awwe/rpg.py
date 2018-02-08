@@ -1,16 +1,21 @@
 __author__ = 'dgx'
 
+# 7/2/18 : I make it work with new awwe architecture
+# It's in 64x32 iso
+
 from engine import Engine, Colors
-from game import Map, Pair
+from map import Map, Layer
+from utils import Pair
 
 
 def load_textures(engine):
-    engine.set_texture_path('..\\..\\assets\\tiles64x32')
+    engine.set_texture_path(r'..\..\..\assets\graphic\textures\flare_textures_iso')
     engine.load_texture('cursor_1', 1000, 'cursor_1.png')
     engine.load_texture('cursor_2', 1001, 'cursor_2.png')
     engine.load_texture('grass', 0, 'grass_1.png')
     engine.load_texture('rock', 10, 'rock_1.png', 0, -16)
-    engine.load_texture('tree', 100, 'tree_1.png')  # TODO : Center better the tree
+    engine.load_texture('rock', 100, 'rock_1.png', 0, -16)
+    #engine.load_texture('tree', 100, 'tree_1.png')  # TODO : Center better the tree
 
     # engine.textures = {
     #    0: Texture('cursor', 0, 'cursor_1.png', Colors.MINI_MAP_BLUE, False),
@@ -52,9 +57,9 @@ def screen_to_matrix(x, y):
 
 def game_loop(engine):
     global s_x, start_x, start_y
-    xmap = Map(Pair(10, 10))
-    xmap.set_layer()
-    xmap.set(5, 5, 1, 0)
+    xmap = Map("pipo", 10, 10, {"ground" : Layer("ground", 10, 10, 0)})
+    #xmap.set_layer()
+    xmap.set_at("ground", 5, 5, 1)
     debug = False
     while True:
         # Update + Event
@@ -83,10 +88,10 @@ def game_loop(engine):
         print(mx, my, imx, imy, r[0], r[1])
         # Background
         cpt = 0
-        for i in range(0, xmap.size.x):
-            for j in range(0, xmap.size.y):
+        for i in range(0, xmap.width):
+            for j in range(0, xmap.height):
                 x, y = matrix_to_screen(i, j)
-                t = xmap.get(i, j)
+                t = xmap.get_at("ground", i, j)
                 engine.tex(x, y, engine.textures[0], 5)
                 if t == 1:
                     engine.tex(x, y, engine.textures[10], 10)

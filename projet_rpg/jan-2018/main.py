@@ -38,82 +38,122 @@ class Application:
         self.ress_dir = ress_dir
         self.time_step = 5
         self.game_map = None
+
+    def get_base(self, row, col):
+        val = self.game_map.get(row, col, 0)
+        return val >> 10
+
+    def get_trans(self, row, col):
+        val = self.game_map.get(row, col, 0)
+        val2str = f"{val:15b}".replace(' ', '0')
+        return int(val2str[5:10], base=2)
+
+    def is_base_or_trans(self, row, col, list_of_val):
+        a = self.get_base(row, col)
+        if a in list_of_val:
+            return list_of_val.index(a)
+        b = self.get_trans(row, col)
+        if b in list_of_val:
+            return list_of_val.index(b)
+        return -1
     
     def transitions(self):
-        # transitions
-        WATER  = 0b0000000100000000 #  256
-        GROUND = 0b0000001000000000 #  512
-        GRASS  = 0b0000010000000000 # 1024
+        # base texture
+        WATER  = 0b0001 # 1
+        GROUND = 0b0010 # 2
+        GRASS  = 0b0011 # 3
+        SAND   = 0b0100 # 4
         for row in range(0, self.game_map.rows):
             for col in range(0, self.game_map.columns):
                 me, doo = self.game_map.get(row, col)
+                base = me >> 10
                 # tests
-                if me not in [WATER, GROUND, GRASS]:
-                    raise Exception('Value not correct: ' + str(me) + ' @ ' + str(row) + ', ' + str(col))
-                if me == WATER:
-                    if row - 1 >= 0 and self.game_map.get(row - 1, col, 0) == GROUND:
-                        if row + 1 < self.game_map.rows and self.game_map.get(row + 1, col, 0) == GROUND:
+                if base not in [WATER, GROUND, GRASS, SAND]:
+                    raise Exception('Value not correct: ' + str(base) + ' from ' + str(me) + ' @ ' + str(row) + ', ' + str(col))
+                if base == WATER:
+                    if row - 1 >= 0 and self.get_base(row - 1, col) == GROUND:
+                        if row + 1 < self.game_map.rows and self.get_base(row + 1, col) == GROUND:
                             raise Exception(f"Invalid map. Error at: {col}, {row}.")
-                    if col - 1 >= 0 and self.game_map.get(row, col - 1, 0) == GROUND:
-                        if col + 1 < self.game_map.columns and self.game_map.get(row, col + 1, 0) == GROUND:
+                    if col - 1 >= 0 and self.get_base(row, col - 1) == GROUND:
+                        if col + 1 < self.game_map.columns and self.get_base(row, col + 1) == GROUND:
                             raise Exception(f"Invalid map. Error at: {col}, {row}.")
                 # transitions
-                if me == WATER:
-                    opposed = GROUND
-                elif me == GROUND:
-                    opposed = GRASS
+                if base == WATER:
+                    opposed = [GROUND, SAND]
+                    opposed_val = [0b000000001000000, 0b000000010000000]
+                elif base == GROUND:
+                    opposed = [GRASS]
+                    opposed_val = [0b000000001100000]
                 else:
                     opposed = None
                 if opposed is not None:
                     value = me
-                    SOUTH_WEST = 0b0000000000000001 # 1
-                    SOUTH_EAST = 0b0000000000000010 # 2
-                    NORTH_EAST = 0b0000000000000100 # 4
-                    NORTH_WEST = 0b0000000000001000 # 8
+                    # Corner calculations
+                    SOUTH_WEST = 0b0000000000011000 # 24
+                    SOUTH_EAST = 0b0000000000010100 # 20
+                    NORTH_EAST = 0b0000000000010010 # 18
+                    NORTH_WEST = 0b0000000000010001 # 17
+                    # Has corner?
+                    #CORNER    = 0b0000000000010000 # 16
                     if row + 1 < self.game_map.rows and col - 1 >= 0:
-                        if self.game_map.get(row + 1, col - 1, 0) & opposed:
-                            if not self.game_map.get(row + 1, col - 1, 0) & me:
-                                value |= SOUTH_WEST | opposed
+                        tst =  self.is_base_or_trans(row + 1, col - 1, opposed)
+                        if tst != -1:
+                            if self.get_base(row + 1, col - 1) != base:
+                                value |= SOUTH_WEST | opposed_val[tst]
                     if row + 1 < self.game_map.rows and col + 1 < self.game_map.columns:
-                        if self.game_map.get(row + 1, col + 1, 0) & opposed:
-                            if not self.game_map.get(row + 1, col + 1, 0) & me:
-                                value |= SOUTH_EAST | opposed
+                        tst =  self.is_base_or_trans(row + 1, col + 1, opposed)
+                        if tst != -1:
+                            if self.get_base(row + 1, col + 1) != base:
+                                value |= SOUTH_EAST | opposed_val[tst]
                     if row - 1 >= 0 and col - 1 >= 0:
-                        if self.game_map.get(row - 1, col - 1, 0) & opposed:
-                            if not self.game_map.get(row - 1, col - 1, 0) & me:
-                                value |= NORTH_WEST | opposed
+                        tst = self.is_base_or_trans(row - 1, col - 1, opposed)
+                        if tst != -1:
+                            if self.get_base(row - 1, col - 1) != base:
+                                value |= NORTH_WEST | opposed_val[tst]
                     if row - 1 >= 0 and col + 1 < self.game_map.columns:
-                        if self.game_map.get(row - 1, col + 1, 0) & opposed:
-                            if not self.game_map.get(row - 1, col + 1, 0) & me:
-                                value |= NORTH_EAST | opposed
+                        tst = self.is_base_or_trans(row - 1, col + 1, opposed)
+                        if tst != -1:
+                            if self.get_base(row - 1, col + 1) != base:
+                                value |= NORTH_EAST | opposed_val[tst]
                     backup = value
                     value = me
                     # N E S W
-                    NORTH = 0b0000000010000000 # 128
-                    EAST  = 0b0000000001000000 #  64
-                    SOUTH = 0b0000000000100000 #  32
-                    WEST  = 0b0000000000010000 #  16
+                    NORTH = 0b0000000000000001 # 1
+                    EAST  = 0b0000000000000010 # 2
+                    SOUTH = 0b0000000000000100 # 4
+                    WEST  = 0b0000000000001000 # 8
+                    border = 0
                     if row + 1 < self.game_map.rows:
-                        if self.game_map.get(row + 1, col, 0) & opposed:
-                            if not self.game_map.get(row + 1, col, 0) & me:
-                                value |= SOUTH | opposed
+                        tst = self.is_base_or_trans(row + 1, col, opposed)
+                        if tst != -1:
+                            if self.get_base(row + 1, col) != base:
+                                value |= SOUTH | opposed_val[tst]
+                                border += 1
                     if row - 1 >= 0:
-                        if self.game_map.get(row - 1, col, 0) & opposed:
-                            if not self.game_map.get(row - 1, col, 0) & me:
-                                value |= NORTH | opposed
+                        tst = self.is_base_or_trans(row - 1, col, opposed)
+                        if tst != -1:
+                            if self.get_base(row - 1, col) != base:
+                                value |= NORTH | opposed_val[tst]
+                                border += 1
                     if col - 1 >= 0:
-                        if self.game_map.get(row, col - 1, 0) & opposed:
-                            if not self.game_map.get(row, col - 1, 0) & me:
-                                value |= WEST | opposed
+                        tst = self.is_base_or_trans(row, col - 1, opposed)
+                        if tst != -1:
+                            if self.get_base(row, col - 1) != base:
+                                value |= WEST | opposed_val[tst]
+                                border += 1
                     if col + 1 < self.game_map.columns:
-                        if self.game_map.get(row, col + 1, 0) & opposed:
-                            if not self.game_map.get(row, col + 1, 0) & me:
-                                value |= EAST | opposed
+                        tst = self.is_base_or_trans(row, col + 1, opposed)
+                        if tst != -1:
+                            if self.get_base(row, col + 1) != base:
+                                value |= EAST | opposed_val[tst]
+                                border += 1
                     if value == me: # no border modifications, relying on corner modifications
-                        self.game_map.set(backup, row, col, 0)
-                    else:
+                        value = backup
+                    # save changes
+                    if value in self.tiles:
                         self.game_map.set(value, row, col, 0)
-                    if self.game_map.get(row, col, 0) not in [256, 512, 1024, 769, 770, 772, 776, 784, 800, 816, 832, 864, 896, 912, 960, 1537, 1538, 1540, 1544, 1552, 1568, 1584, 1600, 1632, 1664, 1680, 1728]:
+                    else:
+                        print(f'Invalid value {value} for {base} with nb borders = {border}') 
                         self.game_map.set(0, row, col, 0)
                 else:
                     self.game_map.set(me, row, col, 0)
@@ -138,7 +178,7 @@ class Application:
                 self.load_ressource(dir_path, filename)
 
     def load_map(self, dir_path, file_name):
-        self.game_map = MatrixMap.load_map(dir_path, file_name)
+        self.game_map = MatrixMap.load_map(dir_path, file_name, debug=False)
         self.transitions()
     
     def load(self):
