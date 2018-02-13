@@ -24,7 +24,7 @@ class MatrixMap:
 
     @staticmethod
     def load_map(dir_path, file_name, debug=False):
-        print(f'Opening map file: {file_name}')
+        print(f'Loading map file: {file_name}')
         workbook = xlrd.open_workbook(os.path.join(dir_path, file_name), on_demand=False)
         for s in workbook.sheets():
             if s.name == "ground":
@@ -45,6 +45,7 @@ class MatrixMap:
                 doo = doodad.cell_value(row, col)
                 doo = int(doo) if doo != '' else 0
                 content[row].append([tex, doo])
+        print(f'  col / width = {ground.ncols} row / height = {ground.nrows}')
         return MatrixMap(file_name, content)
     
     #-------

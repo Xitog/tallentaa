@@ -88,7 +88,9 @@ class Application:
                     opposed = None
                 if opposed is not None:
                     value = me
+                    #
                     # Corner calculations
+                    #
                     SOUTH_WEST = 0b0000000000011000 # 24
                     SOUTH_EAST = 0b0000000000010100 # 20
                     NORTH_EAST = 0b0000000000010010 # 18
@@ -96,57 +98,59 @@ class Application:
                     # Has corner?
                     #CORNER    = 0b0000000000010000 # 16
                     if row + 1 < self.game_map.rows and col - 1 >= 0:
-                        tst =  self.is_base_or_trans(row + 1, col - 1, opposed)
+                        b = self.get_base(row + 1, col - 1)
+                        tst = opposed.index(b) if b in opposed else -1
                         if tst != -1:
-                            if self.get_base(row + 1, col - 1) != base:
-                                value |= SOUTH_WEST | opposed_val[tst]
+                            value |= SOUTH_WEST | opposed_val[tst]
                     if row + 1 < self.game_map.rows and col + 1 < self.game_map.columns:
-                        tst =  self.is_base_or_trans(row + 1, col + 1, opposed)
+                        b = self.get_base(row + 1, col + 1)
+                        tst = opposed.index(b) if b in opposed else -1
                         if tst != -1:
-                            if self.get_base(row + 1, col + 1) != base:
-                                value |= SOUTH_EAST | opposed_val[tst]
+                            value |= SOUTH_EAST | opposed_val[tst]
                     if row - 1 >= 0 and col - 1 >= 0:
-                        tst = self.is_base_or_trans(row - 1, col - 1, opposed)
+                        b = self.get_base(row - 1, col - 1)
+                        tst = opposed.index(b) if b in opposed else -1
                         if tst != -1:
-                            if self.get_base(row - 1, col - 1) != base:
-                                value |= NORTH_WEST | opposed_val[tst]
+                            value |= NORTH_WEST | opposed_val[tst]
                     if row - 1 >= 0 and col + 1 < self.game_map.columns:
-                        tst = self.is_base_or_trans(row - 1, col + 1, opposed)
+                        b = self.get_base(row - 1, col + 1)
+                        tst = opposed.index(b) if b in opposed else -1
                         if tst != -1:
-                            if self.get_base(row - 1, col + 1) != base:
-                                value |= NORTH_EAST | opposed_val[tst]
+                            value |= NORTH_EAST | opposed_val[tst]
                     backup = value
                     value = me
-                    # N E S W
+                    #
+                    # Border calculation
+                    #
                     NORTH = 0b0000000000000001 # 1
                     EAST  = 0b0000000000000010 # 2
                     SOUTH = 0b0000000000000100 # 4
                     WEST  = 0b0000000000001000 # 8
                     border = 0
                     if row + 1 < self.game_map.rows:
-                        tst = self.is_base_or_trans(row + 1, col, opposed)
+                        b = self.get_base(row + 1, col)
+                        tst = opposed.index(b) if b in opposed else -1
                         if tst != -1:
-                            if self.get_base(row + 1, col) != base:
-                                value |= SOUTH | opposed_val[tst]
-                                border += 1
+                            value |= SOUTH | opposed_val[tst]
+                            border += 1
                     if row - 1 >= 0:
-                        tst = self.is_base_or_trans(row - 1, col, opposed)
+                        b = self.get_base(row - 1, col)
+                        tst = opposed.index(b) if b in opposed else -1
                         if tst != -1:
-                            if self.get_base(row - 1, col) != base:
-                                value |= NORTH | opposed_val[tst]
-                                border += 1
+                            value |= NORTH | opposed_val[tst]
+                            border += 1
                     if col - 1 >= 0:
-                        tst = self.is_base_or_trans(row, col - 1, opposed)
+                        b = self.get_base(row, col - 1)
+                        tst = opposed.index(b) if b in opposed else -1
                         if tst != -1:
-                            if self.get_base(row, col - 1) != base:
-                                value |= WEST | opposed_val[tst]
-                                border += 1
+                            value |= WEST | opposed_val[tst]
+                            border += 1
                     if col + 1 < self.game_map.columns:
-                        tst = self.is_base_or_trans(row, col + 1, opposed)
+                        b = self.get_base(row, col + 1)
+                        tst = opposed.index(b) if b in opposed else -1
                         if tst != -1:
-                            if self.get_base(row, col + 1) != base:
-                                value |= EAST | opposed_val[tst]
-                                border += 1
+                            value |= EAST | opposed_val[tst]
+                            border += 1
                     if value == me: # no border modifications, relying on corner modifications
                         value = backup
                     # save changes
