@@ -2,6 +2,26 @@
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <title>Tools &amp; Languages</title>
     <meta charset="utf-8">
+    <style>
+     ul.tree, ul.tree ul { 
+        list-style-type: none; 
+        background: url(vline.png) repeat-y; margin: 0; padding: 0; 
+    } 
+    ul.tree ul { 
+        margin-left: 10px; 
+    } 
+    ul.tree li { 
+        margin: 0; 
+        padding: 0 12px; 
+        line-height: 20px;
+        background: url(node.png) no-repeat;
+        color: #369;
+        font-weight: bold; 
+    }
+    ul.tree li:last-child {
+        background: #fff url(lastnode.png) no-repeat;
+    } 
+    </style>
   </head>
   <body>
    <body>
@@ -145,13 +165,17 @@
           </tbody>
         </table>
         <hr>
-        <ul>
+        <ul class="tree">
           <li id="lang_C">C
             <ul>
               <li><a href="http://www.smorgasbordet.com/pellesc/">Pelles C</a></li>
               <li><a href="http://www.mingw.org/">MinGW</a></li>
               <li><a href="http://liballeg.org/">Allegro</a></li>
               <li><a href="http://libsdl.org/">SDL</a></li>
+              <li><a href="http://webserver2.tecgraf.puc-rio.br/iup/">IUP</a> (GUI, based on GTK+ for Unix, native for Windows)</li>
+              <li><a href="https://www.gtk.org/">GTK+</a> (GUI)</li>
+              <li>Beaucoup de bibliothèques demandent C++. GTK+ et IUP non.</li>
+              <li>SDL existe en deux versions majeures : 1.2 et 2.0</li>
             </ul>
           </li>
           <li id="lang_Lua">Lua
@@ -171,16 +195,46 @@
                   <li><a href="http://www.jython.org/">Jython</a></li>
                   <li><a href="http://cython.org/">Cython</a></li>
                   <li><a href="http://ironpython.net/">IronPython</a></li>
+                  <li>Transpilation
+                    <ul>
+                      <li>To JavaScript : <ul>
+                        <li><a href="http://pyjs.org/">PyJS</a> <i>Py to JS, ex-Pyjama</i></li>
+                        <li>Brython</li>
+                        <li>GlowScript</li>
+                        <li>py2js</li>
+                        <li>PyCow</li>
+                        <li>Pyjaco</li>
+                        <li>PyvaScript</li>
+                        <li>RapydScript</li>
+                        <li>Transcrypt</li>
+                    </ul>
+                  </li>
                 </ul>
               </li>
               <li>Bibliothèques
                 <ul>
-                  <li><a href="http://www.lfd.uci.edu/%7Egohlke/pythonlibs/">Compiled</a></li>
-                  <li><a href="http://python-pillow.org/">Pillow</a> <i>Images, fork of PIL</i></li>
-                  <li><a href="http://pyfltk.sourceforge.net/">PyFLTK</a> <i>GUI</i></li>
-                  <li><a href="https://kivy.org/#home">Kivy</a> <i>GUI, Multitouch</i></li>
-                  <li><a href="http://pyjs.org/">PyJS</a> <i>Py to JS, ex-Pyjama</i></li>
-                  <li><s><a href="http://www.pythonware.com/products/pil/">PIL</a></s> <i>deprecated, use Pillow</i></li>
+                  <li>GUI : check if TreeView
+                    <ul>
+                      <li><a href="https://www.tcl.tk/">Tk</a> : <a href="https://docs.python.org/3/library/tk.html">Tkinter</a> <i>(base lib)</i>, <a href="http://appjar.info/">appJar</a></li>
+                      <li><a href="https://www.qt.io/">Qt</a> : <a href="https://riverbankcomputing.com/software/pyqt/intro">PyQt</a>, <a href="http://wiki.qt.io/PySide2">PySide2</a> (Qt 5)</li>
+                      <li><a href="https://www.wxwidgets.org/">WxWidgets</a> : <a href="https://www.wxpython.org/">WxPython</a></li>
+                      <li><a href="http://www.fox-toolkit.org/">FOX Toolkit</a> : <s><a href="http://fxpy.sourceforge.net/">FXPy</a></s> (frozen)</li>
+                      <li><a href="http://www.fltk.org/index.php">FLTK</a> : <a href="http://pyfltk.sourceforge.net/">PyFLTK</a></li>
+                      <li><a href="https://www.gtk.org/">GTK+</a> : <s><a href="http://www.pygtk.org/">PyGTK+</a></s> (GTK+ v2, deprecated), <a href="https://pygobject.readthedocs.io/en/latest/">PyGObject</a> (GTK+ v3)</li>
+                      <li><s><a href="http://nucleic.github.io/enaml/docs/index.html">ENAML</a></s> (declarative, deprecated)</li>
+                      <li>List of libraries : <a href="https://wiki.python.org/moin/GuiProgramming">Python GUI Programming</a></li>
+                    </ul>
+                  </li>
+                  <li>Multimedia
+                    <ul>
+                      <li><a href="https://www.pygame.org/news">Pygame</a> ★</li>
+                      <li><a href="https://bitbucket.org/pyglet/pyglet/wiki/Home">Pyglet</a></li>
+                      <li><a href="https://kivy.org/#home">Kivy</a> <i>GUI, Multitouch</i></li>
+                      <li><a href="http://python-pillow.org/">Pillow</a> <i>Images, fork of PIL</i></li>
+                      <li><s><a href="http://www.pythonware.com/products/pil/">PIL</a></s> <i>deprecated, use Pillow</i></li>
+                    </ul>
+                  </li>
+                  <li><a href="http://www.lfd.uci.edu/%7Egohlke/pythonlibs/">Repository of compiled libraries for Windows</a></li>
                 </ul>
               </li>
               <li>Documentation
@@ -212,6 +266,7 @@
               <li><a href="https://www.ruby-toolbox.com/">Ruby Toolbox</a></li>
               <li><a href="https://rubyinstaller.org/">Ruby Installer</a></li>
               <li><a href="https://www.libgosu.org/">Gosu</a></li>
+              <li><a href="http://shoesrb.com/">Shoes</a> (basic GUI)</li>
             </ul>
           </li>
           <li id="lang_Autres">Autres langages de programmation
@@ -223,6 +278,7 @@
               <li><a href="https://dlang.org/">D</a></li>
               <li><a href="https://elixir-lang.org/">Elixir</a></li>
               <li><a href="http://www.erlang.org/">Erlang</a></li>
+              <li>Free Pascal</li>
               <li><a href="https://wiki.gnome.org/Projects/Genie">Genie</a></li>
               <li><a href="https://golang.org/">Go</a></li>
               <li><a href="https://www.haskell.org/">Haskell</a></li>
@@ -266,11 +322,6 @@
             <ul>
               <li><a href="http://www.json.org/json-fr.html">JSON</a></li>
               <li><a href="http://json-schema.org/">JSON Schema</a></li>
-            </ul>
-          </li>
-          <li>Autres listes diverses
-            <ul>
-              <li><a href="https://wiki.python.org/moin/GuiProgramming">Python GUI Programming</a></li>
             </ul>
           </li>
         </ul>
