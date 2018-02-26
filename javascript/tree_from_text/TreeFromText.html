@@ -1,0 +1,102 @@
+﻿<html>
+  <head>
+    <link rel="StyleSheet" href="css/dtree.css" type="text/css" />
+    <script type="text/javascript" src="js/dtree.js"></script>
+  </head>
+  <body>
+    <script>
+        var description = `
+C
+    Pelles C
+    Bonjour
+Lua
+    Au revoir
+Magic
+    Blob
+        Tobacco
+    Zorba
+End
+`
+
+    var ID_COUNT = -1;
+    function GET_ID() {
+        ID_COUNT += 1;
+        return ID_COUNT;
+    }
+    
+    // Data node
+    function xnode(idn, parent, level, content) {
+        var node = new Object();
+        node.idn = idn;
+        node.parent = parent;
+        node.level = level;
+        node.content = content;
+        node.children = [];
+        return node;
+    }
+    
+    // Get lines of description and filter
+    var lines = description.split("\n");
+    var cleaned_lines = [];
+    for (let line of lines) {
+        if (line.length > 0) {
+            cleaned_lines.push(line);
+        }
+    }
+    var lines = cleaned_lines;
+    
+    // Read
+    function read(node, nb, lines) {
+        if (nb >= lines.length) {
+            return nb;
+        }
+        var i = nb;
+        while (i < lines.length) {
+            line = lines[i];
+            var cpt_spaces = 0;
+            for (let c of line) {
+                if (c == ' ') {
+                    cpt_spaces += 1;
+                } else {
+                    break;
+                }
+            }
+            var cpt_tabs = cpt_spaces / 4;
+            if (node.level < cpt_tabs) {
+                // Children
+                new_node = xnode(GET_ID(), node, cpt_tabs, line.trim());
+                node.children.push(new_node);
+                i = read(new_node, i + 1, lines);
+            } else {
+                // Children of one its predecessors
+                break;
+            }
+        }
+        return i;
+    }
+    
+    var tree = xnode(GET_ID(), -1, -1, 'Outils');
+    read(tree, 0, lines);
+    
+    // Tree make
+    var d = new dTree('d');
+    d.config.inOrder = true;
+    
+    function create_tree(tree) {
+        if (tree.parent == -1) {
+            base = -1;
+        } else {
+            base = tree.parent.idn;
+        }
+        //alert(tree.idn + ' ' + base + ' ' + tree.content);
+        // id parent label link ? ? icon1 icon2
+        d.add(tree.idn, base, tree.content);
+        for (let child of tree.children) {
+            create_tree(child);
+        }
+    }
+    create_tree(tree);
+    document.write(d);
+    </script>
+  </body>
+</html>
