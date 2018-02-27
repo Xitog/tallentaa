@@ -8,6 +8,10 @@ from tkinter import font
 import configparser
 import os.path
 
+# Tokenize from rey
+import sys
+sys.path.append('../../projet_language/rey')
+from rey import Tokenizer, Token
 
 class Fonts:
     COURRIER_NEW_10_BOLD = None
@@ -140,6 +144,7 @@ class Application:
         self.options = {}
         # base options
         self.options['display_tree'] = True
+        self.options['confirm_exit'] = True
         self.options['lang'] = 'txt'
         # try to load options
         if os.path.isfile(self.title + '.ini'):
@@ -149,6 +154,9 @@ class Application:
                 if 'display_tree' in config['MAIN']:
                     self.options['display_tree'] = (config['MAIN']['display_tree'] == 'True')
                     self.log.info('Display tree is : ' + str(self.options['display_tree']))
+                if 'confirm_exit' in config['MAIN']:
+                    self.options['confirm_exit'] = (config['MAIN']['confirm_exit'] == 'True')
+                    self.log.info('Confirm exit is : ' + str(self.options['confirm_exit']))
         # create default option file
         else:
             self.write_options()
@@ -156,7 +164,10 @@ class Application:
     
     def write_options(self):
         config = configparser.ConfigParser()
-        config['MAIN'] = { 'display_tree' : str(self.options['display_tree']) }
+        config['MAIN'] = {
+            'display_tree' : str(self.options['display_tree']),
+            'confirm_exit' : str(self.options['confirm_exit']),
+        }
         with open(self.title + '.ini', 'w') as configfile:
             config.write(configfile)
     
@@ -207,10 +218,13 @@ class Application:
         
         self.display_tree = tkinter.BooleanVar()
         self.display_tree.set(self.options['display_tree'])
+        self.confirm_exit = tkinter.BooleanVar()
+        self.confirm_exit.set(self.options['confirm_exit'])
         
         self.options_menu = tkinter.Menu(self.menu, tearoff=0)
         self.menu.add_cascade(label="Options", menu=self.options_menu)
         self.options_menu.add_checkbutton(label="Display Tree", onvalue=True, offvalue=False, variable=self.display_tree, command=self.restart)
+        self.options_menu.add_checkbutton(label="Confirm Exit", onvalue=True, offvalue=False, variable=self.confirm_exit, command=self.restart)
         
         self.lang = tkinter.StringVar()
         self.lang.set(self.options['lang'])
@@ -299,6 +313,7 @@ class Application:
             dirtyness.append(f.get_dirty(i))
         del f
         self.options['display_tree'] = self.display_tree.get()
+        self.options['confirm_exit'] = self.confirm_exit.get()
         self.root.after_cancel(self.after_id)
         self.menu_exit()
         self.write_options()
@@ -430,7 +445,7 @@ class Application:
         self.state_restart(filename)
 
     def exit(self):
-        if self.frame.is_dirty():
+        if self.frame.is_dirty() and self.options['confirm_exit']:
             if messagebox.askyesno("Unsaved changes", "There are unsaved changes. Do you really want to quit " + self.title + "?", default=messagebox.NO):
                 self.root.destroy()
         else:
@@ -453,68 +468,6 @@ class Application:
             self.log.info("State changed to dirty")
             self.frame.set_current_dirty(True)
             self.set_title()
-
-
-class Token:
-    
-    SEPARATOR = "sep"
-    KEYWORD = "kw"
-    TEXT = "txt"
-    STRING = "str"
-    
-    def __init__(self, content, start, length, typ):
-        self.content = content
-        self.start = start
-        self.length = length
-        self.type = typ
-
-    def __str__(self):
-        return "%s [%d +%d] (%s)" % (self.content, self.start, self.length, self.type)
-
-
-class Tokenizer:
-    
-    def __init__(self):
-        pass
-    
-    def lex(self, content):
-        #print('---')
-        for s in content:
-            if s == '\n':
-                s = 'NL'
-            elif s == '\r':
-                s = 'CR'
-            #print('[' + s + ']')
-        #print('---')
-        keyword = ('if', 'else', 'for')
-        separators = (' ', '(', ')', ':', '.', ';', ',', '\n')
-        discard = (' ',)
-        replace = {'\n' : 'NEWLINE'}
-        word = ''
-        start = 0
-        tokens = []
-        for i in range(0, len(content)):
-            char = content[i]
-            if char in separators:
-                if len(word)>0:
-                    if word in keyword:
-                        tokens.append(Token(word, start, len(word), Token.KEYWORD))
-                    else:
-                        tokens.append(Token(word, start, len(word), Token.TEXT))
-                    word = ''
-                start = i+1 # bug was here
-                if char not in discard and char not in replace:
-                    tokens.append(Token(char, i, 1, Token.SEPARATOR))
-                if char in replace:
-                    tokens.append(Token(replace[char], i, 1, Token.SEPARATOR))
-            else:
-                word += char
-        if len(word)>0:
-            if word in keyword:
-                tokens.append(Token(word, start, len(word), Token.KEYWORD))
-            else:
-                tokens.append(Token(word, start, len(word), Token.TEXT))
-        return tokens
 
 
 class MyFrame(tkinter.Frame):
@@ -631,21 +584,32 @@ class MyFrame(tkinter.Frame):
         self.hi_there.pack(side="bottom")
     
     def tokenizer(self):
+        debug = False
         text = self.get_current_text()
         content = text.get(1.0, tkinter.END)
-        tokens = Tokenizer().lex(content)
+        #print('||',content,'||', sep='')
+        tokens = Tokenizer().tokenize(content, debug)
         # Clear all tags
         for tag in text.tag_names():
             text.tag_remove(tag, 1.0)
         # Put tags
+        if debug:
+            print('------------')
+            print('Setting tags')
+            print('------------')
         for t in tokens:
-            if t.type == Token.KEYWORD:
+            deb = '1.0+%ic' % t.start
+            end = '1.0+%ic' % (t.start + t.length)
+            if debug:
                 print(t)
-                deb = '1.0+%ic' % t.start
                 print(deb)
-                end = '1.0+%ic' % (t.start + t.length)
                 print(end)
+            if t.typ == Token.Keyword:
+                print('TAGGING KWD')
                 text.tag_add("keyword", deb, end)
+            elif t.typ == Token.Comment:
+                print('TAGGING CMT')
+                text.tag_add("comment", deb, end)
     
     # There is a bug when doing Ctrl+A : the refresh (call to key function) "let" the first character outside the selected area!
     # To prevent this, we do this
@@ -729,6 +693,7 @@ class MyFrame(tkinter.Frame):
                 
         # Tags        
         tag_keyword = text.tag_config("keyword", foreground="blue", font=Fonts.COURRIER_NEW_10_BOLD)
+        tag_comment = text.tag_config("comment", foreground="grey", font=Fonts.COURRIER_NEW_10)
         
         # Tabs
         def tab(event):

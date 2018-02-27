@@ -61,16 +61,22 @@ class Token:
     NewLine     = TokenType('New Line')
     Boolean     = TokenType('Boolean')
     String      = TokenType('String')
+    Comment     = TokenType('Comment')
     Discard     = TokenType('Discard') # Unused
     Error       = TokenType('Error')   # Unused
     EndOfSource = TokenType('End')     # Unused
     
-    def __init__(self, typ: TokenType, val: str):
+    def __init__(self, typ: TokenType, val: str, start=None):
         self.typ = typ
         self.val = val
+        self.start = start
+        self.length = len(val)
     
     def __str__(self):
-        return f":{self.typ}: [{self.val}]"
+        if self.start is None or self.length is None:
+            return f":{self.typ}: [{self.val}]"
+        else:
+            return f":{self.typ}: [{self.val}] ({self.start} +{self.length})"
     
     def to_s(self, level=1):
         return "    " * level + "{Token} " + str(self)
@@ -85,8 +91,8 @@ class Tokenizer:
     END_OF_STRING = ['?', '!']
     
     SEPARATORS = [
-        '(', ')', '[', ']', '{', '}'
-        #',', ';',
+        '(', ')', '[', ']', '{', '}',
+        '\n',
     ]
     
     OPERATORS = [
@@ -98,7 +104,7 @@ class Tokenizer:
         '.', '..', '..<',
         ':', '|', '->',
         '<<', '>>',
-        ',', ';' # concat : , for expression, ; for stratement
+        ',', ';' # concat : , for expression, ; for statement
     ]
 
     KEYWORDS = [
@@ -146,7 +152,7 @@ class Tokenizer:
                 suspended = False
                 word += line[index]
             index += 1
-        t = Token(Token.Integer, word)
+        t = Token(Token.Integer, word, self.counter)
         if self.debug:
             print("    " + f'Creating token {t} n°{len(self.tokens)}')
         self.tokens.append(t)
@@ -166,15 +172,15 @@ class Tokenizer:
             word += line[index]
             index += 1
         if word in Tokenizer.OPERATORS:
-            t = Token(Token.Operator, word)
+            t = Token(Token.Operator, word, self.counter)
         elif word in Tokenizer.KEYWORDS:
-            t = Token(Token.Keyword, word)
+            t = Token(Token.Keyword, word, self.counter)
         elif word in Tokenizer.BOOLEANS:
-            t = Token(Token.Boolean, word)
+            t = Token(Token.Boolean, word, self.counter)
         else:
-            t = Token(Token.Identifier, word)
+            t = Token(Token.Identifier, word, self.counter)
         if self.debug:
-            print("    " + f'Creating token {t} n°{len(self.tokens)}')
+            print("    " + f'Creating token {t} n°{len(self.tokens)}, returning index {index}')
         self.tokens.append(t)
         # Handling of block level only for display!
         if t.val in Tokenizer.BLOCK_PLUS:
@@ -196,7 +202,7 @@ class Tokenizer:
             index += 1
         if operator not in Tokenizer.OPERATORS:
             raise Exception("Operator unknown: " + operator + " at line " + str(self.line_count))
-        t = Token(Token.Operator, operator)
+        t = Token(Token.Operator, operator, self.counter)
         if self.debug:
             print("    " + f'Creating token {t} n°{len(self.tokens)}')
         self.tokens.append(t)
@@ -205,7 +211,10 @@ class Tokenizer:
     def read_separator(self, line, index):
         if self.debug:
             print("    " + f'Reading separator at {index}, line {self.line_count}, starting with [{line[index]}]')
-        t = Token(Token.Separator, line[index])
+        if line[index] == '\n':
+            t = Token(Token.NewLine, line[index], self.counter)
+        else:
+            t = Token(Token.Separator, line[index], self.counter)
         if self.debug:
             print("    " + f'Creating token {t} n°{len(self.tokens)}')
         self.tokens.append(t)
@@ -229,51 +238,68 @@ class Tokenizer:
             raise Exception("Terminator char not found for string!")
         if word == '\\n':
             word = '\n'
-        t = Token(Token.String, word)
+        t = Token(Token.String, word, self.counter)
         if self.debug:
             print("    " + f'Creating token {t} n°{len(self.tokens)}')
         self.tokens.append(t)
         return index+1
     
     def tokenize(self, source, debug=False):
-        print('[INFO] Start lexing')
+        if debug:
+            print('[INFO] Start lexing')
         self.debug = debug
         self.tokens.clear()
         self.block_level = 0
+        self.counter = 0
         if os.path.isfile(source):
             source = open(source, 'r', encoding='utf8').readlines()
         else:
-            source = source.split('\n')
-        skip = False
+            if '\n' in source:
+                source = source.split('\n')
+                del source[-1] # delete the last element, it will be empty
+                source2 = []
+                for s in source:
+                    source2.append(s + '\n') # add again the ending '\n' to make like readlines
+                source = source2
+        if debug:
+            print('       -------')
+            print('       Source:')
+            print('       -------')
+            for i in range(0, len(source)):
+                print(f'           {i}. ' + source[i].replace('\n', '<NEWLINE>'))
+            print('       ------')
+            print('       Lines:')
+            print('       ------')
+        skip_line = False
         for line in source:
             self.line_level = self.block_level
             self.line_count += 1
-            line = line.strip()
-            if len(line) >= 2:
-                if line.startswith('--'):
-                    continue
-                elif line.startswith('=='):
-                    skip = not skip
-                    continue
-                elif skip:
-                    continue
-            elif len(line) == 1:
-                if line[0] == '\n':
-                    continue
-            elif not line:
+            # comments
+            if skip_line or line.strip().startswith('--'):
+                t = Token(Token.Comment, line[:-1], self.counter + line.index('--'))
+                self.tokens.append(t)
+                t = Token(Token.NewLine, "\n", self.counter + len(line) - 1)
+                self.tokens.append(t)
+                self.counter += len(line)
+                continue
+            elif line.strip().startswith('=='):
+                skip_line = not skip_line
+                self.counter += len(line)
                 continue
             # analyze line
             if self.debug:
-                print('>>>', line)
+                print('           Analyzing line : ', line.replace('\n', '<NEWLINE>'))
+                print('                of length : ', len(line))
             index = 0
             word = None
             while index < len(line):
+                previous = index
                 char = line[index]
                 if char.isdigit(): # 0 1 2 3 4 5 6 7 8 9
                     index = self.read_number(line, index)
                 elif char.isalpha() or char in Tokenizer.START_OF_ID: # a-z A-Z @ _
                     index = self.read_id(line, index)
-                elif char.isspace(): # ' ' \n \t
+                elif char.isspace() and char != '\n': # ' ' \t
                     index += 1
                 elif char in Tokenizer.START_OF_STRING:
                     index = self.read_string(line, index)
@@ -283,12 +309,14 @@ class Tokenizer:
                     index = self.read_separator(line, index)
                 else:
                     raise Exception("What to do with: " + char + "?")
-            self.tokens.append(Token(Token.NewLine, Tokenizer.NEWLINE))
+                self.counter += (index - previous)
             # Pretty print
-            if not self.debug:
+            if self.debug:
                 print('>>>', "    " * self.line_level, line)
         if self.debug:
-            print(f'{len(self.tokens)} tokens created.')
+            print(f'[INFO] {len(self.tokens)} tokens created:')
+            for i in range(0, len(self.tokens)):
+                print(f'{i}. {self.tokens[i]}')
         return self.tokens
 
 #-------------------------------------------------------------------------------
@@ -684,6 +712,9 @@ class Parser:
         print('[INFO] Start parsing')
         if tokens is None:
             raise Exception("tokens is None!")
+        # clean tokens
+        cleaned = [tok for tok in tokens if tok.typ not in [Token.NewLine, Token.Comment]]
+        tokens = cleaned
         index = 0
         ast = AST()
         ast.root = self.read_block(tokens, 0)[1] # index is discared
