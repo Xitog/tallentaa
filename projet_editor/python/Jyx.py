@@ -242,12 +242,12 @@ class Application:
         self.langmenu.add_radiobutton(label="JavaScript (.js)", variable=self.lang, value="js", command=self.update_lang)
         self.langmenu.add_radiobutton(label="Lua (.lua)", variable=self.lang, value="lua", command=self.update_lang)
         self.langmenu.add_radiobutton(label="Python (.py)", variable=self.lang, value="py", command=self.update_lang)#, indicatoron=0
-        self.langmenu.add_radiobutton(label="Rey (.rey)", variable=self.lang, value="rb", command=self.update_lang)
+        self.langmenu.add_radiobutton(label="Rey (.rey)", variable=self.lang, value="rey", command=self.update_lang)
         self.langmenu.add_radiobutton(label="Ruby (.rb)", variable=self.lang, value="rb", command=self.update_lang)
         self.langmenu.add_separator()
         # Compiled language
-        self.langmenu.add_radiobutton(label="C (.c, .h)", variable=self.lang, value="js", command=self.update_lang)
-        self.langmenu.add_radiobutton(label="Java (.java)", variable=self.lang, value="js", command=self.update_lang)
+        self.langmenu.add_radiobutton(label="C (.c, .h)", variable=self.lang, value="c", command=self.update_lang)
+        self.langmenu.add_radiobutton(label="Java (.java)", variable=self.lang, value="java", command=self.update_lang)
         self.langmenu.add_separator()
         # Data format
         self.langmenu.add_radiobutton(label="INI (.ini)", variable=self.lang, value="ini", command=self.update_lang)
@@ -536,11 +536,11 @@ class MyFrame(tkinter.Frame):
         #    borderwidth = 0,  # zero width for the border
         #)
         self.treeview = ttk.Treeview(self)
-        self.treeview["columns"] = ("text",)
+        #self.treeview["columns"] = ("text",)
         self.treeview.column("#0", width=120)
         self.treeview.heading("#0", text="Nodes")
-        self.treeview.column("text", width=80)
-        self.treeview.heading("text", text="Tag")
+        #self.treeview.column("text", width=80)
+        #self.treeview.heading("text", text="Tag")
         self.treeview.insert("", 0, text="First entry")
         if self.app.rc.found('Crystal_Clear_device_blockdevice16'):
             self.treeview.insert("", 1, text=" Second entry", image=self.app.rc.get_as_image('Crystal_Clear_device_blockdevice16'))
@@ -584,11 +584,15 @@ class MyFrame(tkinter.Frame):
         self.hi_there.pack(side="bottom")
     
     def tokenizer(self):
-        debug = False
+        debug = True
         text = self.get_current_text()
         content = text.get(1.0, tkinter.END)
         #print('||',content,'||', sep='')
-        tokens = Tokenizer().tokenize(content, debug)
+        if self.app.options['lang'] == 'txt':
+            return
+        else:
+            print(self.app.options['lang'])
+        tokens = Tokenizer(lang).tokenize(content, debug)
         # Clear all tags
         for tag in text.tag_names():
             text.tag_remove(tag, 1.0)
