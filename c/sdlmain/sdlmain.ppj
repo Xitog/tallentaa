@@ -1,0 +1,21 @@
+# 
+# FICHIER DE PROJET construit par "Pelles C pour Windows, version 8.00".
+# AVERTISSEMENT! NE PAS MODIFIER CE FICHIER.
+# 
+
+POC_PROJECT_VERSION = 7.00#
+POC_PROJECT_TYPE = 2#
+POC_PROJECT_OUTPUTDIR = output#
+POC_PROJECT_RESULTDIR = .#
+POC_PROJECT_ARGUMENTS = #
+POC_PROJECT_ZIPEXTRA = #
+CC = pocc.exe#
+AS = poasm.exe#
+AR = polib.exe#
+CCFLAGS = -Tx86-coff -Ot -W1 -Ze -Gz -std:C11#
+ASFLAGS = -AIA32 -Gz#
+ARFLAGS = #
+INCLUDE = $(PellesCDir)\Include\Win;$(PellesCDir)\Include#
+LIB = $(PellesCDir)\Lib\Win;$(PellesCDir)\Lib#
+
+.SILENT:
