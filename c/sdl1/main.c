@@ -209,31 +209,25 @@ void input(void) {
     }
 }
 
-/*
-bool close(bool quit_if_esc, bool delay) {
-    if (delay) {
-        SDL_Delay(5);
-    }
-    int done = false;
-    if (!SDL_PollEvent(&event)) {
-        // done = 0;
-    } else {
-        input();
-        if(quit_if_esc && inkeys[SDLK_ESCAPE]) {
-            done = true;
-        }
-        if(event.type == SDL_QUIT) {
-            done = true;
-        }
-    }
-    return done;
-}
-*/
-
 double player_x;
 double player_y;
 double direction_x;
 double direction_y;
+double camera_x;
+double camera_y;
+
+int map[10][10] = {
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+};
 
 void display_info_on_surface(SDL_Surface * surf) {
     // https://www.libsdl.org/release/SDL-1.2.15/docs/html/sdlsurface.html
@@ -258,7 +252,7 @@ void display_info_on_surface(SDL_Surface * surf) {
     printf("Do I have to lock? %d\n", mustlock); // 0 = No. Software surface don't need.
 }
 
-// Il faut un buffer et ne pas écrire directement sur le screen !
+// Il faut un buffer et ne pas ecrire directement sur le screen !
 int main(int argc, char * argv[]) {
     int err = init("Test Simple SDL 1", 640, 400, 32, false);
     if (err == EXIT_FAILURE) {
@@ -272,23 +266,61 @@ int main(int argc, char * argv[]) {
     player_y = screen->h / 2;
     direction_x = -1;
     direction_y = 0;
+    camera_x = 0;
+    camera_y = 0.66;
     Uint32 RED = SDL_MapRGB(screen->format, 255, 0, 0);
     Uint32 GREEN = SDL_MapRGB(screen->format, 0, 255, 0);
     Uint32 BLUE = SDL_MapRGB(screen->format, 0, 0, 255);
     Uint32 BLACK = SDL_MapRGB(screen->format, 0, 0, 0);
+    Uint32 YELLOW = SDL_MapRGB(screen->format, 255, 255, 0);
     double tick_current = 0.0;
     double tick_previous = 0.0;
     double frame_time = 0.0;
     double move_modifier = 0.2;
     double rot_modifier = 0.01;
+    int ZOOM = 10;
+
+    SDL_Surface * my_bitmap = SDL_LoadBMP("..\\..\\assets\\graphic\\textures\\woolfy_wall\\noni_a_006.bmp");
+    SDL_Surface * my_bitmap_conv = SDL_DisplayFormat(my_bitmap);
+    SDL_FreeSurface(my_bitmap);
+    SDL_Rect rect;
+    rect.x = 0;
+    rect.y = 0;
+    rect.w = my_bitmap->w;
+    rect.h = my_bitmap->h;
+
+    SDL_Surface * my_bitmap_key = SDL_LoadBMP("..\\..\\assets\\graphic\\sprites\\woolfy\\mguard_s_1.bmp");
+    Uint32 key = SDL_MapRGB(screen->format, 152, 0, 136);
+    //SDL_SetColorKey(my_bitmap_key, SDL_SRCCOLORKEY | SDL_RLEACCEL, key);
+    
+    SDL_Surface * my_bitmap_key_conv = SDL_DisplayFormat(my_bitmap_key);
+    SDL_SetColorKey(my_bitmap_key_conv, SDL_SRCCOLORKEY | SDL_RLEACCEL, key);
+
+    SDL_Rect rect2;
+    rect2.x = my_bitmap_key->w;
+    rect2.y = my_bitmap_key->h;
+    rect2.w = my_bitmap_key->w;
+    rect2.h = my_bitmap_key->h;
+    
     while(!done) {
+        //---------------------------------------------------------------------
+        // Calculations
+        //---------------------------------------------------------------------
+        int posdirx = player_x + direction_x * ZOOM;
+        int posdiry = player_y + direction_y * ZOOM;
         //---------------------------------------------------------------------
         // Rendering
         //---------------------------------------------------------------------
         fill(BLACK);
         for (int x = 0; x < screen->w; x++) {
             vertical(x, 0, screen->h - 1, RED);
-            line(player_x, player_y, player_x + direction_x * 5, player_y + direction_y * 5, BLUE);
+            SDL_BlitSurface(my_bitmap_conv, NULL, screen, &rect);
+            SDL_BlitSurface(my_bitmap_key_conv, NULL, screen, &rect2);
+            line(player_x, player_y, posdirx, posdiry, BLUE);
+            line(posdirx, posdiry, posdirx + camera_x * ZOOM, posdiry + camera_y * ZOOM, YELLOW);
+            line(posdirx, posdiry, posdirx - camera_x * ZOOM, posdiry - camera_y * ZOOM, YELLOW);
+            line(player_x, player_y, posdirx + camera_x * ZOOM, posdiry + camera_y * ZOOM, YELLOW);
+            line(player_x, player_y, posdirx - camera_x * ZOOM, posdiry - camera_y * ZOOM, YELLOW);
             pixel(player_x, player_y, GREEN);
         }
         render();
@@ -311,14 +343,21 @@ int main(int argc, char * argv[]) {
             double old_dir_x = direction_x;
             direction_x = direction_x * cos(rot_modifier * frame_time) - direction_y * sin(rot_modifier * frame_time);
             direction_y = old_dir_x * sin(rot_modifier * frame_time) + direction_y * cos(rot_modifier * frame_time);
+            double old_cam_x = camera_x;
+            camera_x = camera_x * cos(rot_modifier * frame_time) - camera_y * sin(rot_modifier * frame_time);
+            camera_y = old_cam_x * sin(rot_modifier * frame_time) + camera_y * cos(rot_modifier * frame_time);
         }
         if (left) {
             double old_dir_x = direction_x;
             direction_x = direction_x * cos(-rot_modifier * frame_time) - direction_y * sin(-rot_modifier * frame_time);
             direction_y = old_dir_x * sin(-rot_modifier * frame_time) + direction_y * cos(-rot_modifier * frame_time);
+            double old_cam_x = camera_x;
+            camera_x = camera_x * cos(-rot_modifier * frame_time) - camera_y * sin(-rot_modifier * frame_time);
+            camera_y = old_cam_x * sin(-rot_modifier * frame_time) + camera_y * cos(-rot_modifier * frame_time);
         }
         //printf("%f.%f %f\n", player_x, player_y, frame_time); 
     }
+    SDL_FreeSurface(my_bitmap_conv);
     quit();
     return EXIT_SUCCESS;
 }
