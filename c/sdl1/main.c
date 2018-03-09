@@ -283,6 +283,7 @@ int main(int argc, char * argv[]) {
     SDL_Surface * my_bitmap = SDL_LoadBMP("..\\..\\assets\\graphic\\textures\\woolfy_wall\\noni_a_006.bmp");
     SDL_Surface * my_bitmap_conv = SDL_DisplayFormat(my_bitmap);
     SDL_FreeSurface(my_bitmap);
+
     SDL_Rect rect;
     rect.x = 0;
     rect.y = 0;
@@ -290,10 +291,10 @@ int main(int argc, char * argv[]) {
     rect.h = my_bitmap->h;
 
     SDL_Surface * my_bitmap_key = SDL_LoadBMP("..\\..\\assets\\graphic\\sprites\\woolfy\\mguard_s_1.bmp");
-    Uint32 key = SDL_MapRGB(screen->format, 152, 0, 136);
-    //SDL_SetColorKey(my_bitmap_key, SDL_SRCCOLORKEY | SDL_RLEACCEL, key);
-    
     SDL_Surface * my_bitmap_key_conv = SDL_DisplayFormat(my_bitmap_key);
+    SDL_FreeSurface(my_bitmap_key);
+
+    Uint32 key = SDL_MapRGB(screen->format, 152, 0, 136);
     SDL_SetColorKey(my_bitmap_key_conv, SDL_SRCCOLORKEY | SDL_RLEACCEL, key);
 
     SDL_Rect rect2;
@@ -358,6 +359,7 @@ int main(int argc, char * argv[]) {
         //printf("%f.%f %f\n", player_x, player_y, frame_time); 
     }
     SDL_FreeSurface(my_bitmap_conv);
+    SDL_FreeSurface(my_bitmap_key_conv);
     quit();
     return EXIT_SUCCESS;
 }
