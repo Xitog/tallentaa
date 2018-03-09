@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <string.h>
 #include <math.h>
+#include <io.h>
 #include "SDL.h"
 
 //-----------------------------------------------------------------------------
@@ -163,6 +164,10 @@ void input(void) {
 }
 */
 
+bool file_exist(char * file) {
+    return  (_access(file, 0) != -1);
+}
+
 bool down;
 bool up;
 bool right;
@@ -252,6 +257,8 @@ void display_info_on_surface(SDL_Surface * surf) {
     printf("Do I have to lock? %d\n", mustlock); // 0 = No. Software surface don't need.
 }
 
+#define not !
+
 // Il faut un buffer et ne pas ecrire directement sur le screen !
 int main(int argc, char * argv[]) {
     int err = init("Test Simple SDL 1", 640, 400, 32, false);
@@ -280,7 +287,12 @@ int main(int argc, char * argv[]) {
     double rot_modifier = 0.01;
     int ZOOM = 10;
 
-    SDL_Surface * my_bitmap = SDL_LoadBMP("..\\..\\assets\\graphic\\textures\\woolfy_wall\\noni_a_006.bmp");
+    char * file_path = "..\\..\\assets\\graphic\\textures\\woolfy_wall\\noni_a_006.bmp";
+    if (not file_exist(file_path)) {
+        printf("[ERROR] File not found: %s\n", file_path);
+        return EXIT_FAILURE;
+    }
+    SDL_Surface * my_bitmap = SDL_LoadBMP(file_path);
     SDL_Surface * my_bitmap_conv = SDL_DisplayFormat(my_bitmap);
     SDL_FreeSurface(my_bitmap);
 
