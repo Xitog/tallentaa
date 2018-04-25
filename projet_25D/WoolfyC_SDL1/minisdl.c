@@ -389,17 +389,35 @@ void disk(int x, int y, int radius, Uint32 color) {
     }
 }
 
-void rectangle(int x1, int y1, int x2, int y2, Uint32 color) {
-    if (x1 < 0 || x1 > screen->w - 1 || x2 < 0 || x2 > screen->w - 1 || y1 < 0 || y1 > screen->h -1 || y2 < 0 || y2 > screen->h - 1) {
-        return ;
+void rectangle(int x1, int y1, int x2, int y2, Uint32 color, bool filled) {
+    //if (x1 < 0 || x1 > screen->w - 1 || x2 < 0 || x2 > screen->w - 1 || y1 < 0 || y1 > screen->h -1 || y2 < 0 || y2 > screen->h - 1) {
+    //    return ;
+    //}
+    if (filled) {
+        SDL_Rect rect;
+        rect.x = x1;
+        rect.y = y1;
+        rect.w = x2 - x1 + 1;
+        rect.h = y2 - y1 + 1;
+        //printf("%d %d %d %d\n", rect.x, rect.y, rect.w, rect.h);
+        SDL_FillRect(screen, &rect, color);
+    } else {
+        vertical(x1, y1, y2, color);
+        vertical(x2, y1, y2, color);
+        horizontal(y1, x1, x2, color);
+        horizontal(y2, x1, x2, color);
     }
-    SDL_Rect rect;
-    rect.x = x1;
-    rect.y = y1;
-    rect.w = x2 - x1 + 1;
-    rect.h = y2 - y1 + 1;
-    //printf("%d %d %d %d\n", rect.x, rect.y, rect.w, rect.h);
-    SDL_FillRect(screen, &rect, color);
+}
+
+SDL_Surface * load_bmp(char * file_path) {
+    if (not file_exist(file_path)) {
+        printf("[ERROR] File not found: %s\n", file_path);
+        return NULL;
+    }
+    SDL_Surface * my_bitmap = SDL_LoadBMP(file_path);
+    SDL_Surface * my_bitmap_conv = SDL_DisplayFormat(my_bitmap);
+    SDL_FreeSurface(my_bitmap);
+    return my_bitmap_conv;
 }
 
 bool file_exist(char * file) {

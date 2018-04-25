@@ -101,7 +101,8 @@ void vertical(int x, int y1, int y2, Uint32 color);
 void horizontal(int y, int x1, int x2, Uint32 color);
 void circle(int x, int y, int radius, Uint32 color);
 void disk(int x, int y, int radius, Uint32 color);
-void rectangle(int x1, int y1, int x2, int y2, Uint32 color);
+void rectangle(int x1, int y1, int x2, int y2, Uint32 color, bool filled);
+SDL_Surface * load_bmp(char * file_path);
 bool file_exist(char * file);
 
 #endif
