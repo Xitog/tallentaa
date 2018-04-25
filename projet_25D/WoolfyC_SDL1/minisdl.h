@@ -90,6 +90,7 @@ int init_audio(int freq, Uint16 format, Uint8 channels, Uint16 samples);
 int load_wav(char * path);
 void play_wav(void);
 void stop_audio(void);
+void display_info_on_surface(SDL_Surface * surf);
 void render(void);
 void fill(Uint32 color);
 void pixel(int x, int y, Uint32 color);

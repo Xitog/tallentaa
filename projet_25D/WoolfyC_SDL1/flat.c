@@ -68,8 +68,6 @@
 #define TEXTURE_PATH "noni_a_006.bmp"
 #define ENEMY_PATH "mguard_s_1.bmp"
 
-#define TEST 1
-#define WOOLFY 5
 #define MAP_WIDTH 20
 #define MAP_HEIGHT 20
 
@@ -78,6 +76,13 @@
 
 #define MINIMAP_FACTOR 20
 #define MINIMAP_ZOOM 10
+
+#define R 1
+#define Y 2
+#define B 3
+#define G 4
+#define W 5
+#define P 6
 
 //-----------------------------------------------------------------------------
 // Globals
@@ -90,59 +95,27 @@ bool left;
 bool done = false;
 bool show_map = false;
 
-double player_x;
-double player_y;
-double direction_x;
-double direction_y;
-double camera_x;
-double camera_y;
-
-int MODE = WOOLFY;
-
 int map[MAP_WIDTH][MAP_HEIGHT] = {
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 1, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-};
-
-int map_height[MAP_WIDTH][MAP_HEIGHT] = {
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 2, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 2, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 2, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4},
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    {R, Y, R, Y, R, Y, R, Y, R, Y, R, Y, R, Y, R, Y, R, Y, R, Y},
+    {G, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {W, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {W, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {W, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {G, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {G, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {G, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {W, 0, 0, 0, 0, 0, 0, R, 0, Y, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {W, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {W, 0, 0, 0, 0, 0, 0, G, 0, B, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {G, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {G, 0, 0, 0, 0, 0, 0, B, 0, P, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {G, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {W, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {W, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {W, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {G, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {G, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {G, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 };
 
 //-----------------------------------------------------------------------------
@@ -193,31 +166,26 @@ void input(void) {
     }
 }
 
-void display_info_on_surface(SDL_Surface * surf) {
-    // https://www.libsdl.org/release/SDL-1.2.15/docs/html/sdlsurface.html
-
-    printf("Uint32 flags = %d\n", surf->flags);
-    //SDL_PixelFormat *format;
-    //SDL_Palette *palette;
-    printf("Uint8  BitsPerPixel = %d\n", surf->format->BitsPerPixel);
-    printf("Uint8  BytesPerPixel = %d\n", surf->format->BytesPerPixel);
-    //Uint8  Rloss, Gloss, Bloss, Aloss;
-    //Uint8  Rshift, Gshift, Bshift, Ashift;
-    //Uint32 Rmask, Gmask, Bmask, Amask;
-    printf("Uint32 colorkey = %d\n", surf->format->colorkey);
-    printf("Uint8  alpha = %d\n", surf->format->alpha);
-
-    printf("int w, h = %d, %d\n", surf->w, surf->h);
-    printf("Uint16 pitch = %d\n", surf->pitch);
-    printf("void *pixels"); // writable
-    //SDL_Rect clip_rect;
-    printf("int refcount  = %d\n", surf->refcount); // read mostly
-    int mustlock = SDL_MUSTLOCK(screen); 
-    printf("Do I have to lock? %d\n", mustlock); // 0 = No. Software surface don't need.
-}
-
 // Il faut un buffer et ne pas ecrire directement sur le screen !
 int main(int argc, char * argv[]) {
+    // 2.5D Coordinates
+    double player_x = 5; // screen->w / 2;
+    double player_y = 5; // screen->h / 2;
+    double direction_x = -1;
+    double direction_y = 0;
+    double camera_x = 0;
+    double camera_y = 0.66;
+
+    double next_x = 0.0;
+    double next_y = 0.0;
+    int probe_x = 0;
+    int probe_y = 0;
+    int probe_left_x = 0;
+    int probe_left_y = 0;
+    int probe_right_x = 0;
+    int probe_right_y = 0;
+    float hitbox = 0.3;
+
     int err = init("Test Simple SDL 1", 640, 400, 32, false);
     if (err == EXIT_FAILURE) {
         return err;
@@ -226,18 +194,13 @@ int main(int argc, char * argv[]) {
     // Info
     display_info_on_surface(screen);
     // Colors
-    player_x = 5; // screen->w / 2;
-    player_y = 5; // screen->h / 2;
-    direction_x = -1;
-    direction_y = 0;
-    camera_x = 0;
-    camera_y = 0.66;
     Uint32 RED = SDL_MapRGB(screen->format, 255, 0, 0);
     Uint32 GREEN = SDL_MapRGB(screen->format, 0, 255, 0);
     Uint32 BLUE = SDL_MapRGB(screen->format, 0, 0, 255);
     Uint32 BLACK = SDL_MapRGB(screen->format, 0, 0, 0);
     Uint32 YELLOW = SDL_MapRGB(screen->format, 255, 255, 0);
     Uint32 WHITE = SDL_MapRGB(screen->format, 255, 255, 255);
+    Uint32 PURPLE = SDL_MapRGB(screen->format, 128, 64, 128);
     double tick_current = 0.0;
     double tick_previous = 0.0;
     double frame_time = 0.0;
@@ -277,14 +240,10 @@ int main(int argc, char * argv[]) {
     //---------------------------------------------------------------------
     // Sound test
     //---------------------------------------------------------------------
-    
     char name[32];
     printf("Using audio driver: %s\n", SDL_AudioDriverName(name, 32));
-
     init_audio(22050, AUDIO_U8, 1, 4096);
-    
     load_wav(SOUND_PATH);
-    
     play_wav();
     
     //---------------------------------------------------------------------
@@ -294,151 +253,132 @@ int main(int argc, char * argv[]) {
         // Rendering
         //---------------------------------------------------------------------
         fill(BLACK);
-        if (MODE == WOOLFY) {
-            for (int x = 0; x < screen->w; x++) {
-                double raycast_cpt = 2 * x / (float) screen->w - 1;
-                double ray_x = direction_x + camera_x * raycast_cpt;
-                double ray_y = direction_y + camera_y * raycast_cpt;
+        
+        for (int x = 0; x < screen->w; x++) {
+            double raycast_cpt = 2 * x / (float) screen->w - 1;
+            double ray_x = direction_x + camera_x * raycast_cpt;
+            double ray_y = direction_y + camera_y * raycast_cpt;
 
-                int map_x = (int) player_x;
-                int map_y = (int) player_y;
+            int map_x = (int) player_x;
+            int map_y = (int) player_y;
 
-                double sideDistX;
-                double sideDistY;
+            double sideDistX;
+            double sideDistY;
 
-                double deltaDistX = fabs(1 / ray_x);
-                double deltaDistY = fabs(1 / ray_y);
-                double perpWallDist;
+            double deltaDistX = fabs(1 / ray_x);
+            double deltaDistY = fabs(1 / ray_y);
+            double perpWallDist;
 
-                int stepX;
-                int stepY;
+            int stepX;
+            int stepY;
 
-                int hit = 0;
-                int side;
+            int hit = 0;
+            int side;
 
-                if (ray_x < 0) {
-                    stepX = -1;
-                    sideDistX = (player_x - map_x) * deltaDistX;
+            if (ray_x < 0) {
+                stepX = -1;
+                sideDistX = (player_x - map_x) * deltaDistX;
+            } else {
+                stepX = 1;
+                sideDistX = (map_x + 1.0 - player_x) * deltaDistX;
+            }
+            if (ray_y < 0) {
+                stepY = -1;
+                sideDistY = (player_y - map_y) * deltaDistY;
+            } else {
+                stepY = 1;
+                sideDistY = (map_y + 1.0 - player_y) * deltaDistY;
+            }
+
+            while (hit == 0) {
+                if (sideDistX < sideDistY) {
+                    sideDistX += deltaDistX;
+                    map_x += stepX;
+                    side = 0;
                 } else {
-                    stepX = 1;
-                    sideDistX = (map_x + 1.0 - player_x) * deltaDistX;
+                    sideDistY += deltaDistY;
+                    map_y += stepY;
+                    side = 1;
                 }
-                if (ray_y < 0) {
-                    stepY = -1;
-                    sideDistY = (player_y - map_y) * deltaDistY;
-                } else {
-                    stepY = 1;
-                    sideDistY = (map_y + 1.0 - player_y) * deltaDistY;
-                }
+                if (map[map_x][map_y] > 0) hit = 1;
+            }
+            if (side == 0) {
+                perpWallDist = (map_x - player_x + (1 - stepX) / 2) / ray_x;
+            } else {
+                perpWallDist = (map_y - player_y + (1 - stepY) / 2) / ray_y;
+            }
 
-                while (hit == 0) {
-                    if (sideDistX < sideDistY) {
-                        sideDistX += deltaDistX;
-                        map_x += stepX;
-                        side = 0;
-                    } else {
-                        sideDistY += deltaDistY;
-                        map_y += stepY;
-                        side = 1;
-                    }
-                    if (map[map_x][map_y] > 0) hit = 1;
-                }
-                if (side == 0) {
-                    perpWallDist = (map_x - player_x + (1 - stepX) / 2) / ray_x;
-                } else {
-                    perpWallDist = (map_y - player_y + (1 - stepY) / 2) / ray_y;
-                }
-
-                int lineHeight = (int) (screen->h / perpWallDist);
-                int drawStart = drawStart = -lineHeight / 2 + screen->h / 2;
-                /*
-                int drawStart = 0;
-                switch(map_height[map_x][map_y]) {
-                    case 1:
-                        drawStart = -lineHeight / 2 + screen->h / 2;
-                        break;
-                    case 2:
-                        drawStart = -lineHeight / 2 - lineHeight + screen->h / 2;
-                        break;
-                    case 3:
-                        drawStart = -lineHeight / 2 - lineHeight * 2 + screen->h / 2;
-                        break;
-                    case 4:
-                        drawStart = -lineHeight / 2 - lineHeight * 3 + screen->h / 2;
-                        break;
-                }
-                */
-                int drawEnd = lineHeight / 2 + screen->h / 2;
-                if (drawStart < 0) {
-                    drawStart = 0;
-                }
-                if (drawEnd >= screen->h) {
-                    drawEnd = screen->h - 1;
-                }
-                
-                Uint32 color = RED; // for 1
-                switch(map[map_x][map_y]) {
-                    case 2:
-                        color = YELLOW;
-                        break;
-                    case 3:
-                        color = BLUE;
-                        break;
-                    case 4:
-                        color = GREEN;
-                        break;
-                    default:
-                        color = RED;
-                }
-                
-                vertical(x, drawStart, drawEnd, color);
+            int lineHeight = (int) (screen->h / perpWallDist);
+            int drawStart = drawStart = -lineHeight / 2 + screen->h / 2;
+            int drawEnd = lineHeight / 2 + screen->h / 2;
+            if (drawStart < 0) {
+                drawStart = 0;
+            }
+            if (drawEnd >= screen->h) {
+                drawEnd = screen->h - 1;
             }
             
-            if (show_map) {
-                int minimap_player_x = player_x * MINIMAP_FACTOR;
-                int minimap_player_y = player_y * MINIMAP_FACTOR;
-                int minimap_posdirx = minimap_player_x + direction_x * MINIMAP_ZOOM;
-                int minimap_posdiry = minimap_player_y + direction_y * MINIMAP_ZOOM;
+            Uint32 color = RED; // for 1
+            switch(map[map_x][map_y]) {
+                case 1:
+                    color = RED;
+                    break;
+                case 2:
+                    color = YELLOW;
+                    break;
+                case 3:
+                    color = BLUE;
+                    break;
+                case 4:
+                    color = GREEN;
+                    break;
+                case 5:
+                    color = WHITE;
+                    break;
+                case 6:
+                    color = PURPLE;
+            }
+            
+            vertical(x, drawStart, drawEnd, color);
+        }
+        
+        if (show_map) {
+            int minimap_player_x = player_x * MINIMAP_FACTOR;
+            int minimap_player_y = player_y * MINIMAP_FACTOR;
+            int minimap_posdirx = minimap_player_x + direction_x * MINIMAP_ZOOM;
+            int minimap_posdiry = minimap_player_y + direction_y * MINIMAP_ZOOM;
+            int minimap_sideleft_x = minimap_player_x + camera_x * MINIMAP_ZOOM * hitbox;
+            int minimap_sideleft_y = minimap_player_y + camera_y * MINIMAP_ZOOM * hitbox;
+            int minimap_sideright_x = minimap_player_x - camera_x * MINIMAP_ZOOM * hitbox;
+            int minimap_sideright_y = minimap_player_y - camera_y * MINIMAP_ZOOM * hitbox;
 
-                line(minimap_player_x, minimap_player_y, minimap_posdirx, minimap_posdiry, BLUE);
-                line(minimap_posdirx, minimap_posdiry, minimap_posdirx + camera_x * MINIMAP_ZOOM, minimap_posdiry + camera_y * MINIMAP_ZOOM, YELLOW);
-                line(minimap_posdirx, minimap_posdiry, minimap_posdirx - camera_x * MINIMAP_ZOOM, minimap_posdiry - camera_y * MINIMAP_ZOOM, YELLOW);
-                line(minimap_player_x, minimap_player_y, minimap_posdirx + camera_x * MINIMAP_ZOOM, minimap_posdiry + camera_y * MINIMAP_ZOOM, YELLOW);
-                line(minimap_player_x, minimap_player_y, minimap_posdirx - camera_x * MINIMAP_ZOOM, minimap_posdiry - camera_y * MINIMAP_ZOOM, YELLOW);
-                pixel(minimap_player_x, minimap_player_y, GREEN);
-                circle(minimap_player_x, minimap_player_y, MINIMAP_ZOOM * 4, WHITE);
+            line(minimap_player_x, minimap_player_y, minimap_posdirx, minimap_posdiry, BLUE);
+            line(minimap_player_x, minimap_player_y, minimap_sideleft_x, minimap_sideleft_y, WHITE);
+            line(minimap_player_x, minimap_player_y, minimap_sideright_x, minimap_sideright_y, WHITE);
 
-                for(int y = 0; y < MAP_HEIGHT; y++) {
-                    for(int x = 0; x < MAP_WIDTH; x++) {
-                        if (map[x][y] > 0) {
-                            vertical(x * MINIMAP_FACTOR, y * MINIMAP_FACTOR, (y + 1) * MINIMAP_FACTOR, WHITE);
-                            vertical((x + 1) * MINIMAP_FACTOR, y * MINIMAP_FACTOR, (y + 1) * MINIMAP_FACTOR, WHITE);
-                            horizontal(y * MINIMAP_FACTOR, x * MINIMAP_FACTOR, (x + 1) * MINIMAP_FACTOR, WHITE);
-                            horizontal((y + 1) * MINIMAP_FACTOR, x * MINIMAP_FACTOR, (x + 1) * MINIMAP_FACTOR, WHITE);
-                        }
+            line(minimap_posdirx, minimap_posdiry, minimap_posdirx + camera_x * MINIMAP_ZOOM, minimap_posdiry + camera_y * MINIMAP_ZOOM, YELLOW);
+            line(minimap_posdirx, minimap_posdiry, minimap_posdirx - camera_x * MINIMAP_ZOOM, minimap_posdiry - camera_y * MINIMAP_ZOOM, YELLOW);
+            line(minimap_player_x, minimap_player_y, minimap_posdirx + camera_x * MINIMAP_ZOOM, minimap_posdiry + camera_y * MINIMAP_ZOOM, YELLOW);
+            line(minimap_player_x, minimap_player_y, minimap_posdirx - camera_x * MINIMAP_ZOOM, minimap_posdiry - camera_y * MINIMAP_ZOOM, YELLOW);
+            pixel(minimap_player_x, minimap_player_y, GREEN);
+            circle(minimap_player_x, minimap_player_y, MINIMAP_ZOOM * 4, WHITE);
+
+            for(int y = 0; y < MAP_HEIGHT; y++) {
+                for(int x = 0; x < MAP_WIDTH; x++) {
+                    if (map[x][y] > 0) {
+                        vertical(x * MINIMAP_FACTOR, y * MINIMAP_FACTOR, (y + 1) * MINIMAP_FACTOR, WHITE);
+                        vertical((x + 1) * MINIMAP_FACTOR, y * MINIMAP_FACTOR, (y + 1) * MINIMAP_FACTOR, WHITE);
+                        horizontal(y * MINIMAP_FACTOR, x * MINIMAP_FACTOR, (x + 1) * MINIMAP_FACTOR, WHITE);
+                        horizontal((y + 1) * MINIMAP_FACTOR, x * MINIMAP_FACTOR, (x + 1) * MINIMAP_FACTOR, WHITE);
+                    }
+                    if (x == (int)player_x && y == (int)player_y) {
+                        vertical(x * MINIMAP_FACTOR, y * MINIMAP_FACTOR, (y + 1) * MINIMAP_FACTOR, GREEN);
+                        vertical((x + 1) * MINIMAP_FACTOR, y * MINIMAP_FACTOR, (y + 1) * MINIMAP_FACTOR, GREEN);
+                        horizontal(y * MINIMAP_FACTOR, x * MINIMAP_FACTOR, (x + 1) * MINIMAP_FACTOR, GREEN);
+                        horizontal((y + 1) * MINIMAP_FACTOR, x * MINIMAP_FACTOR, (x + 1) * MINIMAP_FACTOR, GREEN);
                     }
                 }
             }
-        } else {
-            int posdirx = player_x + direction_x * MINIMAP_ZOOM;
-            int posdiry = player_y + direction_y * MINIMAP_ZOOM;
-
-            SDL_BlitSurface(my_bitmap_conv, NULL, screen, &rect);
-            SDL_BlitSurface(my_bitmap_key_conv, NULL, screen, &rect2);
-
-            line(player_x, player_y, posdirx, posdiry, BLUE);
-            line(posdirx, posdiry, posdirx + camera_x * MINIMAP_ZOOM, posdiry + camera_y * MINIMAP_ZOOM, YELLOW);
-            line(posdirx, posdiry, posdirx - camera_x * MINIMAP_ZOOM, posdiry - camera_y * MINIMAP_ZOOM, YELLOW);
-            line(player_x, player_y, posdirx + camera_x * MINIMAP_ZOOM, posdiry + camera_y * MINIMAP_ZOOM, YELLOW);
-            line(player_x, player_y, posdirx - camera_x * MINIMAP_ZOOM, posdiry - camera_y * MINIMAP_ZOOM, YELLOW);
-            pixel(player_x, player_y, GREEN);
-            circle(player_x, player_y, MINIMAP_ZOOM * 4, BLACK);
-
-            disk(250, 250, MINIMAP_ZOOM * 4, WHITE);
-            circle(200, 100, MINIMAP_ZOOM, WHITE);
-            pixel(200, 100, YELLOW);
-            get(200, 100);
-            rectangle(500, 300, 600, 350, WHITE);
         }
         render();
 
@@ -449,13 +389,42 @@ int main(int argc, char * argv[]) {
         tick_previous = tick_current;
         tick_current = SDL_GetTicks();
         frame_time = (tick_current - tick_previous);
-        if (up) {
-            player_x += direction_x * move_modifier * frame_time;
-            player_y += direction_y * move_modifier * frame_time;
-        }
-        if (down) {
-            player_x -= direction_x * move_modifier * frame_time;
-            player_y -= direction_y * move_modifier * frame_time;
+
+        //---------------------------------------------------------------------
+        // Update
+        //---------------------------------------------------------------------
+        if (up || down) {
+            if (up) {
+                next_x = player_x + direction_x * move_modifier * frame_time;
+                next_y = player_y + direction_y * move_modifier * frame_time;
+                probe_x = (int) (next_x + direction_x);
+                probe_y = (int) (next_y + direction_y);
+            }
+            if (down) {
+                next_x = player_x - direction_x * move_modifier * frame_time;
+                next_y = player_y - direction_y * move_modifier * frame_time;
+                probe_x = (int) (next_x - direction_x);
+                probe_y = (int) (next_y - direction_y);
+            }
+            probe_left_x = (int) (next_x + camera_x * hitbox);
+            probe_left_y = (int) (next_y + camera_y * hitbox);
+            probe_right_x = (int) (next_x - camera_x * hitbox);
+            probe_right_y = (int) (next_y - camera_y * hitbox);
+            printf("Probing at: %d %d\n", probe_x, probe_y);
+            // Check if next_x and next_y are ok
+            if (map[probe_x][probe_y] == 0 && map[probe_left_x][probe_left_y] == 0 && map[probe_right_x][probe_right_y] == 0) {
+                player_x = next_x;
+                player_y = next_y;
+                printf("Front OK, Left OK, Right OK\n");
+            } else if (map[probe_x][(int)player_y] == 0 && map[probe_left_x][(int) (player_y + camera_y * hitbox)] == 0 && map[probe_right_x][(int) (player_y - camera_y * hitbox)] == 0) {
+                player_x = next_x;
+                printf("On X\n");
+            } else if (map[(int)player_x][probe_y] == 0 && map[(int) (player_x + camera_x * hitbox)][probe_left_y] == 0 && map[(int) (player_x - camera_x * hitbox)][probe_right_y] == 0) {
+                player_y = next_y;
+                printf("On Y\n");
+            } else {
+                printf("No where to go.\n");
+            }
         }
         if (left) {
             double old_dir_x = direction_x;
@@ -474,6 +443,10 @@ int main(int argc, char * argv[]) {
             camera_y = old_cam_x * sin(-rot_modifier * frame_time) + camera_y * cos(-rot_modifier * frame_time);
         }
     }
+
+    //---------------------------------------------------------------------
+    // Cleaning
+    //---------------------------------------------------------------------
     SDL_FreeSurface(my_bitmap_conv);
     SDL_FreeSurface(my_bitmap_key_conv);
     stop_audio();

@@ -133,6 +133,29 @@ void stop_audio(void) {
     SDL_CloseAudio();
 }
 
+void display_info_on_surface(SDL_Surface * surf) {
+    // https://www.libsdl.org/release/SDL-1.2.15/docs/html/sdlsurface.html
+
+    printf("Uint32 flags = %d\n", surf->flags);
+    //SDL_PixelFormat *format;
+    //SDL_Palette *palette;
+    printf("Uint8  BitsPerPixel = %d\n", surf->format->BitsPerPixel);
+    printf("Uint8  BytesPerPixel = %d\n", surf->format->BytesPerPixel);
+    //Uint8  Rloss, Gloss, Bloss, Aloss;
+    //Uint8  Rshift, Gshift, Bshift, Ashift;
+    //Uint32 Rmask, Gmask, Bmask, Amask;
+    printf("Uint32 colorkey = %d\n", surf->format->colorkey);
+    printf("Uint8  alpha = %d\n", surf->format->alpha);
+
+    printf("int w, h = %d, %d\n", surf->w, surf->h);
+    printf("Uint16 pitch = %d\n", surf->pitch);
+    printf("void *pixels"); // writable
+    //SDL_Rect clip_rect;
+    printf("int refcount  = %d\n", surf->refcount); // read mostly
+    int mustlock = SDL_MUSTLOCK(screen); 
+    printf("Do I have to lock? %d\n", mustlock); // 0 = No. Software surface don't need.
+}
+
 // slow
 void render(void) {
     SDL_UpdateRect(screen, 0, 0, 0, 0);
