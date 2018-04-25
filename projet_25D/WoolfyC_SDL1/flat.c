@@ -64,11 +64,12 @@
 // Constants
 //-----------------------------------------------------------------------------
 
-// #define TEXTURE_PATH "..\\..\\assets\\graphic\\textures\\woolfy_wall\\noni_a_006.bmp"
-// #define ENEMY_PATH "..\\..\\assets\\graphic\\sprites\\woolfy\\mguard_s_1.bmp"
-#define SOUND_PATH "blip.wav"
-#define TEXTURE_PATH "noni_a_006.bmp"
-#define ENEMY_PATH "mguard_s_1.bmp"
+#define SOUND_PATH "..\\..\\assets\\audio\\sounds\\blip.wav"
+#define TEXTURE_PATH "..\\..\\assets\\graphic\\textures\\woolfy_wall\\noni_a_006.bmp"
+#define ENEMY_PATH "..\\..\\assets\\graphic\\sprites\\woolfy\\mguard_s_1.bmp"
+//#define SOUND_PATH "blip.wav"
+//#define TEXTURE_PATH "noni_a_006.bmp"
+//#define ENEMY_PATH "mguard_s_1.bmp"
 
 #define MAP_WIDTH 20
 #define MAP_HEIGHT 20
