@@ -95,7 +95,7 @@ void render(void);
 void fill(Uint32 color);
 void pixel(int x, int y, Uint32 color);
 Uint32 get(int x, int y);
-void buffer(Uint32 * buffer);
+void buffer(Uint32 (* pbuffer)[640]);
 void line(int x1, int y1, int x2, int y2, Uint32 color);
 void vertical(int x, int y1, int y2, Uint32 color);
 void horizontal(int y, int x1, int x2, Uint32 color);
