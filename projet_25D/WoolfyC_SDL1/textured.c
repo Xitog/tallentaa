@@ -64,12 +64,12 @@
 // Constants
 //-----------------------------------------------------------------------------
 
-#define SOUND_PATH "..\\..\\assets\\audio\\sounds\\blip.wav"
-#define TEXTURE_PATH "..\\..\\assets\\graphic\\textures\\woolfy_wall\\noni_a_006.bmp"
-#define ENEMY_PATH "..\\..\\assets\\graphic\\sprites\\woolfy\\mguard_s_1.bmp"
-//#define SOUND_PATH "blip.wav"
-//#define TEXTURE_PATH "noni_a_006.bmp"
-//#define ENEMY_PATH "mguard_s_1.bmp"
+// #define TEXTURE_PATH "..\\..\\assets\\graphic\\textures\\woolfy_wall\\noni_a_006.bmp"
+// #define ENEMY_PATH "..\\..\\assets\\graphic\\sprites\\woolfy\\mguard_s_1.bmp"
+#define SOUND_PATH "blip.wav"
+//#define TEXTURE_PATH "perso_basic_tex.bmp"
+#define TEXTURE_PATH "noni_a_006.bmp"
+#define ENEMY_PATH "mguard_s_1.bmp"
 
 #define MAP_WIDTH 20
 #define MAP_HEIGHT 20
@@ -79,6 +79,11 @@
 
 #define MINIMAP_FACTOR 20
 #define MINIMAP_ZOOM 10
+
+#define WALL_HEIGHT 2
+
+#define TEX_WIDTH 64 //32
+#define TEX_HEIGHT 64 //32
 
 #define R 1
 #define Y 2
@@ -109,7 +114,7 @@ int map[MAP_WIDTH][MAP_HEIGHT] = {
     {G, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
     {W, 0, 0, 0, 0, 0, 0, R, 0, Y, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
     {W, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {W, 0, 0, 0, 0, 0, 0, G, 0, B, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {W, 0, 0, 0, 0, -1, 0, G, 0, B, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
     {G, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
     {G, 0, 0, 0, 0, 0, 0, B, 0, P, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
     {G, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
@@ -169,22 +174,26 @@ void input(void) {
     }
 }
 
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 480
+
+Uint32 screen_buffer[SCREEN_HEIGHT][SCREEN_WIDTH];
+
 // Il faut un buffer et ne pas ecrire directement sur le screen !
 int main(int argc, char * argv[]) {
     // Player 2.5D Coordinates
-    double player_x = 5.5; // screen->w / 2;
-    double player_y = 5.5; // screen->h / 2;
+    double player_x = 5.5;
+    double player_y = 5.5;
     double direction_x = -1;
     double direction_y = 0;
     double camera_x = 0;
     double camera_y = 0.66;
     
     // Init and screen
-    int err = init("Woolfy 2.5 TEXTURED", 640, 400, 32, false);
+    int err = init("Woolfy 2.5 TEXTURED", SCREEN_WIDTH, SCREEN_HEIGHT, 32, false);
     if (err == EXIT_FAILURE) {
         return err;
     }
-    Uint32 buffer[screen->h][screen->w];
 
     // Info
     display_info_on_surface(screen);
@@ -217,6 +226,13 @@ int main(int argc, char * argv[]) {
     rect.y = 0;
     rect.w = my_bitmap_conv->w;
     rect.h = my_bitmap_conv->h;
+    
+    Uint32 tex[TEX_WIDTH][TEX_HEIGHT];
+    for (int x = 0; x < my_bitmap_conv->w; x++) {
+        for (int y = 0; y < my_bitmap_conv->h; y++) {
+            tex[x][y] = *((Uint32 *)((Uint8 *)my_bitmap_conv->pixels + y * my_bitmap_conv->pitch + x * my_bitmap_conv->format->BytesPerPixel));
+        }
+    }
 
     // With colorkey
     SDL_Surface * my_bitmap_key_conv = load_bmp(ENEMY_PATH);
@@ -308,6 +324,9 @@ int main(int argc, char * argv[]) {
             int lineHeight = (int) (screen->h / perpWallDist);
             int drawStart = drawStart = -lineHeight / 2 + screen->h / 2;
             int drawEnd = lineHeight / 2 + screen->h / 2;
+            //if (WALL_HEIGHT > 1) {
+            //    drawStart -= lineHeight * WALL_HEIGHT; 
+            //}
             if (drawStart < 0) {
                 drawStart = 0;
             }
@@ -315,29 +334,135 @@ int main(int argc, char * argv[]) {
                 drawEnd = screen->h - 1;
             }
             
-            Uint32 color = RED; // for 1
-            switch(map[ray_map_x][ray_map_y]) {
-                case 1:
-                    color = RED;
-                    break;
-                case 2:
-                    color = YELLOW;
-                    break;
-                case 3:
-                    color = BLUE;
-                    break;
-                case 4:
-                    color = GREEN;
-                    break;
-                case 5:
-                    color = WHITE;
-                    break;
-                case 6:
-                    color = PURPLE;
+            double wallX; //where exactly the wall was hit
+            if (side == 0) {
+                wallX = player_y + perpWallDist * ray_y;
+            } else {
+                wallX = player_x + perpWallDist * ray_x;
             }
+            wallX -= floor((wallX));
             
-            vertical(x, drawStart, drawEnd, color);
+            //x coordinate on the texture
+            int texX = (int)(wallX * (double) TEX_WIDTH);
+            if(side == 0 && ray_x > 0) texX = TEX_WIDTH - texX - 1; // (inverse)
+            if(side == 1 && ray_y < 0) texX = TEX_WIDTH - texX - 1;
+
+            for(int y = drawStart; y < drawEnd; y++)
+            {
+                int d = (int) ((y * 2 - screen->h + lineHeight) * 128);
+                //int d = y * 256 - screen->h * 128 + lineHeight * 128;  //256 and 128 factors to avoid floats
+                // TODO: avoid the division to speed this up
+                int texY = ((d * TEX_HEIGHT) / lineHeight) / 256;
+                //make color darker for y-sides
+                Uint32 color = tex[texX][texY];
+                if(side == 1) {
+                    color = (color >> 1) & 8355711;
+                }
+                //pixel(x, y, color);
+                screen_buffer[y][x] = color;
+                if  (WALL_HEIGHT > 1) {
+                    for (int wh = 1; wh < WALL_HEIGHT; wh++) { 
+                        //pixel(x, y - lineHeight * wh, color);
+                        int yy = y - lineHeight * wh;
+                        if (yy >= 0) {
+                            screen_buffer[yy][x] = color;
+                        }
+                    }
+                }
+            }
+
+            #ifdef ENABLE_FLOOR
+            //FLOOR CASTING
+            double floorXWall, floorYWall; //x, y position of the floor texel at the bottom of the wall
+
+            //4 different wall directions possible
+            if(side == 0 && ray_x > 0)
+            {
+                floorXWall = ray_map_x;
+                floorYWall = ray_map_y + wallX;
+            }
+            else if(side == 0 && ray_x < 0)
+            {
+                floorXWall = ray_map_x + 1.0;
+                floorYWall = ray_map_y + wallX;
+            }
+            else if(side == 1 && ray_y > 0)
+            {
+                floorXWall = ray_map_x + wallX;
+                floorYWall = ray_map_y;
+            }
+            else
+            {
+                floorXWall = ray_map_x + wallX;
+                floorYWall = ray_map_y + 1.0;
+            }
+
+            double distWall, distPlayer, currentDist;
+
+            distWall = perpWallDist;
+            distPlayer = 0.0;
+
+            if (drawEnd < 0) drawEnd = screen->h; //becomes < 0 when the integer overflows
+
+            //draw the floor from drawEnd to the bottom of the screen
+            for(int y = drawEnd + 1; y < screen->h; y++)
+            {
+                currentDist = screen->h / (2.0 * y - screen->h); //you could make a small lookup table for this instead
+
+                double weight = (currentDist - distPlayer) / (distWall - distPlayer);
+
+                double currentFloorX = weight * floorXWall + (1.0 - weight) * player_x;
+                double currentFloorY = weight * floorYWall + (1.0 - weight) * player_y;
+
+                int floorTexX, floorTexY;
+                floorTexX = ((int)(currentFloorX * TEX_WIDTH)) % TEX_WIDTH;
+                floorTexY = ((int)(currentFloorY * TEX_HEIGHT)) % TEX_HEIGHT;
+
+                //floor
+                //1 buffer[y][x] = (texture[3][TEX_WIDTH * floorTexY + floorTexX] >> 1) & 8355711;
+                //2 pixel(x, y, tex[floorTexX][floorTexY]);
+                screen_buffer[y][x] = tex[floorTexX][floorTexY];
+                //ceiling (symmetrical!)
+                //1 buffer[h - y][x] = texture[6][TEX_WIDTH * floorTexY + floorTexX];
+                //2 pixel(x, screen->h - y - (WALL_HEIGHT - 1) * lineHeight, tex[floorTexX][floorTexY]);
+                
+                // Ceiling 1 bug
+                if (map[(int)currentFloorX][(int)currentFloorY] == 0) {
+                    //int yy = screen->h - y;
+                    //int yy = screen->h - y - (WALL_HEIGHT - 1) * lineHeight;
+                    //int yy = drawStart - (y - drawEnd); // OK
+                    int yy = drawStart - (y - drawEnd) - (WALL_HEIGHT - 1) * lineHeight; // KO
+                    if (yy >= 0)
+                        screen_buffer[yy][x] = tex[floorTexX][floorTexY];
+                    //else
+                    //    screen_buffer[0][x] = 16777215;
+                }
+                
+                    
+            }
+            // Ceiling 2 (no bug but parallax + megatex + holes in tex)
+            /*
+            int maxDrawStart = drawStart - lineHeight * (WALL_HEIGHT - 1);
+            for(int y = maxDrawStart - 1; y >= 0; y--) {
+                // This line provokes the problem
+                currentDist = screen->h / (2.0 * y - screen->h); //you could make a small lookup table for this instead
+
+                double weight = (currentDist - distPlayer) / (distWall - distPlayer);
+
+                double currentFloorX = weight * floorXWall + (1.0 - weight) * player_x;
+                double currentFloorY = weight * floorYWall + (1.0 - weight) * player_y;
+
+                int floorTexX, floorTexY;
+                floorTexX = ((int)(currentFloorX * TEX_WIDTH)) % TEX_WIDTH;
+                floorTexY = ((int)(currentFloorY * TEX_HEIGHT)) % TEX_HEIGHT;
+
+                screen_buffer[y][x] = tex[floorTexX][floorTexY];
+            }
+            */
+            #endif
         }
+        
+        buffer(screen_buffer);
         
         if (show_map) {
             int minimap_player_x = player_x * MINIMAP_FACTOR;
@@ -371,7 +496,12 @@ int main(int argc, char * argv[]) {
             rectangle(player_map_x * MINIMAP_FACTOR, player_map_y * MINIMAP_FACTOR, (player_map_x + 1) * MINIMAP_FACTOR, (player_map_y + 1) * MINIMAP_FACTOR, GREEN, false);
 
             SDL_BlitSurface(my_bitmap_conv, NULL, screen, &rect);
-            SDL_BlitSurface(my_bitmap_key_conv, NULL, screen, &rect2);
+            //SDL_BlitSurface(my_bitmap_key_conv, NULL, screen, &rect2);
+            for (int y = 0; y < my_bitmap_key_conv->w; y++) {
+                for (int x = 0; x < my_bitmap_key_conv->h; x++) {
+                    pixel(x + 500, y + 200, tex[x][y]);
+                }
+            }
         }
         render();
 
@@ -395,24 +525,24 @@ int main(int argc, char * argv[]) {
                 next_x = player_x - direction_x * move_modifier * frame_time;
                 next_y = player_y - direction_y * move_modifier * frame_time;
             }
-            if (map[(int)next_x][(int)next_y] == 0 && 
-                map[(int)(next_x - hitbox)][(int)(next_y - hitbox)] == 0 && // up, left
-                map[(int)(next_x + hitbox)][(int)(next_y + hitbox)] == 0 && // down, right
-                map[(int)(next_x - hitbox)][(int)(next_y + hitbox)] == 0 && // down, left
-                map[(int)(next_x + hitbox)][(int)(next_y - hitbox)] == 0) { // up, right
+            if (map[(int)next_x][(int)next_y] <= 0 && 
+                map[(int)(next_x - hitbox)][(int)(next_y - hitbox)] <= 0 && // up, left
+                map[(int)(next_x + hitbox)][(int)(next_y + hitbox)] <= 0 && // down, right
+                map[(int)(next_x - hitbox)][(int)(next_y + hitbox)] <= 0 && // down, left
+                map[(int)(next_x + hitbox)][(int)(next_y - hitbox)] <= 0) { // up, right
                 player_x = next_x;
                 player_y = next_y;
-            } else if (map[(int)next_x][(int)player_y] == 0 &&  // gliding on x
-                map[(int)(next_x - hitbox)][(int)(player_y - hitbox)] == 0 && // up, left
-                map[(int)(next_x + hitbox)][(int)(player_y + hitbox)] == 0 && // down, right
-                map[(int)(next_x - hitbox)][(int)(player_y + hitbox)] == 0 && // down, left
-                map[(int)(next_x + hitbox)][(int)(player_y - hitbox)] == 0) { // up, right
+            } else if (map[(int)next_x][(int)player_y] <= 0 &&  // gliding on x
+                map[(int)(next_x - hitbox)][(int)(player_y - hitbox)] <= 0 && // up, left
+                map[(int)(next_x + hitbox)][(int)(player_y + hitbox)] <= 0 && // down, right
+                map[(int)(next_x - hitbox)][(int)(player_y + hitbox)] <= 0 && // down, left
+                map[(int)(next_x + hitbox)][(int)(player_y - hitbox)] <= 0) { // up, right
                 player_x = next_x;
-            } else if (map[(int)player_x][(int)next_y] == 0 &&  // gliding on y
-                map[(int)(player_x - hitbox)][(int)(next_y - hitbox)] == 0 && // up, left
-                map[(int)(player_x + hitbox)][(int)(next_y + hitbox)] == 0 && // down, right
-                map[(int)(player_x - hitbox)][(int)(next_y + hitbox)] == 0 && // down, left
-                map[(int)(player_x + hitbox)][(int)(next_y - hitbox)] == 0) { // up, right
+            } else if (map[(int)player_x][(int)next_y] <= 0 &&  // gliding on y
+                map[(int)(player_x - hitbox)][(int)(next_y - hitbox)] <= 0 && // up, left
+                map[(int)(player_x + hitbox)][(int)(next_y + hitbox)] <= 0 && // down, right
+                map[(int)(player_x - hitbox)][(int)(next_y + hitbox)] <= 0 && // down, left
+                map[(int)(player_x + hitbox)][(int)(next_y - hitbox)] <= 0) { // up, right
                 player_y = next_y; 
             }
         }
