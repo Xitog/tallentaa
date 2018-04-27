@@ -196,7 +196,14 @@ Uint32 get(int x, int y) {
     return *bufp;
 }
 
-void buffer(Uint32 * buffer) {
+void buffer(Uint32 (* pbuffer)[640]) {
+    for(int x = 0; x < screen->w; x++) {
+        for(int y = 0; y < screen->h; y++) {
+            pixel(x, y, pbuffer[y][x]);
+            pbuffer[y][x] = 0; //clear the buffer instead of cls()
+        }
+    }
+    /*
     Uint32 * bufp = (Uint32*) screen->pixels;
     for (int y = 0; y < screen->h; y++) {
         for (int x = 0; x < screen->w; x++) {
@@ -206,6 +213,7 @@ void buffer(Uint32 * buffer) {
         bufp += screen->pitch << 2;
         bufp -= screen->w;
     }
+    */
 }
 
 // Use Bresenham algorithm
