@@ -64,12 +64,11 @@
 // Constants
 //-----------------------------------------------------------------------------
 
-#define SOUND_PATH "..\\..\\assets\\audio\\sounds\\blip.wav"
-#define TEXTURE_PATH "..\\..\\assets\\graphic\\textures\\woolfy_wall\\noni_a_006.bmp"
-#define ENEMY_PATH "..\\..\\assets\\graphic\\sprites\\woolfy\\mguard_s_1.bmp"
-//#define SOUND_PATH "blip.wav"
-//#define TEXTURE_PATH "noni_a_006.bmp"
-//#define ENEMY_PATH "mguard_s_1.bmp"
+// #define TEXTURE_PATH "..\\..\\assets\\graphic\\textures\\woolfy_wall\\noni_a_006.bmp"
+// #define ENEMY_PATH "..\\..\\assets\\graphic\\sprites\\woolfy\\mguard_s_1.bmp"
+#define SOUND_PATH "blip.wav"
+#define TEXTURE_PATH "noni_a_006.bmp"
+#define ENEMY_PATH "mguard_s_1.bmp"
 
 #define MAP_WIDTH 20
 #define MAP_HEIGHT 20
@@ -79,6 +78,8 @@
 
 #define MINIMAP_FACTOR 20
 #define MINIMAP_ZOOM 10
+
+#define WALL_HEIGHT 2
 
 #define R 1
 #define Y 2
@@ -109,7 +110,7 @@ int map[MAP_WIDTH][MAP_HEIGHT] = {
     {G, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
     {W, 0, 0, 0, 0, 0, 0, R, 0, Y, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
     {W, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {W, 0, 0, 0, 0, 0, 0, G, 0, B, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {W, 0, 0, 0, 0, -1, 0, G, 0, B, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
     {G, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
     {G, 0, 0, 0, 0, 0, 0, B, 0, P, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
     {G, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
@@ -169,18 +170,20 @@ void input(void) {
     }
 }
 
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 480
 // Il faut un buffer et ne pas ecrire directement sur le screen !
 int main(int argc, char * argv[]) {
     // Player 2.5D Coordinates
-    double player_x = 5.5; // screen->w / 2;
-    double player_y = 5.5; // screen->h / 2;
+    double player_x = 5.5;
+    double player_y = 5.5;
     double direction_x = -1;
     double direction_y = 0;
     double camera_x = 0;
     double camera_y = 0.66;
     
     // Init and screen
-    int err = init("Woolfy 2.5 FLAT", 640, 400, 32, false);
+    int err = init("Woolfy 2.5 FLAT", SCREEN_WIDTH, SCREEN_HEIGHT, 32, false);
     if (err == EXIT_FAILURE) {
         return err;
     }
@@ -308,6 +311,9 @@ int main(int argc, char * argv[]) {
             int lineHeight = (int) (screen->h / perpWallDist);
             int drawStart = drawStart = -lineHeight / 2 + screen->h / 2;
             int drawEnd = lineHeight / 2 + screen->h / 2;
+            if (WALL_HEIGHT > 1) {
+                drawStart -= lineHeight * WALL_HEIGHT; 
+            }
             if (drawStart < 0) {
                 drawStart = 0;
             }
@@ -395,24 +401,24 @@ int main(int argc, char * argv[]) {
                 next_x = player_x - direction_x * move_modifier * frame_time;
                 next_y = player_y - direction_y * move_modifier * frame_time;
             }
-            if (map[(int)next_x][(int)next_y] == 0 && 
-                map[(int)(next_x - hitbox)][(int)(next_y - hitbox)] == 0 && // up, left
-                map[(int)(next_x + hitbox)][(int)(next_y + hitbox)] == 0 && // down, right
-                map[(int)(next_x - hitbox)][(int)(next_y + hitbox)] == 0 && // down, left
-                map[(int)(next_x + hitbox)][(int)(next_y - hitbox)] == 0) { // up, right
+            if (map[(int)next_x][(int)next_y] <= 0 && 
+                map[(int)(next_x - hitbox)][(int)(next_y - hitbox)] <= 0 && // up, left
+                map[(int)(next_x + hitbox)][(int)(next_y + hitbox)] <= 0 && // down, right
+                map[(int)(next_x - hitbox)][(int)(next_y + hitbox)] <= 0 && // down, left
+                map[(int)(next_x + hitbox)][(int)(next_y - hitbox)] <= 0) { // up, right
                 player_x = next_x;
                 player_y = next_y;
-            } else if (map[(int)next_x][(int)player_y] == 0 &&  // gliding on x
-                map[(int)(next_x - hitbox)][(int)(player_y - hitbox)] == 0 && // up, left
-                map[(int)(next_x + hitbox)][(int)(player_y + hitbox)] == 0 && // down, right
-                map[(int)(next_x - hitbox)][(int)(player_y + hitbox)] == 0 && // down, left
-                map[(int)(next_x + hitbox)][(int)(player_y - hitbox)] == 0) { // up, right
+            } else if (map[(int)next_x][(int)player_y] <= 0 &&  // gliding on x
+                map[(int)(next_x - hitbox)][(int)(player_y - hitbox)] <= 0 && // up, left
+                map[(int)(next_x + hitbox)][(int)(player_y + hitbox)] <= 0 && // down, right
+                map[(int)(next_x - hitbox)][(int)(player_y + hitbox)] <= 0 && // down, left
+                map[(int)(next_x + hitbox)][(int)(player_y - hitbox)] <= 0) { // up, right
                 player_x = next_x;
-            } else if (map[(int)player_x][(int)next_y] == 0 &&  // gliding on y
-                map[(int)(player_x - hitbox)][(int)(next_y - hitbox)] == 0 && // up, left
-                map[(int)(player_x + hitbox)][(int)(next_y + hitbox)] == 0 && // down, right
-                map[(int)(player_x - hitbox)][(int)(next_y + hitbox)] == 0 && // down, left
-                map[(int)(player_x + hitbox)][(int)(next_y - hitbox)] == 0) { // up, right
+            } else if (map[(int)player_x][(int)next_y] <= 0 &&  // gliding on y
+                map[(int)(player_x - hitbox)][(int)(next_y - hitbox)] <= 0 && // up, left
+                map[(int)(player_x + hitbox)][(int)(next_y + hitbox)] <= 0 && // down, right
+                map[(int)(player_x - hitbox)][(int)(next_y + hitbox)] <= 0 && // down, left
+                map[(int)(player_x + hitbox)][(int)(next_y - hitbox)] <= 0) { // up, right
                 player_y = next_y; 
             }
         }
