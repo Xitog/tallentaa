@@ -64,12 +64,20 @@
 // Constants
 //-----------------------------------------------------------------------------
 
-// #define TEXTURE_PATH "..\\..\\assets\\graphic\\textures\\woolfy_wall\\noni_a_006.bmp"
-// #define ENEMY_PATH "..\\..\\assets\\graphic\\sprites\\woolfy\\mguard_s_1.bmp"
-#define SOUND_PATH "blip.wav"
-//#define TEXTURE_PATH "perso_basic_tex.bmp"
-#define TEXTURE_PATH "noni_a_006.bmp"
-#define ENEMY_PATH "mguard_s_1.bmp"
+#define SHODAN
+
+#ifdef SHODAN
+  #define TEXTURE_PATH "..\\..\\assets\\graphic\\textures\\woolfy_wall\\noni_a_006.bmp"
+  #define ENEMY_PATH "..\\..\\assets\\graphic\\sprites\\woolfy\\mguard_s_1.bmp"
+  #define SOUND_PATH "..\\..\\assets\\audio\\sounds\\blip.wav"
+#endif
+
+#ifndef SHODAN
+  //#define TEXTURE_PATH "perso_basic_tex.bmp"
+  #define TEXTURE_PATH "noni_a_006.bmp"
+  #define ENEMY_PATH "mguard_s_1.bmp"
+  #define SOUND_PATH "blip.wav"
+#endif
 
 #define MAP_WIDTH 20
 #define MAP_HEIGHT 20
@@ -102,6 +110,8 @@ bool right;
 bool left;
 bool done = false;
 bool show_map = false;
+bool debug = false;
+FILE * debug_file;
 
 int map[MAP_WIDTH][MAP_HEIGHT] = {
     {R, Y, R, Y, R, Y, R, Y, R, Y, R, Y, R, Y, R, Y, R, Y, R, Y},
@@ -111,9 +121,9 @@ int map[MAP_WIDTH][MAP_HEIGHT] = {
     {W, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
     {G, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
     {G, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {G, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {W, 0, 0, 0, 0, 0, 0, R, 0, Y, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {W, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {G, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {W, -1, -2, 0, 0, 0, 0, R, 0, Y, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {W, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
     {W, 0, 0, 0, 0, -1, 0, G, 0, B, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
     {G, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
     {G, 0, 0, 0, 0, 0, 0, B, 0, P, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
@@ -167,6 +177,10 @@ void input(void) {
                 case SDLK_TAB:
                     show_map = not show_map;
                     break;
+                case SDLK_SPACE:
+                    debug = true;
+                    debug_file = fopen("out.txt", "w");
+                    break;
             }
        } else if (event.type == SDL_QUIT ) {
             done = true;
@@ -176,6 +190,7 @@ void input(void) {
 
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
+#define MID_SCREEN_HEIGHT 240
 
 Uint32 screen_buffer[SCREEN_HEIGHT][SCREEN_WIDTH];
 
@@ -322,11 +337,11 @@ int main(int argc, char * argv[]) {
             }
 
             int lineHeight = (int) (screen->h / perpWallDist);
-            int drawStart = drawStart = -lineHeight / 2 + screen->h / 2;
-            int drawEnd = lineHeight / 2 + screen->h / 2;
-            //if (WALL_HEIGHT > 1) {
-            //    drawStart -= lineHeight * WALL_HEIGHT; 
-            //}
+            int midLineHeight = lineHeight / 2;
+
+            int drawStart = MID_SCREEN_HEIGHT - midLineHeight;
+            int drawEnd = MID_SCREEN_HEIGHT + midLineHeight;
+            
             if (drawStart < 0) {
                 drawStart = 0;
             }
@@ -397,19 +412,82 @@ int main(int argc, char * argv[]) {
                 floorYWall = ray_map_y + 1.0;
             }
 
-            double distWall, distPlayer, currentDist;
+            // 0. Base
+            for(int count = 0;; count++)
+            {
+                int y = drawEnd + 1 + count;
+                if (y >= screen->h) {
+                    break;
+                }
+                double currentDist = screen->h / (2.0 * y - screen->h); //you could make a small lookup table for this instead
 
-            distWall = perpWallDist;
-            distPlayer = 0.0;
+                double weight = currentDist / perpWallDist;
 
-            if (drawEnd < 0) drawEnd = screen->h; //becomes < 0 when the integer overflows
+                double currentFloorX = weight * floorXWall + (1.0 - weight) * player_x;
+                double currentFloorY = weight * floorYWall + (1.0 - weight) * player_y;
 
-            //draw the floor from drawEnd to the bottom of the screen
+                int floorTexX, floorTexY;
+                floorTexX = ((int)(currentFloorX * TEX_WIDTH)) % TEX_WIDTH;
+                floorTexY = ((int)(currentFloorY * TEX_HEIGHT)) % TEX_HEIGHT;
+
+                int val = map[(int)currentFloorX][(int)currentFloorY];
+                Uint32 color = PURPLE;
+                switch (val) {
+                    case 0:
+                        color = tex[floorTexX][floorTexY];
+                        break;
+                    case -1:
+                        color = BLACK;
+                        break;
+                    case -2:
+                        color = RED;
+                        break;
+                }
+                //floor
+                screen_buffer[y][x] = (color >> 1) & 8355711;
+                // ceiling
+                int y_ceiling = MID_SCREEN_HEIGHT - midLineHeight - lineHeight - count;
+
+                currentDist = screen->h / (2.0 * y_ceiling - screen->h); //you could make a small lookup table for this instead
+
+                weight = currentDist / perpWallDist;
+
+                currentFloorX = weight * floorXWall + (1.0 - weight) * player_x;
+                currentFloorY = weight * floorYWall + (1.0 - weight) * player_y;
+
+                floorTexX = ((int)(currentFloorX * TEX_WIDTH)) % TEX_WIDTH;
+                floorTexY = ((int)(currentFloorY * TEX_HEIGHT)) % TEX_HEIGHT;
+
+                val = map[(int)currentFloorX][(int)currentFloorY];
+                color = PURPLE;
+                switch (val) {
+                    case 0:
+                        color = tex[floorTexX][floorTexY];
+                        break;
+                    case -1:
+                        color = BLACK;
+                        break;
+                    case -2:
+                        color = RED;
+                        break;
+                }
+
+                if (y_ceiling > 0) {
+                    screen_buffer[y_ceiling][x] = color;
+                }
+                
+                if (debug) {
+                    fprintf(debug_file, "x = %d, y_floor = %d, y_ceiling = %d, lineHeight = %d, count= %d, color = %d\n", x, y, y_ceiling, lineHeight, count, color);
+                }
+            }
+
+            /*
+            // BASE : draw the floor from drawEnd to the bottom of the screen
             for(int y = drawEnd + 1; y < screen->h; y++)
             {
                 currentDist = screen->h / (2.0 * y - screen->h); //you could make a small lookup table for this instead
 
-                double weight = (currentDist - distPlayer) / (distWall - distPlayer);
+                double weight = (currentDist - distPlayer) / (distWall - distPlayer); // no need of distPlayer, distWall is perpWallDist
 
                 double currentFloorX = weight * floorXWall + (1.0 - weight) * player_x;
                 double currentFloorY = weight * floorYWall + (1.0 - weight) * player_y;
@@ -421,11 +499,30 @@ int main(int argc, char * argv[]) {
                 //floor
                 //1 buffer[y][x] = (texture[3][TEX_WIDTH * floorTexY + floorTexX] >> 1) & 8355711;
                 //2 pixel(x, y, tex[floorTexX][floorTexY]);
-                screen_buffer[y][x] = tex[floorTexX][floorTexY];
+                int val = map[(int)currentFloorX][(int)currentFloorY];
+                Uint32 color = PURPLE;
+                switch (val) {
+                    case 0:
+                        color = tex[floorTexX][floorTexY];
+                        break;
+                    case -1:
+                        color = BLACK;
+                        break;
+                    case -2:
+                        color = RED;
+                        break;
+                }
+                screen_buffer[y][x] = color;
+                int ceiling = drawStart - (y - drawEnd) - lineHeight;
+                if (ceiling >= 0) {
+                    screen_buffer[ceiling][x] = color;
+                }
+
                 //ceiling (symmetrical!)
                 //1 buffer[h - y][x] = texture[6][TEX_WIDTH * floorTexY + floorTexX];
                 //2 pixel(x, screen->h - y - (WALL_HEIGHT - 1) * lineHeight, tex[floorTexX][floorTexY]);
-                
+                */
+                /*
                 // Ceiling 1 bug
                 if (map[(int)currentFloorX][(int)currentFloorY] == 0) {
                     //int yy = screen->h - y;
@@ -437,12 +534,14 @@ int main(int argc, char * argv[]) {
                     //else
                     //    screen_buffer[0][x] = 16777215;
                 }
-                
+                */
                     
-            }
-            // Ceiling 2 (no bug but parallax + megatex + holes in tex)
+            /*}*/
+
             /*
-            int maxDrawStart = drawStart - lineHeight * (WALL_HEIGHT - 1);
+            // Ceiling 2 (no bug but parallax + megatex + holes in tex)
+            int highFactor = lineHeight * (WALL_HEIGHT - 1);
+            int maxDrawStart = drawStart - highFactor;
             for(int y = maxDrawStart - 1; y >= 0; y--) {
                 // This line provokes the problem
                 currentDist = screen->h / (2.0 * y - screen->h); //you could make a small lookup table for this instead
@@ -455,13 +554,29 @@ int main(int argc, char * argv[]) {
                 int floorTexX, floorTexY;
                 floorTexX = ((int)(currentFloorX * TEX_WIDTH)) % TEX_WIDTH;
                 floorTexY = ((int)(currentFloorY * TEX_HEIGHT)) % TEX_HEIGHT;
-
-                screen_buffer[y][x] = tex[floorTexX][floorTexY];
+                
+                int val = map[(int)currentFloorX][(int)currentFloorY];
+                switch (val) {
+                    case 0:
+                        screen_buffer[y][x] = tex[floorTexX][floorTexY];
+                        break;
+                    case -1:
+                        break;
+                    case -2:
+                        screen_buffer[y][x] = RED;
+                }
             }
             */
+
             #endif
         }
         
+        if (debug) {
+            debug = false;
+            fclose(debug_file);
+            printf("End of dump\n");
+        }
+
         buffer(screen_buffer);
         
         if (show_map) {
