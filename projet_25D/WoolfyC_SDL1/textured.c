@@ -76,7 +76,7 @@
   //#define TEXTURE_PATH "perso_basic_tex.bmp"
   #define TEXTURE_PATH "noni_a_006.bmp"
   #define ENEMY_PATH "mguard_s_1.bmp"
-  #define SOUND_PATH "blip.wav"
+  #define SOULD_PATH "blip.wav"
 #endif
 
 #define MAP_WIDTH 20
@@ -88,7 +88,7 @@
 #define MINIMAP_FACTOR 20
 #define MINIMAP_ZOOM 10
 
-#define WALL_HEIGHT 2
+int WALL_HEIGHT = 3; //1 //2 //5
 
 #define TEX_WIDTH 64 //32
 #define TEX_HEIGHT 64 //32
@@ -112,6 +112,7 @@ bool done = false;
 bool show_map = false;
 bool debug = false;
 FILE * debug_file;
+bool write_debug = false;
 
 int map[MAP_WIDTH][MAP_HEIGHT] = {
     {R, Y, R, Y, R, Y, R, Y, R, Y, R, Y, R, Y, R, Y, R, Y, R, Y},
@@ -180,6 +181,14 @@ void input(void) {
                 case SDLK_SPACE:
                     debug = true;
                     debug_file = fopen("out.txt", "w");
+                    break;
+                case SDLK_PAGEUP:
+                    WALL_HEIGHT += 1;
+                    break;
+                case SDLK_PAGEDOWN:
+                    if (WALL_HEIGHT > 1) {
+                        WALL_HEIGHT -= 1;
+                    }
                     break;
             }
        } else if (event.type == SDL_QUIT ) {
@@ -271,7 +280,7 @@ int main(int argc, char * argv[]) {
     play_wav();
     
     //---------------------------------------------------------------------
-    
+
     while(!done) {
 
         int player_map_x = (int) player_x;
@@ -336,12 +345,14 @@ int main(int argc, char * argv[]) {
                 perpWallDist = (ray_map_y - player_y + (1 - stepY) / 2) / ray_y;
             }
 
-            int lineHeight = (int) (screen->h / perpWallDist);
+            int lineHeight = (int) ((screen->h / perpWallDist) * WALL_HEIGHT);
+            double trueLineHeight = screen->h / perpWallDist;
             int midLineHeight = lineHeight / 2;
 
             int drawStart = MID_SCREEN_HEIGHT - midLineHeight;
             int drawEnd = MID_SCREEN_HEIGHT + midLineHeight;
-            
+            int trueDrawStart = drawStart;
+
             if (drawStart < 0) {
                 drawStart = 0;
             }
@@ -361,28 +372,28 @@ int main(int argc, char * argv[]) {
             int texX = (int)(wallX * (double) TEX_WIDTH);
             if(side == 0 && ray_x > 0) texX = TEX_WIDTH - texX - 1; // (inverse)
             if(side == 1 && ray_y < 0) texX = TEX_WIDTH - texX - 1;
-
+            
             for(int y = drawStart; y < drawEnd; y++)
             {
-                int d = (int) ((y * 2 - screen->h + lineHeight) * 128);
-                //int d = y * 256 - screen->h * 128 + lineHeight * 128;  //256 and 128 factors to avoid floats
-                // TODO: avoid the division to speed this up
-                int texY = ((d * TEX_HEIGHT) / lineHeight) / 256;
+                int d = y - trueDrawStart;
+                int texY = (int) (d * ( (double) TEX_HEIGHT / trueLineHeight)) % TEX_HEIGHT; //lineHeight);
+
+                //int d = (int) (y * 2 - screen-> h + lineHeight);
+                //int texY = ((d * TEX_HEIGHT) / lineHeight) % TEX_HEIGHT; // ajout de % TEX_HEIGHT pour éviter bug de la dernière colonne;
+                
                 //make color darker for y-sides
                 Uint32 color = tex[texX][texY];
                 if(side == 1) {
                     color = (color >> 1) & 8355711;
                 }
-                //pixel(x, y, color);
+                // DEBUG
+                if (y == drawStart || y == drawEnd - 1) {
+                    color = WHITE;
+                }
+                // END DEBUG
                 screen_buffer[y][x] = color;
-                if  (WALL_HEIGHT > 1) {
-                    for (int wh = 1; wh < WALL_HEIGHT; wh++) { 
-                        //pixel(x, y - lineHeight * wh, color);
-                        int yy = y - lineHeight * wh;
-                        if (yy >= 0) {
-                            screen_buffer[yy][x] = color;
-                        }
-                    }
+                if (debug) {
+                    fprintf(debug_file, "x, %d, y, %d, d, %d, texX, %d, texY, %d, color, %d\n", x, y, d, texX, texY, color);
                 }
             }
 
@@ -421,7 +432,7 @@ int main(int argc, char * argv[]) {
                 }
                 double currentDist = screen->h / (2.0 * y - screen->h); //you could make a small lookup table for this instead
 
-                double weight = currentDist / perpWallDist;
+                double weight = currentDist / (perpWallDist / WALL_HEIGHT);
 
                 double currentFloorX = weight * floorXWall + (1.0 - weight) * player_x;
                 double currentFloorY = weight * floorYWall + (1.0 - weight) * player_y;
@@ -446,8 +457,17 @@ int main(int argc, char * argv[]) {
                 //floor
                 screen_buffer[y][x] = (color >> 1) & 8355711;
                 // ceiling
-                int y_ceiling = MID_SCREEN_HEIGHT - midLineHeight - lineHeight - count;
+                //int y_ceiling = MID_SCREEN_HEIGHT - midLineHeight - lineHeight - count -1;
+                int y_ceiling = drawStart - count - 1;
+                /*
+                if (y_ceiling - lineHeight > 0) {
+                    y_ceiling -= lineHeight;
+                } else {
+                    y_ceiling = 0;
+                }
+                */
 
+                /*
                 currentDist = screen->h / (2.0 * y_ceiling - screen->h); //you could make a small lookup table for this instead
 
                 weight = currentDist / perpWallDist;
@@ -471,14 +491,23 @@ int main(int argc, char * argv[]) {
                         color = RED;
                         break;
                 }
-
+                */
                 if (y_ceiling > 0) {
                     screen_buffer[y_ceiling][x] = color;
                 }
                 
+                /*
                 if (debug) {
-                    fprintf(debug_file, "x = %d, y_floor = %d, y_ceiling = %d, lineHeight = %d, count= %d, color = %d\n", x, y, y_ceiling, lineHeight, count, color);
+                    if (color == 16711680 && not write_debug) {
+                        fprintf(debug_file, "x = %d, y_floor = %d, y_ceiling = %d, lineHeight = %d, count= %d, color = %d, currentFloorX = %f, currentFloorY = %f\n", x, y, y_ceiling, lineHeight, count, color, currentFloorX, currentFloorY);
+                        write_debug = true;
+                    }
+                    if (color != 16711680 && write_debug) {
+                        fprintf(debug_file, "x = %d, y_floor = %d, y_ceiling = %d, lineHeight = %d, count= %d, color = %d, currentFloorX = %f, currentFloorY = %f\n", x, y, y_ceiling, lineHeight, count, color, currentFloorX, currentFloorY);
+                        write_debug = false;
+                    }
                 }
+                */
             }
 
             /*
