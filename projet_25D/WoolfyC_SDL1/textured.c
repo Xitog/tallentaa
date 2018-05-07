@@ -308,6 +308,13 @@ int main(int argc, char * argv[]) {
     
     //---------------------------------------------------------------------
 
+    // test 1
+    double intersections[SCREEN_WIDTH][2]; //t1
+    for (int i=0; i < SCREEN_WIDTH; i++) { //t1
+        intersections[i][0] = 0;           //t1
+        intersections[i][1] = 0;           //t1
+    }                                      //t1
+    
     while(!done) {
 
         int player_map_x = (int) player_x;
@@ -411,6 +418,16 @@ int main(int argc, char * argv[]) {
             printf("\n\n"); //d            
 #endif    
 
+            // Si VERTICAL : perpWallDist =
+            // (
+            //     ray_map_x - player_x + (1 - stepX) / 2
+            //  ) / ray_dir_x;
+            // C'est une "projection sur un vecteur".
+            // Il calcule la simple différence entre le X map de l'intersection et le X map du joueur (avec (1-stepX) / 2 qui sert à départager si on touche à gauche ou à droite).
+            // Cela donne une ligne horizontale. PB : l'angle du joueur.
+            // En divisant par RAY_DIR_X, on a LA DISTANCE PERPENDICULAIRE (PERPWALLDIST).
+            // Si RAY_DIR_X = 1, le mur est VERTICAL, le joueur est pile en face de lui donc PERPWALLDIST = TRUE DIST.
+            // Cette simplification ne marche que si les murs sont à 90 degrés horizontaux ou verticaux
             if (side == VERTICAL) {
                 perpWallDist = (ray_map_x - player_x + (1 - stepX) / 2) / ray_dir_x;
             } else {
@@ -446,17 +463,24 @@ int main(int argc, char * argv[]) {
             }
             
             double wallX; //where exactly the wall was hit
-            if (side == 0) {
+            if (side == VERTICAL) {
                 wallX = player_y + perpWallDist * ray_dir_y;
             } else {
                 wallX = player_x + perpWallDist * ray_dir_x;
             }
+            if (side == VERTICAL) {                                    //t1
+                intersections[x][0] = ray_map_x + (1 - stepX) / 2;     //t1
+                intersections[x][1] = wallX;                           //t1
+            } else {                                                   //t1
+                intersections[x][0] = wallX;                           //t1
+                intersections[x][1] = ray_map_y + (1 - stepY) / 2;     //t1
+            }                                                          //t1
             wallX -= floor((wallX));
             
             //x coordinate on the texture
             int texX = (int)(wallX * (double) TEX_WIDTH);
-            if(side == 0 && ray_dir_x > 0) texX = TEX_WIDTH - texX - 1; // (inverse)
-            if(side == 1 && ray_dir_y < 0) texX = TEX_WIDTH - texX - 1;
+            if(side == VERTICAL && ray_dir_x > 0) texX = TEX_WIDTH - texX - 1; // (inverse)
+            if(side == HORIZONTAL && ray_dir_y < 0) texX = TEX_WIDTH - texX - 1;
             
             for(int y = drawStart; y < drawEnd; y++)
             {
@@ -753,6 +777,12 @@ int main(int argc, char * argv[]) {
                     pixel(x + 500, y + 200, tex[x][y]);
                 }
             }
+
+            //deb t1
+            for(int x=0; x < screen->w; x++) {
+                line(minimap_player_x, minimap_player_y, intersections[x][0] * MINIMAP_FACTOR, intersections[x][1] * MINIMAP_FACTOR, PURPLE);
+            }
+            //end t1
         }
         render();
 

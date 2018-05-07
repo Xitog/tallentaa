@@ -8,10 +8,10 @@
 			<property name="Line2" type="integer">235</property>
 		</category>
 		<category name="Window">
-			<property name="Left" type="integer">130</property>
-			<property name="Top" type="integer">130</property>
-			<property name="Right" type="integer">1392</property>
-			<property name="Bottom" type="integer">657</property>
+			<property name="Left" type="integer">26</property>
+			<property name="Top" type="integer">26</property>
+			<property name="Right" type="integer">1466</property>
+			<property name="Bottom" type="integer">572</property>
 			<property name="Maximized" type="integer">0</property>
 			<property name="Active" type="integer">0</property>
 		</category>
@@ -20,8 +20,8 @@
 		<category name="Window">
 			<property name="Left" type="integer">-8</property>
 			<property name="Top" type="integer">-31</property>
-			<property name="Right" type="integer">1691</property>
-			<property name="Bottom" type="integer">711</property>
+			<property name="Right" type="integer">1701</property>
+			<property name="Bottom" type="integer">737</property>
 			<property name="Maximized" type="integer">1</property>
 			<property name="Active" type="integer">1</property>
 		</category>
