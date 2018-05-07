@@ -64,7 +64,13 @@
 // Constants
 //-----------------------------------------------------------------------------
 
+// OPTIONS
+// #define FOG
+#define MAX_FOG 25 // 12 15 20 25
+// #define DEBUG 
 #define SHODAN
+// #define ENABLE_FLOOR
+// #undef ENABLE_FLOOR
 
 #ifdef SHODAN
   #define TEXTURE_PATH "..\\..\\assets\\graphic\\textures\\woolfy_wall\\noni_a_006.bmp"
@@ -76,7 +82,7 @@
   //#define TEXTURE_PATH "perso_basic_tex.bmp"
   #define TEXTURE_PATH "noni_a_006.bmp"
   #define ENEMY_PATH "mguard_s_1.bmp"
-  #define SOULD_PATH "blip.wav"
+  #define SOUND_PATH "blip.wav"
 #endif
 
 #define MAP_WIDTH 20
@@ -84,6 +90,7 @@
 
 #define MOVE_SPEED 0.004 // 0.002 0.2
 #define ROT_SPEED 0.001 // 0.01;
+#define UP_DOWN_SPEED 4 // 1 2
 
 #define MINIMAP_FACTOR 20
 #define MINIMAP_ZOOM 10
@@ -113,6 +120,8 @@ bool show_map = false;
 bool debug = false;
 FILE * debug_file;
 bool write_debug = false;
+bool z_down = false;
+bool z_up = false;
 
 int map[MAP_WIDTH][MAP_HEIGHT] = {
     {R, Y, R, Y, R, Y, R, Y, R, Y, R, Y, R, Y, R, Y, R, Y, R, Y},
@@ -160,6 +169,12 @@ void input(void) {
                 case SDLK_ESCAPE:
                     done = true;
                     break;
+                case SDLK_h:
+                    z_down = true;
+                    break;
+                case SDLK_g:
+                    z_up = true;
+                    break;
             }
        } else if (event.type == SDL_KEYUP) {
             switch (event.key.keysym.sym) {
@@ -190,6 +205,12 @@ void input(void) {
                         WALL_HEIGHT -= 1;
                     }
                     break;
+                case SDLK_h:
+                    z_down = false;
+                    break;
+                case SDLK_g:
+                    z_up = false;
+                    break;
             }
        } else if (event.type == SDL_QUIT ) {
             done = true;
@@ -201,6 +222,11 @@ void input(void) {
 #define SCREEN_HEIGHT 480
 #define MID_SCREEN_HEIGHT 240
 
+// Collision with a wall which is :
+#define VERTICAL 0
+#define HORIZONTAL 1
+// used in side variable
+
 Uint32 screen_buffer[SCREEN_HEIGHT][SCREEN_WIDTH];
 
 // Il faut un buffer et ne pas ecrire directement sur le screen !
@@ -208,6 +234,7 @@ int main(int argc, char * argv[]) {
     // Player 2.5D Coordinates
     double player_x = 5.5;
     double player_y = 5.5;
+    double player_z = 0.0;
     double direction_x = -1;
     double direction_y = 0;
     double camera_x = 0;
@@ -292,18 +319,26 @@ int main(int argc, char * argv[]) {
         fill(BLACK);
         
         for (int x = 0; x < screen->w; x++) {
-            double raycast_cpt = 2 * x / (float) screen->w - 1;
-            double ray_x = direction_x + camera_x * raycast_cpt;
-            double ray_y = direction_y + camera_y * raycast_cpt;
+            double raycast_cpt = 2 * x / (double) screen->w - 1; 
+            // On va parcourir tout le projection plane en avançant d'une fraction du vecteur caméra
+            // La fraction est donné par [x / screen->w]. On convertir double screen->w pour ne pas perdre en précision.
+            // Les fractions iront de 0 à 1. Or le vecteur caméra est orienté et on va le parcourir deux fois mais de -1 à +1.
+            // On passe de (0 à 1) à (0 à 2) puis on soustrait 1 donc de (-1 à 1).
+
+            double ray_dir_x = direction_x + camera_x * raycast_cpt;
+            double ray_dir_y = direction_y + camera_y * raycast_cpt;
 
             int ray_map_x = player_map_x;
             int ray_map_y = player_map_y;
+            
+            double ray_x = player_x;
+            double ray_y = player_y;
 
             double sideDistX;
             double sideDistY;
 
-            double deltaDistX = fabs(1 / ray_x);
-            double deltaDistY = fabs(1 / ray_y);
+            double deltaDistX = fabs(1 / ray_dir_x);
+            double deltaDistY = fabs(1 / ray_dir_y);
             double perpWallDist;
 
             int stepX;
@@ -312,46 +347,96 @@ int main(int argc, char * argv[]) {
             int hit = 0;
             int side;
 
-            if (ray_x < 0) {
+            if (ray_dir_x < 0) {
                 stepX = -1;
                 sideDistX = (player_x - ray_map_x) * deltaDistX;
             } else {
                 stepX = 1;
                 sideDistX = (ray_map_x + 1.0 - player_x) * deltaDistX;
             }
-            if (ray_y < 0) {
+            if (ray_dir_y < 0) {
                 stepY = -1;
                 sideDistY = (player_y - ray_map_y) * deltaDistY;
             } else {
                 stepY = 1;
                 sideDistY = (ray_map_y + 1.0 - player_y) * deltaDistY;
-            }
+            }   
+#ifdef DEBUG 
+            int itercount = 0; //d
+            printf("-- Start DDA --\n"); //d
+#endif
 
             while (hit == 0) {
+                
+#ifdef DEBUG
+                itercount += 1; //d
+                printf("-- %d -- \n", itercount); //d
+                printf("sideDistX = %f, sideDistY = %f\n", sideDistX, sideDistY); //d
+                printf("deltaDistX = %f, deltaDistY = %f\n", deltaDistX, deltaDistY); //d
+                printf("ray_dir_x = %f, ray_dir_y = %f\n", ray_dir_x, ray_dir_y); //d
+                printf("ray_map_x = %d, ray_map_y = %d\n", ray_map_x, ray_map_y); //d
+                printf("ray_x = %f, ray_y = %f\n", ray_x, ray_y); //d
+                printf("\n\n"); //d
+#endif
+    
                 if (sideDistX < sideDistY) {
                     sideDistX += deltaDistX;
                     ray_map_x += stepX;
-                    side = 0;
+                    ray_x += stepX * deltaDistX; //d
+                    side = VERTICAL;
                 } else {
                     sideDistY += deltaDistY;
                     ray_map_y += stepY;
-                    side = 1;
+                    ray_y += stepY * deltaDistY; //d
+                    side = HORIZONTAL;
                 }
                 if (map[ray_map_x][ray_map_y] > 0) hit = 1;
             }
-            if (side == 0) {
-                perpWallDist = (ray_map_x - player_x + (1 - stepX) / 2) / ray_x;
+            
+#ifdef DEBUG
+            if (side == VERTICAL) {
+                ray_x = ray_map_x - stepX;
+                ray_y -= stepY * deltaDistY;
             } else {
-                perpWallDist = (ray_map_y - player_y + (1 - stepY) / 2) / ray_y;
+                ray_y = ray_map_y - stepY;
+                ray_x -= stepX * deltaDistX;
             }
 
+            printf("-- End of DDA -- \n", itercount); //d
+            printf("sideDistX = %f, sideDistY = %f\n", sideDistX, sideDistY); //d
+            printf("deltaDistX = %f, deltaDistY = %f\n", deltaDistX, deltaDistY); //d
+            printf("ray_dir_x = %f, ray_dir_y = %f\n", ray_dir_x, ray_dir_y); //d
+            printf("ray_map_x = %d, ray_map_y = %d\n", ray_map_x, ray_map_y); //d
+            printf("ray_x = %f, ray_y = %f\n", ray_x, ray_y); //d
+            printf("\n\n"); //d            
+#endif    
+
+            if (side == VERTICAL) {
+                perpWallDist = (ray_map_x - player_x + (1 - stepX) / 2) / ray_dir_x;
+            } else {
+                perpWallDist = (ray_map_y - player_y + (1 - stepY) / 2) / ray_dir_y;
+            }
+            
+#ifdef DEBUG
+            double xwalldist = sqrt(pow(ray_x - player_x , 2) + pow(ray_y - player_y, 2)); //d
+            //perpWallDist = xwalldist; //d
+
+            printf("xwalldist = %f, perpWallDist = %f\n", xwalldist, perpWallDist); //d
+            exit(0); //d
+#endif
+#ifdef FOG
+            double fog_factor = 0.0;
+            if (perpWallDist < MAX_FOG) {
+                fog_factor = 1 - perpWallDist / MAX_FOG;
+            }
+#endif
             int lineHeight = (int) ((screen->h / perpWallDist) * WALL_HEIGHT);
             double trueLineHeight = screen->h / perpWallDist;
             int midLineHeight = lineHeight / 2;
 
-            int drawStart = MID_SCREEN_HEIGHT - midLineHeight;
-            int drawEnd = MID_SCREEN_HEIGHT + midLineHeight;
-            int trueDrawStart = drawStart;
+            int drawStart = MID_SCREEN_HEIGHT - midLineHeight + player_z;
+            int drawEnd = MID_SCREEN_HEIGHT + midLineHeight + player_z;
+            int trueDrawStart = drawStart; // + player_z; c'est ne pas changer ça qui fait regarder en haut et en bas. Hum...
 
             if (drawStart < 0) {
                 drawStart = 0;
@@ -362,35 +447,45 @@ int main(int argc, char * argv[]) {
             
             double wallX; //where exactly the wall was hit
             if (side == 0) {
-                wallX = player_y + perpWallDist * ray_y;
+                wallX = player_y + perpWallDist * ray_dir_y;
             } else {
-                wallX = player_x + perpWallDist * ray_x;
+                wallX = player_x + perpWallDist * ray_dir_x;
             }
             wallX -= floor((wallX));
             
             //x coordinate on the texture
             int texX = (int)(wallX * (double) TEX_WIDTH);
-            if(side == 0 && ray_x > 0) texX = TEX_WIDTH - texX - 1; // (inverse)
-            if(side == 1 && ray_y < 0) texX = TEX_WIDTH - texX - 1;
+            if(side == 0 && ray_dir_x > 0) texX = TEX_WIDTH - texX - 1; // (inverse)
+            if(side == 1 && ray_dir_y < 0) texX = TEX_WIDTH - texX - 1;
             
             for(int y = drawStart; y < drawEnd; y++)
             {
                 int d = y - trueDrawStart;
-                int texY = (int) (d * ( (double) TEX_HEIGHT / trueLineHeight)) % TEX_HEIGHT; //lineHeight);
+                int texY = (int) (d * ( (double) TEX_HEIGHT / trueLineHeight)) % TEX_HEIGHT; //lineHeight); // Ajout de (double) pour éviter le flottement sur trueLineHeight
 
                 //int d = (int) (y * 2 - screen-> h + lineHeight);
                 //int texY = ((d * TEX_HEIGHT) / lineHeight) % TEX_HEIGHT; // ajout de % TEX_HEIGHT pour éviter bug de la dernière colonne;
                 
                 //make color darker for y-sides
                 Uint32 color = tex[texX][texY];
-                if(side == 1) {
-                    color = (color >> 1) & 8355711;
-                }
+                //if(side == 1) {
+                //    color = (color >> 1) & 8355711;
+                //}
                 // DEBUG
                 if (y == drawStart || y == drawEnd - 1) {
                     color = WHITE;
                 }
+                //if (x == 0) {
+                //    color = PURPLE;
+                //}
                 // END DEBUG
+#ifdef FOG
+                Uint8 r;
+                Uint8 g;
+                Uint8 b;
+                SDL_GetRGB(color, screen->format, &r, &g, &b);
+                color = SDL_MapRGB(screen->format, r * fog_factor, g * fog_factor, b * fog_factor);
+#endif
                 screen_buffer[y][x] = color;
                 if (debug) {
                     fprintf(debug_file, "x, %d, y, %d, d, %d, texX, %d, texY, %d, color, %d\n", x, y, d, texX, texY, color);
@@ -402,17 +497,17 @@ int main(int argc, char * argv[]) {
             double floorXWall, floorYWall; //x, y position of the floor texel at the bottom of the wall
 
             //4 different wall directions possible
-            if(side == 0 && ray_x > 0)
+            if(side == 0 && ray_dir_x > 0)
             {
                 floorXWall = ray_map_x;
                 floorYWall = ray_map_y + wallX;
             }
-            else if(side == 0 && ray_x < 0)
+            else if(side == 0 && ray_dir_x < 0)
             {
                 floorXWall = ray_map_x + 1.0;
                 floorYWall = ray_map_y + wallX;
             }
-            else if(side == 1 && ray_y > 0)
+            else if(side == 1 && ray_dir_y > 0)
             {
                 floorXWall = ray_map_x + wallX;
                 floorYWall = ray_map_y;
@@ -454,8 +549,20 @@ int main(int argc, char * argv[]) {
                         color = RED;
                         break;
                 }
-                //floor
-                screen_buffer[y][x] = (color >> 1) & 8355711;
+#ifdef FOG // DON'T WORK
+                fog_factor = 0.0;
+                if (currentDist * weight < MAX_FOG) {
+                    fog_factor = 1 - currentDist * weight / MAX_FOG;
+                }
+                Uint8 r;
+                Uint8 g;
+                Uint8 b;
+                SDL_GetRGB(color, screen->format, &r, &g, &b);
+                color = SDL_MapRGB(screen->format, r * fog_factor, g * fog_factor, b * fog_factor);
+#endif
+                //darker floor
+                //screen_buffer[y][x] = (color >> 1) & 8355711;
+                screen_buffer[y][x] = color;
                 // ceiling
                 //int y_ceiling = MID_SCREEN_HEIGHT - midLineHeight - lineHeight - count -1;
                 int y_ceiling = drawStart - count - 1;
@@ -705,6 +812,14 @@ int main(int argc, char * argv[]) {
             double old_cam_x = camera_x;
             camera_x = camera_x * cos(-rot_modifier * frame_time) - camera_y * sin(-rot_modifier * frame_time);
             camera_y = old_cam_x * sin(-rot_modifier * frame_time) + camera_y * cos(-rot_modifier * frame_time);
+        }
+        if (z_down) {
+            player_z -= UP_DOWN_SPEED;
+            printf("%f\n", player_z);
+        }
+        if (z_up) {
+            player_z += UP_DOWN_SPEED;
+            printf("%f\n", player_z);
         }
     }
 
