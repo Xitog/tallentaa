@@ -65,8 +65,8 @@
 //-----------------------------------------------------------------------------
 
 // OPTIONS
-// #define FOG
-#define MAX_FOG 25 // 12 15 20 25
+#define FOG
+#define MAX_FOG 12 // 12 15 20 25
 // #define DEBUG 
 #define SHODAN
 // #define ENABLE_FLOOR
@@ -573,10 +573,11 @@ int main(int argc, char * argv[]) {
                         color = RED;
                         break;
                 }
-#ifdef FOG // DON'T WORK
+#ifdef FOG
+                double xdist = sqrt(pow(currentFloorX - player_x, 2)+pow(currentFloorY - player_y, 2));
                 fog_factor = 0.0;
-                if (currentDist * weight < MAX_FOG) {
-                    fog_factor = 1 - currentDist * weight / MAX_FOG;
+                if (xdist < MAX_FOG) {
+                    fog_factor = 1 - xdist / MAX_FOG;
                 }
                 Uint8 r;
                 Uint8 g;
