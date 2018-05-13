@@ -65,7 +65,7 @@
 //-----------------------------------------------------------------------------
 
 // OPTIONS
-#define FOG
+// #define FOG
 #define MAX_FOG 12 // 12 15 20 25
 // #define DEBUG 
 #define SHODAN
@@ -426,14 +426,37 @@ int main(int argc, char * argv[]) {
             // Il calcule la simple différence entre le X map de l'intersection et le X map du joueur (avec (1-stepX) / 2 qui sert à départager si on touche à gauche ou à droite).
             // Cela donne une ligne horizontale. PB : l'angle du joueur.
             // En divisant par RAY_DIR_X, on a LA DISTANCE PERPENDICULAIRE (PERPWALLDIST).
-            // Si RAY_DIR_X = 1, le mur est VERTICAL, le joueur est pile en face de lui donc PERPWALLDIST = TRUE DIST.
+            // Si RAY_DIR_X = 1 ou -1 et que le mur est VERTICAL (sur X), le joueur est pile en face de lui donc PERPWALLDIST = TRUE DIST.
             // Cette simplification ne marche que si les murs sont à 90 degrés horizontaux ou verticaux
+
+            // Comme les normes de ray_dir_x et ray_dir_y sont égales à un cela revient à :
+            // divisé par un cos(angle) pour ray_dir_x et sin(angle) pour ray_dir_y
+            // or si on divise l'adjacent par le cosinus on trouve... l'hypothénuse !
+            // si exactement à la perpendiculaire d'un mur vertical, ray_dir_x est soit -1 ou 1. Ce qui correspond à un angle de 0° ou 180° 
+            // mais surtout si on divise par 1 donc la diff player_x ray_map_x donne directement la distance !
+            // printf("ray_dir_x = %f, dir_x = %f, cam_x = %f, cpt = %f\n", ray_dir_x, direction_x, camera_x, raycast_cpt);
+            // printf("ray_dir_y = %f, dir_y = %f, cam_y = %f, cpt = %f\n", ray_dir_y, direction_y, camera_y, raycast_cpt);
+            if (side == VERTICAL) {
+                if (ray_map_x < player_x) {
+                    perpWallDist = (player_x - (ray_map_x + 1)) / -ray_dir_x;
+                } else {
+                    perpWallDist = (ray_map_x - player_x) / ray_dir_x;
+                }
+            } else {
+                if (ray_map_y < player_y) {
+                    perpWallDist = (player_y - (ray_map_y + 1)) / -ray_dir_y;
+                } else {
+                    perpWallDist = (ray_map_y - player_y) / ray_dir_y;
+                }
+            }
+            /*
             if (side == VERTICAL) {
                 perpWallDist = (ray_map_x - player_x + (1 - stepX) / 2) / ray_dir_x;
             } else {
                 perpWallDist = (ray_map_y - player_y + (1 - stepY) / 2) / ray_dir_y;
             }
-            
+            */
+
 #ifdef DEBUG
             double xwalldist = sqrt(pow(ray_x - player_x , 2) + pow(ray_y - player_y, 2)); //d
             //perpWallDist = xwalldist; //d
