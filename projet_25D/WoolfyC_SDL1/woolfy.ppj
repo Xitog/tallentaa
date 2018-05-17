@@ -29,6 +29,7 @@ LIB = $(PellesCDir)\Lib\Win;$(PellesCDir)\Lib;..\..\librairies\SDL_1_2_15\lib#
 # 
 woolfy.exe: \
 	output\flat.obj \
+	output\flat_nogrid.obj \
 	output\main.obj \
 	output\minisdl.obj \
 	output\oldcode.obj \
@@ -96,8 +97,14 @@ output\oldcode.obj: \
 # 
 output\main.obj: \
 	main.c \
-	flat.c \
-	textured.c
+	flat_nogrid.c
+	$(CC) $(CCFLAGS) "$!" -Fo"$@"
+
+# 
+# Construction de flat_nogrid.obj.
+# 
+output\flat_nogrid.obj: \
+	flat_nogrid.c
 	$(CC) $(CCFLAGS) "$!" -Fo"$@"
 
 .EXCLUDEDFILES:

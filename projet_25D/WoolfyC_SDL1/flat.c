@@ -88,6 +88,9 @@
 #define W 5
 #define P 6
 
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 480
+
 //-----------------------------------------------------------------------------
 // Globals
 //-----------------------------------------------------------------------------
@@ -170,8 +173,6 @@ void input(void) {
     }
 }
 
-#define SCREEN_WIDTH 640
-#define SCREEN_HEIGHT 480
 // Il faut un buffer et ne pas ecrire directement sur le screen !
 int main(int argc, char * argv[]) {
     // Player 2.5D Coordinates
