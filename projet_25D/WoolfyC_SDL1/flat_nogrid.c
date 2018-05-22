@@ -43,6 +43,7 @@ typedef struct {
 } Wall;
 
 typedef struct {
+    Vector ray;
     Vector pos;
     Wall wall;
     double dist;
@@ -64,6 +65,7 @@ const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
 const Intersection NO_INTERSECTION = { 
+    {-1, -1, -1}, // ray
     {-1, -1, -1}, // pos
     { {-1, -1, -1}, {-1, -1, -1}, 0, 0}, // wall
     -1 // dist
@@ -203,6 +205,8 @@ Intersection intersection(Vector ray, Vector pos, Wall wall) {
             return NO_INTERSECTION;
         } else if (ray.x == 0) { // perpendicular to wall
             Intersection coll;
+            coll.ray.x = ray.x;
+            coll.ray.y = ray.y;
             coll.pos.x = ray_on_pos.x;
             coll.pos.y = wall.pos1.y;
             coll.pos.z = 0;
@@ -211,7 +215,6 @@ Intersection intersection(Vector ray, Vector pos, Wall wall) {
             //printf("    HORIZONTAL PERPENDICULAR INTERSECTION AT %.2f, %.2f\n", coll.pos.x, coll.pos.y);
             return coll;
         } else {
-            Intersection coll;
             // calc
             double A = ray.y / ray.x;
             double B = ray_on_pos.y - A * ray_on_pos.x;
@@ -219,6 +222,9 @@ Intersection intersection(Vector ray, Vector pos, Wall wall) {
             double coll_x = (wall.pos1.y - B) / A;
             //printf("    INTERSECT AT : %f %f\n", coll_x, wall.pos1.y);
             if (coll_x >= wall.pos1.x && coll_x <= wall.pos2.x) {
+                Intersection coll;
+                coll.ray.x = ray.x;
+                coll.ray.y = ray.y;
                 coll.pos.x = coll_x;
                 coll.pos.y = wall.pos1.y;
                 coll.pos.z = 0;
@@ -241,6 +247,8 @@ Intersection intersection(Vector ray, Vector pos, Wall wall) {
             return NO_INTERSECTION;
         } else if (ray.y == 0) { // perpendicular to wall
             Intersection coll;
+            coll.ray.x = ray.x;
+            coll.ray.y = ray.y;
             coll.pos.x = wall.pos1.x;
             coll.pos.y = ray_on_pos.y;
             coll.pos.z = 0;
@@ -250,7 +258,6 @@ Intersection intersection(Vector ray, Vector pos, Wall wall) {
             //printf("        VERTICAL PERPENDICULAR INTERSECTION AT %.2f, %.2f\n", coll.pos.x, coll.pos.y);
             return coll;
         } else {
-            Intersection coll;
             // calc
             double A = ray.y / ray.x;
             double B = ray_on_pos.y - A * ray_on_pos.x;
@@ -258,6 +265,9 @@ Intersection intersection(Vector ray, Vector pos, Wall wall) {
             double coll_y = A * wall.pos1.x + B;
             //printf("        INTERSECT AT : X = %f Y = %f. Y should be between %f %f\n", wall.pos1.x, coll_y, wall.pos1.y, wall.pos2.y);
             if (coll_y >= wall.pos1.y && coll_y <= wall.pos2.y) {
+                Intersection coll;
+                coll.ray.x = ray.x;
+                coll.ray.y = ray.y;
                 coll.pos.x = wall.pos1.x;
                 coll.pos.y = coll_y;
                 coll.pos.z = 0;
@@ -326,9 +336,7 @@ int main(int argc, char * argv[]) {
 
         Intersection intersections[SCREEN_WIDTH];
         
-        // Rendering
-        fill(BLACK);
-        
+        // Computing raycasting
         for (int x = 0; x < SCREEN_WIDTH; x++) {
             intersections[x].dist = 1000;
             double raycast_cpt = 2 * x / (float) SCREEN_WIDTH - 1; // -1 to +1
@@ -343,32 +351,44 @@ int main(int argc, char * argv[]) {
             }
         }
         
-
-        /*
-        for (int x = 0; x < SCREEN_WIDTH; x++) {
-            intersections[x].dist = 1000;
-        }
+        // Rendering
+        fill(BLACK);
         
-        Vector rays[3];
-        rays[0] = player.dir;
-        rays[1].x = player.dir.x + camera.x;
-        rays[1].y = player.dir.y + camera.y;
-        rays[2].x = player.dir.x - camera.x;
-        rays[2].y = player.dir.y - camera.y;
-
-        for (int r=0; r < 1; r++) {
-            printf("== Ray %d ==\n", r);
-            printf("    X = %.2f Y = %.2f\n", rays[r].x, rays[r].y);
-            for (int i=0; i < MAX_WALL; i++) {
-                printf("    == Wall num %d (color %d) ==\n", i, map[i].color);
-                Intersection inter = intersection(rays[r], player.pos, map[i]);
-                printf("        Inter.dist = %.2f vs %2.f\n", inter.dist, intersections[r].dist);
-                if (inter.dist < intersections[r].dist && inter.dist > -1) {
-                    intersections[r] = inter;
-                }
+        int mid = SCREEN_HEIGHT / 2;
+        for (int x = 0; x < SCREEN_WIDTH; x++) {
+            if (intersections[x].dist == -1 || intersections[x].dist == 1000 || intersections[x].dist == 0) {
+                continue;
             }
+            double perpDist = 1;
+            if (intersections[x].wall.type == HORIZONTAL) {
+                perpDist = fabs((intersections[x].pos.y - player.pos.y) / intersections[x].ray.y);
+            } else if (intersections[x].wall.type == VERTICAL) {
+                perpDist = fabs((intersections[x].pos.x - player.pos.x) / intersections[x].ray.x);
+            }
+            int lineHeight = SCREEN_HEIGHT / perpDist;
+            Uint32 color;
+            switch (intersections[x].wall.color) {
+                case WHITE_COLOR:
+                    color = WHITE;
+                    break;
+                case RED_COLOR:
+                    color = RED;
+                    break;
+                case BLUE_COLOR:
+                    color = BLUE;
+                    break;
+                case YELLOW_COLOR:
+                    color = YELLOW;
+                    break;
+                case GREEN_COLOR:
+                    color = GREEN;
+                    break;
+                default:
+                    color = PURPLE;
+                    break;
+            }
+            line(x, mid - lineHeight, x, mid + lineHeight, color);
         }
-        */
 
         if (show_map) {
             // Draw rays
@@ -377,30 +397,28 @@ int main(int argc, char * argv[]) {
                     continue;
                 }
                 //printf("%d. INTERSECT : %.2f\n", x, intersections[x].dist);
-                if (intersections[x].dist != -1) {
-                    Uint32 color;
-                    switch (intersections[x].wall.color) {
-                        case WHITE_COLOR:
-                            color = WHITE;
-                            break;
-                        case RED_COLOR:
-                            color = RED;
-                            break;
-                        case BLUE_COLOR:
-                            color = BLUE;
-                            break;
-                        case YELLOW_COLOR:
-                            color = YELLOW;
-                            break;
-                        case GREEN_COLOR:
-                            color = GREEN;
-                            break;
-                        default:
-                            color = PURPLE;
-                            break;
-                    }
-                    line(player.pos.x * MINIMAP_ZOOM, player.pos.y * MINIMAP_ZOOM, intersections[x].pos.x * MINIMAP_ZOOM, intersections[x].pos.y * MINIMAP_ZOOM, color);
+                Uint32 color;
+                switch (intersections[x].wall.color) {
+                    case WHITE_COLOR:
+                        color = WHITE;
+                        break;
+                    case RED_COLOR:
+                        color = RED;
+                        break;
+                    case BLUE_COLOR:
+                        color = BLUE;
+                        break;
+                    case YELLOW_COLOR:
+                        color = YELLOW;
+                        break;
+                    case GREEN_COLOR:
+                        color = GREEN;
+                        break;
+                    default:
+                        color = PURPLE;
+                        break;
                 }
+                line(player.pos.x * MINIMAP_ZOOM, player.pos.y * MINIMAP_ZOOM, intersections[x].pos.x * MINIMAP_ZOOM, intersections[x].pos.y * MINIMAP_ZOOM, color);
             }
             // Draw player and camera
             circle(player.pos.x * MINIMAP_ZOOM, player.pos.y * MINIMAP_ZOOM, 5, WHITE);
@@ -462,6 +480,7 @@ int main(int argc, char * argv[]) {
             player.pos.y = next_pos.y;
         }
         if (left) {
+            printf("dir.x = %.2f dir.y = %.2f (%.2f) (%.2f)\n", player.dir.x, player.dir.y, acos(player.dir.x), asin(player.dir.y));
             double old_dir_x = player.dir.x;
             player.dir.x = player.dir.x * cos(rot_modifier * frame_time) - player.dir.y * sin(rot_modifier * frame_time);
             player.dir.y = old_dir_x * sin(rot_modifier * frame_time) + player.dir.y * cos(rot_modifier * frame_time);
@@ -470,6 +489,7 @@ int main(int argc, char * argv[]) {
             camera.y = old_cam_x * sin(rot_modifier * frame_time) + camera.y * cos(rot_modifier * frame_time);
         }
         if (right) {
+            printf("dir.x = %.2f dir.y = %.2f (%.2f) (%.2f)\n", player.dir.x, player.dir.y, acos(player.dir.x), asin(player.dir.y));
             double old_dir_x = player.dir.x;
             player.dir.x = player.dir.x * cos(-rot_modifier * frame_time) - player.dir.y * sin(-rot_modifier * frame_time);
             player.dir.y = old_dir_x * sin(-rot_modifier * frame_time) + player.dir.y * cos(-rot_modifier * frame_time);
