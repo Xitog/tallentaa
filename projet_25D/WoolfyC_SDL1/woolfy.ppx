@@ -1,13 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <settings version="1.0">
-	<category name="textured.c" />
+	<category name="textured.c">
+		<category name="Window">
+			<property name="Left" type="integer">104</property>
+			<property name="Top" type="integer">104</property>
+			<property name="Right" type="integer">731</property>
+			<property name="Bottom" type="integer">436</property>
+			<property name="Maximized" type="integer">0</property>
+			<property name="Active" type="integer">0</property>
+		</category>
+	</category>
 	<category name="flat.c" />
 	<category name="minisdl.c">
 		<category name="Window">
 			<property name="Left" type="integer">0</property>
 			<property name="Top" type="integer">0</property>
 			<property name="Right" type="integer">798</property>
-			<property name="Bottom" type="integer">533</property>
+			<property name="Bottom" type="integer">332</property>
 			<property name="Maximized" type="integer">0</property>
 			<property name="Active" type="integer">0</property>
 		</category>
@@ -17,7 +26,7 @@
 			<property name="Left" type="integer">26</property>
 			<property name="Top" type="integer">26</property>
 			<property name="Right" type="integer">824</property>
-			<property name="Bottom" type="integer">559</property>
+			<property name="Bottom" type="integer">358</property>
 			<property name="Maximized" type="integer">0</property>
 			<property name="Active" type="integer">0</property>
 		</category>
@@ -26,8 +35,8 @@
 		<category name="Window">
 			<property name="Left" type="integer">-8</property>
 			<property name="Top" type="integer">-31</property>
-			<property name="Right" type="integer">845</property>
-			<property name="Bottom" type="integer">719</property>
+			<property name="Right" type="integer">1147</property>
+			<property name="Bottom" type="integer">425</property>
 			<property name="Maximized" type="integer">1</property>
 			<property name="Active" type="integer">1</property>
 		</category>
@@ -37,7 +46,7 @@
 			<property name="Left" type="integer">78</property>
 			<property name="Top" type="integer">78</property>
 			<property name="Right" type="integer">876</property>
-			<property name="Bottom" type="integer">611</property>
+			<property name="Bottom" type="integer">410</property>
 			<property name="Maximized" type="integer">0</property>
 			<property name="Active" type="integer">0</property>
 		</category>

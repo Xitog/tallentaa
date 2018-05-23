@@ -3,6 +3,7 @@
 //#define ENABLE_FLOOR
 //#define TEXTURED
 //#define LODE
+#define SHODAN
 #define FLAT_NOGRID
 
 //#include "flat.c"

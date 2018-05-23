@@ -40,6 +40,7 @@ typedef struct {
     Vector pos2;
     WallType type;
     int color;
+    int texture;
 } Wall;
 
 typedef struct {
@@ -71,7 +72,7 @@ const Intersection NO_INTERSECTION = {
     -1 // dist
 };
 
-#define DEF_MAX_WALL 4
+#define DEF_MAX_WALL 7
 
 const int MAX_WALL = DEF_MAX_WALL;
 const Wall map[DEF_MAX_WALL] = {
@@ -80,25 +81,59 @@ const Wall map[DEF_MAX_WALL] = {
         {10, 1, 0},     // pos 2
         HORIZONTAL,     // sens
         WHITE_COLOR,    // color
+        1,              // texture
     },
     {
         {1, 1, 0},
         {1, 10, 0},
         VERTICAL,
         BLUE_COLOR,
+        0,              // texture
     },
     {
         {1, 10, 0},
         {10, 10, 0},
         HORIZONTAL,
         YELLOW_COLOR,
+        0,              // texture
     },
     {
         {10, 1, 0},
-        {10, 10, 0},
+        {10, 5, 0},     //{10, 10, 0},
         VERTICAL,
         GREEN_COLOR,
+        0,              // texture
+    },
+    /*
+    {
+        {10, 5, 0},
+        {10, 10, 0},
+        VERTICAL,
+        WHITE_COLOR,
+        1,
     }
+    */
+    {
+        {10, 5, 0},
+        {15, 5, 0},
+        HORIZONTAL,
+        WHITE_COLOR,
+        1,
+    },
+    {
+        {15, 5, 0},
+        {15, 10, 0},
+        VERTICAL,
+        YELLOW_COLOR,
+        0,
+    },
+    {
+        {10, 10, 0},
+        {15, 10, 0},
+        HORIZONTAL,
+        BLUE_COLOR,
+        1,
+    },
 };
 
 const double MOVE_SPEED = 0.008;
@@ -331,6 +366,30 @@ int main(int argc, char * argv[]) {
         }
     }
 
+    // Texture loading
+    #define TEXTURE_PATH "tile110.bmp"
+    #define TEX_WIDTH 64
+    #define TEX_HEIGHT 64
+    #define TEXTURES 2
+    #ifdef SHODAN
+        char * texture_names[] = {
+            "..\\..\\assets\\graphic\\textures\\woolfy_wall\\LAB\\tile110.bmp",
+            "..\\..\\assets\\graphic\\textures\\woolfy_wall\\LAB\\tile110b.bmp",
+        };
+    #endif
+    #ifndef SHODAN
+        char * texture_names[] = { "tile110.bmp", "tile110b.bmp" };
+    #endif
+    Uint32 texture[TEXTURES][TEX_WIDTH][TEX_HEIGHT];
+    for (int tni = 0; tni < 2; tni++) {
+        SDL_Surface * surface = load_bmp(texture_names[tni]);
+        for (int x = 0; x < surface->w; x++) {
+            for (int y = 0; y < surface->h; y++) {
+                texture[tni][x][y] = *((Uint32 *)((Uint8 *)surface->pixels + y * surface->pitch + x * surface->format->BytesPerPixel));
+            }
+        }
+    }
+
     // Main loop
     while(!done) {
 
@@ -387,7 +446,27 @@ int main(int argc, char * argv[]) {
                     color = PURPLE;
                     break;
             }
+            // Flat
             line(x, mid - lineHeight, x, mid + lineHeight, color);
+            // Textured
+            double tex_x;
+            if (intersections[x].wall.type == VERTICAL) {
+                tex_x = intersections[x].pos.y; // 14h07 : il fallait inverser : premiere vraie texture mais tutti frutti !
+            } else {
+                tex_x = intersections[x].pos.x;
+            }
+            tex_x -= floor(tex_x);
+            tex_x *= (double) TEX_WIDTH;
+            for(int yy = mid - lineHeight ; yy <= mid + lineHeight ; yy++) {
+                int tex_y = (int) (yy - (mid - lineHeight)) * ((double) TEX_HEIGHT / lineHeight); //14h04 (double) + inverser div : premier texture mais répété
+                while (tex_y >= TEX_HEIGHT) {
+                    tex_y -= TEX_HEIGHT; // 14h12 c'est bon :-) plus rapide que %
+                }
+                if (tex_x < 0 || tex_x >= TEX_WIDTH || tex_y < 0 || tex_y >= TEX_HEIGHT) {
+                    printf("%d %d\n", (int) tex_x, tex_y);
+                }
+                pixel(x, yy, texture[intersections[x].wall.texture][(int) tex_x][(int) tex_y]);
+            }
         }
 
         if (show_map) {
