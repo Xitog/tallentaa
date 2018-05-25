@@ -1,6 +1,12 @@
 
 #ifdef FLAT_NOGRID
 
+// Todo
+
+// Level loading
+// Level editor & level saving
+// Multisector & Invisible wall
+
 //-----------------------------------------------------------------------------
 // Includes
 //-----------------------------------------------------------------------------
@@ -41,7 +47,14 @@ typedef struct {
     WallType type;
     int color;
     int texture;
+    int sector;
 } Wall;
+
+typedef struct {
+    int nb_wall;
+    int walls[7];
+    double height;
+} Sector;
 
 typedef struct {
     Vector ray;
@@ -69,40 +82,43 @@ const Intersection NO_INTERSECTION = {
     {-1, -1, -1}, // ray
     {-1, -1, -1}, // pos
     { {-1, -1, -1}, {-1, -1, -1}, 0, 0}, // wall
-    -1 // dist
+    -1, // dist
 };
 
 #define DEF_MAX_WALL 7
-
 const int MAX_WALL = DEF_MAX_WALL;
 const Wall map[DEF_MAX_WALL] = {
-    {
+    { // 0
         {1, 1, 0},      // pos 1
         {10, 1, 0},     // pos 2
         HORIZONTAL,     // sens
         WHITE_COLOR,    // color
         1,              // texture
+        0,              // sector
     },
-    {
+    { // 1
         {1, 1, 0},
         {1, 10, 0},
         VERTICAL,
         BLUE_COLOR,
         0,              // texture
+        0,              // sector
     },
-    {
+    {// 2
         {1, 10, 0},
         {10, 10, 0},
         HORIZONTAL,
         YELLOW_COLOR,
         0,              // texture
+        0,              // sector
     },
-    {
+    {// 3
         {10, 1, 0},
         {10, 5, 0},     //{10, 10, 0},
         VERTICAL,
         GREEN_COLOR,
         0,              // texture
+        0,              // sector
     },
     /*
     {
@@ -113,27 +129,40 @@ const Wall map[DEF_MAX_WALL] = {
         1,
     }
     */
-    {
+    {// 4
         {10, 5, 0},
         {15, 5, 0},
         HORIZONTAL,
         WHITE_COLOR,
         1,
+        0,              // sector
     },
-    {
+    {// 5
         {15, 5, 0},
         {15, 10, 0},
         VERTICAL,
         YELLOW_COLOR,
-        0,
+        2,
+        0,              // sector
     },
-    {
+    {// 6
         {10, 10, 0},
         {15, 10, 0},
         HORIZONTAL,
         BLUE_COLOR,
         1,
+        0,              // sector
     },
+};
+
+#define DEF_MAX_SECTOR 1
+const int MAX_SECTOR = DEF_MAX_SECTOR;
+const Sector sectors[DEF_MAX_SECTOR] = {
+    {
+        7, // nb of walls
+        {0, 1, 2, 3, 4, 5, 6}, // walls ref
+        1, // 3
+    }
 };
 
 const double MOVE_SPEED = 0.008;
@@ -318,6 +347,15 @@ Intersection intersection(Vector ray, Vector pos, Wall wall) {
     }
 }
 
+void draw_sector(int sid, int x, Player player, Vector ray, Intersection * intersections) {
+    for (int i=0; i < sectors[sid].nb_wall; i++) {
+        Intersection inter = intersection(ray, player.pos, map[sectors[sid].walls[i]]);
+        if (inter.dist < intersections[x].dist && inter.dist > -1) {
+            intersections[x] = inter;
+        }
+    }
+}
+
 int main(int argc, char * argv[]) {
     printf("Start\n");
 
@@ -367,21 +405,17 @@ int main(int argc, char * argv[]) {
     }
 
     // Texture loading
-    #define TEXTURE_PATH "tile110.bmp"
-    #define TEX_WIDTH 64
-    #define TEX_HEIGHT 64
-    #define TEXTURES 2
-    #ifdef SHODAN
-        char * texture_names[] = {
-            "..\\..\\assets\\graphic\\textures\\woolfy_wall\\LAB\\tile110.bmp",
-            "..\\..\\assets\\graphic\\textures\\woolfy_wall\\LAB\\tile110b.bmp",
-        };
-    #endif
-    #ifndef SHODAN
-        char * texture_names[] = { "tile110.bmp", "tile110b.bmp" };
-    #endif
+    #define TEXTURE_PATH ..\\..\\assets\\graphic\\textures\\woolfy\\freedoom /* .\\assets\\ */
+    #define TEX_WIDTH 128 //64
+    #define TEX_HEIGHT 128 //64
+    #define TEXTURES 3
+    char * texture_names[] = { 
+        "..\\..\\assets\\graphic\\textures\\woolfy_wall\\freedoom\\brick.bmp", 
+        "..\\..\\assets\\graphic\\textures\\woolfy_wall\\freedoom\\concrete.bmp", 
+        "..\\..\\assets\\graphic\\textures\\woolfy_wall\\freedoom\\door9_1.bmp" 
+    }; // "tile110.bmp", "tile110b.bmp" };
     Uint32 texture[TEXTURES][TEX_WIDTH][TEX_HEIGHT];
-    for (int tni = 0; tni < 2; tni++) {
+    for (int tni = 0; tni < TEXTURES; tni++) {
         SDL_Surface * surface = load_bmp(texture_names[tni]);
         for (int x = 0; x < surface->w; x++) {
             for (int y = 0; y < surface->h; y++) {
@@ -402,12 +436,7 @@ int main(int argc, char * argv[]) {
             Vector ray;
             ray.x = player.dir.x + camera.x * raycast_cpt;
             ray.y = player.dir.y + camera.y * raycast_cpt;
-            for (int i=0; i < MAX_WALL; i++) {
-                Intersection inter = intersection(ray, player.pos, map[i]);
-                if (inter.dist < intersections[x].dist && inter.dist > -1) {
-                    intersections[x] = inter;
-                }
-            }
+            draw_sector(0, x, player, ray, intersections);
         }
         
         // Rendering
@@ -424,7 +453,7 @@ int main(int argc, char * argv[]) {
             } else if (intersections[x].wall.type == VERTICAL) {
                 perpDist = fabs((intersections[x].pos.x - player.pos.x) / intersections[x].ray.x);
             }
-            int lineHeight = SCREEN_HEIGHT / perpDist;
+            int lineHeight = sectors[intersections[x].wall.sector].height * (SCREEN_HEIGHT / perpDist);
             Uint32 color;
             switch (intersections[x].wall.color) {
                 case WHITE_COLOR:
@@ -447,7 +476,7 @@ int main(int argc, char * argv[]) {
                     break;
             }
             // Flat
-            line(x, mid - lineHeight, x, mid + lineHeight, color);
+            //line(x, mid - lineHeight, x, mid + lineHeight, color);
             // Textured
             double tex_x;
             if (intersections[x].wall.type == VERTICAL) {
@@ -457,8 +486,10 @@ int main(int argc, char * argv[]) {
             }
             tex_x -= floor(tex_x);
             tex_x *= (double) TEX_WIDTH;
-            for(int yy = mid - lineHeight ; yy <= mid + lineHeight ; yy++) {
-                int tex_y = (int) (yy - (mid - lineHeight)) * ((double) TEX_HEIGHT / lineHeight); //14h04 (double) + inverser div : premier texture mais répété
+            int draw_start = mid - lineHeight / 2;
+            int draw_end = mid + lineHeight / 2;
+            for(int yy = draw_start ; yy <= draw_end ; yy++) {
+                int tex_y = (int) (yy - draw_start) * ((double) TEX_HEIGHT / lineHeight); //14h04 (double) + inverser div : premier texture mais répété
                 while (tex_y >= TEX_HEIGHT) {
                     tex_y -= TEX_HEIGHT; // 14h12 c'est bon :-) plus rapide que %
                 }
