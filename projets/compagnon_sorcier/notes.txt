@@ -1,0 +1,86 @@
+Début le 27 mai 2018.
+
+Le but est de faire un graphe du LDVELH « Le Sorcier de la Montagne de Feu », le premier de ces livres.
+Je dispose d'une édition Folio juinor édition spéciale au devant d'or de 1990.
+La première édition anglaise date de 1982, Penguin Books, UK.
+La première édition française date de 1983, Gallimard.
+Steve Jackson et Ian Livingston.
+Illustrations de Russ Nicholson.
+Livres dont vous êtes les héros
+
+épée et bouclier
+sac à dos
+provisions (10 repas)
+armure de cuir
+lanterne
+1 des 3 potions dans une bouteille
+1 Pièce d'Or
+
+d6+6 => Habileté (au combat)
+2d6+12 => Endurance (force, volonté de survie, forme)
+d6+6 => Chance
+
+Assaut
+    2d6 +Hab Créature => Force d'Attaque Créature FAC
+    2d6 +Hab Joueur => Force d'Attaque Joueur FAJ
+    Si FAJ > FAC : 
+        elle est blessée -2 End
+            Si chanceux : -2 End encore
+            Si malchanceux : -1 End only
+    Si FAJ < FAC :
+        le joueur est blessé -2 End
+            Si chanceux : -1 End only
+            Si malchanceux : -1 End encore
+    Si FAJ = FAC :
+        recommencer
+Si Fuite possible et qu'on la prend : -2 End
+
+Tenter sa chance
+    2d6
+    Si résultat <= Cha : chanceux 
+    sinon : malchanceux
+    On fait -1 Cha après chaque tenter sa chance
+    On peut toujours tenter sa chance au combat
+
+Certaines armes augmentent l'Hab
+Only une arme à la fois.
+Poyion d'Adresse rétablit l'Hab à son départ.
+
+Repas : +4 points d'End
+Potion de Vigueur rétablitl'End à son départ.
+
+Potion de Bonne Fortune rétablit la Cha à son départ + 1.
+
+On peut boire n'importe quand.
+Une potion contient deux mesures.
+
+Prendre des notes et dessiner une carte.
+Pièces : monstres, pièges ou trésors.
+Ramasser en chemin des objets bien précis.
+Il y a des rumeurs.
+
+Et maintenant, tournez la page !
+
+Illustrations
+- 001 (pleine page = PP) L'entrée des cavernes sous la montagne
+- 071 (PP) Lutin
+
+Chapitres faits (400 en tout)
+
+  1 x
+---
+ 71 x
+---
+ 82 <
+---
+208
+---
+248
+---
+278
+---
+301 x
+
+Sans x, il a été évoqué et donc juste tracé.
+Avec x, il a été parcouru.
+Avec <, j'en suis là.
