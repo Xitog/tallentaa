@@ -69,17 +69,33 @@ Chapitres faits (400 en tout)
 
   1 x
 ---
+ 33 x
+---
+ 42 <
+---
  71 x
 ---
- 82 <
+ 82 x
 ---
-208
+113
+---
+147 x
+---
+208 <
 ---
 248
+---
+257
 ---
 278
 ---
 301 x
+---
+320 x
+---
+363 x
+---
+370
 
 Sans x, il a été évoqué et donc juste tracé.
 Avec x, il a été parcouru.
