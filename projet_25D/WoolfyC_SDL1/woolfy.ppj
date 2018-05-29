@@ -33,7 +33,8 @@ woolfy.exe: \
 	output\main.obj \
 	output\minisdl.obj \
 	output\oldcode.obj \
-	output\textured.obj
+	output\textured.obj \
+	output\flat_final_nogrid.obj
 	$(LINK) $(LINKFLAGS) -out:"$@" $**
 
 # 
@@ -97,7 +98,7 @@ output\oldcode.obj: \
 # 
 output\main.obj: \
 	main.c \
-	flat_nogrid.c
+	flat_final_nogrid.c
 	$(CC) $(CCFLAGS) "$!" -Fo"$@"
 
 # 
@@ -107,6 +108,13 @@ output\flat_nogrid.obj: \
 	flat_nogrid.c
 	$(CC) $(CCFLAGS) "$!" -Fo"$@"
 
-.EXCLUDEDFILES:
+# 
+# Construction de flat_final_nogrid.obj.
+# 
+output\flat_final_nogrid.obj: \
+	flat_final_nogrid.c
+	$(CC) $(CCFLAGS) "$!" -Fo"$@"
 
 .SILENT:
+
+.EXCLUDEDFILES:
