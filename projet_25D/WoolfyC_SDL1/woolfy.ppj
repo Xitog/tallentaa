@@ -29,12 +29,13 @@ LIB = $(PellesCDir)\Lib\Win;$(PellesCDir)\Lib;..\..\librairies\SDL_1_2_15\lib#
 # 
 woolfy.exe: \
 	output\flat.obj \
-	output\flat_nogrid.obj \
+	output\flat_final_nogrid.obj \
 	output\main.obj \
 	output\minisdl.obj \
 	output\oldcode.obj \
 	output\textured.obj \
-	output\flat_final_nogrid.obj
+	output\flat_nogrid_angle.obj \
+	output\flat_nogrid_vector.obj
 	$(LINK) $(LINKFLAGS) -out:"$@" $**
 
 # 
@@ -98,23 +99,24 @@ output\oldcode.obj: \
 # 
 output\main.obj: \
 	main.c \
-	flat_final_nogrid.c
+	flat_nogrid_angle.c \
+	flat_nogrid_vector.c
 	$(CC) $(CCFLAGS) "$!" -Fo"$@"
 
 # 
-# Construction de flat_nogrid.obj.
+# Construction de flat_nogrid_angle.obj.
 # 
-output\flat_nogrid.obj: \
-	flat_nogrid.c
+output\flat_nogrid_angle.obj: \
+	flat_nogrid_angle.c
 	$(CC) $(CCFLAGS) "$!" -Fo"$@"
 
 # 
-# Construction de flat_final_nogrid.obj.
+# Construction de flat_nogrid_vector.obj.
 # 
-output\flat_final_nogrid.obj: \
-	flat_final_nogrid.c
+output\flat_nogrid_vector.obj: \
+	flat_nogrid_vector.c
 	$(CC) $(CCFLAGS) "$!" -Fo"$@"
-
-.SILENT:
 
 .EXCLUDEDFILES:
+
+.SILENT:

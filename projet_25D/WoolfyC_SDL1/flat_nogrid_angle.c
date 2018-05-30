@@ -1,11 +1,5 @@
 
-#ifdef FLAT_NOGRID
-
-// Todo
-
-// Level loading
-// Level editor & level saving
-// Multisector & Invisible wall
+#ifdef FLAT_NOGRID_ANGLE
 
 //-----------------------------------------------------------------------------
 // Includes
@@ -34,6 +28,7 @@ typedef struct {
 typedef struct {
     Vector pos;
     Vector dir;
+    double angle;
 } Player;
 
 typedef enum {
@@ -161,7 +156,7 @@ const Sector sectors[DEF_MAX_SECTOR] = {
     {
         7, // nb of walls
         {0, 1, 2, 3, 4, 5, 6}, // walls ref
-        1, // 3
+        1,
     }
 };
 
@@ -248,24 +243,15 @@ void input(void) {
 }
 
 Intersection intersection(Vector ray, Vector pos, Wall wall) {
-    //printf("    Ray direction : %.2f, %.2f\n", ray.x, ray.y);
-    //printf("    Origin position : %.2f, %.2f\n", pos.x, pos.y);
-    //printf("    Wall : Pos1 = %.2f, %.2f, Pos2 = %.2f, %.2f and Type = %d and Color = %d\n", wall.pos1.x, wall.pos1.y, wall.pos2.x, wall.pos2.y, wall.type, wall.color);
     Vector ray_on_pos;
     ray_on_pos.x = ray.x + pos.x;
     ray_on_pos.y = ray.y + pos.y;
-    //printf("    Intersection called with:\n");
-    //printf("        ray X = %f Y = %f\n", ray.x, ray.y);
-    //printf("        ray_on_pos X = %f Y = %f\n", ray_on_pos.x, ray_on_pos.y);
     if (wall.type == HORIZONTAL) {
         if (ray.y == 0) {
-            //printf("    HORIZONTAL NO INTERSECTION PARALLEL\n");
             return NO_INTERSECTION;
         } else if (ray.y > 0 && wall.pos2.y < pos.y) {
-            //printf("    HORIZONTAL NO INTERSECTION WALL NEVER ENCOUNTERED\n");
             return NO_INTERSECTION;
         } else if (ray.y < 0 && wall.pos1.y > pos.y) {
-            //printf("    HORIZONTAL NO INTERSECTION WALL NEVER ENCOUNTERED\n");
             return NO_INTERSECTION;
         } else if (ray.x == 0) { // perpendicular to wall
             Intersection coll;
@@ -275,16 +261,12 @@ Intersection intersection(Vector ray, Vector pos, Wall wall) {
             coll.pos.y = wall.pos1.y;
             coll.pos.z = 0;
             coll.wall = wall;
-            coll.dist = fabs(pos.y - wall.pos1.y);
-            //printf("    HORIZONTAL PERPENDICULAR INTERSECTION AT %.2f, %.2f\n", coll.pos.x, coll.pos.y);
+            coll.dist = sqrt(pow(coll.pos.x - pos.x, 2) + pow(coll.pos.y - pos.y, 2));
             return coll;
         } else {
-            // calc
             double A = ray.y / ray.x;
             double B = ray_on_pos.y - A * ray_on_pos.x;
-            //printf("    HORIZONTAL WALL (%d) and RAY Y = %f * X + %f\n", wall.type, A, B);
             double coll_x = (wall.pos1.y - B) / A;
-            //printf("    INTERSECT AT : %f %f\n", coll_x, wall.pos1.y);
             if (coll_x >= wall.pos1.x && coll_x <= wall.pos2.x) {
                 Intersection coll;
                 coll.ray.x = ray.x;
@@ -301,13 +283,10 @@ Intersection intersection(Vector ray, Vector pos, Wall wall) {
         }
     } else if (wall.type == VERTICAL) {
         if (ray.x == 0) {
-            //printf("    VERTICAL NO INTERSECTION PARALLEL\n");
             return NO_INTERSECTION;
         } else if (ray.x > 0 && wall.pos2.x < pos.x) {
-            //printf("    VERTICAL NO INTERSECTION WALL NEVER ENCOUNTERED\n");
             return NO_INTERSECTION;
         } else if (ray.x < 0 && wall.pos1.x > pos.x) {
-            //printf("    VERTICAL NO INTERSECTION WALL NEVER ENCOUNTERED\n");
             return NO_INTERSECTION;
         } else if (ray.y == 0) { // perpendicular to wall
             Intersection coll;
@@ -317,17 +296,12 @@ Intersection intersection(Vector ray, Vector pos, Wall wall) {
             coll.pos.y = ray_on_pos.y;
             coll.pos.z = 0;
             coll.wall = wall;
-            //printf("        >>> %f %f = %f\n", pos.x, wall.pos1.x, fabs(pos.x - wall.pos1.x));
-            coll.dist = fabs(pos.x - wall.pos1.x);
-            //printf("        VERTICAL PERPENDICULAR INTERSECTION AT %.2f, %.2f\n", coll.pos.x, coll.pos.y);
+            coll.dist = sqrt(pow(coll.pos.x - pos.x, 2) + pow(coll.pos.y - pos.y, 2));
             return coll;
         } else {
-            // calc
             double A = ray.y / ray.x;
             double B = ray_on_pos.y - A * ray_on_pos.x;
-            //printf("        VERTICAL WALL (%d) and RAY Y = %f * X + %f\n", wall.type, A, B);
             double coll_y = A * wall.pos1.x + B;
-            //printf("        INTERSECT AT : X = %f Y = %f. Y should be between %f %f\n", wall.pos1.x, coll_y, wall.pos1.y, wall.pos2.y);
             if (coll_y >= wall.pos1.y && coll_y <= wall.pos2.y) {
                 Intersection coll;
                 coll.ray.x = ray.x;
@@ -347,6 +321,15 @@ Intersection intersection(Vector ray, Vector pos, Wall wall) {
     }
 }
 
+/*
+ x_diff = playerx - xs;
+ y_diff = playery - ys;
+ if (abs(x_diff) > abs(y_diff)) {
+   distance = x_diff / cos(angle); else
+   distance = y_diff / sin(angle); 
+ }
+ */
+
 void draw_sector(int sid, int x, Player player, Vector ray, Intersection * intersections) {
     for (int i=0; i < sectors[sid].nb_wall; i++) {
         Intersection inter = intersection(ray, player.pos, map[sectors[sid].walls[i]]);
@@ -357,11 +340,10 @@ void draw_sector(int sid, int x, Player player, Vector ray, Intersection * inter
 }
 
 int main(int argc, char * argv[]) {
-    printf("Start\n");
+    printf("Start nogrid angle\n");
 
     // Player
-    Player player = {{5.5, 5.5, 0}, {-1, 0, 0}}; // pos dir
-    Vector camera = {0, 0.66, 0};
+    Player player = {{12, 5.5, 0}, {-1, 0, 0}, 180.0 * 0.017453292519943295}; // pos dir angle {5.5, 5.5, 0}
     Vector next_pos = {0, 0, 0};
 
     // Time
@@ -374,7 +356,7 @@ int main(int argc, char * argv[]) {
     double rot_modifier = ROT_SPEED;
 
     // Init and screen
-    int err = init("Woolfy 2.5 FLAT NO GRID", SCREEN_WIDTH, SCREEN_HEIGHT, 32, false);
+    int err = init("Woolfy 2.5 FLAT NO GRID ANGLE", SCREEN_WIDTH, SCREEN_HEIGHT, 32, false);
     if (err == EXIT_FAILURE) {
         return err;
     }
@@ -408,11 +390,16 @@ int main(int argc, char * argv[]) {
     #define TEX_WIDTH 128 //64
     #define TEX_HEIGHT 128 //64
     #define TEXTURES 3
+    #ifdef SHODAN
     char * texture_names[] = { 
         "..\\..\\assets\\graphic\\textures\\woolfy_wall\\freedoom\\brick.bmp", 
         "..\\..\\assets\\graphic\\textures\\woolfy_wall\\freedoom\\concrete.bmp", 
         "..\\..\\assets\\graphic\\textures\\woolfy_wall\\freedoom\\door9_1.bmp" 
-    }; // "tile110.bmp", "tile110b.bmp" };
+    };
+    #endif
+    #ifndef SHODAN
+    char * texture_names[] = { ".\\assets\\brick.bmp", ".\\assets\\concrete.bmp", ".\\assets\\door9_1.bmp" };
+    #endif
     Uint32 texture[TEXTURES][TEX_WIDTH][TEX_HEIGHT];
     for (int tni = 0; tni < TEXTURES; tni++) {
         SDL_Surface * surface = load_bmp(texture_names[tni]);
@@ -422,22 +409,89 @@ int main(int argc, char * argv[]) {
             }
         }
     }
+    
+    double player_fov = 66.84962236520761 * 0.017453292519943295; // 45 66 90 120
+    double player_fov_mid = player_fov / (double) 2;
+    double player_fov_inc = player_fov / (double) SCREEN_WIDTH;
 
     // Main loop
     while(!done) {
 
         Intersection intersections[SCREEN_WIDTH];
         
+        double camera_x = cos(player.angle + 90 * 0.017453292519943295) * 0.66;
+        double camera_y = sin(player.angle + 90 * 0.017453292519943295) * 0.66;
+
         // Computing raycasting
         for (int x = 0; x < SCREEN_WIDTH; x++) {
             intersections[x].dist = 1000;
+            
             double raycast_cpt = 2 * x / (float) SCREEN_WIDTH - 1; // -1 to +1
             Vector ray;
-            ray.x = player.dir.x + camera.x * raycast_cpt;
-            ray.y = player.dir.y + camera.y * raycast_cpt;
+            ray.x = cos(player.angle) + camera_x * raycast_cpt;
+            ray.y = sin(player.angle) + camera_y * raycast_cpt;
+            double ray_angle = 3.141593 - atan(ray.y);
+
+            /*
+            double ray_angle = player_fov_inc * x + player.angle - player_fov_mid;
+            Vector ray;
+            ray.x = cos(ray_angle);
+            ray.y = sin(ray_angle);
+            */
+
             draw_sector(0, x, player, ray, intersections);
+
+            // Calcul distance
+            if (intersections[x].dist != -1 && intersections[x].dist != 1000) {
+                //double dist = intersections[x].dist;
+                double ray_angle = player_fov_inc * x + player.angle - player_fov_mid;
+                double diff = player.angle - ray_angle;
+                intersections[x].dist *= fabs(cos(diff));
+                /*
+                double perpDist = 1;
+                char c = 'u';
+                if (intersections[x].wall.type == HORIZONTAL) {
+                    perpDist = fabs((intersections[x].pos.y - player.pos.y) / intersections[x].ray.y);
+                    c = 'h';
+                } else if (intersections[x].wall.type == VERTICAL) {
+                    perpDist = fabs((intersections[x].pos.x - player.pos.x) / intersections[x].ray.x);
+                    c = 'v';
+                }
+                intersections[x].dist = perpDist;
+                */
+                /*
+                if (fabs(perpDist - intersections[x].dist) > 0.1) {
+                    printf("x: %d diff_angle: %f wall: %c\n", x, diff, c);
+                    printf("   cos : %f sin  : %f\n", cos(diff), sin(diff));
+                    printf("   rayx: %f rayy : %f\n", ray.x, ray.y);
+                    printf("   inter_raw: %.2f inter_correct: %.2f perp: %.2f diff: %.2f\n", dist, intersections[x].dist, perpDist, perpDist - intersections[x].dist);
+                }*/
+                //intersections[x].dist = perpDist;
+            }
         }
         
+        #ifdef DEBUG
+        FILE * traces = fopen("debug_2_12_55L.txt", "w");
+        for (int x = 0; x < SCREEN_WIDTH; x++) {
+            double ray_angle = player_fov_inc * x + player.angle - player_fov_mid;
+            int lineHeight = sectors[intersections[x].wall.sector].height * (SCREEN_HEIGHT / intersections[x].dist);
+            //double diff = player.angle - ray_angle;
+            //double cosdiff = cos(diff);
+            /*
+            fprintf(traces, "x= %3d  ipx= %.4lf  ipy= %.4lf  irx= %.4lf  iry= %.4lf  idist= %lf  line= %5d\n", //  raya= %lf\n", // play= %lf  diff= %lf  cos= %lf\n", 
+                             x, 
+                             intersections[x].pos.x,
+                             intersections[x].pos.y, 
+                             intersections[x].ray.x,
+                             intersections[x].ray.y,
+                             intersections[x].dist, lineHeight); //, ray_angle); //, player.angle, diff, cosdiff);
+            */
+            fprintf(traces, "%3d, %5d\n", x, lineHeight); 
+        }
+        fclose(traces);
+        done = true;
+        #endif
+
         // Rendering
         fill(BLACK);
         
@@ -446,13 +500,7 @@ int main(int argc, char * argv[]) {
             if (intersections[x].dist == -1 || intersections[x].dist == 1000 || intersections[x].dist == 0) {
                 continue;
             }
-            double perpDist = 1;
-            if (intersections[x].wall.type == HORIZONTAL) {
-                perpDist = fabs((intersections[x].pos.y - player.pos.y) / intersections[x].ray.y);
-            } else if (intersections[x].wall.type == VERTICAL) {
-                perpDist = fabs((intersections[x].pos.x - player.pos.x) / intersections[x].ray.x);
-            }
-            int lineHeight = sectors[intersections[x].wall.sector].height * (SCREEN_HEIGHT / perpDist);
+            int lineHeight = sectors[intersections[x].wall.sector].height * (SCREEN_HEIGHT / intersections[x].dist);
             Uint32 color;
             switch (intersections[x].wall.color) {
                 case WHITE_COLOR:
@@ -479,7 +527,7 @@ int main(int argc, char * argv[]) {
             // Textured
             double tex_x;
             if (intersections[x].wall.type == VERTICAL) {
-                tex_x = intersections[x].pos.y; // 14h07 : il fallait inverser : premiere vraie texture mais tutti frutti !
+                tex_x = intersections[x].pos.y;
             } else {
                 tex_x = intersections[x].pos.x;
             }
@@ -488,9 +536,9 @@ int main(int argc, char * argv[]) {
             int draw_start = mid - lineHeight / 2;
             int draw_end = mid + lineHeight / 2;
             for(int yy = draw_start ; yy <= draw_end ; yy++) {
-                int tex_y = (int) (yy - draw_start) * ((double) TEX_HEIGHT / lineHeight); //14h04 (double) + inverser div : premier texture mais répété
+                int tex_y = (int) (yy - draw_start) * ((double) TEX_HEIGHT / lineHeight);
                 while (tex_y >= TEX_HEIGHT) {
-                    tex_y -= TEX_HEIGHT; // 14h12 c'est bon :-) plus rapide que %
+                    tex_y -= TEX_HEIGHT; // plus rapide que %
                 }
                 if (tex_x < 0 || tex_x >= TEX_WIDTH || tex_y < 0 || tex_y >= TEX_HEIGHT) {
                     printf("%d %d\n", (int) tex_x, tex_y);
@@ -505,7 +553,6 @@ int main(int argc, char * argv[]) {
                 if (intersections[x].dist == -1 || intersections[x].dist == 1000) {
                     continue;
                 }
-                //printf("%d. INTERSECT : %.2f\n", x, intersections[x].dist);
                 Uint32 color;
                 switch (intersections[x].wall.color) {
                     case WHITE_COLOR:
@@ -531,12 +578,12 @@ int main(int argc, char * argv[]) {
             }
             // Draw player and camera
             circle(player.pos.x * MINIMAP_ZOOM, player.pos.y * MINIMAP_ZOOM, 5, WHITE);
-            double pos_dir_x = player.pos.x + player.dir.x;
-            double pos_dir_y = player.pos.y + player.dir.y;
+            double pos_dir_x = player.pos.x + cos(player.angle);
+            double pos_dir_y = player.pos.y + sin(player.angle);
             // cam left and right
-            line(player.pos.x * MINIMAP_ZOOM, player.pos.y * MINIMAP_ZOOM, (pos_dir_x + camera.x) * MINIMAP_ZOOM, (pos_dir_y + camera.y) * MINIMAP_ZOOM, GREEN);
-            line(player.pos.x * MINIMAP_ZOOM, player.pos.y * MINIMAP_ZOOM, (pos_dir_x - camera.x) * MINIMAP_ZOOM, (pos_dir_y - camera.y) * MINIMAP_ZOOM, RED);
-            line((pos_dir_x + camera.x) * MINIMAP_ZOOM, (pos_dir_y + camera.y) * MINIMAP_ZOOM, (pos_dir_x - camera.x) * MINIMAP_ZOOM, (pos_dir_y - camera.y) * MINIMAP_ZOOM, PURPLE);
+            line(player.pos.x * MINIMAP_ZOOM, player.pos.y * MINIMAP_ZOOM, (pos_dir_x + camera_x) * MINIMAP_ZOOM, (pos_dir_y + camera_y) * MINIMAP_ZOOM, GREEN);
+            line(player.pos.x * MINIMAP_ZOOM, player.pos.y * MINIMAP_ZOOM, (pos_dir_x - camera_x) * MINIMAP_ZOOM, (pos_dir_y - camera_y) * MINIMAP_ZOOM, RED);
+            //line((pos_dir_x + camera.x) * MINIMAP_ZOOM, (pos_dir_y + camera.y) * MINIMAP_ZOOM, (pos_dir_x - camera.x) * MINIMAP_ZOOM, (pos_dir_y - camera.y) * MINIMAP_ZOOM, PURPLE);
             // dir
             line(player.pos.x * MINIMAP_ZOOM, player.pos.y * MINIMAP_ZOOM, pos_dir_x * MINIMAP_ZOOM, pos_dir_y * MINIMAP_ZOOM, PURPLE);
             // Draw walls
@@ -566,8 +613,6 @@ int main(int argc, char * argv[]) {
             }
         }
         render();
-        
-        //done = true;
 
         // Time and input
         input();
@@ -578,33 +623,32 @@ int main(int argc, char * argv[]) {
         // Update
         if (up || down) {
             if (up) {
-                next_pos.x = player.pos.x + player.dir.x * move_modifier * frame_time;
-                next_pos.y = player.pos.y + player.dir.y * move_modifier * frame_time;
+                next_pos.x = player.pos.x + cos(player.angle) * move_modifier * frame_time;
+                next_pos.y = player.pos.y + sin(player.angle) * move_modifier * frame_time;
             }
             if (down) {
-                next_pos.x = player.pos.x - player.dir.x * move_modifier * frame_time;
-                next_pos.y = player.pos.y - player.dir.y * move_modifier * frame_time;
+                next_pos.x = player.pos.x - cos(player.angle) * move_modifier * frame_time;
+                next_pos.y = player.pos.y - sin(player.angle) * move_modifier * frame_time;
             }
+            bool dist_ok = true;
+            int size = 10;
+            int min_dist = 1;
+            for (int x = SCREEN_WIDTH / 2 - size; x < SCREEN_WIDTH / 2 + size; x++) {
+                if (intersections[x].dist <= min_dist) {
+                    dist_ok = false;
+                    break;
+                }
+            }
+            if (dist_ok || down) {
             player.pos.x = next_pos.x;
             player.pos.y = next_pos.y;
         }
+        }
         if (left) {
-            printf("dir.x = %.2f dir.y = %.2f (%.2f) (%.2f)\n", player.dir.x, player.dir.y, acos(player.dir.x), asin(player.dir.y));
-            double old_dir_x = player.dir.x;
-            player.dir.x = player.dir.x * cos(rot_modifier * frame_time) - player.dir.y * sin(rot_modifier * frame_time);
-            player.dir.y = old_dir_x * sin(rot_modifier * frame_time) + player.dir.y * cos(rot_modifier * frame_time);
-            double old_cam_x = camera.x;
-            camera.x = camera.x * cos(rot_modifier * frame_time) - camera.y * sin(rot_modifier * frame_time);
-            camera.y = old_cam_x * sin(rot_modifier * frame_time) + camera.y * cos(rot_modifier * frame_time);
+            player.angle -= rot_modifier * frame_time;
         }
         if (right) {
-            printf("dir.x = %.2f dir.y = %.2f (%.2f) (%.2f)\n", player.dir.x, player.dir.y, acos(player.dir.x), asin(player.dir.y));
-            double old_dir_x = player.dir.x;
-            player.dir.x = player.dir.x * cos(-rot_modifier * frame_time) - player.dir.y * sin(-rot_modifier * frame_time);
-            player.dir.y = old_dir_x * sin(-rot_modifier * frame_time) + player.dir.y * cos(-rot_modifier * frame_time);
-            double old_cam_x = camera.x;
-            camera.x = camera.x * cos(-rot_modifier * frame_time) - camera.y * sin(-rot_modifier * frame_time);
-            camera.y = old_cam_x * sin(-rot_modifier * frame_time) + camera.y * cos(-rot_modifier * frame_time);
+            player.angle += rot_modifier * frame_time;
         }
 
         while (pause && !done) {
