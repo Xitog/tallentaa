@@ -134,24 +134,24 @@ void stop_audio(void) {
 }
 
 void display_info_on_surface(SDL_Surface * surf) {
-    // https://www.libsdl.org/release/SDL-1.2.15/docs/html/sdlsurface.html
-
+    printf("-- SDL_Surface Info\n");
     printf("Uint32 flags = %d\n", surf->flags);
-    //SDL_PixelFormat *format;
-    //SDL_Palette *palette;
-    printf("Uint8  BitsPerPixel = %d\n", surf->format->BitsPerPixel);
-    printf("Uint8  BytesPerPixel = %d\n", surf->format->BytesPerPixel);
-    //Uint8  Rloss, Gloss, Bloss, Aloss;
-    //Uint8  Rshift, Gshift, Bshift, Ashift;
-    //Uint32 Rmask, Gmask, Bmask, Amask;
-    printf("Uint32 colorkey = %d\n", surf->format->colorkey);
-    printf("Uint8  alpha = %d\n", surf->format->alpha);
-
     printf("int w, h = %d, %d\n", surf->w, surf->h);
     printf("Uint16 pitch = %d\n", surf->pitch);
     printf("void *pixels"); // writable
     //SDL_Rect clip_rect;
     printf("int refcount  = %d\n", surf->refcount); // read mostly
+
+    printf("-- SDL_PixelFormat Info\n");
+    printf("SDL_Palette * palette = %d\n", (int) surf->format->palette);
+    printf("Uint8  BitsPerPixel = %d\n", surf->format->BitsPerPixel);
+    printf("Uint8  BytesPerPixel = %d\n", surf->format->BytesPerPixel);
+    printf("Uint8  Rloss = %d, Gloss = %d, Bloss = %d, Aloss = %d\n", surf->format->Rloss, surf->format->Gloss, surf->format->Bloss, surf->format->Aloss);
+    printf("Uint8  Rshift = %d, Gshift = %d, Bshift = %d, Ashift = %d\n", surf->format->Rshift, surf->format->Gshift, surf->format->Bshift, surf->format->Ashift);
+    printf("Uint8  Rmask = %d, Gmask = %d, Bmask = %d, Amask = %d\n", surf->format->Rmask, surf->format->Gmask, surf->format->Bmask, surf->format->Amask);
+    printf("Uint32 colorkey = %d\n", surf->format->colorkey);
+    printf("Uint8  alpha = %d\n", surf->format->alpha);
+
     int mustlock = SDL_MUSTLOCK(screen); 
     printf("Do I have to lock? %d\n", mustlock); // 0 = No. Software surface don't need.
 }

@@ -29,6 +29,7 @@ typedef struct {
     Vector pos;
     Vector dir;
     double angle;
+    int sector;
 } Player;
 
 typedef enum {
@@ -40,31 +41,34 @@ typedef struct {
     Vector pos1;
     Vector pos2;
     WallType type;
-    int color;
+    Uint32 color;
     int texture;
     int sector;
 } Wall;
 
 typedef struct {
     int nb_wall;
-    int walls[7];
+    int * walls;
     double height;
+    Uint32 floor;
+    Uint32 ceiling;
 } Sector;
+
+typedef struct {
+    Sector * sectors;
+    Wall * walls;
+    char * name;
+    int nb_sectors;
+    int nb_walls;
+} Map;
 
 typedef struct {
     Vector ray;
     Vector pos;
     Wall wall;
     double dist;
+    int sector; // a wall can be touched from two different sector...
 } Intersection;
-
-typedef enum {
-    WHITE_COLOR = 1,
-    YELLOW_COLOR = 2,
-    BLUE_COLOR = 3,
-    RED_COLOR = 4,
-    GREEN_COLOR = 5,
-} Colors;
 
 //-----------------------------------------------------------------------------
 // Global constants
@@ -78,16 +82,17 @@ const Intersection NO_INTERSECTION = {
     {-1, -1, -1}, // pos
     { {-1, -1, -1}, {-1, -1, -1}, 0, 0}, // wall
     -1, // dist
+    -1, // sector
 };
 
-#define DEF_MAX_WALL 7
+#define DEF_MAX_WALL 15
 const int MAX_WALL = DEF_MAX_WALL;
-const Wall map[DEF_MAX_WALL] = {
+Wall all_walls[DEF_MAX_WALL] = {
     { // 0
         {1, 1, 0},      // pos 1
         {10, 1, 0},     // pos 2
         HORIZONTAL,     // sens
-        WHITE_COLOR,    // color
+        WHITE,          // color
         1,              // texture
         0,              // sector
     },
@@ -95,7 +100,7 @@ const Wall map[DEF_MAX_WALL] = {
         {1, 1, 0},
         {1, 10, 0},
         VERTICAL,
-        BLUE_COLOR,
+        BLUE,
         0,              // texture
         0,              // sector
     },
@@ -103,7 +108,7 @@ const Wall map[DEF_MAX_WALL] = {
         {1, 10, 0},
         {10, 10, 0},
         HORIZONTAL,
-        YELLOW_COLOR,
+        YELLOW,
         0,              // texture
         0,              // sector
     },
@@ -111,7 +116,7 @@ const Wall map[DEF_MAX_WALL] = {
         {10, 1, 0},
         {10, 5, 0},     //{10, 10, 0},
         VERTICAL,
-        GREEN_COLOR,
+        GREEN,
         0,              // texture
         0,              // sector
     },
@@ -120,44 +125,26 @@ const Wall map[DEF_MAX_WALL] = {
         {10, 5, 0},
         {10, 10, 0},
         VERTICAL,
-        WHITE_COLOR,
+        WHITE,
         1,
     }
     */
-    {// 4
-        {10, 5, 0},
-        {15, 5, 0},
-        HORIZONTAL,
-        WHITE_COLOR,
-        1,
-        0,              // sector
-    },
-    {// 5
-        {15, 5, 0},
-        {15, 10, 0},
-        VERTICAL,
-        YELLOW_COLOR,
-        2,
-        0,              // sector
-    },
-    {// 6
-        {10, 10, 0},
-        {15, 10, 0},
-        HORIZONTAL,
-        BLUE_COLOR,
-        1,
-        0,              // sector
-    },
-};
-
-#define DEF_MAX_SECTOR 1
-const int MAX_SECTOR = DEF_MAX_SECTOR;
-const Sector sectors[DEF_MAX_SECTOR] = {
-    {
-        7, // nb of walls
-        {0, 1, 2, 3, 4, 5, 6}, // walls ref
-        1,
-    }
+    // The C of the map
+    //   pos1          pos2     hori/verti  col  tex sector
+    { {10,  5, 0}, {15,  5, 0}, HORIZONTAL, WHITE,  1, 0 },    // 4
+    { {15,  5, 0}, {15, 10, 0}, VERTICAL,   YELLOW, 2, 0 },    // 5
+    { {10, 10, 0}, {15, 10, 0}, HORIZONTAL, BLUE,   1, 0 },    // 6
+    // A column
+    { { 3,  3, 0}, { 4,  3, 0}, HORIZONTAL, RED,    2, 0 },    // 7
+    { { 4,  3, 0}, { 4,  4, 0}, VERTICAL,   RED,    2, 0 },    // 8
+    { { 3,  4, 0}, { 4,  4, 0}, HORIZONTAL, RED,    2, 0 },    // 9
+    { { 3,  3, 0}, { 3,  4, 0}, VERTICAL,   RED,    2, 0 },    // 10
+    // A sector in a sector
+    { { 4,  6, 0}, { 6,  6, 0}, HORIZONTAL, RED,    2, 0 },    // 11
+    { { 6,  6, 0}, { 6,  7, 0}, VERTICAL,   RED,    2, 0 },    // 12
+    { { 4,  7, 0}, { 6,  7, 0}, HORIZONTAL, RED,    2, 0 },    // 13
+    { { 4,  6, 0}, { 4,  7, 0}, VERTICAL,   RED,    2, 0 },    // 14
+    
 };
 
 const double MOVE_SPEED = 0.008;
@@ -176,10 +163,40 @@ bool left;
 bool done = false;
 bool show_map = true;
 bool pause = false;
+bool change_sector = false;
 
 //-----------------------------------------------------------------------------
 // Functions
 //-----------------------------------------------------------------------------
+
+Map * map;
+
+void init_map(Map ** ptr_to_map) {
+    Map * map = (Map *) malloc(sizeof(Map));
+    if (map == NULL) {
+        perror("Not enough memory to create map.\n");
+    }
+    map->name = (char *) malloc(sizeof(char) * 9);
+    strcpy(map->name, "The Core");
+    map->walls = all_walls; // (Wall *) malloc(sizeof(Wall) * 11);
+    map->sectors = (Sector *) malloc(sizeof(Sector) * 1);
+    map->sectors[0].nb_wall = DEF_MAX_WALL;
+    map->sectors[0].walls = (int *) malloc(sizeof(int) * DEF_MAX_WALL);
+    for (int i = 0; i < map->sectors[0].nb_wall; i++)
+        map->sectors[0].walls[i] = i;
+    map->sectors[0].height = 1;
+    map->sectors[0].floor = FLOORGREY;
+    map->sectors[0].ceiling = CEILGREY;
+    map->nb_sectors = 1;
+    map->nb_walls = DEF_MAX_WALL;
+    *ptr_to_map = map;
+}
+
+void info_map(Map * map) {
+    printf("%s\n", map->name);
+    printf("Sectors : %4d\n", map->nb_sectors);
+    printf("Walls   : %4d\n", map->nb_walls);
+}
 
 void wait_pause(void) {
     if (SDL_PollEvent(&event)) {
@@ -234,6 +251,9 @@ void input(void) {
                     break;
                 case SDLK_SPACE:
                     pause = !pause;
+                    break;
+                case SDLK_s:
+                    change_sector = true;
                     break;
             }
        } else if (event.type == SDL_QUIT ) {
@@ -331,10 +351,11 @@ Intersection intersection(Vector ray, Vector pos, Wall wall) {
  */
 
 void draw_sector(int sid, int x, Player player, Vector ray, Intersection * intersections) {
-    for (int i=0; i < sectors[sid].nb_wall; i++) {
-        Intersection inter = intersection(ray, player.pos, map[sectors[sid].walls[i]]);
+    for (int i=0; i < map->sectors[sid].nb_wall; i++) {
+        Intersection inter = intersection(ray, player.pos, map->walls[map->sectors[sid].walls[i]]);
         if (inter.dist < intersections[x].dist && inter.dist > -1) {
             intersections[x] = inter;
+            intersections[x].sector = sid;
         }
     }
 }
@@ -343,7 +364,7 @@ int main(int argc, char * argv[]) {
     printf("Start nogrid angle\n");
 
     // Player
-    Player player = {{12, 5.5, 0}, {-1, 0, 0}, 180.0 * 0.017453292519943295}; // pos dir angle {5.5, 5.5, 0}
+    Player player = {{12, 5.5, 0}, {-1, 0, 0}, 180.0 * 0.017453292519943295, 0}; // pos dir angle sector {5.5, 5.5, 0}
     Vector next_pos = {0, 0, 0};
 
     // Time
@@ -362,26 +383,24 @@ int main(int argc, char * argv[]) {
     }
 
     // Colors
-    Uint32 RED = SDL_MapRGB(screen->format, 255, 0, 0);
-    Uint32 GREEN = SDL_MapRGB(screen->format, 0, 255, 0);
-    Uint32 BLUE = SDL_MapRGB(screen->format, 0, 0, 255);
-    Uint32 BLACK = SDL_MapRGB(screen->format, 0, 0, 0);
-    Uint32 YELLOW = SDL_MapRGB(screen->format, 255, 255, 0);
-    Uint32 WHITE = SDL_MapRGB(screen->format, 255, 255, 255);
-    Uint32 PURPLE = SDL_MapRGB(screen->format, 128, 64, 128);
-    
+    display_info_on_surface(screen);
+
+    // Load map
+    init_map(&map);
+    info_map(map);
+
     // Check wall
     for (int i=0; i < MAX_WALL; i++) {
-        if (map[i].pos1.x > map[i].pos2.x) {
+        if (map->walls[i].pos1.x > map->walls[i].pos2.x) {
             printf("ERROR: pos2.x > pos1.x\n");
         }
-        if (map[i].pos1.y > map[i].pos2.y) {
+        if (map->walls[i].pos1.y > map->walls[i].pos2.y) {
             printf("ERROR: pos2.y > pos1.y\n");
         }
-        if (map[i].pos1.x == map[i].pos2.x && map[i].type != VERTICAL) {
+        if (map->walls[i].pos1.x == map->walls[i].pos2.x && map->walls[i].type != VERTICAL) {
             printf("ERROR: Should be VERTICAL\n");
         }
-        if (map[i].pos1.y == map[i].pos2.y && map[i].type != HORIZONTAL) {
+        if (map->walls[i].pos1.y == map->walls[i].pos2.y && map->walls[i].type != HORIZONTAL) {
             printf("ERROR: Should be HORIZONTAL\n");
         }
     }
@@ -416,7 +435,7 @@ int main(int argc, char * argv[]) {
 
     // Main loop
     while(!done) {
-
+        
         Intersection intersections[SCREEN_WIDTH];
         
         double camera_x = cos(player.angle + 90 * 0.017453292519943295) * 0.66;
@@ -500,28 +519,8 @@ int main(int argc, char * argv[]) {
             if (intersections[x].dist == -1 || intersections[x].dist == 1000 || intersections[x].dist == 0) {
                 continue;
             }
-            int lineHeight = sectors[intersections[x].wall.sector].height * (SCREEN_HEIGHT / intersections[x].dist);
-            Uint32 color;
-            switch (intersections[x].wall.color) {
-                case WHITE_COLOR:
-                    color = WHITE;
-                    break;
-                case RED_COLOR:
-                    color = RED;
-                    break;
-                case BLUE_COLOR:
-                    color = BLUE;
-                    break;
-                case YELLOW_COLOR:
-                    color = YELLOW;
-                    break;
-                case GREEN_COLOR:
-                    color = GREEN;
-                    break;
-                default:
-                    color = PURPLE;
-                    break;
-            }
+            int lineHeight = map->sectors[intersections[x].wall.sector].height * (SCREEN_HEIGHT / intersections[x].dist);
+            Uint32 color = intersections[x].wall.color;
             // Flat
             //line(x, mid - lineHeight, x, mid + lineHeight, color);
             // Textured
@@ -545,6 +544,17 @@ int main(int argc, char * argv[]) {
                 }
                 pixel(x, yy, texture[intersections[x].wall.texture][(int) tex_x][(int) tex_y]);
             }
+            // Basic floor & ceiling
+            if (intersections[x].sector == player.sector) {
+                if (draw_end < SCREEN_HEIGHT - 1) {
+                    color = map->sectors[intersections[x].wall.sector].floor;
+                    vertical(x, draw_end + 1, SCREEN_HEIGHT - 1, color);
+                }
+                if (draw_start > 0) {
+                    color = map->sectors[intersections[x].wall.sector].ceiling;
+                    vertical(x, draw_start - 1, 0, color);
+                }
+            }
         }
 
         if (show_map) {
@@ -553,27 +563,7 @@ int main(int argc, char * argv[]) {
                 if (intersections[x].dist == -1 || intersections[x].dist == 1000) {
                     continue;
                 }
-                Uint32 color;
-                switch (intersections[x].wall.color) {
-                    case WHITE_COLOR:
-                        color = WHITE;
-                        break;
-                    case RED_COLOR:
-                        color = RED;
-                        break;
-                    case BLUE_COLOR:
-                        color = BLUE;
-                        break;
-                    case YELLOW_COLOR:
-                        color = YELLOW;
-                        break;
-                    case GREEN_COLOR:
-                        color = GREEN;
-                        break;
-                    default:
-                        color = PURPLE;
-                        break;
-                }
+                Uint32 color = intersections[x].wall.color;
                 line(player.pos.x * MINIMAP_ZOOM, player.pos.y * MINIMAP_ZOOM, intersections[x].pos.x * MINIMAP_ZOOM, intersections[x].pos.y * MINIMAP_ZOOM, color);
             }
             // Draw player and camera
@@ -588,28 +578,8 @@ int main(int argc, char * argv[]) {
             line(player.pos.x * MINIMAP_ZOOM, player.pos.y * MINIMAP_ZOOM, pos_dir_x * MINIMAP_ZOOM, pos_dir_y * MINIMAP_ZOOM, PURPLE);
             // Draw walls
             for (int i=0; i < MAX_WALL; i++) {
-                Uint32 color;
-                switch (map[i].color) {
-                    case WHITE_COLOR:
-                        color = WHITE;
-                        break;
-                    case RED_COLOR:
-                        color = RED;
-                        break;
-                    case BLUE_COLOR:
-                        color = BLUE;
-                        break;
-                    case YELLOW_COLOR:
-                        color = YELLOW;
-                        break;
-                    case GREEN_COLOR:
-                        color = GREEN;
-                        break;
-                    default:
-                        color = PURPLE;
-                        break;
-                }
-                line(map[i].pos1.x * MINIMAP_ZOOM, map[i].pos1.y * MINIMAP_ZOOM, map[i].pos2.x * MINIMAP_ZOOM, map[i].pos2.y * MINIMAP_ZOOM, color);
+                Uint32 color = map->walls[i].color;
+                line(map->walls[i].pos1.x * MINIMAP_ZOOM, map->walls[i].pos1.y * MINIMAP_ZOOM, map->walls[i].pos2.x * MINIMAP_ZOOM, map->walls[i].pos2.y * MINIMAP_ZOOM, color);
             }
         }
         render();
@@ -649,6 +619,15 @@ int main(int argc, char * argv[]) {
         }
         if (right) {
             player.angle += rot_modifier * frame_time;
+        }
+
+        if (change_sector) {
+            if (player.sector == 0) {
+                player.sector = 1;
+            } else {
+                player.sector = 0;
+            }
+            change_sector = false;
         }
 
         while (pause && !done) {
