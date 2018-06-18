@@ -1,0 +1,107 @@
+# 
+# FICHIER DE PROJET construit par "Pelles C pour Windows, version 8.00".
+# AVERTISSEMENT! NE PAS MODIFIER CE FICHIER.
+# 
+
+POC_PROJECT_VERSION = 7.00#
+POC_PROJECT_TYPE = 3#
+POC_PROJECT_OUTPUTDIR = output#
+POC_PROJECT_RESULTDIR = .#
+POC_PROJECT_ARGUMENTS = #
+POC_PROJECT_WORKPATH = .#
+POC_PROJECT_EXECUTOR = #
+POC_PROJECT_ZIPEXTRA = #
+CC = pocc.exe#
+AS = poasm.exe#
+RC = porc.exe#
+LINK = polink.exe#
+SIGN = posign.exe#
+CCFLAGS = -std:C11 -Tx86-coff -Ot -Ob1 -fp:precise -W1 -Gd -Ze#
+ASFLAGS = -AIA32 -Gd#
+RCFLAGS = #
+LINKFLAGS = -subsystem:console -machine:x86 kernel32.lib advapi32.lib delayimp.lib SDL.lib SDLmain.lib#
+SIGNFLAGS = -timeurl:http://timestamp.verisign.com/scripts/timstamp.dll -location:CU -store:MY -errkill#
+INCLUDE = $(PellesCDir)\Include\Win;$(PellesCDir)\Include;include#
+LIB = $(PellesCDir)\Lib\Win;$(PellesCDir)\Lib;lib#
+
+# 
+# Construction de action.exe.
+# 
+action.exe: \
+	output\main.obj \
+	output\minisdl.obj
+	$(LINK) $(LINKFLAGS) -out:"$@" $**
+
+# 
+# Construction de main.obj.
+# 
+output\main.obj: \
+	main.c \
+	include\begin_code.h \
+	include\close_code.h \
+	include\SDL.h \
+	include\SDL_active.h \
+	include\SDL_audio.h \
+	include\SDL_cdrom.h \
+	include\SDL_config.h \
+	include\SDL_config_minimal.h \
+	include\SDL_cpuinfo.h \
+	include\SDL_endian.h \
+	include\SDL_error.h \
+	include\SDL_events.h \
+	include\SDL_joystick.h \
+	include\SDL_keyboard.h \
+	include\SDL_keysym.h \
+	include\SDL_loadso.h \
+	include\SDL_main.h \
+	include\SDL_mouse.h \
+	include\SDL_mutex.h \
+	include\SDL_platform.h \
+	include\SDL_quit.h \
+	include\SDL_rwops.h \
+	include\SDL_stdinc.h \
+	include\SDL_thread.h \
+	include\SDL_timer.h \
+	include\SDL_version.h \
+	include\SDL_video.h \
+	minisdl.h
+	$(CC) $(CCFLAGS) "$!" -Fo"$@"
+
+# 
+# Construction de minisdl.obj.
+# 
+output\minisdl.obj: \
+	minisdl.c \
+	include\begin_code.h \
+	include\close_code.h \
+	include\SDL.h \
+	include\SDL_active.h \
+	include\SDL_audio.h \
+	include\SDL_cdrom.h \
+	include\SDL_config.h \
+	include\SDL_config_minimal.h \
+	include\SDL_cpuinfo.h \
+	include\SDL_endian.h \
+	include\SDL_error.h \
+	include\SDL_events.h \
+	include\SDL_joystick.h \
+	include\SDL_keyboard.h \
+	include\SDL_keysym.h \
+	include\SDL_loadso.h \
+	include\SDL_main.h \
+	include\SDL_mouse.h \
+	include\SDL_mutex.h \
+	include\SDL_platform.h \
+	include\SDL_quit.h \
+	include\SDL_rwops.h \
+	include\SDL_stdinc.h \
+	include\SDL_thread.h \
+	include\SDL_timer.h \
+	include\SDL_version.h \
+	include\SDL_video.h \
+	minisdl.h
+	$(CC) $(CCFLAGS) "$!" -Fo"$@"
+
+.SILENT:
+
+.EXCLUDEDFILES:
