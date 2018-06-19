@@ -1,10 +1,14 @@
 //=============================================================================
 // Demo program for minisdl.c
 // Show examples of the function of minisdl library based on SDL 1.2.15
+// Show examples of handling time in C (getting a string, difftime, timestamp)
+// Show examples of handling Lua (registering C function, interpreting Lua)
+// Show examples of loading a PNG image with SDL_image
+// Needed DLL : SDL.dll, SDL_image.dll, zlib1.dll, lua53.dll, libpng15-15.dll
 //-----------------------------------------------------------------------------
 // Author           Damien Gouteux
 // Created          2018
-// Last modified    18 june 2018
+// Last modified    19 june 2018
 //=============================================================================
 
 //-----------------------------------------------------------------------------
@@ -20,14 +24,22 @@
 #include <math.h>
 #include <io.h>
 
-// Project libraries
-#include "SDL.h"
-
 // Internal librairies
 #include "minisdl.h"
 
-// C examples
+// SDL libraries
+#include "SDL.h"
+
+// Time examples
 #include <time.h>
+
+// Lua libraries
+#include "lua.h"
+#include "lualib.h"
+#include "lauxlib.h"
+
+// SDL images
+#include "SDL_image.h"
 
 //-----------------------------------------------------------------------------
 // Type definitions
@@ -52,6 +64,7 @@ const bool FULLSCREEN = false;
 const char * SOUND_PATH = "..\\assets\\audio\\sounds\\blip.wav";
 const char * TEXTURE_PATH = "..\\assets\\graphic\\walls\\door11_1.bmp";
 const char * TEXTURE_COLOR_KEY_PATH = "..\\assets\\graphic\\walls\\mguard_s_1.bmp";
+const char * TEXTURE_PNG_PATH = "..\\assets\\graphic\\walls\\tile110.png";
 
 #define DEF_MAP_SIZE 32
 const int MAP_SIZE = DEF_MAP_SIZE;
@@ -172,37 +185,119 @@ void input(void) {
     }
 }
 
+//
+// Random functions
+//
+
+void rand_init(void) {
+    srand(time(NULL));
+}
+
+int rand_int(const int max) {
+    // Getting a random number from 1 to MAX included
+    const int BARRE = RAND_MAX / max;
+    int nb = 1;
+    int nb_barre = BARRE;
+    int randomValue = rand();
+    while (randomValue > nb_barre) {
+        nb_barre += BARRE;
+        nb += 1;
+    }
+    return nb;
+}
+
+//
+// Time functions
+//
+
+void time_now_stamp(char time_stamp[], unsigned int size) {
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    const struct tm * restrict tmp = &tm;
+    strftime(time_stamp, size, "%Y-%m-%d_%H-%M-%S", tmp);
+}
+
+void time_now_string(char time_string[], unsigned int size) {
+    // Getting time
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    const struct tm * restrict tmp = &tm;
+    strftime(time_string, size, "%c", tmp);
+}
+
+//
+// Lua function to register
+//
+
+static int twice(lua_State * lua) {
+    double arg = lua_tonumber(lua, 1);  /* get argument */
+    lua_pushnumber(lua, arg * 2);       /* push result */
+    return 1;                           /* number of results */
+}
+
+// SDL image function
+SDL_Surface * load_image(char * filename ) {
+    SDL_Surface * loadedImage = NULL;
+    SDL_Surface * optimizedImage = NULL;
+    loadedImage = IMG_Load(filename);
+    if( loadedImage != NULL ) {
+        optimizedImage = SDL_DisplayFormat( loadedImage );
+        SDL_FreeSurface( loadedImage ); 
+    }
+    return optimizedImage;
+}
+
+//
+// Test function
+//
+
+void tests(void) {
+    // Time
+    char time_string[64];
+    time_now_stamp(time_string, 64);
+    printf("A time stamp: %s\n", time_string);
+
+    // Random
+    rand_init();
+    for(int i=0; i < 10; i++) {
+        printf("Dice : %d\n", rand_int(6));
+    }
+    
+    // Lua
+    lua_State * lua = luaL_newstate();
+    luaL_openlibs(lua);
+
+    lua_pushcfunction(lua, twice);
+    lua_setglobal(lua, "twiceC");
+
+    int res = luaL_dostring(lua, "print(\"Lua is here\")");
+    printf("retour = %d\n", res);
+
+    res = luaL_dostring(lua, "a = twiceC(2)");
+    printf("retour = %d\n", res);
+
+    res = luaL_dostring(lua, "print(a)");
+    printf("retour = %d\n", res);
+
+    lua_close(lua);
+}
+
 //-----------------------------------------------------------------------------
 // Main function
 //-----------------------------------------------------------------------------
 
 int main(int argc, char * argv[]) {
-    // Getting time
-    time_t t = time(NULL);
-    struct tm tm = *localtime(&t);
-    const struct tm * restrict tmp = &tm;
+    
+    time_t start = time(NULL);
+    
     char time_string[64];
-    strftime(time_string, sizeof(time_string), "%c", tmp);
+    time_now_string(time_string, sizeof(time_string));
     
     // Init message
     printf("Start %s at %s\n", APPNAME, time_string);
-
-    // Getting a random number
-    const int MAX = 6;
-    const int BARRE = RAND_MAX / MAX;
-    int nb = 1;
-    int nb_barre = BARRE;
-    srand(time(NULL));
-    int randomValue = 0;
-    for(int i=0; i < 10; i++) {
-        randomValue = rand();
-        while (randomValue < nb_barre) {
-            printf("%d. %d\n", nb, nb_barre);
-            nb_barre += BARRE;
-            nb += 1;
-        }
-        printf(">>> %d\n", nb);
-    }
+    
+    // Tests
+    tests();
 
     // Init and screen
     int err = init((char *) APPNAME, SCREEN_WIDTH, SCREEN_HEIGHT, BITS_PER_PIXEL, FULLSCREEN);
@@ -224,6 +319,10 @@ int main(int argc, char * argv[]) {
     SDL_Surface * my_bitmap_key_conv = load_bmp(TEXTURE_COLOR_KEY_PATH);
     Uint32 key = SDL_MapRGB(screen->format, 152, 0, 136);
     SDL_SetColorKey(my_bitmap_key_conv, SDL_SRCCOLORKEY | SDL_RLEACCEL, key);
+    
+    // Texture from PNG
+    // Another format
+    SDL_Surface * my_png_conv = load_image((char *) TEXTURE_PNG_PATH);
     
     // Time
     double tick_current = 0.0;
@@ -249,7 +348,8 @@ int main(int argc, char * argv[]) {
 
         blit(500, 100, my_bitmap_conv);
         blit(500, 200, my_bitmap_key_conv);
-        
+        blit(500, 300, my_png_conv);
+
         // End of examples
         render();
         
@@ -273,7 +373,9 @@ int main(int argc, char * argv[]) {
 
     // Cleaning
     SDL_Quit();
-    printf("End %s\n", APPNAME);
+    time_t end = time(NULL);
+    double elapsed = difftime(end, start);
+    printf("End %s. Time elapsed: %02dh%02d\n", APPNAME, (int) elapsed / 60, (int) elapsed % 60);
     return EXIT_SUCCESS;
 
 }
