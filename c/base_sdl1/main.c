@@ -5,11 +5,20 @@
 // Show examples of handling Lua (registering C function, interpreting Lua)
 // Show examples of loading a PNG image with SDL_image
 // Needed DLL : SDL.dll, SDL_image.dll, zlib1.dll, lua53.dll, libpng15-15.dll
+// Needed DLL : libFLAC-8.dll, libogg-0.dll, libpng15-15.dll, libvorbis-0.dll, libvorbisfile-3.dll
 //-----------------------------------------------------------------------------
 // Author           Damien Gouteux
 // Created          2018
 // Last modified    19 june 2018
 //=============================================================================
+
+//-----------------------------------------------------------------------------
+// Global switch
+//-----------------------------------------------------------------------------
+
+#define SOUND_USE_MIXER
+//#define BINARY_WRITER
+//#define BINARY_READER
 
 //-----------------------------------------------------------------------------
 // Includes
@@ -41,6 +50,11 @@
 // SDL images
 #include "SDL_image.h"
 
+#ifdef SOUND_USE_MIXER
+// SDL mixer
+#include "SDL_mixer.h"
+#endif
+
 //-----------------------------------------------------------------------------
 // Type definitions
 //-----------------------------------------------------------------------------
@@ -49,6 +63,13 @@ typedef struct {
     int x;
     int y;
 } Position;
+
+typedef struct {
+    int i[128];
+    double d;
+    char name[64];
+    bool b;
+} Save;
 
 //-----------------------------------------------------------------------------
 // Global constants
@@ -61,10 +82,11 @@ const int SCREEN_HEIGHT = 480;
 const int BITS_PER_PIXEL = 32;
 const bool FULLSCREEN = false;
 
-const char * SOUND_PATH = "..\\assets\\audio\\sounds\\blip.wav";
-const char * TEXTURE_PATH = "..\\assets\\graphic\\walls\\door11_1.bmp";
-const char * TEXTURE_COLOR_KEY_PATH = "..\\assets\\graphic\\walls\\mguard_s_1.bmp";
-const char * TEXTURE_PNG_PATH = "..\\assets\\graphic\\walls\\tile110.png";
+const char * SOUND_PATH = "..\\..\\assets\\audio\\sounds\\blip.wav";
+const char * MUSIC_PATH = "..\\..\\assets\\audio\\musics\\ds.ogg";
+const char * TEXTURE_PATH = "..\\..\\assets\\graphic\\textures\\woolfy_wall\\freedoom\\door9_1.bmp";
+const char * TEXTURE_COLOR_KEY_PATH = "..\\..\\assets\\graphic\\sprites\\woolfy\\mguard_s_1.bmp";
+const char * TEXTURE_PNG_PATH = "..\\..\\assets\\graphic\\textures\\woolfy_wall\\lab\\tile110.png";
 
 #define DEF_MAP_SIZE 32
 const int MAP_SIZE = DEF_MAP_SIZE;
@@ -116,6 +138,11 @@ bool left;
 // Global states
 bool done = false;
 bool pause = false;
+
+#ifdef SOUND_USE_MIXER
+Mix_Music * music = NULL;
+Mix_Chunk * sound = NULL;
+#endif
 
 //-----------------------------------------------------------------------------
 // Functions
@@ -251,7 +278,97 @@ SDL_Surface * load_image(char * filename ) {
 // Test function
 //
 
+#ifdef SOUND_USE_MIXER
+void test_mixer(void) {
+    printf("Testing SDL_mixer\n");
+    int flags = MIX_INIT_OGG | MIX_INIT_FLAC;
+    int result = Mix_Init(flags);
+    if((result & flags) != flags) {
+        printf("Mix_Init: Failed to init required FLAC and OGG support!\n");
+        printf("Mix_Init: %s\n", Mix_GetError());
+    }
+    // if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) == -1) {
+    // if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096) == -1) {
+    // working : 22050 AUDIO_U8 1 4096
+    // working : 44100 AUDIO_U8 1 4096
+    // working : 44100 AUDIO_U8 2 4096
+    if(Mix_OpenAudio(88200, AUDIO_U8, 2, 4096) == -1) {
+        printf("Problem while trying to init SDL_mixer: %s\n", Mix_GetError());
+        return;
+    }
+    music = Mix_LoadMUS(MUSIC_PATH);
+    if (music == NULL) {
+        printf("Problem while trying to load music: %s\n", Mix_GetError());
+        return;
+    }
+    sound = Mix_LoadWAV(SOUND_PATH);
+    if (sound == NULL) {
+        printf("Problem while trying to load sound: %s\n", Mix_GetError());
+        return;
+    }
+    if(Mix_PlayingMusic() == 0 ) {
+        if( Mix_PlayMusic(music, -1) == -1 ) {
+            printf("Problem while trying to play music: %s\n", Mix_GetError());
+            return;
+        }
+        // Mix_PausedMusic() == 1
+        // Mix_ResumeMusic();
+        // Mix_PauseMusic();
+        // Mix_HaltMusic();
+    }
+    if( Mix_PlayChannel(-1, sound, 0) == -1) {
+        printf("Problem while trying to play sound: %s\n", Mix_GetError());
+        return;
+    }
+}
+#endif
+
 void tests(void) {
+    
+    #ifndef SOUND_USE_MIXER
+    // Sound Test (SDL raw)
+    char name[32];
+    printf("Using audio driver: %s\n", SDL_AudioDriverName(name, 32));
+    init_audio(22050, AUDIO_U8, 1, 4096);
+    load_wav(SOUND_PATH);
+    play_wav();
+    #endif
+
+    #ifdef SOUND_USE_MIXER
+    // Sound Test (SDL mixer)
+    test_mixer();
+    #endif
+
+    #ifdef BINARY_WRITER
+    printf("Size of int: %d\n", sizeof(int)); // 4 bytes/octet
+    printf("Size of double: %d\n", sizeof(double)); // 8
+    printf("Size of bool: %d\n", sizeof(bool)); // 1
+    printf("Size of char: %d\n", sizeof(char)); // 1
+    printf("Size of save: %d\n", sizeof(Save)); // 592 != 585 = 128 * 4 + 8 + 1 + 64 * 1
+    FILE * filesave = fopen("save.bin", "wb");
+    Save save;
+    for(int i=0;i < 128; i++) {
+        save.i[i] = i*2;
+    }
+    save.d = 5.55;
+    strcpy(save.name, "Bonjour");
+    save.b = true;
+    fwrite(&save, sizeof(save), 1, filesave);
+    fclose(filesave);
+    #endif
+    
+    #ifdef BINARY_READER
+    FILE * filesave = fopen("save.bin", "rb");
+    Save save;
+    fread(&save, sizeof(save), 1, filesave);
+    for(int i=0;i < 128; i++) {
+        printf("%d ", save.i[i]);
+    }
+    printf("\n");
+    printf("%s %f %d\n", save.name, save.d, save.b);
+    fclose(filesave);
+    #endif
+
     // Time
     char time_string[64];
     time_now_stamp(time_string, 64);
@@ -304,13 +421,6 @@ int main(int argc, char * argv[]) {
     if (err == EXIT_FAILURE) {
         return err;
     }
-    
-    // Sound Test
-    char name[32];
-    printf("Using audio driver: %s\n", SDL_AudioDriverName(name, 32));
-    init_audio(22050, AUDIO_U8, 1, 4096);
-    load_wav(SOUND_PATH);
-    play_wav();
     
     // Texture Test
     SDL_Surface * my_bitmap_conv = load_bmp(TEXTURE_PATH);
@@ -372,6 +482,16 @@ int main(int argc, char * argv[]) {
     }
 
     // Cleaning
+    #ifdef SOUND_USE_MIXER
+    Mix_FreeChunk(sound);
+    Mix_FreeMusic(music);
+    Mix_CloseAudio();
+    // Quit all the mixers
+    while(Mix_Init(0)) {
+        Mix_Quit();
+    }
+    #endif
+
     SDL_Quit();
     time_t end = time(NULL);
     double elapsed = difftime(end, start);
