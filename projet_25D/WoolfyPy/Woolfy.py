@@ -1,23 +1,27 @@
-# http://lodev.org/cgtutor/raycasting.html ***
-# http://lodev.org/cgtutor/files/raycaster_flat.cpp ***
-# http://www.cplusplus.com/reference/clibrary/cmath/fabs/
-# http://www.student.kuleuven.be/~m0216922/CG/raycasting.html
-# http://www.pygame.org/docs/tut/newbieguide.html
-# http://www.permadi.com/tutorial/raycast/
-#   http://www.permadi.com/tutorial/raycast/rayc8.html distorsion
-# http://cython.org/
+#===============================================================================
+# Raycaster Engine of Love Vandevenne ported to Python
+#-------------------------------------------------------------------------------
+# http://lodev.org/cgtutor/raycasting.html
+# http://lodev.org/cgtutor/files/raycaster_flat.cpp
+#===============================================================================
 
-# Import
-import pygame
+#-------------------------------------------------------------------------------
+# Imports
+#-------------------------------------------------------------------------------
+
+# Standard library
 import math
 import time
-
-from pygame.locals import *
-from pygame import Surface
 from datetime import datetime
 
-#sprite1 = pygame.image.load('flower.png').convert()
-#sprite1.set_colorkey((255,0,255))
+# PyGame
+import pygame
+from pygame.locals import *
+from pygame import Surface
+
+#-------------------------------------------------------------------------------
+# Global functions
+#-------------------------------------------------------------------------------
 
 def tile2color(index : int):
     """
@@ -61,6 +65,9 @@ def color2string(color : (int, int, int)):
     else:
         return str(color)
 
+#-------------------------------------------------------------------------------
+# Classes
+#-------------------------------------------------------------------------------
 
 class Level:
     
@@ -85,13 +92,17 @@ class Application:
     """
     
     def load_texture(self, filename : str, where : int):
-        # Load
-        s : Surface = pygame.image.load(filename)
+        """Load a texture and encode it into an one-dimension buffer"""
+        try:
+            s : Surface = pygame.image.load(filename)
+        except pygame.error:
+            self.textures_loaded = False
+            return None
         z : [int] = []
         for i in range(0, self.TEXTURE_MAX):
             z.append(0)
         i = 0
-        if s.get_height() != 64 or s.get_width() != 64:
+        if s.get_height() != self.TEXTURE_HEIGHT or s.get_width() != self.TEXTURE_WIDTH:
             raise Exception("Wrong texture size")
         for ii in range(0, s.get_height()):
             for jj in range(0, s.get_width()):
@@ -130,22 +141,20 @@ class Application:
             [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
         ])
         
-        self.screen_width : int = 640  #300 320 640
-        self.screen_height : int = 480 #200 240 480
+        self.screen_width : int = 640  #300 320 640 800
+        self.screen_height : int = 480 #200 240 480 600
         self.half_height : int = self.screen_height // 2
-        self.FPS : int = 60
         
         pygame.init()
         pygame.display.set_caption('Woolfy 3D')
-        resolution : (int, int) = (800,600)
+        resolution : (int, int) = (self.screen_width, self.screen_height)
         flags : int = pygame.DOUBLEBUF
         print(pygame.display.mode_ok(resolution))
         # 0 : not ok, !0: best color depth
     
         self.screen : Surface = pygame.display.set_mode(resolution, flags, 32)
         self.screen_buffer : Surface = Surface((self.screen_width, self.screen_height))
-        #clock = pygame.time.Clock()
-    
+        
         self.position : [float, float] = [22.0,12.0]      # position vector (point)
         self.direction : [float, float] = [-1.0,0.0]      # direction vector
         self.camera : [float, float] = [0.0, 0.66]        # camera plane (orthogonal to direction vector) 2 * atan(0.66/1.0)=66
@@ -183,6 +192,7 @@ class Application:
             self.wall_buffer.append(0)
 
         self.font = pygame.font.SysFont(pygame.font.get_default_font(), 20)
+        self.textures_loaded = True
 
     
     def restart(self):
@@ -201,7 +211,7 @@ class Application:
                     if event.key == K_SPACE:
                         loop = False
     
-    def update(self):
+    def update(self, frametime : int):
         """Handle events"""
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -231,7 +241,8 @@ class Application:
                 if event.key == K_RETURN:
                     self.restart()
                 if event.key == K_t:
-                    self.TEXTURED_WALL = not self.TEXTURED_WALL
+                    if self.textures_loaded:
+                        self.TEXTURED_WALL = not self.TEXTURED_WALL
                 # movement
                 if event.key == K_RIGHT:
                     self.right = False
@@ -252,10 +263,10 @@ class Application:
                         f.write(str(s) + '. color= ' + color2string(buffer[s][0]) + ', startDraw= ' + str(buffer[s][1]) + ', startEnd= ' + str(buffer[s][2]) + '\n')
                     f.close()
         
-        self.rotSpeed : float = self.frameTime * self.ROTATION_FACTOR
-        self.moveSpeed : float = self.frameTime * self.MOVEMENT_FACTOR
+        self.rotSpeed : float = frametime * self.ROTATION_FACTOR
+        self.moveSpeed : float = frametime * self.MOVEMENT_FACTOR
         if self.running:
-            self.moveSpeed = self.frameTime * self.RUNNING_FACTOR
+            self.moveSpeed = frametime * self.RUNNING_FACTOR
         
         # rotate to the right
         if self.left:
@@ -274,27 +285,21 @@ class Application:
             oldPlaneX = self.camera[0]
             self.camera[0] = self.camera[0] * math.cos(self.rotSpeed) - self.camera[1] * math.sin(self.rotSpeed)
             self.camera[1] = oldPlaneX * math.sin(self.rotSpeed) + self.camera[1] * math.cos(self.rotSpeed)
-        if self.down:
-            try:        
-                if self.level.area[int(self.position[0] + self.direction[0] * self.moveSpeed)][int(self.position[1])] == False:
-                    self.position[0] += self.direction[0] * self.moveSpeed
-                if self.level.area[int(self.position[0])][int(self.position[1] + self.direction[1] * self.moveSpeed)] == False:
-                    self.position[1] += self.direction[1] * self.moveSpeed
-            except Exception as e:
-                print(int(self.position[0] + self.direction[0] * self.moveSpeed))
-                print(int(self.position[1] + self.direction[1] * self.moveSpeed))
-                print(e)
-        if self.up:
-            if self.level.area[int(self.position[0] - self.direction[0] * self.moveSpeed)][int(self.position[1])] == False:
-                self.position[0] -= self.direction[0] * self.moveSpeed
-            if self.level.area[int(self.position[0])][int(self.position[1] - self.direction[1] * self.moveSpeed)] == False:
-                self.position[1] -= self.direction[1] * self.moveSpeed
+        if self.down or self.up:
+            if self.down:
+                next_x : float = self.position[0] + self.direction[0] * self.moveSpeed
+                next_y : float = self.position[1] + self.direction[1] * self.moveSpeed
+            elif self.up:
+                next_x : float = self.position[0] - self.direction[0] * self.moveSpeed
+                next_y : float = self.position[1] - self.direction[1] * self.moveSpeed
+            if self.level.area[int(next_x)][int(self.position[1])] == False:
+                self.position[0] = next_x
+            if self.level.area[int(self.position[0])][int(next_y)] == False:
+                self.position[1] = next_y
     
     
     def draw(self):
         """Draw"""
-        #self.screen.fill((0,0,0))
-        #screen.blit(sprite1, (100, 100))
         
         # Background
         #------------
@@ -372,8 +377,6 @@ class Application:
             
             # Calculate height of line to draw on screen
             lineHeight = int(float(self.screen_height) / float(perpWallDist))
-
-            #self.wait_for_key(K_SPACE, rayDirX=rayDirX, rayDirY=rayDirY, stepX=stepX, stepY=stepY, perpWallDist=perpWallDist, lineHeight=lineHeight)
             
             # Calculate lowest and highest pixel to fill in current stripe
             drawStart = int(-lineHeight / 2 + self.half_height)
@@ -421,9 +424,6 @@ class Application:
                 
                 if side == 0 and ray_dir_x > 0: texX = self.TEXTURE_WIDTH - texX - 1
                 if side == 1 and ray_dir_y < 0: texX = self.TEXTURE_WIDTH - texX - 1
-                
-                # ME BICOLOR TEXTURE
-                # if texX > 32: color = ((color[0]+100)%255,color[1],color[2])
                 
                 ## ME Now y
                 for yy in range(draw_start, draw_end):
@@ -474,8 +474,7 @@ class Application:
 
             pos_x = int(self.position[0]*SIZE + REPX)
             pos_y = self.level.height*SIZE-int(self.position[1]*SIZE) + REPY # Y AXIS INVERTED
-            pygame.draw.rect(self.screen_buffer, (255,0,0), (pos_x, pos_y, SIZE, SIZE), 0)    
-            #screen.set_at((pos_x,pos_y), (255,0,0))
+            pygame.draw.rect(self.screen_buffer, (255,0,0), (pos_x, pos_y, SIZE, SIZE), 0)
             dir_x = pos_x+SIZE/2+self.direction[0]*SIZE
             dir_y = pos_y+SIZE/2-self.direction[1]*SIZE # Y AXIS INVERTED
             pygame.draw.line(self.screen_buffer, (255,0,0), (pos_x+SIZE/2, pos_y+SIZE/2), (dir_x, dir_y), 1)
@@ -497,9 +496,7 @@ class Application:
         while not self.escape:
             start = time.time()
             self.draw()
-            end = time.time()
-            self.frameTime : int = start - end
-            self.update()
+            self.update(start - time.time())
 
 
 if __name__ == '__main__':
