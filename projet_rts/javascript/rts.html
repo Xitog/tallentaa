@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Test</title>
+    <script type="text/javascript">
+      'use strict';
+      const MAX_COL = 20; // = 640 / 32
+      const MAX_ROW = 15; // = 480 / 32
+      function draw() {
+        var canvas = document.getElementById('screen');
+        if (canvas.getContext) {
+          var img1 = document.getElementById('t1');
+          var ctx = canvas.getContext('2d');
+          for (let row = 0; row < MAX_ROW; row++) {
+            for (let col = 0; col < MAX_COL; col++) {
+              ctx.drawImage(img1, col * 32, row * 32);
+            }
+          }
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+          ctx.fillRect(64, 64, 32, 32);
+          ctx.strokeStyle = 'rgb(0, 255, 0)';
+          ctx.strokeRect(128, 128, 32, 32)
+        } else {
+          alert("Your browser must support canvas to play.");
+        }
+      }
+    </script>
+    <style type="text/css">
+      canvas { border: 1px solid black; }
+    </style>
+  </head>
+  <body onload="draw();">
+    <canvas id="screen" width="640" height="480">Your browser must support canvas to play.</canvas>
+    <img id="t1" src="01.bmp">
+  </body>
+</html>
