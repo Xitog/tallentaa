@@ -4,16 +4,31 @@
     <meta charset="utf-8"/>
     <title>Test</title>
     <script type="text/javascript">
+      // Core functions
+      //     start -> load, run
+      //     run   -> update, draw
+      // Input functions
+      //     on_mouse_move
+      //     on_mouse_right_click
+      //     on_key_down
+      //     on_mouse_left_click
+      
       'use strict';
+      
+      const SCREEN_X = 640;
+      const SCREEN_Y = 480;
+      
       const CAM_MAX_COL = 20; // = 640 / 32
       const CAM_MAX_ROW = 15; // = 480 / 32
+      const SCROLLING_ZONE = 10;
+      
       const MAP_MAX_COL = 32;
       const MAP_MAX_ROW = 32;
       
       var map = [
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1],
-        [1, 1, 1, 0, 2, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1],
+        [1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1],
+        [1, 1, 0, 0, 2, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1],
         [1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -45,37 +60,59 @@
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1],
       ];
       
-      var textures = [];
+      var textures = {};
       
       var camera_row = 0;
       var camera_col = 0;
       
       var screen = null;
       
+      var mouse_map_col = -1;
+      var mouse_map_row = -1;
+      var mouse_col = -1;
+      var mouse_row = -1;
+      
+      var scroll_left = false;
+      var scroll_right = false;
+      var scroll_up = false;
+      var scroll_down = false;
+      
+      //-----------------------------------------------------------------------
+      // Core functions : load, start, run, update, draw
+      //-----------------------------------------------------------------------
+      
+      function load() {
+        textures = {
+          "0" : document.getElementById('w1'),
+          "1" : document.getElementById('t1'),
+          "2" : document.getElementById('h1'),
+          "82": document.getElementById('82'),
+        };
+        
+      }
+      
       function start() {
         screen = document.getElementById('screen');
-        screen.onmousemove = function(event) {
-          event = event || window.event;
-          let screenRect = screen.getBoundingClientRect();
-          let x = event.pageX - screenRect.left;
-          let y = event.pageY - screenRect.top;
-          if (x < 5) {
-            camera_col = (camera_col > 0 ? camera_col - 1 : 0);
-          } else if (x > 640 - 5) {
-            camera_col = (camera_col < (MAP_MAX_COL - CAM_MAX_COL) ? camera_col + 1 : camera_col);
-          }
-        }
+        screen.onmousemove = on_mouse_move;
         load();
+        run();
+      }
+      
+      function run() {
+        update();
         draw();
       }
       
-      function load() {
-        textures = [
-          document.getElementById('w1'),
-          document.getElementById('t1'),
-          document.getElementById('h1')
-        ];
-        
+      function update() {
+        if (scroll_right) {
+          camera_col = (camera_col > 0 ? camera_col - 1 : 0);
+        } else if (scroll_left) {
+          camera_col = (camera_col < (MAP_MAX_COL - CAM_MAX_COL) ? camera_col + 1 : camera_col);
+        } else if (scroll_up) {
+          camera_row = (camera_row > 0 ? camera_row - 1 : 0);
+        } else if (scroll_down) {
+          camera_row = (camera_row < (MAP_MAX_ROW - CAM_MAX_ROW) ? camera_row + 1 : camera_row);
+        }
       }
       
       function draw() {
@@ -89,24 +126,84 @@
           }
           ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
           ctx.fillRect(64, 64, 32, 32);
-          ctx.strokeStyle = 'rgb(0, 255, 0)';
-          ctx.strokeRect(128, 128, 32, 32)
+          // Mouse
+          if (mouse_map_col != -1 || mouse_map_row != -1) {
+            ctx.strokeStyle = 'rgb(0, 255, 0)';
+            ctx.strokeRect(Math.floor(mouse_col / 32) * 32, Math.floor(mouse_row / 32) * 32, 32, 32);
+          }
         } else {
           alert("Your browser must support canvas to play.");
         }
       }
       
-      window.oncontextmenu = function () {
-        alert("Youpi");
-        return false;     // prevent default menu
-      }
+      //-----------------------------------------------------------------------
+      // UI : Input handling
+      //-----------------------------------------------------------------------
+      
+      // Consts
       
       const KEY_UP = 38;
       const KEY_DOWN = 40;
       const KEY_RIGHT = 39;
       const KEY_LEFT = 37;
       
-      window.onkeydown = function(event){
+      // Functions
+      
+      function on_mouse_move(event) {
+        event = event || window.event;
+        // Mouse coordinates
+        let screenRect = screen.getBoundingClientRect();
+        mouse_col = event.pageX - screenRect.left;
+        mouse_row = event.pageY - screenRect.top;
+        mouse_map_col = Math.floor(mouse_col / 32) - camera_col;
+        mouse_map_row = Math.floor(mouse_row / 32) - camera_row;
+        // Scrolling
+        scroll_left = false;
+        scroll_right = false;
+        scroll_up = false;
+        scroll_down = false;
+        if (mouse_col < SCROLLING_ZONE) {
+          scroll_right = true;
+        } else if (mouse_col > SCREEN_X - SCROLLING_ZONE) {
+          scroll_left = true;
+        }
+        if (mouse_row < SCROLLING_ZONE) {
+          scroll_up = true;
+        } else if (mouse_row > SCREEN_Y - SCROLLING_ZONE) {
+          scroll_down = true;
+        }
+      }
+      
+      var clicked = false;
+      var iTimer;
+      
+      function on_mouse_left_click(event) {
+        if (event.button == 0) {
+          if (event.ctrlKey) {
+            console.log('Ctrl + Left Click');
+          } else {
+            console.log('Left Click');
+          }
+        }
+        /*
+        if (!clicked) {
+          console.log('Left Click');
+          clicked = true;
+          iTimer = setTimeout(function() { clicked = false; }, 250);
+        } else if (iTimer < 10) {
+          console.log('Double Click');
+          clicked = false;
+          clearTimeout(iTimer);
+        }
+        */
+      }
+      
+      function on_mouse_right_click() {
+        console.log("Right click");
+        return false;     // prevent default menu
+      }
+      
+      function on_key_down(event){
         event = window.event || event;
         //alert(event.keyCode);
         if (event.keyCode == KEY_UP || event.keyCode == KEY_DOWN || event.keyCode == KEY_RIGHT || event.keyCode == KEY_LEFT) {
@@ -123,14 +220,46 @@
         }
       }
       
-      /*
-      window.onmousemove = function(event) {
-        event = event || window.event;
-        alert(event.pageX);
-      }
-      */
+      window.onclick = on_mouse_left_click;
+      window.oncontextmenu = on_mouse_right_click;
+      window.onkeydown = on_key_down;
+      window.setInterval(run, 33);
       
-      window.setInterval(draw, 33);
+      //-----------------------------------------------------------------------
+      // Core : Data model
+      //-----------------------------------------------------------------------
+      
+      function transition(tcol, trow) {
+        let calc = 0;
+        let pow = 8;
+        let center = map[trow][tcol];
+        let opposed = null;
+        for (let row = trow - 1; row <= trow + 1; row++) {
+          for (let col = tcol - 1; col <= tcol + 1; col++) {
+            if (row != trow || col != tcol) {
+              // Get opposed
+              if (map[row][col] != center) {
+                if (!opposed) {
+                  opposed = map[row][col];
+                } else if (opposed != map[row][col]) {
+                  console.log("Surrounded by two different textures, aborting");
+                  return;
+                }
+              }
+              // Calculate transition
+              if (map[row][col] == opposed) {
+                calc += 1 * Math.pow(2, pow);
+              }
+              pow -= 1;
+            }
+          }
+        }
+        map[trow][tcol] = 82;
+        console.log(calc);
+        console.log(pow);
+      }
+      
+      transition(1, 1);
       
     </script>
     <style type="text/css">
@@ -150,12 +279,16 @@
         align-items: center;
         justify-content: center;
       }
+      img.shadow {
+        display: none;
+      }
     </style>
   </head>
   <body onload="start();">
     <canvas id="screen" width="640" height="480">Your browser must support canvas to play.</canvas>
-    <img id="w1" src="transition/t2/w1.bmp">
-    <img id="t1" src="transition/t2/t1.bmp">
-    <img id="h1" src="transition/t2/h1.bmp">
+    <img class="shadow" id="w1" src="t2/w1.bmp">
+    <img class="shadow" id="t1" src="t2/t1.bmp">
+    <img class="shadow" id="h1" src="t2/h1.bmp">
+    <img class="shadow" id="82" src="t2/82.bmp">
   </body>
 </html>
