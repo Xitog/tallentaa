@@ -82,8 +82,8 @@
       
       'use strict';
       
-      const SCREEN_X = 640;
-      const SCREEN_Y = 480;
+      const SCREEN_WIDTH = 640;
+      const SCREEN_HEIGHT = 480;
       
       const CAM_MAX_COL = 20; // = 640 / 32
       const CAM_MAX_ROW = 15; // = 480 / 32
@@ -187,13 +187,15 @@
           let ctx = screen.getContext('2d');
           for (let row = 0; row < CAM_MAX_ROW; row++) {
             for (let col = 0; col < CAM_MAX_COL; col++) {
-              let img = map[row + camera_row][col + camera_col];
+              let r = row + camera_row;
+              let c = col + camera_col;
+              let img = map[r][c];
               try {
                 ctx.drawImage(textures[img], col * 32, row * 32);
               } catch (e) {
                 console.log(img, e);
               }
-              if (g.units[row][col] != 0) {
+              if (g.units[r][c] != 0) {
                 let posx = col * 32 + 16;
                 let posy = row * 32 + 16;
                 ctx.fillStyle = 'rgb(255, 0, 0)';
@@ -243,12 +245,12 @@
         scroll_down = false;
         if (mouse_col < SCROLLING_ZONE) {
           scroll_right = true;
-        } else if (mouse_col > SCREEN_X - SCROLLING_ZONE) {
+        } else if (mouse_col > SCREEN_WIDTH - SCROLLING_ZONE) {
           scroll_left = true;
         }
         if (mouse_row < SCROLLING_ZONE) {
           scroll_up = true;
-        } else if (mouse_row > SCREEN_Y - SCROLLING_ZONE) {
+        } else if (mouse_row > SCREEN_HEIGHT - SCROLLING_ZONE) {
           scroll_down = true;
         }
       }
@@ -304,7 +306,8 @@
       //-----------------------------------------------------------------------
       
       class Unit {
-        constructor(row, col) {
+        constructor(type, row, col) {
+          this.type = type;
           this.row = row;
           this.col = col;
         }
@@ -324,11 +327,12 @@
         }
         
         create_unit(row, col) {
-          this.units[row][col] = new Unit(5, 5);
+          this.units[row][col] = new Unit('soldier', 5, 5);
         }
       }
       const g = new Game("A lost cause");
       g.create_unit(5, 5);
+      g.create_unit(5, 6);
       
       //-----------------------------------------------------------------------
       // Transition system
