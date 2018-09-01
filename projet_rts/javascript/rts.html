@@ -232,29 +232,37 @@
           // special
           for (let u of selected) {
             if (u.orders.length > 0) {
-              let o = u.orders[0];
-              if (o.type == 'move') {
-                // Line
-                ctx.strokeStyle = 'rgb(255, 0, 0)';
-                ctx.beginPath();
-                ctx.moveTo((u.col - camera_col) * 32 + 16, (u.row - camera_row) * 32 + 16);
-                ctx.lineTo((o.col - camera_col) * 32 + 16, (o.row - camera_row) * 32 + 16);
-                ctx.stroke();
-                // Redraw unit because of the line
-                if (u.selected) {
-                  ctx.fillStyle = 'rgb(0, 255, 0)';
-                } else { 
+              let start_col = (u.col - camera_col) * 32 + 16;
+              let start_row = (u.row - camera_row) * 32 + 16;
+              let next_col = start_col;
+              let next_row = start_row;
+              for (let o of u.orders) {
+                if (o.type == 'move') {
+                  // Line
+                  ctx.strokeStyle = 'rgb(255, 0, 0)';
+                  ctx.beginPath();
+                  ctx.moveTo(next_col, next_row);
+                  ctx.lineTo((o.col - camera_col) * 32 + 16, (o.row - camera_row) * 32 + 16);
+                  ctx.stroke();
+                  // Target
                   ctx.fillStyle = 'rgb(255, 0, 0)';
+                  ctx.beginPath();
+                  ctx.arc((o.col - camera_col) * 32 + 16, (o.row - camera_row) * 32 + 16, 5, 0, 2 * Math.PI);
+                  ctx.fill();
+                  // Chain
+                  next_col = (o.col - camera_col) * 32 + 16;
+                  next_row = (o.row - camera_row) * 32 + 16;
                 }
-                ctx.beginPath();
-                ctx.arc((u.col - camera_col) * 32 + 16, (u.row - camera_row) * 32 + 16, 10, 0, 2 * Math.PI);
-                ctx.fill();
-                // Target
-                ctx.fillStyle = 'rgb(255, 0, 0)';
-                ctx.beginPath();
-                ctx.arc((o.col - camera_col) * 32 + 16, (o.row - camera_row) * 32 + 16, 5, 0, 2 * Math.PI);
-                ctx.fill();
               }
+              // Redraw unit because of the line
+              if (u.selected) {
+                ctx.fillStyle = 'rgb(0, 255, 0)';
+              } else { 
+                ctx.fillStyle = 'rgb(255, 0, 0)';
+              }
+              ctx.beginPath();
+              ctx.arc(start_col, start_row, 10, 0, 2 * Math.PI);
+              ctx.fill();
             }
           }
           //ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
@@ -350,8 +358,10 @@
           }
           console.log('row', mouse_map_row, 'col', mouse_map_col,);
           // unselected current group (do that only if there is an unit to hold the selection)
-          save_selection();
-          unselect();
+          if (!event.ctrlKey) {
+            save_selection();
+            unselect();
+          }
           // select
           let u = g.units[mouse_map_row][mouse_map_col];
           if (u != 0) {
@@ -376,7 +386,7 @@
         console.log("Right click");
         for (let u of selected) {
           console.log("Sending order move to unit", u.id, 'to', 'row', mouse_map_row, 'col', mouse_map_col);
-          u.order(new Order('move', mouse_map_row, mouse_map_col));
+          u.order(new Order('move', mouse_map_row, mouse_map_col), event.shiftKey);
         }
         return false;     // prevent default menu
       }
@@ -440,35 +450,53 @@
           this.orders = [];
           this.id = IDUnit;
           IDUnit += 1;
+          if (this.type == 'soldier') {
+            this.speed = 3;
+          } else {
+            throw "Unknown type for Unit";
+          }
+          this.speed_counter = this.speed;
         }
         
-        order(o) {
+        order(o, add) {
+          if (!add) {
+            this.orders.length = 0;
+          }
           this.orders.push(o);
         }
         
         update() {
-          if (this.orders.length > 0) {
-            console.log('cleaning', this.row, this.col);
-            g.units[this.row][this.col] = 0;
+          if (this.speed_counter == 0 && this.orders.length > 0) {
+            let new_row = this.row;
+            let new_col = this.col;
             let o = this.orders[0];
             if (o.type == 'move') {
               console.log('I am unit', this.id, 'and I am moving');
               if (o.row > this.row) {
-                this.row += 1;
+                new_row += 1;
               } else if (o.row < this.row) {
-                this.row -= 1;
+                new_row -= 1;
               }
               if (o.col > this.col) {
-                this.col += 1;
+                new_col += 1;
               } else if (o.col < this.col) {
-                this.col -= 1;
+                new_col -= 1;
               }
-              if (o.row == this.row && o.col == this.col) {
-                this.orders.shift();
+              if (g.units[new_row][new_col] == 0 && pass_matrix[new_row][new_col]) {
+                console.log('cleaning', this.row, this.col);
+                g.units[this.row][this.col] = 0;
+                this.row = new_row;
+                this.col = new_col;
+                g.units[this.row][this.col] = this;
+                console.log('setting', this.id, 'at', this.row, this.col);
+                if (o.row == this.row && o.col == this.col) {
+                  this.orders.shift();
+                }
+                this.speed_counter = this.speed;
               }
             }
-            console.log('setting', this.id, 'at', this.row, this.col);
-            g.units[this.row][this.col] = this;
+          } else if (this.speed_counter > 0) {
+            this.speed_counter -= 1;
           }
           //console.log(this.life);
         }
@@ -510,6 +538,7 @@
       };
       
       var trans_matrix = [];
+      var pass_matrix = [];
       
       function transition_one(trow, tcol) {
         let calc = 0;
@@ -569,6 +598,9 @@
           }
         }
         trans_matrix[trow][tcol] = cal.join('');
+        if (center > 0) {
+          pass_matrix[trow][tcol] = true;
+        }
         /*
         var EAST = 0b0010;
         if (calc & EAST) {
@@ -587,8 +619,10 @@
         // Prepare trans_matrix
         for (let row = 0; row < MAP_MAX_ROW; row++) {
           trans_matrix[row] = [];
+          pass_matrix[row] = [];
           for (let col=0; col < MAP_MAX_COL; col++) {
             trans_matrix[row][col] = 0;
+            pass_matrix[row][col] = false;
           }
         }
         // Do transitions
