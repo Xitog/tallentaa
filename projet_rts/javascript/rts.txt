@@ -1,0 +1,63 @@
+@startuml
+
+namespace Core #EEEEEE {
+    
+    class Map {
+        -name : String
+        -content : Integer[][]
+    }
+    
+    class Game {
+        -name : String
+    }
+    Game --> "1" Map : map
+    Game "1" -- "*" Player : players >
+    Game "1" -- "*" Unit : units >
+    
+    class Order {
+        -type : String
+        -row : Integer
+        -col : Integer
+    }
+    
+    class Unit {
+        {static} IDUnit
+        -id : Integer
+        -type : String
+        -row : Integer
+        -col : Integer
+        -selected : Boolean
+        -life : Integer
+    }
+    Unit --> "1" Player : player
+    Unit "1" -- "*" Order : orders
+    
+    class Player {
+        -name : String
+        -color : Color
+        -row : Integer
+        -col : Integer
+    }
+    
+}
+
+namespace Graphics #EFEFEF {
+
+    class Camera {
+        -row : Integer
+        -col : Integer
+    }
+    Camera --> "1" Core.Player : player >
+    Camera --> "1" Minimap : minimap >
+
+    class Minimap {
+        -show : Boolean
+        -size : Integer
+        -x : Integer
+        -y : Integer
+        -max_x : Integer
+        -max_y : Integer
+    }
+    
+}
+@enduml
