@@ -1,6 +1,14 @@
 @startuml
 
-namespace Core #EEEEEE {
+skinparam Class {
+    BorderColor DodgerBlue
+    BackgroundColor GhostWhite
+    ArrowColor DodgerBlue
+}
+skinparam StereotypeCBackgroundColor GhostWhite
+skinparam StereotypeCBorderColor DodgerBlue
+
+namespace Core #f5fffa {
     
     class Map {
         -name : String
@@ -16,18 +24,25 @@ namespace Core #EEEEEE {
     
     class Order {
         -type : String
-        -row : Integer
-        -col : Integer
+        -row : UInt
+        -col : UInt
     }
     
     class Unit {
         {static} IDUnit
-        -id : Integer
+        -id : UInt
         -type : String
-        -row : Integer
-        -col : Integer
+        -row : UInt
+        -col : UInt
         -selected : Boolean
-        -life : Integer
+        -life : UInt
+        -width : UInt
+        -height : UInt
+        -mod_x : Integer
+        -mod_y : Integer
+        -order_start_row_mod : Integer
+        -order_start_col_mod : Integer
+        -available_orders : String[]
     }
     Unit --> "1" Player : player
     Unit "1" -- "*" Order : orders
@@ -35,13 +50,14 @@ namespace Core #EEEEEE {
     class Player {
         -name : String
         -color : Color
-        -row : Integer
-        -col : Integer
+        -row : UInt
+        -col : UInt
     }
+    Player --> "1" Game : game
     
 }
 
-namespace Graphics #EFEFEF {
+namespace Graphics #f5fffa {
 
     class Camera {
         -row : Integer
@@ -53,11 +69,14 @@ namespace Graphics #EFEFEF {
     class Minimap {
         -show : Boolean
         -size : Integer
-        -x : Integer
-        -y : Integer
-        -max_x : Integer
-        -max_y : Integer
+        -x : UInt
+        -y : UInt
+        -max_x : UInt
+        -max_y : UInt
     }
     
 }
+
+hide methods
+
 @enduml
