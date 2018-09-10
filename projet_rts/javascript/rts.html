@@ -173,7 +173,7 @@
           'available_orders': ['move'],
         },
         'generator' : {
-          'speed' : 0,
+          'speed' : 100,
           'width' : 1,
           'height' : 1,
           'mod_x' : 0,
@@ -285,7 +285,49 @@
         }
       }
       
+      var ENERGY_INCREASE_BY_TURN = 20;
+      var MASS_INCREASE_BY_TURN = 10;
+      
+      //in game : ressources[][] = {} (entre 1=10 et 0.1=1)
+      
       class Building extends Unit {
+      }
+      
+      class Turret extends Building {
+        update() {
+          if (this.speed_counter == 0 && this.orders.length > 0) {
+            let o = this.orders[0];
+            if (o.type == 'attack') {
+              this.attack(o.target);
+            } else {
+              throw 'Incorrect order for Turret';
+            }
+            this.speed_counter = this.speed;
+          }
+          if (this.speed_counter > 0) {
+            this.speed_counter -= 1;
+          }
+          if (this.orders.length == 0) {
+            // detect enemy. if there is someone give an order of attack.
+            for (let row = this.row - this.range; row < this.row + this.range; row++) {
+              for (let col = this.col - this.range; col < this.col + this.range; col++) {
+                if (row > 0 && col > 0 && row < MAP_MAX_ROW && col < MAP_MAX_COL) {
+                  let u = this.player.game.units[row][col];
+                  if (u.player != this.player) {
+                    this.order(new Order('attack', u));
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      class UnitCreator extends Building {
+        
+        //this.creation_order = []
+        //Quand l'unité sort, on fait une copie de la liste de la liste d'ordre du bâtiment :
+        //Array.from(a);
         
         update() {
           if (this.orders.length > 0) {
@@ -305,7 +347,22 @@
             }
           }
         }
-        
+      }
+      
+      class RessourceProductor extends Building {
+        update() {
+          if (this.speed_counter == 0) {
+            if (this.type == 'generator') {
+              this.player.energy += ENERGY_INCREASE_BY_TURN;
+            } else if (this.type == 'extractor') {
+              this.player.mass += this.player.game.ressources[this.row][this.col] * MASS_INCREASE_BY_TURN;
+            }
+            this.speed_counter = this.speed;
+          }
+          if (this.speed_counter > 0) {
+            this.speed_counter -= 1;
+          }
+        }
       }
       
       //const u = new Unit(5, 5);
@@ -324,6 +381,8 @@
           this.color = color;
           this.row = row;
           this.col = col;
+          this.energy = 0;
+          this.mass = 0;
         }
       }
       
@@ -354,7 +413,11 @@
         
         create_building(player, type, row, col) {
           player = this.players[player];
-          new Building(player, type, row, col);
+          if (type == 'barrack') {
+            new UnitCreator(player, type, row, col);
+          } else if (type == 'generator') {
+            new RessourceProductor(player, type, row, col);
+          }
         }
       }
       
@@ -631,8 +694,8 @@
             // Info on unit
             ctx.font = '10px arial';
             ctx.fillStyle = 'rgb(255, 242, 0)';
-            ctx.fillText('Counter: ' + u.creation_counter, 10, 20);
-            ctx.fillText('Ordres: ' + u.orders.length, 10, 30);
+            ctx.fillText('Counter: ' + u.creation_counter, 10, 30);
+            ctx.fillText('Ordres: ' + u.orders.length, 10, 40);
           }
           // Mouse
           if (mouse_map_col != -1 || mouse_map_row != -1) {
@@ -642,7 +705,8 @@
           // Info on player
           ctx.font = '10px arial';
           ctx.fillStyle = 'rgb(255, 242, 0)';
-          ctx.fillText('22', 10, 10);
+          ctx.fillText('Energy: ' + camera.player.energy, 10, 10);
+          ctx.fillText('Mass: ' + camera.player.mass, 10, 20);
         } else {
           alert("Your browser must support canvas to play.");
         }

@@ -52,6 +52,8 @@ namespace Core #f5fffa {
         -color : Color
         -row : UInt
         -col : UInt
+        -mass : UInt
+        -energy : UInt
     }
     Player --> "1" Game : game
     
