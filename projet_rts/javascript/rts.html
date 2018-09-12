@@ -108,7 +108,7 @@
       const MAP_MAX_ROW = 32;
       
       const ENERGY_INCREASE_BY_TURN = 20;
-      const MASS_INCREASE_BY_TURN = 10;
+      const MATTER_INCREASE_BY_TURN = 10;
       
       //-----------------------------------------------------------------------
       // Core : Data model
@@ -189,6 +189,10 @@
           'creation_time' : 150,
           'available_orders': [Move, Attack],
           'max_life' : 50,
+          'cost' : {
+            'energy' : 20,
+            'matter' : 10,
+          }
         },
         'barrack' : {
           'speed' : 0,
@@ -200,6 +204,10 @@
           'order_start_col_mod' : 1,
           'available_orders': [Move, Attack, CreateSoldier, CreateScout, CreateBuilder],
           'max_life' : 300,
+          'cost' : {
+            'energy' : 20,
+            'matter' : 10,
+          }
         },
         'generator' : {
           'speed' : 100,
@@ -211,6 +219,10 @@
           'order_start_col_mod' : 1,
           'available_orders': [],
           'max_life' : 100,
+          'cost' : {
+            'energy' : 20,
+            'matter' : 10,
+          }
         }
       };
       
@@ -222,7 +234,6 @@
           this.type = type;
           this.row = row;
           this.col = col;
-          this.selected = false;
           this.orders = [];
           this.id = IDUnit;
           IDUnit += 1;
@@ -311,6 +322,87 @@
       
       //in game : ressources[][] = {} (entre 1=10 et 0.1=1)
       
+      class Group {
+        constructor(player) {
+          this.content = [];
+          this.is_building = false;
+          this.is_friendly = false;
+          this.player = player;
+          this.index = 0;
+        }
+        
+        get length() {
+          return this.content.length;
+        }
+        
+        get first() {
+          if (this.content.length > 0) {
+            return this.content[0];
+          } else {
+            throw "Content empty";
+          }
+        }
+        
+        copy() {
+          let g = new Group(this.player);
+          g.content = Array.from(this.content);
+          g.is_building = this.is_building;
+          g.is_friendly = this.is_friendly;
+          return g;
+        }
+        
+        includes(u) {
+          return this.content.includes(u);
+        }
+        
+        [Symbol.iterator]() {
+          return {
+            next: () => {
+              if (this.index < this.content.length) {
+                return {
+                  value: this.content[this.index++],
+                  done: false
+                };
+              } else {
+                this.index = 0; 
+                return {
+                  done: true
+                };
+              }
+            }
+          }
+        }
+        
+        clear() {
+          this.content.length = 0;
+          this.is_building = false;
+          this.is_friendly = false;
+        }
+        
+        // add an unit to a group
+        // if adding is true, the unit is added if the rules are respected
+        // if adding is false, the group is cleared and the unit is added
+        add(u, adding) {
+          if (!adding) {
+            this.clear();
+          }
+          if (this.content.length > 0) {
+            // rules
+            // if we are building, we only add if u is building, of same type, of our player
+            if (this.is_building && u instanceof Building && this.content[0].type == u.type && u.player == this.player) {
+              this.content.push(u);
+            // if we are not building, we only add if u is not a building, of our player, and we are a friendly group
+            } else if (!this.is_building && !(u instanceof Building) && u.player == this.player && this.is_friendly) {
+              this.content.push(u);
+            }
+          } else {
+            this.is_friendly = (this.player == u.player);
+            this.is_building = (u instanceof Building);
+            this.content.push(u);
+          }
+        }
+      }
+      
       class Building extends Unit {
       }
       
@@ -376,7 +468,7 @@
             if (this.type == 'generator') {
               this.player.energy += ENERGY_INCREASE_BY_TURN;
             } else if (this.type == 'extractor') {
-              this.player.mass += this.player.game.ressources[this.row][this.col] * MASS_INCREASE_BY_TURN;
+              this.player.matter += this.player.game.ressources[this.row][this.col] * MATTER_INCREASE_BY_TURN;
             }
             this.speed_counter = this.speed;
           }
@@ -394,7 +486,7 @@
           this.row = row;
           this.col = col;
           this.energy = 0;
-          this.mass = 0;
+          this.matter = 0;
         }
       }
       
@@ -568,7 +660,7 @@
         }
         
         draw(ctx) {
-          if (selected.length > 0 && selected[0].player == camera.player) {
+          if (camera.selected.length > 0 && camera.selected.is_friendly) {
             // Background
             ctx.fillStyle = 'rgb(30, 30, 30)';
             ctx.fillRect(this.x, this.y, this.width, this.height);
@@ -576,41 +668,44 @@
             ctx.strokeStyle = 'rgb(255, 242, 0)';
             ctx.strokeRect(this.x, this.y, this.width, this.height);
             // Available Orders (auto)
-            ctx.drawImage(textures['Move'], this.x, this.y);
-            ctx.drawImage(textures['Attack'], this.x + 32, this.y);
-            let draw_barrack_orders = false;
-            for (let u of selected) {
-              if (u.type == 'barrack') {
-                draw_barrack_orders = true;
+            if (!camera.selected.is_building) {
+              ctx.drawImage(textures['Move'], this.x, this.y);
+              ctx.drawImage(textures['Attack'], this.x + 32, this.y);
+            } else {
+              if (camera.selected.first.type == 'barrack') {
+                ctx.strokeStyle = 'rgb(0, 128, 0)';
+                ctx.strokeRect(this.x, this.y + 32, this.width / 2, 1);
+                ctx.drawImage(textures['CreateSoldier'], this.x, this.y + 32);
+                ctx.drawImage(textures['CreateScout'], this.x + 32, this.y + 32);
+                ctx.drawImage(textures['CreateBuilder'], this.x + 64, this.y + 32);
               }
             }
-            if (draw_barrack_orders) {
-              ctx.drawImage(textures['CreateSoldier'], this.x + 64, this.y);
-              ctx.drawImage(textures['CreateScout'], this.x + 96, this.y);
-              ctx.drawImage(textures['CreateBuilder'], this.x + 128, this.y);
-            }
             // Info on unit
-            if (selected.length == 1 && selected[0].type == 'barrack') {
+            if (camera.selected.length == 1 && camera.selected.first.type == 'barrack') {
                 ctx.font = '10px arial';
                 ctx.fillStyle = 'rgb(255, 242, 0)';
-                ctx.fillText('Counter: ' + selected[0].creation_counter, 10, 30);
-                ctx.fillText('Ordres: ' + selected[0].orders.length, 10, 40);
+                ctx.fillText('Counter: ' + camera.selected.first.creation_counter, 10, 30);
+                ctx.fillText('Ordres: ' + camera.selected.first.orders.length, 10, 40);
             }
           }
         }
         
         click(mouse_col, mouse_row) {
-          let pos = Math.floor(mouse_col / 32);
-          if (pos == 2) {
-            // warning should be guarded
-            for(let u of selected) {
-              u.order(new CreateSoldier(), true);
+          let row = CAM_MAX_ROW - Math.floor(mouse_row / 32);
+          let col = Math.floor(mouse_col / 32);
+          if (camera.selected.length == 1 && camera.selected.first.type == 'barrack') {
+            if (row == 1 && col == 0) {
+              for(let u of camera.selected) {
+                camera.player.energy -= UNIT_DEFINITIONS['soldier']['cost']['energy'];
+                camera.player.matter -= UNIT_DEFINITIONS['soldier']['cost']['matter'];
+                u.order(new CreateSoldier(), true);
+              }
             }
           }
         }
         
-        inside(x, y) {
-          return (y >= this.y && x <= this.width);
+        inside(mouse_col, mouse_row) {
+          return (mouse_row >= this.y && mouse_col <= this.width);
         }
       }
       
@@ -680,6 +775,18 @@
           this.menu = new Menu();
           this.row = player.row;
           this.col = player.col;
+          this.selected = new Group(this.player);
+          this.prev_selected = null;
+        }
+        
+        save_selection() {
+          this.prev_selected = this.selected.copy();
+        }
+      
+        restore_selection() {
+          if (this.prev_selected) {
+            this.selected = this.prev_selected;
+          }
         }
       }
       var camera = new Camera(game.players['Sarah']);
@@ -733,7 +840,7 @@
         ctx.arc(posx, posy, 10, 0, 2 * Math.PI);
         ctx.fill();
         // Circle of selection
-        if (u.selected) {
+        if (camera.selected.includes(u)) {
           if (u.player == camera.player) {
             ctx.strokeStyle = 'rgb(0, 255, 0)';
           } else {
@@ -757,7 +864,7 @@
         let posx = (u.col - camera.col) * 32 + u.mod_x;
         let posy = (u.row - camera.row) * 32 + u.mod_y;
         // Draw Building
-        if (u.selected) {
+        if (camera.selected.includes(u)) {
           ctx.drawImage(textures[u.type + "_selected"], posx, posy);
         } else {
           ctx.drawImage(textures[u.type], posx, posy);
@@ -795,7 +902,7 @@
             }
           }
           // orders
-          for (let u of selected) {
+          for (let u of camera.selected) {
             if (u.orders.length > 0 && u.player == camera.player) {
               let start_col = (u.col + u.order_start_col_mod - camera.col) * 32 + 16;
               let start_row = (u.row + u.order_start_row_mod - camera.row) * 32 + 16;
@@ -836,7 +943,7 @@
           ctx.font = '10px arial';
           ctx.fillStyle = 'rgb(255, 242, 0)';
           ctx.fillText('Energy: ' + camera.player.energy, 10, 10);
-          ctx.fillText('Mass: ' + camera.player.mass, 10, 20);
+          ctx.fillText('Matter: ' + camera.player.matter, 10, 20);
         } else {
           alert("Your browser must support canvas to play.");
         }
@@ -854,11 +961,6 @@
       const KEY_LEFT = 37;
       const KEY_BACKSPACE = 8;
       const KEY_M = 77;
-      
-      // Variables
-      
-      var selected = [];
-      var prev_selected = null;
       
       // Functions
       
@@ -890,56 +992,23 @@
       var clicked = false;
       var iTimer;
       
-      function unselect() {
-        for (let o of selected) {
-          console.log('unselecting unit:', o.id);
-          o.selected = false;
-        }
-        selected.length = 0;
-      }
-      
-      function select(u) {
-        u.selected = true;
-        selected.push(u);
-      }
-      
-      function save_selection() {
-        prev_selected = Array.from(selected);
-      }
-      
-      function restore_selection() {
-        console.log(prev_selected);
-        if (prev_selected) {
-          unselect();
-          for (let u of prev_selected) {
-            select(u);
-          }
-        }
-      }
-      
       function on_mouse_left_click(event) {
         if (camera.menu.inside(mouse_col, mouse_row)) {
           camera.menu.click(mouse_col, mouse_row);
           return false;
         }
         if (event.button == 0) {
-          if (event.ctrlKey) {
-            console.log('Ctrl + Left Click');
-          } else {
-            console.log('Left Click');
-          }
-          console.log('row', mouse_map_row, 'col', mouse_map_col,);
+          console.log('row', mouse_map_row, 'col', mouse_map_col);
           // unselected current group (do that only if there is an unit to hold the selection)
           if (!event.ctrlKey) {
-            save_selection();
-            unselect();
+            camera.save_selection();
+            camera.selected.clear();
           }
           // select
-          let u = game.units[mouse_map_row][mouse_map_col];
-          if (u != 0) {
-            if (!event.ctrlKey || (event.ctrlKey && u.player == camera.player)) { // with ctrl you can only add your unit
-              console.log('selecting unit:', u.id);
-              select(u);
+          if (mouse_map_row >= 0 && mouse_map_row < MAP_MAX_ROW && mouse_map_col >= 0 && mouse_map_col < MAP_MAX_COL) {
+            let u = game.units[mouse_map_row][mouse_map_col];
+            if (u) {
+              camera.selected.add(u, event.ctrlKey);
             }
           }
         }
@@ -963,7 +1032,7 @@
         }
         event = window.event || event;
         console.log("Right click");
-        for (let u of selected) {
+        for (let u of camera.selected) {
           if (u.player == camera.player) {
             console.log("Sending order move to unit", u.id, 'to', 'row', mouse_map_row, 'col', mouse_map_col);
             if (u.available_orders.includes(Move)) {
@@ -985,7 +1054,7 @@
         } else if (event.keyCode == KEY_LEFT) {
           scroll_right = false;
         } else if (event.keyCode == KEY_BACKSPACE) {
-          restore_selection();
+          camera.restore_selection();
         } else if (event.keyCode == KEY_M) {
           camera.minimap.show = !camera.minimap.show;
         } else {
@@ -1084,18 +1153,6 @@
         if (center > 0) {
           pass_matrix[trow][tcol] = true;
         }
-        /*
-        var EAST = 0b0010;
-        if (calc & EAST) {
-          trans_matrix[trow][tcol] = 82;
-        //if (calc == 82 || calc == 86 || calc == 2) {
-        //  trans_matrix[trow][tcol] = calc;
-        } else {
-          
-        }
-        console.log('row=', trow, 'col=', tcol, 'center=', map[trow][tcol], 'calculated=', calc);
-        //console.log(pow);
-        */
       }
       
       function make_transition() {
