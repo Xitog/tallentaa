@@ -141,10 +141,10 @@
         }
       }
       
-      class BuildingOrder extends Order {
+      class CreateOrder extends Order {
       }
       
-      class CreateSoldier extends BuildingOrder {
+      class CreateSoldier extends CreateOrder {
         constructor() {
           super();
           this.creation = 'soldier';
@@ -152,7 +152,7 @@
         }
       }
       
-      class CreateScout extends BuildingOrder {
+      class CreateScout extends CreateOrder {
         constructor() {
           super();
           this.creation = 'scout';
@@ -160,7 +160,7 @@
         }
       }
       
-      class CreateBuilder extends BuildingOrder {
+      class CreateBuilder extends CreateOrder {
         constructor() {
           super();
           this.creation = 'builder';
@@ -407,6 +407,7 @@
       }
       
       class Turret extends Building {
+        
         update() {
           if (this.speed_counter == 0 && this.orders.length > 0) {
             let o = this.orders[0];
@@ -438,26 +439,42 @@
       
       class UnitCreator extends Building {
         
-        //this.creation_order = []
-        //Quand l'unité sort, on fait une copie de la liste de la liste d'ordre du bâtiment :
-        //Array.from(a);
+        constructor(player, type, row, col) {
+            super(player, type, row, col);
+            this.creation_orders = [];
+        }
+        
+        order(o, add) {
+          if (o instanceof CreateOrder) {
+            // auto add
+            this.creation_orders.push(o);
+          } else {
+            if (!add) {
+              this.orders.length = 0;
+            }
+            this.orders.push(o);
+          }
+        }
         
         update() {
-          if (this.orders.length > 0) {
-            let o = this.orders[0];
-            if (this.creation_counter == -1) {
+          if (this.creation_orders.length > 0) {
+            let o = this.creation_orders[0];
+            if (this.creation_counter == -1) { // Ready to create, taking the order into account
               if (o instanceof CreateSoldier) {
                 this.creation_counter = UNIT_DEFINITIONS['soldier']['creation_time'];
               }
-            } else if (this.creation_counter > 0) {
+            } else if (this.creation_counter > 0) { // Order taken into account, creating...
               this.creation_counter -= 1;
-            } else if (this.creation_counter == 0) {
+            } else if (this.creation_counter == 0) { // Creation finished
               if (o instanceof CreateSoldier) {
-                new Unit(this.player, 'soldier', this.row + this.order_start_row_mod, this.col + this.order_start_col_mod);
-                this.orders.shift();
+                let u = new Unit(this.player, 'soldier', this.row + this.order_start_row_mod, this.col + this.order_start_col_mod);
+                u.orders = Array.from(this.orders);
+                this.creation_orders.shift();
                 this.creation_counter = -1;
               }
             }
+          } else if (this.creation_counter == 0) {
+            throw "Incorrect state for UnitCreator: creation_counter at 0 and no order, what to create?";
           }
         }
       }
@@ -684,8 +701,9 @@
             if (camera.selected.length == 1 && camera.selected.first.type == 'barrack') {
                 ctx.font = '10px arial';
                 ctx.fillStyle = 'rgb(255, 242, 0)';
-                ctx.fillText('Counter: ' + camera.selected.first.creation_counter, 10, 30);
-                ctx.fillText('Ordres: ' + camera.selected.first.orders.length, 10, 40);
+                ctx.fillText('Orders: ' + camera.selected.first.orders.length, this.x + 170, this.y + 10);
+                ctx.fillText('Creation orders: ' + camera.selected.first.creation_orders.length, this.x + 170, this.y + 20);
+                ctx.fillText('Counter: ' + camera.selected.first.creation_counter, this.x + 170, this.y + 30);
             }
           }
         }
