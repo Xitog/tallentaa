@@ -36,6 +36,8 @@
     <!-- Buildings -->
     <img class="shadow" id="barrack" src="graphics/buildings/barrack.png">
     <img class="shadow" id="barrack_selected" src="graphics/buildings/barrack_selected.png">
+    <img class="shadow" id="factory" src="graphics/buildings/factory.png">
+    <img class="shadow" id="factory_selected" src="graphics/buildings/factory_selected.png">
     <img class="shadow" id="generator" src="graphics/buildings/generator.png">
     <img class="shadow" id="generator_selected" src="graphics/buildings/generator_selected.png">
     <!-- Water to Earth transitions W E | N E S W -->
@@ -173,12 +175,16 @@
       var UNIT_DEFINITIONS = {
         'all' : [
           'barrack',
+          'factory',
           'generator',
+          'extractor',
           'soldier',
         ],
         'buildings' : [
           'barrack',
+          'factory',
           'generator',
+          'extractor',
         ],
         'soldier' : {
           'speed' : 3,
@@ -209,7 +215,37 @@
             'matter' : 10,
           }
         },
+        'factory' : {
+          'speed' : 0,
+          'width' : 3,
+          'height' : 3,
+          'mod_x' : 0,
+          'mod_y' : 0,
+          'order_start_row_mod' : 3,
+          'order_start_col_mod' : 1,
+          'available_orders': [Move, Attack, CreateSoldier, CreateScout, CreateBuilder],
+          'max_life' : 450,
+          'cost' : {
+            'energy' : 40,
+            'matter' : 20,
+          }
+        },
         'generator' : {
+          'speed' : 100,
+          'width' : 1,
+          'height' : 1,
+          'mod_x' : 0,
+          'mod_y' : -32,
+          'order_start_row_mod' : 3,
+          'order_start_col_mod' : 1,
+          'available_orders': [],
+          'max_life' : 100,
+          'cost' : {
+            'energy' : 20,
+            'matter' : 10,
+          }
+        },
+        'extractor' : {
           'speed' : 100,
           'width' : 1,
           'height' : 1,
@@ -263,6 +299,9 @@
             }
           }
           this.player.game.all_units.push(this);
+        }
+        
+        menu_order(row, col) {
         }
         
         order(o, add) {
@@ -440,8 +479,18 @@
       class UnitCreator extends Building {
         
         constructor(player, type, row, col) {
-            super(player, type, row, col);
-            this.creation_orders = [];
+          super(player, type, row, col);
+          this.creation_orders = [];
+        }
+        
+        menu_order(row, col) {
+          if (this.type == 'barrack') {
+            if (row == 1 && col == 0) {
+              this.player.energy -= UNIT_DEFINITIONS['soldier']['cost']['energy'];
+              this.player.matter -= UNIT_DEFINITIONS['soldier']['cost']['matter'];
+              this.order(new CreateSoldier(), true);
+            }
+          }
         }
         
         order(o, add) {
@@ -534,9 +583,9 @@
         
         create_building(player, type, row, col) {
           player = this.players[player];
-          if (type == 'barrack') {
+          if (type == 'barrack' || type == 'factory') {
             new UnitCreator(player, type, row, col);
-          } else if (type == 'generator') {
+          } else if (type == 'generator' || type == 'extractor') {
             new RessourceProductor(player, type, row, col);
           }
         }
@@ -621,6 +670,7 @@
       game.create_unit('Tom', 'soldier', 10, 6);
       game.create_building('Sarah', 'barrack', 17, 18);
       game.create_building('Sarah', 'generator', 23, 16);
+      game.create_building('Sarah', 'factory', 18, 5);
       
       //-----------------------------------------------------------------------
       // Graphisme
@@ -698,7 +748,7 @@
               }
             }
             // Info on unit
-            if (camera.selected.length == 1 && camera.selected.first.type == 'barrack') {
+            if (camera.selected.length == 1 && camera.selected.first instanceof UnitCreator) {
                 ctx.font = '10px arial';
                 ctx.fillStyle = 'rgb(255, 242, 0)';
                 ctx.fillText('Orders: ' + camera.selected.first.orders.length, this.x + 170, this.y + 10);
@@ -711,14 +761,8 @@
         click(mouse_col, mouse_row) {
           let row = CAM_MAX_ROW - Math.floor(mouse_row / 32);
           let col = Math.floor(mouse_col / 32);
-          if (camera.selected.length == 1 && camera.selected.first.type == 'barrack') {
-            if (row == 1 && col == 0) {
-              for(let u of camera.selected) {
-                camera.player.energy -= UNIT_DEFINITIONS['soldier']['cost']['energy'];
-                camera.player.matter -= UNIT_DEFINITIONS['soldier']['cost']['matter'];
-                u.order(new CreateSoldier(), true);
-              }
-            }
+          for (let u of camera.selected) {
+            u.menu_order(row, col);
           }
         }
         
