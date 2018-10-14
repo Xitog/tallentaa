@@ -29,7 +29,6 @@ LIB = $(PellesCDir)\Lib\Win;$(PellesCDir)\Lib;..\..\librairies\SDL_1_2_15\lib#
 # 
 woolfy.exe: \
 	output\flat.obj \
-	output\flat_final_nogrid.obj \
 	output\main.obj \
 	output\minisdl.obj \
 	output\oldcode.obj \

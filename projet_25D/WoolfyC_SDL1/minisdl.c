@@ -100,7 +100,7 @@ void fill_audio(void *udata, Uint8 *stream, int len) {
     audio_len -= len;
 }
 
-int load_wav(char * path) {
+int load_wav(const char * path) {
     if(SDL_LoadWAV(path, &audiospec, &audio_chunk, &audio_len) == NULL ){
       fprintf(stderr, "Could not open audio file: %s\n", SDL_GetError());
       exit(-1);
@@ -417,7 +417,7 @@ void rectangle(int x1, int y1, int x2, int y2, Uint32 color, bool filled) {
     }
 }
 
-SDL_Surface * load_bmp(char * file_path) {
+SDL_Surface * load_bmp(const char * file_path) {
     if (not file_exist(file_path)) {
         printf("[ERROR] File not found: %s\n", file_path);
         return NULL;
@@ -428,6 +428,15 @@ SDL_Surface * load_bmp(char * file_path) {
     return my_bitmap_conv;
 }
 
-bool file_exist(char * file) {
+bool file_exist(const char * file) {
     return  (_access(file, 0) != -1);
+}
+
+void blit(int x, int y, SDL_Surface * surf) {
+    SDL_Rect rect;
+    rect.x = x;
+    rect.y = y;
+    rect.w = surf->w;
+    rect.h = surf->h;
+    SDL_BlitSurface(surf, NULL, screen, &rect);
 }

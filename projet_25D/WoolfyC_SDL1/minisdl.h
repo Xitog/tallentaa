@@ -101,7 +101,7 @@ extern SDL_Event event;
 
 int init(char * title, int width, int height, int color, bool fullscreen);
 int init_audio(int freq, Uint16 format, Uint8 channels, Uint16 samples);
-int load_wav(char * path);
+int load_wav(const char * path);
 void play_wav(void);
 void stop_audio(void);
 void display_info_on_surface(SDL_Surface * surf);
@@ -116,7 +116,8 @@ void horizontal(int y, int x1, int x2, Uint32 color);
 void circle(int x, int y, int radius, Uint32 color);
 void disk(int x, int y, int radius, Uint32 color);
 void rectangle(int x1, int y1, int x2, int y2, Uint32 color, bool filled);
-SDL_Surface * load_bmp(char * file_path);
-bool file_exist(char * file);
+SDL_Surface * load_bmp(const char * file_path);
+bool file_exist(const char * file);
+void blit(int x, int y, SDL_Surface * surf);
 
 #endif

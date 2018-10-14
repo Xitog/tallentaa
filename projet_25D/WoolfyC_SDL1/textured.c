@@ -599,6 +599,10 @@ int main(int argc, char * argv[]) {
 #ifdef FOG
                 double xdist = sqrt(pow(currentFloorX - player_x, 2)+pow(currentFloorY - player_y, 2));
                 fog_factor = 0.0;
+                /* Vieux code alternatif
+                if (currentDist * weight < MAX_FOG) {
+                    fog_factor = 1 - currentDist * weight / MAX_FOG;
+                }*/
                 if (xdist < MAX_FOG) {
                     fog_factor = 1 - xdist / MAX_FOG;
                 }
