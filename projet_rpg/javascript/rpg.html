@@ -27,13 +27,12 @@
   </head>
   <body onload="start();">
     <canvas id="screen" width="960" height="800">Your browser must support canvas to play.</canvas>
+    <img class="shadow" id="black" src="graphics/black.png">
     <img class="shadow" id="grey" src="graphics/grey.png">
-    <!--<img class="shadow" id="black" src="graphics/black.png">-->
     <img class="shadow" id="brown" src="graphics/brown.png">
     <img class="shadow" id="darkblue" src="graphics/darkblue.png">
     <img class="shadow" id="blue" src="graphics/blue.png">
     <img class="shadow" id="green" src="graphics/green.png">
-    <img class="shadow" id="grey" src="graphics/grey.png">
     <img class="shadow" id="lemongreen" src="graphics/lemongreen.png">
     <img class="shadow" id="lightpurple" src="graphics/lightpurple.png">
     <img class="shadow" id="orange" src="graphics/orange.png">
@@ -68,22 +67,30 @@
       const NONE = 0;
       const VERTICAL = 1;
       const HORIZONTAL = 2;
-      const MIN_DIV = 3;
+      const MIN_SIZE = 5;
       const MAX_DIVISION = 4;
+      
+      const EMPTY_TEXTURE = 0;
+      const PLAIN_TEXTURE = 1;
+      const MIN_TEXTURE = 2;
       
       var map = [];
       var textures = [];
-      var color_index = 5;
+      var color_index = 1;
       
       function get_color() {
         let res = color_index;
         color_index += 1;
         if (color_index == textures.length) {
-          color_index = 0;
+          color_index = MIN_TEXTURE;
         }
-        console.log("color = " + res + " / " + textures.length);
+        //console.log("color = " + res + " / " + textures.length);
         return res;
       }
+      
+      const EMPTY = 0;
+      var ROOM_ID = 1;
+      var ROOMS = {};
       
       // 2 essais : Lua (1er) Python (2e)
       class Room {
@@ -93,25 +100,41 @@
           this.y = y;
           this.w = width; // col max
           this.h = height; // row max
+          this.tx = null;
+          this.ty = null;
+          this.tw = null;
+          this.th = null;
           this.color = get_color();
-          //this.hole = NONE;
+          this.hole = null;
           this.parent = parent;
           if (this.parent == null) {
             this.level = 0;
           } else {
             this.level = this.parent.level + 1;
           }
+          this.id = ROOM_ID;
+          ROOM_ID += 1;
+          ROOMS[this.id] = this;
           this.div = 0;
           this.top = null;
           this.bottom = null;
           this.left = null;
           this.right = null;
-          console.log("  ".repeat(this.level) + "Creating room x=" + x + " y=" + y + " width/colmax=" + width + " height/rowmax=" + height + " on map col=" + map[0].length + " row=" + map.length);
+          this.sibling = null;
+          console.log("  ".repeat(this.level) + "Creating room @" + this.id + " x=" + x + " y=" + y + " width/colmax=" + width + " height/rowmax=" + height + " on map col=" + map[0].length + " row=" + map.length);
         }
         
         has_child() {
           return (this.div != 0);
           //return (!(this.top == null && this.bottom == null && this.left == null && this.right == null));
+        }
+        
+        vertical() {
+          return (this.parent.left != null);
+        }
+        
+        horizontal() {
+          return (this.parent.top != null);
         }
         
         first() {
@@ -147,7 +170,7 @@
             length = this.h;
             intent = HORIZONTAL;
           }
-          if (length > MIN_DIV * 2 + 1) {
+          if (length > MIN_SIZE * 2 + 1) {
             if (length & 1) { // odd
               // 0 1 2 3 4 5 6 7 8 => 9
               // length / 2 = 4, possible = 3, 4, 5 soit -1, 0, 1
@@ -161,9 +184,13 @@
             if (intent == VERTICAL) {
               this.left = new Room(map, this, this.x, this.y, this.div, this.h);
               this.right = new Room(map, this, this.x + this.div, this.y, this.w - this.div, this.h);
+              this.left.sibling = this.right;
+              this.right.sibling = this.left;
             } else {
               this.top = new Room(map, this, this.x, this.y, this.w, this.div);
               this.bottom = new Room(map, this, this.x, this.y + this.div, this.w, this.h - this.div);
+              this.top.sibling = this.bottom;
+              this.bottom.sibling = this.top;
             }
             // Divide
             if (times - 1 > 0) {
@@ -173,17 +200,70 @@
           }
         }
         
+        dig() {
+          if (this.has_child()) {
+            this.first().dig();
+            this.second().dig();
+          } else {
+            if (this.w - 2 < MIN_SIZE) {
+              this.tw = this.w;
+              this.tx = this.x;
+              //throw "width " + this.w + " is too small!";
+            } else {
+              this.tw = getRandomIntInclusive(MIN_SIZE, this.w - 2);
+              this.tx = this.x + getRandomIntInclusive(0, this.w - 2 - this.tw);
+            }
+            if (this.h - 2 < MIN_SIZE) {
+              this.th = this.h;
+              this.ty = this.y;
+              //throw "height " + this.h + " is too small!";
+            } else {
+              this.th = getRandomIntInclusive(MIN_SIZE, this.h - 2);
+              this.ty = this.y + getRandomIntInclusive(0, this.h - 2 - this.th);
+            }
+          }
+        }
+        
+        spade() {
+          if (this.has_child()) {
+            // pass the order to make a hole
+            this.first().spade();
+            this.second().spade();
+            // make a hole for yourself by looking at your child
+            // TODO
+          } else {
+            // make a hole for yourself without children IF you are the first child
+            if (this == this.parent.first()) {
+              if (this.vertical()) { // I'm on top
+                this.hole = [this.tx + this.tw - 1, getRandomIntInclusive(this.ty + 1, this.ty + this.th - 2)]; 
+                console.log("hole col= " + this.hole[0] + " row= " + this.hole[1] + " for vertical room " + this.id);
+              } else {
+                this.hole = [getRandomIntInclusive(this.tx + 1, this.tx + this.tw - 2), this.ty + this.th - 1]; 
+                console.log("hole col= " + this.hole[0] + " row= " + this.hole[1] + " for horizontal room " + this.id);
+              }
+            }
+          }
+        }
+        
         draw() {
           if (this.has_child()) {
             this.first().draw();
             this.second().draw();
           } else {
-            for (let row = this.y; row < this.y + this.h; row++) {
-              for (let col = this.x; col < this.x + this.w; col++) {
+            for (let row = this.ty; row < this.ty + this.th; row++) {
+              for (let col = this.tx; col < this.tx + this.tw; col++) {
                 if (row >= this.map.length || col >= this.map[0].length) {
                   throw "Map is too small for this room: row=" + row + " col=" + col + "/" + this.w;
                 }
-                this.map[row][col] = this.color;
+                if (row == this.ty || row == this.ty + this.th - 1 || col == this.tx || col == this.tx + this.tw - 1) {
+                  if (this.hole == null || row != this.hole[1] || col != this.hole[0]) {
+                    this.map[row][col] = this.id;
+                  } else {
+                    this.map[row][col] = EMPTY;
+                  }
+                } else {
+                  this.map[row][col] = EMPTY;
+                }
               }
             }
           }
@@ -201,11 +281,13 @@
         for (let row = 0; row < CAM_MAX_ROW; row++) {
           map.push([])
           for (let col = 0; col < CAM_MAX_COL; col++) {
-            map[row].push(0);
+            map[row].push(PLAIN_TEXTURE);
           }
         }
         let room = new Room(map, null, 0, 0, CAM_MAX_COL, CAM_MAX_ROW); // x y width height
         room.divide(MAX_DIVISION);
+        room.dig();
+        room.spade();
         room.draw();
         console.log(map);
         return room;
@@ -243,10 +325,17 @@
       function draw() {
         if (screen.getContext) {
           let ctx = screen.getContext('2d');
+          ctx.clearRect(0, 0, screen.width, screen.height);
+          ctx.font = "10px Arial";
+          ctx.fillStyle = "black";
           for (let row = 0; row < CAM_MAX_ROW; row++) {
             for (let col = 0; col < CAM_MAX_COL; col++) {
-              let val = map[row][col];
-              ctx.drawImage(textures[val], col * 32, row * 32);
+              let index = map[row][col];
+              if (index != EMPTY) {
+                let room = ROOMS[index];
+                ctx.drawImage(textures[room.color], col * 32, row * 32);
+                ctx.fillText(room.id, col * 32 + 10, row * 32 + 10); 
+              }
             }
           }
           

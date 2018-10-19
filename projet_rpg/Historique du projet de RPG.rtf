@@ -1,0 +1,47 @@
+{\rtf1\ansi\ansicpg1252\deff0\deflang1036\deflangfe1036{\fonttbl{\f0\fswiss\fprq2\fcharset0 Calibri;}{\f1\fnil\fcharset2 Symbol;}}
+{\colortbl ;\red0\green77\blue187;\red255\green0\blue0;\red0\green176\blue80;\red0\green0\blue255;}
+{\*\generator Msftedit 5.41.21.2510;}\viewkind4\uc1\pard\nowidctlpar\sa200\sl276\slmult1\qj\cf1\lang12\b\f0\fs28 Historique du projet de RPG\b0\fs22\par
+\cf0 Ce document retrace l'historique de mes projets de jeux vid\'e9o de type RPG et Action-RPG, ainsi que du "datahack", regarder le format de donn\'e9es de glorieux anc\'eatres. La distinction entre les deux est la suivante :\par
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\nowidctlpar\fi-360\li720\sa200\sl276\slmult1\qj Beaucoup plus d'actions dans l'action-RPG\par
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\nowidctlpar\fi-360\li720\sa200\sl276\slmult1 Beaucoup moins de dialogues et de choix dans l'action-RPG\par
+\pard\nowidctlpar\sa200\sl276\slmult1\qj Cette division se retrouve dans les deux jeux qui m'ont fait d\'e9couvrir ces genres, respectivement Diablo pour l'action-RPG et Baldur's Gate pour le RPG. Dans Diablo, il n'est m\'eame pas possible de choisir une quelconque r\'e9ponse \'e0 un dialogue. On ne peut choisir que d'enclencher un dialogue, le suivre, et basta.\par
+\cf1\b I. Un projet de RPG\par
+\cf0\b0 G\'e9n\'e9ralement, il comprend :\par
+\pard{\pntext\f0 1.\tab}{\*\pn\pnlvlbody\pnf0\pnindent0\pnstart1\pndec{\pntxta.}}
+\nowidctlpar\fi-360\li720\sa200\sl276\slmult1\qj un syst\'e8me de repr\'e9sentation du monde,\par
+\pard{\pntext\f0 2.\tab}{\*\pn\pnlvlbody\pnf0\pnindent0\pnstart1\pndec{\pntxta.}}
+\nowidctlpar\fi-360\li720\sa200\sl276\slmult1 un syst\'e8me de combat,\par
+{\pntext\f0 3.\tab}un syst\'e8me de dialogue,\par
+{\pntext\f0 4.\tab}un syst\'e8me de gestion des personnages (inventaire, progression),\par
+{\pntext\f0 5.\tab}un syst\'e8me de gestion du monde (qu\'eates, objets, monstres).\par
+\pard\nowidctlpar\sa200\sl276\slmult1\qj\cf1\b 1. 2000 => Jeu RPG-Action Zelda RPG-Baldur\par
+\cf0\b0 Sur ma calculette Casio, j'ai commenc\'e9 \'e0 programmer quelques essais : \par
+Soit un mode seulement d'ar\'e8ne, en mode texte, \'e0 la Pok\'e9mon au tour par tour, o\'f9 on combattait diff\'e9rents ennemis en devenant plus puissant.\par
+Soit, avec un v\'e9ritable d\'e9placement de tableau en tableau, avec des matrices derri\'e8res, et un syst\'e8me de combat toujours textuel. \'c0 l\rquote ancienne donc !\par
+\cf1\b 2. 2011 => La question des dialogues\par
+\cf0\b0 Tr\'e8s vite, quelque chose qui va retenir mon attention est un syst\'e8me de dialogue. Comment encha\'eener une suite de choix du joueur parmi des possibilit\'e9s, la construction d'un arbre. Il en r\'e9sultera des prototypes portant uniquement sur cet aspect.\par
+\pard{\pntext\f0 1.\tab}{\*\pn\pnlvlbody\pnf0\pnindent0\pnstart1\pndec{\pntxta.}}
+\nowidctlpar\fi-360\li720\sa200\sl276\slmult1\qj La plus vieille trace sur github remonte au\cf2  29 novembre 2011 \cf0 en ruby, elle est nomm\'e9e \cf3\i dialogs/script.rb\cf0\i0  . L'arbre est stock\'e9 dans un fichier texte, les dialogues dans un autre fichier texte. L'arbre n'a donc que des r\'e9f\'e9rences vers une ligne du fichier dialogue.\par
+{\pntext\f0 2.\tab}Une trace sur github montre une tentative commit\'e9e le \cf2 14 d\'e9cembre 2015 \cf0 d'un prototype en html et javascript appel\'e9 \cf3\i dialogue_display_systems.html\cf0\i0 . Selon le message du commit, il aurait \'e9t\'e9 \'e9crit le 24 \ltrmark octobre \ltrmark 2015 et se pr\'e9sente comme "un d\'e9but de JDR en HTML [...] (dialogue, canvas)" cr\'e9\'e9 suite \'e0 l'immobilisation de mon ordi (\'e0 cause du probl\'e8me qu'il ne d\'e9marrait plus, non ? J'avais eu peur de tout perdre, mais finalement il n'avait pas fait de formattage).\par
+{\pntext\f0 3.\tab}Une trois\'e8me tentative, appel\'e9e \cf3\i talk.py\cf0\i0 , est commit\'e9e pour la premi\'e8re fois le\cf2  11 f\'e9vrier 2016 \cf0 et sera am\'e9lior\'e9e le 12 f\'e9vrier et le 19 mars. Elle est fonctionnelle et purement textuelle. L'arbre de dialogue est d\'e9fini par  un dictionnaire. Chaque noeud a une intro, un type (choice, simple, end). Pour choice, il y a deux listes : une indiquant les r\'e9ponses, une autre indiquant le noeud o\'f9 on va selon la r\'e9ponse. Pour simple, on a juste deux valeurs, la r\'e9ponse et la suite. Le texte n'est pas mis directement dans l'abre, mais il n'y a qu'une r\'e9f\'e9rence num\'e9rique qui pointe vers une liste des dialogues. Cela permet de facilement internationalis\'e9 : on ne remplace que les cha\'eenes dans cette liste, l'arbre ne bouge pas.\par
+{\pntext\f0 4.\tab}Une autre tentative, en python, beaucoup plus aboutie est \cf3\i dialog_tree.py\cf0\i0 , dat\'e9e du \cf2 26 janvier 2018\cf0 . Elle reprend talk.py mais la compl\'e8te, introduit des \i #tags# \i0 dans les dialogues remplac\'e9s dynamiquement \'e0 l'affichage. L'arbre est construit via des objets, les textes sont toujours dans une liste \'e0 part, pour faciliter la localisation. Autre feature int\'e9ressante, on peut \i dumper \i0 le dialogue sous la forme d'un fichier texte.\par
+\pard\nowidctlpar\sa200\sl276\slmult1\qj\cf1\b 3. 2011 => L'interrogation du ma\'eetre\par
+\cf0\b0 La d\'e9couverte des travaux sur le format des donn\'e9es de Baldur's Gate, qui est pour moi \'e0 la fois le premier jeu de ce genre auquel j'ai jou\'e9 et le meilleur repr\'e9sentnant de ce type de jeu, m'entra\'eena dans la programmation en Python de scripts pour les interroger. L'id\'e9e d'un moteur alternatif \'e0 l'Infinity Engine, \'e0 la mani\'e8re de GemRB, en Python germa, mais devant la difficult\'e9 de la t\'e2che, je l'abandonnais vite.\par
+\pard{\pntext\f0 1.\tab}{\*\pn\pnlvlbody\pnf0\pnindent0\pnstart1\pndec{\pntxta.}}
+\nowidctlpar\fi-360\li720\sa200\sl276\slmult1\qj La "fi\'e8vre du hacking" de BG remonte au \cf2 24 f\'e9vrier 2011\cf0 . Du moins, c'est \'e0 cette date que j'ai ouvert un dossier sur google drive nomm\'e9\cf3  Baldur's Gate Hacking\cf0 . Ce dossier s\rquote appelait avant Hacking old games.\par
+{\pntext\f0 2.\tab}Une tentative, nomm\'e9e \cf3\i read.py\cf0\i0 , est commit\'e9e le 14 juin 2017 mais il s'agit d'un d\'e9placement. Elle remonte en fait au \cf2 11 f\'e9vrier 2016\cf0  et concerne... KOTOR, plus pr\'e9cisemment le fichier chitin.key. L\'e0 aussi, des documents existent pour d\'e9crire les formats utilis\'e9s.\par
+\pard\nowidctlpar\sa200\sl276\slmult1\qj\cf1\b 4. 2015 => Le proc\'e9dural\cf0\b0\par
+ Pour gagner du temps, on peut g\'e9n\'e9rer du contenu plut\'f4t que le faire \'e0 la main. C'est cette piste que vont suivre plusieurs prototypes. Au d\'e9but, ces essais sont guid\'e9s par la r\'e9flexion propre mais je d\'e9couvre ensuite un article g\'e9nial sur la g\'e9n\'e9ration avec BSP :\par
+\pard{\field{\*\fldinst{HYPERLINK "http://www.roguebasin.com/index.php?title=Basic_BSP_Dungeon_generation"}}{\fldrslt{\ul\cf4 http://www.roguebasin.com/index.php?title=Basic_BSP_Dungeon_generation}}}\f0\fs22\par
+\'c0 partir de l\'e0, je vais me concentrer sur cette technique avec plusieurs essais :\par
+\pard{\pntext\f0 1.\tab}{\*\pn\pnlvlbody\pnf0\pnindent0\pnstart1\pndec{\pntxta.}}
+\nowidctlpar\fi-360\li720\sa200\sl276\slmult1\qj Une trace sur github montre un commit le \cf2 9 novembre 2015 \cf0 concernant un prototype en python d'un g\'e9n\'e9rateur de donjon primitif appel\'e9 \cf3\i dungeon_gen.py\cf0\i0  peu avanc\'e9.\par
+{\pntext\f0 2.\tab}Une autre version en lua, appel\'e9e \cf3\i bsp_dungeons\\main.lua\cf0\i0  est beaucoup plus avanc\'e9e mais semble avoir \'e9t\'e9 d\'e9plac\'e9e \'e0 l'int\'e9rieur du d\'e9p\'f4t. Le premier commit de cette r\'e9organisation remonte au 8 mars 2017. Cette version remonte en fait au \cf2 6 mars 2017\cf0 , elle pr\'e9sente l'innovation d'utiliser un arbre.\par
+{\pntext\f0 3.\tab}Une version en python, appel\'e9 \cf3\i random_dungeon.py\cf0\i0  bas\'e9e sur BSP aussi, est dat\'e9 du \cf2 3 mai 2018\cf0 .\par
+{\pntext\f0 4.\tab}Une autre version en lua, appel\'e9e\cf3\i  lua-random-dungeons\\main.lua \cf0\i0 semble bas\'e9e sur plusieurs techniques maps pas le BSP, elle est dat\'e9e du \cf2 19 juillet 2018\cf0 . La premi\'e8re est des salles pr\'e9constuites, la seconde sur un "vers" qui ouvre un chemin.\par
+\pard\nowidctlpar\sa200\sl276\slmult1\qj\cf1\b A. Historique du document\par
+\cf0\b0 Nous retra\'e7ons ici l'historique du document :\par
+\pard\nowidctlpar\fi-360\li720\sa200\sl276\slmult1\qj 1.\tab\cf2 19 octobre 2018 \cf0 Reprise, avec changement de format (RTF et mise sous github) et fusion avec le document "Histoire du projet DataHack" qui datait lui aussi du 6 mai 2016 avec un point.\par
+2.\tab\cf2 6 mai 2016 \cf0 Cr\'e9ation avec juste le point n\'b01 sur l'ann\'e9e 2000 (mis sur google docs)\par
+}
+ 
