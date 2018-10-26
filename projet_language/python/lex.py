@@ -1,3 +1,5 @@
+import regex
+
 definitions = {
     'KEYWORD' : ['if', 'then', 'else', 'end', 'while', 'do', 'for',
                  'break', 'next', 'return',
@@ -8,29 +10,30 @@ definitions = {
     'NIL_LITTERAL' : ['nil'], 
     'BINARY_OPERATOR' : ['and', 'or', # boolean
                   'in', # belongs to
-                  '+', '-', '*', '/', '//', '**', '%', # mathematical
+                  r'\+', '-', r'\*', '/', '//', r'\*\*', '%', # mathematical
                   '&', '|', '~', '>>', '<<', # bitwise
                   '<', '<=', '>', '>=', '==', '!=', # comparison
                   '.'], # call
     'AFFECTATION' : ['='],
-    'COMBINED_AFFECTATION' : ['+=', '-=', '*=', '/=', '//=', '**=', '%='],
+    'COMBINED_AFFECTATION' : [r'\+=', '-=', r'\*=', '/=', '//=', r'\*\*=', '%='],
     'TYPE' : [':', '->'],
     'FAST' : ['=>'],
     'LABEL' : ['::'],
     'UNARY_OPERATOR' : ['-', 'not', '#', '~'],
     'NEWLINE' : ['\n'],
-    'INTEGER' : [r'[\d]+'],
-    'IDENTIFIER' : [r'[\w_][\w_\d]*'],
+    'INTEGER' : [r'\d+'],
+    'IDENTIFIER' : [r'[\a_][\w_\d]*'],
     'COMMENT' : ['--'],
+    'WRONGINT' : [r'\d+\w+'], #
     }
 
-definitions = {
+definitionsTEST = {
     'KEYWORD' : ['bonjour', 'bon'],
-    'IDENTIFIER' : [r'\u\w+'],
-    'MONOID' : [r'\u'], # because \w+ is no OPTIONNAL in the previous
+    'IDENTIFIER' : [r'[\a_]\w*'],
+    #'MONOID' : [r'[\a_]'], # because \w+ is no OPTIONNAL in the previous
     'INTEGER' : ['08789'],
     'ALL_INTEGER' : [r'\d+'],
-    'OPERATOR' : ['+', '+='],
+    'OPERATOR' : ['\+', '\+='],
     'NEWLINE' : ['\n'],
     'WRONGINT' : [r'\d+\w+'], #
     }
@@ -53,132 +56,37 @@ class TokenDef:
     MAYBE = 0
     EXACT = 1
     
-    def __init__(self, typ, val, debug=False):
+    def __init__(self, typ, pattern, debug=False):
         self.typ = typ
-        self.val = val
-        self.i = 0
-        self.nb = 0
-        self.debug = debug
-        self.regex = False
-        if r'\d' in val or r'\w' in val or r'\a' in val or r'\u' in val:
-            self.regex = True
-            self.val = []
-            self.repeat = []
-            index = 0
-            while index < len(val):
-                c = val[index]
-                if c == '\\':
-                    if index + 1 >= len(val):
-                        raise Exception('Malformed Regex :', val)
-                    element = c + val[index + 1]
-                    self.val.append(element)
-                    if index + 2 < len(val) and val[index + 2] in ['+']:
-                        self.repeat.append('+')
-                        index += 1
-                    else:
-                        self.repeat.append(False)
-                    index += 1
-                else:
-                    self.val.append(c)
-                index += 1
-            if debug:
-                print('Val =', self.val)
+        self.regex = regex.Regex(pattern, debug)
     
     def __str__(self):
-        if self.regex:
-            return f"{self.typ} {self.val} [REGEX]"
-        else:
-            return f"{self.typ} {self.val}"
+        return f"{self.typ} {self.regex}"
 
     def __repr__(self):
         return str(self)
-    
-    def reset(self):
-        self.i = 0
-        self.nb = 0
 
-    def test_regex(self, c):
-        if self.debug:
-            print('Test for ', str(self), ' : |', c, '| i = ', self.i, '/', len(self.val), sep='', end=' ')
-        if self.i >= len(self.val):
-            if self.debug:
-                print('not a match (too short)')
-            res = TokenDef.NO
-        else:
-            val = self.val[self.i]
-            if val == r'\a' and c.isalpha():
-                if len(self.val)-1 == self.i:
-                    res = TokenDef.EXACT
-                else:
-                    res = TokenDef.MAYBE
-            elif val == r'\u' and (c.isalpha() or c == '_'):
-                if len(self.val)-1 == self.i:
-                    res = TokenDef.EXACT
-                else:
-                    res = TokenDef.MAYBE
-            elif val == r'\w' and (c.isalpha() or c.isdigit() or c == '_'):
-                if len(self.val)-1 == self.i:
-                    res = TokenDef.EXACT
-                else:
-                    res = TokenDef.MAYBE
-            elif val == r'\d' and c.isdigit():
-                if len(self.val)-1 == self.i:
-                    res = TokenDef.EXACT
-                else:
-                    res = TokenDef.MAYBE
-            else:
-                if self.debug:
-                    print('not a match')
-                res = TokenDef.NO
-        # repeat or not
-        if res == TokenDef.NO:
-            if self.i < len(self.val) and self.repeat[self.i] and self.i + 1 < len(self.val): #memorize repeated at least once
-                # pour +, on doit y être passé au moins une fois
-                if self.repeat[self.i] == '+' and self.nb > 0:
-                    self.i += 1
-                    res = self.test_regex(c)
-                    return res
-                else:
-                    res = TokenDef.NO
-        else:
-            self.nb += 1
-            if not self.repeat[self.i]:
-                self.i += 1
-                self.nb = 0
-        # result
-        if self.debug:
-            if res == TokenDef.EXACT:
-                print('exact match')
-            else: #res == TokenDef.MAYBE
-                print('maybe a match')
-        return res
+
+class ParcoursTokenDef:
+
+    def __init__(self, tokdef):
+        self.tokdef = tokdef
+        self.inner = regex.Parcours(tokdef.regex)
+
+    def test(self, c):
+        return self.inner.test(c)
+
+    def __str__(self):
+        return str(self.inner)
     
-    def test(self, c): # -1 : not, 0 : maybe, 1 : exact
-        if self.regex:
-            return self.test_regex(c)
-        if self.debug:
-            if self.i < len(self.val):
-                print('Test for ', str(self), ' : |', c, '| vs ', self.val[self.i], sep='', end=' ')
-            else:
-                print('Test for ', str(self), ' : |', c, '| (too short : ', self.i, ' vs ', len(self.val), ')', sep='', end=' ')
-        if self.i >= len(self.val):
-            res = -1
-        elif c == self.val[self.i]:
-            if len(self.val)-1 == self.i:
-                res = TokenDef.EXACT
-            else:
-                res = TokenDef.MAYBE
-                self.i += 1
-        else:
-            res = TokenDef.NO
-        if self.debug:
-            if res == TokenDef.EXACT:
-                print('exact match')
-            elif res == TokenDef.MAYBE:
-                print('maybe a match')
-            else:
-                print('not a match')
-        return res
+    def __repr__(self):
+        return repr(self.inner)
+
+    def complex(self):
+        return self.tokdef.regex.complex()
+
+    def typ(self):
+        return self.tokdef.typ
 
 
 class Token:
@@ -218,7 +126,7 @@ class Lexer:
         index = 0
         tokens = []
         for tokdef in self.tokendefs:
-            def_ok.append((tokdef, TokenDef.MAYBE))
+            def_ok.append((ParcoursTokenDef(tokdef), regex.Parcours.MAYBE))
         current = ''
         nb = 0
         # La boucle principale, on va parcourir le texte, un caractère à la fois
@@ -234,7 +142,7 @@ class Lexer:
             # Maybe signifie "c'est potentiellement un début de mon définition de token".
             for tokdef, val in def_ok:
                 val = tokdef.test(c)
-                if val >= 0:
+                if val > regex.Parcours.NO:
                     next_ok.append((tokdef, val))
             if self.debug:
                 print('NEXT:', next_ok)
@@ -259,16 +167,16 @@ class Lexer:
                     # mais dans ces définitions une seule n'est pas une REGEX, alors c'est celle-ci.
                     # Ex : "if" est captée à la fois comme l'IDENTIFIER \w+ et comme le KEYWORD if.
                     # On privilégie cette dernière définition car elle est plus fine
-                    exact_filtered = list(filter(lambda elem: elem[1] == TokenDef.EXACT, def_ok))
-                    regex_removed = list(filter(lambda elem: elem[0].regex == False, exact_filtered))
+                    exact_filtered = list(filter(lambda elem: elem[1] == regex.Parcours.COMPLETE, def_ok))
+                    regex_removed = list(filter(lambda elem: not elem[0].complex(), exact_filtered))
                     if self.debug:
                         print('    Exact filtered:', exact_filtered)
                         print('    Regex removed:', regex_removed)
                     if len(exact_filtered) == 1 or len(regex_removed) == 1:
                         if len(exact_filtered) == 1:
-                            tok = Token(exact_filtered[0][0].typ, current)
+                            tok = Token(exact_filtered[0][0].typ(), current)
                         else: # regex_removed == 1
-                            tok = Token(regex_removed[0][0].typ, current)
+                            tok = Token(regex_removed[0][0].typ(), current)
                         if self.debug:
                             print('**producing:', tok)
                         tokens.append(tok)
@@ -278,8 +186,7 @@ class Lexer:
                         current = ''
                         def_ok = []
                         for tokdef in self.tokendefs:
-                            tokdef.reset()
-                            def_ok.append((tokdef, TokenDef.MAYBE))
+                            def_ok.append((ParcoursTokenDef(tokdef), regex.Parcours.MAYBE))
                         index -= 1                        
                     else:
                         if (c.isspace() or c == '\0') and len(current) == 0:
@@ -318,4 +225,3 @@ print('Texte =', texte)
 tokens = lexer.lex(texte)
 for tok in tokens:
     print('   ', tok)
-
