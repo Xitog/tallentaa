@@ -200,6 +200,7 @@
           }
         }
         
+        // make the room into the BSP leaves
         dig() {
           if (this.has_child()) {
             this.first().dig();
@@ -224,6 +225,7 @@
           }
         }
         
+        // make the hole to connect rooms
         spade() {
           if (this.has_child()) {
             // pass the order to make a hole
@@ -233,13 +235,42 @@
             // TODO
           } else {
             // make a hole for yourself without children IF you are the first child
+            // take always the smallest starting point and dimension between first and second child
             if (this == this.parent.first()) {
               if (this.vertical()) { // I'm on top
-                this.hole = [this.tx + this.tw - 1, getRandomIntInclusive(this.ty + 1, this.ty + this.th - 2)]; 
+                let xcol = this.tx + this.tw - 1;
+                let smallest_y = Math.max(this.ty, this.sibling.ty);
+                let smallest_h = Math.min(this.th, this.sibling.th);
+                let yrow = getRandomIntInclusive(smallest_y + 1, smallest_y + smallest_h - 2);
+                this.hole = [xcol, yrow] ; 
                 console.log("hole col= " + this.hole[0] + " row= " + this.hole[1] + " for vertical room " + this.id);
-              } else {
-                this.hole = [getRandomIntInclusive(this.tx + 1, this.tx + this.tw - 2), this.ty + this.th - 1]; 
+                // the other hole
+                this.sibling.hole = [this.sibling.tx, yrow];
+                // spade until the other room
+                for (let xcol = this.tx + this.tw; xcol <= this.sibling.tx; xcol++) {
+                  this.map[yrow][xcol] = EMPTY;
+                  if (xcol < this.sibling.tx) {
+                    this.map[yrow-1][xcol] = this.id;
+                    this.map[yrow+1][xcol] = this.id;
+                  }
+                }
+              } else { // I'm on the right
+                let yrow = this.ty + this.th - 1;
+                let smallest_x = Math.max(this.tx, this.sibling.tx);
+                let smallest_w = Math.min(this.tw, this.sibling.tw);
+                let xcol = getRandomIntInclusive(smallest_x + 1, smallest_x + smallest_w - 2);
+                this.hole = [xcol, yrow]; 
                 console.log("hole col= " + this.hole[0] + " row= " + this.hole[1] + " for horizontal room " + this.id);
+                // the other hole
+                this.sibling.hole = [xcol, this.sibling.ty];
+                // spade until the other room
+                for (let yrow = this.ty + this.th; yrow <= this.sibling.ty; yrow++) {
+                  this.map[yrow][xcol] = EMPTY;
+                  if (yrow < this.sibling.ty) {
+                    this.map[yrow][xcol-1] = this.id;
+                    this.map[yrow][xcol+1] = this.id;
+                  }
+                }
               }
             }
           }
