@@ -36,7 +36,10 @@ const THE_RIVER = {
     ],
     height : 32,
     width : 32,
-    triggers : []
+    triggers : {
+        'conditions' : [],
+        'actions' : []
+    }
 };
 
 const ARCHIPELAGO = {
@@ -77,7 +80,14 @@ const ARCHIPELAGO = {
     ],
     height : 32,
     width : 32,
-    triggers : []
+    triggers : {
+        'conditions' : [
+            ['ControlUnits', 4, 0, 0, 1, [1, 31, 7, 31]]
+        ],
+        'actions' : [
+            ['Victory', 'You Win']
+        ]
+    }
 };
 
 MAPS["E1M1"] = load_map(ARCHIPELAGO);

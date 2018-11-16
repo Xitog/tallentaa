@@ -126,6 +126,7 @@
         let width;
         let height;
         let triggers;
+        let triggers_oo;
         if ("name" in dic) {
           name = dic["name"];
         } else {
@@ -158,10 +159,118 @@
         }
         if ("triggers" in dic) {
           triggers = dic["triggers"];
+          triggers_oo = []
+          let conditions = [];
+          let actions = [];
+          for (let c of triggers['conditions']) {
+            if (c[0] === 'ControlUnits') {
+              conditions.push(new ControlUnits(c[0], c[1], c[2], c[3], c[4], c[5]));
+            } else {
+              throw "Unknown condition : " + c[0];
+            }
+          }
+          for (let a of triggers['actions']) {
+            if (a[0] === 'Victory') {
+              actions.push(new Victory(a[0], a[1]));
+            } else {
+              throw "Unknown action :" + a[0];
+            }
+          }
+          triggers_oo.push(new Trigger(conditions, actions));
         } else {
           throw "Incorrect map format: no triggers provided";
         }
-        return new Map(name, content, width, height, triggers);
+        return new Map(name, content, width, height, triggers_oo);
+      }
+      
+      class Trigger {
+        constructor(conditions, actions) {
+          this.conditions = conditions;
+          this.actions = actions;
+          this.done = false;
+        }
+        
+        test(game) {
+          for (let c of this.conditions) {
+            if (!c.test(game)) {
+              return false;
+            }
+          }
+          return true;
+        }
+        
+        act(game) {
+          this.done = true;
+          for (let c of this.actions) {
+            c.act(game);
+          }
+        }
+      }
+      
+      class Condition {
+        constructor(code) {
+          this.code = code;
+        }
+        test(game) {
+          return false;
+        }
+      }
+      
+      class Action {
+        constructor(code) {
+          this.code = code;
+        }
+        act(game) {
+        }
+      }
+      
+      class ControlUnits extends Condition {
+        constructor(code, cmp, type, player, nb, area) {
+          super(code);
+          this.cmp = cmp;
+          this.type = type;
+          this.player = player;
+          this.nb = nb;
+          this.area = area;
+        }
+        
+        test(game) {
+          let count = 0;
+          if (this.cmp === ControlUnits.GREATER_OR_EQUAL) {
+            if (this.area !== ControlUnits.ANYWHERE) {
+              for (let row = this.area[1]; row <= this.area[3]; row++) {
+                for (let col = this.area[0]; col <= this.area[2]; col++) {
+                  if (game.units[row][col] != 0) {
+                    if (this.player === ControlUnits.ANY) {
+                      if (this.type === ControlUnits.ANY) {
+                        count += 1;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            return (count >= this.nb);
+          }
+        }
+      }
+      ControlUnits.EQUAL = 1;
+      ControlUnits.GREATER_THAN = 2;
+      ControlUnits.LESSER_THAN = 3;
+      ControlUnits.GREATER_OR_EQUAL = 4;
+      ControlUnits.LESSER_OR_EQUAL = 5;
+      ControlUnits.ANY = 0;
+      ControlUnits.ANYWHERE = 0;
+      
+      class Victory extends Action {
+        constructor(code, message) {
+          super(code);
+          this.message = message;
+        }
+        
+        act(game) {
+          alert(this.message);
+        }
       }
       
       class Map {
@@ -522,6 +631,7 @@
           this.units = [];
           this.all_units = [];
           this.map = map.content;
+          this.triggers = map.triggers;
           for (let row = 0; row < MAP_MAX_ROW; row++) {
             this.units[row] = [];
             for (let col=0; col < MAP_MAX_COL; col++) {
@@ -546,6 +656,16 @@
             new UnitCreator(player, type, row, col);
           } else if (type == 'generator' || type == 'extractor') {
             new RessourceProductor(player, type, row, col);
+          }
+        }
+        
+        update() {
+          for (let t of this.triggers) {
+            if (!t.done) {
+              if (t.test(this)) {
+                t.act(this);
+              }
+            }
           }
         }
       }
@@ -717,6 +837,7 @@
           this.col = player.col;
           this.selected = new Group(this.player);
           this.prev_selected = null;
+          this.gui = true;
         }
         
         save_selection() {
@@ -731,6 +852,7 @@
       }
       
       function update() {
+        game.update();
         for (let u of game.all_units) {
           u.update();
         }
@@ -869,10 +991,12 @@
             }
           }
           // Minimap
-          if (camera.minimap.show) {
+          if (camera.minimap.show && camera.gui) {
             camera.minimap.draw(ctx);
           }
-          camera.menu.draw(ctx);
+          if (camera.gui) {
+            camera.menu.draw(ctx);
+          }
           // Mouse
           if (mouse_map_col != -1 || mouse_map_row != -1) {
             ctx.strokeStyle = 'rgb(0, 255, 0)';
@@ -900,6 +1024,7 @@
       const KEY_LEFT = 37;
       const KEY_BACKSPACE = 8;
       const KEY_M = 77;
+      const KEY_H = 72;
       
       // Functions
       
@@ -932,7 +1057,8 @@
       var iTimer;
       
       function on_mouse_left_click(event) {
-        if (camera.menu.inside(mouse_col, mouse_row)) {
+        console.log('row:', mouse_map_row, 'col:', mouse_map_col);
+        if (camera.menu.inside(mouse_col, mouse_row) && camera.gui) {
           camera.menu.click(mouse_col, mouse_row);
           return false;
         }
@@ -951,7 +1077,6 @@
             }
           }
         }
-        console.log('row:', mouse_map_row, 'col:', mouse_map_col);
         /*
         if (!clicked) {
           console.log('Left Click');
@@ -966,7 +1091,7 @@
       }
       
       function on_mouse_right_click(event) {
-        if (camera.menu.inside(mouse_col, mouse_row)) {
+        if (camera.menu.inside(mouse_col, mouse_row) && camera.gui) {
           return false;
         }
         event = window.event || event;
@@ -996,6 +1121,8 @@
           camera.restore_selection();
         } else if (event.keyCode == KEY_M) {
           camera.minimap.show = !camera.minimap.show;
+        } else if (event.keyCode == KEY_H) {
+          camera.gui = !camera.gui;
         } else {
           console.log('Unbound up key:', event.keyCode);
         }
