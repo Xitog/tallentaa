@@ -171,7 +171,7 @@
           }
           for (let a of triggers['actions']) {
             if (a[0] === 'Victory') {
-              actions.push(new Victory(a[0], a[1]));
+              actions.push(new Victory(a[0], a[1], a[2]));
             } else {
               throw "Unknown action :" + a[0];
             }
@@ -180,7 +180,8 @@
         } else {
           throw "Incorrect map format: no triggers provided";
         }
-        return new Map(name, content, width, height, triggers_oo);
+        let res = make_transition(content); // return content et passable (pass) matrixes
+        return new Map(name, res[0], res[1], width, height, triggers_oo);
       }
       
       class Trigger {
@@ -263,20 +264,23 @@
       ControlUnits.ANYWHERE = 0;
       
       class Victory extends Action {
-        constructor(code, message) {
+        constructor(code, message, next_map) {
           super(code);
           this.message = message;
+          this.next_map = next_map;
         }
         
         act(game) {
           alert(this.message);
+          game.load_map(MAPS[this.next_map]);
         }
       }
       
       class Map {
-        constructor(name, content, width, height, triggers) {
+        constructor(name, content, pass, width, height, triggers) {
           this.name = name;
           this.content = content;
+          this.pass = pass;
           this.width = width;
           this.height = height;
           this.triggers = triggers;
@@ -393,14 +397,14 @@
           } else if (o.col < this.col) {
             new_col -= 1;
           }
-          if (game.units[new_row][new_col] != 0 || !pass_matrix[new_row][new_col]) {
-            if (game.units[new_row][this.col] == 0 && pass_matrix[new_row][this.col]) {
+          if (game.units[new_row][new_col] != 0 || !game.pass[new_row][new_col]) {
+            if (game.units[new_row][this.col] == 0 && game.pass[new_row][this.col]) {
               new_col = this.col;
-            } else if (game.units[this.row][new_col] == 0 && pass_matrix[this.row][new_col]) {
+            } else if (game.units[this.row][new_col] == 0 && game.pass[this.row][new_col]) {
               new_row = this.row;
             }
           }
-          if (game.units[new_row][new_col] == 0 && pass_matrix[new_row][new_col]) {
+          if (game.units[new_row][new_col] == 0 && game.pass[new_row][new_col]) {
             console.log('cleaning', this.row, this.col);
             game.units[this.row][this.col] = 0;
             this.row = new_row;
@@ -627,17 +631,22 @@
       class Game {
         constructor(name, map) {
           this.name = name;
+          this.load_map(map);
+        }
+        
+        load_map(map) {
           this.players = {};
           this.units = [];
           this.all_units = [];
           this.map = map.content;
+          this.pass = map.pass;
           this.triggers = map.triggers;
           for (let row = 0; row < MAP_MAX_ROW; row++) {
             this.units[row] = [];
             for (let col=0; col < MAP_MAX_COL; col++) {
               this.units[row][col] = 0;
             }
-          }
+          }          
         }
         
         create_player(name, color, row, col) {
@@ -1158,10 +1167,10 @@
       var trans_matrix = [];
       var pass_matrix = [];
       
-      function transition_one(trow, tcol) {
+      function transition_one(trow, tcol, content) {
         let calc = 0;
         let pow = 8;
-        let center = game.map[trow][tcol];
+        let center = content[trow][tcol]; // game.map
         let opposed = null;
         outerloop:
         for (let row = trow - 1; row <= trow + 1; row++) {
@@ -1169,18 +1178,18 @@
             if (row != trow || col != tcol) {
               if (row >= 0 && row < MAP_MAX_ROW && col >= 0 && col < MAP_MAX_COL) {
                 // Get opposed
-                if (game.map[row][col] != center) {
+                if (content[row][col] != center) {
                   // Check IF opposed is NOT defined AND if the other texture encountered modifies the center
-                  if (!opposed && modified[center].includes(game.map[row][col])) {
-                    opposed = game.map[row][col];
+                  if (!opposed && modified[center].includes(content[row][col])) {
+                    opposed = content[row][col];
                   // Check IF opposed is defined AND if the other texture is different from the opposed
-                  } else if (opposed && opposed != game.map[row][col] && modified[center].includes(game.map[row][col])) {
-                    console.log("Surrounded by two different textures, aborting at ", row, col, "opp=", opposed, "found=", game.map[row][col], "me=", center);
+                  } else if (opposed && opposed != content[row][col] && modified[center].includes(content[row][col])) {
+                    console.log("Surrounded by two different textures, aborting at ", row, col, "opp=", opposed, "found=", content[row][col], "me=", center);
                     break outerloop;
                   }
                 }
                 // Calculate transition
-                if (game.map[row][col] == opposed) {
+                if (content[row][col] == opposed) {
                   calc += 1 * Math.pow(2, pow);
                 }
               }
@@ -1203,16 +1212,16 @@
         if ([0, 1].includes(center)) {
           opposed = modified[center]; // Earth
           // Borders
-          if (trow > 0 && game.map[trow - 1][tcol] == opposed) { cal[O] = opposed; cal[N] = 1; }
-          if (tcol > 0 && game.map[trow][tcol - 1] == opposed) { cal[O] = opposed; cal[W] = 1; }
-          if (trow < MAP_MAX_ROW - 2 && game.map[trow + 1][tcol] == opposed) { cal[O] = opposed; cal[S] = 1; }
-          if (tcol < MAP_MAX_COL - 2 && game.map[trow][tcol + 1] == opposed) { cal[O] = opposed; cal[E] = 1; }
+          if (trow > 0 && content[trow - 1][tcol] == opposed) { cal[O] = opposed; cal[N] = 1; }
+          if (tcol > 0 && content[trow][tcol - 1] == opposed) { cal[O] = opposed; cal[W] = 1; }
+          if (trow < MAP_MAX_ROW - 2 && content[trow + 1][tcol] == opposed) { cal[O] = opposed; cal[S] = 1; }
+          if (tcol < MAP_MAX_COL - 2 && content[trow][tcol + 1] == opposed) { cal[O] = opposed; cal[E] = 1; }
           // Corners only if no borders
           if (cal[N] == 0 && cal[E] == 0 && cal[S] == 0 && cal[W] == 0) {
-            if (trow > 0 && tcol > 0 && game.map[trow - 1][tcol - 1] == opposed) { cal[O] = opposed; cal[NW] = 1; }
-            if (trow > 0 && tcol < MAP_MAX_COL - 2 && game.map[trow - 1][tcol + 1] == opposed) { cal[O] = opposed; cal[NE] = 1; }
-            if (trow < MAP_MAX_ROW - 2 && tcol < MAP_MAX_COL - 2 && game.map[trow + 1][tcol + 1] == opposed) { cal[O] = opposed; cal[SE] = 1; }
-            if (trow < MAP_MAX_ROW - 2 && tcol > 0 && game.map[trow + 1][tcol - 1] == opposed) { cal[O] = opposed; cal[SW] = 1; }
+            if (trow > 0 && tcol > 0 && content[trow - 1][tcol - 1] == opposed) { cal[O] = opposed; cal[NW] = 1; }
+            if (trow > 0 && tcol < MAP_MAX_COL - 2 && content[trow - 1][tcol + 1] == opposed) { cal[O] = opposed; cal[NE] = 1; }
+            if (trow < MAP_MAX_ROW - 2 && tcol < MAP_MAX_COL - 2 && content[trow + 1][tcol + 1] == opposed) { cal[O] = opposed; cal[SE] = 1; }
+            if (trow < MAP_MAX_ROW - 2 && tcol > 0 && content[trow + 1][tcol - 1] == opposed) { cal[O] = opposed; cal[SW] = 1; }
           }
         }
         trans_matrix[trow][tcol] = cal.join('');
@@ -1221,7 +1230,9 @@
         }
       }
       
-      function make_transition() {
+      function make_transition(content) {
+        trans_matrix = [];
+        pass_matrix = [];
         // Prepare trans_matrix
         for (let row = 0; row < MAP_MAX_ROW; row++) {
           trans_matrix[row] = [];
@@ -1234,14 +1245,17 @@
         // Do transitions
         for (let row=0; row < MAP_MAX_ROW; row++) {
           for (let col=0; col < MAP_MAX_COL; col++) {
-            transition_one(row, col);
+            transition_one(row, col, content);
           }
         }
         // Swap
-        game.map = trans_matrix;
+        return [trans_matrix, pass_matrix];
       }
     </script>
+    <!-- Load Maps -->
     <script src="maps/E1M1.js"></script>
+    <script src="maps/E1M2.js"></script>
+    <!-- Load Game Info -->
     <script src="game.js"></script>
   </body>
 </html>

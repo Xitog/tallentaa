@@ -100,5 +100,3 @@ game.create_building('Sarah', 'generator', 23, 16);
 game.create_building('Sarah', 'factory', 18, 5);
 
 var camera = new Camera(game.players['Sarah']);
-
-make_transition();
