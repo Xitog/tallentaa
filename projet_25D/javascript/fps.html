@@ -27,35 +27,23 @@
   </head>
   <body onload="start();">
     <canvas id="screen" width="960" height="800">Your browser must support canvas to play.</canvas>
-    <img class="shadow" id="black" src="graphics/black.png">
-    <img class="shadow" id="grey" src="graphics/grey.png">
-    <img class="shadow" id="brown" src="graphics/brown.png">
-    <img class="shadow" id="darkblue" src="graphics/darkblue.png">
-    <img class="shadow" id="blue" src="graphics/blue.png">
-    <img class="shadow" id="green" src="graphics/green.png">
-    <img class="shadow" id="lemongreen" src="graphics/lemongreen.png">
-    <img class="shadow" id="lightpurple" src="graphics/lightpurple.png">
-    <img class="shadow" id="orange" src="graphics/orange.png">
-    <img class="shadow" id="pink" src="graphics/pink.png">
-    <img class="shadow" id="purple" src="graphics/purple.png">
-    <img class="shadow" id="red" src="graphics/red.png">
-    <img class="shadow" id="skyblue" src="graphics/skyblue.png">
-    <img class="shadow" id="steelblue" src="graphics/steelblue.png">
-    <img class="shadow" id="yellow" src="graphics/yellow.png">
-    <img class="shadow" id="lobster" src="graphics/lobster.png">
+    <!--<img class="shadow" id="black" src="graphics/black.png">-->
     
     <script type="text/javascript">
     
       // 20 => 640 25 => 800 30 => 960
+      const ZOOM = 100;
+      
       const SCREEN_WIDTH = 960;
       const SCREEN_HEIGHT = 800;
       
-      const CAM_MAX_COL = SCREEN_WIDTH / 32; // 30
-      const CAM_MAX_ROW = SCREEN_HEIGHT / 32; // 25
+      const CAM_MAX_COL = SCREEN_WIDTH / ZOOM; // 30
+      const CAM_MAX_ROW = SCREEN_HEIGHT / ZOOM; // 25
       
       var screen = null;
       var mouse_col = -1;
       var mouse_row = -1;
+      var show_number = true;
       
       const KEY_UP = 38;
       const KEY_DOWN = 40;
@@ -63,6 +51,14 @@
       const KEY_LEFT = 37;
       const KEY_BACKSPACE = 8;
       const KEY_M = 77;
+      const KEY_TAB = 9;
+      
+      var keys_down = {
+        38 : false,
+        40 : false,
+        37 : false,
+        39 : false
+      };
       
       const NONE = 0;
       const VERTICAL = 1;
@@ -74,10 +70,13 @@
       const PLAIN_TEXTURE = 1;
       const MIN_TEXTURE = 2;
       
+      const ROTATION_MOD = 0.1;
+      const MOVEMENT_MOD = 0.2;
+      
       var map = [
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -105,15 +104,84 @@
       var ROOMS = {};
       
       class Player {
-        constructor(x, y) {
+        constructor(x, y, angle) {
           this.x = x;
           this.y = y;
+          this.set_angle(angle);
+        }
+        
+        set_angle(angle) {
+          this.angle = angle;
+          this.dir_x = Math.cos(this.angle);
+          this.dir_y = -Math.sin(this.angle);
+          this.camera_plane_x = Math.cos(this.angle + Math.PI / 2);
+          this.camera_plane_y = -Math.sin(this.angle + Math.PI / 2);
+          // Dans la représentation mathématique
+          // les positifs sont vers le haut :
+          // il faut donc inverser !
+          this.set_box();
+        }
+        
+        set_box() {
+          this.box_max_x = Math.max(Math.max(this.x, this.x + this.dir_x + this.camera_plane_x), this.x + this.dir_x - this.camera_plane_x);
+          this.box_max_y = Math.max(Math.max(this.y, this.y + this.dir_y + this.camera_plane_y), this.y + this.dir_y - this.camera_plane_y);
+          this.box_min_x = Math.min(Math.min(this.x, this.x + this.dir_x + this.camera_plane_x), this.x + this.dir_x - this.camera_plane_x);
+          this.box_min_y = Math.min(Math.min(this.y, this.y + this.dir_y + this.camera_plane_y), this.y + this.dir_y - this.camera_plane_y);
+          this.box_width = this.box_max_x - this.box_min_x;
+          this.box_height = this.box_max_y - this.box_min_y;
+        }
+        
+        mod_angle(mod) {
+          let old_angle = this.angle;
+          this.set_angle(this.angle + mod);
+          this.set_box();
+          
+          let ok = this.check();
+          
+          if (!ok) {
+            this.set_angle(old_angle);
+            this.set_box();
+          }
+        }
+        
+        check() {
+          let start_x = Math.floor(this.box_min_x);
+          let start_y = Math.floor(this.box_min_y);
+          let end_x = Math.floor(this.box_max_x);
+          let end_y = Math.floor(this.box_max_y);
+          let ok = true;
+          outer_loop : for (let col = start_x; col <= end_x; col++) {
+            for (let row = start_y; row <= end_y; row++) {
+              if (map[col][row] != 0) {
+                ok = false;
+                break outer_loop;
+              }
+            }
+          }
+          return ok;
+        }
+        
+        mod_position(mod) {
+          let old_x = this.x;
+          let old_y = this.y;
+          
+          this.x += this.dir_x * mod;
+          this.y += this.dir_y * mod;
+          this.set_box();
+          
+          let ok = this.check();
+          
+          if (!ok) {
+            this.x = old_x;
+            this.y = old_y;
+            this.set_box();
+          }
         }
       }
       
       class Game {
         constructor() {
-          this.player = new Player(5.5, 5.5);
+          this.player = new Player(5.5, 5.5, Math.PI / 2);
         }
       }
       
@@ -148,6 +216,18 @@
       }
       
       function update() {
+        if (keys_down[KEY_LEFT]) {
+          game.player.mod_angle(ROTATION_MOD);
+        }
+        if (keys_down[KEY_RIGHT]) {
+          game.player.mod_angle(-ROTATION_MOD);
+        }
+        if (keys_down[KEY_UP]) {
+          game.player.mod_position(MOVEMENT_MOD);
+        }
+        if (keys_down[KEY_DOWN]) {
+          game.player.mod_position(-MOVEMENT_MOD);
+        } 
       }
       
       function draw() {
@@ -161,26 +241,59 @@
               let index = map[row][col];
               if (index == 0) {
                 ctx.fillStyle = 'rgb(0, 0, 0)';
-                ctx.fillRect(col * 32, row * 32, 32, 32);
+                ctx.fillRect(col * ZOOM, row * ZOOM, ZOOM, ZOOM);
                 ctx.strokeStyle = 'rgb(120, 120, 120)';
                 ctx.beginPath();
-                ctx.rect(col * 32, row * 32, 32, 32);
+                ctx.rect(col * ZOOM, row * ZOOM, ZOOM, ZOOM);
                 ctx.stroke();
-                ctx.fillStyle = 'rgb(255, 255, 255)';
-                ctx.fillText(col + ":" + row, col * 32 + 10, row * 32 + 10); 
+                if (show_number) {
+                  ctx.fillStyle = 'rgb(255, 255, 255)';
+                  ctx.fillText(col + ":" + row, col * ZOOM + 10, row * ZOOM + 10); 
+                }
               } else {
-                ctx.fillStyle = 'rgb(30, 30, 30)';
-                ctx.fillRect(row * 32, col * 32, 32, 32);
+                ctx.fillStyle = 'rgb(60, 60, 60)';
+                ctx.fillRect(col * ZOOM, row * ZOOM, ZOOM, ZOOM);
               }
             }
           }
+          
+          let px = game.player.x * ZOOM;
+          let py = game.player.y * ZOOM;
+          let dx = px + game.player.dir_x * ZOOM;
+          let dy = py + game.player.dir_y * ZOOM;
+          let cx = dx + game.player.camera_plane_x * ZOOM;
+          let cy = dy + game.player.camera_plane_y * ZOOM;
+          let c2x = dx - game.player.camera_plane_x * ZOOM;
+          let c2y = dy - game.player.camera_plane_y * ZOOM;
+          
           ctx.strokeStyle = 'yellow';
           ctx.beginPath();
-          ctx.rect(game.player.x * 32 - 1, game.player.y * 32 - 1, 3, 3);
+          ctx.rect(px - 1, py - 1, 3, 3);
+          ctx.moveTo(px, py);
+          ctx.lineTo(dx, dy);
+          ctx.stroke();
+          
+          ctx.strokeStyle = 'red';
+          ctx.beginPath();
+          ctx.moveTo(dx, dy);
+          ctx.lineTo(cx, cy);
+          ctx.lineTo(px, py);
+          ctx.lineTo(c2x, c2y);
+          ctx.lineTo(dx, dy);
+          ctx.stroke();
+          
+          ctx.strokeStyle = 'green';
+          ctx.beginPath();
+          let max_x = Math.max(Math.max(c2x, cx), px);
+          let max_y = Math.max(Math.max(c2y, cy), py);
+          let min_x = Math.min(Math.min(c2x, cx), px);
+          let min_y = Math.min(Math.min(c2y, cy), py);
+          ctx.rect(game.player.box_min_x * ZOOM, game.player.box_min_y * ZOOM, 
+                   game.player.box_width * ZOOM, game.player.box_height * ZOOM);
           ctx.stroke();
           
           ctx.strokeStyle = 'rgb(0, 255, 0)';
-          ctx.strokeRect(Math.floor(mouse_col / 32) * 32, Math.floor(mouse_row / 32) * 32, 32, 32);
+          ctx.strokeRect(Math.floor(mouse_col / ZOOM) * ZOOM, Math.floor(mouse_row / ZOOM) * ZOOM, ZOOM, ZOOM);
           
           //ctx.beginPath();
           //ctx.arc(posx, posy, 10, 0, 2 * Math.PI);
@@ -211,8 +324,10 @@
       
       function on_key_up(event) {
         event = window.event || event;
-        if (event.keyCode == KEY_UP) {
-          //...
+        if (event.keyCode in keys_down) {
+          keys_down[event.keyCode] = false;
+        } else if (event.keyCode == KEY_M) {
+          show_number = ! show_number;
         } else {
           console.log('Unbound up key:', event.keyCode);
         }
@@ -220,8 +335,8 @@
       
       function on_key_down(event){
         event = window.event || event;
-        if (event.keyCode == KEY_LEFT) {
-          //...
+        if (event.keyCode in keys_down) {
+          keys_down[event.keyCode] = true;
         } else {
           console.log('Unbound down key:', event.keyCode);
         }
