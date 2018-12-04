@@ -73,17 +73,32 @@
       const ROTATION_MOD = 0.1;
       const MOVEMENT_MOD = 0.2;
       
-      var map = [
+      const HITBOX = 0.90; // 1.42
+      
+      var units = [
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
         [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      ];
+      
+      var map = [
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+        [1, 0, 0, 1, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+        [1, 0, 0, 1, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
       ];
       
       var textures = [];
@@ -103,11 +118,49 @@
       var ROOM_ID = 1;
       var ROOMS = {};
       
+      class Thing {
+        constructor(type, x, y) {
+          this.type = type;
+          this.x = x;
+          this.y = y;
+        }
+      }
+      
+      class MedPack extends Thing {
+      
+        constructor(x, y) {
+          super('medpack', x, y);
+        }
+        
+        action(game) {
+          game.player.life = Math.min(100, game.player.life + 10);
+        }
+        
+        draw(ctx, x, y) {
+          ctx.fillStyle = 'white';
+          ctx.fillRect(x - 10, y - 10, 20, 20);
+          ctx.fillStyle = 'red';
+          ctx.fillRect(x - 2, y - 5, 4, 10);
+          ctx.fillRect(x - 5, y - 2, 10, 4);
+        }
+      }
+         
+      class Entity {
+        constructor(type, x, y, angle) {
+          this.type = type;
+          this.x = x;
+          this.y = y;
+          this.angle = angle;
+          units[Math.floor(this.y)][Math.floor(this.x)] = 1;
+        }
+      }
+
       class Player {
-        constructor(x, y, angle) {
+        constructor(x, y, angle, life) {
           this.x = x;
           this.y = y;
           this.set_angle(angle);
+          this.life = life;
         }
         
         set_angle(angle) {
@@ -123,6 +176,13 @@
         }
         
         set_box() {
+          this.box_max_x = this.x + HITBOX;
+          this.box_min_x = this.x - HITBOX;
+          this.box_max_y = this.y + HITBOX;
+          this.box_min_y = this.y - HITBOX;
+          this.box_width = HITBOX * 2;
+          this.box_height = HITBOX * 2;
+          return;
           this.box_max_x = Math.max(Math.max(this.x, this.x + this.dir_x + this.camera_plane_x), this.x + this.dir_x - this.camera_plane_x);
           this.box_max_y = Math.max(Math.max(this.y, this.y + this.dir_y + this.camera_plane_y), this.y + this.dir_y - this.camera_plane_y);
           this.box_min_x = Math.min(Math.min(this.x, this.x + this.dir_x + this.camera_plane_x), this.x + this.dir_x - this.camera_plane_x);
@@ -150,9 +210,11 @@
           let end_x = Math.floor(this.box_max_x);
           let end_y = Math.floor(this.box_max_y);
           let ok = true;
-          outer_loop : for (let col = start_x; col <= end_x; col++) {
-            for (let row = start_y; row <= end_y; row++) {
-              if (map[col][row] != 0) {
+          console.log(start_x, start_y, end_x, end_y);
+          outer_loop : for (let row = start_y; row <= end_y; row++) {
+            for (let col = start_x; col <= end_x; col++) {
+              console.log('x=', col, 'y=', row);
+              if (map[row][col] != 0 || units[row][col] != 0) {
                 ok = false;
                 break outer_loop;
               }
@@ -165,23 +227,41 @@
           let old_x = this.x;
           let old_y = this.y;
           
-          this.x += this.dir_x * mod;
-          this.y += this.dir_y * mod;
+          let new_x = this.x + this.dir_x * mod;
+          let new_y = this.y + this.dir_y * mod;
+          
+          this.x = new_x;
+          this.y = new_y;
           this.set_box();
           
           let ok = this.check();
           
           if (!ok) {
             this.x = old_x;
-            this.y = old_y;
             this.set_box();
+            ok = this.check();
+            if (!ok) {
+              this.x = new_x;
+              this.y = old_y;
+              this.set_box();
+              ok = this.check();
+              if (!ok) {
+                this.x = old_x;
+                this.y = old_y;
+                this.set_box();
+              }
+            }
           }
         }
       }
       
       class Game {
         constructor() {
-          this.player = new Player(5.5, 5.5, Math.PI / 2);
+          this.player = new Player(5.0, 5.5, Math.PI / 2, 100);
+          this.entities = [];
+          this.entities.push(new Entity('soldier', 2.5, 2.5, Math.PI / 2));
+          this.things = [];
+          this.things.push(new MedPack(1.5, 3.5));
         }
       }
       
@@ -227,7 +307,17 @@
         }
         if (keys_down[KEY_DOWN]) {
           game.player.mod_position(-MOVEMENT_MOD);
-        } 
+        }
+        let things2 = []
+        for (let obj of game.things) {
+          if (Math.floor(obj.x) == Math.floor(game.player.x) && 
+              Math.floor(obj.y) == Math.floor(game.player.y)) {
+              obj.action(game);
+          } else {
+              things2.push(obj);
+          }
+        }
+        game.things = things2;
       }
       
       function draw() {
@@ -240,8 +330,14 @@
             for (let col = 0; col < CAM_MAX_COL && col < map[row].length; col++) {
               let index = map[row][col];
               if (index == 0) {
-                ctx.fillStyle = 'rgb(0, 0, 0)';
-                ctx.fillRect(col * ZOOM, row * ZOOM, ZOOM, ZOOM);
+                let unit = units[row][col];
+                if (unit == 0) {
+                  ctx.fillStyle = 'rgb(0, 0, 0)';
+                  ctx.fillRect(col * ZOOM, row * ZOOM, ZOOM, ZOOM);
+                } else {
+                  ctx.fillStyle = 'rgb(255, 0, 0)';
+                  ctx.fillRect(col * ZOOM, row * ZOOM, ZOOM, ZOOM);
+                }
                 ctx.strokeStyle = 'rgb(120, 120, 120)';
                 ctx.beginPath();
                 ctx.rect(col * ZOOM, row * ZOOM, ZOOM, ZOOM);
@@ -296,8 +392,20 @@
           ctx.strokeRect(Math.floor(mouse_col / ZOOM) * ZOOM, Math.floor(mouse_row / ZOOM) * ZOOM, ZOOM, ZOOM);
           
           //ctx.beginPath();
-          //ctx.arc(posx, posy, 10, 0, 2 * Math.PI);
-          //ctx.fill();
+          //ctx.rect(px - 142, py - 142, 284, 284);
+          //ctx.stroke();
+          
+          ctx.strokeStyle = 'white';
+          for (let ent of game.entities) {
+            ctx.beginPath();
+            ctx.arc(ent.x * ZOOM, ent.y * ZOOM, 30, 0, 2 * Math.PI);
+            ctx.stroke(); //ctx.fill();
+          }
+          for (let obj of game.things) {
+            let objx = obj.x * ZOOM;
+            let objy = obj.y * ZOOM;
+            obj.draw(ctx, objx, objy);
+          }
         }
       }
       
