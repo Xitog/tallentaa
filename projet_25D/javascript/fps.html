@@ -14,11 +14,12 @@
         overflow:hidden;
       }
       body {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        margin: 0px;
+        border: None;
+      }
+      canvas#screen {
+        margin: 0px;
+        border: None;
       }
       img.shadow {
         display: none;
@@ -26,11 +27,12 @@
     </style>
   </head>
   <body onload="start();">
-    <canvas id="screen" width="960" height="800">Your browser must support canvas to play.</canvas>
+    <canvas id="screen" width="960px" height="800px">Your browser must support canvas to play.</canvas>
     <!--<img class="shadow" id="black" src="graphics/black.png">-->
     
     <script type="text/javascript">
-    
+      // v1_13-12-2018
+      
       // 20 => 640 25 => 800 30 => 960
       const ZOOM = 100;
       
@@ -44,20 +46,13 @@
       var mouse_col = -1;
       var mouse_row = -1;
       var show_number = true;
-      
-      const KEY_UP = 38;
-      const KEY_DOWN = 40;
-      const KEY_RIGHT = 39;
-      const KEY_LEFT = 37;
-      const KEY_BACKSPACE = 8;
-      const KEY_M = 77;
-      const KEY_TAB = 9;
+      var show_grid = true;
       
       var keys_down = {
-        38 : false,
-        40 : false,
-        37 : false,
-        39 : false
+        'ArrowUp' : false,
+        'ArrowDown' : false,
+        'ArrowRight' : false,
+        'ArrowLeft' : false
       };
       
       const NONE = 0;
@@ -74,32 +69,54 @@
       const MOVEMENT_MOD = 0.2;
       
       const HITBOX = 0.90; // 1.42
-      
-      var units = [
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-        [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-      ];
-      
+
       var map = [
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 1, 0, 0, 1],
-        [1, 0, 0, 1, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 1, 0, 0, 1],
-        [1, 0, 0, 1, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
       ];
+      
+      console.log('Width map (X, number of columns)', map[0].length);
+      console.log('Height map (Y, number of rows)', map.length);
+      
+      var units = [];
+      for (let row of map) {
+        let tmp = [];
+        for (let col of row) {
+          tmp.push(0);
+        }
+        units.push(tmp);
+      }
       
       var textures = [];
       var color_index = 1;
@@ -119,17 +136,35 @@
       var ROOMS = {};
       
       class Thing {
-        constructor(type, x, y) {
+        constructor(type, x, y, size) {
           this.type = type;
           this.x = x;
           this.y = y;
+          this.size = size;
         }
+        
+        action(game) {
+          return true;
+        }
+        
+        draw(ctx, x, y) {
+        }
+        
+        contact(game) {
+          let dist_x = Math.abs(this.x - game.player.x);
+          let dist_y = Math.abs(this.y - game.player.y);
+          if (dist_x <= this.size / 2 && dist_y <= this.size / 2) {
+            return true;
+          }
+        }
+          //if (Math.floor(obj.x) == Math.floor(game.player.x) && 
+          //    Math.floor(obj.y) == Math.floor(game.player.y)) {
       }
       
       class MedPack extends Thing {
       
         constructor(x, y) {
-          super('medpack', x, y);
+          super('medpack', x, y, 1.00);
         }
         
         action(game) {
@@ -142,9 +177,66 @@
           ctx.fillStyle = 'red';
           ctx.fillRect(x - 2, y - 5, 4, 10);
           ctx.fillRect(x - 5, y - 2, 10, 4);
+          ctx.strokeStyle = 'blue';
+          ctx.beginPath();
+          ctx.rect(x - this.size / 2 * ZOOM, y - this.size / 2 * ZOOM, this.size * ZOOM, this.size * ZOOM);
+          ctx.stroke();
         }
       }
-         
+      
+      class Gate {
+        constructor(x, y, w, h, orientation, speed) {
+          this.x = x;
+          this.y = y;
+          this.w = w;
+          this.h = h;
+          this.closed = 100;
+          this.mod = 0;
+          this.orientation = orientation; // L |--, R --|, U, D
+          this.speed = speed;
+        }
+        
+        activate() {
+          if (this.mod < 0 || this.mod > 0) { // opening or closing
+            this.mod = -this.mod; 
+          } else { // mod == 0
+            if (this.closed == 100) {
+              this.open();
+            } else { // this.closed == 0
+              this.close();
+            }
+          }
+        }
+        
+        open() {
+          this.mod = -this.speed;
+        }
+        
+        close() {
+          this.mod = this.speed;
+        }
+        
+        update() {
+          this.closed += this.mod;
+          if (this.closed <= 0) { // the gate is open
+            this.closed = 0;
+            this.mod = 0;
+          } else if (this.closed >= 100) { // the gate is closed
+            this.closed = 100;
+            this.mod = 0;
+          }
+        }
+        
+        calc() {
+          if (this.orientation == 'L') { // gate starting on left |-- |- |
+            return [this.x, this.y, this.w * (this.closed / 100), this.h];
+          } else if (this.orientation == 'R') { // --| -| |
+            return [this.x + this.w - this.w * (this.closed / 100), this.y, this.w * (this.closed / 100), this.h];
+          }
+        }
+        
+      }
+      
       class Entity {
         constructor(type, x, y, angle) {
           this.type = type;
@@ -161,6 +253,7 @@
           this.y = y;
           this.set_angle(angle);
           this.life = life;
+          units[Math.floor(this.y)][Math.floor(this.x)] = 1;
         }
         
         set_angle(angle) {
@@ -183,15 +276,10 @@
           this.box_width = HITBOX * 2;
           this.box_height = HITBOX * 2;
           return;
-          this.box_max_x = Math.max(Math.max(this.x, this.x + this.dir_x + this.camera_plane_x), this.x + this.dir_x - this.camera_plane_x);
-          this.box_max_y = Math.max(Math.max(this.y, this.y + this.dir_y + this.camera_plane_y), this.y + this.dir_y - this.camera_plane_y);
-          this.box_min_x = Math.min(Math.min(this.x, this.x + this.dir_x + this.camera_plane_x), this.x + this.dir_x - this.camera_plane_x);
-          this.box_min_y = Math.min(Math.min(this.y, this.y + this.dir_y + this.camera_plane_y), this.y + this.dir_y - this.camera_plane_y);
-          this.box_width = this.box_max_x - this.box_min_x;
-          this.box_height = this.box_max_y - this.box_min_y;
         }
         
         mod_angle(mod) {
+          units[Math.floor(this.y)][Math.floor(this.x)] = 0;
           let old_angle = this.angle;
           this.set_angle(this.angle + mod);
           this.set_box();
@@ -202,6 +290,7 @@
             this.set_angle(old_angle);
             this.set_box();
           }
+          units[Math.floor(this.y)][Math.floor(this.x)] = 1;
         }
         
         check() {
@@ -210,10 +299,10 @@
           let end_x = Math.floor(this.box_max_x);
           let end_y = Math.floor(this.box_max_y);
           let ok = true;
-          console.log(start_x, start_y, end_x, end_y);
+          //console.log(start_x, start_y, end_x, end_y);
           outer_loop : for (let row = start_y; row <= end_y; row++) {
             for (let col = start_x; col <= end_x; col++) {
-              console.log('x=', col, 'y=', row);
+              //console.log('x=', col, 'y=', row);
               if (map[row][col] != 0 || units[row][col] != 0) {
                 ok = false;
                 break outer_loop;
@@ -224,6 +313,8 @@
         }
         
         mod_position(mod) {
+          units[Math.floor(this.y)][Math.floor(this.x)] = 0;
+          
           let old_x = this.x;
           let old_y = this.y;
           
@@ -252,6 +343,7 @@
               }
             }
           }
+          units[Math.floor(this.y)][Math.floor(this.x)] = 1;
         }
       }
       
@@ -262,163 +354,197 @@
           this.entities.push(new Entity('soldier', 2.5, 2.5, Math.PI / 2));
           this.things = [];
           this.things.push(new MedPack(1.5, 3.5));
+          this.things.push(new MedPack(5.5, 6.5));
+          this.gates = [];
+          this.gates.push(new Gate(16, 21, 2, 1, 'L', 5)); // x, y, w, h, orientation, speed
+          this.gates.push(new Gate(9, 7, 2, 1, 'L', 5)); // x, y, w, h, orientation, speed
+          this.gates.push(new Gate(11, 7, 2, 1, 'R', 5)); // x, y, w, h, orientation, speed
         }
-      }
-      
-      function load() {
-        for (let o of document.images) {
-          textures.push(o);
-          //textures[o.id] = o;
-        }
-        console.log("End loading " + textures.length + " textures.");
-      }
-      
-      var game;
-      
-      function start() {
-        screen = document.getElementById('screen');
-        screen.onmousemove = on_mouse_move;
-        window.onclick = on_mouse_left_click;
-        window.oncontextmenu = on_mouse_right_click;
-        window.onkeydown = on_key_down;
-        window.onkeyup = on_key_up;
-        window.setInterval(run, 33);
-        console.log(screen.getContext('2d').globalCompositeOperation);
-        //screen.getContext('2d').globalCompositeOperation = 'copy';
-        load();
-        game = new Game();
-        run();
-      }
-      
-      function run() {
-        update();
-        draw();
-      }
-      
-      function update() {
-        if (keys_down[KEY_LEFT]) {
-          game.player.mod_angle(ROTATION_MOD);
-        }
-        if (keys_down[KEY_RIGHT]) {
-          game.player.mod_angle(-ROTATION_MOD);
-        }
-        if (keys_down[KEY_UP]) {
-          game.player.mod_position(MOVEMENT_MOD);
-        }
-        if (keys_down[KEY_DOWN]) {
-          game.player.mod_position(-MOVEMENT_MOD);
-        }
-        let things2 = []
-        for (let obj of game.things) {
-          if (Math.floor(obj.x) == Math.floor(game.player.x) && 
-              Math.floor(obj.y) == Math.floor(game.player.y)) {
-              obj.action(game);
-          } else {
-              things2.push(obj);
+        
+        update() {
+          for (let g of this.gates) {
+            g.update();
           }
         }
-        game.things = things2;
       }
       
-      function draw() {
-        if (screen.getContext) {
-          let ctx = screen.getContext('2d');
-          ctx.clearRect(0, 0, screen.width, screen.height);
-          ctx.font = "10px Arial";
-          ctx.fillStyle = "black";
-          for (let row = 0; row < CAM_MAX_ROW && row < map.length; row++) {
-            for (let col = 0; col < CAM_MAX_COL && col < map[row].length; col++) {
+      //---------------------------------------------------
+      // Application class
+      // + screen
+      // + ctx
+      // + game
+      // + static boot()
+      // + constructor()
+      // + load()
+      // + start()
+      // + run()
+      // + update()
+      // + draw()
+      // + on_mouse_move(event)
+      //---------------------------------------------------
+      class Application {
+        
+        constructor() {
+          this.screen = document.getElementById('screen');
+          if (!this.screen.getContext) {
+            alert("Unable to get the context");
+          }
+          this.ctx = this.screen.getContext('2d', { alpha: false });
+          console.log(this.ctx.globalCompositeOperation);
+        }
+        
+        load() {
+          for (let o of document.images) {
+            textures.push(o);
+            //textures[o.id] = o;
+          }
+          console.log("End loading " + textures.length + " textures.");
+        }
+        
+        start() {
+          this.screen.onmousemove = on_mouse_move;
+          window.onclick = on_mouse_left_click;
+          window.oncontextmenu = on_mouse_right_click;
+          window.onkeydown = on_key_down;
+          window.onkeyup = on_key_up;
+          window.setInterval(run, 33);
+          this.load();
+          this.game = new Game();
+          this.run();
+        }
+      
+        run() {
+          this.update();
+          this.draw();
+        }
+      
+        update() {
+          if (keys_down['ArrowLeft']) {
+            this.game.player.mod_angle(ROTATION_MOD);
+          }
+          if (keys_down['ArrowRight']) {
+            this.game.player.mod_angle(-ROTATION_MOD);
+          }
+          if (keys_down['ArrowUp']) {
+            this.game.player.mod_position(MOVEMENT_MOD);
+          }
+          if (keys_down['ArrowDown']) {
+            this.game.player.mod_position(-MOVEMENT_MOD);
+          }
+          let things2 = []
+          for (let obj of this.game.things) {
+            if (Math.floor(obj.x) == Math.floor(this.game.player.x) && 
+                Math.floor(obj.y) == Math.floor(this.game.player.y)) {
+                obj.action(this.game);
+            } else {
+                things2.push(obj);
+            }
+          }
+          this.game.things = things2;
+          this.game.update();
+        }
+      
+        draw() {
+          let px = this.game.player.x * ZOOM;
+          let py = this.game.player.y * ZOOM;
+          let dx = px + this.game.player.dir_x * ZOOM;
+          let dy = py + this.game.player.dir_y * ZOOM;
+          let cx = dx + this.game.player.camera_plane_x * ZOOM;
+          let cy = dy + this.game.player.camera_plane_y * ZOOM;
+          let c2x = dx - this.game.player.camera_plane_x * ZOOM;
+          let c2y = dy - this.game.player.camera_plane_y * ZOOM;
+       
+          let fx = px - 480;
+          let fy = py - 400;
+          
+          this.ctx.clearRect(0, 0, this.screen.width, this.screen.height);
+          this.ctx.font = "10px Arial";
+          for (let row = 0; row < map.length; row++) { // row < CAM_MAX_ROW && 
+            for (let col = 0; col < map[row].length; col++) { // col < CAM_MAX_COL && 
               let index = map[row][col];
               if (index == 0) {
                 let unit = units[row][col];
-                if (unit == 0) {
-                  ctx.fillStyle = 'rgb(0, 0, 0)';
-                  ctx.fillRect(col * ZOOM, row * ZOOM, ZOOM, ZOOM);
-                } else {
-                  ctx.fillStyle = 'rgb(255, 0, 0)';
-                  ctx.fillRect(col * ZOOM, row * ZOOM, ZOOM, ZOOM);
+                if (unit != 0) {
+                  this.rect(col * ZOOM - fx, row * ZOOM - fy, ZOOM, ZOOM, 'red', true)
                 }
-                ctx.strokeStyle = 'rgb(120, 120, 120)';
-                ctx.beginPath();
-                ctx.rect(col * ZOOM, row * ZOOM, ZOOM, ZOOM);
-                ctx.stroke();
+                if (show_grid) {
+                  this.rect(col * ZOOM - fx, row * ZOOM - fy, ZOOM, ZOOM, 'rgb(120, 120, 120)', false)
+                }
                 if (show_number) {
-                  ctx.fillStyle = 'rgb(255, 255, 255)';
-                  ctx.fillText(col + ":" + row, col * ZOOM + 10, row * ZOOM + 10); 
+                  this.ctx.fillStyle = 'rgb(255, 255, 255)';
+                  this.ctx.fillText(col + ":" + row, col * ZOOM + 10 - fx, row * ZOOM + 10 - fy); 
                 }
               } else {
-                ctx.fillStyle = 'rgb(60, 60, 60)';
-                ctx.fillRect(col * ZOOM, row * ZOOM, ZOOM, ZOOM);
+                this.rect(col * ZOOM - fx, row * ZOOM - fy, ZOOM, ZOOM, 'rgb(60, 60, 60)', true)
               }
             }
           }
           
-          let px = game.player.x * ZOOM;
-          let py = game.player.y * ZOOM;
-          let dx = px + game.player.dir_x * ZOOM;
-          let dy = py + game.player.dir_y * ZOOM;
-          let cx = dx + game.player.camera_plane_x * ZOOM;
-          let cy = dy + game.player.camera_plane_y * ZOOM;
-          let c2x = dx - game.player.camera_plane_x * ZOOM;
-          let c2y = dy - game.player.camera_plane_y * ZOOM;
+          this.ctx.strokeStyle = 'yellow';
+          this.ctx.beginPath();
+          this.ctx.rect(px - 1 - fx, py - 1 - fy, 3, 3);
+          this.ctx.moveTo(px - fx, py - fy);
+          this.ctx.lineTo(dx - fx, dy - fy);
+          this.ctx.stroke();
           
-          ctx.strokeStyle = 'yellow';
-          ctx.beginPath();
-          ctx.rect(px - 1, py - 1, 3, 3);
-          ctx.moveTo(px, py);
-          ctx.lineTo(dx, dy);
-          ctx.stroke();
+          this.ctx.strokeStyle = 'red';
+          this.ctx.beginPath();
+          this.ctx.moveTo(dx - fx, dy - fy);
+          this.ctx.lineTo(cx - fx, cy - fy);
+          this.ctx.lineTo(px - fx, py - fy);
+          this.ctx.lineTo(c2x - fx, c2y - fy);
+          this.ctx.lineTo(dx - fx, dy - fy);
+          this.ctx.stroke();
           
-          ctx.strokeStyle = 'red';
-          ctx.beginPath();
-          ctx.moveTo(dx, dy);
-          ctx.lineTo(cx, cy);
-          ctx.lineTo(px, py);
-          ctx.lineTo(c2x, c2y);
-          ctx.lineTo(dx, dy);
-          ctx.stroke();
+          this.rect(this.game.player.box_min_x * ZOOM - fx, this.game.player.box_min_y * ZOOM - fy, this.game.player.box_width * ZOOM, this.game.player.box_height * ZOOM, 'red', false);
           
-          ctx.strokeStyle = 'green';
-          ctx.beginPath();
-          let max_x = Math.max(Math.max(c2x, cx), px);
-          let max_y = Math.max(Math.max(c2y, cy), py);
-          let min_x = Math.min(Math.min(c2x, cx), px);
-          let min_y = Math.min(Math.min(c2y, cy), py);
-          ctx.rect(game.player.box_min_x * ZOOM, game.player.box_min_y * ZOOM, 
-                   game.player.box_width * ZOOM, game.player.box_height * ZOOM);
-          ctx.stroke();
-          
-          ctx.strokeStyle = 'rgb(0, 255, 0)';
-          ctx.strokeRect(Math.floor(mouse_col / ZOOM) * ZOOM, Math.floor(mouse_row / ZOOM) * ZOOM, ZOOM, ZOOM);
-          
-          //ctx.beginPath();
-          //ctx.rect(px - 142, py - 142, 284, 284);
-          //ctx.stroke();
-          
-          ctx.strokeStyle = 'white';
-          for (let ent of game.entities) {
-            ctx.beginPath();
-            ctx.arc(ent.x * ZOOM, ent.y * ZOOM, 30, 0, 2 * Math.PI);
-            ctx.stroke(); //ctx.fill();
+          // Game entities, things and gates
+          for (let ent of this.game.entities) {
+            this.circle(ent.x * ZOOM - fx, ent.y * ZOOM - fy, 'white');
           }
-          for (let obj of game.things) {
-            let objx = obj.x * ZOOM;
-            let objy = obj.y * ZOOM;
-            obj.draw(ctx, objx, objy);
+          for (let obj of this.game.things) {
+            obj.draw(this.ctx, obj.x * ZOOM - fx, obj.y * ZOOM - fy);
+            this.circle(obj.x * ZOOM - fx, obj.y * ZOOM - fy, 'blue');
+          }
+          for (let gate of this.game.gates) {
+            let r = gate.calc();
+            this.rect(r[0] * ZOOM - fx, r[1] * ZOOM - fy, r[2] * ZOOM, r[3] * ZOOM, 'rgb(0, 0, 120)', true)
+          }
+          
+          // Projection DDA algorithm
+        }
+        
+        rect(x, y, w, h, color, fill) {
+          if (fill) {
+            this.ctx.fillStyle = color;
+            this.ctx.fillRect(Math.floor(x), Math.floor(y), Math.floor(w), Math.floor(h));
+          } else {
+            this.ctx.strokeStyle = color;
+            this.ctx.beginPath();
+            this.ctx.rect(Math.floor(x), Math.floor(y), Math.floor(w), Math.floor(h));
+            this.ctx.stroke();
           }
         }
+        
+        circle(center_x, center_y, color) {
+          this.ctx.strokeStyle = color;
+          this.ctx.beginPath();
+          this.ctx.arc(Math.floor(center_x), Math.floor(center_y), 30, 0, 2 * Math.PI);
+          this.ctx.stroke();
+        }
+        
       }
       
       function on_mouse_move(event) {
         event = event || window.event;
         // Mouse coordinates
-        let screenRect = screen.getBoundingClientRect();
+        let screenRect = app.screen.getBoundingClientRect();
         mouse_col = event.pageX - screenRect.left;
         mouse_row = event.pageY - screenRect.top;
         //mouse_map_col = Math.floor(mouse_col / 32) + camera.col;
         //mouse_map_row = Math.floor(mouse_row / 32) + camera.row;
       }
-      
+        
       function on_mouse_left_click(event) {
         event = event || window.event;
         console.log('Mouse col:', Math.floor(mouse_col / 32), 'Mouse row:', Math.floor(mouse_row / 32));
@@ -432,22 +558,38 @@
       
       function on_key_up(event) {
         event = window.event || event;
-        if (event.keyCode in keys_down) {
-          keys_down[event.keyCode] = false;
-        } else if (event.keyCode == KEY_M) {
+        if (event.key in keys_down) {
+          keys_down[event.key] = false;
+        } else if (event.key == 'n') {
           show_number = ! show_number;
+        } else if (event.key == 'g') {
+          show_grid = ! show_grid
+        } else if (event.key == ' ') {
+          for (let g of app.game.gates) {
+            g.activate();
+          }
         } else {
-          console.log('Unbound up key:', event.keyCode);
+          console.log('Unbound up key:', event.key);
         }
       }
       
       function on_key_down(event){
         event = window.event || event;
-        if (event.keyCode in keys_down) {
-          keys_down[event.keyCode] = true;
+        if (event.key in keys_down) {
+          keys_down[event.key] = true;
         } else {
-          console.log('Unbound down key:', event.keyCode);
+          console.log('Unbound down key:', event.key);
         }
+      }
+      
+      var app = new Application();
+      
+      function start() {
+        app.start();
+      }
+      
+      function run() {
+        app.run();
       }
       
     </script>
