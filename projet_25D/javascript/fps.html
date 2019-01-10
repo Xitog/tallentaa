@@ -68,13 +68,13 @@
       const ROTATION_MOD = 0.1;
       const MOVEMENT_MOD = 0.2;
       
-      const HITBOX = 0.90; // 1.42
+      const HITBOX = 0.45; // 0.90; // 1.42
 
       var map = [
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -136,6 +136,7 @@
       var ROOMS = {};
       
       class Thing {
+      
         constructor(type, x, y, size) {
           this.type = type;
           this.x = x;
@@ -185,27 +186,42 @@
       }
       
       class Gate {
-        constructor(x, y, w, h, orientation, speed) {
+      
+        constructor(x, y, w, h, orientation, speed, autoclose) {
           this.x = x;
           this.y = y;
           this.w = w;
           this.h = h;
-          this.closed = 100;
+          this.closed = 1;
           this.mod = 0;
           this.orientation = orientation; // L |--, R --|, U, D
           this.speed = speed;
+          this.autoclose = autoclose;
+          this.cpt_autoclose = this.autoclose;
         }
         
         activate() {
           if (this.mod < 0 || this.mod > 0) { // opening or closing
             this.mod = -this.mod; 
           } else { // mod == 0
-            if (this.closed == 100) {
+            if (this.closed == 1) {
               this.open();
             } else { // this.closed == 0
               this.close();
             }
           }
+        }
+        
+        can_close() {
+          let status = true;
+          for (let r = this.y; r < this.y + this.h; r++) {
+            for (let c = this.x; c < this.x + this.w; c++) {
+              if (units[r][c] != 0) {
+                status = false;
+              }
+            }
+          }
+          return status;
         }
         
         open() {
@@ -214,30 +230,77 @@
         
         close() {
           this.mod = this.speed;
+          this.cpt_autoclose = this.autoclose;
         }
         
         update() {
-          this.closed += this.mod;
-          if (this.closed <= 0) { // the gate is open
-            this.closed = 0;
-            this.mod = 0;
-          } else if (this.closed >= 100) { // the gate is closed
-            this.closed = 100;
-            this.mod = 0;
+          if (this.mod != 0) { // The gate is closing or opening
+            // can't close if there is something
+            if (this.mod > 0 && this.closed == 0 && !this.can_close()) {
+              return;
+            }
+            // Empty everything
+            for (let r = this.y; r < this.y + this.h; r++) {
+              for (let c = this.x; c < this.x + this.w; c++) {
+                units[r][c] = 0;
+              }
+            }
+            // close or open
+            this.closed += this.mod;
+            // stop
+            if (this.closed <= 0) { // the gate is open
+              this.closed = 0;
+              this.mod = 0;
+            } else if (this.closed >= 1) { // the gate is closed
+              this.closed = 1;
+              this.mod = 0;
+            }
+            // refresh
+            let min_x;
+            let max_x;
+            let min_y;
+            let max_y;
+            if (this.orientation == 'L') { // |-- |-  |
+              min_x = this.x;
+              min_y = this.y;
+              max_x = this.x + Math.ceil(this.w * this.closed);
+              max_y = this.y + this.h;
+              // if (this.closed > 0 && this.closed < 1) console.log(this.closed, min_x, max_x);
+            } else if (this.orientation == 'R') { // --|  -|   |{
+              min_x = Math.floor(this.x + this.w - this.w * this.closed);
+              min_y = this.y;
+              max_x = this.x + this.w;
+              max_y = this.y + this.h;
+            }
+            for (let r = min_y; r < max_y; r++) {
+              for (let c = min_x; c < max_x; c++) {
+                units[r][c] = 1;
+              }
+            }
+          } else { // Gate is opened (closed=0) or closed (closed=1)
+            if (this.autoclose && this.closed == 0) {
+              if (this.cpt_autoclose > 0) {
+                this.cpt_autoclose -= 1;
+                if (this.cpt_autoclose == 0) {
+                  this.close();
+                }
+              }
+            }
           }
         }
         
         calc() {
           if (this.orientation == 'L') { // gate starting on left |-- |- |
-            return [this.x, this.y, this.w * (this.closed / 100), this.h];
+            return [this.x, this.y, this.w * this.closed, this.h];
           } else if (this.orientation == 'R') { // --| -| |
-            return [this.x + this.w - this.w * (this.closed / 100), this.y, this.w * (this.closed / 100), this.h];
+            return [this.x + this.w - this.w * this.closed, this.y, this.w * this.closed, this.h];
           }
         }
         
       }
       
       class Entity {
+      
         constructor(type, x, y, angle) {
           this.type = type;
           this.x = x;
@@ -245,15 +308,33 @@
           this.angle = angle;
           units[Math.floor(this.y)][Math.floor(this.x)] = 1;
         }
+      
       }
 
       class Player {
+      
         constructor(x, y, angle, life) {
           this.x = x;
           this.y = y;
           this.set_angle(angle);
           this.life = life;
-          units[Math.floor(this.y)][Math.floor(this.x)] = 1;
+          this.update();
+        }
+        
+        update() {
+          for (let r = Math.floor(this.box_min_y); r < Math.ceil(this.box_max_y); r++) {
+            for (let c = Math.floor(this.box_min_x); c < Math.ceil(this.box_max_x); c++) {
+              units[r][c] = 1;
+            }
+          }
+        }
+        
+        clean() {
+          for (let r = Math.floor(this.box_min_y); r < Math.ceil(this.box_max_y); r++) {
+            for (let c = Math.floor(this.box_min_x); c < Math.ceil(this.box_max_x); c++) {
+              units[r][c] = 0;
+            }
+          }
         }
         
         set_angle(angle) {
@@ -279,7 +360,7 @@
         }
         
         mod_angle(mod) {
-          units[Math.floor(this.y)][Math.floor(this.x)] = 0;
+          this.clean();
           let old_angle = this.angle;
           this.set_angle(this.angle + mod);
           this.set_box();
@@ -290,7 +371,7 @@
             this.set_angle(old_angle);
             this.set_box();
           }
-          units[Math.floor(this.y)][Math.floor(this.x)] = 1;
+          this.update();
         }
         
         check() {
@@ -313,7 +394,7 @@
         }
         
         mod_position(mod) {
-          units[Math.floor(this.y)][Math.floor(this.x)] = 0;
+          this.clean();
           
           let old_x = this.x;
           let old_y = this.y;
@@ -343,11 +424,13 @@
               }
             }
           }
-          units[Math.floor(this.y)][Math.floor(this.x)] = 1;
+          this.update();
         }
+        
       }
       
       class Game {
+      
         constructor() {
           this.player = new Player(5.0, 5.5, Math.PI / 2, 100);
           this.entities = [];
@@ -356,16 +439,20 @@
           this.things.push(new MedPack(1.5, 3.5));
           this.things.push(new MedPack(5.5, 6.5));
           this.gates = [];
-          this.gates.push(new Gate(16, 21, 2, 1, 'L', 5)); // x, y, w, h, orientation, speed
-          this.gates.push(new Gate(9, 7, 2, 1, 'L', 5)); // x, y, w, h, orientation, speed
-          this.gates.push(new Gate(11, 7, 2, 1, 'R', 5)); // x, y, w, h, orientation, speed
+          //this.gates.push(new Gate(16, 21, 2, 1, 'L', 0.05, 160)); // x, y, w, h, orientation, speed
+          //this.gates.push(new Gate(9, 7, 2, 1, 'L', 0.05, false)); // x, y, w, h, orientation, speed
+          //this.gates.push(new Gate(11, 7, 2, 1, 'R', 0.05, false)); // x, y, w, h, orientation, speed
+          this.gates.push(new Gate(11, 3, 1, 1, 'L', 0.02, 100)); //100));
+          this.gates.push(new Gate(13, 3, 1, 1, 'R', 0.02, 100));
         }
         
         update() {
           for (let g of this.gates) {
             g.update();
           }
+          this.player.update();
         }
+        
       }
       
       //---------------------------------------------------
@@ -512,6 +599,7 @@
           }
           
           // Projection DDA algorithm
+          // TODO
         }
         
         rect(x, y, w, h, color, fill) {
