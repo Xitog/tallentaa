@@ -4,28 +4,28 @@
 		<category name="Window">
 			<property name="Left" type="integer">-8</property>
 			<property name="Top" type="integer">-30</property>
-			<property name="Right" type="integer">952</property>
-			<property name="Bottom" type="integer">423</property>
+			<property name="Right" type="integer">1048</property>
+			<property name="Bottom" type="integer">519</property>
 			<property name="Maximized" type="integer">1</property>
 			<property name="Active" type="integer">1</property>
 		</category>
 	</category>
 	<category name="minisdl.c">
 		<category name="Window">
-			<property name="Left" type="integer">50</property>
-			<property name="Top" type="integer">50</property>
-			<property name="Right" type="integer">1002</property>
-			<property name="Bottom" type="integer">361</property>
+			<property name="Left" type="integer">100</property>
+			<property name="Top" type="integer">100</property>
+			<property name="Right" type="integer">880</property>
+			<property name="Bottom" type="integer">483</property>
 			<property name="Maximized" type="integer">0</property>
 			<property name="Active" type="integer">0</property>
 		</category>
 	</category>
 	<category name="minisdl.h">
 		<category name="Window">
-			<property name="Left" type="integer">75</property>
-			<property name="Top" type="integer">75</property>
-			<property name="Right" type="integer">1027</property>
-			<property name="Bottom" type="integer">386</property>
+			<property name="Left" type="integer">125</property>
+			<property name="Top" type="integer">125</property>
+			<property name="Right" type="integer">905</property>
+			<property name="Bottom" type="integer">508</property>
 			<property name="Maximized" type="integer">0</property>
 			<property name="Active" type="integer">0</property>
 		</category>
