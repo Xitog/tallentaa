@@ -139,12 +139,35 @@ int main (int argc, char * argv[]) {
 	
 	Map * one_col = create_map(1, 10, 2);
 	display_map(one_col);
+    
+    // Lecture de map
+
+    FILE * map_file = fopen("The_quiet_river.map", "rb");
+    int version = 0;
+    fread(&version, sizeof(int), 1, map_file);
+    printf("Version = %d\n", version);
+    int width = 0;
+    fread(&width, sizeof(int), 1, map_file);
+    printf("Width   = %d\n", width);
+    int height = 0;
+    fread(&height, sizeof(int), 1, map_file);
+    printf("Height  = %d\n", height);
+    int namelen = 0;
+    fread(&namelen, sizeof(int), 1, map_file);
+    printf("Length  = %d\n", namelen);
+
+    char * map_name = (char *) malloc((namelen + 1) * sizeof(char));
+    memset(map_name, '\0', namelen + 1);
+    size_t len = fread(map_name, sizeof(char), namelen, map_file);
+    printf("Len = %d\n", len);
+    printf("Name  = %s\n", map_name);
+    fclose(map_file);
 
 	// Transition
 	
     // Init and screen
 
-	const char * APPNAME = "ACTION";
+	const char * APPNAME = "RTS C";
 	const int SCREEN_WIDTH = 640;
 	const int SCREEN_HEIGHT = 480;
 	const int BITS_PER_PIXEL = 32;
@@ -154,16 +177,24 @@ int main (int argc, char * argv[]) {
     if (err == EXIT_FAILURE) {
         return err;
     }
-
+    
+    printf("Loading textures\n");
 	// use SDL_image, load_bmp use only minisdl	
-	SDL_Surface * tex1 = load_image((char *) "C:\\Users\\etudiant\\Desktop\\Projects\\GitHub\\tallentaa\\projet_rts\\javascript\\graphics\\textures\\0000000000.bmp");
+	SDL_Surface * tex1 = load_image((char *) "..\\javascript\\graphics\\textures\\0000000000.bmp");
+    if (tex1 == NULL) {
+        printf("Failed to load texture\n");
+        return -1;
+    }
 
+    printf("Bliting textures\n");
 	for (int row = 0; row < 10; row++) {
 		for (int col = 0; col < 10; col++) {
+            //printf("%d %d %d\n", row, col, (int) tex1);
 			blit(col * 32, row * 32, tex1);
 		}
 	}
 
+    printf("Starting main loop\n");
 	while(not done) {
 		input();
 		render();
