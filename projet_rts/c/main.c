@@ -6,6 +6,7 @@
 #include "minisdl.h"
 #include "SDL.h"
 #include "SDL_image.h"
+#include "SDL_ttf.h"
 
 // uint32_t
 
@@ -50,41 +51,53 @@ SDL_Surface * load_image(char * filename ) {
     return optimizedImage;
 }
 
+TTF_Font *font = NULL;
+
+SDL_Color CWHITE = { 255, 255, 255 };
+//SDL_Color BLACK = {   0,   0,   0 };
+
 bool done = false;
+bool down = false;
+bool up = false;
+bool left = false;
+bool right = false;
+
+Uint32 x = 0;
+Uint32 y = 0;
 
 void input(void) {
     if (SDL_PollEvent(&event)) {
         if (event.type == SDL_KEYDOWN) {
             switch (event.key.keysym.sym) {
                 case SDLK_UP:
-                    //up = true;
+                    up = true;
                     break;
                 case SDLK_DOWN:
-                    //down = true;
+                    down = true;
                     break;
                 case SDLK_LEFT:
-                    //left = true;
+                    left = true;
                     break;
                 case SDLK_RIGHT:
-                    //right = true;
+                    right = true;
                     break;
                 case SDLK_ESCAPE:
-                    //done = true;
+                    done = true;
                     break;
             }
        } else if (event.type == SDL_KEYUP) {
             switch (event.key.keysym.sym) {
                 case SDLK_UP:
-                    //up = false;
+                    up = false;
                     break;
                 case SDLK_DOWN:
-                    //down = false;
+                    down = false;
                     break;
                 case SDLK_LEFT:
-                    //left = false;
+                    left = false;
                     break;
                 case SDLK_RIGHT:
-                    //right = false;
+                    right = false;
                     break;
                 case SDLK_TAB:
                     // nothing
@@ -177,31 +190,74 @@ int main (int argc, char * argv[]) {
     if (err == EXIT_FAILURE) {
         return err;
     }
-    
-    printf("Loading textures\n");
-	// use SDL_image, load_bmp use only minisdl	
-	SDL_Surface * tex1 = load_image((char *) "..\\javascript\\graphics\\textures\\0000000000.bmp");
-    if (tex1 == NULL) {
-        printf("Failed to load texture\n");
-        return -1;
+    //Initialize SDL_ttf
+    if (TTF_Init() == -1)
+    {
+        return false;    
     }
-
-    printf("Bliting textures\n");
-	for (int row = 0; row < 10; row++) {
-		for (int col = 0; col < 10; col++) {
-            //printf("%d %d %d\n", row, col, (int) tex1);
-			blit(col * 32, row * 32, tex1);
-		}
-	}
+	
+	font = TTF_OpenFont("ProzaLibre-Regular.ttf", 28);
+	if (font == NULL)
+    {
+        return false;
+    }
+	SDL_Surface * message = TTF_RenderText_Solid(font, "The quick brown fox jumps over the lazy dog", CWHITE);
+	
+    printf("Loading textures\n");
+	SDL_Surface * textures[10];
+	textures[0] = SDL_LoadBMP("..\\javascript\\graphics\\textures\\0000000000.bmp");
+	textures[1] = SDL_LoadBMP("..\\javascript\\graphics\\textures\\1000000000.bmp");
+	// use SDL_image, load_bmp use only minisdl	
+	//SDL_Surface * tex1 = load_image((char *) "..\\javascript\\graphics\\textures\\0000000000.bmp");
+    //if (tex1 == NULL) {
+    //    printf("Failed to load texture\n");
+    //    return -1;
+    //}
 
     printf("Starting main loop\n");
+
+	Uint32 start = SDL_GetTicks();
+	const Uint32 FRAMES_PER_SECOND = 30;
+	const Uint32 TIME_PER_FRAME = 1000 / FRAMES_PER_SECOND;
+
 	while(not done) {
 		input();
-		render();
+		// Provoque le rafraîchissement de l'écran
+		//render();
+		if (down) y += 5;
+		if (up) y -= 5;
+		if (left) x -= 5;
+		if (right) x += 5;
+		
+		SDL_FillRect(screen, NULL, 0); // Clear
+	    //printf("Bliting textures\n");
+		for (int row = 0; row < 10; row++) {
+			for (int col = 0; col < 10; col++) {
+	            //printf("%d %d %d\n", row, col, (int) tex1);
+				blit(col * 32, row * 32, textures[0]);
+			}
+		}
+		blit(x, y, textures[1]);
+		blit(200, 50, message);
+
+		SDL_Flip(screen);
+		//printf("Timer: %d\n", (SDL_GetTicks() - start)/1000);
+        if ((SDL_GetTicks() - start) < TIME_PER_FRAME)
+        {
+            //Sleep the remaining frame time
+            SDL_Delay( TIME_PER_FRAME - (SDL_GetTicks() - start) );
+        }
 	}
 	
 	//int SDL_SaveBMP(SDL_Surface *surface, const char *file);
 	SDL_SaveBMP(screen, "out.bmp");
 
+    SDL_FreeSurface( message );
+    TTF_CloseFont( font );
+    TTF_Quit();
+
     return 0;
+
+	// TODO : display actual FPS
+
 }
