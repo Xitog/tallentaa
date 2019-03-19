@@ -3,10 +3,15 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "minisdl.h"
+//#include "minisdl.h"
 #include "SDL.h"
 #include "SDL_image.h"
 #include "SDL_ttf.h"
+
+SDL_Surface * screen;
+SDL_Event event;
+
+#define not !
 
 // uint32_t
 
@@ -115,6 +120,25 @@ void input(void) {
     }
 }
 
+void blit2(int x, int y, SDL_Surface * surf) {
+    SDL_Rect rect;
+    rect.x = x;
+    rect.y = y;
+    //rect.w = surf->w;
+    //rect.h = surf->h;
+    SDL_BlitSurface(surf, NULL, screen, &rect);
+}
+
+SDL_Surface * load2(const char * path) {
+    SDL_Surface * temp = SDL_LoadBMP(path);
+    SDL_Surface * optimized = NULL;
+    if(temp != NULL) {
+        optimized = SDL_DisplayFormat(temp);
+        SDL_FreeSurface(temp);
+    }
+    return optimized;
+}
+
 int main (int argc, char * argv[]) {
     
     int size = 0;
@@ -184,12 +208,25 @@ int main (int argc, char * argv[]) {
 	const int SCREEN_WIDTH = 640;
 	const int SCREEN_HEIGHT = 480;
 	const int BITS_PER_PIXEL = 32;
-	const bool FULLSCREEN = false;
+	//const bool FULLSCREEN = false;
 
-    int err = init((char *) APPNAME, SCREEN_WIDTH, SCREEN_HEIGHT, BITS_PER_PIXEL, FULLSCREEN);
-    if (err == EXIT_FAILURE) {
-        return err;
+    if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
+        perror("Error when initializing SDL");
+        return EXIT_FAILURE;
     }
+    screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, BITS_PER_PIXEL, SDL_SWSURFACE | SDL_HWPALETTE);
+    if (screen == NULL) {
+        printf("Error when setting video mode : %s\n", SDL_GetError());
+        SDL_Quit();
+        return EXIT_FAILURE;
+    }
+    SDL_WM_SetCaption(APPNAME, NULL);
+    SDL_EnableUNICODE(true);
+
+    //int err = init((char *) APPNAME, SCREEN_WIDTH, SCREEN_HEIGHT, BITS_PER_PIXEL, FULLSCREEN);
+    //if (err == EXIT_FAILURE) {
+    //    return err;
+    //}
     //Initialize SDL_ttf
     if (TTF_Init() == -1)
     {
@@ -205,8 +242,8 @@ int main (int argc, char * argv[]) {
 	
     printf("Loading textures\n");
 	SDL_Surface * textures[10];
-	textures[0] = SDL_LoadBMP("..\\javascript\\graphics\\textures\\0000000000.bmp");
-	textures[1] = SDL_LoadBMP("..\\javascript\\graphics\\textures\\1000000000.bmp");
+	textures[0] = load2("graphics\\0000000000.bmp"); //"..\\javascript\\graphics\\textures\\0000000000.bmp"); SDL_LoadBMP
+	textures[1] = load2("graphics\\1000000000.bmp"); //"..\\javascript\\graphics\\textures\\1000000000.bmp"); SDL_LoadBMP
 	// use SDL_image, load_bmp use only minisdl	
 	//SDL_Surface * tex1 = load_image((char *) "..\\javascript\\graphics\\textures\\0000000000.bmp");
     //if (tex1 == NULL) {
@@ -216,36 +253,65 @@ int main (int argc, char * argv[]) {
 
     printf("Starting main loop\n");
 
-	Uint32 start = SDL_GetTicks();
+    Uint32 cap_fps_start = 0;
 	const Uint32 FRAMES_PER_SECOND = 30;
-	const Uint32 TIME_PER_FRAME = 1000 / FRAMES_PER_SECOND;
+	const Uint32 TIME_PER_FRAME = 1000 / FRAMES_PER_SECOND; // 33
+    
+    // Free FPS + Measure
+    Uint32 frame_count_start = SDL_GetTicks();
+    Uint32 frame_count = 0;
+    char output[50];
+    float fps;
+
+    int current;
+    float diff_with_last;
 
 	while(not done) {
+        current = SDL_GetTicks();
+        diff_with_last = (current - cap_fps_start) / 1000.f;
+        cap_fps_start = current;
+        
 		input();
+
 		// Provoque le rafraîchissement de l'écran
-		//render();
-		if (down) y += 5;
-		if (up) y -= 5;
-		if (left) x -= 5;
-		if (right) x += 5;
+		if (down) y += 500 * diff_with_last;
+		if (up) y -= 500 * diff_with_last;
+		if (left) x -= 500 * diff_with_last;
+		if (right) x += 500 * diff_with_last;
 		
 		SDL_FillRect(screen, NULL, 0); // Clear
-	    //printf("Bliting textures\n");
+	    // Bliting textures
 		for (int row = 0; row < 10; row++) {
 			for (int col = 0; col < 10; col++) {
 	            //printf("%d %d %d\n", row, col, (int) tex1);
-				blit(col * 32, row * 32, textures[0]);
+				blit2(col * 32, row * 32, textures[0]);
 			}
 		}
-		blit(x, y, textures[1]);
-		blit(200, 50, message);
+		blit2(x, y, textures[1]);
+		blit2(200, 50, message);
 
 		SDL_Flip(screen);
+        
+        // FPS Free + Measure
+        frame_count += 1;
+        int elapsed = SDL_GetTicks() - frame_count_start;
+        if(elapsed >= 1000) { // 1 second passed
+            fps = frame_count / ( elapsed / 1000.f );
+            frame_count = 0;
+            snprintf(output, 50, "%f", fps);
+            SDL_WM_SetCaption(output, NULL);
+            frame_count_start = SDL_GetTicks();
+        }
+        
+        // FPS capped
 		//printf("Timer: %d\n", (SDL_GetTicks() - start)/1000);
-        if ((SDL_GetTicks() - start) < TIME_PER_FRAME)
+        if ((SDL_GetTicks() - cap_fps_start) < TIME_PER_FRAME)
         {
             //Sleep the remaining frame time
-            SDL_Delay( TIME_PER_FRAME - (SDL_GetTicks() - start) );
+            Uint32 time_to_wait = TIME_PER_FRAME - (SDL_GetTicks() - cap_fps_start);
+            printf("sleep for %d\n", time_to_wait);
+            if (time_to_wait > 0 && time_to_wait < TIME_PER_FRAME)
+                SDL_Delay(time_to_wait);
         }
 	}
 	
