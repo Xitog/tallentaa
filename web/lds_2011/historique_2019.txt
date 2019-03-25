@@ -1,0 +1,90 @@
+Plus ancienne : 16/12/2010 (le projet de site web pour pattern)
+Plus récente  : 07/06/2013 (index.html de it, redirection sur ran)
+
+C'est la naissance de mes guides sur Internet pour ne plus me répéter.
+- Beatrice (it)
+- Cristina (fr)
+- Ruby
+- Python (ébauche)
+- C (ébauche)
+- JavaScript (ébauche) <= mais déjà !
+- ActionScript (ébauche)
+
+Mais déjà :
+- Des trucs sur les verbes
+- Mon propre langage avec des tests
+- Des trucs sur les RTS et les FPS 2.5
+
+Histoire                         17/08/2012
+    Biblio.html                  28/09/2011
+    index.html                   28/09/2011
+hobbies                          26/01/2012
+    index.html                   06/09/2011
+    rpg.html                     21/01/2012
+javascript                       01/11/2011
+    loop.html                    28/06/2011
+    talk_receiver.html           28/06/2011
+    talk_sender.html             28/06/2011
+    TestCouleurs.html            01/11/2011
+    todo.data                    28/06/2011
+    todo.php                     28/06/2011
+    verbes_client.php            28/06/2011
+    verbes_it.txt                28/06/2011
+    verbes_server.php            28/06/2011
+    verbes_server_dyn.php        28/06/2011
+    verbes_server_sta.php        28/06/2011
+langages                         22/02/2012
+    calcoolette.html             31/10/2011
+    encapsulerNetEnCom.html      22/02/2012
+    guideActionScript.html       22/02/2012
+    guideC.html                  02/10/2011
+    guideJavaScript.html         22/02/2012
+    guidePython.html             22/02/2012
+    guideRuby.html               24/11/2011
+    guideRuby2.html              24/02/2012
+    index.html                   10/09/2011
+    TestSuite.html               01/11/2011
+    TestSuiteJS.html             09/11/2011
+langues                          28/09/2011
+    fr                           07/03/2012
+        cristina.html            07/03/2012
+        index.html               07/03/2012
+    it                           02/03/2012
+        archives                 02/03/2012
+            index_alpha.html     12/05/2011
+            index_alpha_2.html   13/05/2011
+            index_alpha_2_b.html 18/05/2011
+            index_v_0_5_0.html   23/08/2011
+            index_v_0_6_0.html   23/08/2011
+            index_v_0_7_0.html   17/09/2011
+            index_v_0_7_2.html   10/11/2011
+            index_v_0_7_3.html   12/11/2011
+            italien.pdf          12/05/2011
+            italien.xps          12/05/2011
+        beatrice.html            28/02/2012
+        Beatrice.pdf             02/09/2011
+        favicon.ico              02/09/2011
+        index.html               07/06/2013
+    index.html                   28/09/2011
+    Langue.html                  14/10/2011
+sds                              16/12/2010
+    index.php                    16/12/2010
+    create.php                   16/12/2010
+    controls.php                 16/12/2010
+    models.php                   16/12/2010
+    part_end.php                 16/12/2010
+    part_head.php                16/12/2010
+    part_menu_left.php           16/12/2010
+    main.css                     16/12/2010
+    tools.php                    16/12/2010
+    view_committee.php           16/12/2010
+    view_home.php                16/12/2010
+    view_list.php                16/12/2010
+    view_new.php                 16/12/2010
+    view_pattern.php             16/12/2010
+    views.php                    16/12/2010
+index.html                       25/11/2011
+liane.png                        30/09/2011
+nexus.html                       28/02/2012
+style.css                        22/10/2011
+style2.css                       25/11/2011
