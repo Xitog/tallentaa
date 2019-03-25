@@ -1,0 +1,157 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Scriptal</title>
+    <style type="text/css">
+      h1              { font-family: arial;     font-size: 16px; color: SeaGreen; }
+      div.main        { font-family: arial; font-size: 12px; color: Gray; }
+      div.sommaire    { font-family: arial; font-size: 14px; color: Gray; }
+      
+      i               { color: orangered; }
+      pre.code        { font-family: monospace; font-size: 12px; background: Gainsboro; border-color: Gray; border-style: solid; border-width: 1px;
+                        padding-top: 10px; }
+      span.keyword    { font-family: monospace; font-size: 12px; background: Gainsboro; color: blue; }
+      td              { font-family: arial; font-size: 12px; color: blue; }
+      table           { background: Gainsboro; border-color: Gray; border-style: solid; border-width: 1px; }
+      
+      a:hover         { color: White; text-decoration: underline; background: DarkSlateGray; }
+      a               { font-family: arial; font-size: 14px; color: DarkSlateGray; text-decoration: underline; font-weight: normal;}
+    </style>
+  </head>
+  <body>
+    <h1>Un langage de script simple</h1>
+    <a href="http://looking.dwarf.free.fr/">Retour</a>
+    
+    <div class="sommaire">
+    <h2>Sommaire</h2>
+    <h3>I. Le langage</h3>
+    <ol>
+        <li>Présentation du langage</li>
+        <li>Contrôle du flux</li>
+        <li>Sous-programmes</li>
+        <li>L'orienté object</li>
+    </ol>
+    <h3>II. Bibliothèque standard</h3>
+    <ol>
+        <li>Noyau</li>
+        <li>Média</li>
+    </ol>
+    </div>
+    
+    <div class="main">
+    <p>Noms proposés : Scriptal ("le pur"), Frankenschript ("l'affreux"), Poulpyscript ("le gentil mignon"), Piposcript ("le WTF"), ZZ-thon (en musique), Bubbon (l'excroissance).</p>
+    <p>Mots clés (21)</p>
+    <table>
+      <tr><td>if</td><td>then</td><td>else</td><td>elsif</td><td>end</td></tr>
+      <tr><td>unless</td><td>while</td><td>do</td><td>for</td><td>in</td></tr>
+      <tr><td>def</td><td>module</td><td>class</td><td>require</td><td>include</td></tr>
+      <tr><td>break</td><td>next</td><td>return</td><td>true</td><td>false</td></tr>
+      <tr><td>nil</td></tr>
+    </table> 
+    <p>Le code</p>
+    <h2>La sélection</h2>
+    <pre class="code">
+      <span class="keyword">if</span> <i>condition</i> <span class="keyword">then</span> <i>actions A</i> [ <span class="keyword">else</span> <i>actions B</i> ] <span class="keyword">end</span>
+    </pre>
+    <p>Exécute <actions A> si la <condition> est vraie. Sinon, exécute <actions B> (si spécifiée).</p>
+    <pre class="code">
+      <span class="keyword">unless</span> <i>condition</i> <span class="keyword">then</span> <i>actions</i> [ <span class="keyword">else</span> <i>actions B</i> ] <span class="keyword">end</span>
+    </pre>
+    <p>On traduire unless par "à moins que" ou "sauf si". Exécute <actions A> si la <condition> est fausse. Sinon, exécute <actions B> (si spécifiée).</p>
+    <p>Remarque : unless c = if not c</p>
+    <h2>L'itération</h2>
+    <pre class="code">
+      <span class="keyword">while</span> <i>condition</i> <span class="keyword">do</span> <i>actions</i> <span class="keyword">end</span>
+    </pre>
+    <pre class="code">
+      <span class="keyword">for</span> <i>id</i> <span class="keyword">in</span> <i>list</i> <span class="keyword">do</span> <i>actions</i> <span class="keyword">end</span>
+    </pre>
+    <h2>Instanciation</h2>
+    <pre class="code">
+      <i>Classe</i>(<i>paramètres</i>)
+      <i>id</i> = <i>Classe</i>(<i>paramètres</i>)
+    </pre>
+    
+    <h2>II. Bibliothèque standard</h2>
+    <pre>
+    # Base types:
+    # - int  / Integer
+    # - flt  / Float
+    # - str  / String
+    # - bool / Boolean
+    # - list / List
+    # - hash / Hash
+    # - obj  / Object 
+    </pre>
+    
+<!-- 
+if, then, else, elsif, end
+unless
+while, do
+for
+
+in
+
+def
+module
+class
+
+require
+include
+
+break
+next
+return
+
+true
+false
+nil
+
+==, !=, >, <, >=, <=
+and, or, not
++, -, *, /, //, %, **, <<
+=, +=, -=, /=, //=, %=, **=
+=>
+
+# ...
+"..."
+1
+1.0
+-->
+
+    <h2>Historique</h2>
+    <ul>
+      <li>Version 0.0.2 (version interne)
+        <ul>
+          <li>Samedi 10 Septembre 2011
+            <ul>
+              <li>Vergence dans la Force: un langage sur Python ou // ?</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>Version 0.0.1 (version interne)
+        <ul>
+	      <li>Dimanche 4 Septembre 2011
+	        <ul>
+	          <li>Le petit jeu "deviner un nombre entre 1 et 100" marche. Incroyable !</li>
+	        </ul>
+	      </li>
+	    </ul>
+      </li>
+      <li>Version Alpha 1 (reprise depuis dernière version : NNifwhile6mai11)
+        <ul>
+	  <li>Mardi 30 Août
+	    <ul>
+              <li>Mise en ligne du readme.</li>
+	      <li>21 mots clés.</li>
+	      <li>Corrigé un bug durant deux heures à propos du "call". Mais ça marche !</li>
+	      <li>Le nom Scriptal et Frankenschript sont maintenant "publics" ;-) - trouvé il y a 1 mois ou deux.</li>
+	    </ul>
+	  </li>
+	</ul>
+      </li>
+    </ul>
+    </div>
+  </body>
+</html>

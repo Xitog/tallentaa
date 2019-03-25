@@ -1,0 +1,507 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" type="text/css" href="http://damien.gouteux.free.fr/web5.css"/>
+    <style type="text/css">
+        p.t { text-align:left; padding: 5px; }
+    </style>
+    <title>Langages de script et orienté objet</title>
+    <!--
+    CECI EST UN BROUILLON PUBLIQUE EST NE REFLETE PAS UN FUTUR ETAT COMPLET DU DOCUMENT
+    (02/01/09 : 27/12/09)
+    -->
+</head>
+<body>
+    <table width="100%"><tbody><tr><td width="100%" align="center" valign="center"><div class="main" width="100%" style="text-align: left; padding: 5px;">
+
+<h1>Ruby</h1>
+
+<h2>Introduction</h2>
+
+<p class="t">Ruby est un langage de script : interprété et de haut niveau. Il est orienté objet (TOUT est objet) et dispose d’une bibliothèque importante de classes prédéfinies. Il est disponible sous les termes la licence GNU GPL et la licence Ruby, et fonctionne sur la plupart des plates-formes du marché (notamment Mac OS X, Windows, Linux, Unix).</p>
+
+<p class="t">Ruby a été créé au Japon par Yukihiro Matsumoto, connu sous le pseudonyme "Matz". Il commença à travailler dessus en 1993, et sortit la première version en 1995. Par tradition, les nouvelles versions du langage sortent aux environs de Noël (peut être parce que Matz est d'obédience mormone ?). La dernier version stable a été publiée le 30 janvier 2009, il s'agit de la 1.9.1. Le nom Ruby vient en référence à Perl, un langage de script plus vieux dont Ruby se veut le "successeur". Le livre de référence (en anglais), de Dave Thomas et Andrew Hunt, <em>Programming Ruby</em>, est surnommé le "Pickaxe" en référence à sa couverture (une pioche).</p>
+
+<p class="t">En plus de Perl, Ruby est assez proche du langage Python. La motivation première pour la création de Ruby était d'apporté l'orienté objet aux langages de script, ce qu'aucun des deux langages ne faisaient à l'époque. Bien qu'aux fils des ans, ces deux langages aient évolué pour permettre aux programmeurs l'accès à ce paradigme, Ruby est le seul à avoir été pensé dès le début dans cette optique, ce qui lui donne une cohérence et une puissance plus grande car il n'a pas à garder un encombrant héritage "non-objet". La syntaxe quand à elle, a des parentés avec Eiffel et Ada (en en supprimant la complexité et la verbosité). Quand au paradigme objet en lui même, son implémentation se rapproche beaucoup du langage précurseur Smalltalk.</p>
+
+<p class="t">L'interpréteur officiel de Ruby est écrit en C. D'autres interpréteurs existent, à destination de la JVM (JRuby), de la DLR (IronRuby), et de Parrot (Cardinal). Il existe également Rubinius, une machine virtuelle elle-même implémentée en Ruby, semblable au projet PyPY pour Python. Depuis le 1er janvier 2007, l'interpréteur officiel est basé sur YARV, apportant un gain notable de performance, longtemps le talon d'Achille de Ruby.</p>
+
+<p class="t">Ruby dispose d'un interpréteur en ligne de commande, nommé <u>irb</u>, pour <i>Interactive Ruby</i>, permettant d'évaluer rapidement quelques lignes de code.</p>
+
+<h2>Installation et premiers pas</h2>
+
+<p class="t">Pour l'installer allez sur le site de <a class="intext" href="http://www.ruby-lang.org/fr/" target="_blank">Ruby</a>, rubrique Téléchargements. Il est préférable pour Windows de choisir le RubyInstaller, qui est un installateur facile d'usage et qui apporte, en sus de Ruby, de nombreuses bibliothèques intéressantes.</p>
+
+<p class="t">Irb est une console Ruby où on peut taper directement du code Ruby qui est exécuté de manière directe &amp; immédiate. Pratique pour expérimenter rapidement, il suffit d'ouvrir une console (touche windows et R sous Windows, Terminal sous Linux et Mac OS) et de taper irb dans celle-ci pour que l'interpréteur interactif se lance. Si vous avez des problèmes pour taper les caractères ‘{’ et’}’ qui ne s’affichent pas, au lieu de <code>irb </code>, entrez <code>irb --noreadline </code>pour résoudre ce problème.</p>
+
+<p class="t">Pour faire votre premier programme, ouvrez IRB et faites :</p>
+<p class="code">puts <span class="s">'Hello World!'</span>
+<i>=&gt; Affiche Hello World!</i></p>
+<p class="t">Et voilà ! Vous êtes à présent un Nuby (un newbie en Ruby).</p>
+
+<h2>I. Organisation d'un programme Ruby</h2>
+
+<h3>I.1. Commentaires</h3>
+<p class="code"><i># commentaire jusqu'à la fin de la ligne</i></p>
+
+<span style="text-decoration:underline;">II. Variables</span>
+
+<span style="text-decoration:underline;">II.1. Définition</span>
+
+a) Exemples de définition
+nom = <span style="color:#800000;">'bonjour'</span>
+chiffre = 5
+Le premier caractère d’un identificateur indique le type de variable manipulée :
+Locale : ma_variable
+Globale (accessible de partout) : $ma_variable
+D'instance (voir plus loin) : @ma_variable
+De classe (voir plus loin) : @@ma_variable
+Constante : Il suffit que le premier caractère soit une majuscule : Ma_Constante, MA_CONSTANTE
+
+b) Convention de nommage
+<ul>
+	<li>Pas de lettres accentuées sur les noms de classes, de fonctions et de variables.</li>
+	<li>Les classes commencent par une majuscule (sinon ce n’est pas une constante et Ruby ne sera pas content)</li>
+	<li>Les noms complexes : on supprime les ‘le’, les ‘de’, les ‘un’ et on sépare chaque mot par ‘_’</li>
+	<li>Les noms de fonctions retournant un booléen se terminent par ?</li>
+	<li>Un ! à la fin d’un nom de fonction indique qu’il faut faire plus attention à cette fonction qu’à celle portant le même nom mais sans !</li>
+	<li>Les constantes commencent par une majuscule, voir sont toutes en majuscule</li>
+</ul>
+c) Exemples de nommage
+<ul>
+	<li>Pour vérifier qu'un objet est une instance de la classe : instance_of?</li>
+	<li>Array#sort et Array#sort! : la première retourne un nouveau tableau sans modifier l’objet récepteur (self), l’autre modifie self.</li>
+</ul>
+d) Objets &amp; identificateurs
+
+Les objets : en Ruby, tous les éléments manipulés sont des objets. C’est à dire que l’instruction a = 5 créé un nouvel entier, d’une valeur de 5 et l’associe à l’identificateur a. Attention au code suivant :
+a = 5
+b = a
+a = 7 La valeur finale de a est 7 est celle de b est 5. a et b sont deux identificateurs différents ‘pointant’ vers deux objets différents. Différencier l'objet et l'identificateur permet de bien comprendre les deux concepts. Celui de "variable" qu'on peut parfois trouver est hérité des anciens langages ou l'identificateur représentait un emplacement mémoire fixe contenant une valeur pouvant varier. Dans ce document, "variable" est l'équivalent de l'association d'un identificateur et de l'objet vers lequel il pointe, ainsi "la variable a" désigne "l'objet vers lequel pointe l'identificateur a".
+
+<span style="text-decoration:underline;">II.2. Types de base</span>
+
+chaînes, nombres, objets et méthodes
+un_reel = 3.14
+un_entier = 5
+une_chaine = <span style="color:#800000;">"bonjour le monde"</span>
+une_autre_chaine = <span style="color:#800000;">'bonjour le monde'</span>
+Tout est objet dans Ruby. Ainsi on peut directement appeler une méthode sur un littéral :
+5.to_s (retourne une chaîne représentant le nombre 5)
+<span style="color:#800000;">"bonjour"</span>.upcase (retourne une chaîne avec toutes les lettres en majuscule)
+<span style="color:#800000;">"bonjour"</span>.include?(<span style="color:#800000;">'bon'</span>) (renvoie vrai, car la chaîne bonjour contient bon)
+
+<span style="text-decoration:underline;">II.3. Booléen</span>
+
+Le type booléen dispose de deux valeurs : vrai et faux.
+
+En Ruby, les valeurs constantes (noter le manque de majuscule) <span style="color:#0000ff;">false</span> &amp; <span style="color:#0000ff;">nil</span> sont fausses. Tout le reste est vrai (même 0).
+
+On peut utiliser les opérateurs booléens suivants : <span style="color:#0000ff;">and</span>, <span style="color:#0000ff;">or</span>, <span style="color:#0000ff;">not</span>
+
+<span style="text-decoration:underline;">II.4. Tableaux</span>
+
+Littéral : []
+tableau = [1, 2,<span style="color:#800000;"> 'bonjour'</span>]
+Accès à un élément : tableau[indice]
+tableau[0] (retourne 1 car on numérote l'index de 0 à longueur du tableau-1)
+tableau.last (retourne <span style="color:#800000;">'bonjour'</span>)
+tableau[1] = 3 (le tableau contient à présent : 1, 3,<span style="color:#800000;"> 'bonjour'</span>)
+tableau.length (retourne 3)
+array.push(<span style="color:#800000;">'au revoir'</span>) (ajoute à la fin du tableau 'au revoir')
+
+<span style="text-decoration:underline;">II.5. Dictionnaire</span>
+
+(ou tableaux associatives, hash)
+dict = {}
+Accès à un élément : dict[clé]
+dict[<span style="color:#800000;">'france'</span>] =<span style="color:#800000;"> 'paris'
+</span>dict[<span style="color:#800000;">'france'</span>] (retourne <span style="color:#800000;">'paris'</span>)
+dict.length (retourne 1)
+dict.values (retourne un tableau des valeurs [<span style="color:#800000;">'paris'</span>])
+dict.keys (retourne un tableau des clés [<span style="color:#800000;">'france'</span>])
+
+<span style="text-decoration:underline;">III. Opérateurs</span>
+
+Les opérateurs de bases : +, -, /, *, % (modulo), ** (puissance)
+Opérateurs d’affectation : =
+Opérateurs de comparaison : &lt;, &lt;=, &gt;, &gt;=, ==, !=
+Opérateurs booléens : <span style="color:#0000ff;">and</span>, <span style="color:#0000ff;">or, not</span>
+
+Pour les opérateurs (cf derniers billets) : les opérateurs ‘raccourcis’ du C existent aussi en Ruby :
+i = i – 1 &lt;=&gt; i -= 1
+i = i * 2 &lt;=&gt; i *= 2
+Mais les opérateurs de pré &amp; post décrémentation (++ et –) n’existent pas !
+
+<span style="text-decoration:underline;">IV. Contrôle de flux</span>
+
+<h3>IV.1. Séquence</h3>
+
+<pre>instruction1
+instruction2
+</pre>
+<em>ou</em>
+<pre>instruction1 ; instruction2</pre>
+<p>Au contraire de nombreux langages, le ';' n'est pas un symbole de <u>terminaison</u> d'une instruction mais de <u>séparation</u> de deux instructions.</p>
+
+<h3>IV.2. Sélection</h3>
+
+<h4>a) Syntaxe</h4>
+<pre><span style="color:#0000ff;">if</span> condition
+  instructions<span style="color:#800000;"><span style="color:#0000ff;"><span style="color:#000000;">
+[ </span>elsif </span><span style="color:#000000;">condition</span></span><span style="color:#800000;"><span style="color:#000000;">  
+</span> <span style="color:#000000;">instructions</span><span style="color:#000000;"> ]*</span></span><span style="color:#0000ff;"><span style="color:#000000;">
+[ </span>else</span>  instructions<span style="color:#800000;"> <span style="color:#000000;">]</span></span><span style="color:#0000ff;">
+end</span></pre>
+ou
+<pre><span style="color:#0000ff;">unless</span> condition
+ instructions<span style="color:#0000ff;">
+end</span></pre>
+<span style="color:#0000ff;">unless</span> équivaut à <span style="color:#0000ff;">if not</span>.
+
+b) Exemple
+mon_nombre = 5
+<span style="color:#0000ff;">if</span> mon_nombre == 5
+puts <span style="color:#800000;">"mon nombre vaut 5"
+<span style="color:#0000ff;">elsif </span><span style="color:#000000;">mon_nombre </span><span style="color:#000000;">== 4
+</span> <span style="color:#000000;"> puts</span> "mon nombre vaut 4"</span>
+<span style="color:#0000ff;">else</span>
+puts <span style="color:#800000;">"mon nombre ne vaut pas 5"</span>
+<span style="color:#0000ff;">end
+<span style="color:#000000;">=&gt; Affiche "mon_nombre vaut 5"</span></span>
+
+<span style="text-decoration:underline;">IV.3. Itération</span>
+
+a) Syntaxe
+<pre><span style="color:#0000ff;">for </span>variable <span style="color:#0000ff;">in</span> liste_de_valeurs [<span style="color:#0000ff;">do</span>]
+  instructions
+<span style="color:#0000ff;">end
+while <span style="color:#000000;">condition [<span style="color:#0000ff;">do</span>]
+  instructions
+<span style="color:#0000ff;">end</span></span></span></pre>
+b) Exemple
+2.times <span style="color:#0000ff;">do </span>
+puts <span style="color:#800000;">'bonjour !'
+</span><span style="color:#0000ff;">end
+</span><span style="color:#000000;">=&gt; Affiche bonjour! bonjour!</span>
+<span style="color:#0000ff;">for</span> x in 1..3 <span style="color:#0000ff;">do</span>
+puts x
+<span style="color:#0000ff;">end
+<span style="color:#000000;">=&gt; Affiche 1 2 3</span></span>
+(1..3).each <span style="color:#0000ff;">do</span>
+|x| puts x
+<span style="color:#0000ff;">end
+</span><span style="color:#000000;">=&gt;Affiche 1 2 3</span>
+La partie entre do et end est appelée un bloc. On peut les remplacer par { } (1..3).each { |x| puts x }
+1..3 est un ensemble de valeur.
+Each est itérateur : il va itérer parmi toutes ces valeurs.
+[<span style="color:#800000;">'a'</span>, <span style="color:#800000;">'b'</span>, <span style="color:#800000;">'c'</span>].each { |x| puts x }
+[<span style="color:#800000;">'a'</span>,<span style="color:#800000;"> 'b'</span>,<span style="color:#800000;"> 'c'</span>].collect { |word| word.capitalize } (retourne un nouveau tableau [<span style="color:#800000;">'A'</span>, <span style="color:#800000;">'B'</span>, <span style="color:#800000;">'C'</span>])
+[<span style="color:#800000;">'a'</span>,<span style="color:#800000;"> 'b'</span>, <span style="color:#800000;">'c'</span>].detect { |element| element ==<span style="color:#800000;"> 'a'</span>} (retourne<span style="color:#800000;"> 'a'</span>)
+
+Pour les programmeurs en C : attention ne faites pas de C en Ruby ! Il n’y a pas besoin de parenthèses pour entourer les conditions, donc n’en mettez pas !
+
+<span style="text-decoration:underline;">V. Fonctions</span>
+
+<span style="text-decoration:underline;">V.1. Appels de fonctions
+</span>puts <span style="color:#800000;">'bonjour'</span>
+puts(<span style="color:#800000;">'bonjour'</span>)
+assert_equal(5, number)
+On peut omettre les parenthèses.
+
+<span style="text-decoration:underline;">V.2. Définition de fonctions</span>
+
+a) Syntaxe
+<pre><span style="color:#0000ff;">def </span>identifier(paramètres)
+  instructions
+<span style="color:#0000ff;">end</span></pre>
+b) Exemple
+<pre><span style="color:#0000ff;">def</span> assert_equal(expected, actual)
+  <span style="color:#0000ff;">if</span> expected != actual
+    puts "failed"
+  <span style="color:#0000ff;">end</span>
+<span style="color:#0000ff;">end</span></pre>
+Les fonctions peuvent retourner des valeurs qui peuvent être assignées à des variables. Une fonction retourne toujours la valeur de sa dernière expression exécutée.
+<pre><span style="color:#0000ff;">def</span> five
+  5 <span style="color:#008000;"># équivalent à return 5
+</span><span style="color:#0000ff;">end</span>
+box = five</pre>
+<span style="text-decoration:underline;">VI. Classes et objets
+</span>
+a) Premiers pas dans l'orienté objet
+
+Syntaxe de la déclaration &amp; définition d'une classe
+<pre><span style="color:#0000ff;">class</span> Identifier &lt; SuperClasse
+  instructions
+<span style="color:#0000ff;">end</span></pre>
+Faire de nouvelle classe : une classe est un regroupement de données (partie statique) et de méthodes (partie dynamque). Exemple : une voiture a une méthode ‘rouler’ est a une donnée ‘âge’. Cela donne en Ruby :
+<pre><span style="color:#0000ff;">class</span> Voiture
+  <span style="color:#0000ff;">def</span> initialize(age, marque)
+    @age = age
+    @marque = marque
+  <span style="color:#0000ff;">end</span>
+  <span style="color:#0000ff;">def</span> rouler()
+    puts 'je roule'
+  <span style="color:#0000ff;">end</span>
+<span style="color:#0000ff;">end</span></pre>
+Décortiquons tout cela : tout d’abord la syntaxe class Nom_classe ... end permet de définir notre classe voiture. La première lettre du nom de la classe doit être une majuscule. Nom_classe sera un identificateur constant désignant la classe que nous sommes en train de créer. Après nous avons deux méthodes, déclarées par la syntaxe def nom_methode ... end . La seconde est notre bonne vieille méthode rouler. Elle ne prend pas d’arguments (les parenthèses suivant nom_methode sont vides. Elles sont ici optionnelles. La première, initialize, est une méthode spéciale qui est automatiquement appelée lors de la création d’un nouvelle objet. Elle permet d’initialiser un objet. Dans son corps, nous manipulons deux variables préfixés par <a href="mailto:‘@’">‘@’</a>. Cela désigne des variables d’instances, c’est à dire propre à chaque instance de la classe.
+
+variable d'instance : @var
+variable de classe :  @@var
+
+Pour une voiture, une instance sera par exemple ‘la Ford qui a dix ans’ ou ‘la Lexus qui a un ans’. Ces deux voitures sont des objets. C’est à dire des instances d’une classe, ici la classe Voiture. On crééra ces deux objets en Ruby ainsi :
+
+voiture1 = Voiture.new(10, <span style="color:#800000;">'Ford'</span>)
+voiture2 = Voiture.new(1,<span style="color:#800000;">'Lexus'</span>)
+
+La méthode de la classe Voiture, appelée new va créer deux nouveaux objets et appelera la fonction initialize pour ces deux objets en leur passant ces paramètres.
+Pour voir si tout c’est bien passé, vous pouvez faire un appel à la méthode inspect :
+
+voiture1.inspect  =&gt; Affiche : #&lt;Code Objet @age=10 @marque='Ford'&gt;
+
+Pensée du jour : c’est en forgeant que l’on devient forgeron dit-on. Bah, c’est en rubyxant que l’on devient un rubyste, cela marche aussi…
+
+b) Les méthodes en Ruby
+Une méthode en Ruby est appartient à un objet et ce déclare avec la syntaxe suivante :
+<pre> <span style="color:#0000ff;">def</span> nom_methode(paramètres)
+    code
+ <span style="color:#0000ff;">end</span></pre>
+Une méthode peut appartenir à : un objet, une classe et un objet en particulier. Voyons cela en détail :
+
+Appartenance à un objet
+définition de la méthode dans la classe de l’objet. Ces méthodes sont appelées méthodes d’instances.
+
+Exemple :
+<pre><span style="color:#0000ff;">class</span> Voiture
+<span style="color:#0000ff;">  def</span> rouler()
+    puts 'je roule'<span style="color:#0000ff;">
+  end
+end</span></pre>
+Appel :
+v1 = Voiture.new()  # c'est une méthode de classe voir plus loin...
+v1.rouler()  =&gt; Affiche : je rouleAppartenance à une classe
+définition de la méthode dans la classe en indiquant la classe ainsi : def Nom_classe.nom_methode . Ces méthodes sont appelées méthodes de classe.
+
+Exemple :
+<pre><span style="color:#0000ff;">class</span> Voiture<span style="color:#0000ff;">
+  def</span> Voiture.affiche_nom_classe()
+    puts 'Voiture'
+  <span style="color:#0000ff;">end
+end</span></pre>
+Appel :
+Voiture.affiche_nom_classe()  =&gt; Affiche : Voiture
+Attention : une méthode de classe s'appelle depuis une classe, pas depuis une instance de cette classe !!!Appartenance à un objet en particulier
+définition de la méthode en dehors de la classe de l’objet en indiquant l’objet ainsi : def identificateur.nom_methode . Une méthode définie pour un objet particulier s’appelle une méthode singleton.
+
+Exemple :
+v1 = Voiture.new
+def v1.rouler_vite()
+puts 'je roule vite'
+end
+v1.rouler_vite()  =&gt; Affiche : je roule vite
+v2 = Voiture.new
+v2.rouler_vite()  =&gt; Erreur! : rouler_vite n'est pas définie pour v2 seulement pour v1 !Appartenance ‘à rien’
+Les fonctions que vous écrivez en dehors de toutes classes qui ne sont pas des méthodes pour un objet particulier sont des méthodes rattachées aux instances de la classe Object et seront appelables par tous les objets.
+
+Paramètres
+Les paramètres sont séparés par des virgules. Si il n’y pas de paramètres (), les parenthèses sont optionnelles.
+
+Exemple :
+def pipo()
+puts 'pipo'
+end
+pipo()  =&gt; Affiche : pipo
+Equivaut à :
+def pipo
+puts 'pipo'
+end
+pipo  =&gt; Affiche : pipoMais mon conseil est de toujours mettre des parenthèes. En effet, si on déclare une fonction du même nom qu’une variable, et que on ne mais pas de parenthèses, Ruby préférera croire que c’est la variable plutôt qu’un appel à une fonction !
+
+Exemple :
+def pipo()
+puts 'pipo'
+end
+pipo  =&gt; Affiche : pipo
+pipo = 3  # déclaration d'une variable entière de valeur 3, désignée par l'identificateur pipo
+pipo  =&gt; Affiche : 3 # Ruby doit choisir : danger !
+pipo()  =&gt; Affiche : pipoVoici une fonction multi-paramétrées :
+
+def affiche(nom, age)
+print nom+ " a "+age.to_s+" ans"  # la méthode to_s convertit l'objet age en une chaîne
+end
+
+c) L’encapsulation
+Cela consiste à masquer des méthodes, des attributs de nos objets. En effet, pour limiter leur utilisation, ou quand leur utilisation ne regarde pas l’utilisateur de la classe mais seulement le concepteur.
+
+i. Encapsulation des méthodes
+Lors de la définition d’une classe, vous pouvez définir le niveau d’encapsulation de chaque méthode. Ainsi, le niveau d’encapsulation par défaut est ‘public’. Cela définit qu’une méthode f défini pour un objet de la classe C pourra être appelée depuis n’importe où. Le niveau ‘protected’ indique que la méthode ne pourra être appelée qu’à l’intérieur du code de la classe ou de une de ses classes filles. Le niveau ‘private’ enfin, indique la méthode ne pourra être appelée qu’à l’intérieur du code de la classe, sans indiquer de récepteur.
+La syntaxe est la suivante :
+
+public [(:symbol)]
+protected [(:symbol)]
+private [(:symbol)] Si les symboles sont omis, toutes les méthodes suivantes seront à ce niveau d’encapsulation.
+
+ii. Encapsulation des attributs
+En Ruby, tout attribut d’instance est par définition privé. Pour déclarer que l’on peut y accéder en lecture il faut définir une méthode d’accès en lecture grâce à la syntaxe :
+
+attr_reader :symbol[,:symbol]*
+
+Pour déclarer qu’un attribut peut être aussi en écriture, il suffit de déclarer une méthode d’accès (ou accesseurs) en écriture :
+
+attr_writer :symbol[,:symbol]*
+
+Pour déclarer un accesseur dans les deux sens (lecture et écriture) on peut faire :
+
+attr_accessor :symbol [,:symbol]*
+
+Voici une définition UML de classe Personne :
+
+Personne                              -&gt; Nom de la classe
+-age
++Marcher()
++FêterAnniversaire()
++getAge()La définition correspondante en Ruby :
+
+<p class="code"><span class="k">class </span>Personne<br/>
+<br/>
+&nbsp;&nbsp;<span class="k">def</span> initialize()<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;@age = 0<br/>
+&nbsp;&nbsp;<span class="k">end</span><br/>
+<br/>
+&nbsp;&nbsp;<span class="k">def</span> Marcher()<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;puts <span class="s">'je marche'</span><br/>
+&nbsp;&nbsp;<span class="k">end</span><br/>
+<br/>
+&nbsp;&nbsp;<span class="k">def</span> FêterAnniversaire()<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;@age += 1<br/>
+&nbsp;&nbsp;<span class="k">end</span><br/>
+<br/>
+&nbsp;&nbsp;attr_reader :age<br/>
+<br/>
+<span class="k">end</span></p>
+
+iii. Utilisation :
+
+bob = Personne.new()
+puts bob.age  # Affiche : 0
+bob.FêterAnniversaire()
+puts bob.age  # Affiche : 1
+bob.Marcher()  # Affiche : je marche
+
+Et voilà !
+
+<span style="text-decoration:underline;">Modules</span>
+
+(à compléter)
+<pre><span style="color:#0000ff;">module</span> Identifier
+   instructions
+<span style="color:#0000ff;">end</span></pre>
+<span style="text-decoration:underline;">Exceptions</span>
+
+(à compléter)
+<pre><span style="color:#0000ff;">begin</span>
+   instructions
+<span style="color:#0000ff;">rescue</span> Exception
+   instructions
+<span style="color:#0000ff;">end</span></pre>
+<span style="text-decoration:underline;">Blocs</span>
+
+(à compléter)
+<pre><span style="color:#0000ff;">do</span>
+   |paramètres|
+   instructions
+<span style="color:#0000ff;">end</span>
+
+{
+   |paramètres|
+   instructions
+}</pre>
+<span style="text-decoration:underline;">VII. Autres</span>
+
+<span style="text-decoration:underline;">Bibliothèque </span>
+<span style="color:#0000ff;">require </span><span style="color:#800000;">'ma_bibliothèque'</span>
+Ruby cherchera alors le fichier ma_bibliothèque.rb ou .so dans les dossiers spécifiés par loadpath ainsi que le répertoire courant. On peut changer le loadpath en faisant : $LOAD_PATH &lt;&lt; 'c:/mon_dossier/'
+
+require 'gosu'
+
+Va chercher la librairie gosu.dll. Toutes les éléments sont importées via l'espace de nom Gosu dans l'espace courant.
+
+Gosu::xxx
+
+Si on veut directement importer les éléments de Gosu dans l'espace de nom courant faire :
+
+include Gosu
+
+<span style="text-decoration:underline;">Expression régulière</span>
+regexp =~ string
+Compare une expression à une chaîne, retourne un nombre (l'emplacement du début de la partie associée) si il y a association. Sinon nil. Littéral /chaîne/ %r{chaîne} ^: début (à gauche) $: fin (à droite) .: n'importe quel caractère
+
+<span style="text-decoration:underline;">Blocs</span>
+Fonctions anonymes.
+<span style="color:#0000ff;">do</span> |paramètres| ... <span style="color:#0000ff;">end</span> { |paramètres| ... }
+
+<span style="text-decoration:underline;">Substitution d'expression</span>
+name = <span style="color:#800000;">"Adrien"</span> puts <span style="color:#800000;">"Mon nom est</span> #{name}<span style="color:#800000;">"</span> puts <span style="color:#800000;">"4+4 =</span> #{4+4}<span style="color:#800000;">"</span>
+<h2><span style="color:#000000;">Bibliothèques</span></h2>
+Sites de bibliothèques : <a href="http://raa.ruby-lang.org/" target="_blank">RAA</a> (comme CPAN, Pear, Pecl pour Perl), <a href="http://rubyforge.org/" target="_blank">RubyForge</a>
+
+rand(max) de 0 à max &lt;?&gt;
+puts something
+something = gets
+
+<span style="text-decoration:underline;">Watir</span> (<a href="http://wiki.openqa.org/display/WTR/Example+Test+Case" target="_blank">lien</a>)
+Watir est un module de test d'application web avec IE pour Ruby. Des versions .Net (Watin) et Java (Watij) existe aussi. Le but est d'automatiser le comportement du navigateur internet en vue de tester l'application.
+<span style="color:#0000ff;">require </span><span style="color:#800000;">"watir" </span>
+test_site = <a href="http://www.google.com">http://www.google.com</a>
+ie = Watir::IE.new
+ie.goto test_site
+ie.text_field(:name, <span style="color:#800000;">"q"</span>).set <span style="color:#800000;">"pickaxe"</span>
+ie.button(:name, <span style="color:#800000;">"btnG"</span>).click
+ie.text.include? <span style="color:#800000;">"Programming Ruby"</span>
+
+<span style="color:#000000;">Gosu</span>
+
+<span style="color:#800000;"><span style="color:#000000;">La classe principale de notre application est une fenêtre.</span></span>
+
+class Fenêtre &lt; Gosu::Window
+
+def initialize
+super(largeur, hauteur, booléen) &lt;?&gt;
+self.caption = "Titre"
+initiliasation
+end
+
+def update
+end
+
+def draw
+end
+
+def button_down(id)
+end
+
+end
+
+f = Fenêtre.new
+f.show
+
+<span style="color:#800000;"><span style="color:#000000;">Gosu::Button::xxx</span></span>
+Enumération de tous les boutons possibles.
+
+<h2>Références</h2>
+<ul>
+    <li><a class="intext" href="http://wiki.openqa.org/display/WTR/Ruby+Cheat+Sheet" target="_blank">Aide mémoire de Watir sur Ruby</a></li>
+    <li><a class="intext" href="http://code.google.com/p/gosu-fr/wiki/TutorielRubyGosu" target="_blank">Tutoriel Gosu</a></li>
+    <li><a class="intext" href="http://www.rubyfrance.org/" target="_blank">Association RubyFrance</a></li>
+    <li><a class="intext" href="http://www.rubycentral.org/" target="_blank">Association RubyCentral</a></li>
+    <li><a class="intext" href="http://fr.wikipedia.org/wiki/Ruby">Page Wikipedia (français)</a></li>
+    <li><a class="intext" href="http://en.wikipedia.org/wiki/Ruby_(programming_language)">Page Wikipedia (anglais, plus complète)</a></li>
+</ul>
+
+<h2>Résumé</h2>
+
+<!-- Mettre peut être ici le guide1 -->
+
+    </div></td></tr></tbody></table>
+</body>
+</html>

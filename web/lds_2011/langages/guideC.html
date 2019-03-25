@@ -1,0 +1,249 @@
+﻿<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" type="text/css" href="http://looking.dwarf.free.fr/style.css"/>
+    <title>Guide du langage C</title>
+</head>
+<body>
+    <h1>DRAFT - INCOMPLET - WORK IN PROGRESS - DRAFT - INCOMPLET - WORK IN PROGRESS - USE AT YOUR OWN RISK</h1>
+    <h1>Sommaire</h1>
+    <ol>
+        <li>Introduction au langage C</li>
+        <li>Types et variables</li>
+        <li>Tableaux, énumérations et structures</li>
+        <li>Les pointeurs</li>
+        <li>Les opérateurs</li>
+        <li>Les structures de contrôle</li>
+        <li>Les fonctions</li>
+        <li>Le préprocesseur</li>
+        <li>Compiler et lier</li>
+        <li>Bibliothèque standard</li>
+    </ol>
+    <h1>Introduction au langage C</h1>
+    mots réservés
+type : int, char, short, long, unsigned, float, double, struct, union, enum, void, signed, const, volatile
+classe : auto, extern, static, register, typedef
+instruction : if, else, while, do for, switch, break, continue, goto, return
+opérateur : sizeof
+étiquette : case, default
+
+    <h1>Types et variables</h1>
+    <p>En C, on utilise des variables pour stocker des résultats. Chaque variable à un type. Un type se caractérise par une taille, c'est à dire l'espace mémoire qu'il occupe. Pour déclarer une variable, on utilise la syntaxe suivante :</p>
+    type identifiant [= expression] ;
+    <p>Nous allons voir dans un premier temps les différents types simples possibles, puis nous explorerons un peu plus le concept de variable.</p>
+    <h2>Les types</h2>
+    <table border="1">
+        <thead>
+            <tr><td colspan="2">Type de base</td></tr>
+            <tr><td>nom</td><td>taille (en octets)</td></tr>
+        </thead>
+        <tbody>
+            <tr><td colspan="2">Caractère</td></tr>
+            <tr><td>char</td><td>1</td></tr>
+            <tr><td colspan="2">Entiers</td></tr>
+            <tr><td>short [int]</td><td>2</td></tr>
+            <tr><td>int</td><td>2 ou 4</td></tr>
+            <tr><td>long [int]</td><td>4</td></tr>
+            <tr><td>long long [int]</td><td>8</td></tr>
+            <tr><td colspan="2">Réels</td></tr>
+            <tr><td>float</td><td>4</td></tr>
+            <tr><td>double</td><td>8</td></tr>
+            <tr><td>long double</td><td>12</td></tr>
+            <tr><td colspan="2">Booléens</td></tr>
+            <tr><td>bool</td><td>1</td></tr>
+        </tbody>
+    </table>
+    <ul>
+        <li>On obtient facilement ces valeurs avec l'opérateur sizeof.</li>
+        <li>Le symbole int est optionnel pour les types short, long et long long.</li>
+        <li>Le type int a une définition de taille qui dépend de la machine. Généralement il est équivalent à long (4 octets).</li>
+        <li>Le type bool est accessible seulement si l'on inclut le fichier stdbool.h (voir X).</li>
+        <li>Les types caractères et entiers peuvent être unsigned ou signed (par défaut). Dans le premier mode, tous les bits sont utilisés pour représentés la valeur numérique, alors que dans le dernier, un bit est reservé pour indiquer le signe positif ou négatif.</li>
+    </ul>
+    <h2>Variables</h2>
+    <ul>
+        <li>S'il n'y a pas d'initialisation à une expression donnée, la variable n'est <b>pas</b> initialisée. C'est à dire qu'elle contiendra ce que la mémoire contenait à cette endroit là avant sa déclaration, généralement totalement inutilisable. Il ne faut jamais utiliser une variable qui n'a pas été initialisée pour autre chose qu'une affectation simple (opérateur =) !</li>
+    </ul>
+        VI Classe de mémorisation
+
+Portée, visibilité, durée de vie
+
+var externe = externe à tout bloc (= niveau 0)
+déclaration en tête de bloc pour les internes !
+
+portée : tout son bloc. Externe : à partir de sa decl.
+
+Visibilité : redef masque sans altérer.
+
+externe => portée en amont de sa decl.
+    	=> décl d'existence dans un fichier externe (tab:C ne vérif pas la taille)
+
+Durée de vie : var interne (niv >= 1) sont auto : meurt avec le bloc. Dans pile.
+	Var externe : dans la m"moire.
+	Var interne static : locale à son bloc mais mémorisation dans mémoire.
+    	portée non altérée.
+	Var externe static : privée à un fichier (pas exportable. D'où le static de pike !!!)
+	Fonction : objet de niv 0 : static limite la portée à ce fichier (=privé).
+
+Var extern et static : sont mises à zéro. auto & register = nimp (contenu mémoire).
+
+Tas = Heap, Dynamique
+Pile = Stack. Var internes param de fct./
+
+classe  	static var niv 0    	fct niv 0   	privée à un fichier
+        	static var niv >= 1                 	mémortisation dans mémoire
+        	register	only var locale ou parem formel : dans un registre au lieu de la pile.
+
+
+            
+    <h1>Tableaux, énumérations et structures</h1>
+    type [taille]
+	type v[] = { const, const } ;
+	(taille automatique)
+    Chaîne de caractère
+	char v[10] dernier caractère : '\0'
+    
+    
+    struct [eti] { champs } [var]; Décl : pas de réservation en place mémoire != définition.
+Accès var.champs
+Emboîtable
+Autoref possible par pointeur
+-> si étiquettée, réemploie avec struct Nom var; ou * ptr;
+
+Avec ptr : &var -> @  ,  *ptr->indirection  ,  (*ptr).champs  , ptr->champs
+a = b copie de ses champs. On ne peut importer le contenu d'une struct d'un fichier à un autre. Le mettre dans le .h.
+
+typedef type SYMBOLE ; (decl). En fait c'est + subtil : ce qui était le nom d'une var devient le nom symbolique du type !!!
+typedef int (*PTRFUN)(type, type); étrange : typedef int FUN (...), typedef PTR_TAB(*FUN) (...);
+typedef struct {...} NOM; NOM devient symbole.
+
+Union : union Eti { champs } var ; soit l'un , soit l'autre des champs !
+énumérations : enum Eti { symbole, ... } ; puis enum Eti var = ... ;
+    <h1>Les pointeurs</h1>
+    type * nom
+	niveau d'indirection (= nb de *)
+
+*nom : accès au pointé
+&var : accès à l'adresse
+
+type généralise : type + (* | []). [] = pointeur constant
+
+Déplacement possible (arithmétique de pointeur) : +, -, ++, --, op. rel, aff.
+
+void * malloc(int nboctet) stdlib.h
+void * calloc(int nbelem, int nboctet)
+
+    <h1>Les opérateurs</h1>
+    sizeof(var) -> taille en octet
+	arithmétique +, -, *, /, %
+	conversion implicite -> char->short->int->long->long long->float->double
+	cast : (type) var : promotion, troncature : forcer le type
+	logique : && || !
+	relationnels : > >= == != <= <
+	bit à bit : & | ^(xor) ~(complément à 1)
+	décalage : << >> : si v signé : arithmétique. sinon : logique
+	inc et dec : ++, -- v++ post ++v pré
+	affectation = @= (@ est un opérateur arithmétique ou bit à bit)
+	conditionnel cond ? val si vrai : val si faux
+    
+    
+    1 () [] -> . Right
+2 ! ~ ++ -- - *(indirection) &(adresse) (type) sizeof Left
+3 * / % Right
+4 + - Right
+5 << >> Right
+6 < <= >= > Right
+7 == != Right
+8 & Right
+9 ^ Right
+10 | Right
+11 && Right
+12 || Right
+13 ? : Left
+14 = @= Left
+15 , (opérateur séquentiel) Right
+
+    <h1>Les structures de contrôle</h1>
+itération
+for (préaction; condition; postaction) body
+while (condition) body
+do body while (condition);
+
+sélection
+if (cond) body else body
+switch (expr) { case expr (de constantes): body1 default: body }
+
+modif
+break
+continue
+
+terminateur
+;
+    <h1>Les fonctions</h1>
+type nom (params formels) { corps } <- def
+return ; ou return expr;
+void : ne renvoie rien
+
+appel : nom(params réels/effectifs)
+
+Pas d'imbrications de fonction !
+Par valeur : pour type elem
+Par adresse : type p[] <- jamais de vérif de taille, donc pas la peine de préciser
+
+déclarer avant d'utiliser ! type nom(params formels) ;
+définir déclaire aussi si pas fait avant
+
+
+VII Fonctions et pointeurs
+type * f() : renvoie une @
+
+! ne pas retourner d'@ de var à durée limitée à son bloc. Soit des static, soit du tas.
+Pointeur de fonction : type (*ptrfct) (type, type...);
+affectation via = un pointeur ou une fct (~= pointeur constant ?)
+Appel : (*ptr)(arguments);
+
+Tableau de ptr de fun :
+type(*nom[taille])(type, type,...)
+On peut avoir un ptr de fun en argument.
+
+args : int argc, char * argv[] <- des chaînes (nb = argc)
+
+    <h1>Le préprocesseur</h1>
+#define ident(arg1, ...) value using args N'est pas typée !
+#include "fichierutilisateur.h"
+    	<standard.h>
+Compilation conditionnelle : if else nedif ifdef ifnedef elif
+    <h1>Compiler et lier</h1>
+    <h1>Bibliothèque standard</h1>
+#include <stdio.h>
+#define SYMB VALUE
+printf :
+	\d decimal entier
+	\s string
+	\c char
+	\o octal
+	\x hexa
+	\u non signée
+	\f float
+	\lf double
+	\e expo
+	\g choix auto entre f et e
+    <h1>Reference</h1>
+    http://www.lix.polytechnique.fr/~liberti/public/computing/prog/c/C/FUNCTIONS/format.html
+    http://www.lix.polytechnique.fr/~liberti/public/computing/prog/c/C/cref.html
+</body>
+</html>
+
+<!--
+cin, cout, cerr, clog, <<
+valeur par défaut au fun.
+new et delete opérateur
+:: opérateur de portée
+::x (si x est masqué dans le bloc suivant par une autre var s'appellant x)
+
+namespace nom {...}
+accès nom::éléments
+using namespace nom;
+ou using nom::elem ; -> elem only
+alias : namespace alias old;
+-->

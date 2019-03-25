@@ -1,0 +1,192 @@
+﻿<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" type="text/css" href="./style2.css"/>
+    <title>Looking Dwarf Software on the web</title>
+    <script type="text/javascript">
+<!--
+function multiClass(eltId) {
+	arrLinkId = new Array('_1','_2','_3','_4', '_5', '_6', '_7', '_8');
+	intNbLinkElt = new Number(arrLinkId.length);
+	arrClassLink = new Array('current','ghost');
+	strContent = new String()
+	for (i=0; i<intNbLinkElt; i++) {
+		strContent = "menu"+arrLinkId[i];
+		if ( arrLinkId[i] == eltId ) {
+			document.getElementById(arrLinkId[i]).className = arrClassLink[0];
+			document.getElementById(strContent).className = 'on';
+		} else {
+			document.getElementById(arrLinkId[i]).className = arrClassLink[1];
+			document.getElementById(strContent).className = 'off';
+		}
+	}	
+}
+-->
+    </script>
+    <script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-23318909-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+    </script>
+</head>
+<body class="valentina">
+<div id="menu">
+    <ul class="pages">
+        <li class="page"><a href="#accueil" id="_1" class="current" onclick="multiClass(this.id)" alt="menu1">Accueil</a></li>
+        <li class="page"><a href="#blog" id="_2" class="current" onclick="multiClass(this.id)" alt="menu2">Blog</a></li>
+        <li class="page"><a href="#langues" id="_3" class="ghost" onclick="multiClass(this.id)" alt="menu3">Langues</a></li>
+        <li class="page"><a href="#langages" id="_4" class="ghost" onclick="multiClass(this.id)" alt="menu4">Langages</a></li>
+        <li class="page"><a href="#histoire" id="_5" class="ghost" onclick="multiClass(this.id)" alt="menu5">Histoire</a></li>
+        <li class="page"><a href="#jeux" id="_6" class="ghost" onclick="multiClass(this.id)" alt="menu6">Jeux</a></li>
+        <li class="page"><a href="#plan" id="_7" class="ghost" onclick="multiClass(this.id)" alt="menu7">Plan du site</a></li>
+        <li class="page"><a href="#apropos" id="_8" class="ghost" onclick="multiClass(this.id)" alt="menu8">A propos</a></li>
+    </ul>
+</div> <!-- end menu -->
+<div id="content">
+  <table id="over">
+    <tr>
+      <td>
+        <h1>Looking Dwarf</h1>
+        <p><i>C'est dans les vieux grenier que l'on déniche parfois des trésors !</i></p>
+      </td>
+      <td id="liane">
+        <img src="./liane.png" width="200px" height="40px" align="right">​
+      </td>
+    </tr>
+  </table>
+  <table class="main">
+    <tr>
+      <td>
+          <div id="menu_1" class="on">
+            <h2>Accueil</h2>
+              <div class="main">
+                <p>Bonjour monde !</p>
+                <p>Site en construction regroupant mes activit&eacute;es. Pour une liste des projets en cours, <a href="#plan" onclick="multiClass('_7')">cliquez ici</a></p>
+				<p>Mes projets ne suivent que la fantaise de mes intérêts, et au jour d'aujourd'hui, on y trouvera 4 thèmes principaux : les <i><a href="#langues" id="_3" class="intext" onclick="multiClass(this.id)" alt="menu3">langues</a></i>, les <i><a href="#langages" id="_4" onclick="multiClass(this.id)" alt="menu4">langages</a> (de programmation)</i>, les <i><a href="#jeux" id="_6" onclick="multiClass(this.id)" alt="menu6">jeux</a> (informatiques ou non)</i> et enfin <i>l'<a href="#histoire" id="_5" onclick="multiClass(this.id)" alt="menu5">Histoire</a></i>. Je ne sais pas si on peut tracer une ligne directrice entre ces passions : mais pourquoi le faudrait-il ? Si cela peut vous être utile, vous m'en verrez ravi. Bienvenue !</p>
+				<!--<p>Contact : <img src="adresse.png" vspace="0px" align="top" alt="damien POINT gouteux AROBASE gmail POINT com"></p>-->
+              </div>
+          </div>
+          <div id="menu_2" class="off">
+            <h2>Blog</h2>
+              <div class="main">
+                <p>Bientôt...</p>
+              </div>
+          </div>
+		  <div id="menu_3" class="off">
+		    <h2>Langues</h2>
+              <div class="main">
+                <p>Les langues sont l'outil principal pour communiquer entre êtres humains. Non pas que les caresses, les cris, les yeux, en somme tout le corporel, ne soit pas important, mais les langues demeurent un outil formidablement précis pour exprimer des idées abstraites, et la communication ainsi permise est à la base de notre éducation, clé de notre futur.</p>
+				<p>Projets :
+				  <ul>
+				    <li><a href="./langues/it/">Grammaire italienne</a></li>
+					<li><a href="./langues/Langue.html">Sur les langues</a>
+				  </ul>
+				</p>
+              </div>
+		  </div>
+          <div id="menu_4" class="off">
+            <h2>Langages</h2>
+            <div class="main">
+              <ul>
+                <li>Guides
+                  <ul>
+                    <li><a href="./langages/guideC.html">Un guide pour le langage C</a></li>
+                    <li><a href="./langages/guidePython.html">Un guide pour le langage Python</a></li>
+                    <li><a href="./langages/guideRuby.html">Un guide pour le langage Ruby</a></li>
+                  </ul>
+                </li>
+                <li>Projets
+                  <ul>
+			        <li><a href="./langages/index.html">Frankenschript | Scriptal : langage de script</a></li>
+                    <li><a href="./langages/calcoolette.html">La plus cool des calculatrices !</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+		  </div>
+		  <div id="menu_5" class="off">
+            <h2>Histoire</h2>
+            <div class="main">
+			  <ul>
+                <li><a href="./Histoire/Biblio.html">Sur la bibliographie</a></li>
+              </ul>
+            </div>
+		  </div>
+          <div id="menu_6" class="off">
+            <h2>Jeux</h2>
+            <div class="main">
+			  <ul>
+                <li><a href="./hobbies/index.html">Un essai de règles de jeux</a></li>
+                <li>Un petit jeu de stratégie (todo)</li>
+                <li>Sur les moteurs 2.5D (todo)</li>
+              </ul>
+            </div>
+		  </div>
+          <div id="menu_7" class="off">
+            <h2>Plan du site</h2>
+            <div class="main">
+              <p>Plusieurs sites web :</p>
+              <ul>
+                <li><a href="#blog" id="_2" onclick="multiClass(this.id)" alt="menu2">Blog</a></li>
+                <li><a href="#langues" id="_3" onclick="multiClass(this.id)" alt="menu3">Langues</a>
+                  <ul>
+                    <li><a href="./langues/it/">Grammaire Italienne</a></li>
+                    <li><a href="./langues/Langue.html">Sur les langues</a>
+                  </ul>
+                </li>
+                <li><a href="#langages" id="_4" onclick="multiClass(this.id)" alt="menu4">Langages</a>
+                  <ul>
+                    <li><a href="./langages/guideC.html">Un guide pour le langage C</a></li>
+                    <li><a href="./langages/guidePython.html">Un guide pour le langage Python</a></li>
+                    <li><a href="./langages/guideRuby.html">Un guide pour le langage Ruby</a></li>
+                    <li><a href="./langages/index.html">Frankenschript | Scriptal : langage de script</a></li>
+                    <li><a href="./langages/calcoolette.html">La plus cool des calculatrices !</a></li>
+                  </ul>
+                </li>
+                <li><a href="#histoire" id="_5" onclick="multiClass(this.id)" alt="menu5">Histoire</a>
+                  <ul>
+                    <li><a href="./Histoire/">Fiches sur l'Histoire</a></li>
+                  </ul>
+                </li>
+                <li><a href="#jeux" id="_6" onclick="multiClass(this.id)" alt="menu6">Jeux</a>
+                  <ul>
+                    <li><a href="./hobbies/">Règles de jeux</a></li>
+                    <li>Un petit jeu de stratégie (todo)</li>
+                    <li>Sur les moteurs 2.5D (todo)</li>
+                  </ul>
+                </li>
+                <li>Anciens sites et tests techniques
+                  <ul>
+                    <li><a href="./lds/">LDS Main Site (in english)</a></li>
+                    <li><a href="./silverlight/">Essai avec Silverlight</a></li>
+                    <li><a href="./javascript/TestCouleurs.html">Tester les couleurs</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div id="menu_8" class="off content">
+            <h2>A propos</h2>
+            <div class="main">
+              <p>Au revoir monde !</p>
+            </div>
+          </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div id="footer">Damien Gouteux 2011</div>
+      </td>
+    </tr>
+  </table>
+</div> <!-- end content -->
+</body>
+</html>

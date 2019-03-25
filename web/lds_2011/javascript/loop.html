@@ -1,0 +1,18 @@
+﻿<html charset="utf8">
+<head>
+	<script type="text/javascript">
+		// 10h20 : putain je sais faire un main loop en JavaScript !!!
+		function main() {
+			d = document.getElementById("d");
+			d.innerHTML = d.innerHTML + "a";
+			setTimeout("main()",200); // la fonction se redéclenchera dans 200 ms
+			return true;
+		}
+		window.onload = main;
+	</script>
+</head>
+<body>
+	<div id="d">
+	</div>
+</body>
+</html>

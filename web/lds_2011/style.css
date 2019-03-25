@@ -1,0 +1,31 @@
+#container .on     { display: block; }
+#container .off    { display: none; }
+table.main          { border-width: 0px; border-color: #000000; border-style: solid; margin: auto; }
+div.main            { height:90%; font-family: arial;     font-size: 12px; color: gray; }
+pre                 { font-family: monospace; font-size: 12px; color: white; background: #00a0a0; }
+a.current           { font-family: arial;     font-size: 14px; color: SeaGreen; text-decoration: none; font-weight: normal; }
+a.current:hover     { cursor: default; }
+a.ghost             { font-family: arial;     font-size: 14px; color: DarkSlateGray; text-decoration: none; font-weight: normal; }
+a.intext            { font-family: arial;     font-size: 12px; color: DarkSlateGray; text-decoration: none; font-weight: normal; }
+a.ghost:hover       { color: White; text-decoration: underline; background: DarkSlateGray; }
+a.intext:hover      { color: White; text-decoration: underline; background: DarkSlateGray; }
+
+h1              { font-family: arial;     font-size: 16px; color: SeaGreen; }
+/* Developped in Beatrice : h2, h3, h4 */
+h2              { font-family: arial;     font-size: 14px; color: SeaGreen; }
+h3              { font-family: arial;     font-size: 14px; color: DarkSlateGray; }
+h4              { font-family: arial;     font-size: 14px; color: DarkGray; }
+
+div.footer      { height: 10px; position : absolute; bottom 0px; font-size: 10px; color: gray; text-align: center; width: 98%;}
+p.example       { border-style: inset; }
+span.sep        { font-weight: normal; color: Silver; }  /* #213737; */
+/* Developped in Beatrice */
+body.beatrice   { font-family: arial;     font-size: 14px; color: DarkSlateGray; }
+table.beatrice  { border: 1px solid DarkSlateGray;}
+td.beatrice     { border: 1px solid DarkSlateGray; text-align: center;}
+th.beatrice     { border: 1px solid DarkSlateGray; text-align: center;}
+div.partie      { border: 1px solid SeaGreen; text-align: left; font-size: 18px; color: SeaGreen; font-family: arial; padding: 20px 10px 20px 10px; margin-top: 20px;}
+table.inv       { border: 0px solid White;}
+td.inv          { border: 0px solid White;}
+/* Developped for Calcoolette (supress footer error due to multiple main div */
+div.main2       { height:90%; font-family: arial;     font-size: 12px; color: gray; }

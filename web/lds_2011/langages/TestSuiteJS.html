@@ -1,0 +1,61 @@
+﻿<html>
+<head>
+<title>Test suite</title>
+</head>
+<body>
+  <table border="1">
+    <thead>
+    <tr><td>Test</td><td>Result</td><td>JavaScript</td></tr>
+    </thead>
+    <tbody>
+    <tr><td>'2+3'</td><td>5</td><td><script type="text/javascript">document.write(eval("2+3"));</script></td></tr>
+    <tr><td>'2'</td><td>2</td><td><script type="text/javascript">document.write(eval("2"));</script></td></tr>
+    <tr><td>'(2+2)*3'</td><td>12</td><td><script type="text/javascript">document.write(eval("(2+2)*3"));</script></td></tr>
+    <tr><td>'3*(2+2)'</td><td>12</td><td><script type="text/javascript">document.write(eval("3*(2+2)"));</script></td></tr>
+    <tr><td>'3*2+2'</td><td>8</td><td><script type="text/javascript">document.write(eval("3*2+2"));</script></td></tr>
+    <tr><td>'(3+2)*(2*2)'</td><td>20</td><td><script type="text/javascript">document.write(eval("(3+2)*(2*2)"));</script></td></tr>
+    <tr><td>'(3)'</td><td>3</td><td><script type="text/javascript">document.write(eval("(3)"));</script></td></tr>
+    <!-- # Float -->
+    <tr><td>'(3.0)'</td><td>3.0</td><td><script type="text/javascript">document.write(eval("(3.0)"));</script></td></tr>
+    <tr><td>'5/2'</td><td>2</td><td><script type="text/javascript">document.write(eval("5/2"));</script></td></tr>
+    <tr><td>'5/2.0'</td><td>2.5</td><td><script type="text/javascript">document.write(eval("5/2.0"));</script></td></tr>
+    <tr><td>'5.0/2'</td><td>2.5</td><td><script type="text/javascript">document.write(eval("5.0/2"));</script></td></tr>
+    <tr><td>'5.0//2.0'</td><td>2</td><td><script type="text/javascript">document.write(eval("5.0//2.0"));</script></td></tr>
+    <tr><td>'5%2'</td><td>1</td><td><script type="text/javascript">document.write(eval("5%2"));</script></td></tr>
+    <tr><td>'5%2*3'</td><td>3</td><td><script type="text/javascript">document.write(eval("5%2*3"));</script></td></tr>
+    <tr><td>'5*3%2'</td><td>5</td><td><script type="text/javascript">document.write(eval("5*3%2"));</script></td></tr>
+    <tr><td>'b=4'</td><td>4</td><td><script type="text/javascript">document.write(eval("b=4"));</script></td></tr>
+    <tr><td>'a = 3'</td><td>3</td><td><script type="text/javascript">document.write(eval("a = 3"));</script></td></tr>
+    <tr><td>'a+=0'</td><td>3</td><td><script type="text/javascript">document.write(eval("a+=0"));</script></td></tr>
+    <tr><td>'a*=2'</td><td>6</td><td><script type="text/javascript">document.write(eval("a*=2"));</script></td></tr>
+    <tr><td>'a/=2'</td><td>3</td><td><script type="text/javascript">document.write(eval("a/=2"));</script></td></tr>
+    <tr><td>'a%=2'</td><td>1</td><td><script type="text/javascript">document.write(eval("a%=2"));</script></td></tr>
+    <tr><td>'a-=1'</td><td>0</td><td><script type="text/javascript">document.write(eval("a-=1"));</script></td></tr>
+    <tr><td>'b'</td><td>4</td><td><script type="text/javascript">document.write(eval("b"));</script></td></tr>
+    <!-- # Boolean -->
+    <tr><td>'a = true'</td><td>True</td><td><script type="text/javascript">document.write(eval("a = true"));</script></td></tr>
+    <tr><td>'true == true'</td><td>True</td><td><script type="text/javascript">document.write(eval("true == true"));</script></td></tr>
+    <tr><td>'true == false'</td><td>False</td><td><script type="text/javascript">document.write(eval("true == false"));</script></td></tr>
+    <tr><td>'false == false'</td><td>True</td><td><script type="text/javascript">document.write(eval("false == false"));</script></td></tr>
+    <tr><td>'not true'</td><td>False</td><td><script type="text/javascript">document.write(eval("! true"));</script></td></tr>
+    <tr><td>'not false'</td><td>True</td><td><script type="text/javascript">document.write(eval("! false"));</script></td></tr>
+    <tr><td>'a'</td><td>True</td><td><script type="text/javascript">document.write(eval("a"));</script></td></tr>
+    <tr><td>'not a'</td><td>False</td><td><script type="text/javascript">document.write(eval("! a"));</script></td></tr>
+    <tr><td>'true and true'</td><td>True</td><td><script type="text/javascript">document.write(eval("true && true"));</script></td></tr>
+    <tr><td>'true and false'</td><td>False</td><td><script type="text/javascript">document.write(eval("true && false"));</script></td></tr>
+    <tr><td>'false and true'</td><td>False</td><td><script type="text/javascript">document.write(eval("false && true"));</script></td></tr>
+    <tr><td>'false or true'</td><td>True</td><td><script type="text/javascript">document.write(eval("false || true"));</script></td></tr>
+    <tr><td>'true or false'</td><td>True</td><td><script type="text/javascript">document.write(eval("true || false"));</script></td></tr>
+    <tr><td>'true and true and false'</td><td>False</td><td><script type="text/javascript">document.write(eval("true && true && false"));</script></td></tr>
+    <tr><td>'false or false or true'</td><td>True</td><td><script type="text/javascript">document.write(eval("false || false || true"));</script></td></tr>
+    <tr><td>'false and false or true'</td><td>True</td><td><script type="text/javascript">document.write(eval("false && false || true"));</script></td></tr>
+    <tr><td>'false and (false or true)'</td><td>False</td><td><script type="text/javascript">document.write(eval("false && (false || true)"));</script></td></tr>
+    <!-- # Selection (if) -->
+    <tr><td>'if true then 3 end'</td><td>3</td><td><script type="text/javascript">document.write(eval("if (true) { 3 }"));</script></td></tr>
+    <tr><td>'if false then 3 else 5 end'</td><td>5</td><td><script type="text/javascript">document.write(eval("if (false) { 3 } else { 5 }"));</script></td></tr>
+    <tr><td>'if a then 42 end'</td><td>42</td><td><script type="text/javascript">document.write(eval("if (a) { 42 }"));</script></td></tr>
+    <tr><td>'if not a then 22 else 42 end'</td><td>42</td><td><script type="text/javascript">document.write(eval("if (! a) { 22 } else { 42 }"));</script></td></tr>
+    </tbody>
+  </table>
+</body>
+</html>

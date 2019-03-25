@@ -1,0 +1,103 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" type="text/css" href="http://looking.dwarf.free.fr/style2.css"/>
+    <title>Guide Python</title>
+</head>
+<body class="valentina" width="90%">
+<pre>
+(notes du 4 sept 2008)
+
+Inheritance
+extends <IdentificateurClasse>
+
+Encapsulation
+private public protected internal (classe du même package ont accès)
+
+Interface
+interface <IdentificateurInterface> {
+    signatures ( function <Identificateur>(paramètres) : type ; )
+}
+implements <IdentificateurInterface>
+cv:  +able
+cv: extends X implements Y
+
+Polymorphism
+class A { … }
+class B extends A { … }
+
+var <IdentificateurVariable> : <IdentifcateurType> = new <IdentificateurType>(paramètres réels/effectifs) ;
+var pipo : A = new A();
+pipo = new B(); (upcasting, l’objet de type B est casté en A)
+Une objet de type X, peut contenir une référence vers n’importe quel sous-type.
+
+Wildcard pour le type : *
+var pipo : *;
+
+http://flexblog.faratasystems.com/?p=115
+diff java / AS
+
+On peut se passer du ‘;’ de fin de ligne si il y a un seul statement par ligne
+Egalité strict === !==
+Constant : final (java) const (actionscript)
+Type checking : static & dynamic
+Type check operator : instanceof (java) is (actionscript)
+The as operator : renvoie la valeur castée :
+    var s : String = “123″;
+    var i : Number = s as Number;
+    On peut aussi caster ainsi : Type(Object) (java : (type) object)
+Pas de type primitif en actionscript ! (Boolean, int, uint, Number et String sont des classes de premiers ordres.
+Type complexes : Array, Date, Error, Function, RegExp, XML, XMLList
+Littéral array : var t : Array = [1,2,3,4]; (java : {1,2,3})
+Hashtable : var ht : Object = { key1:’value’, key2:’value’ } ou ht["key"] ou ht.key
+Package : package n.m { … } (java : package n.m;)
+Namespace :                ou
+namespace abc;                   abc::myCalc(){}   use namespace abc;
+abc function myCalc() {}
+trace();
+import package/classe; import même si le nom est fully qualified dans le code !
+!!! Hoisting : Compiler moves all variable declarations to the top of the function, so you can use a variable name even before it’s been explicitly declared in the code.
+Pas de classes privées en AS3
+Pas de constructeur privé : pour faire des singletons, getInstance() avec un flag boolean.
+Dans un package on peut placer : classe, interface, variable, fonction, namespace et executable statements !
+Classe dynamique !!!
+    dynamic class <IdentificateurClasse> { …. }
+    On peut ajouter aux instances des nouveaux champs.
+    p.f = function() { … }
+    Mais à la classe aussi ?
+Static ?
+Pas de classes abstraites
+Il faut utiliser “override” pour redéfinir une méthode (overload)
+Pas de “final variable” (à la java) dans les interfaces AS
+try / catch / throw / finally mais les fonctions n’ont pas a déclaré leurs exception (avec throws). On peut aussi thow 5 (object ?)
+Closure : a snapshot of a function with its lexical context : myButton.addEventListener(“click”, myMethod); (Java 7 only)
+… Identificateur : pour taille variable de paramètre, accès via Identificateur[index starts at 0]
+Pas de surcharge de constructeur en AS3 !
+
+http://www.actionscript.org/resources/articles/684/1/Object-Oriented-Programming-in-AS3/Page1.html
+
+surchage != redéfinition
+paramètres formels / effectifs ou réel
+corps et signature
+définition et déclaration
+
+http://www.actionscript.org/resources/articles/72/1/OOP-and-inheritance-in-Flash/Page1.html
+
+http://gaaton.blogspot.com/2007/08/cheat-sheets-for-actionscript-ajax.html
+
+Quick reference card actionscript
+
+http://www.onflex.org/ted/2006/10/cube-wallpaper-as3-and-flex-api.php
+http://actionscriptcheatsheet.com/blog/quick-referencecheatsheet-for-actionscript-20
+
+http://www.slideshare.net/tbisaacs/flash-flex-air-a-brief-survey
+http://www.slideshare.net/yukoba/use-ruby-on-flash
+    HotRuby : pour exécuter du Ruby en Flash
+http://www.slideshare.net/DSPIP/introduction-to-actionscript3
+http://www.slideshare.net/peterelst/objectoriented-actionscript-30
+
+Essentail Action Script 3.0
+Object-Orentied Action Script 3.0
+</pre>
+</body>
+</html>

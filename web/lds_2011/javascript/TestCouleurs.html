@@ -1,0 +1,213 @@
+﻿<html>
+<head>
+<title>Test des Couleurs</title>
+<link rel="stylesheet" type="text/css" href="http://looking.dwarf.free.fr/style2.css"/>
+<!--
+http://sjc.ironspeed.com/post/How-to-get-textbox-value-using-javascript-550614
+http://stackoverflow.com/questions/57803/how-to-convert-decimal-to-hex-in-javascript parseInt, substr, toString
+http://www.javascripter.net/faq/rgbtohex.htm
+http://www.webcodingtech.com/javascript/change-background-color.php
+http://www.webdeveloper.com/forum/showthread.php?t=84892 Change the text in a span
+Javascript rajoute des champs dynamiquement... Donc info.innnnnnerHTML = x marche...
+http://www.commentcamarche.net/forum/affich-3905124-changer-les-proprietes-css-avec-javascript
+http://www.javascriptkit.com/javatutors/oopjs.shtml
+http://www.w3schools.com/jsref/dom_obj_text.asp
+http://bernard.quevillier.pagesperso-orange.fr/toposnew/select.htm
+http://www.javascriptkit.com/jsref/globalfunctions.shtml ***
+-->
+<script type="text/javascript">
+    function go(f)
+    {
+        var r = parseInt(f.r.value);
+        var g = parseInt(f.g.value);
+        var b = parseInt(f.b.value);
+        if (isNaN(r)) { r = 0; }
+        if (isNaN(g)) { g = 0; }
+        if (isNaN(b)) { b = 0; }
+        var total = r * 256 * 256 + g * 256 + b;
+
+        var par = f.target.value;
+        //alert(decimalToHex(total));
+        if (par == 'Background')
+        {   
+            document.bgColor = "#" + decimalToHex(total);
+        
+            var bd = document.getElementById("main");
+            bd.background = "#" + decimalToHex(total);
+            bd.style.background = "#" + decimalToHex(total);
+        
+            var info = document.getElementById("info");
+            info.innerHTML = ("#" + decimalToHex(total) + " (" + r + ", " + g + ", " + b + ")").toUpperCase();
+        }
+        else if (par == 'border')
+        {
+            
+        }
+        else if (par == 'button_color')
+        {
+        }
+        
+    }
+    
+    function decimalToHex(d) {
+        var hex = Number(d).toString(16);
+        hex = "000000".substr(0, 6 - hex.length) + hex; 
+        return hex;
+    }
+    
+</script>
+</head>
+<body id="main" class="valentina"> <!-- style="background: #8ED6AD;">--> <!-- ED = 237 DE = 222 -->
+<form>
+    Color
+    red <input name="r" type="text" size="3" value="249"/>
+    green <input name="g" type="text" size="3" value="249"/>
+    blue <input name="b" type="text" size="3" value="240"/>
+    <select name="target">
+        <option selected>Background</option>
+        <option>Borders</option>
+        <option>Button Color</option>
+        <option>Button Text</option>
+        <option>H1</option>
+        <option>H2</option>
+        <option>Normal Text</option>
+    </select>
+    <button type="button" onclick="go(this.form)" onmouseover="go(this.form)">Update</button>
+    <span style="color: #FFFFF; width=20; height=10;" id="info">#F9F9F0 (249, 249, 240)</span><br/>
+    
+</form>
+<div id="menu">
+    <ul class="pages">
+        <li class="page"><a href="#accueil" id="_1" class="current" onclick="multiClass(this.id)" alt="menu1">Accueil</a></li>
+        <li class="page"><a href="#blog" id="_2" class="current" onclick="multiClass(this.id)" alt="menu2">Blog</a></li>
+        <li class="page"><a href="#langues" id="_3" class="ghost" onclick="multiClass(this.id)" alt="menu3">Langues</a></li>
+        <li class="page"><a href="#langages" id="_4" class="ghost" onclick="multiClass(this.id)" alt="menu4">Langages</a></li>
+        <li class="page"><a href="#histoire" id="_5" class="ghost" onclick="multiClass(this.id)" alt="menu5">Histoire</a></li>
+        <li class="page"><a href="#jeux" id="_6" class="ghost" onclick="multiClass(this.id)" alt="menu6">Jeux</a></li>
+        <li class="page"><a href="#plan" id="_7" class="ghost" onclick="multiClass(this.id)" alt="menu7">Plan du site</a></li>
+        <li class="page"><a href="#apropos" id="_8" class="ghost" onclick="multiClass(this.id)" alt="menu8">A propos</a></li>
+    </ul>
+</div> <!-- end menu -->
+<div id="content">
+  <table id="over">
+    <tr>
+      <td>
+        <h1>Looking Dwarf</h1>
+        <p>&nbsp;Damien Gouteux, 2011.</p>
+      </td>
+      <td id="liane">
+        <img src="http://looking.dwarf.free.fr/liane.png" width="200px" height="40px" align="right">​
+      </td>
+    </tr>
+  </table>
+  <table class="main">
+    <tr>
+      <td>
+          <div id="menu_1" class="on">
+            <h2>Accueil</h2>
+              <div class="main">
+                <p>Bonjour monde !</p>
+                <p>Site en construction regroupant mes activit&eacute;es. Pour une liste des projets en cours, <a href="#plan" onclick="multiClass('_7')">cliquez ici</a></p>
+				<p>Mes projets ne suivent que la fantaise de mes intérêts, et au jour d'aujourd'hui, on y trouvera 4 thèmes principaux : les <i><a href="#langues" id="_3" class="intext" onclick="multiClass(this.id)" alt="menu3">langues</a></i>, les <i><a href="#langages" id="_4" onclick="multiClass(this.id)" alt="menu4">langages</a> (de programmation)</i>, les <i><a href="#jeux" id="_6" onclick="multiClass(this.id)" alt="menu6">jeux</a> (informatiques ou non)</i> et enfin <i>l'<a href="#histoire" id="_5" onclick="multiClass(this.id)" alt="menu5">Histoire</a></i>. Je ne sais pas si on peut tracer une ligne directrice entre ces passions : mais pourquoi le faudrait-il ? Si cela peut vous être utile, vous m'en verrez ravi. Bienvenue !</p>
+				<!--<p>Contact : <img src="adresse.png" vspace="0px" align="top" alt="damien POINT gouteux AROBASE gmail POINT com"></p>-->
+              </div>
+          </div>
+          <div id="menu_2" class="off">
+            <h2>Blog</h2>
+              <div class="main">
+                <p>Bientôt...</p>
+              </div>
+          </div>
+		  <div id="menu_3" class="off">
+		    <h2>Langues</h2>
+              <div class="main">
+                <p>Les langues sont l'outil principal pour communiquer entre êtres humains. Non pas que les caresses, les cris, les yeux, en somme tout le corporel, ne soit pas important, mais les langues demeurent un outil formidablement précis pour exprimer des idées abstraites, et la communication ainsi permise est à la base de notre éducation, clé de notre futur.</p>
+				<p>Projets :
+				  <ul>
+				    <li><a href="./langues/it/">Grammaire italienne</a></li>
+					<li><a href="./langues/Langue.html">Sur les langues</a>
+				  </ul>
+				</p>
+              </div>
+		  </div>
+          <div id="menu_4" class="off">
+            <h2>Langages</h2>
+            <div class="main">
+              <ul>
+			    <li><a href="./langages/">Un remplacement pour Python</a></li>
+                <li><a href="./langages/guideC.html">Un guide pour le langage C</a></li>
+                <li><a href="./langages/calcoolette.html">La plus cool des calculatrices !</a></li>
+              </ul>
+            </div>
+		  </div>
+		  <div id="menu_5" class="off">
+            <h2>Histoire</h2>
+            <div class="main">
+			  <ul>
+                <li><a href="./Histoire/Biblio.html">Sur la bibliographie</a></li>
+              </ul>
+            </div>
+		  </div>
+          <div id="menu_6" class="off">
+            <h2>Jeux</h2>
+            <div class="main">
+			  <ul>
+                <li><a href="./hobbies/">Un essai de règles de jeux</a></li>
+              </ul>
+            </div>
+		  </div>
+          <div id="menu_7" class="off">
+            <h2>Plan du site</h2>
+            <div class="main">
+              <p>Plusieurs sites web :</p>
+              <ul>
+                <li><a href="#blog" id="_2" onclick="multiClass(this.id)" alt="menu2">Blog</a></li>
+                <li><a href="#langues" id="_3" onclick="multiClass(this.id)" alt="menu3">Langues</a>
+                  <ul>
+                    <li><a href="./langues/it/">Grammaire Italienne</a></li>
+                    <li><a href="./langues/Langue.html">Sur les langues</a>
+                  </ul>
+                </li>
+                <li><a href="#langages" id="_4" onclick="multiClass(this.id)" alt="menu4">Langages</a>
+                  <ul>
+                    <li><a href="./langages/">Frankenschript | Scriptal : langage de script</a></li>
+                    <li><a href="./langages/guideC.html">Guide du langage C</a></li>
+                    <li><a href="./langages/calcoolette.html">La plus cool des calculatrices !</a></li>
+                  </ul>
+                </li>
+                <li><a href="#histoire" id="_5" onclick="multiClass(this.id)" alt="menu5">Histoire</a>
+                  <ul>
+                    <li><a href="./Histoire/">Fiches sur l'Histoire</a></li>
+                  </ul>
+                </li>
+                <li><a href="#jeux" id="_6" onclick="multiClass(this.id)" alt="menu6">Jeux</a>
+                  <ul>
+                    <li><a href="./hobbies/">Règles de jeux</a></li>
+                  </ul>
+                </li>
+                <li>Anciens sites et tests techniques
+                  <ul>
+                    <li><a href="./lds/">LDS Main Site (in english)</a></li>
+                    <li><a href="./silverlight/">Essai avec Silverlight</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div id="menu_8" class="off content">
+            <h2>A propos</h2>
+            <div class="main">
+              <p>Au revoir monde !</p>
+            </div>
+          </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div id="footer">Damien Gouteux 2011</div>
+      </td>
+    </tr>
+  </table>
+</div> <!-- end content -->
+</body>
+</html>

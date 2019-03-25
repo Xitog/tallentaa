@@ -1,0 +1,846 @@
+﻿<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="keywords" content="grammaire, française, cours, langue, France, grammaire française, cours de langue française, cours de français, damien gouteux, gouteux">
+    <meta name="description" content="grammaire de base française de Damien Gouteux">
+
+    <link rel="shortcut icon" href="favicon.ico" >
+    <link rel="icon" type="image/gif" href="favicon.ico" >
+	
+    <title>Grammaire fançaise</title>
+    
+    <style type="text/css">
+        body            { font-family: "Palatino Linotype"; font-size: 14px; color: DarkSlateGray; background-color: #EFEFEF; }
+
+        a               { color: DarkGoldenRod; }
+        a:hover         { color: White; background-color: DarkGoldenRod; }
+        
+        h1              { color: SeaGreen; font-size: 64px; font-weight: normal; margin: 0; padding-left: 7px; text-align: left; 
+                            text-shadow: 0.09em 0.09em 0.1em DarkGrey; }
+        h2              { font-size: 14px; color: SeaGreen; margin-top: 45px; }
+        h2.horstexte    { font-size: 14px; color: SeaGreen; margin-top: 25px; }
+        h3              { font-size: 14px; color: DarkSlateGray; }
+        h4              { font-size: 14px; color: DarkGray; }
+
+        table           { border: 1px solid DarkSlateGray; margin-left:auto; margin-right:auto;}
+        th              { border: 1px solid DarkSlateGray; background-color: SeaGreen; color: White; }
+        tr              { border: 1px solid DarkSlateGray; text-align: center;}
+        tr:nth-child(even) { background-color: rgb(210, 210, 210); }
+
+        table.inv       { border: none; width: 100%; text-align: left; }
+        table.inv tr    { border: none; text-align: left; }
+        table.inv td    { border: none; }
+
+        div.menu        { border-top: 1px solid SeaGreen; text-align: center; padding-top: 3px; padding-bottom: 3px; margin: 0; font-size: 15px; 
+                            border-bottom: 1px solid SeaGreen; }
+        div.partie      { border: 1px solid SeaGreen; text-align: left; font-size: 18px; color: SeaGreen; padding: 20px 10px 20px 10px; 
+                            margin-top: 20px;}
+        div.wrapper     { border: 1px solid SeaGreen; width: 800px; margin: auto; border-radius: 25px; padding: 0;
+	                        -moz-border-radius: 25p; -webkit-border-radius: 25px; -o-border-radius: 25px; background-color: #FEFEFE; }
+        div.content     { margin: 0; padding: 0; padding-left: 5px; padding-right: 5px; }
+        
+        p.info          { color: #778899; font-family: consolas; text-align: right; width: 100%;}
+        
+        header          { padding-left: 3px; padding-right: 3px; }
+
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+
+<header>
+    <h1>Cristina</h1>
+    <p class="info">Mini grammaire française, vocabulaire et conjugaisons<br>Damien Gouteux, 2011-2012. Version 1.0.1</p>
+</header>
+<div class="menu"><a href="#sommaire">Sommaire</a> | <a href="http://ran.alwaysdata.net">Retour</a>  | <a href="http://ran.alwaysdata.net">Télécharger la version PDF</a><i>(indisponible)</i></a></div>
+<div class="content">
+
+<h2 id="avt" class="horstexte">Avant-propos</h2>
+
+<table class="inv">
+  <tr>
+    <td>
+        <p>Cette page est une grammaire <i>rapide</i> du français, non-exhaustive, ni docte, mais pouvant servir d'aide-mémoire ou d'introduction. La simple visite d'une bibliothèque de lettres vous prouvera que le sujet est interminable, et infiniement complexe. Nul discours trop avancé ici, il s'agit d'énoncer les règles amenant à un discours correct dans 95% des cas. De par l'amateurisme de sa rédaction, des fautes et des erreurs sont à prévoir, mais c'est en forgeant que l'on devient forgeron ! En attendant de dépasser le stade d'apprenti, contre-vérifiez les informations auprès d'autres sources (voir les <a href="#ref">références</a>).</p>
+        <p>Un mot sur le titre : il s'agit de faire honeur à Christine de Pisan, née à Venise en 1364, puis ayant vécu en France, considérée comme la première <i>femme de lettres</i> de langue française.</p>
+    </td>
+    <td align="right">
+      <a href="http://fr.wikipedia.org/wiki/Anthony_Frederick_Augustus_Sandys"><img src="http://upload.wikimedia.org/wikipedia/commons/b/ba/Morganlfay.jpg" width="300" height="481" alt="Morgan le Fay, 1864"/></a>
+    </td>
+  </tr>
+</table>
+
+<h2 id="sommaire" class="horstexte">Sommaire</h2>
+
+<ol>
+    <li>Première partie : présentation de la langue<ol>
+        <li><a href="#texte">Du texte aux mots</a></li>
+    </ol></li>
+    <li>Seconde partie : les natures<ol>
+        <li><a href="#noms">Noms</a></li>
+        <li><a href="#articles">Articles</a></li>
+        <li><a href="#adjectifs">Adjectifs qualificatifs</a></li>
+        <li><a href="#verbes">Verbes</a></li>
+        <li><a href="#adverbes">Adverbes</a></li>
+        <li><a href="#pronoms">Pronoms</a></li>
+        <li><a href="#adjnonq">Adjectifs non qualificatifs</a></li>
+        <li><a href="#conjonctions">Conjonctions</a></li>
+        <li><a href="#prepositions">Prépositions</a></li>
+        <li><a href="#interjections">Interjections</a></li>
+    </ol></li>
+    <li>Troisième partie : Les fonctions<ol>
+        <li><a href="#sujet">Le sujet et le complément d'agent</a></li>
+        <li><a href="#determination">Le complément de détermination (de nom, d'adjectif, d'adverbe)</a></li>
+        <li><a href="#objet">Le complément d'objet</a></li>
+        <li><a href="#attribution">Le complément d'objet second ou d'attribution</a></li>
+        <li><a href="#epithete">L'épithète</a></li>
+        <li><a href="#attribut">L'attribut</a></li>
+        <li><a href="#apposition">L'apposition</a></li>
+        <li><a href="#apostrophe">L'apostrophe</a></li>
+        <li><a href="#circonstanciel">Le complément circonstanciel</a></li>
+        <li><a href="#verbale">La fonction verbale</a></li>
+    </ol></li>
+    <li>Quatrième partie : Du mot au texte<ol>
+        <li><a href="#phrase">La phrase</a></li>
+    </ol></li>
+    <li>Cinquième partie : Difficultés<ol>
+        <li><a href="#diff_de">De</a></li>
+        <li><a href="#diff_pro">Pronoms et adjectifs indéfinis</a></li>
+        <li><a href="#diff_sub">Subordonnées et subordonnées relatives</a></li>
+        <li><a href="#diff_grp">Verbes du troisième groupe</a></li>
+    </ol></li>
+    <li>Sixième partie : Vocabulaire initial<ol>
+        <li><a href="#voc_verbes">Verbes</a></li>
+    </ol></li>
+    <li>Septième partie : Références<ol>
+        <li><a href="#abbreviations">Abbréviations</a></li>
+        <li><a href="#lexique">Lexique</a></li>
+        <li><a href="#index">Index</a></li>
+        <li><a href="#biblio">Bibliographie et liens</a></li>
+        <li><a href="#historique">Historique</a></li>
+    </ol></li>
+</ol>
+
+<div class="partie">Première partie : présentation de la langue</div>
+
+<h2 id="texte" class="horstexte" id="prononciation">Du texte aux mots</h2>
+
+<p>Nous allons analyser la langue écrite en affinant le grain de notre perception. En premier lieu, il y a le <b>texte</b>, celui se compose de <b>phrases</b>, reconnaissables par les différents symboles de <b>ponctuation</b> les séparant. Puis vient la <b>proposition</b>, centrée autour d'un groupe verbal. Les phrases simples n'en compte qu'une, les phrases complexes plusieurs. Puis vient le <b>groupe</b> centré sur un mot noyau, et enfin le mot.</p>
+<ul>
+    <li>Texte<ul>
+        <li>Phrase(s)<ul>
+            <li>Proposition(s)<ul>
+                <li>Groupe(s)<ul>
+                    <li>Mot(s)</li>
+                </ul></li>
+            </ul></li>
+        </ul></li>
+    </ul></li>
+</ul>
+<p>Nous verrons plus tard les différentes caractérisations de chaque élément, que nous résumons ici :</p>
+<table>
+    <tbody>
+        <tr><td>Texte</td><td></td></tr>
+        <tr><td>Phrase</td><td>Voix, Type</td></tr>
+        <tr><td>Proposition</td><td></td></tr>
+        <tr><td>Groupe</td><td>Nature, Fonction</td></tr>
+        <tr><td>Mot</td><td>Nature, Fonction</td></tr>
+    </tbody>
+</table>
+
+<h3>La ponctuation</h3>
+
+<p>Liste des signes de ponctuation :</p>
+<table>
+    <tbody>
+        <tr><td>:</td><td>Deux points : annonce d'une citation.</td></tr>
+        <tr><td>,</td><td>Virgule : marque l'apposition.</td></tr>
+        <tr><td>;</td><td>Point virgule : marque une coupure.</td></tr>
+        <tr><td>.</td><td>Point : marque la fin d'une phrase.</td></tr>
+        <tr><td>?</td><td>Point d'intérrogation : marque la fin d'une phrase interrogative.</td></tr>
+        <tr><td>!</td><td>Point d'exclamation : marque la fin d'une phrase exclamative.</td></tr>
+        <tr><td>" "</td><td>Guillemets : indique une citation.</td></tr>
+        <tr><td>( )</td><td>Parenthèses : réflexion accessoire.</td></tr>
+        <tr><td>- -</td><td>Marque le changement d'interlocuteur ou met en valeur un élément.</td></tr>
+        <tr><td>...</td><td>Points de suspension : marque l'incomplétude.</td></tr>
+        <tr><td>[ ]</td><td>Crochets : précision.</td></tr>
+    </tbody>
+</table>
+
+<h3>Les mots</h3> 
+
+<p>Les mots ont une <b>nature</b> (appelée aussi <i>catégorie</i> ou <i>classe</i>) qui les caractérise selon des propriétés <b>syntaxiques</b> (agencement des mots les uns par rapport aux autres) et <b>sémantiques</b> (de sens). Il y a 9 ou 10 natures différentes, selon le regroupement ou non des adjectifs non qualificatifs et des articles en une seule, appelée déterminants.</p>
+<ul>
+	<li>Nom ou substantif</li>
+	<li>Verbe</li>
+	<li>Adjectif qualificatif</li>
+	<li>Pronom</li>
+	<li>Adverbe</li>
+	<li>Déterminant (Adjectif non qualificatif + article)</li>
+	<li>Conjonction</li>
+	<li>Préposition</li>
+	<li>Interjection</li>
+</ul>
+
+<p>De plus, on peut diviser les mots en deux grands ensembles : d'un côté les mots <b>lexicaux</b> et de l'autre les mots <b>grammaticaux</b> selon leur nature. L'ensemble des mots lexicaux est ouvert, des mots nouveaux y entrent en fonction de l'avancée des sciences tandis que les mots lexicaux forment un ensemble fermé de mots outils à peu près immuable.</p>
+
+<p>Une division possible pour les natures sont celles dont les mots varies et celles dont les mots sont invariables. Les interjections, les prépositions, les conjonctons, les adverbes sont invariables. Les noms, les verbes, les adjectifs, les articles, les pronoms varient selon plusieurs paramètres. C'est à dire que selon le genre ou le nombre pour le nom par exemple, le même mot ne s'écrira pas pareil.</p>
+
+<p>La <b>morphologie</b> est l'étude de la forme du mot lui-même.</p>
+
+<p>Nous allons parcourir rapidement chacune de ses natures dans la seconde partie, puis nous évoqueront dans la troisième partie l'articulation des différents mots entre eux et les principaux emplois de chacune.</p>
+
+<div class="partie">Seconde partie : les natures</div>
+
+<h2 id="noms" class="horstexte" id="noms">Noms</h2>
+
+<p>Un nom se caractérise par un <b>genre</b> et un <b>nombre</b>. En français, il existe deux genres : le masculin et le féminin et deux distinctions du nombre : singulier (1) ou pluriel (plusieurs). Certaines langues en comporte plus, on notera le genre neutre pour l'allemand par exemple. On peut diviser les noms selon plusieurs délimitations : on peut distinguer les <b>noms propres</b>, commençant par une majuscule et désignant par exemple une personne (<i>ex : Jules</i>) ou bien un lieu (<i>ex : Paris</i>) des <b>noms communs</b>. Ou encore les <b>noms concrets</b> désignant une chose ou un animal des <b>noms abstraits</b> désignant un concept, une idée, ou une notion. Parmi les noms concrets on distinguera les <b>animés</b> (animaux, personnes) des <b>inanimés</b> (lieux). Et enfin on peut aussi classifier les noms en <b>dénombrables</b> (un mouton) et <b>indénombrables</b> (de l'eau). Ces divisions permettront de mieux saisir certaines règles comme le choix de la <b>prépostion</b> chez plutôt que à devant un animé : on dira aller chez le coiffeur ou le boulanger mais aller à la boulangerie. De même les noms indénombrables demandent l'utilisation de <b>l'article partitif</b> <i>de</i>.</p>
+
+<h3>Masculin et féminin</h3>
+
+<p>On qualifie les êtres animés selon leur sexe (<i>ex : un chien, une chienne</i>) et les inanimés arbitrairement (<i>ex : la table, le livre</i>). Dans le premier cas, le féminin se différenciant souvent du masculin par un -e suffixe, s'accompagnant parfois d'un redoublement de la consonne terminant le nom. Il y a néanmoins de nombreuses exceptions (<i>un prêtre -> une prêtresse, un canard -> une cane, un cambrioleur -> une cambrioleuse</i>).</p>
+
+<p>Certains peuvent s'utiliser avec les deux genres: on peut dire <i>un</i> ou <i>une après-midi</i>. Attention aux noms qui changent de sens selon leur genre (<i>ex : un somme - une sieste, et une somme - une addition</i>) ! Certains ensembles de choses prennent un genre bien défini : le féminin pour les fleurs, le masculin pour les arbres. Certains suffixes (<i>ex : -tion</i>) imposent généralement un genre (<i>le féminin pour cet exemple</i>).</p>
+
+<h3>Pluriel des noms</h3>
+
+<p>Pour former le pluriel on ajoute généralement un s à la fin du singulier (<i>ex : un chat -> des chats</i>) même si de nombreux irréguliers existents (<i>ex : un cheval -> des chevaux ou un hibou -> des hiboux ou encore un petit pois -> des petits pois</i>). Certains noms peuvent n'exister qu'au pluriel (<i>ex : les gens, les ténèbres</i>).</p>
+
+<h3>Noms composés</h3>
+
+<p>C'est un nom composé de deux mots : soit fusionné en un seul (<i>ex : un portefeuille</i>), soit relié par un tiret (<i>ex : un arc-en-ciel</i>). Les règles pour mettre au pluriel dépendent de la nature des mots composant le nom. Par exemple, si les deux sont des noms, les deux se mettront au pluriel (<i>ex : un loup-garou -> des loups-garous</i>).</p>
+
+<table>
+    <tbody>
+        <tr><td>Genre</td><td>masculin</td><td>féminin</td><td>certains les deux : après-midi</td></tr>
+        <tr><td>Nombre</td><td>singulier</td><td>pluriel</td><td>certains n'existent qu'au pluriel</td></tr>
+        <tr><td rowspan="4">Divisions</td><td>Concret (chose, animal)</td><td>Abstrait (notion, concept, idée)</td><td></td></tr>
+        <tr><td>Commun</td><td>Propre</td><td>majuscule pour les propres</td></tr>
+        <tr><td>Animé (chez)</td><td>Inanimé (à)</td><td>choix du pronom</td></tr>
+        <tr><td>Dénombrables</td><td>Indénombrables</td><td>article partitif pour les indénombrables</td></tr>
+    </tbody>
+</table>
+
+<h2 id="articles" class="horstexte" id="noms">Articles</h2>
+
+<p>Les articles déterminent le nom en précisant son genre et son nombre.</p>
+
+<h3>Article indéfini</h3>
+
+<table>
+    <thead>
+        <tr><td></td><th>genre masculin</th><th>genre féminin</th></tr>
+    </thead>
+    <tbody>
+        <tr><th>singulier</th><td>un</td><td>une</td></tr>
+        <tr><th>pluriel</th><td>des</td><td>des</td></tr>
+    </tbody>
+</table>
+
+<h3>Article défini</h3>
+
+<table>
+    <thead>
+        <tr><td></td><th>genre masculin</th><th>genre féminin</th></tr>
+    </thead>
+    <tbody>
+        <tr><th>singulier</th><td>le, l'</td><td>la, l'</td></tr>
+        <tr><th>pluriel</th><td>les</td><td>les</td></tr>
+    </tbody>
+</table>
+
+<p>Il y a élision (perte de la voyelle) au singulier si le nom commence par une voyelle.</p>
+
+<p>Il y a contraction de l'article au singulier masculin et aux pluriels lorsqu'il est précédé de la préposition <b>à</b> (<i>Tu as donné à manger au [= à le] chat ? Tu as donné à manger aux [= à les] tortues ?</i>).</p>
+
+<h3>Article partitif</h3>
+
+<p>L'article partitif est employé avec les noms indénombrables (on ne peut les diviser). Par exemple, de l'eau, dans le sens d'élément liquide de formule chimique H²O, sera toujours employé avec l'article partitif.</p>
+
+<table>
+    <thead>
+        <tr><td></td><th>genre masculin</th><th>genre féminin</th></tr>
+    </thead>
+    <tbody>
+        <tr><th>singulier</th><td>du, de l'</td><td>de la, de l'</td></tr>
+        <tr><th>pluriel</th><td>des</td><td>des</td></tr>
+    </tbody>
+</table>
+
+<h2 id="adjectifs" class="horstexte" id="noms">Adjectifs qualificatifs</h2>
+
+<p>L'adjectif qualificatif précise une qualité du nom ou du pronom auquel il se rattache, le <i>qualifié</i>. Ils varient en genre et en nombre selon celui-ci.</p>
+
+<p>La forme féminine se différencie le plus souvent du masculin par un e suffixe, s'accompagnant parfois d'un changement du radical (redoublement de la consonne terminant le nom, apparition d'un accent sur le dernier e du radical). Bien sûr, il y a des irrégularités.</p>
+
+<h3>Pluriel des adjectifs</h3>
+
+<p>La forme pluriel se constitue le plus souvent par un s suffixe.</p>
+
+<p>Si un adjectif qualifie plusieurs noms, il se met au pluriel. Si les noms qualifiés sont de genre différent, l'adjectif se met au masculin pluriel. Une alternative est la règle de proximité, non encore reconnue par l'Académie, qui accorde le genre au nom le plus proche de l'adjectif.</p>
+
+<p>Si deux adjectifs se rapportent au même nom au pluriel, et qu'ils "décomposent" le pluriel en éléments distincts, ils se mettent au singulier (<i>ex : les deux vertues <u>morale et religieuse</u> sont...</i>).</p>
+
+<p>Les adjectifs de couleur issus de noms de chose sont invariables.</p>
+
+<p>Les adjectifs de couleur composés sont invariables.</p>
+
+<h3>Degré des adjectifs</h3>
+
+<p>Les adjectifs ont trois degré : positif, comparatif, superlatif, chacun exprime une chose différente. Le positif est le cas normal. Le comparatif induit une comparaison avec un autre élément, soit d'égalité (<i>il est aussi beau que toi</i>), d'infériorité (<i>il est moins beau que toi</i>), de supériorité (<i>il est plus beau que toi</i>). Le superlatif relatif indique que la qualification dépasse tous les autres dans le cas de la supériorité (<i>il est le plus beau</i>), ou est la pire dans le cas de l'infériorité (<i>il est le moins beau</i>). Le superlatif absolu indique que la qualification est extrême (<i>il est très beau</i>).</p>
+
+<p>Certains adjectifs ont des formes irrégulières au comparatif et au superlatif.</p>
+
+<h2 id="verbes" class="horstexte" id="noms">Verbes</h2>
+
+<p>Il existe trois conjugaisons : la première dont les verbes finissent par <b>-er</b>, la seconde dont les verbes finissent par <b>-ir</b> et la troisième qui regroupe tous les verbes irréguliers aux terminaisons variées (<b>-ir, -er, -re, -oir</b>, <i>ex : ouvrir, aller, descendre, recevoir</i>).
+
+<p>Le verbe s'accorde en <b>nombre</b> et prend la marque de la <b>personne</b> du sujet.</p>
+
+<p>On classe les verbes en deux grands groupes : les <b>verbes d'action</b>, exprimant une action du sujet, et les <b>verbes d'état</b>, exprimant un état du sujet.</p>
+
+<p>Le verbe est à un <b>mode</b> et à un <b>temps</b> de celui-ci.</p>
+
+<h3>Les modes</h3>
+
+<p>Il y a 7 modes en français. Certains modes sont impersonnels : la forme du verbe ne dépend pas de la personne.</p>
+
+<table>
+    <thead>
+        <tr><th>Mode</th><th>Emploi</th></tr>
+    </thead>
+    <tbody>
+        <tr><td>indicatif</td><td>Action / état réel, fait général, habitude.</td></tr>
+        <tr><td>subjonctif</td><td>principale : intention (désirée, envisagée, douteuse).<br>
+            subordonnée : concordance par rapport à la principale</td></tr>
+        <tr><td>impératif</td><td>ordre / défense, conseil, souhait, opposition, prière<br>
+            présent : ordre, demande, défense portant sur le présent ou l'avenir<br>
+            &nbsp;&nbsp; ou condition (accepte et je me rends)<br>
+            passé : ordre ou défense qui devra être suivi dans l'avenir : soyez prêts demain.</td></tr>
+        <tr><td>conditionnel</td><td>action / état dépendant de conditions éventuelles</td></tr>
+        <tr><td>infinitif</td><td>(impersonnel) peut avoir fct de nom. Action sans indication de nombre ni de personne.</td></tr>
+        <tr><td>participe</td><td>(impersonnel) verbe ou adjectif</td></tr>
+        <tr><td>gérondif</td><td>(impersonnel) indique une circonstance, fct d'averbe (en marchant)</td></tr>
+    </tbody>
+</table>
+
+<h3>Exemple de conjugaison</h3>
+
+<p>Le présent de l'indicatif :</p>
+
+<table>
+    <thead>
+        <tr><th></th><th>1er groupe</th><th>2ème groupe</th><th>3ème groupe</th></tr>
+    </thead>
+    <tbody>
+        <tr><td>je</td><td>parle</td><td>finis</td><td>prends</td></tr>
+        <tr><td>tu</td><td>parles</td><td>finis</td><td>prends</td></tr>
+        <tr><td>elle, il</td><td>parle</td><td>finit</td><td>prend</td></tr>
+        <tr><td>nous</td><td>parlons</td><td>finissons</td><td>prenons</td></tr>
+        <tr><td>vous</td><td>parlez</td><td>finissez</td><td>prenez</td></tr>
+        <tr><td>elles, ils</td><td>parlent</td><td>finissent</td><td>prennent</td></tr>
+    </tbody>
+</table>
+ 
+<h2 id="adverbes" class="horstexte" id="noms">Adverbes</h2>
+
+<p>Les adverbes sont des mots invariables apportant une précision sur la manière, le lieu, le moment, ou la quantité. Ils modifient donc le sens d'un adjectif, verbe ou autre adverbe, en y ajoutant une précision. Ils ont souvent pour fonction celle de <b>complément circonstanciel</b>.</p>
+
+<p>Exemples :<ul>
+    <li>Moment : Il fera beau <i>demain</i>.</li>
+    <li>Manière : Va <i>vite </i>!</li>
+    <li>Lieu : Ils se retrouvent <i>ailleurs</i>.</li>
+    <li>Quantité : Il y avait <i>trop</i> à manger.</li>
+</ul></p>
+
+<p>Les adverbes peuvent être simples ou composés de plusieurs mots, on parlera de locution adverbiale.</p>
+
+<h2 id="pronoms" class="horstexte" id="noms">Pronoms</h2>
+
+<p>Le pronom remplace un élément déjà cité, c'est une <b>anaphore</b>, une reprise <b>sémantique</b>, notion fondamentale pour obtenir un texte cohérent tout en évitant les répétitions. L'élément remplacé est appelé <b>antécédent</b>.</p>
+
+<p>Il existe plusieurs types de pronoms. Les pronoms personnels, indéfinis, démonstratifs, possessifs, relatifs et interrogatifs.</p>
+
+<h3>Pronoms personnels</h3>
+
+<p>Le pronom personnel désigne celui qui parle ou son interlocuteur, ou bien ce dont il est question. On distingue le pronom personnel sujet et le pronom personnel complément.</p>
+
+<table>
+    <thead>
+        <tr><td></td><td></td><th>Sujet</th><th>Complément</th></tr>
+    </thead>
+    <tbody>
+        <tr><th>1ère personne</th><th rowspan="3">sg</th><td>je</td><td>me, moi</td></tr>
+        <tr><th>2ème personne</th><td>tu</td><td>te, toi</td></tr>
+        <tr><th>3ème personne</th><td>il, elle</td><td>lui, elle, la, le</td></tr>
+        <tr><th>1ère personne</th><th rowspan="3">pl</th><td>nous</td><td>nous</td></tr>
+        <tr><th>2ème personne</th><td>vous</td><td>vous</td></tr>
+        <tr><th>3ème personne</th><td>ils, elles</td><td>eux, les, leur</td></tr>
+    </tbody>
+</table>
+
+<h3>Pronoms indéfinis</h3>
+
+<p>Le pronom indéfini désigne quelque chose sans véritablement le préciser (<i>ex : <u>Certains</u> pensent que cela vaut mieux.</i>).</p>
+
+<h3>Pronoms démonstratifs</h3>
+
+<p>Le pronom démonstratif remplace un antécédent mais en indiquant une notion de désignation. Il existe une forme renforcée avec -ci ou -là.</p>
+
+<table>
+    <tbody>
+        <tr><th rowspan="2">masculin</th><th>sg</th><td>celui, celui-ci, celui-là</td></tr>
+        <tr><th>pl</th><td>ceux, ceux-ci, ceux-là</td></tr>
+        <tr><th rowspan="2">féminin</th><th>sg</th><td>celle</td></tr>
+        <tr><th>pl</th><td>celles, celles-ci, celles-là</td></tr>
+        <tr><th rowspan="2">neutre</th><th>sg</th><td>ce, ceci, cela</td></tr>
+        <tr><th>pl</th><td>ce, ceci, celà</td></tr>
+    </tbody>
+</table>
+
+<h3>Pronoms possessifs</h3>
+
+<p>Le pronom possessif remplace un antécédent mais en indiquant une notion de possession.</p>
+
+<h3>Pronoms relatifs</h3>
+
+<p>Le pronom relatif relie deux propositions, l'une principale, l'autre subordonnée, à la manière d'une conjonction de subordination. Mais le pronom relatif a en plus la fonction anaphorique, remplaçant un antécédent donné. On parlera de proposition subordonnée relative.</p>
+
+<h3>Pronoms interrogatifs</h3>
+
+<p>Le pronom interrogatif sert à poser des questions (<i>ex : <u>Qui</u> vient ?</i>).</p>
+
+<h2 id="adjnonq" class="horstexte" id="noms">Adjectifs non qualificatifs</h2>
+
+<p>Il y a plusieurs d'types d'adjectifs non qualificatifs : les indéfinis, les interrogatifs, les exclamatifs, les démonstratifs, les possessifs et les numéraux.</p>
+
+<h3>Adjectifs indéfinis</h3>
+
+<p>Les adjectifs indéfinis expriment une quantité (<i>ex : quelques chats, aucun chat, plusieurs chats, nul chat</i>) ou une réparatition (<i>ex : chaque chat</i>) ou bien une certaine imprécision dans la désignation (<i>certains chats</i>).</p>
+
+<h3>Adjectifs interrogatifs</h3>
+
+<p>Les adjectifs interrogatifs sont utilisés pour former des interrogations (<i>Quel est ce chat ?</i>).</p>
+
+<h3>Adjectifs exclamatifs</h3>
+
+<p>Les adjectifs exclamatifs sont utilisés pour former des exclamations (<i>Quel chat !</i>).</p>
+
+<h3>Adjectifs démonstratifs</h3>
+
+<p>L'adjectif démonstratif désigne l'élément auquel on fait référence.</p>
+
+<table>
+    <thead>
+        <tr><td></td><th>masculin</th><th>féminin</th></tr>
+    </thead>
+    <tbody>
+        <tr><td>singulier</td><td>ce, cet</td><td>cette</td></tr>
+        <tr><td>pluriel</td><td>ces</td><td>ces</td></tr>
+    </tbody>
+</table>
+
+<p>On utilisera <i>cet</i> si le mot après commence par une voyelle, <i>ce</i> sinon.</p>
+
+<p>On peut renforcé l'adjectif démonstratif en ajoutant au déterminé les suffixes -ci ou -là (<i>ex : ce chat-là est bien mignon.</i>).</p>
+
+<h3>Adjectifs possessifs</h3>
+
+<p>L'adjectif possessif énonce que l'élément auquel il se rattache et possédé par une personne ou un groupe de personnes. Il s'accorde selon le possedé et le posseseur.</p>
+
+<table>
+    <thead>
+        <tr><td></td><th colspan="2">possedé singulier</th><th rowspan="2">possedé pluriel</th></tr>
+        <tr><td></td><th>possedé féminin</th><th>possedé masculin</th></tr>
+    </thead>
+    <tbody>
+        <tr><th>possesseur unique</th><td>sa</td><td>son</td><td>ses</td></tr>
+        <tr><th>possesseurs multiples</th><td>leur</td><td>leur</td><td>leurs</td></tr>
+    </tbody>
+</table>
+
+<p>Si on doit mettre <i>sa</i> devant un mot commençant par une voyelle, on mettra <i>son</i> quelque soit le genre de l'élément auquel l'adjectif ce rattache (<i>ex : Soudain, <u>son</u> allumette se brisa. <u>Son</u> incroyable femme avait encore fait fort.</i>).</p>
+
+<h3>Adjectifs numéraux</h3>
+
+<p>Ils indiquent une quantité précise ou un ordre précis. Les premiers sont appelés <b>cardinaux</b> (<i>ex : il y a <u>deux</u> chats.</i>) et les seconds <b>ordinaux</b> (<i>ex : c'est son <u>premier</u> enfant.</i>).
+
+<h3>Accords des adjectifs non qualificatifs</h3>
+
+<p>Les adjectifs non qualificatifs sont employés comme épithètes du nom qu'ils déterminent et s'accordent en genre et en nombre avec celui-ci.</p>
+
+<p>Exemple :<ul>
+    <li>Quel chat !</li>
+    <li>Quelle tortue !</li>
+    <li>Quels chats !</li>
+    <li>Quelles tortues !</li>
+</ul></p>
+
+<p>Selon le sens, le nombre est parfois imposé : ainsi plusieurs ne peut s'employer qu'avec un nom au pluriel, alors que aucun et nul ne peuvent s'employer qu'avec un nom au singulier. Une exception cependant avec les noms n'existant qu'au pluriel : aucun et nul se mettront alors également au pluriel.</p>
+
+<h2 id="conjonctions" class="horstexte" id="noms">Conjonctions</h2>
+
+<p>Il existe deux types de conjonction : les conjonctions de coordination et les conjonctions de subordination.</p>
+
+<p>La conjonction de coordination sert à joindre de éléments de même nature ou deux propositions ensemble. Il introduit un rapport entre les deux éléments reliés qui peut être l'addition (<i>et</i>), un choix (<i>ou</i>), une opposition (<i>mais</i>), la conséquence (<i>donc</i>), le rappel d'un fait (<i>or</i>).</p>
+
+<p>Exemple : <i>Tous les hommes sont morts <u>ou</u> en vie <u>or</u> Serge est un homme <u>et</u> un plombier <u>donc</u> Serge est mortel.</i></p>
+
+<p>La conjonction de subordination relie deux propositions mais pas sur un pied d'égalité. Celle introduite par la conjonction sera subordonnée à la principale (<i>ex : Serge dit <u>qu</u>'il viendra.</i>). La conjonction peut exprimer une valeur de but, cause, condition, conséquence, opposition, temps.</p>
+
+<p>La conjonction de subordination peut être un seul mot ou bien un ensemble de mots figé par l'usage, on parlera alors de locution conjonctive.</p>
+
+<h2 id="prepositions" class="horstexte" id="noms">Prépositions</h2>
+
+<p>Les prépositions sont invariables et relient deux mots entre eux, dans un rapport de subordination de l'un à l'autre.</p>
+
+<p>Un préposition peut être un mot simple ou une locution prépositive.</p>
+
+<h2 id="interjections" class="horstexte" id="noms">Interjections</h2>
+
+<p>Les interjections sont invariables et formées d'un seul mot ou plusieurs (locutions interjectives).</p>
+
+<p>Les onomatopés, les formule de salutation sont des interjections.</p>
+
+<div class="partie">Troisième partie : Les fonctions</div>
+
+<p>Dans cette partie nous allons aborder l'agencement des éléments entre eux pour aboutir à une phrase correcte. Une notion importante est celle de <b>fonction</b>. Un mot aura une fonction, le mot noyau d'un groupe déterminera la nature et la fonction du groupe. Nous verrons les différentes fonctions, puis l'analyse syntaxique du texte, où nous décortiquerons groupes et prépositions. Liste des fonctions et les natures qui les exercent le plus souvent :</p>
+<ul>
+    <li>sujet et complément d'agent (nom, pronom)</li>
+    <li>complément de détermination [de nom, d'adjectif, d'adverbe] (nom)</li>
+    <li>complément d'objet direct ou indirect (nom, pronom)</li>
+    <li>complément d'objet second ou d'attribution (nom, pronom)</li>
+    <li>épithète (adjectif qualificatif)</li>
+    <li>attribut [du sujet, du CO] (nom, adjectif qualificatif)</li>
+    <li>apposition (nom, adjectif qualificatif)</li>
+    <li>apostrophe (nom)</li>
+    <li>complément circonstanciel (nom, adverbe, infinitif, gérondif, proposition subordonnée)</li>
+    <li>fonction verbale (verbe)</li>
+</ul>
+
+<h2 id="sujet" class="horstexte">Le sujet et le complément d'agent</h2>
+
+<p>Le sujet est dans une phrase à la <b>voix active</b> celui qui exerce l'action, il répond à la question <i>qui</i> ? (<i>ex : le chat mange la souris : qui mange la souris ? Le chat.</i>)<p>
+
+<p>Lorsqu'une phrase est transformée à la <b>voix passive</b>, le sujet de la phrase active devient <b>complément d'agent (CA)</b>, introduit par la <b>préposition</b> <i>par</i> ou <i>de</i> et le <b>COD</b> de la phrase active devient le sujet de la phrase passive (<i>ex : le chat mange la souris -> la souris est mangée par le chat.</i>). Le CA répond à la question <i>par qui ?</i>.</p>
+
+<p>Dans la <b>phrase passive</b>, le sujet est celui qui subit l'action.</p>
+
+<h2 id="determination" class="horstexte">Le complément de détermination (de nom, d'adjectif, d'adverbe)</h2>
+
+<p>Il précise un élément. On parlera de complément de nom, d'adjectif ou d'adverbe selon l'élément précisé. Un complément de nom est généralement introduit par la préposition <i>de</i>, mais il peut l'être aussi par <i>à, en, par, pour</i>. Parfois aucune préposition ne l'introduit.</p>
+
+<p>Exemples :<ul>
+    <li>Pour un nom : Les murs <i>de la maison</i> sont blancs.</li>
+    <li>Pour un nom : La lettre <i>de Paul</i> était inquiétante.</li>
+    <li>Pour un adjectif : Il est vide <i>d'intelligence</i>.</li>
+    <li>Pour un adjectif au superlatif : Il était le pire <i>des brigands</i>.</li>
+    <li>Pour un adjectif au superlatif : Il était le plus petit <i>des trois</i>.</li>
+    <li>Pour un adverbe : Il veut trop <i>de choses</i>.</li>
+</ul></p>
+
+<p>Pour le nom, on parlera souvent de <b>complément de nom</b> plutôt que de complément de détermination.</p>
+
+<h2 id="objet" class="horstexte">Le complément d'objet</h2>
+
+<p>Les verbes <b>transitifs</b> font "passer une action" sur un objet. On parle de complément d'objet direct (COD) s'il n'est pas introduit par une préposition (<i>ex : la maîtresse demande une réponse</i>), et de complément d'objet indirect (COI) sinon (<i>ex : il répond <u>à la maîtresse</u></i>).</p>
+
+<h2 id="attribution" class="horstexte">Le complément d'objet second ou d'attribution</h2>
+
+<p>Lorsque un verbe se construit à la fois avec un COD et un COI, on préférera appeler ce dernier compément d'objet second (COS). Lorsque le verbe donne un sens d'aattribution au COS, on appelera ce dernier complément d'attribution (<i>ex : il donne un livre <u>à Marc</u>.</i>).
+
+<h2 id="epithete" class="horstexte">L'épithète</h2>
+
+<p>La fonction épithète concerne les adjectifs. Ils sont placés avant ou après le nom ou le pronom qu'ils qualifient.</p>
+
+<p>Avec certains pronoms uniquement, l'adjectif épithète peut être introduit par la préposition <b>de</b>.</p>
+
+<h2 id="attribut" class="horstexte">L'attribut</h2>
+
+<p>Les <b>verbes attributifs</b> ou <b>verbes copules</b> attribuent, c'est à dire donne une qualité, un renseignement, sur le sujet. L'élément introduit par le verbe aura pour fonction celle d'attribut du sujet. Dans certaines grammaires, on parle de <b>verbes d'état</b> pour désigner ces verbes.</p>
+
+<p>Exemples :<ul>
+    <li>Avec un adjectif attribut du sujet : <i>le chaton est <u>petit</u>.</i></li>
+    <li>Avec un nom attribut du sujet : <i>le chat est un <u>mammifère</u>.</i></li>
+</ul></p>
+
+<p>Il existe la possibilité d'avoir un attribut du complément d'objet avec certains verbes. L'attribut se distingue de l'épithète par son caractère obligatoire pour avoir une phrase correcte (<i>ex : Il trouve Eugénie <u>gentille</u>.</i>).</p>
+
+<p>L'attribut du sujet ou du complément d'objet peut être introduit par une préposition (de, pour, en) ou une conjonction (comme) (<i>ex : Il est <u>comme un frère</u> pour moi.</i>).</p>
+
+<h2 id="apposition" class="horstexte">L'apposition</h2>
+
+<p>Il s'agit de juxtaposer, le plus souvent à l'aide d'une virgule, soit deux noms (<i>ex : René, <u>dentiste</u>, était fort beau.</i>), soit un nom et un adjectif qualificatif (<i>ex : René, <u>triste</u>, marchait seul.</i>).</p>
+
+<p>On notera aussi la difficulté suivante : il existe une forme d'apposition indirecte avec la préposition <i>de</i>, à ne pas confondre avec un complément de nom (<i>ex : le grade <u>de général</u></i>).</p>
+
+<h2 id="apostrophe" class="horstexte">L'apostrophe</h2>
+
+<p>Pour appeler une personne, on utilisera la fonction d'apostrophe pour un nom (<i>ex : <u>Julien</u>, vient à table !</i>).</p>
+
+<h2 id="circonstanciel" class="horstexte">Le complément circonstanciel</h2>
+
+<p>Le complément circonstanciel (CC) indique une circonstance, des conditions de l'action exprimée par le verbe, auquel il se rattache. Ils répondent aux questions <i>pourquoi ? où ? quand ? comment ? combien ?</i>. Les compléments circonstanciels peuvent être introduit par une préposition ou pas. On distingue plusieurs types de CC : <ul>
+    <li>de lieu (<i>où ? d'où ? ex : il va <u>à Paris</u>.</i>),</li>
+    <li>de temps (<i>quand ? combien de temps ? ex : il part <u>deux semaines</u>.</i>),</li>
+    <li>de manière (<i>comment ? ex : il combat <u>sans peur</u>.</i>),</li>
+    <li>de cause (<i>pourquoi ?</i>),</li>
+    <li>d'opposition (<i>malgré quoi ?</i>),</li>
+    <li>de but (<i>pourquoi ? pour qui ? contre quoi ? contre qui ? ex : il le dit <u>pour rire.</u></i>),</li>
+    <li>de prix et mesures (<i>combien ? ex : Les deux patates sont <u>à un euro</u> !</i>),</li>
+    <li>d'accompagnement (<i>avec qui ? ex : Je suis parti <u>avec ma femme</u>.</i>),</li>
+    <li>de moyen (<i>au moyen de quoi ?</i>),</li>
+    <li>de privation (<i>sans quoi ?</i>).</li>
+</ul></p>
+
+<p>Le CC peut ne pas être supprimable dans certaines phrases pour maintenir un sens à celle-ci.</p>
+
+<h2 id="verbale" class="horstexte">La fonction verbale noyau</h2>
+
+<p>Il s'agit de la fonction que joue le verbe noyau de la proposition ou phrase.</p>
+
+<div class="partie">Quatrième partie : Du mot au texte</div>
+
+<h2 id="phrase" class="horstexte">La phrase</h2>
+
+<p>Une phrase se caractérise par l'existence d'un verbe noyau ou pas, par son <b>type</b>, et enfin par sa <b>forme</b>.</p>
+
+<p>On parlera de phrase verbale ou non-verbale selon la présence ou non d'un verbe noyau exerçant la fonction verbale noyau. Dernier cas, on parlera de phrase à présentatif si elle utilise une tournure figée telle que <i>c'est</i> ou <i>il y a</i>, on dénie alors le rôle de noyau verbal au verbe qui ne sert qu'à présenter ce dont on parle.</p>
+
+<p>Pour le type on parlera de phrase interrogative (terminée par un point d'interrogation), partielle ou totale, ces dernières n'admettant que oui ou non, ou si ou non, comme réponse ; ou de phrase exclamative (terminée par un point d'exclamation), de phrase impérative (exprimant un ordre ou une interdiction) et enfin de phrase déclarative (terminée par un point).</p>
+
+<p>Pour la forme, on parlera de phrase négative ou affirmative, passive ou active (le verbe sera à la voix correspondante), pronominale, emphatique (mise en avant d'un élément repris par un pronom, <i>ex : <u>Cet homme</u>, je le connais.</i>) ou impersonnelle (avec un verbe impersonnel, <i>ex : il fait beau.</i>).</p>
+
+<p>Phrase minimale : un sujet et un verbe. Le français est une langue d'ordre SVO : sujet verbe complément d'objet même si parfois le sujet vient après le verbe (on dira qu'il y a <i>inversion du sujet</i> comme dans les phrases interrogatives par exemple).</p>
+
+<p>On met généralement les CC après le CO, en finissant par le plus long.</p>
+
+<p>La phrase négatif voit le verbe mis entre les 2 parties de la négation. Si le temps utilise un auxiliaire, c'est celui qui est entouré. Pour le mode infinitif au contraire, les 2 parties de la négation seront placées avant le verbe, sauf pour avoir et être, où ce sera au choix.</p>
+
+<div class="partie">Cinquième partie : Difficultés</div>
+
+<h2 id="diff_de" class="horstexte">De</h2>
+
+<p><b>De</b> est un sacré problème en français, car il trempe dans tout un tas de constructions !</p>
+
+<p><i>Il y a quelque chose <b>de</b> <u>bien</u> en lui</i>. <b>De</b> introduit ici un adjectif épithète !</p>
+<p><i>Il boit <b>de</b> l'eau. Il boit une bière.</i>Attention de ne pas confondre COI et article partitif !</p>
+
+<h2 id="diff_pro" class="horstexte">Pronoms et adjectifs indéfinis</h2>
+
+<p>Il y a une correspondance entre les pronoms et adjectifs indéfinis, mais il ne faut pas les confondre pour autant !</p>
+
+<h2 id="diff_sub" class="horstexte">Propositions subordonnées et subordonnées relatives</h2>
+
+<p>Attention au que ! Il peut être pronom ou conjonction.</p>
+
+<p>Exemple : <ul>
+    <li>Les chats <i>que</i> j'aime sont mignons.</li>
+    <li>Serge dit <i>qu</i>'il viendra.</li>
+</ul></p>
+
+<h2 id="diff_grp" class="horstexte">Verbes du troisième groupe</h2>
+
+<p>Certains verbes du troisième groupe ont une terminaison qui imite celle d'un deux autres groupes : <i>aller</i> appartient au 3ème groupe, et <i>ouvrir</i> également !</p>
+
+<div class="partie">Sixième partie : Vocabulaire initial</div>
+
+<h2 id="voc_verbes" class="horstexte">Verbes</h2>
+
+<table>
+    <thead>
+        <tr><th>1er groupe</th><th>2ème groupe</th><th>3ème groupe</th><td></td></tr>
+    </thead>
+    <tbody>
+        <tr><td>parler</td><td>finir</td><td>dormir</td><td>être</td></tr>
+        <tr><td>aimer</td><td>choisir</td><td>aller</td><td>avoir</td></tr>
+        <tr><td>manger</td><td>haïr</td><td>apprendre</td><td>vouloir</td></tr>
+    </tbody>
+</table>
+
+<div class="partie">Septième partie : Références</div>
+
+<h2 id="abbreviations" class="horstexte">Abbréviations</h2>
+
+<table>
+    <tbody>
+        <tr><td>COD</td><td>Complément d'objet direct</td></tr>
+        <tr><td>COI</td><td>Complément d'objet indirect</td></tr>
+        <tr><td>COS</td><td>Complément d'objet second</td></tr>
+        <tr><td>CC</td><td>Complément circonstanciel</td></tr>
+    </tbody>
+</table>
+
+<h2 id="lexique" class="horstexte">Lexique</h2>
+
+<dl>
+  <dt>Verbe copule</dt>
+    <dd>Est équivalent à verbe attribut, c'est un verbe qui introduit un attribut du sujet, nom ou adjectif.</dd>
+</dl> 
+
+<h2 id="index" class="horstexte">Index</h2>
+
+<table class="inv">
+    <tbody>
+        <tr>
+            <td>
+                <ul>
+                    <li>adjectif qualificatif</li>
+                    <li>adjectif non qualificatif<ul>
+                        <li>indéfinis</li>
+                        <li>démonstratifs<ul>
+                            <li>renforcés</li>
+                        </ul></li>
+                        <li>possessifs</li>
+                        <li>interrogatifs</li>
+                        <li>exclamatifs</li>
+                        <li>numéraux<ul>
+                            <li>cardinaux</li>
+                            <li>ordinaux</li>
+                        </ul></li>
+                    </ul></li>
+                    <li>adverbe</li>
+                    <li>anaphore</li>
+                    <li>antécédent</li>
+                    <li>apostrophe</li>
+                    <li>apposition</li>
+                    <li>article<ul>
+                        <li>indéfini</li>
+                        <li>défini</li>
+                        <li>partitif</li>
+                    </ul></li>
+                    <li>attribut</li>
+                    <li>complément circonstanciel</li>
+                    <li>complément de détermination</li>
+                    <li>complément du nom</li>
+                    <li>complément d'objet<ul>
+                        <li>direct</li>
+                        <li>indirect</li>
+                        <li>second ou d'attribution</li>
+                    </ul></li>
+                    <li>conjonction</li>
+                    <li>épithète</li>
+                    <li>locution<ul>
+                        <li>adverbiale</li>
+                        <li>prépositive</li>
+                        <li>interjectives</li>
+                        <li>conjonctives</li>
+                    </ul></li>
+                    <li>morphologie</li>
+                    <li>nature, classe, catégorie</li>
+                    <li>nom ou substantif</li>
+                    <li>phrase</li>
+                    <li>préposition</li>
+                    <li>pronom<ul>
+                        <li>personnels</li>
+                        <li>indéfinis</li>
+                        <li>démonstratifs<ul>
+                            <li>renforcés</li>
+                        </ul></li>
+                        <li>possessifs</li>
+                        <li>relatifs</li>
+                        <li>interrogatifs</li>
+                    </ul></li>
+                    <li>proposition<ul>
+                        <li>principale</li>
+                        <li>subordonnée</li>
+                        <li>subordonnée relative</li>
+                    </ul></li>
+                    <li>qualifié</li>
+                    <li>sémantique</li>
+                    <li>syntaxe</li>
+                    <li>texte</li>
+                    <li>verbe<ul>
+                        <li>transitif</li>
+                        <li>intransitif</li>
+                        <li>attributif ou copule</li>
+                    </ul></li>
+                </ul>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+
+<h2 id="biblio" class="horstexte" id="ref">Bibliographie et liens</h2>
+<ul>
+    <li>Bescherelle, la grammaire pour tous, Hatier.</li>
+    <li>Grammaire Larousse de Jean Dubois et René Laganne, version abrégée, collection les indispensables, Larousse, Paris, 2009.</li>
+    <li>Grammaire française de J. Dubois, G. Jouannon et R. Laganne, version complète, Larousse, Paris, 1961.</li>
+    <li>La grammaire française, M.-C. Bayol et M.-J. Bavencoffe, collection Repères Pratiques, Nathan, Paris, 2010.</li>
+    <li><a href="http://fr.wikipedia.org/wiki/Grammaire_du_fran%C3%A7ais">Wikipédia, grammaire du français.</a></li>
+    <li><a href="http://www.aidenet.eu">Aidenet.eu, site de grammaire.</a></li>
+    <li><a href="http://francite.net/education/grammatika/">La Grammatika, grammaire en ligne.</a></li>
+    <li><a href="http://www.synapse-fr.com/grammaire/GTM_0.htm">Grammaire de la société Synapse, éditeur d'un logiciel de correction grammaticale.</a></li> 
+</ul>
+
+<h2 id="historique" class="horstexte">Historique</h2>
+<ul>
+    <li>Version 1.0<ul>
+        <li>Lancement le 6 mars 2012, version 1.0.0</li>
+        <li>1.0.1 <i>Release patch</i> (7 mars 2012) pour compléter certains points.<ul>
+            <li>Adjectifs démonstratifs et possessifs.</li>
+            <li>Pronoms démonstratifs renforcés (composés).</li>
+            <li>Ajouts sur la phrase et de références.</li>
+        </ul></li>
+    </ul></li>
+    <li>Versions Alpha<ul>
+        <li>Construction le 3, 4, 5 et 6 mars 2012.</li>
+        <li>Exhumé des notes de janvier 2012.</li>
+        <li>Exhumé une version html du 21 juillet 2011.</li>
+    </ul></li>
+</ul>
+
+</div>
+</div>
+
+<!--
+        interrogatif : est-ce que + S + V ... : directe : V S (inversion) avec possible de -t- si voyelle. 
+        Les 2 (? + neg) : les 2 parties de la neg encadrent le V S.
+
+        La pluie tombre dru (adv) vs Nous vivions tranquille (adj attr S)
+        Pierre agit en ingrat (adj attr S) vs Pierre joue avec malice (CC de manière)
+        
+        Il est très sensible à vos compliments et il en est fier.
+        en = vos compliments
+   
+Parfois sujet non exprimé -> impératif.
+
+Le verbe
+	Temps / Mode / Aspect
+
+Pronom 
+	Type (7)
+		Réfléchi
+		Interrogatif (simple / composé)
+	Accord genre, nombre avec antécédent + personne (et selon fonction)
+
+Prépositions
+
+	Principale / Indépendante
+	Subordonnée
+		Participiale
+		Infinitive (relative / complétive / circonstancielle)
+		Interrogative indirecte
+		relative (déterminative / explicative)
+		conjonctive (complétive / circonstancielle)
+
+V ? => oui : proposition non : complément
+
+Groupe
+	Nominal / Verbal selon noyau
+
+    Phrase (simple : GN + GV ou complexe : X propositions, 1 principale, X-1 subordonnées)
+        Propositions
+            Groupes de mots
+                Mots (sens, classe grammaticale, forme, fonction syntaxique)
+            adjectifs qual.  indique une qualité
+                épithète : à côté, sans séparation ou prép après certains pron indéf : quelque chose de grave
+                attribut : relié par un verbe (+prép parfois)
+                    du CO (je le crois sincère) ou du sujet (il est beau)
+                peut devenir adv ou un nom.
+        Il y a une possibilité de "transhumance".
+-->
+
+</body>
+	

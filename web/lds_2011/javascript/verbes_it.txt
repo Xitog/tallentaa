@@ -1,0 +1,175 @@
+﻿infinito presente, participio passato
+presente
+passato prossimo
+imperfetto
+futuro semplice
+
+1,essere
+2,avere
+3,fare
+4,andare
+5,potere
+6,dare
+7,volere
+8,stare
+9,venire
+10,dovere
+11,dire
+12,sapere
+13,vedere,2
+14,mangiare,2
+15,parlare,2
+16,piacere,2
+17,leggere,2
+18,prendere,2
+19,uscire,2
+20,amare,2
+21,bere,2
+22,finire,2
+23,scrivere,2
+24,capire,2
+
+essere, stato
+sono,sei,è,siamo,siete,sono
+sono stato/a,sei stato/a,è stato/a,siamo stati/e,siete stati/e,sono stati/e
+ero,eri,era,eravamo,eravate,erano
+sarò,sarai,sarà,saremo,sarete,saranno
+
+avere, avuto
+ho,hai,ha,abbiamo,avete,hanno
+ho avuto,hai avuto,ha avuto,abbiamo avuto,avete avuto,hanno avuto
+avevo,avevi,aveva,avevamo,avevate,avevano
+avrò,avrai,avrà,avremo,avrete,avranno
+
+fare, fatto
+faccio,fai,fa,facciamo,fate,fanno
+ho fatto,hai fatto,ha fatto,abbiamo fatto,avete fatto,hanno fatto
+facevo,facevi,faceva,facevamo,facevate,facevano
+farò,farai,farà,faremo,farete,faranno
+
+andare, andato
+vado,vai,va,andiamo,andate,vanno
+sono andato,sei andato,è andato,siamo andati,siete andati,sono andati
+andavo,andavi,andava,andavamo,andavate,andavano
+andrò,andrai,andrà,andremo,andrete,andranno
+
+potere, potuto
+posso,puoi,può,possiamo,potete,possono
+ho potuto,hai potuto,ha potuto,abbiamo potuto,avete potuto,hanno potuto
+potevo,potevi,poteva,potevamo,potevate,potevano
+potrò,potrai,potrà,potremo,potrete,potranno
+
+dare, dato
+do,dai,dà,diamo,date,danno
+ho dato,hai dato,ha dato,abbiamo dato,avete dato,hanno dato
+davo,davi,dava,davamo,davate,davano
+darò,darai,darà,daremo,darete,daranno
+
+volere, voluto
+voglio,vuoi,vuole,vogliamo,volete,vogliono
+ho voluto,hai voluto,ha voluto,abbiamo voluto,avete voluto,hanno voluto
+volevo,volevi,voleva,volevamo,volevate,volevano
+vorrò,vorrai,vorrà,vorremo,vorrete,vorranno
+
+stare, stato
+sto,stai,sta,stiamo,state,stanno
+sono stato,sei stato,è stato,siamo stati,siete stati,sono stati
+stavo,stavi,stava,stavamo,stavate,stavano
+starò,starai,starà,staremo,starete,staranno
+
+venire, venuto
+vengo,vieni,viene,veniamo,venite,vengono
+sono venuto,sei venuto,è venuto,siamo venuti,siete venuti,sono venuti
+venivo,venivi,veniva,venivamo,venivate,venivano
+verrò,verrai,verrà,verremo,verrete,verranno
+
+dovere, dovuto
+devo,devi,deve,dobbiamo,dovete,devono
+ho dovuto,hai dovuto,ha dovuto,abbiamo dovuto,avete dovuto,hanno dovuto
+dovevo,dovevi,doveva,dovevamo,dovevate,dovevano
+dovrò,dovrai,dovrà,dovremo,dovrete,dovranno,
+
+dire, detto
+dico,dici,dice,diciamo,dite,dicono
+ho detto,hai detto,ha detto,abbiamo detto,avete detto,hanno detto
+dicevo,dicevi,diceva,dicevamo,dicevate,dicevano
+dirò,dirai,dirà,diremo,direte,diranno
+
+sapere, saputo
+so,sai,sa,sappiamo,sapete,sanno
+ho saputo,hai saputo,ha saputo,abbiamo saputo,avete saputo,hanno saputo
+sapevo,sapevi,sapeva,sapevamo,sapevate,sapevano
+saprò,saprai,saprà,sapremo,saprete,sapranno
+
+vedere, visto
+vedo,vedi,vede,vediamo,vedete,vedono
+ho visto,hai visto,ha visto,abbiamo visto,avete visto,hanno visto
+vedevo,vedevi,vedeva,vedevamo,vedevate,vedevano
+vedrò,vedrai,vedrà,vedremo,vedrete,vedranno
+
+mangiare, mangiato
+mangio,mangi,mangia,mangiamo,mangiate,mangiano
+ho mangiato,hai mangiato,ha mangiato,abbiamo mangiato,avete mangiato,hanno mangiato
+mangiavo,mangiavi,mangiava,mangiavamo,mangiavate,mangiavano
+mangerò,mangerai,mangerà,mangeremo,mangerete,mangeranno
+
+parlare, parlato
+parlo,parli,parla,parliamo,parlate,parlano
+ho parlato,hai parlato,ha parlato,abbiamo parlato,avete parlato,hanno parlato
+parlavo,parlavi,parlava,parlavamo,parlavate,parlavano
+parlerò,parlerai,parlerà,parleremo,parlerete,parleranno
+
+piacere, piaciuto
+piaccio,piaci,piace,piac(c)iamo,piacete,piac(c)iono
+sono piaciuto,sei piaciuto,è piaciuto,siamo piaciuti,siete piaciuti,sono piaciuti
+piacevo,piacevi,piaceva,piacevamo,piacevate,piacevano
+piacerò,piacerai,piacerà,piaceremo,piacerete,piaceranno
+
+leggere, letto
+leggo,leggi,legge,leggiamo,leggete,leggono
+ho letto,hai letto,ha letto,abbiamo letto,avete letto,hanno letto
+leggevo,leggevi,leggeva,leggevamo,leggevate,leggevano
+leggerò,leggerai,leggerà,leggeremo,leggerete,leggeranno
+
+prendre, preso
+prendo,prendi,prende,prendiamo,prendete,prendono
+ho preso,hai preso,ha preso,abbiamo preso,avete preso,hanno preso
+prendevo,prendevi,prendeva,prendevamo,prendevate,prendevano
+prenderò,prenderai,prenderà,prenderemo,prenderete,prenderanno
+
+uscire, uscito
+esco,esci,esce,usciamo,uscite,escono
+sono uscito,sei uscito,è uscito,siamo usciti,siete usciti,sono usciti
+uscivo,uscivi,usciva,uscivamo,uscivate,uscivano
+uscirò,uscirai,uscirà,usciremo,uscirete,usciranno
+
+amare, amato
+amo,ami,ama,amiamo,amate,amano
+ho amato,hai amato,ha amato,abbiamo amato,avete amato,hanno amato
+amavo,amavi,amava,amavamo,amavate,amavano
+amerò,amerai,amerà,ameremo,amerete,ameranno
+
+bere, bevuto
+bevo,bevi,beve,beviamo,bevete,bevono
+ho bevuto,hai bevuto,ha bevuto,abbiamo bevuto,avete bevuto,hanno bevuto
+bevevo,bevevi,beveva,bevevamo,bevevate,bevevano
+berrò,berrai,berrà,berremo,berrete,berranno
+
+finire, finito
+finisco,finisci,finisce,finiamo,finite,finiscono
+ho finito,hai finito,ha finito,abbiamo finito,avete finito,hanno finito
+finivo,finivi,finiva,finivamo,finivate,finivano
+finirò,finirai,finirà,finiremo,finirete,finiranno
+
+scrivere, scritto
+scrivo,scrivi,scrive,scriviamo,scrivete,scrivono
+ho scritto,hai scritto,ha scritto,abbiamo scritto,avete scritto,hanno scritto
+scrivevo,scrivevi,scriveva,scrivevamo,scrivevate,scrivevano
+scriverò,scriverai,scriverà,scriveremo,scriverete,scriveranno
+
+capire, capito
+capisco,capisci,capisce,capiamo,capite,capiscono
+ho capito,hai capito,ha capito,abbiamo capito,avete capito,hanno capito
+capivo,capivi,capiva,capivamo,capivate,capivano
+capirò,capirai,capirà,capiremo,capirete,capiranno
+

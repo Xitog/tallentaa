@@ -1,0 +1,54 @@
+﻿<html charset="utf8">
+<head>
+	<script type="text/javascript" src="prototype.js"></script>
+	<script type="text/javascript">
+		// Never close script when you are opening it!
+		// 10h51 : talking but parsing error.
+		// 10h57 : sender compute nicely
+		// 11h06 : server OK (no more header pb)
+		function StringtoXML(text){
+			if (window.ActiveXObject){
+				var doc=new ActiveXObject('Microsoft.XMLDOM');
+				doc.async='false';
+				doc.loadXML(text);
+			} else {
+				var parser=new DOMParser();
+				var doc=parser.parseFromString(text,'text/xml');
+			}
+			return doc;
+		}
+		function talk() {
+			new Ajax.Request('./talk_sender.php',
+			{
+				method:'get',
+				parameters: {operation: 'add', op1: 12, op2: 24},
+				onSuccess: function(transport){
+					var response = transport.responseText || "no response text";
+					var doc = StringtoXML(response);
+					var elem = doc.getElementsByTagName('text')[0];
+					var txt = elem.firstChild;
+					response = txt.data;
+					alert("Success! \n\n" + response);
+				},
+				onFailure: function(){ 
+					alert('Something went wrong...') 
+				}
+			});
+		}
+		// 10h20 : putain je sais faire un main loop en JavaScript !!!
+		function main() {
+			d = document.getElementById("d");
+			d.innerHTML = d.innerHTML + "a";
+			setTimeout("main()",200); // la fonction se redéclenchera dans 200 ms
+			return true;
+		}
+		window.onload = main;
+	</script>
+</head>
+<body>
+	<div id="d">
+	</div>
+	<button onClick="talk()">Hello</button>
+</body>
+</html>
+

@@ -1,0 +1,77 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" type="text/css" href="http://looking.dwarf.free.fr/style2.css"/>
+    <title>Guide Python</title>
+</head>
+<body class="valentina" width="90%">
+
+<h2>Introduction</h2>
+
+<p>C’est un langage de programmation, dont le nom officiel est ECMAScript.
+Sa syntaxe s’inspire de Java et C++ mais ces concepts sont totalement différent.
+Le standard officiel est ECMA-262, adopé par l’ECMA en Juin 1997, reconnu par l’ISO en 1998 sous le nom de ISO/IEC 16262.</p>
+
+<h2>1. Intégration dans une page web</h2>
+
+<pre>
+&lsaquo;script type=”text/javascript”&rsaquo;
+&lsaquo;!–
+votre code
+//–&rsaquo;
+&lsaquo;/script&rsaquo;
+La présence des commentaires HTML empêche l’affichage du script si le navigateur ne prend pas en charge la balise Dans la balise “head” (pas d’exécution mais chargement)
+“script”.
+&lsaquo;script type=”text/javascript” src=”fichier.js”/&rsaquo;
+</pre>
+
+<h2>2. Commentaire</h2>
+
+<pre>
+// toute la ligne est commentée
+/*
+les lignes sont commentées
+*/
+</pre>
+
+<h2>3. Instructions</h2>
+
+<p>Elle se termine par un point-virgule.
+ex: document.write(“Hello”);
+Le code est une suite d’instructions.</p>
+
+<h3>3.1. Bloc</h3>
+
+<p>Un bloc est un ensemble d’instructions entourées d’une paire d’accolade.</p>
+
+<pre>
+{
+    document.write(“Hello”);
+    document.write(“World”);
+}
+</pre>
+
+<h3>4. ?</h3>
+
+<h3>5. Littéraux</h3>
+
+<p>Dans les instructions, on peut utiliser des littéraux :
+- des nombres : 4, 1.5, 22
+- des chaînes de caractères : “bonjour”, “h”
+</p>
+
+<h3>6. Variables</h3>
+
+<p>Composé d’un identifieur (=nom) (“age”, “ville”) et d’une valeur (42, “Paris”).
+Attention, Javascript est sensible à la casse, c’est à dire “age” n’est pas le même identifieur que “Age”.
+4.1. Déclarer, définir, créer une variable
+var Identifier;
+ex: var Age;
+Les variables sont initialisées à une valeur par défaut (?laquelle?).
+4.2. Assignation
+Age = 5
+On peut aussi créer une variable et l’assigner en même temps :
+var Age = 5</p>
+
+</body>
+</html>

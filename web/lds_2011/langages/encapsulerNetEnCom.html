@@ -1,0 +1,36 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" type="text/css" href="http://looking.dwarf.free.fr/style2.css"/>
+    <title>Encapsuler une bibliothèque .Net avec COM</title>
+</head>
+<body class="valentina" width="90%">
+
+<p>1) Ouvrir dans Visual Studio 2008 un nouveau projet de bibliothèque de classe en Visual Basic.</p>
+
+<p>2) Ajouter un nouvel élément au projet, classe COM : ce sera une classe avec un attribut ComClass et trois constantes de classe définies : le GUID de la classe, de l'interface et de l'évènement. De plus cette classe possèdera un constructeur vide (obligatoire pour un objet COM). Une fois cela fait, générer : deux fichiers sont produits portant le nom du projet, l'un avec l'extension tlb, l'autre est une dll DotNet.</p>
+
+<p>3) Ouvrir dans Visual Studio 2008 un nouveau projet C++ console par exemple, copier le fichier tlb au niveau du source et la dll au niveau du bin\debug, puis dans le code utiliser la directive suivante :</p>
+
+<span style="color:#0000ff;font-size:x-small;">#import</span> <span style="color:#a31515;font-size:x-small;">"ma_bibliothèque.tlb"</span>
+
+<p>4) Dans le code initialisé le modèle COM
+HRESULT hr = CoInitialize(NULL);
+Pour tester le retour on peut faire : 
+<span style="color:#0000ff;font-size:x-small;">if</span> (SUCCEEDED(hr)) { ... }</p>
+
+<p>5) Instancier un objet de la bibliothèque et appeler une fonction</p>
+
+<p>comtest::_comclassPtr ptr(<span style="color:#0000ff;font-size:x-small;">__uuidof</span>(comtest::ma_classe));
+<span style="color:#0000ff;font-size:x-small;">long</span> res = ptr-&gt;ma_fonction_entier();</p>
+
+<p>6) Les chaînes managées seront renvoyées sous la forme d'objet <a href="http://msdn.microsoft.com/en-us/library/zthfhkd6(VS.100).aspx" target="_blank">_bstr_t</a>, faire un cast en char * pour avoir la châine C classique.</p>
+
+<p><span style="color:#0000ff;font-size:x-small;">char</span> buffer[512];
+strcpy_s(buffer, 512, (<span style="color:#0000ff;font-size:x-small;">char</span> *) ptr-&gt;ma_fonction_chaîne());</p>
+
+<p>Et voilà !</p>
+
+<p>Référence :<a href="http://www.codeproject.com/KB/COM/comintro.aspx" target="_blank"> introduction à COM</a></p>
+
+</body>

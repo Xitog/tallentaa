@@ -1,0 +1,162 @@
+﻿/*
+How to include directly : <style type="text/css"> ... </style>
+How to include indirectly : <link rel="stylesheet" type="text/css" href="/style2.css"/>
+*/
+ul.pages {
+    display:block;
+    list-style-type:none;
+    padding-left: 2px;
+}
+li.page {
+    float:left;
+    margin-left: 5px;
+}
+li.page a {
+    background: #EDEDED; 
+    color: #666;
+    text-decoration: none;
+    font-weight: bold;
+    border-top-color: #DEDEDE;
+    border-right-color: #DEDEDE;
+    border-left-color: #DEDEDE;
+    border-bottom-color: #DEDEDE;
+    border-width: 1px;
+    border-style: solid;
+    font-size: 12px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+li.page a:hover {
+    background: white;
+    color: #666;
+    text-decoration: none;
+}
+body.valentina { 
+    font-size: 12px; 
+    font-family: Arial;
+    letter-spacing: 1px;
+    background: #F9F9F0;
+    width: 700px;
+    margin: auto;
+}
+p {
+    font-size: 12px;
+    font-family: Arial;
+    letter-spacing: 1px;
+    color: gray;
+    padding-left: 4px;
+}
+p a {
+    color: DarkSlateGray;
+}
+p a:hover {
+    color: white; 
+    text-decoration: underline; 
+    background: DarkSlateGray;
+}
+b {
+    font-size: 12px;
+    font-family: Arial;
+    letter-spacing: 1px;
+    color: gray;
+    font-weight: bold;
+}
+i {
+    font-size: 12px;
+    font-family: Arial;
+    letter-spacing: 1px;
+    color: gray;
+    font-style: italic;
+}
+pre.xcode {
+    background: #F9F9F9;
+    color: black;   
+    border: 1px solid #BFBFBF;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+pre.xcode span.keyword {
+    color: #008080;
+}
+h1 {
+    color: seagreen; /*#265E15;*/
+    font-family: Georgia;
+    font-size: 16px;
+    font-weight: bold;
+    margin-left: 5px;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+h2 {
+    color: seagreen; /*#265E15;*/
+    font-family: Georgia;
+    font-size: 16px;
+    font-weight: normal;
+    margin-left: 5px;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+h3 {
+    color: darkslategrey;
+    font-family: Georgia;
+    font-size: 15px;
+    font-weight: normal;
+    margin-left: 5px;
+    margin-top: 5px;
+    margin-bottom: 2px;
+}
+li {
+    font-size: 12px;
+    font-family: Arial;
+    letter-spacing: 1px;
+    color: gray;
+}
+#content {
+    border-color: #DEDEDE;
+    border-width: 1px;
+    border-style: solid;
+    background: white;
+    margin-top: 0px;
+    margin-bottom: 16px;
+}
+#menu {
+    margin-top: 20px;
+    height: 17px;
+}
+#footer {
+    font-size: 10px; 
+    color: gray; 
+    text-align: center;
+    margin-bottom: 5px;
+}
+#liane {
+    padding-right: 0px;
+}
+#over {
+    padding: 0px;
+    border: 0px;
+    margin: 0px;
+    width: 100%;
+}
+
+/* for index page */
+div.off {
+    display: none;
+}
+div.on {
+    display: block;
+    margin-bottom: 10px;
+}
+table.main {
+    width: 100%;
+}
+li a {
+    color: DarkSlateGray;
+}
+li a:hover {
+    color: white; 
+    text-decoration: underline; 
+    background: DarkSlateGray;
+}

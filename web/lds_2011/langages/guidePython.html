@@ -1,0 +1,274 @@
+﻿<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" type="text/css" href="http://looking.dwarf.free.fr/style2.css"/>
+    <title>Guide Python</title>
+</head>
+<body class="valentina" width="90%">
+<br/>
+<div id="content">
+<h1>Guide du langage Python</h1>
+<i>Draft version</i>
+
+<h2>1. Introduction</h2>
+
+<b>Python (Guido Van Rossum, 1991)</b>
+<ul>
+	<li>Typage Fort + Dynamique (duck/latent typing)
+	<li>Interprété, Cross-platform
+	<li>Implémentations : CPython (C), Jython (JVM), IronPython (.Net), PyPy (Python)
+	<li>Sous-langages   :<ul>
+		<li>Stackless Python (sans pile C)
+		<li>RPython (sous ensemble de Python compilé pour PyPy)
+		<li>Pyrex[->Cython] (type C + Python)
+    </ul></li>
+	<li>Extensions : .py, .pyc (bytecode), .pyx (Pyrex)
+</ul>
+
+<h2>2. Types élémentaires</h2>
+
+<h3>Scalaires</h3>
+
+<table width="100%" style="border: 1px solid #FFFFFF; border-collapse:collapse; color: grey; font-size: 12px;">
+    <tr bgcolor="#E2F3FD"><td rowspan="2">entiers</td><td>int</td><td>1, 0xA</td><td rowspan="2">Long est utilisé pour représenter de grands nombres.<br/> La conversion de int vers long est automatique.</tr>
+    <tr bgcolor="#E2F3FD"><td>long</td><td>34L</td></tr> 
+    <tr><td>réels</td><td>float</td><td>1.0, 1., .1</td><td>La division avec / entre deux entiers ne donnera jamais de réels.</td></tr>
+    <tr bgcolor="#E2F3FD"><td>booléens</td><td>bool</td><td>True, False</td><td>0 est évalué à False.</td></tr>
+    <tr><td>complexes</td><td>complex</td><td>3+2j, 4j</td><td>Le suffixe j marque la partie imaginaire.</td></tr>
+</table>
+
+<h4>Les entiers</h4>
+
+<p>Ils peuvent être définis selon trois formats : hexadécimal (en base 16) en précédant le nombre avec 0x ou 0X, octal (en base 8 ) en précédant le nombre d’un 0 et en base 10. Il faut donc faire bien attention à repérer si le littéral commence par un 0 ou pas pour ne pas confondre base octale et décimale. Les chiffres supplémentaires en base 16 sont représentés par les lettres A à F (indifféremment de la casse).<br/>
+Exemple : 8 (base 10), 010 (8 en base octale), 0xA (10 en base hexadécimale).</p>
+
+<p>Un entier sera convertit en long si besoin est de façon automatique. Le long permet de ne pas avoir de limite relative à la grandeur du nombre représenté – celle-ci est en effet illimité. Le suffixe “L” ou “l” permet de déclarer d’office un long, même si Python se charge complètement et d’une manière transparente de la conversion.<br/>
+Exemple : 8L</p>
+
+<p>Règles de grammaire associées :</p>
+
+<pre>
+digit ::=
+             "0"..."9"
+
+longinteger ::=
+             integer ("l" | "L")
+
+integer ::=
+             decimalinteger | octinteger | hexinteger
+
+decimalinteger ::=
+             nonzerodigit digit* | "0"
+
+octinteger ::=
+             "0" octdigit+
+
+hexinteger ::=
+             "0" ("x" | "X") hexdigit+
+
+nonzerodigit ::=
+             "1"..."9"
+
+octdigit ::=
+             "0"..."7"
+
+hexdigit ::=
+             digit | "a"..."f" | "A"..."F"
+</pre>
+
+<h4>Nombres réels</h4>
+
+<p>Les nombres réels n’utilisent que la base décimale, est le “.” pour séparer la partie entière de la décimale. Le “.” est nécessaire, même sans partie décimale, pour différencier un entier ou un flottant. De même la partie entière, si elle est égale à 0, peut être omise. Un exposant peu être spécifié avec la lettre E (indifféremment de la casse).<br/>
+Exemple : 3.4, 3., .3, 3.e20</p>
+
+<p>Règles de grammaire associées :</p>
+
+<pre>
+floatnumber ::=
+             pointfloat | exponentfloat
+
+pointfloat ::=
+             [intpart] fraction | intpart "."
+
+exponentfloat ::=
+             (intpart | pointfloat)
+              exponent
+
+intpart ::=
+             digit+
+
+fraction ::=
+             "." digit+
+
+exponent ::=
+             ("e" | "E") ["+" | "-"] digit+
+</pre>
+
+<h4>Nombres complexes</h4>
+
+<p>Il suffit d’utiliser le suffixe J (casse indifférente) pour indiquer une partie imaginaire. L’addition d’une partie réelle et imaginaire permet d’exprimer un nombre complexe.<br/>
+Exemples : 3+2j, 3-2j</p>
+
+<p>Règles de grammaire associée :</p>
+
+<pre>
+imagnumber ::= (floatnumber | intpart) ("j" | "J")
+</pre>
+
+<h4>Booléens</h4>
+
+<p>Il n’y a que deux valeurs.<br/>
+Exemples : True, False</p>
+
+<h4>Règles de grammaire associées aux littéraux</h4>
+
+<pre>
+atom ::=
+             identifier | literal | enclosure
+
+literal ::=
+             stringliteral | integer | longinteger
+                | floatnumber | imagnumber
+</pre>
+
+<ul>
+<li>Scalaires<ul>
+	<li>int				1 | 34L							automatiquement converti en long si besoin</li>
+	<li>long		    23L								longueur illimité</li>
+	<li>float			3.4 | 3.</li>
+	<li>bool			True | False</li>
+	<li>complex			3+2j							parti réelle et imaginaire</li>
+</ul></li>
+<li>Séquences<ul>
+	<li>Immutables<ul>
+		<li>str			'Hello' | "Hello"				immutable séquence de caractère</li>
+		<li>unicode		u'Hello' | u"Hello"				immutable séquence de caractère</li>
+		<li>tuple		(4.0, 'a', 'b') | (3,)			immutable, on peut mixé les types</li>
+		<li>frozenset	frozenset([4.0, 'a', True])		immutable, sans ordre, sans doublon</li>
+    </ul></li>
+	<li>Mutables<ul>
+		<li>list		[1, 'a', True]					mutable, on peut mixé les types</li>
+		<li>dict		{'key1' : 1.0, 'key2' : False}	paire clé / valeur</li>
+		<li>set			set([4.0, 'a', True])			mutable, sans ordre, sans doublon</li>
+    </ul></li>
+</ul></li>
+<li>Autres<ul>
+	<li>NoneType		None</li>
+</ul></li>
+</ul>
+
+<h2>3. Structures de contrôles</h2>
+
+<p>Il existe trois structures de contrôle fondamentales : <i>séquence</i>, <i>sélection</i> et <i>itération</i>. La séquence, c'est l'enchaînement d'instructions. En Python, un simple passage à la ligne suivante indique que l'on commence une nouvelle instruction. Si ce n'est pas le cas, c'est à dire si on veut une ligne logique s'étendant sur deux lignes physiques, on finira la première des lignes physiques par le symbole \ . La sélection, c'est un branchement entre deux groupes d'instructions, selon la valeur d'une expression. Enfin, l'itération est la répétition d'un groupe d'instructions, qui continue ou pas selon un critère donné : soit une expression à évaluer, soit une liste à parcourir. En Python, l'instruction nulle, c'est à dire ne faisant strictement rien, est "pass" et est obligatoire lorsque un groupe d'instructions est vide.</p>
+
+<h3>Conditions</h3>
+<pre class="xcode">
+	<span class="keyword">if</span> condition :
+		action
+	<span class="keyword">elif</span> condition :
+		action
+	<span class="keyword">else</span> :
+		action
+</pre>
+
+<h3>Boucles</h3>
+<pre class="xcode">
+	<span class="keyword">for</span> var <span class="keyword">in</span> list :
+		action
+    
+	<span class="keyword">while</span> condition :
+		action
+</pre>
+
+<h2>4. Fonctions</h2>
+
+<h3>4.1 Définition</h3>
+<pre class="xcode">
+<span class="keyword">def</span> Nom ( arg1 <i>[= val1]</i>, arg2 <i>[= val1]</i>, ... <i>*listArgs</i>, <i>**dictArgs</i> ) :
+	action
+	<span class="keyword">return</span> var1, var2, ...
+</pre>
+
+<p>Une fonction est la seule forme que prennent les sous-programmes dans Python. Les arguments ne sont pas typés, on peut leur affecter des <u>valeurs par défaut</u>, mais tous les paramètres suivant à partir du premier en ayant une devront également être doté d'une valeur par défaut. Enfin deux <u>paramètres spéciaux</u> existent qui doivent toujours se trouver à la fin dans l'ordre dit (si tous deux sont utilisés). Le premier, listArgs, contiendra tous les arguments supplémentaires sous la forme d'une liste, et le second, tous les arguments supplémentaires nommés sous la forme d'un dictionnaire (voir appel d'une fonction).
+
+<h3>4.2 Appel</h3>
+<pre class="xcode">
+<span class="keyword">def</span> add (a, b):
+    return a+b/2
+
+add(1,4)        <i># retournera 3</i>
+add(b=4, a=1)   <i># retournera 3</i>
+add(1, b=4)     <i># retournera 3</i>
+</pre>
+
+<p>L'appel d'une fonction, même sans paramètres, doit toujours se faire avec une parenthèse ouvrante et fermante. Il y a deux façons de passer un paramètre lors de l'appel de la fonction : de <u>façon positionnelle</u> ou </u>nommée</u>. On peut mixer les deux, mais à partir du premier paramètre nommé, tous les suivants doivent l'être. On peut ne pas donner un argument par défaut, mais à partir de celui-ci, le passage par position ne marchera plus.</p>
+
+<h3>4.3 Retour</h3>
+<p>Si, lors de l'exécution de la fonction, aucune instruction return n'est rencontrée, la fonction renverra None. Sinon elle renverra l'expression liée à l'instruction return ou None s'il n'y en a pas.</p>
+
+<h3>4.4 Différences avec Ruby</h3>
+<ul>
+<li>Si il n'y a pas de return, None est renvoyé.</li>
+<li>Même si il n'y pas d'arguments, les parenthères sont obligatoires, dans la définition et l'appel.</li>
+</ul>
+
+<h2>5. Programmation Objet</h2>
+<h3>Classe & objets</h3>
+<pre class="xcode">
+<span class="keyword">class</span> Nom(ClasseMère) :
+	action
+</pre>
+<h3>Méthodes & instances
+<h3>Encapsulation</h3>
+<h3>Polymorphisme</h3>
+<h3>Héritage simple</h3>
+<h3>Héritage multiple</h3>
+
+<h2>6. Les Modules</h2>
+<h3>Principes</h3>
+<h3>Module re : expressions régulières</h3>
+<h3>Module os,sys : services du systèmes d'exploitation</h3>
+<h3>Module csv : traitement de fichiers structurés par séparateurs</h3>
+
+<h2>7. Python et le Web : Introduction à Zope</h2>
+<h3>Architecture générale : mécanisme de publication</h3>
+<h3>Interaction DHTML-Python : Exemples</h3>
+
+<h2>Notes diverses :</h2>
+<h3>Un bon "duck programmer" utilisera hasattr() plutôt que type() ou isinstance()</h3>
+<h3>http://en.wikipedia.org/wiki/Category:Type_theory</h3>
+
+<h2>Ressources</h2>
+<ul>
+  <li>Free ebooks:
+    <ul>
+      <li><a href="http://www.swaroopch.com/notes/Python">A byte of Python</a></li>
+      <li><a href="http://www.diveintopython.net/">Dive into Python</a></li>
+      <li><a href="http://learnpythonthehardway.org/">Learn Python the hard way</a></li>
+      <li><a href="http://mindview.net/Books/Python/ThinkingInPython.html">Thinking in Python (Bruce Eckel)</a></li>
+      <li><a href="http://greenteapress.com/thinkpython/thinkpython.html">Think Python: How to Think Like a Computer Scientist</a></li>
+      <li><a href="http://rgruet.free.fr/">Python Quick Reference (PQR)</a></li>
+    </ul>
+  </li>
+  <li>Websites:
+    <ul>
+      <li><a href="http://www.python.org/">Python official website</a></li>
+      <li><a href="http://www.jython.org/">Jython official website</a></li>
+      <li><a href="http://homepages.cwi.nl/~jack/macpython/download.html">Python for Mac</a></li>
+      <li><a href="http://www.freenetpages.co.uk/hp/alan.gauld/">Learn to program using Python</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2>Historique</h2>
+<ul>
+  <li>Version du 24 Juillet 2008
+    <ul>
+      <li>Un premier jet d'une ébauche de guide, mise en ligne courant 2010.</li>
+    </ul>
+  </li>
+</ul>
+</div>
+</body>
+</html>
+
