@@ -1,0 +1,9 @@
+0#map = Map.new("The betrayal", 32, 32)
+0#game = Game.new("This game", map, 2, 0.025)
+0#player1 = Player.new(game, "Bob", Position.new(map, 1, 1))
+0#player2 = Player.new(game, "Xitog", Position.new(map, 15, 15))
+45#player1.make_group([1,2,1,2],11)
+54#player1.order_to_group([4,2,4,2], 11)
+70#player1.order_to_group([9,3,9,3], 11)
+83#player1.order_to_group([8,7,8,7], 11)
+151#This game : exiting game.

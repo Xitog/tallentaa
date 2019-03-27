@@ -57,7 +57,7 @@ class MainWindow < Gosu::Window
     # initialisation
     super(640,480, false, 20)
     @font = Gosu::Font.new(self, "courrier", 20)  # 10 pas mal pour les tous petits trucs
-    # titre de la fenétre
+    # titre de la fenêtre
     self.caption = "Tutorial Gosu"
     
     #
@@ -113,7 +113,7 @@ class MainWindow < Gosu::Window
     # Les graphismes des éléments notables sur une carte
     @doodads = ["doodads_roc.bmp", "navette.bmp", "navette_small.bmp"]
     to_images(self, @doodads, 'graphics/doodads/')
-    # Les particules élémentaires1
+    # Les particules élémentaires
     @particles = ["p_blast.bmp", "p_laser_green.bmp", "p_laser_red.bmp"]
     to_images(self, @particles, 'graphics/effects/')
     # Pour le menu les tiles des unités
@@ -158,7 +158,7 @@ class MainWindow < Gosu::Window
   end
   
   #
-  # Update le contenu de la fenétre
+  # Update le contenu de la fenêtre
   #
   def update
 	
@@ -228,15 +228,15 @@ class MainWindow < Gosu::Window
   end
   
   #
-  # Pour dessiner la fenétre principale
+  # Pour dessiner la fenêtre principale
   #
   def draw
     #puts "draw"
-    #@image.draw(0,0,0) LOL 17h29 16/12/05 : Je commente cette ligne qui est lé depuis le début du projet !!
+    #@image.draw(0,0,0) LOL 17h29 16/12/05 : Je commente cette ligne qui est là depuis le début du projet !!
     for i in @camera_x..@camera_x+MAX_X
 			scroll_i = (i-@camera_x)*32
       for j in @camera_y..@camera_y+MAX_Y
-        #@map_tile[rand(5)].draw(i*32,j*32,0)  # de 0 é 4
+        #@map_tile[rand(5)].draw(i*32,j*32,0)  # de 0 à 4
         #print i,",",j,",",@map.get[i][j],"\n"
         #print i,",",j,",",@gmap.get[i][j],"#"
         #print @map.get[i][j],"/"
@@ -466,7 +466,7 @@ class MainWindow < Gosu::Window
   end
   
   #
-  # Dessine une ligne d'une couleur é une profondeur donnée
+  # Dessine une ligne d'une couleur à une profondeur donnée
   #
   def draw_line(x1, y1, x2, y2, color, size=1, z=0)
     draw_quad(x1,y1,color,x1,y1+size,color,x2+size,y2,color,x2+size,y2+size,color, z)
@@ -528,11 +528,11 @@ class MainWindow < Gosu::Window
 	end
 	
   #
-  # Gére les boutons et la souris
+  # Gère les boutons et la souris
   #
   def button_down(id)
     
-		# Pour quitter le jeu de faéon propre
+		# Pour quitter le jeu de façon propre
     if id == Gosu::Button::KbEscape
       close
     end
@@ -556,7 +556,7 @@ class MainWindow < Gosu::Window
 				else
 					# Ordre de construction
 					if @map.empty?((self.mouse_x/32).to_i-@camera_x,(self.mouse_y/32).to_i-@camera_y,@class_to_build::Size[0],@class_to_build::Size[1])
-						# Construire : passer l'ordre é l'unité
+						# Construire : passer l'ordre à l'unité
 						@active_shade = nil
 						@class_to_build = nil
 						@player.order_to_group(@active_order, 11, Position.new(@map,(self.mouse_x/32).to_i-@camera_x,(self.mouse_y/32).to_i-@camera_y))
@@ -636,20 +636,20 @@ class MainWindow < Gosu::Window
 							a = '5'
 						elsif a == '-'
 							a = '6'
-						elsif a == 'é'
+						elsif a == 'è'
 							a = '7'
 						elsif a == '_'
 							a = '8'
-						elsif a == 'é'
+						elsif a == 'ç'
 							a = '9'
-						elsif a == 'é'
+						elsif a == 'à'
 							a = '0'
 						elsif a == ')'
-							a = 'é'
+							a = '°'
 						elsif a == '='
 							a = '+'
 						elsif a == '*'
-							a = 'é'
+							a = 'µ'
 						end
 					end
 					@cmd << a
