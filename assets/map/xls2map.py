@@ -17,18 +17,25 @@ except ModuleNotFoundError:
 # Global constants
 #-------------------------------------------------------------------------------
 
+WATER = 0
+MUD = 1
+GRASS = 2
+DRY = 3
+
 TEXTURES = {
-    (51, 51, 153) : 0, # ( 83, 141, 213) : 0, # water
-    (153, 51, 0) : 1,  # (151,  71,   6) : 1, # mud
-    (0, 128, 0) : 2,   # grass
-    (128, 128, 0) : 3, # (255, 255, 0) : 3, # sand
-    (255, 255, 0) : 9, # (148, 138, 84) : 9, # level
+    (51, 51, 153) : WATER, # ( 83, 141, 213) : 0, # water
+    (153, 51, 0)  : MUD,   # (151,  71,   6) : 1, # mud
+    (0, 128, 0)   : GRASS,
+    (70, 25, 0)   : DRY,    
+    (128, 128, 0) : 4,     # (255, 255, 0) : 3, # sand
+    (255, 255, 0) : 9,     # (148, 138, 84) : 9, # level
 }
 TEXTURES_NAMES = {
-    0 : 'water',
-    1 : 'mud',
-    2 : 'grass',
-    3 : 'sand',
+    WATER : 'water',
+    MUD   : 'mud',
+    GRASS : 'grass',
+    DRY   : 'dry',
+    4 : 'sand',
     9 : 'level'
 }
 
@@ -86,8 +93,8 @@ class Map:
 
     def transition(self, picture=True):
         modified = {
-            0 : [1],
-            1 : [2],
+            WATER : [MUD],
+            MUD   : [GRASS, DRY],
             2 : [],
             3 : [],
             9 : [],
@@ -125,10 +132,32 @@ class Map:
                                 calc += 2**val
                 print(f'* Cell : x={tcol},y={trow} is {center} with trans {calc:5d} {calc:08b}')
                 # Keycode Center Opposed N E S W NW NE SE SW
-                Cen, Opp, N, E, S, W, NW, NE, SE, SW, Rand1, Rand2, Rand3 = 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
-                key = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-                key[Cen] = center
-                key[Opp] = opposed if opposed is not None else center
+                Cen3, Cen2, Cen1, Opp3, Opp2, Opp1, N, E, S, W, NW, NE, SE, SW, Rand1, Rand2, Rand3 = 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+                key = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                if center == WATER: pass
+                elif center == MUD: key[Cen1] = 1
+                elif center == GRASS: key[Cen2] = 1
+                elif center == DRY: key[Cen1] = 1; key[Cen2] = 1
+                else: raise Exception('Invalid center : ' + str(center))
+                #elif center == 3: key[Cen3] = 1; key[Cen2] = 1
+                #elif center == 4: key[Cen1] = 1
+                #elif center == 5: key[Cen1] = 1; key[Cen3] = 1
+                #elif center == 6: key[Cen1] = 1; key[Cen2] = 1
+                #elif center == 7: key[Cen1] = 1; key[Cen2] = 1; key[Cen3] = 1
+                if opposed is not None:
+                    if opposed == MUD: key[Opp1] = 1
+                    elif opposed == GRASS: key[Opp2] = 1
+                    elif opposed == DRY: key[Opp2] = 1; key[Opp1] = 1
+                    else: raise Exception('Invalid opposed : ' + str(opposed))
+                    #elif opposed == 4: key[Opp1] = 1
+                    #elif opposed == 5: key[Opp1] = 1; key[Opp3] = 1
+                    #elif opposed == 6: key[Opp1] = 1; key[Opp2] = 1
+                    #elif opposed == 7: key[Opp1] = 1; key[Opp2] = 1; key[Opp3] = 1
+                else:
+                    key[Opp3] = key[Cen3]
+                    key[Opp2] = key[Cen2]
+                    key[Opp1] = key[Cen1]
+                #key[Opp] = opposed if opposed is not None else center
                 if calc & 0b00000010: key[N] = 1
                 if calc & 0b00001000: key[E] = 1
                 if calc & 0b00100000: key[S] = 1
@@ -140,11 +169,16 @@ class Map:
                     if calc & 0b00010000: key[SE] = 1
                     if calc & 0b01000000: key[SW] = 1
                 # Keycode to string
-                if key[Cen] == 0: suffix = 'water'
-                elif key[Cen] == 1: suffix = 'mud'
-                else: raise Exception('Center not known :' + str(key[Cen]) + str(type(key[Cen])))
-                if key[Cen] != key[Opp]:
-                    if key[Opp] == 1: prefix = 'mud'
+                if key[Cen3] == 0 and key[Cen2] == 0 and key[Cen1] == 0: suffix = 'water'
+                elif key[Cen3] == 0 and key[Cen2] == 0 and key[Cen1] == 1: suffix = 'mud'
+                elif key[Cen3] == 0 and key[Cen2] == 1 and key[Cen1] == 0: suffix = 'grass'
+                elif key[Cen3] == 0 and key[Cen2] == 1 and key[Cen1] == 1: suffix = 'dry'
+                else: raise Exception('Center not known :' + str(key[Cen3]) + str(key[Cen2]) + str(key[Cen1]) + str(type(key[Cen1])))
+                if key[Cen3] != key[Opp3] or key[Cen2] != key[Opp2] or key[Cen1] != key[Opp1]:
+                    if key[Opp3] == 0 and key[Opp2] == 0 and key[Opp1] == 1: prefix = 'mud'
+                    elif key[Opp3] == 0 and key[Opp2] == 1 and key[Opp1] == 0: prefix = 'grass'
+                    elif key[Opp3] == 0 and key[Opp2] == 1 and key[Opp1] == 1: prefix = 'dry'
+                    else: raise Exception('Opposed not know: ' + str(key[Opp3]) + str(key[Opp2]) + str(key[Opp1]))
                 else: prefix = ''
                 root = ''
                 if key[N] == 1: root += 'n'
@@ -153,7 +187,7 @@ class Map:
                 if key[W] == 1: root += 'w'
                 if key[NW] == 1: root += 'cnw'
                 if key[NE] == 1: root += 'cne'
-                if key[SE] == 1: root += 'cse'
+                if key[SE] == 1: root += 'ces'
                 if key[SW] == 1: root += 'csw'
                 if random == 1: key[Rand3] = 1
                 elif random == 1: key[Rand2] = 1
@@ -180,42 +214,22 @@ class Map:
         if picture:
             pygame.init()
             screen = pygame.display.set_mode((100, 100), pygame.DOUBLEBUF, 32)
-            path = r'..\graphic\textures\wyrmsun_32x32\mud_shallow_water'
-            textures = {
-                'mud-cne-water-1' : path,
-                'mud-cnw-water-1' : path,
-                'mud-cse-water-1' : path,
-                'mud-csw-water-1' : path,
-                'mud-es-water-1'  : path,
-                'mud-e-water-1'   : path,
-                'mud-ne-water-1'  : path,
-                'mud-n-water-1'   : path,
-                'mud-nw-water-1'  : path,
-                'mud-s-water-1'   : path,
-                'mud-sw-water-1'  : path,
-                'mud-w-water-1'   : path,
-                'mud-cne-water-2' : path,
-                'mud-cnw-water-2' : path,
-                'mud-cse-water-2' : path,
-                'mud-csw-water-2' : path,
-                'mud-es-water-2'  : path,
-                'mud-e-water-2'   : path,
-                'mud-ne-water-2'  : path,
-                'mud-n-water-2'   : path,
-                'mud-nw-water-2'  : path,
-                'mud-s-water-2'   : path,
-                'mud-sw-water-2'  : path,
-                'mud-w-water-2'   : path,
-                'water-1'         : r'..\graphic\textures\wyrmsun_32x32\base',
-                'mud-1'           : r'..\graphic\textures\wyrmsun_32x32\base',
-            }
-            for t in textures:
-                textures[t] = pygame.image.load(textures[t] + os.sep + t + '.png').convert_alpha()
+            paths = [
+                r'..\graphic\textures\wyrmsun_32x32\mud_water',
+                r'..\graphic\textures\wyrmsun_32x32\dry_mud',
+                r'..\graphic\textures\wyrmsun_32x32\grass_mud',
+                r'..\graphic\textures\wyrmsun_32x32\base',
+            ]
+            textures = {}
+            for p in paths:
+                for f in os.listdir(p):
+                    texname = os.path.splitext(f)[0]
+                    textures[texname] = pygame.image.load(p + os.sep + f).convert_alpha()
             surf = pygame.Surface((self.width * 32, self.height * 32))
             for trow in range(0, self.height):
                 for tcol in range(0, self.width):
                      surf.blit(textures[self.trans[trow][tcol]], (tcol * 32, trow * 32))
-            pygame.image.save(surf, "out.png")
+            pygame.image.save(surf, 'output' + os.sep + self.name + ".png")
             pygame.quit()
         return
     
@@ -344,12 +358,22 @@ def test(file_name, sheet_name):
         print('\t', 'k=', fnt, 'nb=', nb, 'col=', wb.colour_map[fnt])
 
 
+def do(file_name, sheet_name):
+    print('[INF] Opening file', file_name)
+    if sheet_name is not None:
+        print('[INF] Opening sheet', sheet_name)
+    test(file_name, sheet_name)
+    my_map = Map.from_xls(file_name, sheet_name)
+    #my_map.output_binary(my_map.name.replace(' ', '_') + '.map')
+    my_map.transition()
+
+
 #-------------------------------------------------------------------------------
 # Main code
 #-------------------------------------------------------------------------------
 
 PRELOAD_FILE = 'maps01.xls'
-PRELOAD_SHEET = 'Test2'
+PRELOAD_SHEETS = ['TestWaterMud1', 'TestWaterMud2', 'TestWaterMudGrass1', 'TestWaterMudDry1']
 GO = None
 if __name__ == '__main__':
     if PRELOAD_FILE is None:
@@ -375,13 +399,9 @@ if __name__ == '__main__':
         else:
             file_name = files[i]
             sheet_name = None
+        do(file_name, sheet_name)
     else:
         file_name = PRELOAD_FILE
-        sheet_name = PRELOAD_SHEET
-    print('[INF] Opening file', file_name)
-    if sheet_name is not None:
-        print('[INF] Opening sheet', sheet_name)
-    test(file_name, sheet_name)
-    my_map = Map.from_xls(file_name, sheet_name)
-    #my_map.output_binary(my_map.name.replace(' ', '_') + '.map')
-    my_map.transition()
+        for sheet_name in PRELOAD_SHEETS:
+            do(file_name, sheet_name)
+
