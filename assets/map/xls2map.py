@@ -373,7 +373,7 @@ def do(file_name, sheet_name):
 #-------------------------------------------------------------------------------
 
 PRELOAD_FILE = 'maps01.xls'
-PRELOAD_SHEETS = ['TestWaterMud1', 'TestWaterMud2', 'TestWaterMudGrass1', 'TestWaterMudDry1']
+PRELOAD_SHEETS = ['TestWaterMudDryGrass1'] #['TestWaterMud1', 'TestWaterMud2', 'TestWaterMudGrass1', 'TestWaterMudDry1']
 GO = None
 if __name__ == '__main__':
     if PRELOAD_FILE is None:
