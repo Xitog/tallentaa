@@ -21,12 +21,14 @@ WATER = 0
 MUD = 1
 GRASS = 2
 DRY = 3
+DARK = 4
 
 TEXTURES = {
     (51, 51, 153) : WATER, # ( 83, 141, 213) : 0, # water
     (153, 51, 0)  : MUD,   # (151,  71,   6) : 1, # mud
     (0, 128, 0)   : GRASS,
-    (70, 25, 0)   : DRY,    
+    (70, 25, 0)   : DRY,
+    (0, 51, 0)    : DARK,
     (128, 128, 0) : 4,     # (255, 255, 0) : 3, # sand
     (255, 255, 0) : 9,     # (148, 138, 84) : 9, # level
 }
@@ -35,6 +37,7 @@ TEXTURES_NAMES = {
     MUD   : 'mud',
     GRASS : 'grass',
     DRY   : 'dry',
+    DARK  : 'dark',
     4 : 'sand',
     9 : 'level'
 }
@@ -95,9 +98,9 @@ class Map:
         modified = {
             WATER : [MUD],
             MUD   : [GRASS, DRY],
-            2 : [],
-            3 : [],
-            9 : [],
+            GRASS : [DARK],
+            DRY : [],
+            DARK : [],
         }
         # Make the matrix
         self.trans = []
@@ -138,6 +141,7 @@ class Map:
                 elif center == MUD: key[Cen1] = 1
                 elif center == GRASS: key[Cen2] = 1
                 elif center == DRY: key[Cen1] = 1; key[Cen2] = 1
+                elif center == DARK: key[Cen3] = 1
                 else: raise Exception('Invalid center : ' + str(center))
                 #elif center == 3: key[Cen3] = 1; key[Cen2] = 1
                 #elif center == 4: key[Cen1] = 1
@@ -148,6 +152,7 @@ class Map:
                     if opposed == MUD: key[Opp1] = 1
                     elif opposed == GRASS: key[Opp2] = 1
                     elif opposed == DRY: key[Opp2] = 1; key[Opp1] = 1
+                    elif opposed == DARK: key[Opp3] = 1
                     else: raise Exception('Invalid opposed : ' + str(opposed))
                     #elif opposed == 4: key[Opp1] = 1
                     #elif opposed == 5: key[Opp1] = 1; key[Opp3] = 1
@@ -173,11 +178,13 @@ class Map:
                 elif key[Cen3] == 0 and key[Cen2] == 0 and key[Cen1] == 1: suffix = 'mud'
                 elif key[Cen3] == 0 and key[Cen2] == 1 and key[Cen1] == 0: suffix = 'grass'
                 elif key[Cen3] == 0 and key[Cen2] == 1 and key[Cen1] == 1: suffix = 'dry'
+                elif key[Cen3] == 1 and key[Cen2] == 0 and key[Cen1] == 0: suffix = 'dark'
                 else: raise Exception('Center not known :' + str(key[Cen3]) + str(key[Cen2]) + str(key[Cen1]) + str(type(key[Cen1])))
                 if key[Cen3] != key[Opp3] or key[Cen2] != key[Opp2] or key[Cen1] != key[Opp1]:
                     if key[Opp3] == 0 and key[Opp2] == 0 and key[Opp1] == 1: prefix = 'mud'
                     elif key[Opp3] == 0 and key[Opp2] == 1 and key[Opp1] == 0: prefix = 'grass'
                     elif key[Opp3] == 0 and key[Opp2] == 1 and key[Opp1] == 1: prefix = 'dry'
+                    elif key[Opp3] == 1 and key[Opp2] == 0 and key[Opp1] == 0: prefix = 'dark'
                     else: raise Exception('Opposed not know: ' + str(key[Opp3]) + str(key[Opp2]) + str(key[Opp1]))
                 else: prefix = ''
                 root = ''
@@ -218,6 +225,7 @@ class Map:
                 r'..\graphic\textures\wyrmsun_32x32\mud_water',
                 r'..\graphic\textures\wyrmsun_32x32\dry_mud',
                 r'..\graphic\textures\wyrmsun_32x32\grass_mud',
+                r'..\graphic\textures\wyrmsun_32x32\dark_grass',
                 r'..\graphic\textures\wyrmsun_32x32\base',
             ]
             textures = {}
@@ -373,7 +381,7 @@ def do(file_name, sheet_name):
 #-------------------------------------------------------------------------------
 
 PRELOAD_FILE = 'maps01.xls'
-PRELOAD_SHEETS = ['TestWaterMudDryGrass1'] #['TestWaterMud1', 'TestWaterMud2', 'TestWaterMudGrass1', 'TestWaterMudDry1']
+PRELOAD_SHEETS = ['TestDarkGrass1'] #['TestWaterMudDryGrass1'] #['TestWaterMud1', 'TestWaterMud2', 'TestWaterMudGrass1', 'TestWaterMudDry1']
 GO = None
 if __name__ == '__main__':
     if PRELOAD_FILE is None:
