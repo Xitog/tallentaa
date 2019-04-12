@@ -5,6 +5,7 @@
 import os       # to choose the map
 import struct   # to save to a binary format
 import pygame   # to produce an image
+import random   # for variability
 
 try:
     import xlrd
@@ -22,6 +23,7 @@ MUD = 1
 GRASS = 2
 DRY = 3
 DARK = 4
+DEEP = 5
 
 TEXTURES = {
     (51, 51, 153) : WATER, # ( 83, 141, 213) : 0, # water
@@ -29,8 +31,9 @@ TEXTURES = {
     (0, 128, 0)   : GRASS,
     (70, 25, 0)   : DRY,
     (0, 51, 0)    : DARK,
-    (128, 128, 0) : 4,     # (255, 255, 0) : 3, # sand
-    (255, 255, 0) : 9,     # (148, 138, 84) : 9, # level
+    (0, 0, 102)   : DEEP,
+    (128, 128, 0) : 600,     # (255, 255, 0) : 3, # sand
+    (255, 255, 0) : 700,     # (148, 138, 84) : 9, # level
 }
 TEXTURES_NAMES = {
     WATER : 'water',
@@ -38,6 +41,7 @@ TEXTURES_NAMES = {
     GRASS : 'grass',
     DRY   : 'dry',
     DARK  : 'dark',
+    DEEP  : 'deep',
     4 : 'sand',
     9 : 'level'
 }
@@ -96,11 +100,12 @@ class Map:
 
     def transition(self, picture=True):
         modified = {
-            WATER : [MUD],
+            WATER : [MUD, DEEP],
             MUD   : [GRASS, DRY],
             GRASS : [DARK],
             DRY : [],
             DARK : [],
+            DEEP : [],
         }
         # Make the matrix
         self.trans = []
@@ -111,7 +116,7 @@ class Map:
             self.trans.append(tr)
         # Do transition
         print('Transition on map of Width = ', self.width, 'Height =', self.height)
-        random = 1
+        #random = 1
         for trow in range(0, self.height):
             for tcol in range(0, self.width):
                 calc = 0
@@ -142,22 +147,15 @@ class Map:
                 elif center == GRASS: key[Cen2] = 1
                 elif center == DRY: key[Cen1] = 1; key[Cen2] = 1
                 elif center == DARK: key[Cen3] = 1
+                elif center == DEEP: key[Cen3] = 1; key[Cen1] = 1
                 else: raise Exception('Invalid center : ' + str(center))
-                #elif center == 3: key[Cen3] = 1; key[Cen2] = 1
-                #elif center == 4: key[Cen1] = 1
-                #elif center == 5: key[Cen1] = 1; key[Cen3] = 1
-                #elif center == 6: key[Cen1] = 1; key[Cen2] = 1
-                #elif center == 7: key[Cen1] = 1; key[Cen2] = 1; key[Cen3] = 1
                 if opposed is not None:
                     if opposed == MUD: key[Opp1] = 1
                     elif opposed == GRASS: key[Opp2] = 1
                     elif opposed == DRY: key[Opp2] = 1; key[Opp1] = 1
                     elif opposed == DARK: key[Opp3] = 1
+                    elif opposed == DEEP: key[Opp3] = 1; key[Opp1] = 1
                     else: raise Exception('Invalid opposed : ' + str(opposed))
-                    #elif opposed == 4: key[Opp1] = 1
-                    #elif opposed == 5: key[Opp1] = 1; key[Opp3] = 1
-                    #elif opposed == 6: key[Opp1] = 1; key[Opp2] = 1
-                    #elif opposed == 7: key[Opp1] = 1; key[Opp2] = 1; key[Opp3] = 1
                 else:
                     key[Opp3] = key[Cen3]
                     key[Opp2] = key[Cen2]
@@ -179,12 +177,14 @@ class Map:
                 elif key[Cen3] == 0 and key[Cen2] == 1 and key[Cen1] == 0: suffix = 'grass'
                 elif key[Cen3] == 0 and key[Cen2] == 1 and key[Cen1] == 1: suffix = 'dry'
                 elif key[Cen3] == 1 and key[Cen2] == 0 and key[Cen1] == 0: suffix = 'dark'
+                elif key[Cen3] == 1 and key[Cen2] == 0 and key[Cen1] == 1: suffix = 'deep'
                 else: raise Exception('Center not known :' + str(key[Cen3]) + str(key[Cen2]) + str(key[Cen1]) + str(type(key[Cen1])))
                 if key[Cen3] != key[Opp3] or key[Cen2] != key[Opp2] or key[Cen1] != key[Opp1]:
                     if key[Opp3] == 0 and key[Opp2] == 0 and key[Opp1] == 1: prefix = 'mud'
                     elif key[Opp3] == 0 and key[Opp2] == 1 and key[Opp1] == 0: prefix = 'grass'
                     elif key[Opp3] == 0 and key[Opp2] == 1 and key[Opp1] == 1: prefix = 'dry'
                     elif key[Opp3] == 1 and key[Opp2] == 0 and key[Opp1] == 0: prefix = 'dark'
+                    elif key[Opp3] == 1 and key[Opp2] == 0 and key[Opp1] == 1: prefix = 'deep'
                     else: raise Exception('Opposed not know: ' + str(key[Opp3]) + str(key[Opp2]) + str(key[Opp1]))
                 else: prefix = ''
                 root = ''
@@ -196,16 +196,23 @@ class Map:
                 if key[NE] == 1: root += 'cne'
                 if key[SE] == 1: root += 'ces'
                 if key[SW] == 1: root += 'csw'
-                if random == 1: key[Rand3] = 1
-                elif random == 1: key[Rand2] = 1
+                # Variability
+                threshold = 90
+                if key[Cen3] == key[Opp3] and key[Cen2] == key[Opp2] and key[Cen1] == key[Opp1]:
+                    threshold = 50
+                frandom = 1
+                if random.randint(1, 100) >= threshold:
+                    frandom = 2
+                if frandom == 1:
+                    key[Rand1] = 1
+                elif frandom == 2:
+                    key[Rand2] = 1
                 key = [str(k) for k in key]
                 calc = int(''.join(key), 2)
                 if root != '' or prefix != '':
-                    calc_str = f'{prefix}-{root}-{suffix}-{random}'
+                    calc_str = f'{prefix}-{root}-{suffix}-{frandom}'
                 else:
                     calc_str = f'{suffix}-1'
-                if random == 1: random = 2
-                else: random = 1
                 # Set trans map
                 self.trans[trow][tcol] = calc_str
                 # Save all different values
@@ -226,6 +233,7 @@ class Map:
                 r'..\graphic\textures\wyrmsun_32x32\dry_mud',
                 r'..\graphic\textures\wyrmsun_32x32\grass_mud',
                 r'..\graphic\textures\wyrmsun_32x32\dark_grass',
+                r'..\graphic\textures\wyrmsun_32x32\deep_water',
                 r'..\graphic\textures\wyrmsun_32x32\base',
             ]
             textures = {}
@@ -381,7 +389,7 @@ def do(file_name, sheet_name):
 #-------------------------------------------------------------------------------
 
 PRELOAD_FILE = 'maps01.xls'
-PRELOAD_SHEETS = ['TestDarkGrass1'] #['TestWaterMudDryGrass1'] #['TestWaterMud1', 'TestWaterMud2', 'TestWaterMudGrass1', 'TestWaterMudDry1']
+PRELOAD_SHEETS = ['TestBig1'] #['TestDarkGrass1'] #['TestWaterMudDryGrass1'] #['TestWaterMud1', 'TestWaterMud2', 'TestWaterMudGrass1', 'TestWaterMudDry1']
 GO = None
 if __name__ == '__main__':
     if PRELOAD_FILE is None:
