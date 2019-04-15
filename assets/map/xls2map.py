@@ -67,6 +67,7 @@ class Map:
         self.values = []
         self.trans = []
         self.trans_values = {}
+        self.level = []
     
     def __str__(self):
         return f"{self.name} (W={self.width}, H={self.height})"
@@ -98,7 +99,7 @@ class Map:
         self.height = len(self.ground)
         self.width = len(self.ground[0])
 
-    def transition(self, picture=True):
+    def transition(self, screenshot=False):
         modified = {
             WATER : [MUD, DEEP],
             MUD   : [GRASS, DRY],
@@ -225,7 +226,7 @@ class Map:
         for key, val in self.trans_values.items():
             print(f'\t {val:15s} {key:5d} {key:013b}')
         # Picture
-        if picture:
+        if screenshot:
             pygame.init()
             screen = pygame.display.set_mode((100, 100), pygame.DOUBLEBUF, 32)
             paths = [
@@ -244,7 +245,12 @@ class Map:
             surf = pygame.Surface((self.width * 32, self.height * 32))
             for trow in range(0, self.height):
                 for tcol in range(0, self.width):
-                     surf.blit(textures[self.trans[trow][tcol]], (tcol * 32, trow * 32))
+                    try:
+                        surf.blit(textures[self.trans[trow][tcol]], (tcol * 32, trow * 32))
+                    except KeyError:
+                        print("[ERROR] Texture not found:")
+                        print("...    ", self.trans[trow][tcol], "row =", trow, "col =", tcol)
+                        exit()
             pygame.image.save(surf, 'output' + os.sep + self.name + ".png")
             pygame.quit()
         return
@@ -262,15 +268,17 @@ class Map:
             my_map = Map(sheet_name)
         tex = []
         uni = []
-        #fnt = []
+        lvl = []
+        current_level = 0
         for row in range(0, s.nrows):
             cur_tex = []
             cur_uni = []
-            #cur_fnt = []
+            cur_lvl = []
             for col in range(0, s.ncols):
                 cell = s.cell(row, col)
                 style = wb.xf_list[cell.xf_index]
                 # Récupération du fond de la cellule
+                # Background
                 background = style.background.pattern_colour_index
                 try:
                     background = TEXTURES[wb.colour_map[background]]
@@ -284,6 +292,15 @@ class Map:
                         print(col, wb.colour_map[col])
                     exit()
                 cur_tex.append(background)
+                # Border XFBorder Object
+                if style.border.left_line_style != 0:
+                    current_level += 1
+                    cur_lvl.append(current_level)
+                elif style.border.right_line_style != 0:
+                    cur_lvl.append(current_level)
+                    current_level -= 1
+                else:
+                    cur_lvl.append(current_level)
                 if background not in my_map.values:
                     my_map.values.append(background)
                 if len(cell.value) != 0:
@@ -311,9 +328,10 @@ class Map:
                     #cur_fnt.append('    0')
             tex.append(cur_tex)
             uni.append(cur_uni)
-            #fnt.append(cur_fnt)
+            lvl.append(cur_lvl)
         my_map.ground = tex
         my_map.units = uni
+        my_map.level = lvl
         my_map.refresh_size()
         print('Valeurs de textures:')
         for vt in my_map.values:
@@ -374,14 +392,15 @@ def test(file_name, sheet_name):
         print('\t', 'k=', fnt, 'nb=', nb, 'col=', wb.colour_map[fnt])
 
 
-def do(file_name, sheet_name):
+def do(file_name, sheet_name, screenshot=False):
     print('[INF] Opening file', file_name)
     if sheet_name is not None:
         print('[INF] Opening sheet', sheet_name)
     test(file_name, sheet_name)
     my_map = Map.from_xls(file_name, sheet_name)
     #my_map.output_binary(my_map.name.replace(' ', '_') + '.map')
-    my_map.transition()
+    my_map.transition(screenshot)
+    return my_map
 
 
 #-------------------------------------------------------------------------------
@@ -389,7 +408,7 @@ def do(file_name, sheet_name):
 #-------------------------------------------------------------------------------
 
 PRELOAD_FILE = 'maps01.xls'
-PRELOAD_SHEETS = ['TestBig1'] #['TestDarkGrass1'] #['TestWaterMudDryGrass1'] #['TestWaterMud1', 'TestWaterMud2', 'TestWaterMudGrass1', 'TestWaterMudDry1']
+PRELOAD_SHEETS =  ['Hill1'] #['IslandHill1'] #['TestBig1'] #['TestDarkGrass1'] #['TestWaterMudDryGrass1'] #['TestWaterMud1', 'TestWaterMud2', 'TestWaterMudGrass1', 'TestWaterMudDry1']
 GO = None
 if __name__ == '__main__':
     if PRELOAD_FILE is None:
@@ -415,9 +434,9 @@ if __name__ == '__main__':
         else:
             file_name = files[i]
             sheet_name = None
-        do(file_name, sheet_name)
+        my_map = do(file_name, sheet_name, screenshot=False)
     else:
         file_name = PRELOAD_FILE
         for sheet_name in PRELOAD_SHEETS:
-            do(file_name, sheet_name)
+            my_map = do(file_name, sheet_name, screenshot=False)
 
