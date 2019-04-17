@@ -99,7 +99,7 @@ class Map:
         self.height = len(self.ground)
         self.width = len(self.ground[0])
 
-    def transition(self, screenshot=False):
+    def transition(self, screenshot=False, debug=False):
         modified = {
             WATER : [MUD, DEEP],
             MUD   : [GRASS, DRY],
@@ -116,7 +116,8 @@ class Map:
                 tr.append(0)
             self.trans.append(tr)
         # Do transition
-        print('Transition on map of Width = ', self.width, 'Height =', self.height)
+        print('[INF] Transitions of map', self.width, 'x', self.height)
+        #print('..... Transition on map of Width = ', self.width, 'Height =', self.height)
         #random = 1
         for trow in range(0, self.height):
             for tcol in range(0, self.width):
@@ -139,7 +140,8 @@ class Map:
                             # Calculate transition
                             if self.ground[row][col] == opposed:
                                 calc += 2**val
-                print(f'* Cell : x={tcol},y={trow} is {center} with trans {calc:5d} {calc:08b}')
+                if debug:
+                    print(f'* Cell : x={tcol},y={trow} is {center} with trans {calc:5d} {calc:08b}')
                 # Keycode Center Opposed N E S W NW NE SE SW
                 Cen3, Cen2, Cen1, Opp3, Opp2, Opp1, N, E, S, W, NW, NE, SE, SW, Rand1, Rand2, Rand3 = 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
                 key = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -222,9 +224,10 @@ class Map:
                 elif self.trans_values[calc] != calc_str:
                     raise Exception('Computed string keycode does not match the registered one!')
         # Print all transition
-        print('All transitions')
-        for key, val in self.trans_values.items():
-            print(f'\t {val:15s} {key:5d} {key:013b}')
+        if debug:
+            print('All transitions')
+            for key, val in self.trans_values.items():
+                print(f'\t {val:15s} {key:5d} {key:013b}')
         # Picture
         if screenshot:
             pygame.init()
@@ -236,6 +239,7 @@ class Map:
                 r'..\graphic\textures\wyrmsun_32x32\dark_grass',
                 r'..\graphic\textures\wyrmsun_32x32\deep_water',
                 r'..\graphic\textures\wyrmsun_32x32\base',
+                r'..\graphic\textures\wyrmsun_32x32\doodads',
             ]
             textures = {}
             for p in paths:
@@ -246,7 +250,11 @@ class Map:
             for trow in range(0, self.height):
                 for tcol in range(0, self.width):
                     try:
+                        # Background texture
                         surf.blit(textures[self.trans[trow][tcol]], (tcol * 32, trow * 32))
+                        # Unit or doodad
+                        if self.units[trow][tcol] is not None:
+                            surf.blit(textures[self.units[trow][tcol]], (tcol * 32, trow * 32))
                     except KeyError:
                         print("[ERROR] Texture not found:")
                         print("...    ", self.trans[trow][tcol], "row =", trow, "col =", tcol)
@@ -257,7 +265,7 @@ class Map:
     
 
     @staticmethod
-    def from_xls(file_name, sheet_name):
+    def from_xls(file_name, sheet_name, debug=False):
         wb = xlrd.open_workbook(file_name, formatting_info=1)
         #s = wb.sheets()[0]
         if sheet_name is None:
@@ -293,17 +301,36 @@ class Map:
                     exit()
                 cur_tex.append(background)
                 # Border XFBorder Object
+                doodad = None
                 if style.border.left_line_style != 0:
                     current_level += 1
                     cur_lvl.append(current_level)
+                    if style.border.top_line_style != 0:
+                        doodad = 'cliff-nw'
+                    elif style.border.bottom_line_style != 0:
+                        doodad = 'cliff-sw'
+                    else:
+                        doodad = 'cliff-w'
                 elif style.border.right_line_style != 0:
                     cur_lvl.append(current_level)
                     current_level -= 1
+                    if style.border.top_line_style != 0:
+                        doodad = 'cliff-ne'
+                    elif style.border.bottom_line_style != 0:
+                        doodad = 'cliff-es'
+                    else:
+                        doodad = 'cliff-e'
                 else:
+                    if style.border.top_line_style != 0:
+                        doodad = 'cliff-n'
+                    elif style.border.bottom_line_style != 0:
+                        doodad = 'cliff-s'
                     cur_lvl.append(current_level)
                 if background not in my_map.values:
                     my_map.values.append(background)
                 if len(cell.value) != 0:
+                    if doodad is not None:
+                        raise Exception('No doodad and unit at the same case!')
                     # Récupération du texte de la cellule
                     txt = cell.value
                     #cur_uni.append(cell.value)
@@ -323,7 +350,7 @@ class Map:
                         exit()
                     cur_uni.append(Unit(txt, player))
                 else:
-                    cur_uni.append(None)
+                    cur_uni.append(doodad)
                     #cur_uni.append('_')
                     #cur_fnt.append('    0')
             tex.append(cur_tex)
@@ -333,9 +360,10 @@ class Map:
         my_map.units = uni
         my_map.level = lvl
         my_map.refresh_size()
-        print('Valeurs de textures:')
-        for vt in my_map.values:
-            print('\t', vt)
+        if debug:
+            print('Valeurs de textures:')
+            for vt in my_map.values:
+                print('\t', vt)
         return my_map
 
 
@@ -356,7 +384,7 @@ def display(matrix):
         print()
 
 
-def test(file_name, sheet_name):
+def test(file_name, sheet_name, debug=False):
     wb = xlrd.open_workbook(file_name, formatting_info=1)
     if sheet_name is None:
         s = wb.sheet_by_index(0)
@@ -364,7 +392,8 @@ def test(file_name, sheet_name):
     else:
         s = wb.sheet_by_name(sheet_name)
         my_map = Map(sheet_name)
-    print(my_map.name)
+    if debug:
+        print(my_map.name)
     background_values = {}
     font_color_values = {}
     for row in range(0, s.nrows):
@@ -382,14 +411,15 @@ def test(file_name, sheet_name):
                     font_color_values[font] = 1
                 else:
                     font_color_values[font] += 1
-    print('BACKGROUNDS')
-    for bgv in sorted(background_values, key=background_values.get, reverse=True):
-        nb = background_values[bgv]
-        print('\t', 'k=', bgv, 'nb=', nb, 'col=', wb.colour_map[bgv])
-    print('FONT COLORS')
-    for fnt in sorted(font_color_values, key=font_color_values.get, reverse=True):
-        nb = font_color_values[fnt]
-        print('\t', 'k=', fnt, 'nb=', nb, 'col=', wb.colour_map[fnt])
+    if debug:
+        print('BACKGROUNDS')
+        for bgv in sorted(background_values, key=background_values.get, reverse=True):
+            nb = background_values[bgv]
+            print('\t', 'k=', bgv, 'nb=', nb, 'col=', wb.colour_map[bgv])
+        print('FONT COLORS')
+        for fnt in sorted(font_color_values, key=font_color_values.get, reverse=True):
+            nb = font_color_values[fnt]
+            print('\t', 'k=', fnt, 'nb=', nb, 'col=', wb.colour_map[fnt])
 
 
 def do(file_name, sheet_name, screenshot=False):
@@ -408,8 +438,9 @@ def do(file_name, sheet_name, screenshot=False):
 #-------------------------------------------------------------------------------
 
 PRELOAD_FILE = 'maps01.xls'
-PRELOAD_SHEETS =  ['Hill1'] #['IslandHill1'] #['TestBig1'] #['TestDarkGrass1'] #['TestWaterMudDryGrass1'] #['TestWaterMud1', 'TestWaterMud2', 'TestWaterMudGrass1', 'TestWaterMudDry1']
+PRELOAD_SHEETS =  ['IslandHill1'] #['Hill1'] #['TestBig1'] #['TestDarkGrass1'] #['TestWaterMudDryGrass1'] #['TestWaterMud1', 'TestWaterMud2', 'TestWaterMudGrass1', 'TestWaterMudDry1']
 GO = None
+SCREENSHOT = True
 if __name__ == '__main__':
     if PRELOAD_FILE is None:
         print('[INF] Searching in', os.getcwd())
@@ -434,9 +465,9 @@ if __name__ == '__main__':
         else:
             file_name = files[i]
             sheet_name = None
-        my_map = do(file_name, sheet_name, screenshot=False)
+        my_map = do(file_name, sheet_name, screenshot=SCREENSHOT)
     else:
         file_name = PRELOAD_FILE
         for sheet_name in PRELOAD_SHEETS:
-            my_map = do(file_name, sheet_name, screenshot=False)
+            my_map = do(file_name, sheet_name, screenshot=SCREENSHOT)
 
