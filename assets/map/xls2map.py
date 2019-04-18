@@ -10,8 +10,8 @@ import random   # for variability
 try:
     import xlrd
 except ModuleNotFoundError:
-    print('[ERR] Unable to use this script without xlrd.')
-    print('[ERR] Install it before with: pip install xlrd')
+    print('[FAIL] Unable to use this script without xlrd.')
+    print('[FAIL] Install it before with: pip install xlrd')
     exit()
 
 #-------------------------------------------------------------------------------
@@ -56,6 +56,13 @@ PLAYERS = {
 # Data model
 #-------------------------------------------------------------------------------
 
+class Trigger:
+
+    def __init__(self):
+        self.conditions = []
+        self.actions = []
+
+
 class Map:
 
     def __init__(self, name):
@@ -68,6 +75,7 @@ class Map:
         self.trans = []
         self.trans_values = {}
         self.level = []
+        self.triggers = []
     
     def __str__(self):
         return f"{self.name} (W={self.width}, H={self.height})"
@@ -99,7 +107,7 @@ class Map:
         self.height = len(self.ground)
         self.width = len(self.ground[0])
 
-    def transition(self, screenshot=False, debug=False):
+    def transition(self, debug=False):
         modified = {
             WATER : [MUD, DEEP],
             MUD   : [GRASS, DRY],
@@ -116,7 +124,7 @@ class Map:
                 tr.append(0)
             self.trans.append(tr)
         # Do transition
-        print('[INF] Transitions of map', self.width, 'x', self.height)
+        print('[INFO] Transitions of map', self.width, 'x', self.height)
         #print('..... Transition on map of Width = ', self.width, 'Height =', self.height)
         #random = 1
         for trow in range(0, self.height):
@@ -228,42 +236,80 @@ class Map:
             print('All transitions')
             for key, val in self.trans_values.items():
                 print(f'\t {val:15s} {key:5d} {key:013b}')
-        # Picture
-        if screenshot:
-            pygame.init()
-            screen = pygame.display.set_mode((100, 100), pygame.DOUBLEBUF, 32)
-            paths = [
-                r'..\graphic\textures\wyrmsun_32x32\mud_water',
-                r'..\graphic\textures\wyrmsun_32x32\dry_mud',
-                r'..\graphic\textures\wyrmsun_32x32\grass_mud',
-                r'..\graphic\textures\wyrmsun_32x32\dark_grass',
-                r'..\graphic\textures\wyrmsun_32x32\deep_water',
-                r'..\graphic\textures\wyrmsun_32x32\base',
-                r'..\graphic\textures\wyrmsun_32x32\doodads',
-            ]
-            textures = {}
-            for p in paths:
-                for f in os.listdir(p):
-                    texname = os.path.splitext(f)[0]
-                    textures[texname] = pygame.image.load(p + os.sep + f).convert_alpha()
-            surf = pygame.Surface((self.width * 32, self.height * 32))
-            for trow in range(0, self.height):
-                for tcol in range(0, self.width):
-                    try:
-                        # Background texture
-                        surf.blit(textures[self.trans[trow][tcol]], (tcol * 32, trow * 32))
-                        # Unit or doodad
-                        if self.units[trow][tcol] is not None:
-                            surf.blit(textures[self.units[trow][tcol]], (tcol * 32, trow * 32))
-                    except KeyError:
-                        print("[ERROR] Texture not found:")
-                        print("...    ", self.trans[trow][tcol], "row =", trow, "col =", tcol)
-                        exit()
-            pygame.image.save(surf, 'output' + os.sep + self.name + ".png")
-            pygame.quit()
+    
+    def take_screenshot(self, name=None):
+        "Make a picture of the map."
+        pygame.init()
+        screen = pygame.display.set_mode((100, 100), pygame.DOUBLEBUF, 32)
+        paths = [
+            r'..\graphic\textures\wyrmsun_32x32\mud_water',
+            r'..\graphic\textures\wyrmsun_32x32\dry_mud',
+            r'..\graphic\textures\wyrmsun_32x32\grass_mud',
+            r'..\graphic\textures\wyrmsun_32x32\dark_grass',
+            r'..\graphic\textures\wyrmsun_32x32\deep_water',
+            r'..\graphic\textures\wyrmsun_32x32\base',
+            r'..\graphic\textures\wyrmsun_32x32\doodads',
+        ]
+        textures = {}
+        for p in paths:
+            for f in os.listdir(p):
+                texname = os.path.splitext(f)[0]
+                textures[texname] = pygame.image.load(p + os.sep + f).convert_alpha()
+        surf = pygame.Surface((self.width * 32, self.height * 32))
+        for trow in range(0, self.height):
+            for tcol in range(0, self.width):
+                try:
+                    # Background texture
+                    surf.blit(textures[self.trans[trow][tcol]], (tcol * 32, trow * 32))
+                    # Unit or doodad
+                    if self.units[trow][tcol] is not None:
+                        surf.blit(textures[self.units[trow][tcol]], (tcol * 32, trow * 32))
+                except KeyError:
+                    print("[FAIL] Texture not found:")
+                    print("...    ", self.trans[trow][tcol], "row =", trow, "col =", tcol)
+                    #exit()
+        if name is None:
+            name = self.name
+        pygame.image.save(surf, 'output' + os.sep + name + ".png")
+        pygame.quit()
         return
     
-
+    def generate_js(self, file_name, key):
+        print('[INFO] Generate JavaScript map in ' + file_name + ' with key ' + key)
+        out = open(file_name, mode='w', encoding='utf8')
+        out.write('const ' + self.name.upper() + ' = {\n')
+        out.write('    name : "' + self.name + '",\n')
+        out.write('    content : [\n')
+        for irow in range(self.height):
+            out.write('        [')
+            for icol in range(self.width):
+                out.write(str(self.ground[irow][icol]))
+                if icol < self.width - 1:
+                    out.write(', ')
+            out.write('], // ' + f"{irow:02}" + '\n')
+        out.write('    ],\n')
+        out.write('    width : ' + str(self.width) + ',\n')
+        out.write('    height : ' + str(self.height) + ',\n')
+        out.write('    triggers : [\n')
+        for trig in self.triggers:
+            out.write('        {\n')
+            out.write("            'conditions' : [\n")
+            for i in range(len(trig.conditions)):
+                out.write('                ' + str(trig.conditions[i]))
+                if i < len(trig.conditions) - 1: out.write(',\n')
+                else: out.write('\n')
+            out.write("            ],\n")
+            out.write("            'actions' : [\n")
+            for i in range(len(trig.actions)):
+                out.write('                ' + str(trig.actions[i]))
+                if i < len(trig.actions) - 1: out.write(',\n')
+                else: out.write('\n')
+            out.write("            ]\n")
+            out.write('        }\n')
+        out.write('    ]\n')
+        out.write('};\n\n')
+        out.write('MAPS["' + key + '"] = load_map(' + self.name.upper() + ');\n')
+    
     @staticmethod
     def from_xls(file_name, sheet_name, debug=False):
         wb = xlrd.open_workbook(file_name, formatting_info=1)
@@ -423,9 +469,9 @@ def test(file_name, sheet_name, debug=False):
 
 
 def do(file_name, sheet_name, screenshot=False):
-    print('[INF] Opening file', file_name)
+    print('[INFO] Opening file', file_name)
     if sheet_name is not None:
-        print('[INF] Opening sheet', sheet_name)
+        print('[INFO] Opening sheet', sheet_name)
     test(file_name, sheet_name)
     my_map = Map.from_xls(file_name, sheet_name)
     #my_map.output_binary(my_map.name.replace(' ', '_') + '.map')
@@ -438,16 +484,16 @@ def do(file_name, sheet_name, screenshot=False):
 #-------------------------------------------------------------------------------
 
 PRELOAD_FILE = 'maps01.xls'
-PRELOAD_SHEETS =  ['IslandHill1'] #['Hill1'] #['TestBig1'] #['TestDarkGrass1'] #['TestWaterMudDryGrass1'] #['TestWaterMud1', 'TestWaterMud2', 'TestWaterMudGrass1', 'TestWaterMudDry1']
+PRELOAD_SHEETS = ['Archipelago'] # 'IslandHill1' 'Hill1' 'TestBig1' 'TestDarkGrass1' 'TestWaterMudDryGrass1' 'TestWaterMud1' 'TestWaterMud2' 'TestWaterMudGrass1' 'TestWaterMudDry1'
 GO = None
-SCREENSHOT = True
+SCREENSHOT = False
 if __name__ == '__main__':
     if PRELOAD_FILE is None:
-        print('[INF] Searching in', os.getcwd())
+        print('[INFO] Searching in', os.getcwd())
         files = os.listdir(os.getcwd())
         files = [f for f in files if f[-4:] == '.xls']
         if len(files) == 0:
-            print('[ERR] No map found in current working directory.')
+            print('[FAIL] No map found in current working directory.')
             exit()
         for i in range(0, len(files)):
             print(f'{i:4d}. {files[i]}')
@@ -455,19 +501,30 @@ if __name__ == '__main__':
             try:
                 num = int(input('Enter the number of the map: '))
             except ValueError:
-                print('[ERR] Enter a number.')
+                print('[FAIL] Enter a number.')
                 exit()
         else:
             num = GO
         if num < 0 or num >= len(files):
-            print('[ERR] Wrong map number.')
+            print('[FAIL] Wrong map number.')
             exit()
         else:
             file_name = files[i]
             sheet_name = None
-        my_map = do(file_name, sheet_name, screenshot=SCREENSHOT)
+        my_map = do(file_name, sheet_name)
+        if SCREENSHOT: my_map.take_screenshot()
     else:
         file_name = PRELOAD_FILE
         for sheet_name in PRELOAD_SHEETS:
-            my_map = do(file_name, sheet_name, screenshot=SCREENSHOT)
-
+            my_map = do(file_name, sheet_name)
+            if SCREENSHOT: my_map.take_screenshot()
+            my_trig = Trigger()
+            my_trig.conditions = [
+                ['ControlUnits', 4, 0, 0, 1, [1, 31, 7, 31]]
+            ]
+            my_trig.actions = [
+                ['Victory', 'You Win', 'E1M2']
+            ]
+            my_map.triggers.append(my_trig)
+            my_map.generate_js('test.js', 'E1M1')
+            my_map.take_screenshot()
