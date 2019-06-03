@@ -1,13 +1,44 @@
+#-----------------------------------------------------------
+# Imports
+#-----------------------------------------------------------
+
+import math
 import pygame
-from pygame.locals import QUIT, KEYDOWN, KEYUP, K_ESCAPE, K_DOWN, K_UP, K_RIGHT, K_LEFT, K_TAB
+from pygame.locals import *
+
+#-----------------------------------------------------------
+# Constants
+#-----------------------------------------------------------
+
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+BLUE  = (0, 0, 255)
+RED   = (255, 0, 0)
+GREEN = (0, 255, 0)
+
+TITLE         = '2.5D Engine'
+SCREEN_WIDTH  = 320
+SCREEN_HEIGHT = 200
+COLOR_DEPTH   = 32
+FLAGS         = 0
+
+#-----------------------------------------------------------
+# Init code
+#-----------------------------------------------------------
 
 pygame.init()
-pygame.display.set_caption('2.5D Engine')
-SCREEN_WIDTH, SCREEN_HEIGHT = 320, 200
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
+pygame.display.set_caption(TITLE)
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), FLAGS, COLOR_DEPTH)
 clock = pygame.time.Clock()
-
 font = pygame.font.Font(None, 24)
+
+#-----------------------------------------------------------
+# Resources
+#-----------------------------------------------------------
+
+greendot = pygame.image.load('green_dot.png').convert_alpha()
+# res.sprite_life.set_colorkey((255, 0, 255))
+
 text_surface = font.render('Hello', False, (255, 255, 255))
 text_rect = text_surface.get_rect()
 print('Text rect:', text_rect, 'center =', text_rect.center)
@@ -16,6 +47,7 @@ text_rect.center = screen.get_rect().center
 print(text_rect)
 
 level = {
+    'name' : 'The Deep',
     'sectors': {
         1: {
             'walls': [
@@ -48,11 +80,59 @@ level = {
                 [130, 60, 160, 60, 3],
                 [130, 60, 130, 90, 0],
                 [130, 90, 160, 90, 0],
-                [160, 90, 160, 60, 0]
+                [160, 90, 160, 60, 5]
+            ]
+        },
+        5 : {
+            'walls' : [
+                [160, 90, 160, 60, 4],
+                [160, 60, 180, 60, 0],
+                [160, 90, 180, 90, 0],
+                [180, 90, 180, 120, 0],
+                [180, 60, 180, 30, 0],
+                [180, 30, 260, 30, 0],
+                [180, 120, 260, 120, 6],
+                [260, 30, 260, 120, 0]
+            ]
+        },
+        6 : {
+            'walls' : [
+                [180, 120, 260, 120, 5],
+                [260, 120, 260, 170, 0],
+                [260, 170, 100, 170, 0],
+                [100, 170, 100, 100, 0],
+                [100, 100, 100, 110, 0],
+                [100, 110, 150, 110, 0],
+                [150, 110, 150, 120, 0],
+                [150, 120, 180, 120, 0]
+            ]
+        },
+        7 : {
+            'walls' : [
+                [210, 90, 230, 90, 0],
+                [210, 60, 230, 60, 0],
+                [210, 90, 210, 60, 0],
+                [230, 90, 230, 60, 0]
+            ]
+        },
+        8 : {
+            'walls' : [
+                [130, 140, 240, 140, 6],
+                [130, 150, 240, 150, 6],
+                [130, 150, 130, 140, 6],
+                [240, 150, 240, 140, 6],
             ]
         }
-    }
+    },
+    'objects' : [
+        [50, 50, 'life']
+    ],
+    'start' : [30, 50, 90, 1] # x, y, a, sector
 }
+
+#-----------------------------------------------------------
+# Functions
+#-----------------------------------------------------------
 
 def get_rect(sector):
     min_x = 2000
@@ -133,10 +213,11 @@ def intersect(seg1, seg2):
         else:
             raise Exception("Wall not angular are not handled")
     else:
+        print(move_left, move_right, move_down, move_up, seg1, ab_seg1)
         if seg2[0] == seg2[2]: # vertical
-            return True
+            raise Exception("A") # True
         elif seg2[1] == seg2[3]: # horizontal
-            return True
+            raise Exception("A") # True
         else:
             raise Exception("Wall not angular are not handled")
     return False
@@ -152,43 +233,102 @@ def ab(quad):
         b = quad[1] - a * quad[0]
     return a, b
 
+#-----------------------------------------------------------
+# Data Model
+#-----------------------------------------------------------
+
+class Entity:
+
+    def __init__(self, kind, x, y):
+        self.kind = kind
+        self.x = x
+        self.y = y
+        self.remove = False
+
+    def activate(self, player):
+        if self.kind == 'life':
+            player.mod_life(10)
+            self.remove = True
+    
+    def update(self):
+        pass
+
+
+class Player(Entity):
+
+    def __init__(self, x, y, a, s):
+        super().__init__('player', x, y)
+        self.a = a
+        self.sector = s
+        self.life = 100
+        self.speed = 0.2
+        self.dir = self.update_dir()
+
+    def update_dir(self, neg=1):
+        dist = 20
+        dir_x = int(self.x + dist * math.cos(self.a*0.0174532925) * neg)
+        dir_y = int(self.y + dist * math.sin(self.a*0.0174532925) * neg)
+        return dir_x, dir_y
+    
+    def update(self):
+        self.dir = self.update_dir()
+    
+    def mod_life(self, amount):
+        self.life = min(max(0, self.life + amount), 999)
+        print(f"Player life set to {self.life:3d}")
+
+#-----------------------------------------------------------
+# Variables
+#-----------------------------------------------------------
+
+start         = level['start']
+player        = Player(start[0], start[1], start[2], start[3])
 app_end       = False
-player_sector = 1
-player_x      = 30
-player_y      = 50
-player_x_old  = player_x
-player_y_old  = player_y
-player_speed  = 0.2
+player_x_old  = player.x
+player_y_old  = player.y
 move_left     = False
 move_right    = False
 move_up       = False
 move_down     = False
+turn_left     = False
+turn_right    = False
+forward       = False
+backward      = False
 mod           = 'MAP'
+entities      = [player, Entity('life', 20, 20)]
+
+print("Starting Game...")
+print("Level is = " + level['name'])
+print("Player life is = " + str(player.life))
 
 while not app_end:
     # Drawing picture
-    screen.fill((0, 0, 0))
+    screen.fill(BLACK)
     if mod == 'GAME':
         for i in range(SCREEN_WIDTH):
-            pygame.draw.line(screen, (0, 255, 0), (i, 50), (i, 150))
-        pygame.draw.line(screen, (255, 0, 0), (140, 0), (140, 200))
+            pygame.draw.line(screen, GREEN, (i, 50), (i, 150))
+        pygame.draw.line(screen, RED, (140, 0), (140, 200))
+        screen.blit(greendot, (30, 30))
+        screen.blit(text_surface, text_rect)
     elif mod == 'MAP':
+        pygame.draw.rect(screen, (50, 50, 50), get_rect(level['sectors'][player.sector]))
         for sector_key, sector in level['sectors'].items():
-            if player_sector == sector_key:
-                pygame.draw.rect(screen, (50, 50, 50), get_rect(sector))
             for w in sector['walls']:
-                color = (255, 255, 255) if w[4] == 0 else (255, 0, 0)
+                color = WHITE if w[4] == 0 else RED
                 pygame.draw.line(screen, color, (w[0], w[1]), (w[2], w[3]))
-                pygame.draw.rect(screen, (0, 255, 0),
+                pygame.draw.rect(screen, GREEN,
                                  (w[0] - 2, w[1] - 2, 5, 5), 1)
                 pygame.draw.rect(screen, (0, 255, 0),
                                  (w[2] - 2, w[3] - 2, 5, 5), 1)
-        screen.blit(text_surface, text_rect)
-        pygame.draw.line(screen, (255, 0, 0), (player_x_old, player_y_old),
-                         (player_x, player_y))
-        pygame.draw.rect(screen, (0, 0, 255), (player_x - 2, player_y - 2, 5, 5))
+            for e in entities:
+                if e.kind == 'life':
+                    screen.blit(greendot, (e.x - 16, e.y - 16))
+        pygame.draw.line(screen, RED, (player_x_old, player_y_old),
+                         (player.x, player.y))
+        pygame.draw.rect(screen, BLUE, (player.x - 2, player.y - 2, 5, 5))
+        pygame.draw.line(screen, BLUE, (player.x, player.y), player.dir, 1)
     pygame.display.flip()
-    # Setting framerate
+    # Setting framerate by limiting it to 30 fps
     # dt = clock.tick(30)
     dt = clock.tick_busy_loop(30)  # more accurate
     #print(f'Elapsed: {dt} milliseconds')
@@ -202,6 +342,10 @@ while not app_end:
             elif event.key == K_UP:     move_up    = True
             elif event.key == K_LEFT:   move_left  = True
             elif event.key == K_RIGHT:  move_right = True
+            elif event.key == K_a:      turn_left  = True
+            elif event.key == K_d:      turn_right = True
+            elif event.key == K_w:      forward    = True
+            elif event.key == K_s:      backward   = True
             else:
                 print(f"{event.key:4d}", event.unicode)
         elif event.type == KEYUP:
@@ -210,34 +354,59 @@ while not app_end:
             elif event.key == K_UP:     move_up    = False
             elif event.key == K_LEFT:   move_left  = False
             elif event.key == K_RIGHT:  move_right = False
+            elif event.key == K_a:      turn_left  = False
+            elif event.key == K_d:      turn_right = False
+            elif event.key == K_w:      forward    = False
+            elif event.key == K_s:      backward   = False
             elif event.key == K_TAB:
                 mod = 'GAME' if mod == 'MAP' else 'MAP'
     # Updating
-    player_x_old = player_x
-    player_y_old = player_y
-    if move_down:  player_y += player_speed * dt
-    if move_up:    player_y -= player_speed * dt
-    if move_left:  player_x -= player_speed * dt
-    if move_right: player_x += player_speed * dt
+    player_x_old = player.x
+    player_y_old = player.y
+    if move_down:  player.y += player.speed * dt
+    if move_up:    player.y -= player.speed * dt
+    if move_left:  player.x -= player.speed * dt
+    if move_right: player.x += player.speed * dt
+    if turn_left:  player.a -= player.speed * dt
+    if turn_right: player.a += player.speed * dt
+    if forward:    player.x, player.y = player.update_dir()
+    if backward:   player.x, player.y = player.update_dir(-1)
+    if player.x != player_x_old and player.y != player_y_old:
+        player.x = player_x_old
+    for e in entities:
+        dist = math.sqrt((player.x-e.x)*(player.x-e.x) + (player.y-e.y)*(player.y-e.y))
+        #print(dist)
+        if dist < 10:
+            e.activate(player)
+        else:
+            e.update()
+    entities[:] = [o for o in entities if not o.remove]
     # Check wall
     old_sectors = []
     while True:
-        old_sectors.append(player_sector)
-        for w in level['sectors'][player_sector]['walls']:
-            if intersect([player_x_old, player_y_old, player_x, player_y], w):
+        old_sectors.append(player.sector)
+        for w in level['sectors'][player.sector]['walls']:
+            if intersect([player_x_old, player_y_old, player.x, player.y], w):
                 if w[4] == 0:
-                    player_x = player_x_old
-                    player_y = player_y_old
+                    player.x = player_x_old
+                    player.y = player_y_old
                     break
                 elif w[4] not in old_sectors:
-                    player_sector = w[4]
+                    player.sector = w[4]
                     print('changing sector', w[4])
                     break
-        if player_sector in old_sectors:
+        if player.sector in old_sectors:
             break
+    player.dir = player.update_dir()
 
+print("Goodbye")
 pygame.quit()
 
-# 14h57 : first change of sector
-# 15h02 : ça marche ! il faut mémoriser
-# 16h42 : croisements verticaux aussi mais y'a des bugs
+# Portes
+# Move gun with the mouse
+
+# secteur 7 : le joueur passe car on ne check que son secteur !
+
+# Fusion de topdown dedans
+# TopDown datait du 15 août 2015 
+# Transformé en orienté objet le 6 février 2016
