@@ -52,81 +52,120 @@ print(text_rect)
 
 level = {
     'name' : 'The Deep',
+    'walls' : {
+         1 : [10, 10, 100, 10],
+         2 : [10, 10, 10, 100],
+         3 : [10, 100, 100, 100],
+         4 : [100, 100, 100, 50],
+         5 : [100, 50, 100, 10],
+         6 : [100, 50, 130, 50],
+         7 : [100, 10, 130, 10],
+         8 : [130, 50, 130, 10],
+         9 : [130, 10, 160, 10],
+        10 : [160, 10, 160, 60],
+        11 : [130, 50, 130, 60],
+        12 : [130, 60, 160, 60],
+        13 : [130, 60, 130, 90],
+        14 : [130, 90, 160, 90],
+        15 : [160, 90, 160, 60],
+        16 : [160, 60, 180, 60],
+        17 : [160, 90, 180, 90],
+        18 : [180, 90, 180, 120],
+        19 : [180, 60, 180, 30],
+        20 : [180, 30, 260, 30],
+        21 : [180, 120, 260, 120],
+        22 : [260, 30, 260, 120],
+        23 : [260, 120, 260, 170],
+        24 : [260, 170, 100, 170],
+        25 : [100, 170, 100, 100],
+        26 : [100, 100, 100, 110],
+        27 : [100, 110, 150, 110],
+        28 : [150, 110, 150, 120],
+        29 : [150, 120, 180, 120],
+        30 : [210, 90, 230, 90],
+        31 : [210, 60, 230, 60],
+        32 : [210, 90, 210, 60],
+        33 : [230, 90, 230, 60],
+        34 : [130, 140, 240, 140],
+        35 : [130, 150, 240, 150],
+        36 : [130, 150, 130, 140],
+        37 : [240, 150, 240, 140],
+    },
     'sectors': {
         1: {
             'walls': [
-                [10, 10, 100, 10, 0],
-                [10, 10, 10, 100, 0],
-                [10, 100, 100, 100, 0],
-                [100, 100, 100, 50, 0],
-                [100, 50, 100, 10, 2]
+                [1, 0],
+                [2, 0],
+                [3, 0],
+                [4, 0],
+                [5, 2]
             ]
         },
         2: {
             'walls': [
-                [100, 50, 100, 10, 1],
-                [100, 50, 130, 50, 0],
-                [100, 10, 130, 10, 0],
-                [130, 50, 130, 10, 3]
+                [5, 1],
+                [6, 0],
+                [7, 0],
+                [8, 3]
             ]
         },
         3 : {
             'walls' : [
-                [130, 50, 130, 10, 2],
-                [130, 10, 160, 10, 0],
-                [160, 10, 160, 60, 0],
-                [130, 50, 130, 60, 0],
-                [130, 60, 160, 60, 4]
+                [8, 2],
+                [9, 0],
+                [10, 0],
+                [11, 0],
+                [12, 4]
             ]
         },
         4 : {
             'walls' : [
-                [130, 60, 160, 60, 3],
-                [130, 60, 130, 90, 0],
-                [130, 90, 160, 90, 0],
-                [160, 90, 160, 60, 5]
+                [12, 3],
+                [13, 0],
+                [14, 0],
+                [15, 5]
             ]
         },
         5 : {
             'walls' : [
-                [160, 90, 160, 60, 4],
-                [160, 60, 180, 60, 0],
-                [160, 90, 180, 90, 0],
-                [180, 90, 180, 120, 0],
-                [180, 60, 180, 30, 0],
-                [180, 30, 260, 30, 0],
-                [180, 120, 260, 120, 6],
-                [260, 30, 260, 120, 0]
+                [15, 4],
+                [16, 0],
+                [17, 0],
+                [18, 0],
+                [19, 0],
+                [20, 0],
+                [21, 6],
+                [22, 0]
             ],
             'inside' : [7]
         },
         6 : {
             'walls' : [
-                [180, 120, 260, 120, 5],
-                [260, 120, 260, 170, 0],
-                [260, 170, 100, 170, 0],
-                [100, 170, 100, 100, 0],
-                [100, 100, 100, 110, 0],
-                [100, 110, 150, 110, 0],
-                [150, 110, 150, 120, 0],
-                [150, 120, 180, 120, 0]
+                [21, 5],
+                [23, 0],
+                [24, 0],
+                [25, 0],
+                [26, 0],
+                [27, 0],
+                [28, 0],
+                [29, 0]
             ],
             'inside' : [8]
         },
         7 : {
             'walls' : [
-                [210, 90, 230, 90, 0],
-                [210, 60, 230, 60, 0],
-                [210, 90, 210, 60, 0],
-                [230, 90, 230, 60, 0]
-            ]
+                [30, 0],
+                [31, 0],
+                [32, 0],
+                [33, 0]
+            ],
         },
         8 : {
             'walls' : [
-                [130, 140, 240, 140, 6],
-                [130, 150, 240, 150, 6],
-                [130, 150, 130, 140, 6],
-                [240, 150, 240, 140, 6],
+                [34, 6],
+                [35, 6],
+                [36, 6],
+                [37, 6]
             ]
         }
     },
@@ -136,39 +175,53 @@ level = {
     'start' : [30, 50, 90, 1] # x, y, a, sector
 }
 
-for k, sector in level['sectors'].items():
-    if 'inside' in sector:
-        for sk in sector['inside']:
-            print(f'Sector {sk} in sector {k}')
-            subsector = level['sectors'][sk]
-            for wall in subsector['walls']:
-                print(f'Adding a wall to sector {k}')
-                if wall[4] == 0:
-                    sector['walls'].append(wall)
-                elif wall[4] == k:
-                    wall[4] = sk
-                    sector['walls'].append(wall) 
-                else:
-                    raise Exception('Not handled.')
+def make_sub():
+    global level
+    for k, sector in level['sectors'].items():
+        if 'inside' in sector:
+            for sk in sector['inside']:
+                print(f'Sector {sk} in sector {k}')
+                subsector = level['sectors'][sk]
+                for w in subsector['walls']:
+                    wall = level['walls'][w[0]]
+                    goto = w[1]
+                    print(f'Adding a wall to sector {k}')
+                    if goto == 0:
+                        sector['walls'].append([w[0], 0])
+                    elif goto == k:
+                        sector['walls'].append([w[0], sk]) 
+                    else:
+                        raise Exception('Not handled.')
+
+make_sub()
 
 #-----------------------------------------------------------
 # Functions
 #-----------------------------------------------------------
 
+def coord2id(wall_segment):
+    global level
+    for k, w in level['walls'].items():
+        if w[0] == wall_segment[0] and w[1] == wall_segment[1] and w[2] == wall_segment[2] and w[3] == wall_segment[3]:
+            return k
+
+
 def get_rect(sector):
+    global walls
     min_x = 2000
     min_y = 2000
     max_x = 0
     max_y = 0
     for w in sector['walls']:
-        if w[0] < min_x: min_x = w[0]
-        if w[1] < min_y: min_y = w[1]
-        if w[2] < min_x: min_x = w[2]
-        if w[3] < min_y: min_y = w[3]
-        if w[0] > max_x: max_x = w[0]
-        if w[1] > max_y: max_y = w[1]
-        if w[2] > max_x: max_x = w[2]
-        if w[3] > max_y: max_y = w[3]
+        wall = walls[w[0]]
+        if wall[0] < min_x: min_x = wall[0]
+        if wall[1] < min_y: min_y = wall[1]
+        if wall[2] < min_x: min_x = wall[2]
+        if wall[3] < min_y: min_y = wall[3]
+        if wall[0] > max_x: max_x = wall[0]
+        if wall[1] > max_y: max_y = wall[1]
+        if wall[2] > max_x: max_x = wall[2]
+        if wall[3] > max_y: max_y = wall[3]
     return min_x, min_y, max_x - min_x, max_y - min_y
 
 
@@ -187,24 +240,24 @@ def intersect(seg1, seg2):
             if seg1_min_x <= seg2[0] <= seg1_max_x:
                 if seg2_min_y <= seg1_min_y <= seg2_max_y: # 221211
                     #print('vertical', seg2[0], 'minxs1', seg1_min_x, 'maxxs1', seg1_max_x, 'minys1', seg1_min_y, 'maxys1', seg1_max_y, seg2_min_y, seg2_max_y)
-                    print('crossed')
+                    print('crossed', coord2id(seg2))
                     return True
                 elif seg2_min_y <= seg1_max_y <= seg2_max_y:  # 112122
-                    print('crossed')
+                    print('crossed', coord2id(seg2))
                     return True
                 elif seg1_min_y <= seg2_min_y and seg1_max_y >= seg2_max_y:  # 11222211
-                    print('crossed')
+                    print('crossed', coord2id(seg2))
                     return True
         elif seg2[1] == seg2[3]: # horizontal
             if seg2[1] == seg1[1]: # same line fixée par Y, décrite par X
                 if seg2_min_x <= seg1_min_x <= seg2_max_x: # 221211
-                    print('crossed')
+                    print('crossed', coord2id(seg2))
                     return True
                 elif seg2_min_x <= seg1_max_x <= seg2_max_x:  # 112122
-                    print('crossed')
+                    print('crossed', coord2id(seg2))
                     return True
                 elif seg1_min_x <= seg2_min_x and seg1_max_x >= seg2_max_x:  # 11222211
-                    print('crossed')
+                    print('crossed', coord2id(seg2))
                     return True
         else:
             raise Exception("Wall not angular are not handled")
@@ -212,24 +265,24 @@ def intersect(seg1, seg2):
         if seg2[0] == seg2[2]: # vertical
             if seg2[0] == seg1[0]: # same colonne fixée par X, décrite par Y
                 if seg2_min_y <= seg1_min_y <= seg2_max_y: # 221211
-                    print('crossed')
+                    print('crossed', coord2id(seg2))
                     return True
                 elif seg2_min_y <= seg1_max_y <= seg2_max_y:  # 112122
-                    print('crossed')
+                    print('crossed', coord2id(seg2))
                     return True
                 elif seg1_min_y <= seg2_min_y and seg1_max_y >= seg2_max_y:  # 11222211
-                    print('crossed')
+                    print('crossed', coord2id(seg2))
                     return True
         elif seg2[1] == seg2[3]: # horizontal
             if seg1_min_y <= seg2[1] <= seg1_max_y:
                 if seg2_min_x <= seg1_min_x <= seg2_max_x: # 221211
-                    print('crossed')
+                    print('crossed', coord2id(seg2))
                     return True
                 elif seg2_min_x <= seg1_max_x <= seg2_max_x:  # 112122
-                    print('crossed')
+                    print('crossed', coord2id(seg2))
                     return True
                 elif seg1_min_x <= seg2_min_x and seg1_max_x >= seg2_max_x:  # 11222211
-                    print('crossed')
+                    print('crossed', coord2id(seg2))
                     return True
         else:
             raise Exception("Wall not angular are not handled")
@@ -303,6 +356,8 @@ class Player(Entity):
 #-----------------------------------------------------------
 
 start         = level['start']
+walls         = level['walls']
+sectors       = level['sectors']
 player        = Player(start[0], start[1], start[2], start[3])
 app_end       = False
 player_x_old  = player.x
@@ -333,14 +388,16 @@ while not app_end:
         screen.blit(text_surface, text_rect)
     elif mod == 'MAP':
         pygame.draw.rect(screen, (50, 50, 50), get_rect(level['sectors'][player.sector]))
-        for sector_key, sector in level['sectors'].items():
+        for sector_key, sector in sectors.items():
             for w in sector['walls']:
-                color = WHITE if w[4] == 0 else RED
-                pygame.draw.line(screen, color, (w[0], w[1]), (w[2], w[3]))
+                wall = walls[w[0]]
+                goto = w[1]
+                color = WHITE if goto == 0 else RED
+                pygame.draw.line(screen, color, (wall[0], wall[1]), (wall[2], wall[3]))
                 pygame.draw.rect(screen, GREEN,
-                                 (w[0] - 2, w[1] - 2, 5, 5), 1)
+                                 (wall[0] - 2, wall[1] - 2, 5, 5), 1)
                 pygame.draw.rect(screen, (0, 255, 0),
-                                 (w[2] - 2, w[3] - 2, 5, 5), 1)
+                                 (wall[2] - 2, wall[3] - 2, 5, 5), 1)
             for e in entities:
                 if e.kind == 'life':
                     screen.blit(greendot, (e.x - 16, e.y - 16))
@@ -406,16 +463,20 @@ while not app_end:
     old_sectors = []
     while True:
         old_sectors.append(player.sector)
-        for w in level['sectors'][player.sector]['walls']:
-            if intersect([player_x_old, player_y_old, player.x, player.y], w):
-                if w[4] == 0:
+        for w in sectors[player.sector]['walls']:
+            wall = walls[w[0]]
+            goto = w[1]
+            if intersect([player_x_old, player_y_old, player.x, player.y], wall):
+                if goto == 0:
                     player.x = player_x_old
                     player.y = player_y_old
                     break
-                elif w[4] not in old_sectors:
-                    player.sector = w[4]
-                    print('changing sector', w[4])
+                elif goto not in old_sectors:
+                    player.sector = goto
+                    print('changing sector', goto)
                     break
+                else:
+                    print('not changing to', goto, 'because sector already crossed')
         if player.sector in old_sectors:
             break
     player.dir = player.update_dir()
