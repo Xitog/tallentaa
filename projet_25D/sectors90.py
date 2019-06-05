@@ -36,7 +36,11 @@ font = pygame.font.Font(None, 24)
 # Resources
 #-----------------------------------------------------------
 
-greendot = pygame.image.load('green_dot.png').convert_alpha()
+try:
+    greendot = pygame.image.load('green_dot.png').convert_alpha()
+except pygame.error:
+    greendot = pygame.Surface((10, 10))
+    greendot.fill(GREEN)
 # res.sprite_life.set_colorkey((255, 0, 255))
 
 text_surface = font.render('Hello', False, (255, 255, 255))
@@ -93,7 +97,8 @@ level = {
                 [180, 30, 260, 30, 0],
                 [180, 120, 260, 120, 6],
                 [260, 30, 260, 120, 0]
-            ]
+            ],
+            'inside' : [7]
         },
         6 : {
             'walls' : [
@@ -105,7 +110,8 @@ level = {
                 [100, 110, 150, 110, 0],
                 [150, 110, 150, 120, 0],
                 [150, 120, 180, 120, 0]
-            ]
+            ],
+            'inside' : [8]
         },
         7 : {
             'walls' : [
@@ -129,6 +135,21 @@ level = {
     ],
     'start' : [30, 50, 90, 1] # x, y, a, sector
 }
+
+for k, sector in level['sectors'].items():
+    if 'inside' in sector:
+        for sk in sector['inside']:
+            print(f'Sector {sk} in sector {k}')
+            subsector = level['sectors'][sk]
+            for wall in subsector['walls']:
+                print(f'Adding a wall to sector {k}')
+                if wall[4] == 0:
+                    sector['walls'].append(wall)
+                elif wall[4] == k:
+                    wall[4] = sk
+                    sector['walls'].append(wall) 
+                else:
+                    raise Exception('Not handled.')
 
 #-----------------------------------------------------------
 # Functions
