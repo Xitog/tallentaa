@@ -4,7 +4,9 @@
 
 import math
 import pygame
+from random import randint
 from pygame.locals import *
+import sys
 
 #-----------------------------------------------------------
 # Constants
@@ -23,32 +25,26 @@ COLOR_DEPTH   = 32
 FLAGS         = 0
 
 #-----------------------------------------------------------
-# Init code
+# Global variables
 #-----------------------------------------------------------
 
-pygame.init()
-pygame.display.set_caption(TITLE)
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), FLAGS, COLOR_DEPTH)
-clock = pygame.time.Clock()
-font = pygame.font.Font(None, 24)
-
-#-----------------------------------------------------------
-# Resources
-#-----------------------------------------------------------
-
-try:
-    greendot = pygame.image.load('green_dot.png').convert_alpha()
-except pygame.error:
-    greendot = pygame.Surface((10, 10))
-    greendot.fill(GREEN)
-# res.sprite_life.set_colorkey((255, 0, 255))
-
-text_surface = font.render('Hello', False, (255, 255, 255))
-text_rect = text_surface.get_rect()
-print('Text rect:', text_rect, 'center =', text_rect.center)
-print('Screen rect:', screen.get_rect(), 'center =', screen.get_rect().center)
-text_rect.center = screen.get_rect().center
-print(text_rect)
+turn          = 0
+start         = None
+walls         = None
+sectors       = None
+player        = None
+monsters      = []
+app_end       = False
+move_left     = False
+move_right    = False
+move_up       = False
+move_down     = False
+turn_left     = False
+turn_right    = False
+forward       = False
+backward      = False
+mod           = 'MAP'
+entities      = []
 
 level = {
     'name' : 'The Deep',
@@ -128,14 +124,14 @@ level = {
         },
         5 : {
             'walls' : [
-                [15, 4],
-                [16, 0],
-                [17, 0],
-                [18, 0],
-                [19, 0],
-                [20, 0],
-                [21, 6],
-                [22, 0]
+                [15, 4], # [160, 90, 160, 60],
+                [16, 0], # [160, 60, 180, 60],
+                [17, 0], # [160, 90, 180, 90],
+                [18, 0], # [180, 90, 180, 120],
+                [19, 0], # [180, 60, 180, 30],
+                [20, 0], # [180, 30, 260, 30],
+                [21, 6], # [180, 120, 260, 120],
+                [22, 0]  # [260, 30, 260, 120],
             ],
             'inside' : [7]
         },
@@ -172,8 +168,56 @@ level = {
     'objects' : [
         [50, 50, 'life']
     ],
+    'monsters' : [
+        {
+            'x' : 120,
+            'y' : 120,
+            'a' : 90,
+            's' : 6,
+            'kind' : 'Monster'
+        },
+        {
+            'x' : 250,
+            'y' : 70,
+            'a' : 90,
+            's' : 5,
+            'kind' : 'Monster'
+        }
+    ],
     'start' : [30, 50, 90, 1] # x, y, a, sector
 }
+
+#-----------------------------------------------------------
+# Init code
+#-----------------------------------------------------------
+
+pygame.init()
+pygame.display.set_caption(TITLE)
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), FLAGS, COLOR_DEPTH)
+clock = pygame.time.Clock()
+font = pygame.font.Font(None, 24)
+
+#-----------------------------------------------------------
+# Resources
+#-----------------------------------------------------------
+
+try:
+    greendot = pygame.image.load('green_dot.png').convert_alpha()
+except pygame.error:
+    greendot = pygame.Surface((10, 10))
+    greendot.fill(GREEN)
+# res.sprite_life.set_colorkey((255, 0, 255))
+
+text_surface = font.render('Hello', False, (255, 255, 255))
+text_rect = text_surface.get_rect()
+print('Text rect:', text_rect, 'center =', text_rect.center)
+print('Screen rect:', screen.get_rect(), 'center =', screen.get_rect().center)
+text_rect.center = screen.get_rect().center
+print(text_rect)
+
+#-----------------------------------------------------------
+# Functions
+#-----------------------------------------------------------
 
 def make_sub():
     global level
@@ -193,11 +237,6 @@ def make_sub():
                     else:
                         raise Exception('Not handled.')
 
-make_sub()
-
-#-----------------------------------------------------------
-# Functions
-#-----------------------------------------------------------
 
 def coord2id(wall_segment):
     global level
@@ -225,6 +264,23 @@ def get_rect(sector):
     return min_x, min_y, max_x - min_x, max_y - min_y
 
 
+def is_vert(seg):
+    return seg[0] == seg[2]
+
+
+def is_hori(seg):
+    return seg[1] == seg[3]
+
+
+def intersect_p(seg, point):
+    if is_vert(seg): # | même x
+        return point[0] == seg[0] and min(seg[1], seg[3]) <= max(seg[1], seg[3])
+    elif is_hori(seg):
+        return point[1] == seg[1] and min(seg[0], seg[2]) <= max(seg[0], seg[2])
+    else:
+        raise Exception("Seg not vert nor hori, aborting.")
+
+
 def intersect(seg1, seg2):
     ab_seg1 = ab(seg1)
     seg1_min_x = min(seg1[0], seg1[2])
@@ -236,28 +292,28 @@ def intersect(seg1, seg2):
     seg2_min_y = min(seg2[1], seg2[3])
     seg2_max_y = max(seg2[1], seg2[3])
     if ab_seg1[0] is None: # horizontal
-        if seg2[0] == seg2[2]: # vertical
+        if is_vert(seg2): # vertical
             if seg1_min_x <= seg2[0] <= seg1_max_x:
                 if seg2_min_y <= seg1_min_y <= seg2_max_y: # 221211
                     #print('vertical', seg2[0], 'minxs1', seg1_min_x, 'maxxs1', seg1_max_x, 'minys1', seg1_min_y, 'maxys1', seg1_max_y, seg2_min_y, seg2_max_y)
-                    print('crossed', coord2id(seg2))
+                    print(f'{turn} crossed', coord2id(seg2))
                     return True
                 elif seg2_min_y <= seg1_max_y <= seg2_max_y:  # 112122
-                    print('crossed', coord2id(seg2))
+                    print(f'{turn} crossed', coord2id(seg2))
                     return True
                 elif seg1_min_y <= seg2_min_y and seg1_max_y >= seg2_max_y:  # 11222211
-                    print('crossed', coord2id(seg2))
+                    print(f'{turn} crossed', coord2id(seg2))
                     return True
-        elif seg2[1] == seg2[3]: # horizontal
+        elif is_hori(seg2): # horizontal
             if seg2[1] == seg1[1]: # same line fixée par Y, décrite par X
                 if seg2_min_x <= seg1_min_x <= seg2_max_x: # 221211
-                    print('crossed', coord2id(seg2))
+                    print(f'{turn} crossed', coord2id(seg2))
                     return True
                 elif seg2_min_x <= seg1_max_x <= seg2_max_x:  # 112122
-                    print('crossed', coord2id(seg2))
+                    print(f'{turn} crossed', coord2id(seg2))
                     return True
                 elif seg1_min_x <= seg2_min_x and seg1_max_x >= seg2_max_x:  # 11222211
-                    print('crossed', coord2id(seg2))
+                    print(f'{turn} crossed', coord2id(seg2))
                     return True
         else:
             raise Exception("Wall not angular are not handled")
@@ -265,24 +321,24 @@ def intersect(seg1, seg2):
         if seg2[0] == seg2[2]: # vertical
             if seg2[0] == seg1[0]: # same colonne fixée par X, décrite par Y
                 if seg2_min_y <= seg1_min_y <= seg2_max_y: # 221211
-                    print('crossed', coord2id(seg2))
+                    print(f'{turn} crossed', coord2id(seg2))
                     return True
                 elif seg2_min_y <= seg1_max_y <= seg2_max_y:  # 112122
-                    print('crossed', coord2id(seg2))
+                    print(f'{turn} crossed', coord2id(seg2))
                     return True
                 elif seg1_min_y <= seg2_min_y and seg1_max_y >= seg2_max_y:  # 11222211
-                    print('crossed', coord2id(seg2))
+                    print(f'{turn} crossed', coord2id(seg2))
                     return True
         elif seg2[1] == seg2[3]: # horizontal
             if seg1_min_y <= seg2[1] <= seg1_max_y:
                 if seg2_min_x <= seg1_min_x <= seg2_max_x: # 221211
-                    print('crossed', coord2id(seg2))
+                    print(f'{turn} crossed', coord2id(seg2))
                     return True
                 elif seg2_min_x <= seg1_max_x <= seg2_max_x:  # 112122
-                    print('crossed', coord2id(seg2))
+                    print(f'{turn} crossed', coord2id(seg2))
                     return True
                 elif seg1_min_x <= seg2_min_x and seg1_max_x >= seg2_max_x:  # 11222211
-                    print('crossed', coord2id(seg2))
+                    print(f'{turn} crossed', coord2id(seg2))
                     return True
         else:
             raise Exception("Wall not angular are not handled")
@@ -307,37 +363,105 @@ def ab(quad):
         b = quad[1] - a * quad[0]
     return a, b
 
+
+#-----------------------------------------------------------
+# Test framework
+#-----------------------------------------------------------
+
+class TestSession:
+
+    def __init__(self):
+        self.nb_test = 0
+        self.nb_failure = 0
+
+    def test(self, expression, expected):
+        try:
+            calc = eval(expression)
+        except TypeError:
+            print(expression, type(expression))
+        self.nb_test += 1
+        res = calc == expected
+        s = f"Computed= {str(calc):5} Expected= {str(expected):5} Res= {str(res):5} Expr= {expression}"
+        if res:
+            print(s)
+        else:
+            self.nb_failure += 1
+        sys.stderr.write(s + '\n')
+
+    def dashboard(self):
+        nb_success = self.nb_test - self.nb_failure
+        print('==========================================')
+        print(f"Number of tests   : {self.nb_test:4d} ({round(self.nb_test/self.nb_test*100,0):3.0f}%)")
+        sys.stderr.write(f"Number of failure : {self.nb_failure:4d} ({round(self.nb_failure/self.nb_test*100,0):3.0f}%)\n")
+        print(f"Number of ok      : {nb_success:4d} ({round(nb_success/self.nb_test*100,0):3.0f}%)")
+        print('==========================================')
+
+ts = TestSession()
+seg1 = (10, 10, 50, 50)
+ts.test('is_vert((10, 10, 10, 100))', True)
+ts.test('is_vert(seg1)', False)
+ts.test('True', False)
+# intersect_p verti
+segtest1 = (10, 10, 10, 100)
+ts.test('intersect_p(segtest1, (10, 10))', True)
+ts.test('intersect_p(segtest1, (10, 100))', True)
+ts.test('intersect_p(segtest1, (10, 15))', True)
+ts.test('intersect_p(segtest1, (10, 30))', True)
+ts.test('intersect_p(segtest1, (10, 45))', True)
+ts.test('intersect_p(segtest1, (11, 10))', False)
+# intersect_p hori
+segtest2 = (10, 25, 100, 25)
+ts.test('intersect_p(segtest2, (10, 25))', True)
+ts.test('intersect_p(segtest2, (100, 25))', True)
+ts.test('intersect_p(segtest2, (30, 25))', True)
+ts.test('intersect_p(segtest2, (45, 25))', True)
+ts.test('intersect_p(segtest2, (10, 26))', False)
+#
+ts.dashboard()
+
 #-----------------------------------------------------------
 # Data Model
 #-----------------------------------------------------------
 
-class Entity:
+class Object:
 
-    def __init__(self, kind, x, y):
+    IDN = 0
+    
+    def __init__(self, kind, x, y, a=0, s=None):
+        Object.IDN += 1
+        self.idn = Object.IDN
         self.kind = kind
         self.x = x
         self.y = y
-        self.remove = False
-
+        self.a = a
+        self.sector = s
+    
     def activate(self, player):
         if self.kind == 'life':
             player.mod_life(10)
             self.remove = True
-    
+
     def update(self):
         pass
 
+    def __str__(self):
+        return f"{self.kind}#{self.idn} @ (x {int(self.x)}, y {int(self.y)}, s{self.sector})"
 
-class Player(Entity):
 
-    def __init__(self, x, y, a, s):
-        super().__init__('player', x, y)
-        self.a = a
-        self.sector = s
+class Entity(Object):
+
+    def __init__(self, kind, x, y, a=0, s=None, ia=False):
+        super().__init__(kind, x, y, a, s)
         self.life = 100
         self.speed = 0.2
         self.dir = self.update_dir()
-
+        self.remove = False
+        self.ia = ia
+        self.ia_state = 'stand'
+        self.ia_cpt = 30
+        self.x_old = self.x
+        self.y_old = self.y
+    
     def update_dir(self, neg=1):
         dist = 20
         dir_x = int(self.x + dist * math.cos(self.a*0.0174532925) * neg)
@@ -345,39 +469,77 @@ class Player(Entity):
         return dir_x, dir_y
     
     def update(self):
+        if self.ia:
+            self.x_old = self.x
+            self.y_old = self.y
+            if self.ia_state == 'stand' or self.ia_cpt == 0:
+                r = randint(1, 4)
+                if r == 1:   self.ia_state = 'left'
+                elif r == 2: self.ia_state = 'right'
+                elif r == 3: self.ia_state = 'top'
+                elif r == 4: self.ia_state = 'down'
+                self.ia_cpt = 50
+            if self.ia_state == 'left':    self.x -= 1
+            elif self.ia_state == 'right': self.x += 1
+            elif self.ia_state == 'top':   self.y -= 1
+            elif self.ia_state == 'down':  self.y += 1
+            self.ia_cpt -= 1
+        if self.x_old != self.x or self.y_old != self.y:
+            self.check_collision()
         self.dir = self.update_dir()
     
     def mod_life(self, amount):
         self.life = min(max(0, self.life + amount), 999)
-        print(f"Player life set to {self.life:3d}")
+        print(f"{self.kind} life set to {self.life:3d}")
+    
+    def check_collision(self):
+        if self.x != self.x_old and self.y != self.y_old:
+            raise Exception('MULTI AXIS MOVE FORBIDDEN')
+        old_sectors = []
+        old_walls = []
+        while True:
+            old_sectors.append(self.sector)
+            for w in sectors[self.sector]['walls']:
+                if w[0] not in old_walls:
+                    wall = walls[w[0]]
+                    goto = w[1]
+                    if intersect([self.x_old, self.y_old, self.x, self.y], wall):
+                        old_walls.append(w[0])
+                        if goto == 0:
+                            self.x = self.x_old
+                            self.y = self.y_old
+                            break
+                        elif goto not in old_sectors:
+                            if intersect_p(wall, (self.x, self.y)):
+                                print(str(self), f'{turn} not changing to new=', goto, 'because we are ON the wall staying at', self.sector)
+                            else:
+                                print(str(self), f'{turn} changing sector new=', goto, 'old=', self.sector)
+                                self.sector = goto
+                            break
+                        else:
+                            print(str(self), f'{turn} not changing to new=', goto, 'because sector already crossed staying at', self.sector)
+            if self.sector in old_sectors:
+                break
 
 #-----------------------------------------------------------
-# Variables
+# Start
 #-----------------------------------------------------------
 
+make_sub()
 start         = level['start']
 walls         = level['walls']
 sectors       = level['sectors']
-player        = Player(start[0], start[1], start[2], start[3])
-app_end       = False
-player_x_old  = player.x
-player_y_old  = player.y
-move_left     = False
-move_right    = False
-move_up       = False
-move_down     = False
-turn_left     = False
-turn_right    = False
-forward       = False
-backward      = False
-mod           = 'MAP'
-entities      = [player, Entity('life', 20, 20)]
+player        = Entity('Player', start[0], start[1], start[2], start[3])
+for m in level['monsters']:
+    monsters.append(Entity(m['kind'], m['x'], m['y'], m['a'], m['s'], ia=True))
+entities      = [player, Entity('life', 20, 20)] + monsters
 
 print("Starting Game...")
 print("Level is = " + level['name'])
 print("Player life is = " + str(player.life))
 
 while not app_end:
+    turn += 1
     # Drawing picture
     screen.fill(BLACK)
     if mod == 'GAME':
@@ -387,6 +549,8 @@ while not app_end:
         screen.blit(greendot, (30, 30))
         screen.blit(text_surface, text_rect)
     elif mod == 'MAP':
+        life_surface = font.render(str(player.life), False, (255, 255, 255))
+        screen.blit(life_surface, (280, 180))
         pygame.draw.rect(screen, (50, 50, 50), get_rect(level['sectors'][player.sector]))
         for sector_key, sector in sectors.items():
             for w in sector['walls']:
@@ -401,13 +565,15 @@ while not app_end:
             for e in entities:
                 if e.kind == 'life':
                     screen.blit(greendot, (e.x - 16, e.y - 16))
-        pygame.draw.line(screen, RED, (player_x_old, player_y_old),
+        pygame.draw.line(screen, RED, (player.x_old, player.y_old),
                          (player.x, player.y))
         pygame.draw.rect(screen, BLUE, (player.x - 2, player.y - 2, 5, 5))
         pygame.draw.line(screen, BLUE, (player.x, player.y), player.dir, 1)
+        for m in monsters:
+            pygame.draw.rect(screen, RED, (m.x - 2, m.y - 2, 5, 5))
+            pygame.draw.line(screen, RED, (m.x, m.y), m.dir, 1)
     pygame.display.flip()
     # Setting framerate by limiting it to 30 fps
-    # dt = clock.tick(30)
     dt = clock.tick_busy_loop(30)  # more accurate
     #print(f'Elapsed: {dt} milliseconds')
     # Handling events
@@ -439,8 +605,8 @@ while not app_end:
             elif event.key == K_TAB:
                 mod = 'GAME' if mod == 'MAP' else 'MAP'
     # Updating
-    player_x_old = player.x
-    player_y_old = player.y
+    player.x_old = player.x
+    player.y_old = player.y
     if move_down:  player.y += player.speed * dt
     if move_up:    player.y -= player.speed * dt
     if move_left:  player.x -= player.speed * dt
@@ -449,46 +615,18 @@ while not app_end:
     if turn_right: player.a += player.speed * dt
     if forward:    player.x, player.y = player.update_dir()
     if backward:   player.x, player.y = player.update_dir(-1)
-    if player.x != player_x_old and player.y != player_y_old:
-        player.x = player_x_old
+    if player.x != player.x_old and player.y != player.y_old:
+        player.x = player.x_old
+    # Check for object activation
     for e in entities:
         dist = math.sqrt((player.x-e.x)*(player.x-e.x) + (player.y-e.y)*(player.y-e.y))
-        #print(dist)
         if dist < 10:
             e.activate(player)
-        else:
-            e.update()
+        e.update()
     entities[:] = [o for o in entities if not o.remove]
-    # Check wall
-    old_sectors = []
-    while True:
-        old_sectors.append(player.sector)
-        for w in sectors[player.sector]['walls']:
-            wall = walls[w[0]]
-            goto = w[1]
-            if intersect([player_x_old, player_y_old, player.x, player.y], wall):
-                if goto == 0:
-                    player.x = player_x_old
-                    player.y = player_y_old
-                    break
-                elif goto not in old_sectors:
-                    player.sector = goto
-                    print('changing sector', goto)
-                    break
-                else:
-                    print('not changing to', goto, 'because sector already crossed')
-        if player.sector in old_sectors:
-            break
-    player.dir = player.update_dir()
-
+    
 print("Goodbye")
 pygame.quit()
 
 # Portes
 # Move gun with the mouse
-
-# secteur 7 : le joueur passe car on ne check que son secteur !
-
-# Fusion de topdown dedans
-# TopDown datait du 15 août 2015 
-# Transformé en orienté objet le 6 février 2016
