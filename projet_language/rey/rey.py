@@ -3,19 +3,23 @@ import copy # only once for read_expr
 
 """
     Rey
+    ---
     A simple lexer / parser / interpreter / python transpiler for a small language inspired by Lua/Ruby
     - Tokenizer is working ***
     - Parser is *
     - Interpreter is *
-    - Python transpiler is none
+    - Python transpiler is _
+    - Tests are *
     Developed in 2017
 
 = Working pipe
 
-    Symbolizer/lexer/tokenizer    string   -> [tokens]
-    Parser                        [tokens] -> abstract syntax tree (AST)
-    Interpreter                   AST      -> result
-    Python Transpiler             AST      -> python source code
+    I.   Symbolizer/lexer/tokenizer [LEXER]    string   -> [tokens]
+    II.  Parser                     [PARSER]   [tokens] -> abstract syntax tree (AST)
+    III. Interpreter                [EXEC]     AST      -> result
+    IV.  Python Transpiler          [TRANS]    AST      -> python source code
+    V.   Tests                      [TESTS]
+    VI.  Main                       [MAIN]
 
 = Data Model
 
@@ -29,7 +33,7 @@ import copy # only once for read_expr
 """
 
 #-------------------------------------------------------------------------------
-# Tokenizer/Lexer
+# I. Symbolizer / Tokenizer / Lexer [LEXER]
 #-------------------------------------------------------------------------------
 
 class TokenType:
@@ -322,7 +326,7 @@ class Tokenizer:
         return self.tokens
 
 #-------------------------------------------------------------------------------
-# Parser (Syntaxic analysis)
+# II. Parser (Syntaxic analysis) [PARSER]
 #-------------------------------------------------------------------------------
 
 # Model
@@ -502,7 +506,7 @@ class Parser:
             print('read block', tokens[index].val)
         guard = True if max_index is None else False
         while guard or index < max_index:
-            print('.', index, max_index)
+            #print('.', index, max_index)
             # Test to terminate
             if index >= len(tokens):
                 self.puts('    Terminating stream of tokens')
@@ -664,7 +668,7 @@ class Parser:
         if length <= 0:
             raise Exception("[ERROR] Empty expression of length = " + str(length))
         elif length == 1:
-            if working_list[0].typ in [Token.Boolean, Token.Float, Token.Integer, Token.Identifier]:
+            if working_list[0].typ in [Token.Boolean, Token.Float, Token.Integer, Token.Identifier, Token.String]:
                 node = Terminal(working_list[0])
                 results = end_index + 1, node
             else:
@@ -737,19 +741,7 @@ class Parser:
         return ast
 
 #-------------------------------------------------------------------------------
-# Transpiler
-#-------------------------------------------------------------------------------
-
-class TranspilerPython:
-    
-    def __init__(self):
-        pass
-    
-    def transpile(self, ast):
-        pass
-
-#-------------------------------------------------------------------------------
-# Interpreter
+# III. Interpreter [EXEC]
 #-------------------------------------------------------------------------------
 
 def writeln(arg):
@@ -915,12 +907,33 @@ class Interpreter:
             last = self.do_elem(elem)
         return last #18h59 8/9
 
+#-------------------------------------------------------------------------------
+# IV. Transpiler [TRANS]
+#-------------------------------------------------------------------------------
+
+class TranspilerPython:
+    
+    def __init__(self):
+        pass
+    
+    def transpile(self, ast):
+        pass
+
+#-------------------------------------------------------------------------------
+# V. Tests [TESTS]
+#-------------------------------------------------------------------------------
+
 Tests = {
-        "2 + 5" : 7,
-        "'abc' * 2" : "abcabc",
-        "a = true" : True,
-        "if a == true then write('hello') end" : 5
-    }
+    "2 + 5" : 7,
+    "'abc' * 2" : "abcabc",
+    "a = true" : True,
+    "if a == true then write('hello') end" : 5
+}
+
+#-------------------------------------------------------------------------------
+# VI. Main [MAIN]
+#-------------------------------------------------------------------------------
+
 if __name__ == '__main__':
     interpreter = Interpreter()
     parser = Parser(False)
@@ -929,14 +942,17 @@ if __name__ == '__main__':
         if command == 'exit':
             break
         elif command == 'help':
-            print('Rey language')
+            print('Rey language v0.1 2017-2019')
             print('help    : this help')
             print('tests   : run multiple tests')
             print('reset   : reset interpreter')
             print('debug.x : set/unset debug. x can be parser')
+            print('locals  : get local variable')
             print('exit    : exit this shell')
         elif command == 'debug.parser':
             parser.set_debug()
+        elif command == 'locals':
+            print(interpreter.vars)
         elif command == 'reset':
             interpreter = Interpreter()
         elif command == 'tests':
