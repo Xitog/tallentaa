@@ -1,8 +1,8 @@
-﻿import os.path
+import os.path
 import copy # only once for read_expr
 
 """
-    Rey
+    Ash
     ---
     A simple lexer / parser / interpreter / python transpiler for a small language inspired by Lua/Ruby
     - Tokenizer is working ***
@@ -46,7 +46,7 @@ class TokenType:
     
     def __eq__(self, obj):
         if not isinstance(obj, TokenType):
-            raise Exception("Cannot compare to objet of type " + str(type(obj)))
+            raise Exception("Can only compare instances of TokenType and not instances of " + str(type(obj)))
         return self.name == obj.name
 
 
@@ -75,12 +75,16 @@ class Token:
         self.val = val
         self.start = start
         self.length = len(val)
+        self.lvl = 0
     
     def __str__(self):
         if self.start is None or self.length is None:
             return f":{self.typ}: [{self.val}]"
         else:
             return f":{self.typ}: [{self.val}] ({self.start} +{self.length})"
+
+    def __repr__(self):
+        return str(self)
     
     def to_s(self, level=1):
         return "    " * level + "{Token} " + str(self)
@@ -147,16 +151,26 @@ class Tokenizer:
         word = line[index]
         suspended = False
         index += 1
-        while index < len(line) and (line[index].isdigit() or line[index] == '_'):
-            if suspended:
+        is_float = False
+        while index < len(line) and (line[index].isdigit() or line[index] == '_' or line[index] == '.'):
+            if line[index] == '_' and suspended:
                 raise Exception("Twice _ following in number at line " + str(self.line_count))
             if line[index] == '_':
                 suspended = True
+            elif line[index] == '.':
+                if is_float:
+                    raise Exception("Twice . in a number")
+                else:
+                    is_float = True
+                    word += '.'
             else:
                 suspended = False
                 word += line[index]
             index += 1
-        t = Token(Token.Integer, word, self.counter)
+        if not is_float:
+            t = Token(Token.Integer, word, self.counter)
+        else:
+            t = Token(Token.Float, word, self.counter)
         if self.debug:
             print("    " + f'Creating token {t} n°{len(self.tokens)}')
         self.tokens.append(t)
@@ -358,6 +372,7 @@ class Node:
         self.content = content
         self.right = right
         self.left = left
+        self.lvl = content.lvl
     
     def to_s(self, level=1):
         s = "    " * level + "{Terminal}\n"
@@ -623,7 +638,8 @@ class Parser:
                 after_aug = False
                 lvl *= 100
             token = working_list[index]
-            self.puts("    working_list " + str(index) + '. ' + str(token) + " lvl=" + str(lvl))
+            token.lvl = lvl
+            self.puts(f"    working_list {str(index)}. {token} lvl={token.lvl}")
             if token.typ in [Token.Operator, Token.Separator]:
                 # Handling of ( )
                 if token.val == '(':
@@ -691,26 +707,60 @@ class Parser:
                 left = working_list[operator_index - 1]
                 if not isinstance(left, Node):
                     left = Terminal(left)
-                right = working_list[operator_index + 1]
-                if not isinstance(right, Node):
+                # Right parameter
+                right = None
+                #print('len working list =', len(working_list))
+                #print('ope index =', operator_index)
+                #if len(working_list) > operator_index + 1:
+                #    print('ope lvl =', working_list[operator_index + 1].lvl)
+                #    print('param lvl =', working_list[operator_index].lvl)
+                # We must have a parameter and its priority/lvl must be superior : ( "abc" ) abc is lvl = 100 vs () "abc" abc is lvl = 1
+                if working_list[operator_index].val == 'call(':
+                    if len(working_list) > operator_index + 1 and working_list[operator_index + 1].lvl > working_list[operator_index].lvl:
+                        right = working_list[operator_index + 1]
+                # We must have a parameter (? and for unary op ?)
+                else:
+                    if len(working_list) > operator_index + 1:
+                        right = working_list[operator_index + 1]
+                if right is not None and not isinstance(right, Node):
                     right = Terminal(right)
                 op = Terminal(working_list[operator_index])
                 self.puts('    < BinOp />')
+                #print('debug OPERATOR>', type(op.typ), op.typ, op.content)
+                #print('debug> LEFT', type(left), left, 'END')
+                #print('debug> RIGHT', type(right), right, 'END')
                 node = Operation(
                     op,
                     left,
                     right
                 )
                 # update working list
+                #print('Updating working list')
+                #print('< Before')
+                #print(operator_index)
+                #for i, e in enumerate(working_list):
+                #    print(i, type(e), e)
                 del working_list[operator_index - 1]
                 del working_list[operator_index - 1]
-                del working_list[operator_index - 1]
+                if right is not None: # f()
+                    del working_list[operator_index - 1]
                 working_list.insert(operator_index - 1, node)
+                #print('> After')
+                #for i, e in enumerate(working_list):
+                #    print(i, type(e), e)
                 # update sorted operators
+                #print('Updating sorted operators')
+                #print('< Before')
+                #print(sorted_operators)
                 del sorted_operators[0]
                 for so in range(0, len(sorted_operators)):
                     if sorted_operators[so] > operator_index:
-                        sorted_operators[so] -= 2
+                        if right is not None: # f()
+                            sorted_operators[so] -= 2
+                        else:
+                            sorted_operators[so] -= 1
+                #print('> After')
+                #print(sorted_operators)
             results = end_index + 1, node
         
         #    elif tokens[index + 1].typ == Token.Separator and tokens[index + 1].val == '(':
@@ -744,6 +794,8 @@ class Parser:
 # III. Interpreter [EXEC]
 #-------------------------------------------------------------------------------
 
+# III.A Basic Library
+
 def writeln(arg):
     if isinstance(arg, list):
         res = None
@@ -764,12 +816,37 @@ def write(arg):
         print(arg, end='')
         return len(str(arg))
 
+def readint(arg=None):
+    if isinstance(arg, str) or arg is None:
+        if arg is not None:
+            res = input(arg)
+        else:
+            res = input()
+        i = int(res)
+        return i
+    else:
+        raise Exception('readint arg should be a string or None and is ' + str(type(arg)))
+
+def readstr(arg=None):
+    if isinstance(arg, str) or arg is None:
+        if arg is not None:
+            res = input(arg)
+        else:
+            res = input()
+        return res
+    else:
+        raise Exception('readstr arg should be a string or None' + str(type(arg)))
+    
+# III.B Engine
+
 class Interpreter:
     
     def __init__(self):
         self.vars = {}
         self.vars['writeln'] = writeln
         self.vars['write'] = write
+        self.vars['readint'] = readint
+        self.vars['readstr'] = readstr
     
     def do_elem(self, elem, affectation=False, Scope=None):
         if type(elem) == Operation:
@@ -833,10 +910,22 @@ class Interpreter:
                 return range(a, b)
             # Call
             elif elem.operator.content.val == '.':
-                a = self.do_elem(elem.left)
+                print(elem)
+                obj = self.do_elem(elem.left)
+                if isinstance(elem.right, Operation) and elem.right.operator.content.val == 'call(':
+                    # TODO: PARAMETERS ARE NOT HANDLED
+                    msg = elem.right.left.content.val
+                else:
+                    raise Exception("don't known what to do with" + str(type(elem.right)))
                 #b = self.do_elem(elem.right, scope={random})
-                b = elem.right.content.val
-                if b == 'random' and type(a) == range:
+                if hasattr(obj, msg):
+                    fun = getattr(obj, msg)
+                    if callable(fun):
+                        return fun()
+                    else:
+                        raise Exception("not callable :" + msg)
+                elif b == 'random' and type(a) == range:
+                    # TODO: HERE SHOULD BE THE BASE LIBRARY
                     import random
                     return random.sample(a, 1)[0]
                 else:
@@ -952,7 +1041,8 @@ if __name__ == '__main__':
         elif command == 'debug.parser':
             parser.set_debug()
         elif command == 'locals':
-            print(interpreter.vars)
+            for k in sorted(interpreter.vars):
+                print(f"{k:10}", interpreter.vars[k])
         elif command == 'reset':
             interpreter = Interpreter()
         elif command == 'tests':
