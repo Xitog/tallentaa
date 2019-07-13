@@ -391,6 +391,10 @@ class Terminal(Node):
     def __init__(self, content):
         Node.__init__(self, content, Node.Terminal)
 
+    def to_s(self, level=1):
+        s = "    " * level + "{Terminal} "+ f"{self.content.typ} {self.content.val} ({self.content.start} +{self.content.length})"
+        return s
+
 
 class Block(Node):
 
@@ -422,14 +426,14 @@ class Operation(Node):
         assert self.operator.is_terminal() and self.operator.content.typ == Token.Operator, "Operator should be of type Token.Operator"
     
     def to_s(self, level=1):
-        name = "{Operation} Binary Operation" if self.left is not None and self.right is not None else "Unary Operation"
-        s = "    " * level + f"{name} ({self.content.content.val})\n"
+        name = "{Operation} Binary" if self.left is not None and self.right is not None else "Unary"
+        s = "    " * level + f"{name} {self.content.content.val}\n"
         if self.right is not None:
-            s += "    " * (level + 2) + ".right =\n"
-            s += self.right.to_s(level + 3) + "\n"
+            s += "    " * (level + 1) + "right =\n"
+            s += self.right.to_s(level + 2) + "\n"
         if self.left is not None:
-            s += "    " * (level + 2) + ".left =\n"
-            s += self.left.to_s(level + 3) + "\n"
+            s += "    " * (level + 1) + "left =\n"
+            s += self.left.to_s(level + 2) + "\n"
         return s
 
 
@@ -841,12 +845,16 @@ def readstr(arg=None):
 
 class Interpreter:
     
-    def __init__(self):
+    def __init__(self, debug=False):
         self.vars = {}
         self.vars['writeln'] = writeln
         self.vars['write'] = write
         self.vars['readint'] = readint
         self.vars['readstr'] = readstr
+        self.debug = debug
+
+    def set_debug(self):
+        self.debug = not self.debug
     
     def do_elem(self, elem, affectation=False, Scope=None):
         if type(elem) == Operation:
@@ -910,7 +918,8 @@ class Interpreter:
                 return range(a, b)
             # Call
             elif elem.operator.content.val == '.':
-                print(elem)
+                #if self.debug:
+                #    print(elem)
                 obj = self.do_elem(elem.left)
                 if isinstance(elem.right, Operation) and elem.right.operator.content.val == 'call(':
                     # TODO: PARAMETERS ARE NOT HANDLED
@@ -1026,6 +1035,7 @@ Tests = {
 if __name__ == '__main__':
     interpreter = Interpreter()
     parser = Parser(False)
+    debug = False
     while True:
         command = input('>>> ')
         if command == 'exit':
@@ -1038,8 +1048,13 @@ if __name__ == '__main__':
             print('debug.x : set/unset debug. x can be parser')
             print('locals  : get local variable')
             print('exit    : exit this shell')
+        elif command == 'debug':
+            debug = not debug
+            print('Debug set to', debug)
         elif command == 'debug.parser':
             parser.set_debug()
+        elif command == 'debug.interpreter':
+            interpreter.set_debug()
         elif command == 'locals':
             for k in sorted(interpreter.vars):
                 print(f"{k:10}", interpreter.vars[k])
@@ -1065,6 +1080,8 @@ if __name__ == '__main__':
             #try:
                 res = Tokenizer(False).tokenize(command)
                 ast = parser.parse(res)
+                if debug:
+                    print('AST\n', ast)
                 res = interpreter.do(ast)
                 print(res)
             #except Exception as e:
