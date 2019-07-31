@@ -479,6 +479,7 @@ def main():
             for i in range(0, 1):
                 ray_x = player_x + math.cos(a)
                 ray_y = player_y + math.sin(a)
+                line_draw_full(screen, m, player_x, player_y, ray_x, ray_y, a - player_a)
                 # columns[i] = SCREEN_HEIGHT
                 a += step_a
         else:
@@ -486,6 +487,7 @@ def main():
             for i in range(0, SCREEN_WIDTH):
                 ray_x = player_x + math.cos(a)
                 ray_y = player_y + math.sin(a)
+                x, y, d = line_draw(screen, m, player_x, player_y, ray_x, ray_y, a - player_a)
                 columns[i] = SCREEN_HEIGHT / d
                 a += step_a
         # 2.5D screen
