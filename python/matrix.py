@@ -249,9 +249,13 @@ def line_draw(surf, matrix, x, y, end_x, end_y, a):
     pygame.draw.line(surf, YELLOW, (tos(x), tos(y)), tos2(next_point))
     d = dist(x, y, next_point[0], next_point[1])
     if next_point == next_hori:
-        d *= math.cos(a)
+        #d *= math.cos(a)
+        #d *= end_y
+        d = abs(y - next_point[1]) #* math.sin(a) #/ end_x 
     else:
-        d *= math.cos(a)
+        #d *= math.cos(a)
+        #d *= end_x
+        d = abs(x - next_point[0]) * math.cos(a) #/ end_y
     return next_point[0], next_point[1], d
 
 
@@ -479,7 +483,7 @@ def main():
             for i in range(0, 1):
                 ray_x = player_x + math.cos(a)
                 ray_y = player_y + math.sin(a)
-                line_draw_full(screen, m, player_x, player_y, ray_x, ray_y, a - player_a)
+                line_draw_full(screen, m, player_x, player_y, ray_x, ray_y, abs(a - player_a))
                 # columns[i] = SCREEN_HEIGHT
                 a += step_a
         else:
@@ -487,7 +491,7 @@ def main():
             for i in range(0, SCREEN_WIDTH):
                 ray_x = player_x + math.cos(a)
                 ray_y = player_y + math.sin(a)
-                x, y, d = line_draw(screen, m, player_x, player_y, ray_x, ray_y, a - player_a)
+                x, y, d = line_draw(screen, m, player_x, player_y, ray_x, ray_y, player_a) #abs(a - player_a))
                 columns[i] = SCREEN_HEIGHT / d
                 a += step_a
         # 2.5D screen
