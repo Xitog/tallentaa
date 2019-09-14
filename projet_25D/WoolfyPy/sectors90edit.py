@@ -1,3 +1,11 @@
+# Todo :
+# - Add a way to segment a wall in two
+# - Add a way to merge two walls in one
+# - Add a way to cancel LAST segment
+# - Add a way to save and load a given map
+# - Add a way to add an entity and to specify it (typ, p1, p2)
+# - Add a way to scroll
+
 #-------------------------------------------------------------------------------
 # Imports
 #-------------------------------------------------------------------------------
@@ -14,14 +22,15 @@ import json
 #-------------------------------------------------------------------------------
 
 # Colors
-GREY     = ( 50,  50,  50)
-DARK_RED = (128,   0,   0)
-RED      = (255,   0,   0)
-GREEN    = (  0, 255,   0)
-BLUE     = (  0,   0, 255)
-YELLOW   = (255, 255,   0)
-BLACK    = (  0,   0,   0)
-WHITE    = (255, 255, 255)
+GREY       = ( 50,  50,  50)
+LIGHT_GREY = (128, 128, 128)
+DARK_RED   = (128,   0,   0)
+RED        = (255,   0,   0)
+GREEN      = (  0, 255,   0)
+BLUE       = (  0,   0, 255)
+YELLOW     = (255, 255,   0)
+BLACK      = (  0,   0,   0)
+WHITE      = (255, 255, 255)
 
 # Configuration
 BINDING = {
@@ -64,6 +73,8 @@ def key(x1, y1, x2, y2):
 class Wall:
 
     IDW = 1
+    VERTICAL = 1
+    HORIZONTAL = 2
     
     def __init__(self, s1, x1, y1, x2, y2, s2=None):
         self.idw = Wall.IDW
@@ -73,8 +84,20 @@ class Wall:
         self.y2 = y2
         self.s1 = s1
         self.s2 = s2
+        self.maxy = max(y1, y2)
+        self.miny = min(y1, y2)
+        self.maxx = max(x1, x2)
+        self.minx = min(x1, x2)
+        if self.maxx == self.minx:
+            self.typ = Wall.VERTICAL
+        elif self.maxy == self.miny:
+            self.typ = Wall.HORIZONTAL
         self.line = key(x1, y1, x2, y2)
 
+    def __str__(self):
+        typ = 'H' if self.typ == Wall.HORIZONTAL else 'V'
+        return f"{self.x1},{self.y1} - {self.x2},{self.y2} {typ}"
+        
     def to_array(self):
         if self.s2 is not None:
             return [self.x1, self.y1, self.x2, self.y2]
@@ -90,8 +113,25 @@ class Wall:
     def is_portal(self):
         return self.s2 is not None
 
-    def collision(self, x, y):
-        return (x == self.x1 and y == self.y1) or (x == self.x2 and y == self.y2)
+    def collision_p(self, x, y):
+        if self.typ == Wall.VERTICAL:
+            return x == self.x1 and self.miny <= y <= self.maxy
+        elif self.typ == Wall.HORIZONTAL:
+            return y == self.y1 and self.minx <= x <= self.maxx
+        #return (x == self.x1 and y == self.y1) or (x == self.x2 and y == self.y2)
+
+    def same(self, w):
+        return w.maxx == self.maxx and w.minx == self.minx and w.maxy == self.maxy and w.miny == self.miny
+
+    def collision_w(self, w2):
+        if self.typ == Wall.VERTICAL and w2.typ == Wall.VERTICAL:
+            if self.x1 != w2.x1: return False
+            return self.miny < w2.maxy and self.maxy > w2.miny
+        elif self.typ == Wall.HORIZONTAL and w2.typ == Wall.HORIZONTAL:
+            if self.y1 != w2.y1: return False
+            return self.minx < w2.maxx and self.maxx > w2.minx
+        else:
+            return self.miny < w2.maxy and self.maxy > w2.miny and self.minx < w2.maxx and self.maxx > w2.minx
 
 
 class Sector:
@@ -120,7 +160,22 @@ class Level:
                 for w in s:
                     sec.walls.append(self.reg(sec, *w))
                 self.sectors.append(sec) 
-        
+
+    def exists(self, wp):
+        return wp.line in self.walls
+    
+    def collision(self, wp):
+        override = False
+        collided = False
+        for kw, w in self.walls.items():
+            if w.same(wp):
+                override = True
+                break
+            if w.collision_w(wp):
+                collided = True
+        #print(override, collided)
+        return collided if not override else False
+    
     def reg(self, sector, x1, y1, x2, y2):
         k = key(x1, y1, x2, y2)
         if k not in self.walls:
@@ -182,26 +237,35 @@ def restart():
 # UI
 #-------------------------------------------------------------------------------
 
-def draw_grid(screen, f):
-    for i in range(0, 100):
-        pygame.draw.line(screen, GREY, (i * f, 0), (i * f, 480), 1)
-    for i in range(0, 100):
-        pygame.draw.line(screen, GREY, (0, i * f), (640, i * f), 1)
+def draw_grid(screen, rx, ry, f):
+    for x in range(0, 100): # verti
+        if x != rx:
+            pygame.draw.line(screen, GREY, (x * f, 0), (x * f, 480), 1)
+        else:
+            pygame.draw.line(screen, LIGHT_GREY, (x * f, 0), (x * f, 480), 1)
+    for y in range(0, 100): # hori
+        if y != ry:
+            pygame.draw.line(screen, GREY, (0, y * f), (640, y * f), 1)
+        else:
+            pygame.draw.line(screen, LIGHT_GREY, (0, y * f), (640, y * f), 1)
 
 
-def draw_wall(screen, wall, f=10):
+def draw_wall(screen, wall, rx, ry, f=10):
     if wall.is_portal():
         pygame.draw.line(screen, DARK_RED, *wall())
     else:
-        pygame.draw.line(screen, WHITE, *wall())
+        if wall.collision_p(rx, ry):
+            pygame.draw.line(screen, BLUE, *wall())
+        else:
+            pygame.draw.line(screen, WHITE, *wall())
     pygame.draw.rect(screen, RED, (wall[0] * f - 2, wall[1] * f - 2, 5, 5), 1)
     pygame.draw.rect(screen, RED, (wall[2] * f - 2, wall[3] * f - 2, 5, 5), 1)
 
 
-def draw_level(screen, level, f=10):
+def draw_level(screen, level, rx, ry, f=10):
     for sec in level.sectors:
         for wall in sec.walls:
-            draw_wall(screen, wall, f)
+            draw_wall(screen, wall, rx, ry, f)
 
 #-------------------------------------------------------------------------------
 # Main function
@@ -234,6 +298,7 @@ def test():
         'restart': False,
         'quit'   : False,
         }
+    factor = 10
     # game loop
     amorce = False
     state = 'free'
@@ -249,6 +314,8 @@ def test():
                 if e.key in BINDING:
                     actions[BINDING[e.key]] = False
         mx, my = pygame.mouse.get_pos()
+        rx = round(mx / factor)
+        ry = round(my / factor)
         # update
         if actions['down']:
             pos.y += SPEED_MOVE
@@ -315,11 +382,11 @@ def test():
                 state = 'draw'
                 sec = Sector()
                 draw_building = []
-                draw_start_x = mx // 10
-                draw_start_y = my // 10
+                draw_start_x = rx
+                draw_start_y = ry
             elif state == 'draw':
-                draw_end_x = mx // 10
-                draw_end_y = my // 10
+                draw_end_x = rx
+                draw_end_y = ry
                 draw_diff_x = abs(draw_start_x - draw_end_x)
                 draw_diff_y = abs(draw_start_y - draw_end_y)
                 if draw_diff_x < draw_diff_y:
@@ -327,23 +394,31 @@ def test():
                 else:
                     draw_end_y = draw_start_y
                 draw_building.append(Wall(sec, draw_start_x, draw_start_y, draw_end_x, draw_end_y))
-                if len(draw_building) > 1 and draw_building[0].collision(draw_end_x, draw_end_y):
+                if len(draw_building) > 1 and draw_building[0].collision_p(draw_end_x, draw_end_y):
                     print('draw -> free')
                     state = 'free'
+                    ok = True
                     for w in draw_building:
-                        sec.walls.append(lvl.reg(sec, *w.line))
-                    lvl.sectors.append(sec)
+                        if not lvl.exists(w) and lvl.collision(w):
+                            ok = False
+                            break
+                    if ok:
+                        for w in draw_building:
+                            sec.walls.append(lvl.reg(sec, *w.line))
+                        lvl.sectors.append(sec)
+                    else:
+                        print("Invalid Sector")
                 draw_start_x = draw_end_x
                 draw_start_y = draw_end_y
         # draw
         screen.fill(BLACK)
-        draw_grid(screen, 10)
-        draw_level(screen, lvl)
+        draw_grid(screen, rx, ry, 10)
+        draw_level(screen, lvl, rx, ry)
         pygame.draw.circle(screen, BLUE, pos(), 5, 2)
         if state == 'draw':
             pygame.draw.line(screen, WHITE, (draw_start_x * 10, draw_start_y * 10), (mx, my), 1)
             for w in draw_building:
-                draw_wall(screen, w, 10)
+                draw_wall(screen, w, rx, ry, 10)
         pygame.draw.circle(screen, GREEN, (mx, my), 5, 2)
         s = font.render(lvl.name, False, YELLOW, None)
         screen.blit(s, (620 - s.get_width(), 450))
