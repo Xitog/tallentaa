@@ -1,48 +1,9 @@
-#-----------------------------------------------------------
-# Imports
-#-----------------------------------------------------------
-
-import math
-import pygame
-from random import randint
-from pygame.locals import *
-import sys
-
-#-----------------------------------------------------------
-# Constants
-#-----------------------------------------------------------
-
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-BLUE  = (0, 0, 255)
-RED   = (255, 0, 0)
-GREEN = (0, 255, 0)
-
-TITLE         = '2.5D Engine'
-SCREEN_WIDTH  = 320
-SCREEN_HEIGHT = 200
-COLOR_DEPTH   = 32
-FLAGS         = 0
-
-#-----------------------------------------------------------
-# Global variables
-#-----------------------------------------------------------
-
-turn          = 0
 start         = None
 walls         = None
 sectors       = None
 player        = None
 monsters      = []
 app_end       = False
-move_left     = False
-move_right    = False
-move_up       = False
-move_down     = False
-turn_left     = False
-turn_right    = False
-forward       = False
-backward      = False
 mod           = 'MAP'
 entities      = []
 
@@ -167,35 +128,9 @@ level = {
     },
     'objects' : [
         [50, 50, 'life']
-    ],
-    'monsters' : [
-        {
-            'x' : 120,
-            'y' : 120,
-            'a' : 90,
-            's' : 6,
-            'kind' : 'Monster'
-        },
-        {
-            'x' : 250,
-            'y' : 70,
-            'a' : 90,
-            's' : 5,
-            'kind' : 'Monster'
-        }
-    ],
-    'start' : [30, 50, 90, 1] # x, y, a, sector
+    ]
 }
 
-#-----------------------------------------------------------
-# Init code
-#-----------------------------------------------------------
-
-pygame.init()
-pygame.display.set_caption(TITLE)
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), FLAGS, COLOR_DEPTH)
-clock = pygame.time.Clock()
-font = pygame.font.Font(None, 24)
 
 #-----------------------------------------------------------
 # Resources
@@ -454,19 +389,12 @@ class Entity(Object):
         super().__init__(kind, x, y, a, s)
         self.life = 100
         self.speed = 0.2
-        self.dir = self.update_dir()
         self.remove = False
         self.ia = ia
         self.ia_state = 'stand'
         self.ia_cpt = 30
         self.x_old = self.x
         self.y_old = self.y
-    
-    def update_dir(self, neg=1):
-        dist = 20
-        dir_x = int(self.x + dist * math.cos(self.a*0.0174532925) * neg)
-        dir_y = int(self.y + dist * math.sin(self.a*0.0174532925) * neg)
-        return dir_x, dir_y
     
     def update(self):
         if self.ia:
@@ -534,12 +462,7 @@ for m in level['monsters']:
     monsters.append(Entity(m['kind'], m['x'], m['y'], m['a'], m['s'], ia=True))
 entities      = [player, Entity('life', 20, 20)] + monsters
 
-print("Starting Game...")
-print("Level is = " + level['name'])
-print("Player life is = " + str(player.life))
-
 while not app_end:
-    turn += 1
     # Drawing picture
     screen.fill(BLACK)
     if mod == 'GAME':
@@ -567,52 +490,15 @@ while not app_end:
                     screen.blit(greendot, (e.x - 16, e.y - 16))
         pygame.draw.line(screen, RED, (player.x_old, player.y_old),
                          (player.x, player.y))
-        pygame.draw.rect(screen, BLUE, (player.x - 2, player.y - 2, 5, 5))
-        pygame.draw.line(screen, BLUE, (player.x, player.y), player.dir, 1)
+
         for m in monsters:
             pygame.draw.rect(screen, RED, (m.x - 2, m.y - 2, 5, 5))
             pygame.draw.line(screen, RED, (m.x, m.y), m.dir, 1)
     pygame.display.flip()
-    # Setting framerate by limiting it to 30 fps
-    dt = clock.tick_busy_loop(30)  # more accurate
-    #print(f'Elapsed: {dt} milliseconds')
-    # Handling events
-    for event in pygame.event.get():
-        if event.type == QUIT:
-            app_end = True
-        elif event.type == KEYDOWN:
-            if event.key == K_ESCAPE:   app_end    = True
-            elif event.key == K_DOWN:   move_down  = True
-            elif event.key == K_UP:     move_up    = True
-            elif event.key == K_LEFT:   move_left  = True
-            elif event.key == K_RIGHT:  move_right = True
-            elif event.key == K_a:      turn_left  = True
-            elif event.key == K_d:      turn_right = True
-            elif event.key == K_w:      forward    = True
-            elif event.key == K_s:      backward   = True
-            else:
-                print(f"{event.key:4d}", event.unicode)
-        elif event.type == KEYUP:
-            if event.key == K_ESCAPE:   app_end    = False
-            elif event.key == K_DOWN:   move_down  = False
-            elif event.key == K_UP:     move_up    = False
-            elif event.key == K_LEFT:   move_left  = False
-            elif event.key == K_RIGHT:  move_right = False
-            elif event.key == K_a:      turn_left  = False
-            elif event.key == K_d:      turn_right = False
-            elif event.key == K_w:      forward    = False
-            elif event.key == K_s:      backward   = False
-            elif event.key == K_TAB:
-                mod = 'GAME' if mod == 'MAP' else 'MAP'
+    
     # Updating
     player.x_old = player.x
     player.y_old = player.y
-    if move_down:  player.y += player.speed * dt
-    if move_up:    player.y -= player.speed * dt
-    if move_left:  player.x -= player.speed * dt
-    if move_right: player.x += player.speed * dt
-    if turn_left:  player.a -= player.speed * dt
-    if turn_right: player.a += player.speed * dt
     if forward:    player.x, player.y = player.update_dir()
     if backward:   player.x, player.y = player.update_dir(-1)
     if player.x != player.x_old and player.y != player.y_old:
@@ -624,9 +510,3 @@ while not app_end:
             e.activate(player)
         e.update()
     entities[:] = [o for o in entities if not o.remove]
-    
-print("Goodbye")
-pygame.quit()
-
-# Portes
-# Move gun with the mouse
