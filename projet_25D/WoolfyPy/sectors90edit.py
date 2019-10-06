@@ -28,7 +28,7 @@ import sys
 # Pygame
 TITLE         = '2.5D Engine'
 SCREEN_WIDTH  = 640
-SCREEN_HEIGHT = 400
+SCREEN_HEIGHT = 480
 COLOR_DEPTH   = 32
 FLAGS         = 0
 
@@ -56,10 +56,10 @@ BINDING = {
     pygame.K_q      : 'turn_left',
     pygame.K_e      : 'turn_right',
     
-    pygame.K_UP     : 'forward',
-    pygame.K_DOWN   : 'backward',
-    pygame.K_LEFT   : 'strafe_left',
-    pygame.K_RIGHT  : 'strafe_right',
+    pygame.K_UP     : 'scroll_up',
+    pygame.K_DOWN   : 'scroll_down',
+    pygame.K_LEFT   : 'scroll_left',
+    pygame.K_RIGHT  : 'scroll_right',
     
     pygame.K_SPACE  : 'start',
     pygame.K_ESCAPE : 'cancel',
@@ -138,8 +138,8 @@ class Wall:
         else:
             return [self.x1, self.y1, self.x2, self.y2] #, self.s2]
         
-    def __call__(self, f=10):
-        return ((self.x1 * f, self.y1 * f), (self.x2 * f, self.y2 * f))
+    def __call__(self, sx=0, sy=0, f=10):
+        return (((self.x1 - sx) * f, (self.y1 - sy) * f), ((self.x2 - sx) * f, (self.y2 - sy) * f))
 
     def __getitem__(self, i):
         return self.key[i]
@@ -264,8 +264,8 @@ class Vector:
     def __str__(self):
         return f"{round(self.x,2)}:{round(self.y,2)}"
 
-    def __call__(self):
-        return (int(self.x*10), int(self.y*10))
+    def __call__(self, sx=0, sy=0, f=10):
+        return (int((self.x - sx) * f), int((self.y - sy) * f))
 
 
 class Monster:
@@ -330,42 +330,9 @@ class Player:
         strafe_vec_y = math.sin(strafe_ang * 0.0174532925)
         strafe_vec = Vector(strafe_vec_x, strafe_vec_y)
         self.pos += strafe_vec * self.move_speed * dt
-    
-#-------------------------------------------------------------------------------
-# UI
-#-------------------------------------------------------------------------------
-
-def draw_grid(screen, rx, ry, f):
-    for x in range(0, 100): # verti
-        if x != rx:
-            pygame.draw.line(screen, GREY, (x * f, 0), (x * f, 480), 1)
-        else:
-            pygame.draw.line(screen, LIGHT_GREY, (x * f, 0), (x * f, 480), 1)
-    for y in range(0, 100): # hori
-        if y != ry:
-            pygame.draw.line(screen, GREY, (0, y * f), (640, y * f), 1)
-        else:
-            pygame.draw.line(screen, LIGHT_GREY, (0, y * f), (640, y * f), 1)
-
-
-def draw_wall(screen, wall, rx, ry, f=10):
-    if wall.is_portal():
-        pygame.draw.line(screen, DARK_RED, *wall())
-    else:
-        if wall.collision_p(rx, ry):
-            pygame.draw.line(screen, BLUE, *wall())
-        else:
-            pygame.draw.line(screen, WHITE, *wall())
-    pygame.draw.rect(screen, RED, (wall[0] * f - 2, wall[1] * f - 2, 5, 5), 1)
-    pygame.draw.rect(screen, RED, (wall[2] * f - 2, wall[3] * f - 2, 5, 5), 1)
-
-
-def draw_level(screen, level, rx, ry, f=10):
-    for wall in level.walls.values():
-            draw_wall(screen, wall, rx, ry, f)
 
 #-------------------------------------------------------------------------------
-# Main function
+# Main class
 #-------------------------------------------------------------------------------
 
 class App:
@@ -374,13 +341,27 @@ class App:
         self.title = title
         self.w = w
         self.h = h
+        self.x = 0
+        self.y = 0
         self.flags = flags
         self.colors = colors
         self.lvl = None
         self.player = None
+        self.screen = None
+        self.font = None
+        self.clock = None
         print('Level editor for sector based 2.5 FPS')
         print('(q)uit F9 load F5 save (r)estart (space)start (esc)cancel (i)nfo (s)egment')
     
+
+    def init_pygame(self):
+        pygame.init()
+        pygame.display.set_caption(self.title)
+        self.screen = pygame.display.set_mode((self.w, self.h), self.flags, self.colors)
+        pygame.mouse.set_visible(False)
+        self.font = pygame.font.SysFont('Arial', 18, False, False)
+        self.clock = pygame.time.Clock()
+
     
     def run(self):
         self.init_pygame()
@@ -404,6 +385,10 @@ class App:
             'show_map'      : False,
             'segment'       : False,
             'info'          : False,
+            'scroll_up'     : False,
+            'scroll_down'   : False,
+            'scroll_left'   : False,
+            'scroll_right'  : False,
             }
         factor = 10
         # Game loop
@@ -423,13 +408,13 @@ class App:
                     if e.key in BINDING:
                         actions[BINDING[e.key]] = True
                     else:
-                        print(f"{event.key:4d}", event.unicode)
+                        print(f"{e.key:4d}", e.unicode)
                 elif e.type == pygame.KEYUP:
                     if e.key in BINDING:
                         actions[BINDING[e.key]] = False
             mx, my = pygame.mouse.get_pos()
-            rx = round(mx / factor)
-            ry = round(my / factor)
+            rx = round(mx / factor + self.x)
+            ry = round(my / factor + self.y)
             # Update
             if actions['forward']:      self.player.forward(dt)
             if actions['backward']:     self.player.backward(dt)
@@ -437,6 +422,10 @@ class App:
             if actions['turn_left']:    self.player.turn_left(dt)
             if actions['strafe_right']: self.player.strafe_right(dt)
             if actions['strafe_left']:  self.player.strafe_left(dt)
+            if actions['scroll_left']:  self.x -= 0.01 * dt
+            if actions['scroll_right']: self.x += 0.01 * dt
+            if actions['scroll_up']:    self.y -= 0.01 * dt
+            if actions['scroll_down']:  self.y += 0.01 * dt
             if actions['quit'] and not amorce:
                 amorce = 'quit'
             elif not actions['quit'] and amorce == 'quit':
@@ -548,21 +537,21 @@ class App:
                         print('   ', kw)
             # Draw
             self.screen.fill(BLACK)
-            draw_grid(self.screen, rx, ry, 10)
-            draw_level(self.screen, self.lvl, rx, ry)
+            self.draw_grid(mx, my, 10)
+            self.draw_level(self.lvl, rx, ry)
             # Draw : Player
             #pygame.draw.circle(self.screen, BLUE, self.player.pos(), 5, 2)
-            pygame.draw.rect(self.screen, BLUE, (self.player.pos.x * factor - 2, self.player.pos.y * factor - 2, 5, 5))
-            pygame.draw.line(self.screen, BLUE, self.player.pos(), (self.player.pos + self.player.dir)(), 1)
+            pygame.draw.rect(self.screen, BLUE, ((self.player.pos.x - self.x) * factor - 2, (self.player.pos.y - self.y) * factor - 2, 5, 5))
+            pygame.draw.line(self.screen, BLUE, self.player.pos(self.x, self.y), (self.player.pos + self.player.dir)(self.x, self.y), 1)
             # Draw : Sector under construction
             if state == 'draw':
-                pygame.draw.line(self.screen, WHITE, (draw_start_x * 10, draw_start_y * 10), (mx, my), 1)
+                pygame.draw.line(self.screen, WHITE, ((draw_start_x - self.x) * factor, (draw_start_y - self.y) * factor), (mx, my), 1)
                 for w in draw_building:
-                    draw_wall(self.screen, w, rx, ry, 10)
+                    self.draw_wall(w, rx, ry, 10)
             pygame.draw.circle(self.screen, GREEN, (mx, my), 5, 2)
             s = self.font.render(self.lvl.name, False, YELLOW, None)
             self.screen.blit(s, (620 - s.get_width(), 450))
-            s = self.font.render(f"{mx//10:03d}, {my//10:03d}", False, YELLOW, None)
+            s = self.font.render(f"{rx:03d}, {ry:03d}", False, YELLOW, None)
             self.screen.blit(s, (0, 450))
             pygame.display.update()
             # Setting framerate by limiting it to 30 fps
@@ -570,15 +559,6 @@ class App:
             #print(f'Elapsed: {dt} milliseconds')
         print("Goodbye")
         pygame.quit()
-
-    
-    def init_pygame(self):
-        pygame.init()
-        pygame.display.set_caption(self.title)
-        self.screen = pygame.display.set_mode((self.w, self.h), self.flags, self.colors)
-        pygame.mouse.set_visible(False)
-        self.font = pygame.font.SysFont('Arial', 18, False, False)
-        self.clock = pygame.time.Clock()
     
 
     def restart(self):
@@ -619,6 +599,40 @@ class App:
             }       
         )
         self.player = Player(self.lvl.start['x'], self.lvl.start['y'], self.lvl.start['life'])
+
+    def draw_grid(self, mx, my, f): 
+        diffx = self.x - int(self.x)
+        diffy = self.y - int(self.y)
+        rxns = round(mx / f) # ns = noscroll
+        ryns = round(my / f)
+        for x in range(0, 100): # verti
+            if x != rxns:
+                pygame.draw.line(self.screen, GREY, ((x - diffx) * f, 0), ((x - diffx) * f, 480), 1)
+            else:
+                pygame.draw.line(self.screen, LIGHT_GREY, ((x - diffx) * f, 0), ((x - diffx) * f, 480), 1)
+        for y in range(0, 100): # hori
+            if y != ryns:
+                pygame.draw.line(self.screen, GREY, (0, (y - diffy) * f), (640, (y - diffy) * f), 1)
+            else:
+                pygame.draw.line(self.screen, LIGHT_GREY, (0, (y - diffy) * f), (640, (y - diffy) * f), 1)
+
+    
+    def draw_level(self, level, rx, ry, f=10):
+        for wall in level.walls.values():
+            self.draw_wall(wall, rx, ry, f)
+
+    
+    def draw_wall(self, wall, rx, ry, f=10):
+        if wall.is_portal():
+            pygame.draw.line(self.screen, DARK_RED, *wall(self.x, self.y))
+        else:
+            if wall.collision_p(rx, ry):
+                pygame.draw.line(self.screen, BLUE, *wall(self.x, self.y))
+            else:
+                pygame.draw.line(self.screen, WHITE, *wall(self.x, self.y))
+        pygame.draw.rect(self.screen, RED, ((wall[0] - self.x) * f - 2, (wall[1] - self.y) * f - 2, 5, 5), 1)
+        pygame.draw.rect(self.screen, RED, ((wall[2] - self.x) * f - 2, (wall[3] - self.y) * f - 2, 5, 5), 1)
+
 
 
 if __name__ == '__main__':
