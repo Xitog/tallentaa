@@ -285,7 +285,8 @@ class Player:
 
     MAX_LIFE = 100
     
-    def __init__(self, x, y, life=100.0):
+    def __init__(self, sector, x, y, life=100.0):
+        self.sector = sector
         self.life = Player.MAX_LIFE * life // 100
         self.ang = 0
         self.move_speed = 0.02
@@ -551,7 +552,7 @@ class App:
             pygame.draw.circle(self.screen, GREEN, (mx, my), 5, 2)
             s = self.font.render(self.lvl.name, False, YELLOW, None)
             self.screen.blit(s, (620 - s.get_width(), 450))
-            s = self.font.render(f"{rx:03d}, {ry:03d}", False, YELLOW, None)
+            s = self.font.render(f"Mouse mapX={rx:03d}, mapY={ry:03d} | Player sector={self.player.sector:03d} x={self.player.pos.x:5.2f} y={self.player.pos.y:5.2f}", False, YELLOW, None)
             self.screen.blit(s, (0, 450))
             pygame.display.update()
             # Setting framerate by limiting it to 30 fps
@@ -594,17 +595,17 @@ class App:
                 ],
                 "start" :
                 {
-                    "x" : 3, "y" : 5, "a" : 90, "s" : 0, "life" : 100.0
+                    "x" : 3, "y" : 5, "a" : 90, "s" : 1, "life" : 100.0
                 }
             }       
         )
-        self.player = Player(self.lvl.start['x'], self.lvl.start['y'], self.lvl.start['life'])
+        self.player = Player(self.lvl.start['s'], self.lvl.start['x'], self.lvl.start['y'], self.lvl.start['life'])
 
     def draw_grid(self, mx, my, f): 
         diffx = self.x - int(self.x)
         diffy = self.y - int(self.y)
-        rxns = round(mx / f) # ns = noscroll
-        ryns = round(my / f)
+        rxns = round(mx / f + diffx) # ns = noscroll
+        ryns = round(my / f + diffy)
         for x in range(0, 100): # verti
             if x != rxns:
                 pygame.draw.line(self.screen, GREY, ((x - diffx) * f, 0), ((x - diffx) * f, 480), 1)
