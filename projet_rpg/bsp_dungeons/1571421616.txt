@@ -1,0 +1,128 @@
+--------
+id = 0 deep = 1
+x,y = 0,0
+w,h = 100,100
+div = horizontale
+div_pos = 42
+wall_thickness = 0
+link = 43
+    --------
+    id = 1 deep = 2
+    x,y = 0,0
+    w,h = 100,42
+    div = verticale
+    div_pos = 59
+    wall_thickness = 1
+    link = 2
+        --------
+        id = 3 deep = 3
+        x,y = 0,0
+        w,h = 59,42
+        div = verticale
+        div_pos = 25
+        wall_thickness = 1
+        link = 26
+            --------
+            id = 5 deep = 4
+            LEAF 1
+            x,y = 0,0
+            w,h = 25,42
+            div = horizontale
+            div_pos = -1
+            wall_thickness = 1
+            link = -1
+            --------
+            id = 6 deep = 4
+            LEAF 2
+            x,y = 25,0
+            w,h = 34,42
+            div = horizontale
+            div_pos = -1
+            wall_thickness = 1
+            link = -1
+        --------
+        id = 4 deep = 3
+        x,y = 59,0
+        w,h = 41,42
+        div = horizontale
+        div_pos = 23
+        wall_thickness = 1
+        link = 93
+            --------
+            id = 7 deep = 4
+            LEAF 3
+            x,y = 59,0
+            w,h = 41,23
+            div = horizontale
+            div_pos = -1
+            wall_thickness = 2
+            link = -1
+            --------
+            id = 8 deep = 4
+            LEAF 4
+            x,y = 59,23
+            w,h = 41,19
+            div = horizontale
+            div_pos = -1
+            wall_thickness = 2
+            link = -1
+    --------
+    id = 2 deep = 2
+    x,y = 0,42
+    w,h = 100,58
+    div = verticale
+    div_pos = 57
+    wall_thickness = 1
+    link = 63
+        --------
+        id = 9 deep = 3
+        x,y = 0,42
+        w,h = 57,58
+        div = horizontale
+        div_pos = 29
+        wall_thickness = 3
+        link = 37
+            --------
+            id = 11 deep = 4
+            LEAF 5
+            x,y = 0,42
+            w,h = 57,29
+            div = horizontale
+            div_pos = -1
+            wall_thickness = 3
+            link = -1
+            --------
+            id = 12 deep = 4
+            LEAF 6
+            x,y = 0,71
+            w,h = 57,29
+            div = horizontale
+            div_pos = -1
+            wall_thickness = 3
+            link = -1
+        --------
+        id = 10 deep = 3
+        x,y = 57,42
+        w,h = 43,58
+        div = horizontale
+        div_pos = 34
+        wall_thickness = 3
+        link = 92
+            --------
+            id = 13 deep = 4
+            LEAF 7
+            x,y = 57,42
+            w,h = 43,34
+            div = horizontale
+            div_pos = -1
+            wall_thickness = 3
+            link = -1
+            --------
+            id = 14 deep = 4
+            LEAF 8
+            x,y = 57,76
+            w,h = 43,24
+            div = horizontale
+            div_pos = -1
+            wall_thickness = 3
+            link = -1
