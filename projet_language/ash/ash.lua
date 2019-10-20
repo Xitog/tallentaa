@@ -237,3 +237,9 @@ tokens = tokenize(code)
 for i, tok in ipairs(tokens) do
     print(i, tok)
 end
+
+tokens = tokenize("1")
+assert(tokens[1] == 'integer::1')
+tokens = tokenize("1.2")
+assert(tokens[1] == 'float::1.2')
+
