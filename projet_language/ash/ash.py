@@ -1018,15 +1018,120 @@ class TranspilerPython:
         pass
 
 #-------------------------------------------------------------------------------
-# V. Tests [TESTS]
+# V. Test framework [TESTS]
 #-------------------------------------------------------------------------------
 
-Tests = {
-    "2 + 5" : 7,
-    "'abc' * 2" : "abcabc",
-    "a = true" : True,
-    "if a == true then write('hello') end" : 5
-}
+class Assertion:
+    def __init__(self, nb, typ, val):
+        self.nb = nb
+        self.typ = typ
+        self.val = val
+
+class Test:
+
+    def __init__(self, title, command, expected, length=None, assertions=None, no_exec=False):
+        self.title = title
+        self.command = command
+        self.expected = expected
+        self.length = length
+        self.assertions = assertions
+        self.no_exec = no_exec
+    
+    def execute(self):
+        print(f'--- {self.title} ---')
+        res = Tokenizer().tokenize(self.command)
+        for itoken in range(0, len(res)):
+            print(itoken, '. ', res[itoken], sep='')
+        if self.length is not None:
+            assert len(res) == self.length, f"[ERROR] {self.length} tokens should have been producted! Instead: {str(len(res))}"
+        if self.assertions is not None and type(self.assertions) == dict:
+            for val in self.assertions:
+                if type(val) != Assertion:
+                    raise Exception("Only Assertion instance can be handled here.")
+                assert type(res[val.nb]) == Token and res[val.nb].val == val.val and res[val.nb].typ == val.typ, f"[ERROR] Token {val.nb} should be {val.typ} with the falue of '{val.val}'. Instead: {res[val.nb]}"
+        ast = Parser().parse(res)
+        print('AST:\n', ast.to_s(), sep='', end='')
+        if not self.no_exec:
+            print('#======== Console ========#')
+            print('#-------------------------#')
+            res = Interpreter().do(ast)
+            print('#-------------------------#')
+            print('RES:\n    ', res, sep='')
+            if self.expected != 'JUST_DISPLAY':
+                assert res == self.expected, "[ERROR] Result is not equal to " + str(self.expected) + " instead: " + str(res)
+        else:
+            print('Execution skipped')
+        print("== OK ==")
+        print()
+        return 'OK'
+
+def read_tests(filepath):
+    type2python = {
+        'Boolean' : bool,
+        'Integer' : int,
+        'String' : str
+    }
+    res2python = {
+        'false' : False,
+        'true' : True
+    }
+    f = open(filepath, mode='r')
+    lines = f.readlines()
+    f.close()
+    nb_tests = {
+        'skipped' : 0,
+        'success' : 0,
+        'failed'  : 0,
+    }
+    for i, line in enumerate(lines, start=1):
+        if i == 1: continue # headers
+        try:
+            data    = line.split('\t')
+            idt     = data[0]
+            status  = data[1]
+            py      = data[2]
+            lua     = data[3]
+            title   = data[4]
+            content = data[5]
+            resval  = data[6]
+            restyp  = data[7]
+            numtok  = int(data[8].rstrip())
+        except (ValueError, IndexError) as e:
+            print(f'[TEST] Skipping line {i:05d} {e}')
+            nb_tests['skipped'] += 1
+            continue
+        if status == 'Do':
+            print(f'[TEST] {title} : {content}')
+            try:
+                res = Tokenizer(False).tokenize(content)
+                ast = parser.parse(res)
+                res = interpreter.do(ast)
+                ok = False
+                if restyp in type2python:
+                    if type(res) == type2python[restyp]:
+                        if restyp == 'Boolean':
+                            if res == res2python[resval]:
+                                ok = True
+                        elif restyp == 'Integer':
+                            if res == int(resval):
+                                ok = True
+                        elif restyp == 'String':
+                            if "'" + res + "'" == resval:
+                                ok = True
+                if ok:
+                     print(f'[SUCCESS] Expected {resval} of type {restyp} and got: {res} of type {type(res)}')
+                     nb_tests['success'] += 1
+                else:
+                    print(f'[FAILED] Expected {resval} of type {restyp} and got: {res} of type {type(res)}')
+                    nb_tests['failed'] += 1
+            except Exception as e:
+                print('[FAILED]', e)
+    print('-----')
+    total = nb_tests["success"] + nb_tests["failed"] + nb_tests["skipped"]
+    print(f'Nb test success: {nb_tests["success"]:05d} ({round(nb_tests["success"]/total*100):3d}%)')
+    print(f'Nb test failed:  {nb_tests["failed"]:05d} ({round(nb_tests["failed"]/total*100):3d}%)')
+    print(f'Nb test skipped: {nb_tests["skipped"]:05d} ({round(nb_tests["skipped"]/total*100):3d}%)')
+    print(f'Total test:      {total:05d}')
 
 #-------------------------------------------------------------------------------
 # VI. Main [MAIN]
@@ -1061,21 +1166,7 @@ if __name__ == '__main__':
         elif command == 'reset':
             interpreter = Interpreter()
         elif command == 'tests':
-            for tst in Tests:
-                print('--', tst, '--------------------------')
-                try:
-                    res = Tokenizer(False).tokenize(tst)
-                    ast = parser.parse(res)
-                    res = interpreter.do(ast)
-                    print('   RES =', res)
-                    if res == Tests[tst]:
-                        print('-- [SUCCESS] --------------------')
-                    else:
-                        print('-- [FAILED] ---------------------')
-                        print('-- Expected :', Tests[tst])
-                except Exception as e:
-                    print('-- [FAILED] ---------------------')
-                    print('-- Error :', e)
+            read_tests('tests.txt')      
         else:
             #try:
                 res = Tokenizer(False).tokenize(command)

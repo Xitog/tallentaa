@@ -1,52 +1,8 @@
-from ash import Tokenizer, Token, Parser, Interpreter
+from ash import Test, Assertion, Tokenizer, Token, Parser, Interpreter
 
 #-------------------------------------------------------------------------------
 # Unit tests for Rey language
 #-------------------------------------------------------------------------------
-
-class Assertion:
-    def __init__(self, nb, typ, val):
-        self.nb = nb
-        self.typ = typ
-        self.val = val
-
-class Test:
-
-    def __init__(self, title, command, expected, length=None, assertions=None, no_exec=False):
-        self.title = title
-        self.command = command
-        self.expected = expected
-        self.length = length
-        self.assertions = assertions
-        self.no_exec = no_exec
-    
-    def execute(self):
-        print(f'--- {self.title} ---')
-        res = Tokenizer().tokenize(self.command)
-        for itoken in range(0, len(res)):
-            print(itoken, '. ', res[itoken], sep='')
-        if self.length is not None:
-            assert len(res) == self.length, f"[ERROR] {self.length} tokens should have been producted! Instead: {str(len(res))}"
-        if self.assertions is not None and type(self.assertions) == dict:
-            for val in self.assertions:
-                if type(val) != Assertion:
-                    raise Exception("Only Assertion instance can be handled here.")
-                assert type(res[val.nb]) == Token and res[val.nb].val == val.val and res[val.nb].typ == val.typ, f"[ERROR] Token {val.nb} should be {val.typ} with the falue of '{val.val}'. Instead: {res[val.nb]}"
-        ast = Parser().parse(res)
-        print('AST:\n', ast.to_s(), sep='', end='')
-        if not self.no_exec:
-            print('#======== Console ========#')
-            print('#-------------------------#')
-            res = Interpreter().do(ast)
-            print('#-------------------------#')
-            print('RES:\n    ', res, sep='')
-            if self.expected != 'JUST_DISPLAY':
-                assert res == self.expected, "[ERROR] Result is not equal to " + str(self.expected) + " instead: " + str(res)
-        else:
-            print('Execution skipped')
-        print("== OK ==")
-        print()
-        return 'OK'
 
 tests = []
 

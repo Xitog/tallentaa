@@ -1,0 +1,21 @@
+ID	Status	Py	Lua	Title	Content	ResValue	ResType	NumTok
+LITT_BOOL_01	Do			Boolean false	false	false	Boolean	2
+LITT_BOOL_02	Do			Boolean true	true	true	Boolean	2
+OP_BOOL_01	Do			Boolean T and F	true and false	false	Boolean	4
+OP_BOOL_02	Do			Boolean T or F	true or false	true	Boolean	4
+OP_ARI_01	Do			Simple Addition	5 + 6	11	Integer	4
+OP_ARI_02	Do			Simple Addition	2 + 5	7	Integer	4
+OP_ARI_03	Do			Double Operation	5 + 6 \n 2 - 1	1	Integer	8
+OP_STR_01	Do			Mutliply a string	'abc' * 2	'abcabc'	String	4
+OP_AFF_01	Do			Affect a boolean	a := true	true	Boolean	4
+FUN_CALL_01	Do			Function call, 1 arg, no caller	writeln("Hello!")	6	Integer	5
+FUN_CALL_02	Do			Function call, 2 args, no caller	writeln("Hello", "World!")	6	Integer	7
+FUN_CALL_03	Do			Function call, 3 args, no caller, writeln	writeln("Hello", "World!", 2+3)			X
+FUN_CALL_04	Skip			Function call, three args, no caller, writeln				X
+IF_01	Skip			Simple If, One	if a == true then write('hello') end	Integer	5	11
+IF_02	Skip			Simple If, Two action				X
+IF_03	Skip			Simple If, Three actions				X
+IF_04	Skip			Simple Else				X
+IF_05	Skip			Simple Else, Two actions				X
+WHILE_01	Skip			Simple While				X
+WHILE_02	Skip			Guess Game with While				X
