@@ -1,5 +1,17 @@
 import os.path
 import copy # only once for read_expr
+import sys # for writing debug info in red for the tests
+import traceback
+
+class FallBack:
+    def write(self, msg, color):
+        sys.stdout.write(msg)
+
+try:
+    shell = sys.stdout.shell
+except AttributeError:
+    shell = FallBack()
+    #raise RuntimeError("Only works in IDLE")
 
 """
     Ash
@@ -58,7 +70,7 @@ class Token:
 
     Integer     = TokenType('Integer')
     Float       = TokenType('Float')
-    Identifier  = TokenType('Id')
+    Identifier  = TokenType('Identifier')
     Operator    = TokenType('Operator')
     Separator   = TokenType('Separator')
     Keyword     = TokenType('Keyword')
@@ -143,7 +155,6 @@ class Tokenizer:
             if not op[0].isalpha() and op[0] not in Tokenizer.START_OF_OPERATOR:
                 Tokenizer.START_OF_OPERATOR.append(op[0])
         self.debug = debug
-        self.block_level = 0
         
     def read_number(self, line, index):
         if self.debug:
@@ -200,14 +211,6 @@ class Tokenizer:
         if self.debug:
             print("    " + f'Creating token {t} n°{len(self.tokens)}, returning index {index}')
         self.tokens.append(t)
-        # Handling of block level only for display!
-        if t.val in Tokenizer.BLOCK_PLUS:
-            self.block_level += 1
-        elif t.val in Tokenizer.BLOCK_LESS:
-            self.block_level -= 1
-            self.line_level -= 1
-        elif t.val in Tokenizer.LINE_LESS:
-            self.line_level -= 1
         return index
 
     def read_operator(self, line, index):
@@ -263,76 +266,43 @@ class Tokenizer:
         return index+1
     
     def tokenize(self, source, debug=False):
-        if debug:
-            print('[INFO] Start lexing')
+        if debug: print('[INFO] Start lexing')
         self.debug = debug
         self.tokens.clear()
-        self.block_level = 0
         self.counter = 0
         if os.path.isfile(source):
-            source = open(source, 'r', encoding='utf8').readlines()
-        else:
-            if '\n' in source:
-                source = source.split('\n')
-                del source[-1] # delete the last element, it will be empty
-                source2 = []
-                for s in source:
-                    source2.append(s + '\n') # add again the ending '\n' to make like readlines
-                source = source2
-            else:
-                source = [source] # only one line
-        if debug:
-            print('       -------')
-            print('       Source:')
-            print('       -------')
-            for i in range(0, len(source)):
-                print(f'           {i}. ' + source[i].replace('\n', '<NEWLINE>'))
-            print('       ------')
-            print('       Lines:')
-            print('       ------')
+            source = open(source, 'r', encoding='utf8').read()
+        index = 0
+        word = None
+        self.line_position = 0
+        self.line_count = 1
         skip_line = False
-        for line in source:
-            self.line_level = self.block_level
-            self.line_count += 1
-            # comments
-            if skip_line or line.strip().startswith('--'):
-                t = Token(Token.Comment, line[:-1], self.counter + line.index('--'))
-                self.tokens.append(t)
-                t = Token(Token.NewLine, "\n", self.counter + len(line) - 1)
-                self.tokens.append(t)
-                self.counter += len(line)
-                continue
-            elif line.strip().startswith('=='):
-                skip_line = not skip_line
-                self.counter += len(line)
-                continue
-            # analyze line
-            if self.debug:
-                print('           Analyzing line : ', line.replace('\n', '<NEWLINE>'))
-                print('                of length : ', len(line))
-            index = 0
-            word = None
-            while index < len(line):
-                previous = index
-                char = line[index]
+        while index < len(source):
+            char = source[index]
+            self.line_position += 1
+            if char == '-' and index + 1 < len(source) and source[index + 1] == '-':
+                skip_line = True
+            if skip_line and char == '\n':
+                skip_line = False
+                self.line_count += 1
+                self.line_position = 0
+            elif skip_line:
+                index += 1
+            else:
                 if char.isdigit(): # 0 1 2 3 4 5 6 7 8 9
-                    index = self.read_number(line, index)
+                    index = self.read_number(source, index)
                 elif char.isalpha() or char in Tokenizer.START_OF_ID: # a-z A-Z @ _
-                    index = self.read_id(line, index)
+                    index = self.read_id(source, index)
                 elif char.isspace() and char != '\n': # ' ' \t
                     index += 1
                 elif char in Tokenizer.START_OF_STRING:
-                    index = self.read_string(line, index)
+                    index = self.read_string(source, index)
                 elif char in Tokenizer.START_OF_OPERATOR:
-                    index = self.read_operator(line, index)
+                    index = self.read_operator(source, index)
                 elif char in Tokenizer.SEPARATORS:
-                    index = self.read_separator(line, index)
+                    index = self.read_separator(source, index)
                 else:
-                    raise Exception("What to do with: " + char + "?")
-                self.counter += (index - previous)
-            # Pretty print
-            if self.debug:
-                print('>>>', "    " * self.line_level, line)
+                    raise Exception("[TOKENS] What to do with: " + char + " at line " + str(self.line_count) + " pos " + str(self.line_position))
         if self.debug:
             print(f'[INFO] {len(self.tokens)} tokens created:')
             for i in range(0, len(self.tokens)):
@@ -508,7 +478,8 @@ class Parser:
     def __init__(self, debug = False):
         self.level_of_ana = 0
         self.debug = debug
-
+        self.debug_expression = False # expression are too verbose, we must try to segregate
+    
     def set_debug(self):
         self.debug = not self.debug
     
@@ -521,42 +492,42 @@ class Parser:
         self.puts('< Block >')
         block = Block()
         level = 0
-        if self.debug:
-            print('read block', tokens[index].val)
-        guard = True if max_index is None else False
-        while guard or index < max_index:
+        while (max_index is None or (max_index is not None and index < max_index)) and index < len(tokens):
+            if index >= len(tokens):
+                raise Exception("[ERROR] Parser: impossible to read a token at " + str(index))
+            tok = tokens[index]
             #print('.', index, max_index)
             # Test to terminate
             if index >= len(tokens):
                 self.puts('    Terminating stream of tokens')
                 if end_block: # should have an "end" keyword at the end
-                    raise Exception("[ERROR] malformed expression")
+                    raise Exception("[ERROR] Parser: malformed expression")
                 break
-            if tokens[index].typ == Token.Keyword and tokens[index].val == 'end' and level == 0:
+            if tok.typ == Token.Keyword and tok.val == 'end' and level == 0:
                 self.puts('||| Keyword End found')
                 index += 1
                 break
-            if tokens[index].typ == Token.Keyword and tokens[index].val == 'else' and level == 0:
+            if tok.typ == Token.Keyword and tok.val == 'else' and level == 0:
                 self.puts('||| Keyword Else found')
                 index += 1
                 break
             # Parsing
-            self.puts('    read_block:' + str(tokens[index]))
-            if tokens[index].typ == Token.Keyword and tokens[index].val in ['if', 'unless']:
+            self.puts('    read_block decides on: ' + str(tok))
+            if tok.typ == Token.Keyword and tok.val in ['if', 'unless']:
                 level +=1
                 #self.puts('||| :: If/unless')
                 index, node = self.read_if(tokens, index + 1)
                 block.add(node)
-            elif tokens[index].typ == Token.Keyword and tokens[index].val in ['while', 'until']:
+            elif tok.typ == Token.Keyword and tok.val in ['while', 'until']:
                 level += 1
                 #self.puts('||| :: While/until')
                 index, node = self.read_while(tokens, index + 1)
                 block.add(node)
-            elif tokens[index].typ == Token.Keyword and tokens[index].val == 'end':
+            elif tok.typ == Token.Keyword and tok.val == 'end':
                 level -= 1
                 self.puts('||| :: End')
                 index += 1
-            elif tokens[index].typ == Token.NewLine:
+            elif tok.typ == Token.NewLine:
                 self.puts('||| :: Newline (discarded)')
                 index += 1
             else:
@@ -597,7 +568,7 @@ class Parser:
         # read else action
         else_action = None
         if index < len(tokens):
-            if tokens[index - 1].typ == Token.Keyword and tokens[index - 1].val == 'else':
+            if tokens[index].typ == Token.Keyword and tokens[index].val == 'else':
                 index, else_action = self.read_block(tokens, index, True)
         node = Statement(cond, action, else_action)
         self.puts('< End If @' + str(index) + '>')
@@ -643,7 +614,8 @@ class Parser:
                 lvl *= 100
             token = working_list[index]
             token.lvl = lvl
-            self.puts(f"    working_list {str(index)}. {token} lvl={token.lvl}")
+            if self.debug_expression:
+                self.puts(f"    working_list {str(index)}. {token} lvl={token.lvl}")
             if token.typ in [Token.Operator, Token.Separator]:
                 # Handling of ( )
                 if token.val == '(':
@@ -662,11 +634,13 @@ class Parser:
                 # Handling of Operators
                 if token.typ == Token.Operator:
                     if len(sorted_operators) == 0:
-                        self.puts('    adding the first operator')
+                        if self.debug_expression:
+                            self.puts('    adding the first operator')
                         sorted_operators.append(index)
                         prio_values.append(Parser.PRIORITIES[token.val] * lvl)
                     else:
-                        self.puts('    adding another operator')
+                        if self.debug_expression:
+                            self.puts('    adding another operator')
                         computed_prio = Parser.PRIORITIES[token.val] * lvl
                         ok = False
                         for i in range(0, len(sorted_operators)):
@@ -686,28 +660,30 @@ class Parser:
         self.level_of_ana += 1
         self.puts(f'< Expr length={length}>')
         if length <= 0:
-            raise Exception("[ERROR] Empty expression of length = " + str(length))
+            raise Exception("[ERROR] Parser: Empty expression of length = " + str(length))
         elif length == 1:
             if working_list[0].typ in [Token.Boolean, Token.Float, Token.Integer, Token.Identifier, Token.String]:
                 node = Terminal(working_list[0])
                 results = end_index + 1, node
             else:
-                raise Exception("[ERROR] Expression of length 1 is not valid we have: " + str(working_list[0]))
+                raise Exception("[ERROR] Parser: Expression of length 1 is not valid we have: " + str(working_list[0]))
         else:
             modifier = 0
             while len(sorted_operators) > 0:
                 # Debug Display
-                self.puts('====================')
-                self.puts('    Sorted Operators')
-                for so in range(0, len(sorted_operators)):
-                    self.puts('        ' + str(so) + '. ' + str(sorted_operators[so]) + ' -> ' + str(working_list[sorted_operators[so] + modifier]) + ' modifier = ' + str(modifier))
-                self.puts('    Starting to resolve')
-                self.puts('    Working copy (start):')
-                for j in range(0, len(working_list)):
-                    self.puts('        ' + str(j) + '. ' + str(working_list[j]))
+                if self.debug_expression:
+                    self.puts('====================')
+                    self.puts('    Sorted Operators')
+                    for so in range(0, len(sorted_operators)):
+                        self.puts('        ' + str(so) + '. ' + str(sorted_operators[so]) + ' -> ' + str(working_list[sorted_operators[so] + modifier]) + ' modifier = ' + str(modifier))
+                    self.puts('    Starting to resolve')
+                    self.puts('    Working copy (start):')
+                    for j in range(0, len(working_list)):
+                        self.puts('        ' + str(j) + '. ' + str(working_list[j]))
                 # End of Debug Display
                 operator_index = sorted_operators[0] + modifier
-                self.puts(f'    Resolving 0. in sorted_operators is : {operator_index} referencing token : {working_list[operator_index]}')
+                if self.debug_expression:
+                    self.puts(f'    Resolving 0. in sorted_operators is : {operator_index} referencing token : {working_list[operator_index]}')
                 left = working_list[operator_index - 1]
                 if not isinstance(left, Node):
                     left = Terminal(left)
@@ -787,7 +763,7 @@ class Parser:
         if tokens is None:
             raise Exception("tokens is None!")
         # clean tokens
-        cleaned = [tok for tok in tokens if tok.typ not in [Token.NewLine, Token.Comment]]
+        cleaned = [tok for tok in tokens if tok.typ not in [Token.Comment]] # Token.NewLine, 
         tokens = cleaned
         index = 0
         ast = AST()
@@ -800,25 +776,32 @@ class Parser:
 
 # III.A Basic Library
 
+GLOBAL_DEBUG = False
+
 def writeln(arg):
     if isinstance(arg, list):
-        res = None
-        for i in arg:
-            res = writeln(i)
-        return res
+        res = 0
+        for i, a in enumerate(arg):
+            res += write(a, i == 0)
+        print()
+        return res + 1 # for the newline
     else:
-        print(arg)
-        return len(str(arg))
+        msg = str(arg)
+        prompt = '          ' if GLOBAL_DEBUG else ''
+        shell.write(prompt + msg + '\n', "TODO")
+        return len(msg) + 1 # for the newline
 
-def write(arg):
+def write(arg, first=True):
     if isinstance(arg, list):
         res = 0
-        for i in arg:
-            res += write(i)
+        for i, a in enumerate(arg):
+            res += write(a, i == 0)
         return res
     else:
-        print(arg, end='')
-        return len(str(arg))
+        msg = str(arg)
+        prompt = '          ' if first and GLOBAL_DEBUG else ''
+        shell.write(prompt + msg, "TODO")
+        return len(msg)
 
 def readint(arg=None):
     if isinstance(arg, str) or arg is None:
@@ -857,6 +840,11 @@ class Interpreter:
         self.debug = not self.debug
     
     def do_elem(self, elem, affectation=False, Scope=None):
+        if self.debug:
+            if type(elem) == Terminal:
+                print(type(elem), '::', elem)
+            else:
+                print(type(elem), '::\n', elem)
         if type(elem) == Operation:
             #print('do operation', elem)
             if elem.operator.content.val == '+':
@@ -878,6 +866,7 @@ class Interpreter:
                 val = self.do_elem(elem.right)
                 ids = self.do_elem(elem.left, affectation=True)
                 self.vars[ids] = val
+                if self.debug: print('[EXEC] =', val, 'to', ids)
                 return self.vars[ids]
             elif elem.operator.content.val == '+=':
                 val = self.do_elem(elem.right)
@@ -891,7 +880,9 @@ class Interpreter:
                 return self.vars[ids]
             # Comparison
             elif elem.operator.content.val == '==':
-                return self.do_elem(elem.left) == self.do_elem(elem.right)
+                r = self.do_elem(elem.left) == self.do_elem(elem.right)
+                if self.debug: print('[EXEC] == ', r)
+                return r
             elif elem.operator.content.val == '!=':
                 return self.do_elem(elem.left) != self.do_elem(elem.right)
             elif elem.operator.content.val == '<':
@@ -955,11 +946,13 @@ class Interpreter:
             cond = self.do_elem(elem.cond)
             executed = 0
             result = False
+            if self.debug: print('[EXEC] Statement cond=', cond, 'executed=', executed)
             while cond and (executed == 0 or elem.loop):
                 result = self.do_elem(elem.action)
                 executed += 1
                 if elem.loop:
                     cond = self.do_elem(elem.cond)
+                if self.debug: print('[EXEC] Looping cond=', cond, 'executed=', executed, 'loop=', elem.loop)
             if executed == 0 and elem.alter is not None:
                 return self.do_elem(elem.alter)
             else:
@@ -978,7 +971,7 @@ class Interpreter:
                     return elem.content.val
                 else:
                     if elem.content.val not in self.vars:
-                        raise Exception(f"Identifier not know: {elem.content.val}")
+                        raise Exception(f"[ERROR] Interpreter: Identifier not know: {elem.content.val}")
                     return self.vars[elem.content.val]
             else:
                 raise Exception(f"Terminal not known:\nelem.content.typ = {elem.content.typ} and type(elem) = {type(elem)}")
@@ -998,8 +991,14 @@ class Interpreter:
             return res
         else:
             raise Exception(f"Elem not known {elem}")
+
+    def do(self, data):
+        parser = Parser()
+        res = Tokenizer().tokenize(data)
+        ast = parser.parse(res)
+        res = self.do_ast(ast)
     
-    def do(self, ast):
+    def do_ast(self, ast):
         last = None
         for elem in ast.root.actions:
             last = self.do_elem(elem)
@@ -1021,51 +1020,54 @@ class TranspilerPython:
 # V. Test framework [TESTS]
 #-------------------------------------------------------------------------------
 
-class Assertion:
-    def __init__(self, nb, typ, val):
-        self.nb = nb
-        self.typ = typ
-        self.val = val
+#class Assertion:
+#    def __init__(self, nb, typ, val):
+#        self.nb = nb
+#        self.typ = typ
+#        self.val = val
 
-class Test:
-
-    def __init__(self, title, command, expected, length=None, assertions=None, no_exec=False):
-        self.title = title
-        self.command = command
-        self.expected = expected
-        self.length = length
-        self.assertions = assertions
-        self.no_exec = no_exec
-    
-    def execute(self):
-        print(f'--- {self.title} ---')
-        res = Tokenizer().tokenize(self.command)
-        for itoken in range(0, len(res)):
-            print(itoken, '. ', res[itoken], sep='')
-        if self.length is not None:
-            assert len(res) == self.length, f"[ERROR] {self.length} tokens should have been producted! Instead: {str(len(res))}"
-        if self.assertions is not None and type(self.assertions) == dict:
-            for val in self.assertions:
-                if type(val) != Assertion:
-                    raise Exception("Only Assertion instance can be handled here.")
-                assert type(res[val.nb]) == Token and res[val.nb].val == val.val and res[val.nb].typ == val.typ, f"[ERROR] Token {val.nb} should be {val.typ} with the falue of '{val.val}'. Instead: {res[val.nb]}"
-        ast = Parser().parse(res)
-        print('AST:\n', ast.to_s(), sep='', end='')
-        if not self.no_exec:
-            print('#======== Console ========#')
-            print('#-------------------------#')
-            res = Interpreter().do(ast)
-            print('#-------------------------#')
-            print('RES:\n    ', res, sep='')
-            if self.expected != 'JUST_DISPLAY':
-                assert res == self.expected, "[ERROR] Result is not equal to " + str(self.expected) + " instead: " + str(res)
-        else:
-            print('Execution skipped')
-        print("== OK ==")
-        print()
-        return 'OK'
+#class Test:
+#
+#    def __init__(self, title, command, expected, length=None, assertions=None, no_exec=False):
+#        self.title = title
+#        self.command = command
+#        self.expected = expected
+#        self.length = length
+#        self.assertions = assertions
+#        self.no_exec = no_exec
+#    
+#    def execute(self):
+#        print(f'--- {self.title} ---')
+#        res = Tokenizer().tokenize(self.command)
+#        for itoken in range(0, len(res)):
+#            print(itoken, '. ', res[itoken], sep='')
+#        if self.length is not None:
+#            assert len(res) == self.length, f"[ERROR] {self.length} tokens should have been producted! Instead: {str(len(res))}"
+#        if self.assertions is not None and type(self.assertions) == dict:
+#            for val in self.assertions:
+#                if type(val) != Assertion:
+#                    raise Exception("Only Assertion instance can be handled here.")
+#                assert type(res[val.nb]) == Token and res[val.nb].val == val.val and res[val.nb].typ == val.typ, f"[ERROR] Token {val.nb} should be {val.typ} with the falue of '{val.val}'. Instead: {res[val.nb]}"
+#        ast = Parser().parse(res)
+#        print('AST:\n', ast.to_s(), sep='', end='')
+#       if not self.no_exec:
+#            print('#======== Console ========#')
+#            print('#-------------------------#')
+#            res = Interpreter().do(ast)
+#            print('#-------------------------#')
+#            print('RES:\n    ', res, sep='')
+#            if self.expected != 'JUST_DISPLAY':
+#                assert res == self.expected, "[ERROR] Result is not equal to " + str(self.expected) + " instead: " + str(res)
+#        else:
+#            print('Execution skipped')
+#        print("== OK ==")
+#        print()
+#        return 'OK'
 
 def read_tests(filepath):
+    global GLOBAL_DEBUG
+    GLOBAL_DEBUG = True
+    print('-------------------------------')
     type2python = {
         'Boolean' : bool,
         'Integer' : int,
@@ -1082,9 +1084,10 @@ def read_tests(filepath):
         'skipped' : 0,
         'success' : 0,
         'failed'  : 0,
+        'total'   : 0,
     }
     for i, line in enumerate(lines, start=1):
-        if i == 1: continue # headers
+        if i < 3: continue # headers
         try:
             data    = line.split('\t')
             idt     = data[0]
@@ -1093,19 +1096,56 @@ def read_tests(filepath):
             lua     = data[3]
             title   = data[4]
             content = data[5]
+            content_exec = content.replace('\\n', '\n')
             resval  = data[6]
             restyp  = data[7]
-            numtok  = int(data[8].rstrip())
+            try:
+                numtok  = int(data[8].rstrip())
+            except ValueError:
+                numtok = None
+            asserts  = data[9:]
+            if len(asserts) > 0:
+                asserts[-1] = asserts[-1].rstrip()
         except (ValueError, IndexError) as e:
-            print(f'[TEST] Skipping line {i:05d} {e}')
+            print(f'[TEST]    {nb_tests["total"]+1:03} Skipping line {i:05d} {e}')
             nb_tests['skipped'] += 1
+            nb_tests['total']   += 1
             continue
         if status == 'Do':
-            print(f'[TEST] {title} : {content}')
+            print(f'[TEST]    {nb_tests["total"]+1:03} {title} : {content}')
             try:
-                res = Tokenizer(False).tokenize(content)
+                # Tokenizing
+                res = Tokenizer(False).tokenize(content_exec)
+                if numtok is not None and len(res) != numtok:
+                    shell.write(f'[FAILED]  Wrong number of tokens, expecting {numtok} got {len(res)}\n', 'COMMENT')
+                    nb_tests['failed'] += 1
+                    nb_tests['total']  += 1
+                    continue
+                for assertcheck in asserts:
+                    data = assertcheck.split('::')
+                    if len(data) == 4:
+                        what = data[0]
+                        where = data[1]
+                        typ = data[2]
+                        val = data[3]
+                        if what == 'Tokens':
+                            where = int(where)
+                            if res[where].typ.name != typ:
+                                shell.write(f'[FAILED]  Wrong type of token, expecting {typ} got {res[where].typ}\n', 'COMMENT')
+                                nb_tests['failed'] += 1
+                                nb_tests['total']  += 1
+                                continue
+                            else:
+                                if res[where].val != val: # all value are strings
+                                    shell.write(f'[FAILED]  Wrong value of token, expecting {val} got {res[where].val}\n', 'COMMENT')
+                                    nb_tests['failed'] += 1
+                                    nb_tests['total']  += 1
+                                    continue
+                                else:
+                                    shell.write(f'[ASSERT]  Assert ok for token {where} of type {typ} of val {val}\n', 'STRING')
+                # Parsing & Interpreting
                 ast = parser.parse(res)
-                res = interpreter.do(ast)
+                res = interpreter.do_ast(ast)
                 ok = False
                 if restyp in type2python:
                     if type(res) == type2python[restyp]:
@@ -1119,61 +1159,81 @@ def read_tests(filepath):
                             if "'" + res + "'" == resval:
                                 ok = True
                 if ok:
-                     print(f'[SUCCESS] Expected {resval} of type {restyp} and got: {res} of type {type(res)}')
+                     shell.write(f'[SUCCESS] Expected {resval} of type {restyp} and got: {res} of type {type(res)}\n', 'STRING')
                      nb_tests['success'] += 1
+                     nb_tests['total']   += 1
                 else:
-                    print(f'[FAILED] Expected {resval} of type {restyp} and got: {res} of type {type(res)}')
+                    shell.write(f'[FAILED]  Expected {resval} of type {restyp} and got: {res} of type {type(res)}\n', 'COMMENT')
                     nb_tests['failed'] += 1
+                    nb_tests['total']  += 1
             except Exception as e:
-                print('[FAILED]', e)
-    print('-----')
-    total = nb_tests["success"] + nb_tests["failed"] + nb_tests["skipped"]
-    print(f'Nb test success: {nb_tests["success"]:05d} ({round(nb_tests["success"]/total*100):3d}%)')
-    print(f'Nb test failed:  {nb_tests["failed"]:05d} ({round(nb_tests["failed"]/total*100):3d}%)')
-    print(f'Nb test skipped: {nb_tests["skipped"]:05d} ({round(nb_tests["skipped"]/total*100):3d}%)')
-    print(f'Total test:      {total:05d}')
+                shell.write(f'[FAILED]  Exception: {e}\n', 'COMMENT')
+                traceback.print_exception(*sys.exc_info())
+                nb_tests['failed'] += 1
+                nb_tests['total']  += 1
+    print('-------------------------------')
+    if nb_tests["success"] + nb_tests["failed"] + nb_tests["skipped"] != nb_tests['total']:
+        raise Exception("[ERROR] Total of tests not equal to total of tests failed/skipped/success")
+    shell.write(f'Nb test success:   {nb_tests["success"]:05d} ({round(nb_tests["success"]/nb_tests["total"]*100):3d}%)\n', 'STRING')
+    if nb_tests["failed"] == 0:
+        shell.write(f'Nb test failed:    {nb_tests["failed"]:05d} ({round(nb_tests["failed"]/nb_tests["total"]*100):3d}%)\n', 'STRING')
+    else:
+        shell.write(f'Nb test failed:    {nb_tests["failed"]:05d} ({round(nb_tests["failed"]/nb_tests["total"]*100):3d}%)\n', 'COMMENT')
+    shell.write(f'Nb test skipped:   {nb_tests["skipped"]:05d} ({round(nb_tests["skipped"]/nb_tests["total"]*100):3d}%)\n', 'KEYWORD')
+    print('-------------------------------')
+    print(f'Total test passed: {nb_tests["total"]:05d}')
+    print('-------------------------------')
+    GLOBAL_DEBUG = False
 
 #-------------------------------------------------------------------------------
 # VI. Main [MAIN]
 #-------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    interpreter = Interpreter()
-    parser = Parser(False)
-    debug = False
-    while True:
-        command = input('>>> ')
-        if command == 'exit':
-            break
-        elif command == 'help':
-            print('Rey language v0.1 2017-2019')
-            print('help    : this help')
-            print('tests   : run multiple tests')
-            print('reset   : reset interpreter')
-            print('debug.x : set/unset debug. x can be parser')
-            print('locals  : get local variable')
-            print('exit    : exit this shell')
-        elif command == 'debug':
-            debug = not debug
-            print('Debug set to', debug)
-        elif command == 'debug.parser':
-            parser.set_debug()
-        elif command == 'debug.interpreter':
-            interpreter.set_debug()
-        elif command == 'locals':
-            for k in sorted(interpreter.vars):
-                print(f"{k:10}", interpreter.vars[k])
-        elif command == 'reset':
-            interpreter = Interpreter()
-        elif command == 'tests':
-            read_tests('tests.txt')      
-        else:
-            #try:
-                res = Tokenizer(False).tokenize(command)
-                ast = parser.parse(res)
-                if debug:
-                    print('AST\n', ast)
-                res = interpreter.do(ast)
-                print(res)
-            #except Exception as e:
-            #    print(e)
+    if len(sys.argv) > 1:
+        filepath = sys.argv[1]
+        f = open(filepath, mode='r')
+        data = f.read()
+        f.close()
+        interpreter = Interpreter().do(data)
+    else:        
+        interpreter = Interpreter()
+        parser = Parser(False)
+        debug = False
+        while True:
+            command = input('>>> ')
+            if command == 'exit':
+                break
+            elif command == 'help':
+                print('Rey language v0.1 2017-2019')
+                print('help    : this help')
+                print('tests   : run multiple tests')
+                print('reset   : reset interpreter')
+                print('debug.x : set/unset debug. x can be parser, interpreter')
+                print('locals  : get local variable')
+                print('exit    : exit this shell')
+            elif command == 'debug':
+                debug = not debug
+                print('Debug set to', debug)
+            elif command == 'debug.parser':
+                parser.set_debug()
+            elif command == 'debug.interpreter':
+                interpreter.set_debug()
+            elif command == 'locals':
+                for k in sorted(interpreter.vars):
+                    print(f"{k:10}", interpreter.vars[k])
+            elif command == 'reset':
+                interpreter = Interpreter()
+            elif command == 'tests':
+                read_tests('./tests/tests.txt')      
+            else:
+                try:
+                    res = Tokenizer(False).tokenize(command)
+                    ast = parser.parse(res)
+                    if debug:
+                        print('AST\n', ast)
+                    res = interpreter.do_ast(ast)
+                    print(res)
+                except Exception as e:
+                    shell.write(f'[ERROR] Exception: {e}\n', 'COMMENT')
+                    traceback.print_exception(*sys.exc_info())
