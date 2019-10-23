@@ -1,0 +1,22 @@
+Unit tests for Ash language
+ID_UNIT_TST	Sta	Py	Lua	Title	Content	ResValue	ResType	NumTok	Assert1
+LIT_BOOL_01	Do	OK	?	Boolean false	false	false	Boolean	1	Tokens::0::Boolean::false
+LIT_BOOL_02	Do	OK	?	Boolean true	true	true	Boolean	1	Tokens::0::Boolean::true
+OP_BOOL_01	Do	OK	?	Boolean T and F	true and false	false	Boolean	3	Tokens::0::Boolean::true	Tokens::1::Operator::and	Tokens::2::Boolean::false
+OP_BOOL_02	Do	OK	?	Boolean T or F	true or false	true	Boolean	3	Tokens::1::Operator::or
+OP_ARI_01	Do	OK	?	Simple Addition	5 + 6	11	Integer	3	Tokens::1::Operator::+
+OP_ARI_02	Do	OK	?	Simple Addition	2 + 5	7	Integer	3	Tokens::2::Integer::5
+OP_ARI_03	Do	OK	?	Double Operation	5 + 6 \n 2 - 1	1	Integer	7	X
+OP_STR_01	Do	OK	?	Mutliply a string	'abc' * 2	'abcabc'	String	3	X
+OP_AFF_01	Do	OK	?	Affect a boolean	a = true	true	Boolean	3	X
+FUN_CALL_01	Do	OK	?	Function call, 1 arg, no caller	writeln("Hello!")	7	Integer	4	Tokens::0::Identifier::writeln
+FUN_CALL_02	Do	OK	?	Function call, 2 args, no caller	writeln("Hello", "World!")	12	Integer	6	Tokens::0::Identifier::writeln
+FUN_CALL_03	Do	OK	?	Function call, 3 args, no caller, writeln	writeln("Hello", "World!", 2+3)	13	Integer	10	Tokens::0::Identifier::writeln
+FUN_CALL_04	Do	OK	?	Function call, three args, no caller, write	write("Hello", "World!", 2+3, "\n")	13	Integer	12	Tokens::0::Identifier::write
+IF_ELSE_01	Do		?	Simple If, One action	a = true \n if a == true then write('hello') end	5	Integer	14	Tokens::0::Identifier::a
+IF_ELSE_02	Do		?	Simple If, One action	a = 5 \n if a == 5 then \n writeln("Hello World!") \n end	13	Integer	16	Tokens::0::Identifier::a
+IF_ELSE_03	Do		?	Simple If, Two actions	a = 5 \n if a == 5 then \n writeln("Way A") \n writeln("Follow Way A") \n end	13	Integer	21	Tokens::0::Identifier::a
+IF_ELSE_04	Do		?	Simple Else	a = 8 \n if a != 8 then \n writeln("Never!!!") \n else \n writeln("Hello") \n end	6	Integer	23	Tokens::0::Identifier::a
+IF_ELSE_05	Do		?	Simple Else, Two actions	a = 8 \n if a != 8 then \n writeln("Never!") \n else \n writeln("Hello") \n writeln("World!") \n end	7	Integer	28	Tokens::0::Identifier::a
+WHILE_01	Do		?	Simple While	max = 5 \n count = 0 \n while count <= max do \n writeln(count) \n count += 1 \n end	6	Integer	24	Tokens::0::Identifier::max
+WHILE_02	Jmp		?	Guess Game with While				X	X
