@@ -13,6 +13,41 @@
 9. Bibliothèque standard
 10. Interactions avec Python et transpilation
 
+# Introduction
+
+Ash est né des limitations frustrantes de Lua :
+
+* La fusion des listes et des tableaux
+    * L'impossibilité de distinguer entre une clé inexistante et une clé pointant vers nul :
+    
+      ```a = {'bbb'} ; a['bbb'] = nil comme a['ccc'] = nil !```
+      
+    * La possibilité de faire des trous :
+    
+      ```a[0] = 'aaa' mais aussi a['5'] = 'ccc'```
+      
+* L'utilisation de ~= au lieu du plus standard != pour l'opérateur de différence,
+* L'absence d'opérateurs arithmétiques combinés
+* L'utilisation du très long elseif plutôt que elif,
+* Le fait qu'une variable soit globale par défaut : il faut mettre local sinon,
+* L'impossibilité de définir des constantes,
+* L'absence de tests sur le nombre de paramètres passés à une fonction,
+* L'impossibilité de définir des contraintes ou des hints de types,
+* L'absence de séparateur de ligne,
+* La fusion des entiers et des réels en un seul type.
+* in ne s'utilise pas directement sur une table, il faut utiliser pairs ou ipairs
+* Une clé chaîne dans une table doit être entourée de crochets
+
+    ```['key'] = val```
+
+Lua a néanmoins des forces que j'ai reprises pour Ash :
+
+* L'élégance des commentaires avec --
+* L'élégance de l'opérateur # pour avoir la longueur
+* L'élégance d'utiliser directement un symbole comme clé dans les tables
+* L'élégance d'utiliser = pour associer clés et valeurs dans une table
+* L'élégance de ne pas avoir à définir avant son appel une fonction
+
 # 1. Premiers pas avec Ash
 
 Ash est un langage de programmation, un langage pour donner des ordres à un ordinateur. Ash est un langage interprété, c'est-à-dire qu'un interprétateur va lire du code Ash et donner les ordres correspondants à l'ordinateur. D'autres langages, comme C, sont compilés : le code C est directement traduit en ordres compréhensibles directement par l'ordinateur à l'aide d'un compilateur. Un programme C compilé n'a donc pas besoin d'un interpréteur pour être exécuté. D'autres langages, comme Python, Ruby ou Java, sont compilés dans un langage intermédiaire de bas niveau, qui n'est pas compréhensible directement par l'ordinateur. Le programme est ensuite exécuté dans une machine virtuelle, qui communique au véritable ordinateur les ordres correspondants. Ash dispose également d'un transpileur qui transforme le code Ash en code Python.
