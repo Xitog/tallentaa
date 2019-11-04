@@ -27,7 +27,7 @@ Ash est né des limitations frustrantes de Lua :
       ```a[0] = 'aaa' mais aussi a['5'] = 'ccc'```
       
 * L'utilisation de ~= au lieu du plus standard != pour l'opérateur de différence,
-* L'absence d'opérateurs arithmétiques combinés
+* L'absence d'opérateurs arithmétiques combinés comme +=, -=, /=, *=, %=, **=,
 * L'utilisation du très long elseif plutôt que elif,
 * Le fait qu'une variable soit globale par défaut : il faut mettre local sinon,
 * L'impossibilité de définir des constantes,
