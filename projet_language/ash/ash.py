@@ -460,7 +460,7 @@ class Statement(Node):
 class Parser:
     
     PRIORITIES = { 
-        '=' : 1, '+=' : 1, '-=' : 1,
+        '=' : 1, '+=' : 1, '-=' : 1, '*=' : 1,
         ',' : 2,
         'and' : 5, 'or' : 5, 'xor' : 5, 
         '>' : 8, '<' : 8, '>=' : 8, '<=' : 8, '==' : 8, '!=' : 8, '<=>' : 8, 
@@ -878,6 +878,21 @@ class Interpreter:
                 ids = self.do_elem(elem.left, affectation=True)
                 self.vars[ids] -= val
                 return self.vars[ids]
+            elif elem.operator.content.val == '*=':
+                val = self.do_elem(elem.right)
+                ids = self.do_elem(elem.left, affectation=True)
+                self.vars[ids] *= val
+                return self.vars[ids]
+            elif elem.operator.content.val == '>>':
+                val = self.do_elem(elem.right)
+                ids = self.do_elem(elem.left)
+                if type(ids) != int: raise Exception('[ERROR] Unsupported operator >> on ' + str(type(ids)))
+                return ids >> val
+            elif elem.operator.content.val == '<<':
+                val = self.do_elem(elem.right)
+                ids = self.do_elem(elem.left)
+                if type(ids) != int: raise Exception('[ERROR] Unsupported operator << on ' + str(type(ids)))
+                return ids << val
             # Comparison
             elif elem.operator.content.val == '==':
                 r = self.do_elem(elem.left) == self.do_elem(elem.right)
@@ -1201,11 +1216,11 @@ if __name__ == '__main__':
         parser = Parser(False)
         debug = False
         while True:
-            command = input('>>> ')
+            command = input('ash> ')
             if command == 'exit':
                 break
             elif command == 'help':
-                print('Rey language v0.1 2017-2019')
+                print('Ash language v0.1 2017-2019')
                 print('help    : this help')
                 print('tests   : run multiple tests')
                 print('reset   : reset interpreter')
