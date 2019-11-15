@@ -19,6 +19,9 @@ typedef struct {
     float x;
     float y;
     float a;
+    double cos_a;
+    double sin_a;
+    double fov;
 } Player;
 
 //-----------------------------------------------------------------------------
@@ -40,5 +43,7 @@ void game_draw(void);
 void game_init(void);
 
 void game_update(double frame_time);
+
+void info(void);
 
 #endif
