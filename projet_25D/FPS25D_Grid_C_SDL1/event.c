@@ -27,6 +27,8 @@ void event_init(void) {
     action_bindings[SDLK_d] = A_STRAFE_RIGHT;
     action_bindings[SDLK_q] = A_TURN_LEFT;
     action_bindings[SDLK_e] = A_TURN_RIGHT;
+    action_bindings[SDLK_f] = A_USE;
+    action_bindings[SDLK_SPACE] = A_JUMP;
 }
 
 void event_input(void) {

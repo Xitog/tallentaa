@@ -32,7 +32,7 @@ extern Player player;
 extern const int MAP_WIDTH;
 extern const int MAP_HEIGHT;
 extern const Uint32 map[12][18];
-
+extern double final_distances[640];
 
 //-----------------------------------------------------------------------------
 // Functions

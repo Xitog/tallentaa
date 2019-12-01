@@ -52,6 +52,14 @@ void horizontal(int x1, int x2, int y, Uint32 color) {
 
 // Use Bresenham algorithm
 void line(int x1, int y1, int x2, int y2, Uint32 color) {
+    if (x1 < 0) x1 = 0;
+    if (x2 < 0) x2 = 0;
+    if (y1 < 0) y1 = 0;
+    if (y2 < 0) y2 = 0;
+    if (x1 >= screen->w) x1 = screen->w - 1;
+    if (x2 >= screen->w) x2 = screen->w - 1;
+    if (y1 >= screen->h) y1 = screen->h - 1;
+    if (y2 >= screen->h) y2 = screen->h - 1;
     int deltax = abs(x2 - x1);
     int deltay = abs(y2 - y1);
     int x = x1;
@@ -140,6 +148,12 @@ void vertical(int x, int y1, int y2, Uint32 color) {
 // Draw rect
 void rect(int x, int y, int w, int h, Uint32 color) {
     //Uint32 pix_per_line = screen->pitch >> 2;
+    if (x < 0) x = 0;
+    if (y < 0) y = 0;
+    if (x >= screen->w) return;
+    if (y >= screen->h) return;
+    if (x + w >= screen->w) w = screen->w - x;
+    if (y + h >= screen->h) h = screen->h - y;
 
     // 2 horizontal lines
     Uint32 * px = (Uint32*) screen->pixels + y * screen->w + x;

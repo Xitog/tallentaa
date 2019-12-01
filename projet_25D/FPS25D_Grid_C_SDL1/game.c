@@ -44,6 +44,7 @@ const Uint32 map[12][18] = {
 // retro calc 1/3
 double dirX = -1, dirY = 0;
 double planeX = 0, planeY = 0.66;
+double column_width = 0;
 
 //-----------------------------------------------------------------------------
 // Functions
@@ -52,19 +53,184 @@ double planeX = 0, planeY = 0.66;
 void game_init(void) {
     printf("Game started\n");
     player.x = 2.2;
-    player.y = 1.2;
+    player.y = 4.2; //1.2;
     player.a = 180;
     player.cos_a = cos(player.a * D2R);
-    player.sin_a = sin(player.a * D2R);
+    player.sin_a = -sin(player.a * D2R);
     player.fov = 66;
+    column_width = 1 / screen->w;
     info();
 }
 
+void game_raycast3(void) {
+    line(player.x * FACTOR, player.y * FACTOR, (player.x + player.cos_a) * FACTOR, (player.y + player.sin_a) * FACTOR, RED);
+}
+
+// X = rouge
+// Y = jaune
+
+double final_distances[640];
+
 void game_raycast(void) {
-    for(int x = 0; x < screen->w; x+=100) {
+
+    line(0, 380, screen->w-1, 380, RED);
+
+    for(int x = 0; x < screen->w; x++) {
+        //int x = screen->w / 2;
+        double factor = ((float) x / screen->w) * 2 - 1;
+
+        double vectorRayX = player.cos_a + player.sin_a * 0.66 * factor;
+        double vectorRayY = player.sin_a - player.cos_a * 0.66 * factor;
+        if (vectorRayX > 0 && vectorRayX < 0.00000001) vectorRayX = 0;
+        if (vectorRayY > 0 && vectorRayY < 0.00000001) vectorRayY = 0;
+        if (vectorRayX < 0 && vectorRayX > -0.00000001) vectorRayX = 0;
+        if (vectorRayY < 0 && vectorRayY > -0.00000001) vectorRayY = 0;
+
+        double x2 = player.x + vectorRayX;
+        double y2 = player.y + vectorRayY;
+        int mapX2 = (int) x2;
+        int mapY2 = (int) y2;
+        int player_xi = (int) player.x;
+        int player_yi = (int) player.y;
+        
+        int dirX = 1;
+        int dirY = 1;
+        if (vectorRayX < 0) dirX = -1; 
+        if (vectorRayY < 0) dirY = -1;
+        
+        double final_x = 0;
+        double final_y = 0;
+        double final_d = 0;
+
+        if (vectorRayX != 0 && vectorRayY != 0) {
+            // y = a * x + b
+            double a = (y2 - player.y) / (x2 - player.x);
+            double b = player.y - a * player.x;
+
+            // crossColumn
+            double crossColumn_x = dirX > 0 ? player_xi + dirX : player_xi;
+            double crossColumn_y = crossColumn_x * a + b;
+            int crossColumn_xi = player_xi + dirX;
+            int crossColumn_yi = (int) crossColumn_y;
+            double crossColumn_d = sqrt(pow(crossColumn_x - player.x, 2) + pow(crossColumn_y - player.y, 2));
+
+            // crossLine
+            double crossLine_y = dirY > 0 ? player_yi + dirY : player_yi;
+            double crossLine_x = (crossLine_y - b) / a;
+            int crossLine_xi = (int) crossLine_x;
+            int crossLine_yi = player_yi + dirY;
+            double crossLine_d = sqrt(pow(crossLine_x - player.x, 2) + pow(crossLine_y - player.y, 2));
+
+            bool hit = false;
+            while (!hit) {
+                if (crossLine_d < crossColumn_d) {
+                    while (crossLine_d < crossColumn_d) {
+                        if (map[crossLine_yi][crossLine_xi] > 0) {
+                            hit = 1;
+                            final_x = crossLine_x;
+                            final_y = crossLine_y;
+                            //final_d = crossLine_d;
+                            //final_d = fabs(final_x - player.x) * player.cos_a - fabs(final_y - player.y) * player.sin_a;
+                            //final_d = (crossLine_xi - player_xi + (1 - dirX) / 2) / vectorRayY;
+                            final_d = (crossLine_xi - player_xi) / vectorRayY;
+                            //final_d = (crossColumn_xi - player_xi) / vectorRayY;
+                            break;
+                        } else {
+                            crossLine_y += dirY;
+                            crossLine_x = (crossLine_y - b) / a;
+                            crossLine_xi = (int) crossLine_x;
+                            crossLine_yi += dirY;
+                            crossLine_d = sqrt(pow(crossLine_x - player.x, 2) + pow(crossLine_y - player.y, 2));
+                        }
+                    }
+                    //line((int) (player.x * FACTOR), (int) (player.y * FACTOR), (int) (crossColumn_x * FACTOR), (int) (crossColumn_y * FACTOR), RED); 
+                    //line((int) (player.x * FACTOR), (int) (player.y * FACTOR), (int) (crossLine_x * FACTOR), (int) (crossLine_y * FACTOR), YELLOW); 
+                } else {
+                    while (crossLine_d >= crossColumn_d) {
+                        if (map[crossColumn_yi][crossColumn_xi] > 0) {
+                            hit = 1;
+                            final_x = crossColumn_x;
+                            final_y = crossColumn_y;
+                            //final_d = crossColumn_d;
+                            //final_d = fabs(final_x - player.x) * player.cos_a - fabs(final_y - player.y) * player.sin_a;
+                            //final_d = (crossColumn_xi - player_xi + (1 - dirY) / 2) / vectorRayX;
+                            final_d = (crossColumn_xi - player_xi) / vectorRayX;
+                            //final_d = (crossLine_xi - player_xi) / vectorRayX;
+                            break;
+                        } else {
+                            crossColumn_x += dirX;
+                            crossColumn_y = crossColumn_x * a + b;
+                            crossColumn_xi += dirX;
+                            crossColumn_yi = (int) crossColumn_y;
+                            crossColumn_d = sqrt(pow(crossColumn_x - player.x, 2) + pow(crossColumn_y - player.y, 2));
+                        }
+                    }
+                    //line((int) (player.x * FACTOR), (int) (player.y * FACTOR), (int) (crossLine_x * FACTOR), (int) (crossLine_y * FACTOR), YELLOW); 
+                    //line((int) (player.x * FACTOR), (int) (player.y * FACTOR), (int) (crossColumn_x * FACTOR), (int) (crossColumn_y * FACTOR), RED);
+                }
+            }
+            // debug
+            if (final_d == 0) {
+                printf("OUPS\n");
+                printf("%d\n", x);
+                printf("%f\n", vectorRayX);
+                printf("%f\n", vectorRayY);
+                printf("%f\n", crossLine_d);
+                printf("%f\n", crossColumn_d);
+                printf("%f\n", (crossLine_xi - player_xi) / vectorRayY);
+                printf("%f\n", (crossColumn_xi - player_xi) / vectorRayX);
+                system("pause");
+            }
+        } else if (vectorRayY == 0) {
+            bool hit = false;
+            int crossColumn_xi = player_xi;
+            while (!hit) {
+                crossColumn_xi += dirX;
+                if (map[player_yi][crossColumn_xi] > 0) {
+                    hit = true;
+                }
+            }
+            final_x = dirX > 0 ? crossColumn_xi : crossColumn_xi + 1;
+            final_y = player.y;
+            final_d = sqrt(pow(final_x - player.x, 2) + pow(final_y - player.y, 2));
+        } else if (vectorRayX == 0) {
+            bool hit = false;
+            int crossLine_yi = player_yi;
+            while (!hit) {
+                crossLine_yi += dirY;
+                if (map[crossLine_yi][player_xi] > 0) {
+                    hit = true;
+                }
+            }
+            final_x = dirY > 0 ? crossLine_yi : crossLine_yi + 1;
+            final_y = player.x;
+            final_d = sqrt(pow(final_x - player.x, 2) + pow(final_y - player.y, 2));
+        }
+
+        line((int) (player.x * FACTOR), (int) (player.y * FACTOR), (int) (final_x * FACTOR), (int) (final_y * FACTOR), RED);
+
+        // 2.5D
+        final_distances[x] = final_d;
+        int d = (int) (100 / final_d);
+        if (d > 100) d = 100;
+        if (d < 0) d = 0;
+        line(x, 430 - (int) (d / 2), x, 430 + (int) (d / 2), RED);
+    }
+}
+
+void game_raycast2(void) {
+    for(int x = 0; x < screen->w; x++) {
+
+        //float factor = ((float) x / screen->w) * 2 - 1;
+        float factor = 1;
+        float vectorRayX = player.cos_a + player.sin_a * 0.66 * factor;
+        float vectorRayY = player.sin_a + player.cos_a * 0.66 * factor;
+        int mapJustInFrontX = (int) (player.cos_a * 0.1 + player.sin_a * 0.66 * factor);
+        int mapJustInFrontY = (int) (player.sin_a * 0.1 + player.cos_a * 0.66 * factor);
+
         // rayX et rayY
-        float vectorRayX = player.cos_a;
-        float vectorRayY = player.sin_a;
+        //float vectorRayX = player.cos_a;
+        //float vectorRayY = player.sin_a;
         float appliedRayX = player.x + vectorRayX;
         float appliedRayY = player.y + vectorRayY;
         int mapRayX = (int) appliedRayX;
@@ -112,26 +278,11 @@ void game_raycast(void) {
         
         // Next case
         bool hit = false;
+        if (map[mapRayY][mapRayX] > 0 || map[mapJustInFrontY][mapJustInFrontX] > 0) {
+            hit = true;
+        }
+        float dist = 0;
         while (!hit) {
-    
-            /*
-            printf("---------\n");
-    
-            printf("Dir and adding to map coordinates\n");
-            printf("dirRayX     = %d\n", dirRayX);
-            printf("dirRayY     = %d\n", dirRayY);
-    
-            printf("dist2nextX  = %f\n", dist2nextX);
-            printf("dist2nextY  = %f\n", dist2nextY);
-    
-            printf("Adding to dist2next\n");
-            printf("HypoRayX    = %f\n", hypoRayX);
-            printf("HypoRayY    = %f\n", hypoRayY);
-    
-            printf("mapRayX     = %d\n", mapRayX);
-            printf("mapRayY     = %d\n", mapRayY);
-            */
-
             if (dirRayX == 0 && dirRayY == 0) {
                 printf("[ERROR] Ray without direction.");
                 break;
@@ -139,44 +290,22 @@ void game_raycast(void) {
             if (dist2nextX < dist2nextY || dirRayY == 0) {
                 mapRayX += dirRayX;
                 dist2nextX += hypoRayX;
+                dist += hypoRayX;
             } else {
                 mapRayY += dirRayY;
                 dist2nextY += hypoRayY;
+                dist += hypoRayY;
             }
             if (map[mapRayY][mapRayX] > 0) {
                 hit = true;
             }
         }
-
-        // Print
-        /*
-        printf("---------\n");
-        printf("VectorRayX  = %f\n", vectorRayX);
-        printf("VectorRayY  = %f\n", vectorRayY);
-        printf("AppliedRayX = %f\n", appliedRayX);
-        printf("AppliedRayY = %f\n", appliedRayY);
-        */
-
-
-        /*if (dirRayX > 0) {
-            xx -= 1;
-        }
         
-        if (dirRayY > 0) {
-            yy -= 1;
-        }*/
-        
-        //printf("%d %d\n", xx, yy);
-        // dirX
-        
-        // 
         int xx = mapRayX;
         int yy = mapRayY;
-        line((int) (player.x * FACTOR), (int) (player.y * FACTOR), xx * FACTOR + FACTOR / 2, yy * FACTOR + FACTOR / 2, RED);    
-        
+        line((int) (player.x * FACTOR), (int) (player.y * FACTOR), xx * FACTOR + FACTOR / 2, yy * FACTOR + FACTOR / 2, RED);       
     }
 
-    
     line((int) (player.x * FACTOR), (int) (player.y * FACTOR), (int) ((player.x + player.cos_a) * FACTOR), (int) ((player.y + player.sin_a) * FACTOR), WHITE);
     
     line((int) (player.x * FACTOR), (int) (player.y * FACTOR), (int) ((player.x + player.cos_a - player.sin_a * 0.66) * FACTOR), (int) ((player.y + player.sin_a + player.cos_a * 0.66) * FACTOR), YELLOW);
@@ -233,22 +362,65 @@ void game_draw(void) {
 }
 
 void info(void) {
+    printf("-------------------------\n");
     printf("MATH.PI     = %f\n", M_PI);
     printf("angle (deg) = %f\n", player.a);
     printf("angle (rad) = %f\n", player.a / 180 * M_PI);
     printf("dirX        = %f   retroDirX = %f\n", player.cos_a, dirX);
     printf("dirY        = %f   retroDirY = %f\n", player.sin_a, dirY);
-    printf("fovX         = %f  retroPlaneX = %f\n", player.sin_a * 0.66, planeX);
-    printf("fovY         = %f  retroPlaneY = %f\n", player.cos_a * 0.66, planeY);
+    printf("fovX        = %f  retroPlaneX = %f\n", player.sin_a * 0.66, planeX);
+    printf("fovY        = %f  retroPlaneY = %f\n", player.cos_a * 0.66, planeY);
+    printf("mapX        = %d\n", (int) player.x);
+    printf("mapY        = %d\n", (int) player.y);
+    float vectorRayX = player.cos_a + player.sin_a * 0.66;
+    float vectorRayY = player.sin_a + player.cos_a * 0.66;
+    printf("vectorRayX  = %f\n", vectorRayX);
+    printf("vectorRayY  = %f\n", vectorRayY);
+    printf("mapRayX     = %d\n", (int) (vectorRayX + player.x));
+    printf("mapRayY     = %d\n", (int) (vectorRayY + player.y));
 }
+
+bool load_use = false;
+bool load_jump = false;
 
 void game_update(double frame_time) {
     float old_x = player.x;
     float old_y = player.y;
     bool print = false;
 
-    if (action_state[A_USE]) {
+    if (action_state[A_JUMP]) {
+        load_jump = true;
+    } else if (load_jump) {
+        load_jump = false;
+        FILE * f = fopen("dump.txt", "w");
+        fprintf(f, "player.x     = %f\n", player.x);
+        fprintf(f, "player.y     = %f\n", player.y);
+        fprintf(f, "player.a     = %f\n", player.a);
+        fprintf(f, "player.cos_a = %f\n", player.cos_a);
+        fprintf(f, "player.sin_a = %f\n", player.sin_a);
+        fprintf(f, "Col Dist    Height\n");
+        for (int i=0; i < screen->w; i++) {
+            int d = (int) (100 / final_distances[i]);
+            fprintf(f, "%.3d. %f %d\n", i, final_distances[i], d);
+        }
+        fclose(f);
+    }
 
+    if (action_state[A_USE]) {
+        load_use = true;
+    } else if (load_use) {
+        load_use = false;
+        if (player.a == 90 || player.a == 180 || player.a == 270 || player.a == 0) {
+            player.a += 90;
+            if (player.a >= 360) {
+                player.a -= 360;
+            }
+        } else {
+            player.a = 180;
+        }
+        player.cos_a = cos(player.a * D2R);
+        player.sin_a = -sin(player.a * D2R);
+        printf("use\n");
     }
     if (action_state[A_MOVE_FORWARD]) {
         player.x += player.cos_a * move_modifier * frame_time;
@@ -270,11 +442,11 @@ void game_update(double frame_time) {
         player.a += turn_modifier * 180 / M_PI * frame_time;
         if (player.a < 0) {
             player.a += 360;
-        } else if (player.a > 360) {
+        } else if (player.a >= 360) {
             player.a -= 360;
         }
         player.cos_a = cos(player.a * D2R);
-        player.sin_a = sin(player.a * D2R);
+        player.sin_a = -sin(player.a * D2R);
         // retro calc 2
         double oldDirX = dirX;
         dirX = dirX * cos(turn_modifier * frame_time) - dirY * sin(turn_modifier * frame_time);
@@ -292,7 +464,7 @@ void game_update(double frame_time) {
             player.a -= 360;
         }
         player.cos_a = cos(player.a * D2R);
-        player.sin_a = sin(player.a * D2R);
+        player.sin_a = -sin(player.a * D2R);
         // retro calc 3
         double oldDirX = dirX;
         dirX = dirX * cos(-turn_modifier * frame_time) - dirY * sin(-turn_modifier * frame_time);
@@ -307,7 +479,7 @@ void game_update(double frame_time) {
         info();
     }
 
-    if (map[(int)player.y][(int)player.x] == 1) {
+    if (map[(int)player.y][(int)player.x] > 0) {
         player.x = old_x;
         player.y = old_y;
     }
