@@ -29,6 +29,7 @@ void event_init(void) {
     action_bindings[SDLK_e] = A_TURN_RIGHT;
     action_bindings[SDLK_f] = A_USE;
     action_bindings[SDLK_SPACE] = A_JUMP;
+    action_bindings[SDLK_TAB] = A_FIRE;
 }
 
 void event_input(void) {

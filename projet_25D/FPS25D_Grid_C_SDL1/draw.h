@@ -20,8 +20,8 @@ typedef enum {
     GREEN     =   0 * 256*256 + 255 * 256 +   0,
     LIGHTGREY = 211 * 256*256 + 211 * 256 + 211,
     DARKGREY  = 169 * 256*256 + 169 * 256 + 169,
-    FLOORGREY = 113 * 256*256 + 113 * 256 + 113,
-    CEILGREY  =  56 * 256*256 +  56 * 256 +  56,
+    FLOORGREY = 112 * 256*256 + 112 * 256 + 112,
+    CEILGREY  =  57 * 256*256 +  57 * 256 +  57,
     BLACK     =   0 * 256*256 +   0 * 256 +   0,
     PURPLE    = 128 * 256*256 +  64 * 256 + 128,
 } Colors;
@@ -46,7 +46,7 @@ void line(int x1, int y1, int x2, int y2, Uint32 color);
 
 void vertical(int x, int y1, int y2, Uint32 color);
 
-void rect(int x, int y, int w, int h, Uint32 color);
+void rect(int x, int y, int w, int h, Uint32 color, bool fill);
 
 void render(void);
 

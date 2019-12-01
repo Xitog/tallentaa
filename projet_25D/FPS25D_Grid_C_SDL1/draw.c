@@ -146,7 +146,16 @@ void vertical(int x, int y1, int y2, Uint32 color) {
 }
 
 // Draw rect
-void rect(int x, int y, int w, int h, Uint32 color) {
+void rect(int x, int y, int w, int h, Uint32 color, bool fill) {
+    if (fill) {
+        SDL_Rect r;
+        r.x = x;
+        r.y = y;
+        r.w = w;
+        r.h = h;
+        SDL_FillRect(screen, &r, color);
+        return;
+    }
     //Uint32 pix_per_line = screen->pitch >> 2;
     if (x < 0) x = 0;
     if (y < 0) y = 0;

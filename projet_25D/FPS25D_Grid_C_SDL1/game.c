@@ -32,8 +32,8 @@ const Uint32 map[12][18] = {
     {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
     {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
     {1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 2, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 3, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1},
     {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
     {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
     {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
@@ -71,21 +71,25 @@ void game_raycast3(void) {
 
 double final_distances[640];
 
+int START_SCREEN = 380; // 0; //380;
+int FPS_SCREEN_HEIGHT = 100; //screen->h; //100;
+bool debug = true;
+
 void game_raycast(void) {
-
-    line(0, 380, screen->w-1, 380, RED);
-
     for(int x = 0; x < screen->w; x++) {
         //int x = screen->w / 2;
         double factor = ((float) x / screen->w) * 2 - 1;
+        
+        double camVectorX = - player.sin_a * 0.66 * factor;
+        double camVectorY = player.cos_a * 0.66 * factor;
 
-        double vectorRayX = player.cos_a + player.sin_a * 0.66 * factor;
-        double vectorRayY = player.sin_a - player.cos_a * 0.66 * factor;
+        double vectorRayX = player.cos_a - player.sin_a * 0.66 * factor;
+        double vectorRayY = player.sin_a + player.cos_a * 0.66 * factor;
         if (vectorRayX > 0 && vectorRayX < 0.00000001) vectorRayX = 0;
         if (vectorRayY > 0 && vectorRayY < 0.00000001) vectorRayY = 0;
         if (vectorRayX < 0 && vectorRayX > -0.00000001) vectorRayX = 0;
         if (vectorRayY < 0 && vectorRayY > -0.00000001) vectorRayY = 0;
-
+        
         double x2 = player.x + vectorRayX;
         double y2 = player.y + vectorRayY;
         int mapX2 = (int) x2;
@@ -101,6 +105,7 @@ void game_raycast(void) {
         double final_x = 0;
         double final_y = 0;
         double final_d = 0;
+        int tex = 0;
 
         if (vectorRayX != 0 && vectorRayY != 0) {
             // y = a * x + b
@@ -120,20 +125,36 @@ void game_raycast(void) {
             int crossLine_xi = (int) crossLine_x;
             int crossLine_yi = player_yi + dirY;
             double crossLine_d = sqrt(pow(crossLine_x - player.x, 2) + pow(crossLine_y - player.y, 2));
+            
+            // applied vector ray (try)
+            double vectorCameraPlaneNorme_x = player.sin_a;
+            double vectorCameraPlaneNorme_y = - player.cos_a;
+            double crossCameraPlane_x = player.x + vectorRayX;
+            double crossCameraPlane_y = player.y + vectorRayY;
+            //double lenOnCameraPlane = sqrt(pow(player.cos_a - vectorRayX, 2) + pow(player.sin_a - vectorRayY, 2));
+            //double lenOnCameraPlane = sqrt(pow(camVectorX, 2) + pow(camVectorY, 2));
+            double lenOnCameraPlane = fabs(0.66*factor);
+            double diffAngleRayPlayer = atan(lenOnCameraPlane);
 
             bool hit = false;
             while (!hit) {
                 if (crossLine_d < crossColumn_d) {
                     while (crossLine_d < crossColumn_d) {
                         if (map[crossLine_yi][crossLine_xi] > 0) {
+                            tex = map[crossLine_yi][crossLine_xi];
                             hit = 1;
                             final_x = crossLine_x;
                             final_y = crossLine_y;
                             //final_d = crossLine_d;
                             //final_d = fabs(final_x - player.x) * player.cos_a - fabs(final_y - player.y) * player.sin_a;
                             //final_d = (crossLine_xi - player_xi + (1 - dirX) / 2) / vectorRayY;
-                            final_d = (crossLine_xi - player_xi) / vectorRayY;
+                            //final_d = fabs((crossLine_xi - player_xi) / vectorRayY); // perpwalldist
+                            //final_d = fabs((crossLine_x - player.x) / vectorRayY);
+                            //final_d = fabs((crossLine_x - player.x) / vectorRayX);
                             //final_d = (crossColumn_xi - player_xi) / vectorRayY;
+                            //final_d = (crossLine_x - crossCameraPlane_x) * vectorCameraPlaneNorme_x + (crossLine_y - crossCameraPlane_y) * vectorCameraPlaneNorme_y;
+                            //final_d = fabs(player.cos_a * crossLine_d) - 1;
+                            final_d = fabs(cos(diffAngleRayPlayer) * crossLine_d);
                             break;
                         } else {
                             crossLine_y += dirY;
@@ -148,14 +169,20 @@ void game_raycast(void) {
                 } else {
                     while (crossLine_d >= crossColumn_d) {
                         if (map[crossColumn_yi][crossColumn_xi] > 0) {
+                            tex = map[crossColumn_yi][crossColumn_xi];
                             hit = 1;
                             final_x = crossColumn_x;
                             final_y = crossColumn_y;
                             //final_d = crossColumn_d;
                             //final_d = fabs(final_x - player.x) * player.cos_a - fabs(final_y - player.y) * player.sin_a;
                             //final_d = (crossColumn_xi - player_xi + (1 - dirY) / 2) / vectorRayX;
-                            final_d = (crossColumn_xi - player_xi) / vectorRayX;
+                            //final_d = fabs((crossColumn_xi - player_xi) / vectorRayX); // perpwalldist
+                            //final_d = fabs((crossColumn_x - player.x) / vectorRayX);
+                            //final_d = fabs((crossColumn_x - player.x) / vectorRayY);
                             //final_d = (crossLine_xi - player_xi) / vectorRayX;
+                            //final_d = (crossColumn_x - crossCameraPlane_x) * vectorCameraPlaneNorme_x + (crossColumn_y - crossCameraPlane_y) * vectorCameraPlaneNorme_y;
+                            //final_d = fabs(player.cos_a * crossColumn_d) - 1;
+                            final_d = fabs(cos(diffAngleRayPlayer) * crossColumn_d);
                             break;
                         } else {
                             crossColumn_x += dirX;
@@ -179,7 +206,7 @@ void game_raycast(void) {
                 printf("%f\n", crossColumn_d);
                 printf("%f\n", (crossLine_xi - player_xi) / vectorRayY);
                 printf("%f\n", (crossColumn_xi - player_xi) / vectorRayX);
-                system("pause");
+                //system("pause");
             }
         } else if (vectorRayY == 0) {
             bool hit = false;
@@ -187,6 +214,7 @@ void game_raycast(void) {
             while (!hit) {
                 crossColumn_xi += dirX;
                 if (map[player_yi][crossColumn_xi] > 0) {
+                    tex = map[player_yi][crossColumn_xi];
                     hit = true;
                 }
             }
@@ -199,6 +227,7 @@ void game_raycast(void) {
             while (!hit) {
                 crossLine_yi += dirY;
                 if (map[crossLine_yi][player_xi] > 0) {
+                    tex = map[crossLine_yi][player_xi];
                     hit = true;
                 }
             }
@@ -207,14 +236,29 @@ void game_raycast(void) {
             final_d = sqrt(pow(final_x - player.x, 2) + pow(final_y - player.y, 2));
         }
 
-        line((int) (player.x * FACTOR), (int) (player.y * FACTOR), (int) (final_x * FACTOR), (int) (final_y * FACTOR), RED);
+        Uint32 color;
+        switch (tex) {
+            case 1:
+                color = BLUE;
+                break;
+            case 2:
+                color = RED;
+                break;
+            case 3:
+                color = YELLOW;
+                break;
+        }
+
+        if (debug) {
+            line((int) (player.x * FACTOR), (int) (player.y * FACTOR), (int) (final_x * FACTOR), (int) (final_y * FACTOR), color);
+        }
 
         // 2.5D
         final_distances[x] = final_d;
-        int d = (int) (100 / final_d);
-        if (d > 100) d = 100;
+        int d = (int) (FPS_SCREEN_HEIGHT / final_d);
+        if (d > FPS_SCREEN_HEIGHT) d = FPS_SCREEN_HEIGHT;
         if (d < 0) d = 0;
-        line(x, 430 - (int) (d / 2), x, 430 + (int) (d / 2), RED);
+        line(x, START_SCREEN + FPS_SCREEN_HEIGHT / 2 - (int) (d / 2), x, START_SCREEN + FPS_SCREEN_HEIGHT / 2 + (int) (d / 2), color);
     }
 }
 
@@ -310,55 +354,44 @@ void game_raycast2(void) {
     
     line((int) (player.x * FACTOR), (int) (player.y * FACTOR), (int) ((player.x + player.cos_a - player.sin_a * 0.66) * FACTOR), (int) ((player.y + player.sin_a + player.cos_a * 0.66) * FACTOR), YELLOW);
     line((int) (player.x * FACTOR), (int) (player.y * FACTOR), (int) ((player.x + player.cos_a + player.sin_a * 0.66) * FACTOR), (int) ((player.y + player.sin_a - player.cos_a * 0.66) * FACTOR), YELLOW);
-
-    // projected
-
-    // Calc
-    
-    //float player_angle_deg = 180;
-    //float player_angle_rad = player_angle_deg / 180 * M_PI;
-    //float player_fov_deg = 66;
-    //float player_fov_rad = player_fov_deg / 180 * M_PI;
-
-    //float vectorProjX = player.sin_a;
-    //float vectorProjY = player.cos_a;
-    //float appliedRayX = player.x + player.cos_a;
-    //float appliedRayY = player.y + player.sin_a;
-    //float appliedProjX = player.x +  player.x + cos(player.a) + vectorProjX;
-    //float appliedProjY = player.y +  player.y - sin(player.a) + vectorProjY;
-
-    //line(appliedRayX * FACTOR, appliedRayY * FACTOR, (appliedRayX + vectorProjY) * FACTOR, (appliedRayY - vectorProjX) * FACTOR, YELLOW);
-    //line(appliedRayX * FACTOR, appliedRayY * FACTOR, (appliedRayX - vectorProjY) * FACTOR, (appliedRayY + vectorProjX) * FACTOR, YELLOW);
 }
 
 void game_draw(void) {
-
+    
     fill(BLACK);
 
-    // Grid
-    for (int row = 0; row < MAP_HEIGHT; row++) {
-        for (int col = 0; col < MAP_WIDTH; col++) {
-             if (map[row][col] == 1) {
-                SDL_Rect r;
-                r.x = col * FACTOR;
-                r.y = row * FACTOR;
-                r.w = FACTOR;
-                r.h = FACTOR;
-                SDL_FillRect(screen, &r, BLUE);
+    rect(0, START_SCREEN, screen->w, FPS_SCREEN_HEIGHT / 2, CEILGREY, true);
+    rect(0, START_SCREEN + FPS_SCREEN_HEIGHT / 2, screen->w, FPS_SCREEN_HEIGHT / 2, FLOORGREY, true);
+
+    if (debug) {
+        // Grid
+        for (int row = 0; row < MAP_HEIGHT; row++) {
+            for (int col = 0; col < MAP_WIDTH; col++) {
+                if (map[row][col] > 0) {
+                    Uint32 color;
+                    switch (map[row][col]) {
+                        case 1:
+                            color = BLUE;
+                            break;
+                        case 2:
+                            color = RED;
+                            break;
+                        case 3:
+                            color = YELLOW;
+                            break;
+                    }
+                    rect(col * FACTOR, row * FACTOR, FACTOR, FACTOR, color, true);
+                }
+                rect(col * FACTOR, row * FACTOR, FACTOR, FACTOR, WHITE, false);
             }
-            rect(col * FACTOR, row * FACTOR, FACTOR, FACTOR, WHITE);
         }
+        // Player
+        rect((player.x * FACTOR) - 2, (player.y * FACTOR) - 2, 5, 5, WHITE, false);
+        // Div
+        line(0, START_SCREEN, screen->w-1, START_SCREEN, RED);
     }
 
-    // Player
-    rect((player.x * FACTOR) - 2, (player.y * FACTOR) - 2, 5, 5, WHITE);
-
     game_raycast();
-
-    /*for (Uint32 i = 0; i <= x; i++) {
-        vertical(i, drawStart, drawEnd, color);
-    }*/
-
 }
 
 void info(void) {
@@ -382,11 +415,27 @@ void info(void) {
 
 bool load_use = false;
 bool load_jump = false;
+bool load_fire = false;
 
 void game_update(double frame_time) {
     float old_x = player.x;
     float old_y = player.y;
     bool print = false;
+
+    if (action_state[A_FIRE]) {
+        load_fire = true;
+    } else if (load_fire) {
+        load_fire = false;
+        if (!debug) {
+            debug = true;
+            START_SCREEN = 380;
+            FPS_SCREEN_HEIGHT = 100;
+        } else {
+            debug = false;
+            START_SCREEN = 0;
+            FPS_SCREEN_HEIGHT = screen->h;
+        }
+    }
 
     if (action_state[A_JUMP]) {
         load_jump = true;
