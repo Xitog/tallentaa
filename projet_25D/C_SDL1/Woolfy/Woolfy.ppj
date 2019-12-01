@@ -1,0 +1,84 @@
+# 
+# FICHIER DE PROJET construit par "Pelles C pour Windows, version 8.00".
+# AVERTISSEMENT! NE PAS MODIFIER CE FICHIER.
+# 
+
+POC_PROJECT_VERSION = 7.00#
+POC_PROJECT_TYPE = 3#
+POC_PROJECT_OUTPUTDIR = output#
+POC_PROJECT_RESULTDIR = .#
+POC_PROJECT_ARGUMENTS = #
+POC_PROJECT_WORKPATH = #
+POC_PROJECT_EXECUTOR = #
+POC_PROJECT_ZIPEXTRA = #
+CC = pocc.exe#
+AS = poasm.exe#
+RC = porc.exe#
+LINK = polink.exe#
+SIGN = posign.exe#
+CCFLAGS = -std:C11 -Tx86-coff -Ot -Ob1 -fp:precise -W1 -Gd -Ze#
+ASFLAGS = -AIA32 -Gd#
+RCFLAGS = #
+LINKFLAGS = -subsystem:console -machine:x86 kernel32.lib advapi32.lib delayimp.lib sdlmain.lib sdl.lib#
+SIGNFLAGS = -location:CU -store:MY -timeurl:http://timestamp.verisign.com/scripts/timstamp.dll -errkill#
+INCLUDE = $(PellesCDir)\Include\Win;$(PellesCDir)\Include;..\..\..\librairies\SDL_1_2_15\include#
+LIB = $(PellesCDir)\Lib\Win;$(PellesCDir)\Lib;..\..\..\librairies\SDL_1_2_15\lib#
+
+# 
+# Construction de Woolfy.exe.
+# 
+Woolfy.exe: \
+	output\draw.obj \
+	output\event.obj \
+	output\game.obj \
+	output\main.obj
+	$(LINK) $(LINKFLAGS) -out:"$@" $**
+
+# 
+# Construction de draw.obj.
+# 
+output\draw.obj: \
+	draw.c \
+	draw.h
+	$(CC) $(CCFLAGS) "$!" -Fo"$@"
+
+# 
+# Construction de event.obj.
+# 
+output\event.obj: \
+	event.c \
+	event.h
+	$(CC) $(CCFLAGS) "$!" -Fo"$@"
+
+# 
+# Construction de game.obj.
+# 
+output\game.obj: \
+	game.c \
+	draw.h \
+	event.h \
+	game.h
+	$(CC) $(CCFLAGS) "$!" -Fo"$@"
+
+# 
+# Construction de main.obj.
+# 
+output\main.obj: \
+	main.c \
+	draw.h \
+	event.h \
+	game.h
+	$(CC) $(CCFLAGS) "$!" -Fo"$@"
+
+# 
+# Construction de minisdl.obj.
+# 
+output\minisdl.obj: \
+	minisdl.c \
+	minisdl.h
+	$(CC) $(CCFLAGS) "$!" -Fo"$@"
+
+.EXCLUDEDFILES: \
+	output\minisdl.obj
+
+.SILENT:
