@@ -20,17 +20,23 @@ const Uint32 SCREEN_HEIGHT = 480;
 // Function
 //-----------------------------------------------------------------------------
 
+void infosurf(SDL_Surface * surf) {
+    printf("%d\n", sizeof(*surf)); // 60
+    printf("%d\n", sizeof(*(surf->format))); // 40
+    printf("PixelFormat.BytesPexPixel = %d\n", surf->format->BytesPerPixel); // 4
+    printf("Surface.Pitch = %d\n", surf->pitch); // 2560
+}
+
 int main(int argc, char * argv[]) {
     
     int err = init("Woolfy 2.5 FLAT", SCREEN_WIDTH, SCREEN_HEIGHT, 32, false);
     if (err == EXIT_FAILURE) {
         return err;
     }
-    
-    printf("%d\n", sizeof(*screen)); // 60
-    printf("%d\n", sizeof(*(screen->format))); // 40
-    printf("PixelFormat.BytesPexPixel = %d\n", screen->format->BytesPerPixel); // 4
-    printf("Surface.Pitch = %d\n", screen->pitch); // 2560
+
+    // Textures
+    TEXTURES[0] = SDL_ConvertSurface(SDL_LoadBMP(".\\data\\tex\\wall.bmp"), screen->format, SDL_SWSURFACE);
+    infosurf(TEXTURES[0]);
 
     // Time
     double tick_current = 0.0;

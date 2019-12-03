@@ -193,3 +193,17 @@ void rect(int x, int y, int w, int h, Uint32 color, bool fill) {
 void render(void) {
     SDL_UpdateRect(screen, 0, 0, 0, 0);
 }
+
+Uint32 get_pixel(SDL_Surface * surf, int x, int y) {
+    Uint32 * px = (Uint32 *) surf->pixels + y * surf->w + x;
+    return *px;
+}
+
+void set_pixel(int x, int y, Uint32 color) {
+    if (x < 0 || y < 0 || x >= screen->w || y >= screen->h) {
+        return;
+    }
+    Uint32 * px = (Uint32*) screen->pixels + y * screen->w + x;
+    *px = color;
+}
+

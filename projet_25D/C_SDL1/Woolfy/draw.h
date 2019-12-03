@@ -50,4 +50,8 @@ void rect(int x, int y, int w, int h, Uint32 color, bool fill);
 
 void render(void);
 
+Uint32 get_pixel(SDL_Surface * surf, int x, int y);
+
+void set_pixel(int x, int y, Uint32 color);
+
 #endif

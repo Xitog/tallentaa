@@ -33,6 +33,9 @@ extern const int MAP_WIDTH;
 extern const int MAP_HEIGHT;
 extern const Uint32 map[12][18];
 extern double final_distances[640];
+extern const int TEXTURE_WIDTH;
+extern const int TEXTURE_HEIGHT;
+extern SDL_Surface * TEXTURES[10];
 
 //-----------------------------------------------------------------------------
 // Functions

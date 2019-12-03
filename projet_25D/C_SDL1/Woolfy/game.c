@@ -41,6 +41,10 @@ const Uint32 map[12][18] = {
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 };
 
+const int TEXTURE_WIDTH = 32;
+const int TEXTURE_HEIGHT = 32;
+SDL_Surface * TEXTURES[10];
+
 // retro calc 1/3
 double dirX = -1, dirY = 0;
 double planeX = 0, planeY = 0.66;
@@ -62,10 +66,6 @@ void game_init(void) {
     info();
 }
 
-void game_raycast3(void) {
-    line(player.x * FACTOR, player.y * FACTOR, (player.x + player.cos_a) * FACTOR, (player.y + player.sin_a) * FACTOR, RED);
-}
-
 // X = rouge
 // Y = jaune
 
@@ -77,7 +77,6 @@ bool debug = true;
 
 void game_raycast(void) {
     for(int x = 0; x < screen->w; x++) {
-        //int x = screen->w / 2;
         double factor = ((float) x / screen->w) * 2 - 1;
         
         double camVectorX = - player.sin_a * 0.66 * factor;
@@ -105,6 +104,7 @@ void game_raycast(void) {
         double final_x = 0;
         double final_y = 0;
         double final_d = 0;
+        double final_w = 0; // where we hit the wall
         int tex = 0;
 
         if (vectorRayX != 0 && vectorRayY != 0) {
@@ -131,8 +131,6 @@ void game_raycast(void) {
             double vectorCameraPlaneNorme_y = - player.cos_a;
             double crossCameraPlane_x = player.x + vectorRayX;
             double crossCameraPlane_y = player.y + vectorRayY;
-            //double lenOnCameraPlane = sqrt(pow(player.cos_a - vectorRayX, 2) + pow(player.sin_a - vectorRayY, 2));
-            //double lenOnCameraPlane = sqrt(pow(camVectorX, 2) + pow(camVectorY, 2));
             double lenOnCameraPlane = fabs(0.66*factor);
             double diffAngleRayPlayer = atan(lenOnCameraPlane);
 
@@ -145,16 +143,8 @@ void game_raycast(void) {
                             hit = 1;
                             final_x = crossLine_x;
                             final_y = crossLine_y;
-                            //final_d = crossLine_d;
-                            //final_d = fabs(final_x - player.x) * player.cos_a - fabs(final_y - player.y) * player.sin_a;
-                            //final_d = (crossLine_xi - player_xi + (1 - dirX) / 2) / vectorRayY;
-                            //final_d = fabs((crossLine_xi - player_xi) / vectorRayY); // perpwalldist
-                            //final_d = fabs((crossLine_x - player.x) / vectorRayY);
-                            //final_d = fabs((crossLine_x - player.x) / vectorRayX);
-                            //final_d = (crossColumn_xi - player_xi) / vectorRayY;
-                            //final_d = (crossLine_x - crossCameraPlane_x) * vectorCameraPlaneNorme_x + (crossLine_y - crossCameraPlane_y) * vectorCameraPlaneNorme_y;
-                            //final_d = fabs(player.cos_a * crossLine_d) - 1;
                             final_d = fabs(cos(diffAngleRayPlayer) * crossLine_d);
+                            final_w = final_x;
                             break;
                         } else {
                             crossLine_y += dirY;
@@ -173,16 +163,8 @@ void game_raycast(void) {
                             hit = 1;
                             final_x = crossColumn_x;
                             final_y = crossColumn_y;
-                            //final_d = crossColumn_d;
-                            //final_d = fabs(final_x - player.x) * player.cos_a - fabs(final_y - player.y) * player.sin_a;
-                            //final_d = (crossColumn_xi - player_xi + (1 - dirY) / 2) / vectorRayX;
-                            //final_d = fabs((crossColumn_xi - player_xi) / vectorRayX); // perpwalldist
-                            //final_d = fabs((crossColumn_x - player.x) / vectorRayX);
-                            //final_d = fabs((crossColumn_x - player.x) / vectorRayY);
-                            //final_d = (crossLine_xi - player_xi) / vectorRayX;
-                            //final_d = (crossColumn_x - crossCameraPlane_x) * vectorCameraPlaneNorme_x + (crossColumn_y - crossCameraPlane_y) * vectorCameraPlaneNorme_y;
-                            //final_d = fabs(player.cos_a * crossColumn_d) - 1;
                             final_d = fabs(cos(diffAngleRayPlayer) * crossColumn_d);
+                            final_w = final_y;
                             break;
                         } else {
                             crossColumn_x += dirX;
@@ -221,6 +203,7 @@ void game_raycast(void) {
             final_x = dirX > 0 ? crossColumn_xi : crossColumn_xi + 1;
             final_y = player.y;
             final_d = sqrt(pow(final_x - player.x, 2) + pow(final_y - player.y, 2));
+            final_w = final_y;
         } else if (vectorRayX == 0) {
             bool hit = false;
             int crossLine_yi = player_yi;
@@ -234,6 +217,7 @@ void game_raycast(void) {
             final_x = dirY > 0 ? crossLine_yi : crossLine_yi + 1;
             final_y = player.x;
             final_d = sqrt(pow(final_x - player.x, 2) + pow(final_y - player.y, 2));
+            final_w = final_x;
         }
 
         Uint32 color;
@@ -255,10 +239,28 @@ void game_raycast(void) {
 
         // 2.5D
         final_distances[x] = final_d;
-        int d = (int) (FPS_SCREEN_HEIGHT / final_d);
-        if (d > FPS_SCREEN_HEIGHT) d = FPS_SCREEN_HEIGHT;
-        if (d < 0) d = 0;
-        line(x, START_SCREEN + FPS_SCREEN_HEIGHT / 2 - (int) (d / 2), x, START_SCREEN + FPS_SCREEN_HEIGHT / 2 + (int) (d / 2), color);
+        int column_height = (int) (FPS_SCREEN_HEIGHT / final_d);
+        //if (d > FPS_SCREEN_HEIGHT) d = FPS_SCREEN_HEIGHT;
+        //if (d < 0) d = 0;
+        int column_start = START_SCREEN + FPS_SCREEN_HEIGHT / 2 - (int) (column_height / 2);
+        int column_end = START_SCREEN + FPS_SCREEN_HEIGHT / 2 + (int) (column_height / 2);
+        for (int s = column_start ; s <= column_end ; s++) {
+            if (s >= START_SCREEN && s < screen->h) {
+                int col_tex = (final_w - (int) final_w) * (TEXTURE_WIDTH - 1);
+                int lin_tex = ((s - column_start) / (float) column_height) * (TEXTURE_HEIGHT - 1);
+                //printf("%d\n", col_tex);
+                Uint32 c = get_pixel(TEXTURES[0], col_tex, lin_tex);
+                set_pixel(x, s, c);
+            }
+        }
+        //line(x, START_SCREEN + FPS_SCREEN_HEIGHT / 2 - (int) (d / 2), x, START_SCREEN + FPS_SCREEN_HEIGHT / 2 + (int) (d / 2), color);
+
+        for(int yy = 0; yy < TEXTURE_HEIGHT; yy++) {
+            for (int xx = 0; xx < TEXTURE_WIDTH; xx++) {
+                Uint32 c = get_pixel(TEXTURES[0], xx, yy);
+                set_pixel(xx, yy, c);
+            }
+        }
     }
 }
 
