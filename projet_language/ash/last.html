@@ -1,0 +1,40 @@
+<html>
+  <body>
+    <h2>Command</h2>
+      <pre>
+writeln("pipo")    </pre>
+    <h2>Tokens</h2>
+      <table border="1">
+      <tr><td>Identifier</td><td>writeln</td></tr>
+      <tr><td>Separator</td><td>(</td></tr>
+      <tr><td>String</td><td>pipo</td></tr>
+      <tr><td>Separator</td><td>)</td></tr>
+    </table>
+    <h2>Abstract syntax tree</h2>
+    <ul>
+      <li>{Block}
+        <ol>
+          <li>{Operation} Binary call(
+            <ul>
+              <li>{Terminal} Identifier writeln (0 +7)
+                <ul>
+                </ul>
+              </li>
+              <li>{Terminal} String pipo (0 +4)
+                <ul>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ol>
+      </li>
+    </ul>
+    <h2>Outputs</h2>
+      <table border="1">
+      <tr><td>pipo</td></tr>
+      <tr><td>= 5</td></tr>
+    </table>
+    <h2>Result</h2>
+    <h1>5</h1>
+  </body>
+</html>

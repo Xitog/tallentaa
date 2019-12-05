@@ -3,9 +3,9 @@
 
 local funcdef = "([A-Za-z_][A-Za-z0-9_%.%:]*)%s*"
 local decindent = {
-  ['else'] = true, ['elseif'] = true, ['until'] = true, ['end'] = true}
+  ['else'] = true, ['elif'] = true, ['until'] = true, ['end'] = true}
 local incindent = {
-  ['else'] = true, ['elseif'] = true, ['for'] = true, ['do'] = true,
+  ['else'] = true, ['elif'] = true, ['for'] = true, ['do'] = true,
   ['if'] = true, ['repeat'] = true, ['while'] = true}
 local function isfndef(str)
   local l
@@ -54,11 +54,11 @@ return {
     str = str:gsub('%-%-%[=*%[.*%]=*%]',''):gsub('%-%-.*','')
     -- this handles three different cases:
     local term = (str:match("^%s*(%w+)%s*$")
-      or str:match("^%s*(elseif)[%s%(]")
+      or str:match("^%s*(elif)[%s%(]")
       or str:match("^%s*(until)[%s%(]")
       or str:match("^%s*(else)%f[%W]")
     )
-    -- (1) 'end', 'elseif', 'else', 'until'
+    -- (1) 'end', 'elif', 'else', 'until'
     local match = term and decindent[term]
     -- (2) 'end)', 'end}', 'end,', and 'end;'
     if not term then term, match = str:match("^%s*(end)%s*([%)%}]*)%s*[,;]?") end
@@ -90,13 +90,13 @@ return {
     local terminc = term and incindent[term] and 1 or 0
     -- fix 'if' not terminated with 'then'
     -- or 'then' not started with 'if'
-    if (term == 'if' or term == 'elseif') and not str:match("%f[%w]then%f[%W]")
+    if (term == 'if' or term == 'elif') and not str:match("%f[%w]then%f[%W]")
     or (term == 'for') and not str:match("%S%s+do%f[%W]")
     or (term == 'while') and not str:match("%f[%w]do%f[%W]")
     -- if this is a function definition, then don't increment the level
     or func == 1 then
       terminc = 0
-    elseif not (term == 'if' or term == 'elseif') and str:match("%f[%w]then%f[%W]")
+    elseif not (term == 'if' or term == 'elif') and str:match("%f[%w]then%f[%W]")
     or not (term == 'for') and str:match("%S%s+do%f[%W]")
     or not (term == 'while') and str:match("%f[%w]do%f[%W]") then
       terminc = 1
@@ -252,14 +252,13 @@ return {
   },
 
   keywords = {
-    [[and break do else elseif end for function goto if in local not or repeat return then until while]],
+    [[and break do else elif end for function goto if in local not or repeat return then until while]],
 
     [[_G _VERSION _ENV false io.stderr io.stdin io.stdout nil math.huge math.pi self true]],
 
     [[assert collectgarbage dofile error getfenv getmetatable ipairs load loadfile loadstring
       module next pairs pcall print rawequal rawget rawlen rawset require
-      select setfenv setmetatable tonumber tostring type unpack xpcall
-      writeln write]],
+      select setfenv setmetatable tonumber tostring type unpack xpcall]],
 
     [[bit32.arshift bit32.band bit32.bnot bit32.bor bit32.btest bit32.bxor bit32.extract
       bit32.lrotate bit32.lshift bit32.replace bit32.rrotate bit32.rshift
