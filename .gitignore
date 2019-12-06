@@ -21,3 +21,4 @@ assets/graphic/textures/woolfy_wall/freedoom/Thumbs.db
 web/Thumbs.db
 *.db
 *.db
+.DS_Store
