@@ -200,8 +200,12 @@ class Tokenizer:
                 if is_float:
                     raise Exception("Twice . in a number")
                 else:
-                    is_float = True
-                    word += '.'
+                    # 1..2 => range op
+                    if index + 1 < len(line) and line[index + 1] == '.':
+                        break
+                    else:
+                        is_float = True
+                        word += '.'
             else:
                 suspended = False
                 word += line[index]
@@ -461,11 +465,11 @@ class Operation(Node):
     def __init__(self, operator : Token, left=None, right=None):
         Node.__init__(self, operator, Node.Operation, right, left)
         self.operator = self.content
-        assert self.operator.is_terminal() and self.operator.content.typ == Token.Operator, "Operator should be of type Token.Operator"
+        assert self.operator.is_terminal() and self.operator.content.typ == Token.Operator, "Operator should be of type Token.Operator and is " + self.operator.content.typ
     
     def to_s(self, level=1):
         name = self.get_name()
-        s = "    " * level + f"{name} {self.content.content.val}\n"
+        s = "    " * level + f"{name}\n" # {self.content.content.val}
         if self.right is not None:
             s += "    " * (level + 1) + "right =\n"
             s += self.right.to_s(level + 2) + "\n"
@@ -549,8 +553,9 @@ class Parser:
         '**' : 30, '%' : 30,
         'call' : 35,
         '.' : 40,
-        'unary-' : 50,
-        'call(' : 51,
+        'call(' : 50,
+        'not' : 51,
+        'unary-' : 52,
         'expr(' : 60,
     }
     
@@ -574,15 +579,6 @@ class Parser:
         ast = AST()
         ast.root = self.read_block(tokens, 0)[1] # index is discared
         return ast
-
-    def get_end_of_expr(self, tokens, index):
-        for t in range(index + 1, len(tokens)):
-            tok = tokens[t]
-            if tok.typ == Token.NewLine:
-                return t
-            elif tok.typ == Token.Keyword and tok.val in ['else', 'end']:
-                return t
-        return t
     
     def get_end(self, tokens, index):
         level = 0
@@ -631,54 +627,63 @@ class Parser:
             elif tok.typ == Token.NewLine: # discard not meaningfull newline
                 index += 1
             else:
-                end = self.get_end_of_expr(tokens, index)
+                end = self.get_keyword_or_nl(tokens, index, max_index, ['else', 'end'])
                 index, node = self.read_expr(tokens, index, end)
                 block.add(node)
         return index, block
+
+    def get_keyword_or_nl(self, tokens, index, max_index, keywords):
+        if type(keywords) == str:
+            keywords = [keywords]
+        for t in range(index, max_index):
+            if tokens[t].typ == Token.NewLine or (tokens[t].typ == Token.Keyword and tokens[t].val in keywords):
+                return t
     
-    def read_if(self, tokens, index, else_index, max_index):
+    def read_if(self, tokens, index, else_index, end_index):
         self.level_of_ana += 1
-        #print('    ' * self.level_of_ana, 'read_if from', index, tokens[index], 'to', max_index)
-        #for t in range(index, max_index):
+        #print('    ' * self.level_of_ana, 'read_if from', index, tokens[index], 'to', end_index)
+        #for t in range(index, end_index):
         #    print('    ' * self.level_of_ana, ' -', tokens[t])
         # read condition
         cond = None
-        for t in range(index, len(tokens)):
-            if tokens[t].typ == Token.NewLine or \
-                tokens[t].typ == Token.Keyword and tokens[t].val == "then":
-                index, cond = self.read_expr(tokens, index, t)        
-                break
+        t = self.get_keyword_or_nl(tokens, index, end_index, 'then')
+        index, cond = self.read_expr(tokens, index, t)
         # read action
         action = None
-        _, action = self.read_block(tokens, index, else_index)
+        end = else_index if else_index is not None else end_index
+        _, action = self.read_block(tokens, index, end)
         # read else action
         else_action = None
         if else_index is not None:
-            _, else_action = self.read_block(tokens, else_index + 1, max_index)
+            if tokens[else_index].val == 'else':
+                _, else_action = self.read_block(tokens, else_index + 1, end_index)
+            else: # elif
+                elif_else = self.get_else(tokens, else_index + 1, end_index)
+                _, else_action = self.read_if(tokens, else_index + 1, elif_else, end_index)
         node = Statement(cond, action, else_action)
         self.level_of_ana -= 1
-        return max_index + 1, node
+        return end_index + 1, node
     
-    def read_while(self, tokens, index, max_index):
+    def read_while(self, tokens, index, end_index):
         # read condition
         cond = None
-        for t in range(index, len(tokens)):
-            if tokens[t].typ == Token.NewLine or \
-                tokens[t].typ == Token.Keyword and tokens[t].val == "do":
-                index, cond = self.read_expr(tokens, index, t)        
-                break
+        t = self.get_keyword_or_nl(tokens, index, end_index, 'do')
+        index, cond = self.read_expr(tokens, index, t)        
         # read action
         action = None
-        _, action = self.read_block(tokens, index, max_index)
+        _, action = self.read_block(tokens, index, end_index)
         node = Statement(cond, action, loop=True)
-        return max_index + 1, node
+        return end_index + 1, node
     
-    def read_for(self, tokens, index):
+    def read_for(self, tokens, index, end_index):
         return 99
     
     def read_expr(self, tokens, index, end_index):
+        if end_index is None: end_index = len(tokens)
         self.level_of_ana += 1
-        #print('    ' * self.level_of_ana, 'read_expr from', index, tokens[index], 'to', end_index, tokens[end_index])
+        # Debug
+        #debug_end = end_index - 1 if end_index == len(tokens) else end_index 
+        #print('    ' * self.level_of_ana, 'read_expr from', index, tokens[index], 'to', end_index, tokens[debug_end])
         #for t in range(index, end_index):
         #    print('    ' * self.level_of_ana, ' -', tokens[t])
         # sorting operators
@@ -733,6 +738,9 @@ class Parser:
                             sorted_operators.append(index)
                             prio_values.append(computed_prio)
             index += 1
+        # remove ending newline(s)
+        while working_list[-1].typ == Token.NewLine:
+            working_list.pop()
         if len(sorted_operators) == 0 and len(working_list) > 1:
             raise Exception("[ERROR] Incorrect expression len(sorted_operators) == 0")
         # Resolving operators
@@ -753,20 +761,28 @@ class Parser:
                 # Debug Display
                 if self.debug_expression:
                     print('====================')
-                    print('    Sorted Operators')
+                    print('Sorted Operators')
+                    print('====================')
                     for so in range(0, len(sorted_operators)):
-                        print('        ' + str(so) + '. ' + str(sorted_operators[so]) + ' -> ' + str(working_list[sorted_operators[so] + modifier]) + ' modifier = ' + str(modifier))
-                    print('    Starting to resolve')
+                        idx = sorted_operators[so]
+                        obj = working_list[sorted_operators[so] + modifier]
+                        print(f'    {so}. index={idx} type={obj.__class__.__name__} str={obj} modifier={modifier}')
+                    print('Starting to resolve')
                     print('    Working copy (start):')
                     for j in range(0, len(working_list)):
                         print('        ' + str(j) + '. ' + str(working_list[j]))
                 # End of Debug Display
                 operator_index = sorted_operators[0] + modifier
                 if self.debug_expression:
-                    print(f'    Resolving 0. in sorted_operators is : {operator_index} referencing token : {working_list[operator_index]}')
-                left = working_list[operator_index - 1]
-                if not isinstance(left, Node):
-                    left = Terminal(left)
+                    print('    Resolving 0. in sorted_operators.')
+                # Left parameter, None for Unary Operator
+                op = working_list[operator_index]
+                if (type(op) == Token and op.val == 'not') or (type(op) == Operation and op.operator.content.val == 'not'):
+                    left = None
+                else:
+                    left = working_list[operator_index - 1]
+                    if not isinstance(left, Node):
+                        left = Terminal(left)
                 # Right parameter
                 right = None
                 #print('len working list =', len(working_list))
@@ -775,15 +791,16 @@ class Parser:
                 #    print('ope lvl =', working_list[operator_index + 1].lvl)
                 #    print('param lvl =', working_list[operator_index].lvl)
                 # We must have a parameter and its priority/lvl must be superior : ( "abc" ) abc is lvl = 100 vs () "abc" abc is lvl = 1
-                if working_list[operator_index].val == 'call(':
+                if (type(op) == Token and op.val == 'call(') or (type(op) == Operation and op.operator.content.val == 'call('):
                     if len(working_list) > operator_index + 1 and working_list[operator_index + 1].lvl > working_list[operator_index].lvl:
                         right = working_list[operator_index + 1]
-                # We must have a parameter (? and for unary op ?)
+                # We must have always a right parameter (there is no unary op with left operand)
                 else:
                     if len(working_list) > operator_index + 1:
                         right = working_list[operator_index + 1]
                 if right is not None and not isinstance(right, Node):
                     right = Terminal(right)
+                #print('aaa', op, type(op), working_list)
                 op = Terminal(working_list[operator_index])
                 #print('debug OPERATOR>', type(op.typ), op.typ, op.content)
                 #print('debug> LEFT', type(left), left, 'END')
@@ -794,23 +811,31 @@ class Parser:
                     right
                 )
                 # update working list
-                #print('Updating working list')
-                #print('< Before')
-                #print(operator_index)
-                #for i, e in enumerate(working_list):
-                #    print(i, type(e), e)
-                del working_list[operator_index - 1]
-                del working_list[operator_index - 1]
-                if right is not None: # f()
-                    del working_list[operator_index - 1]
-                working_list.insert(operator_index - 1, node)
-                #print('> After')
-                #for i, e in enumerate(working_list):
-                #    print(i, type(e), e)
+                if self.debug_expression:
+                    print(f'Updating working list, operator_index={operator_index}, left={left}, right={right}')
+                    print('< Before')
+                    for i, e in enumerate(working_list):
+                        print(f'    {i}. {e.__class__.__name__} {e}')
+                if left is not None and right is not None:
+                    del working_list[operator_index + 1] # right
+                    del working_list[operator_index] # op
+                    del working_list[operator_index - 1] # left
+                    working_list.insert(operator_index - 1, node)
+                elif left is None and right is not None:
+                    del working_list[operator_index + 1] # right
+                    del working_list[operator_index] # op
+                    working_list.insert(operator_index, node)
+                else: # left is None and right is None
+                    del working_list[operator_index]
+                    working_list.insert(operator_index, node)
                 # update sorted operators
-                #print('Updating sorted operators')
-                #print('< Before')
-                #print(sorted_operators)
+                if self.debug_expression:
+                    print('> After')
+                    for i, e in enumerate(working_list):
+                        print(f'    {i}. {e.__class__.__name__} {e}')
+                    
+                    print('Updating sorted operators')
+                    print('< Before')
                 del sorted_operators[0]
                 for so in range(0, len(sorted_operators)):
                     if sorted_operators[so] > operator_index:
@@ -818,8 +843,9 @@ class Parser:
                             sorted_operators[so] -= 2
                         else:
                             sorted_operators[so] -= 1
-                #print('> After')
-                #print(sorted_operators)
+                if self.debug_expression:
+                    print('> After')
+                    print(sorted_operators)
             results = end_index + 1, node
         
         #    elif tokens[index + 1].typ == Token.Separator and tokens[index + 1].val == '(':
@@ -975,6 +1001,9 @@ class Interpreter:
                 return self.do_elem(elem.left) and self.do_elem(elem.right)
             elif elem.operator.content.val == 'or':
                 return self.do_elem(elem.left) or self.do_elem(elem.right)
+            # Not
+            elif elem.operator.content.val == 'not':
+                return not self.do_elem(elem.right)
             # Function Call
             elif elem.operator.content.val == 'call(':
                 a = self.do_elem(elem.left)
@@ -1266,8 +1295,8 @@ def read_tests(filepath):
 # VI. Main [MAIN]
 #-------------------------------------------------------------------------------
 
-def read(file):
-    f = open(arg, mode='r', encoding='utf8')
+def read(filepath):
+    f = open(filepath, mode='r', encoding='utf8')
     c = f.read()
     f.close()
     return c
@@ -1338,17 +1367,37 @@ if __name__ == '__main__':
             elif command == 'locals':
                 for k in sorted(interpreter.vars):
                     print(f"{k:10}", interpreter.vars[k])
-            elif command.startswith('exec'):
+            elif command.startswith('exec') or command == 'tests':
+                if command == 'tests': # hack
+                    command = 'exec tests'
                 args = command.split(' ')
                 if len(args) < 2:
                     console.error('You must indicate a file to process.')
                 else:
                     arg = args[1]
-                    if not os.path.isfile(arg):
-                        console.error('File ' + arg + ' does not exist')
+                    if os.path.isdir(arg):
+                        files = os.listdir(arg)
+                        cpt = 0
+                        max_file = 0
+                        for f in files:
+                            if f.endswith('.ash'):
+                                max_file += 1
+                        for f in files:
+                            if f.endswith('.ash'):
+                                cpt += 1
+                                console.info(f'Executing {f} ({cpt}/{max_file})')
+                                filename = os.path.join(arg, f)
+                                html_output = os.path.join(arg, 'html', f)
+                                c = read(filename)
+                                run(c, interpreter, html_output[:-4] + '.html')
                     else:
-                        c = read(arg)
-                        run(c, interpreter)
+                        if not arg.endswith('.ash'):
+                            arg += '.ash'
+                        if not os.path.isfile(arg):
+                            console.error('File ' + arg + ' does not exist')
+                        else:
+                            c = read(arg)
+                            run(c, interpreter)
             elif command == 'reset':
                 interpreter = Interpreter()
             elif command == 'tests':

@@ -1,0 +1,281 @@
+<html>
+  <body>
+    <h2>Command</h2>
+      <pre>
+writeln(2+3)
+writeln(53)
+a = 5
+if a == 5 then
+    writeln("hello world!")
+end
+
+-- Ceci est un commentaire $
+
+writeln("Hello World")
+writeln(2 + 3)
+a = 5
+if a == 5 then
+    writeln("a=5")
+end
+a
+"aaaaaaaaaaa"
+
+--b = 1.2.floor
+--for a in 1..5 do
+--    writeln(a)
+--end
+    </pre>
+    <h2>Tokens</h2>
+      <table border="1">
+      <tr><td>Identifier</td><td>writeln</td></tr>
+      <tr><td>Separator</td><td>(</td></tr>
+      <tr><td>Integer</td><td>2</td></tr>
+      <tr><td>Operator</td><td>+</td></tr>
+      <tr><td>Integer</td><td>3</td></tr>
+      <tr><td>Separator</td><td>)</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Identifier</td><td>writeln</td></tr>
+      <tr><td>Separator</td><td>(</td></tr>
+      <tr><td>Integer</td><td>53</td></tr>
+      <tr><td>Separator</td><td>)</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Identifier</td><td>a</td></tr>
+      <tr><td>Operator</td><td>=</td></tr>
+      <tr><td>Integer</td><td>5</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Keyword</td><td>if</td></tr>
+      <tr><td>Identifier</td><td>a</td></tr>
+      <tr><td>Operator</td><td>==</td></tr>
+      <tr><td>Integer</td><td>5</td></tr>
+      <tr><td>Keyword</td><td>then</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Identifier</td><td>writeln</td></tr>
+      <tr><td>Separator</td><td>(</td></tr>
+      <tr><td>String</td><td>hello world!</td></tr>
+      <tr><td>Separator</td><td>)</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Keyword</td><td>end</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Identifier</td><td>writeln</td></tr>
+      <tr><td>Separator</td><td>(</td></tr>
+      <tr><td>String</td><td>Hello World</td></tr>
+      <tr><td>Separator</td><td>)</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Identifier</td><td>writeln</td></tr>
+      <tr><td>Separator</td><td>(</td></tr>
+      <tr><td>Integer</td><td>2</td></tr>
+      <tr><td>Operator</td><td>+</td></tr>
+      <tr><td>Integer</td><td>3</td></tr>
+      <tr><td>Separator</td><td>)</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Identifier</td><td>a</td></tr>
+      <tr><td>Operator</td><td>=</td></tr>
+      <tr><td>Integer</td><td>5</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Keyword</td><td>if</td></tr>
+      <tr><td>Identifier</td><td>a</td></tr>
+      <tr><td>Operator</td><td>==</td></tr>
+      <tr><td>Integer</td><td>5</td></tr>
+      <tr><td>Keyword</td><td>then</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Identifier</td><td>writeln</td></tr>
+      <tr><td>Separator</td><td>(</td></tr>
+      <tr><td>String</td><td>a=5</td></tr>
+      <tr><td>Separator</td><td>)</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Keyword</td><td>end</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Identifier</td><td>a</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>String</td><td>aaaaaaaaaaa</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+    </table>
+    <h2>Abstract syntax tree</h2>
+    <ul>
+      <li>{Block}
+        <ol>
+          <li>{Operation} Binary call(
+            <ul>
+              <li>{Terminal} Identifier writeln (0 +7)
+                <ul>
+                </ul>
+              </li>
+              <li>{Operation} Binary +
+                <ul>
+                  <li>{Terminal} Integer 2 (0 +1)
+                    <ul>
+                    </ul>
+                  </li>
+                  <li>{Terminal} Integer 3 (0 +1)
+                    <ul>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li>{Operation} Binary call(
+            <ul>
+              <li>{Terminal} Identifier writeln (0 +7)
+                <ul>
+                </ul>
+              </li>
+              <li>{Terminal} Integer 53 (0 +2)
+                <ul>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li>{Operation} Binary =
+            <ul>
+              <li>{Terminal} Identifier a (0 +1)
+                <ul>
+                </ul>
+              </li>
+              <li>{Terminal} Integer 5 (0 +1)
+                <ul>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li>{Statement} if
+            <ul>
+              <li>{Operation} Binary ==
+                <ul>
+                  <li>{Terminal} Identifier a (0 +1)
+                    <ul>
+                    </ul>
+                  </li>
+                  <li>{Terminal} Integer 5 (0 +1)
+                    <ul>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              <li>{Block}
+                <ol>
+                  <li>{Operation} Binary call(
+                    <ul>
+                      <li>{Terminal} Identifier writeln (0 +7)
+                        <ul>
+                        </ul>
+                      </li>
+                      <li>{Terminal} String hello world! (0 +12)
+                        <ul>
+                        </ul>
+                      </li>
+                    </ul>
+                  </li>
+                </ol>
+              </li>
+            </ul>
+          </li>
+          <li>{Operation} Binary call(
+            <ul>
+              <li>{Terminal} Identifier writeln (0 +7)
+                <ul>
+                </ul>
+              </li>
+              <li>{Terminal} String Hello World (0 +11)
+                <ul>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li>{Operation} Binary call(
+            <ul>
+              <li>{Terminal} Identifier writeln (0 +7)
+                <ul>
+                </ul>
+              </li>
+              <li>{Operation} Binary +
+                <ul>
+                  <li>{Terminal} Integer 2 (0 +1)
+                    <ul>
+                    </ul>
+                  </li>
+                  <li>{Terminal} Integer 3 (0 +1)
+                    <ul>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li>{Operation} Binary =
+            <ul>
+              <li>{Terminal} Identifier a (0 +1)
+                <ul>
+                </ul>
+              </li>
+              <li>{Terminal} Integer 5 (0 +1)
+                <ul>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li>{Statement} if
+            <ul>
+              <li>{Operation} Binary ==
+                <ul>
+                  <li>{Terminal} Identifier a (0 +1)
+                    <ul>
+                    </ul>
+                  </li>
+                  <li>{Terminal} Integer 5 (0 +1)
+                    <ul>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              <li>{Block}
+                <ol>
+                  <li>{Operation} Binary call(
+                    <ul>
+                      <li>{Terminal} Identifier writeln (0 +7)
+                        <ul>
+                        </ul>
+                      </li>
+                      <li>{Terminal} String a=5 (0 +3)
+                        <ul>
+                        </ul>
+                      </li>
+                    </ul>
+                  </li>
+                </ol>
+              </li>
+            </ul>
+          </li>
+          <li>{Terminal} Identifier a (0 +1)
+            <ul>
+            </ul>
+          </li>
+          <li>{Terminal} String aaaaaaaaaaa (0 +11)
+            <ul>
+            </ul>
+          </li>
+        </ol>
+      </li>
+    </ul>
+    <h2>Outputs</h2>
+      <table border="1">
+      <tr><td>5</td></tr>
+      <tr><td>53</td></tr>
+      <tr><td>hello world!</td></tr>
+      <tr><td>Hello World</td></tr>
+      <tr><td>5</td></tr>
+      <tr><td>a=5</td></tr>
+      <tr><td>= aaaaaaaaaaa</td></tr>
+    </table>
+    <h2>Result</h2>
+    <h1>aaaaaaaaaaa</h1>
+  </body>
+</html>

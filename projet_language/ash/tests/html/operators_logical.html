@@ -1,0 +1,212 @@
+<html>
+  <body>
+    <h2>Command</h2>
+      <pre>
+a = true
+b = true
+f = false
+writeln(not a)
+writeln(a and b)
+writeln(a and f)
+writeln(a or b)
+writeln(a or f)    </pre>
+    <h2>Tokens</h2>
+      <table border="1">
+      <tr><td>Identifier</td><td>a</td></tr>
+      <tr><td>Operator</td><td>=</td></tr>
+      <tr><td>Boolean</td><td>true</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Identifier</td><td>b</td></tr>
+      <tr><td>Operator</td><td>=</td></tr>
+      <tr><td>Boolean</td><td>true</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Identifier</td><td>f</td></tr>
+      <tr><td>Operator</td><td>=</td></tr>
+      <tr><td>Boolean</td><td>false</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Identifier</td><td>writeln</td></tr>
+      <tr><td>Separator</td><td>(</td></tr>
+      <tr><td>Operator</td><td>not</td></tr>
+      <tr><td>Identifier</td><td>a</td></tr>
+      <tr><td>Separator</td><td>)</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Identifier</td><td>writeln</td></tr>
+      <tr><td>Separator</td><td>(</td></tr>
+      <tr><td>Identifier</td><td>a</td></tr>
+      <tr><td>Operator</td><td>and</td></tr>
+      <tr><td>Identifier</td><td>b</td></tr>
+      <tr><td>Separator</td><td>)</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Identifier</td><td>writeln</td></tr>
+      <tr><td>Separator</td><td>(</td></tr>
+      <tr><td>Identifier</td><td>a</td></tr>
+      <tr><td>Operator</td><td>and</td></tr>
+      <tr><td>Identifier</td><td>f</td></tr>
+      <tr><td>Separator</td><td>)</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Identifier</td><td>writeln</td></tr>
+      <tr><td>Separator</td><td>(</td></tr>
+      <tr><td>Identifier</td><td>a</td></tr>
+      <tr><td>Operator</td><td>or</td></tr>
+      <tr><td>Identifier</td><td>b</td></tr>
+      <tr><td>Separator</td><td>)</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Identifier</td><td>writeln</td></tr>
+      <tr><td>Separator</td><td>(</td></tr>
+      <tr><td>Identifier</td><td>a</td></tr>
+      <tr><td>Operator</td><td>or</td></tr>
+      <tr><td>Identifier</td><td>f</td></tr>
+      <tr><td>Separator</td><td>)</td></tr>
+    </table>
+    <h2>Abstract syntax tree</h2>
+    <ul>
+      <li>{Block}
+        <ol>
+          <li>{Operation} Binary =
+            <ul>
+              <li>{Terminal} Identifier a (0 +1)
+                <ul>
+                </ul>
+              </li>
+              <li>{Terminal} Boolean true (0 +4)
+                <ul>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li>{Operation} Binary =
+            <ul>
+              <li>{Terminal} Identifier b (0 +1)
+                <ul>
+                </ul>
+              </li>
+              <li>{Terminal} Boolean true (0 +4)
+                <ul>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li>{Operation} Binary =
+            <ul>
+              <li>{Terminal} Identifier f (0 +1)
+                <ul>
+                </ul>
+              </li>
+              <li>{Terminal} Boolean false (0 +5)
+                <ul>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li>{Operation} Binary call(
+            <ul>
+              <li>{Terminal} Identifier writeln (0 +7)
+                <ul>
+                </ul>
+              </li>
+              <li>Unary not
+                <ul>
+                  <li>{Terminal} Identifier a (0 +1)
+                    <ul>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li>{Operation} Binary call(
+            <ul>
+              <li>{Terminal} Identifier writeln (0 +7)
+                <ul>
+                </ul>
+              </li>
+              <li>{Operation} Binary and
+                <ul>
+                  <li>{Terminal} Identifier a (0 +1)
+                    <ul>
+                    </ul>
+                  </li>
+                  <li>{Terminal} Identifier b (0 +1)
+                    <ul>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li>{Operation} Binary call(
+            <ul>
+              <li>{Terminal} Identifier writeln (0 +7)
+                <ul>
+                </ul>
+              </li>
+              <li>{Operation} Binary and
+                <ul>
+                  <li>{Terminal} Identifier a (0 +1)
+                    <ul>
+                    </ul>
+                  </li>
+                  <li>{Terminal} Identifier f (0 +1)
+                    <ul>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li>{Operation} Binary call(
+            <ul>
+              <li>{Terminal} Identifier writeln (0 +7)
+                <ul>
+                </ul>
+              </li>
+              <li>{Operation} Binary or
+                <ul>
+                  <li>{Terminal} Identifier a (0 +1)
+                    <ul>
+                    </ul>
+                  </li>
+                  <li>{Terminal} Identifier b (0 +1)
+                    <ul>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li>{Operation} Binary call(
+            <ul>
+              <li>{Terminal} Identifier writeln (0 +7)
+                <ul>
+                </ul>
+              </li>
+              <li>{Operation} Binary or
+                <ul>
+                  <li>{Terminal} Identifier a (0 +1)
+                    <ul>
+                    </ul>
+                  </li>
+                  <li>{Terminal} Identifier f (0 +1)
+                    <ul>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ol>
+      </li>
+    </ul>
+    <h2>Outputs</h2>
+      <table border="1">
+      <tr><td>False</td></tr>
+      <tr><td>True</td></tr>
+      <tr><td>False</td></tr>
+      <tr><td>True</td></tr>
+      <tr><td>True</td></tr>
+      <tr><td>= 5</td></tr>
+    </table>
+    <h2>Result</h2>
+    <h1>5</h1>
+  </body>
+</html>

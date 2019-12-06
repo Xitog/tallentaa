@@ -6,6 +6,7 @@ if a == 5 then
 end
 
 -- Ceci est un commentaire $
+
 writeln("Hello World")
 writeln(2 + 3)
 a = 5
@@ -14,14 +15,8 @@ if a == 5 then
 end
 a
 "aaaaaaaaaaa"
+
 --b = 1.2.floor
 --for a in 1..5 do
 --    writeln(a)
 --end
-a = true
-b = true
-f = false
-writeln(a and b)
-writeln(a and f)
-writeln(a or b)
-writeln(a or f)

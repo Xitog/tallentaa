@@ -2,12 +2,13 @@
   <body>
     <h2>Command</h2>
       <pre>
-writeln("pipo")    </pre>
+writeln(not true)    </pre>
     <h2>Tokens</h2>
       <table border="1">
       <tr><td>Identifier</td><td>writeln</td></tr>
       <tr><td>Separator</td><td>(</td></tr>
-      <tr><td>String</td><td>pipo</td></tr>
+      <tr><td>Operator</td><td>not</td></tr>
+      <tr><td>Boolean</td><td>true</td></tr>
       <tr><td>Separator</td><td>)</td></tr>
     </table>
     <h2>Abstract syntax tree</h2>
@@ -20,8 +21,12 @@ writeln("pipo")    </pre>
                 <ul>
                 </ul>
               </li>
-              <li>{Terminal} String pipo (0 +4)
+              <li>Unary not
                 <ul>
+                  <li>{Terminal} Boolean true (0 +4)
+                    <ul>
+                    </ul>
+                  </li>
                 </ul>
               </li>
             </ul>
@@ -31,10 +36,10 @@ writeln("pipo")    </pre>
     </ul>
     <h2>Outputs</h2>
       <table border="1">
-      <tr><td>pipo</td></tr>
-      <tr><td>= 5</td></tr>
+      <tr><td>False</td></tr>
+      <tr><td>= 6</td></tr>
     </table>
     <h2>Result</h2>
-    <h1>5</h1>
+    <h1>6</h1>
   </body>
 </html>

@@ -1,0 +1,354 @@
+<html>
+  <body>
+    <h2>Command</h2>
+      <pre>
+-- Test 1
+
+a = 7
+
+if a == 5 then
+    writeln("never 1.1")
+elif a == 6 then
+    writeln("never 1.2")
+else
+    writeln("a == 7 (on else after elif)")
+end
+
+-- Test 2
+
+a = 8
+
+if a == 5 then
+    writeln("never 2.1")
+elif a == 6 then
+    writeln("never 2.2")
+elif a == 8 then
+    writeln("a == 8 (on elif)")
+else
+    writeln("never 2.3")
+end
+    </pre>
+    <h2>Tokens</h2>
+      <table border="1">
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Identifier</td><td>a</td></tr>
+      <tr><td>Operator</td><td>=</td></tr>
+      <tr><td>Integer</td><td>7</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Keyword</td><td>if</td></tr>
+      <tr><td>Identifier</td><td>a</td></tr>
+      <tr><td>Operator</td><td>==</td></tr>
+      <tr><td>Integer</td><td>5</td></tr>
+      <tr><td>Keyword</td><td>then</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Identifier</td><td>writeln</td></tr>
+      <tr><td>Separator</td><td>(</td></tr>
+      <tr><td>String</td><td>never 1.1</td></tr>
+      <tr><td>Separator</td><td>)</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Keyword</td><td>elif</td></tr>
+      <tr><td>Identifier</td><td>a</td></tr>
+      <tr><td>Operator</td><td>==</td></tr>
+      <tr><td>Integer</td><td>6</td></tr>
+      <tr><td>Keyword</td><td>then</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Identifier</td><td>writeln</td></tr>
+      <tr><td>Separator</td><td>(</td></tr>
+      <tr><td>String</td><td>never 1.2</td></tr>
+      <tr><td>Separator</td><td>)</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Keyword</td><td>else</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Identifier</td><td>writeln</td></tr>
+      <tr><td>Separator</td><td>(</td></tr>
+      <tr><td>String</td><td>a == 7 (on else after elif)</td></tr>
+      <tr><td>Separator</td><td>)</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Keyword</td><td>end</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Identifier</td><td>a</td></tr>
+      <tr><td>Operator</td><td>=</td></tr>
+      <tr><td>Integer</td><td>8</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Keyword</td><td>if</td></tr>
+      <tr><td>Identifier</td><td>a</td></tr>
+      <tr><td>Operator</td><td>==</td></tr>
+      <tr><td>Integer</td><td>5</td></tr>
+      <tr><td>Keyword</td><td>then</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Identifier</td><td>writeln</td></tr>
+      <tr><td>Separator</td><td>(</td></tr>
+      <tr><td>String</td><td>never 2.1</td></tr>
+      <tr><td>Separator</td><td>)</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Keyword</td><td>elif</td></tr>
+      <tr><td>Identifier</td><td>a</td></tr>
+      <tr><td>Operator</td><td>==</td></tr>
+      <tr><td>Integer</td><td>6</td></tr>
+      <tr><td>Keyword</td><td>then</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Identifier</td><td>writeln</td></tr>
+      <tr><td>Separator</td><td>(</td></tr>
+      <tr><td>String</td><td>never 2.2</td></tr>
+      <tr><td>Separator</td><td>)</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Keyword</td><td>elif</td></tr>
+      <tr><td>Identifier</td><td>a</td></tr>
+      <tr><td>Operator</td><td>==</td></tr>
+      <tr><td>Integer</td><td>8</td></tr>
+      <tr><td>Keyword</td><td>then</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Identifier</td><td>writeln</td></tr>
+      <tr><td>Separator</td><td>(</td></tr>
+      <tr><td>String</td><td>a == 8 (on elif)</td></tr>
+      <tr><td>Separator</td><td>)</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Keyword</td><td>else</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Identifier</td><td>writeln</td></tr>
+      <tr><td>Separator</td><td>(</td></tr>
+      <tr><td>String</td><td>never 2.3</td></tr>
+      <tr><td>Separator</td><td>)</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+      <tr><td>Keyword</td><td>end</td></tr>
+      <tr><td>New Line</td><td>NEWLINE</td></tr>
+    </table>
+    <h2>Abstract syntax tree</h2>
+    <ul>
+      <li>{Block}
+        <ol>
+          <li>{Operation} Binary =
+            <ul>
+              <li>{Terminal} Identifier a (0 +1)
+                <ul>
+                </ul>
+              </li>
+              <li>{Terminal} Integer 7 (0 +1)
+                <ul>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li>{Statement} if
+            <ul>
+              <li>{Operation} Binary ==
+                <ul>
+                  <li>{Terminal} Identifier a (0 +1)
+                    <ul>
+                    </ul>
+                  </li>
+                  <li>{Terminal} Integer 5 (0 +1)
+                    <ul>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              <li>{Block}
+                <ol>
+                  <li>{Operation} Binary call(
+                    <ul>
+                      <li>{Terminal} Identifier writeln (0 +7)
+                        <ul>
+                        </ul>
+                      </li>
+                      <li>{Terminal} String never 1.1 (0 +9)
+                        <ul>
+                        </ul>
+                      </li>
+                    </ul>
+                  </li>
+                </ol>
+              </li>
+              <li>{Statement} if
+                <ul>
+                  <li>{Operation} Binary ==
+                    <ul>
+                      <li>{Terminal} Identifier a (0 +1)
+                        <ul>
+                        </ul>
+                      </li>
+                      <li>{Terminal} Integer 6 (0 +1)
+                        <ul>
+                        </ul>
+                      </li>
+                    </ul>
+                  </li>
+                  <li>{Block}
+                    <ol>
+                      <li>{Operation} Binary call(
+                        <ul>
+                          <li>{Terminal} Identifier writeln (0 +7)
+                            <ul>
+                            </ul>
+                          </li>
+                          <li>{Terminal} String never 1.2 (0 +9)
+                            <ul>
+                            </ul>
+                          </li>
+                        </ul>
+                      </li>
+                    </ol>
+                  </li>
+                  <li>{Block}
+                    <ol>
+                      <li>{Operation} Binary call(
+                        <ul>
+                          <li>{Terminal} Identifier writeln (0 +7)
+                            <ul>
+                            </ul>
+                          </li>
+                          <li>{Terminal} String a == 7 (on else after elif) (0 +27)
+                            <ul>
+                            </ul>
+                          </li>
+                        </ul>
+                      </li>
+                    </ol>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li>{Operation} Binary =
+            <ul>
+              <li>{Terminal} Identifier a (0 +1)
+                <ul>
+                </ul>
+              </li>
+              <li>{Terminal} Integer 8 (0 +1)
+                <ul>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li>{Statement} if
+            <ul>
+              <li>{Operation} Binary ==
+                <ul>
+                  <li>{Terminal} Identifier a (0 +1)
+                    <ul>
+                    </ul>
+                  </li>
+                  <li>{Terminal} Integer 5 (0 +1)
+                    <ul>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              <li>{Block}
+                <ol>
+                  <li>{Operation} Binary call(
+                    <ul>
+                      <li>{Terminal} Identifier writeln (0 +7)
+                        <ul>
+                        </ul>
+                      </li>
+                      <li>{Terminal} String never 2.1 (0 +9)
+                        <ul>
+                        </ul>
+                      </li>
+                    </ul>
+                  </li>
+                </ol>
+              </li>
+              <li>{Statement} if
+                <ul>
+                  <li>{Operation} Binary ==
+                    <ul>
+                      <li>{Terminal} Identifier a (0 +1)
+                        <ul>
+                        </ul>
+                      </li>
+                      <li>{Terminal} Integer 6 (0 +1)
+                        <ul>
+                        </ul>
+                      </li>
+                    </ul>
+                  </li>
+                  <li>{Block}
+                    <ol>
+                      <li>{Operation} Binary call(
+                        <ul>
+                          <li>{Terminal} Identifier writeln (0 +7)
+                            <ul>
+                            </ul>
+                          </li>
+                          <li>{Terminal} String never 2.2 (0 +9)
+                            <ul>
+                            </ul>
+                          </li>
+                        </ul>
+                      </li>
+                    </ol>
+                  </li>
+                  <li>{Statement} if
+                    <ul>
+                      <li>{Operation} Binary ==
+                        <ul>
+                          <li>{Terminal} Identifier a (0 +1)
+                            <ul>
+                            </ul>
+                          </li>
+                          <li>{Terminal} Integer 8 (0 +1)
+                            <ul>
+                            </ul>
+                          </li>
+                        </ul>
+                      </li>
+                      <li>{Block}
+                        <ol>
+                          <li>{Operation} Binary call(
+                            <ul>
+                              <li>{Terminal} Identifier writeln (0 +7)
+                                <ul>
+                                </ul>
+                              </li>
+                              <li>{Terminal} String a == 8 (on elif) (0 +16)
+                                <ul>
+                                </ul>
+                              </li>
+                            </ul>
+                          </li>
+                        </ol>
+                      </li>
+                      <li>{Block}
+                        <ol>
+                          <li>{Operation} Binary call(
+                            <ul>
+                              <li>{Terminal} Identifier writeln (0 +7)
+                                <ul>
+                                </ul>
+                              </li>
+                              <li>{Terminal} String never 2.3 (0 +9)
+                                <ul>
+                                </ul>
+                              </li>
+                            </ul>
+                          </li>
+                        </ol>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ol>
+      </li>
+    </ul>
+    <h2>Outputs</h2>
+      <table border="1">
+      <tr><td>a == 7 (on else after elif)</td></tr>
+      <tr><td>a == 8 (on elif)</td></tr>
+      <tr><td>= 17</td></tr>
+    </table>
+    <h2>Result</h2>
+    <h1>17</h1>
+  </body>
+</html>
