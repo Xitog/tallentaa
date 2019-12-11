@@ -679,20 +679,20 @@ class Parser:
         return 99
     
     def read_expr(self, tokens, index, end_index):
+        #self.debug_expression = True
         if end_index is None: end_index = len(tokens)
         self.level_of_ana += 1
-        # Debug
-        #debug_end = end_index - 1 if end_index == len(tokens) else end_index 
-        #print('    ' * self.level_of_ana, 'read_expr from', index, tokens[index], 'to', end_index, tokens[debug_end])
-        #for t in range(index, end_index):
-        #    print('    ' * self.level_of_ana, ' -', tokens[t])
-        # sorting operators
+        # Sorting operators
         working_list = copy.deepcopy(tokens[index:end_index + 1])
         sorted_operators = []
         prio_values = []
         lvl = 1
         index = 0
         after_aug = False
+        if self.debug_expression:
+            print('================================')
+            print('Building initial list')
+            print('================================')
         while index < len(working_list):
             if after_aug:
                 after_aug = False
@@ -720,12 +720,12 @@ class Parser:
                 if token.typ == Token.Operator:
                     if len(sorted_operators) == 0:
                         if self.debug_expression:
-                            print('    adding the first operator')
+                            print('        => adding the first operator')
                         sorted_operators.append(index)
                         prio_values.append(Parser.PRIORITIES[token.val] * lvl)
                     else:
                         if self.debug_expression:
-                            print('    adding another operator')
+                            print('        => adding another operator')
                         computed_prio = Parser.PRIORITIES[token.val] * lvl
                         ok = False
                         for i in range(0, len(sorted_operators)):
@@ -757,29 +757,39 @@ class Parser:
                 raise Exception("[ERROR] Parser: Expression of length 1 is not valid we have: " + str(working_list[0]))
         else:
             modifier = 0
+            counter = 0 # only for debug
+            length_at_start = len(sorted_operators) # only for debug
             while len(sorted_operators) > 0:
                 # Debug Display
+                counter += 1
                 if self.debug_expression:
-                    print('====================')
+                    print('================================')
+                    print('=', counter, '/', length_at_start)
+                    print('================================')
+                    print('--------------------')
+                    print('Initial working list')
+                    print('--------------------')
+                    for index, token in enumerate(working_list):
+                        print(f"    working_list {index}. {token.__class__.__name__} {token} lvl={token.lvl}")
+                    print('----------------')
                     print('Sorted Operators')
-                    print('====================')
+                    print('----------------')
                     for so in range(0, len(sorted_operators)):
                         idx = sorted_operators[so]
                         obj = working_list[sorted_operators[so] + modifier]
                         print(f'    {so}. index={idx} type={obj.__class__.__name__} str={obj} modifier={modifier}')
+                    print('-------------------')
                     print('Starting to resolve')
-                    print('    Working copy (start):')
-                    for j in range(0, len(working_list)):
-                        print('        ' + str(j) + '. ' + str(working_list[j]))
+                    print('-------------------')
                 # End of Debug Display
                 operator_index = sorted_operators[0] + modifier
                 if self.debug_expression:
-                    print('    Resolving 0. in sorted_operators.')
+                    print('    Resolving 0. in sorted_operators: ' + str(working_list[operator_index]))
                 # Left parameter, None for Unary Operator
                 op = working_list[operator_index]
                 if (type(op) == Token and op.val == 'not') or (type(op) == Operation and op.operator.content.val == 'not'):
                     left = None
-                elif (type(op) == Token and op.val == '-') or (type(op) == Operation and op.operator.content.val == '-'):
+                elif ((type(op) == Token and op.val == '-') or (type(op) == Operation and op.operator.content.val == '-')) and operator_index - 1 < 0:
                     left = None
                 else:
                     left = working_list[operator_index - 1]
@@ -787,11 +797,6 @@ class Parser:
                         left = Terminal(left)
                 # Right parameter
                 right = None
-                #print('len working list =', len(working_list))
-                #print('ope index =', operator_index)
-                #if len(working_list) > operator_index + 1:
-                #    print('ope lvl =', working_list[operator_index + 1].lvl)
-                #    print('param lvl =', working_list[operator_index].lvl)
                 # We must have a parameter and its priority/lvl must be superior : ( "abc" ) abc is lvl = 100 vs () "abc" abc is lvl = 1
                 if (type(op) == Token and op.val == 'call(') or (type(op) == Operation and op.operator.content.val == 'call('):
                     if len(working_list) > operator_index + 1 and working_list[operator_index + 1].lvl > working_list[operator_index].lvl:
@@ -802,22 +807,13 @@ class Parser:
                         right = working_list[operator_index + 1]
                 if right is not None and not isinstance(right, Node):
                     right = Terminal(right)
-                #print('aaa', op, type(op), working_list)
                 op = Terminal(working_list[operator_index])
-                #print('debug OPERATOR>', type(op.typ), op.typ, op.content)
-                #print('debug> LEFT', type(left), left, 'END')
-                #print('debug> RIGHT', type(right), right, 'END')
                 node = Operation(
                     op,
                     left,
                     right
                 )
                 # update working list
-                if self.debug_expression:
-                    print(f'Updating working list, operator_index={operator_index}, left={left}, right={right}')
-                    print('< Before')
-                    for i, e in enumerate(working_list):
-                        print(f'    {i}. {e.__class__.__name__} {e}')
                 if left is not None and right is not None:
                     del working_list[operator_index + 1] # right
                     del working_list[operator_index] # op
@@ -832,12 +828,14 @@ class Parser:
                     working_list.insert(operator_index, node)
                 # update sorted operators
                 if self.debug_expression:
-                    print('> After')
-                    for i, e in enumerate(working_list):
-                        print(f'    {i}. {e.__class__.__name__} {e}')
-                    
-                    print('Updating sorted operators')
-                    print('< Before')
+                    print(f'    Updating working list, operator_index={operator_index}, left={left}, right={right}')
+                    print('---------------------')
+                    print('Modified working list')
+                    print('---------------------')
+                    for index, token in enumerate(working_list):
+                        print(f"    working_list {index}. {token.__class__.__name__} {token} lvl={token.lvl}")
+                    print('    Updating sorted operators')
+                    print('    < Before')
                 del sorted_operators[0]
                 for so in range(0, len(sorted_operators)):
                     if sorted_operators[so] > operator_index:
@@ -846,19 +844,11 @@ class Parser:
                         else:
                             sorted_operators[so] -= 1
                 if self.debug_expression:
-                    print('> After')
-                    print(sorted_operators)
+                    print('    > After')
+                    print('       ', sorted_operators)
             results = end_index + 1, node
-        
-        #    elif tokens[index + 1].typ == Token.Separator and tokens[index + 1].val == '(':
-        #        self.puts('    < FunCall />')
-        #        node = FunCall(Terminal(tokens[index]), Terminal(tokens[index + 2])) # writeln ( "Hello!" ) 0 1 2
-        #        results = index + 4, node # +1 for ")"
-        #    else:
-        #        raise Exception("Non valid expression: " + str(tokens[index]))
         self.level_of_ana -= 1
         return results
-
 
 #-------------------------------------------------------------------------------
 # III. Interpreter [EXEC]
@@ -1031,11 +1021,14 @@ def boo_and(b1, b2):
     return AshObject(AshBoolean, val=b1.val and b2.val)
 def boo_or(b1, b2):
     return AshObject(AshBoolean, val=b1.val or b2.val)
+def boo_not(b):
+    return AshObject(AshBoolean, val=not b.val)
 
 AshBoolean = AshClass('Boolean')
 
 AshBoolean.instance_methods['and'] = boo_and
 AshBoolean.instance_methods['or'] = boo_or
+AshBoolean.instance_methods['not'] = boo_not
 
 AshFloat = AshClass('Float')
 
@@ -1104,8 +1097,8 @@ class Interpreter:
             elif op in ['and', 'or']:
                 return self.do_elem(elem.left).send(op, self.do_elem(elem.right))
             # Not
-            elif elem.operator.content.val == 'not':
-                return not self.do_elem(elem.right)
+            elif op == 'not':
+                return self.do_elem(elem.right).send(op)
             # Function Call
             elif elem.operator.content.val == 'call(':
                 a = self.do_elem(elem.left)
@@ -1155,7 +1148,7 @@ class Interpreter:
             executed = 0
             result = False
             if self.debug: print('[EXEC] Statement cond=', cond, 'executed=', executed)
-            while cond and (executed == 0 or elem.loop):
+            while cond.val and (executed == 0 or elem.loop):
                 result = self.do_elem(elem.action)
                 executed += 1
                 if elem.loop:
@@ -1221,8 +1214,138 @@ class TranspilerPython:
     def __init__(self):
         pass
     
-    def transpile(self, ast):
-        pass
+    def transpile(self, ast, filename):
+        s = self.do_elem(ast)
+        print(s)
+        f = open(filename, mode='w', encoding='utf8')
+        f.write(s)
+        f.close()
+
+    def do_elem(self, elem, affectation=False, Scope=None):
+        if type(elem) == Operation:
+            op = elem.operator.content.val
+            # Arithmetic
+            if op in ['+', '-', '*', '/', '//', '%', '**', '<<', '>>']:
+                if elem.left is None:
+                    return self.do_elem(elem.right).send('unary-')
+                else:
+                    return self.do_elem(elem.left).send(op, self.do_elem(elem.right))
+            # Comparison
+            elif op in ['==', '<=', '<', '>=', '>', '!=']:
+                return self.do_elem(elem.left).send(op, self.do_elem(elem.right))
+            elif op in ['+=', '-=', '*=', '/=', '//=', '%=', '**=']:
+                ids = self.do_elem(elem.left, affectation=True)
+                val = self.do_elem(elem.right)
+                true_op = op[:-1]
+                self.vars[ids] = self.vars[ids].send(true_op, val)
+                return self.vars[ids]
+            # Affectation
+            elif elem.operator.content.val == '=':
+                val = self.do_elem(elem.right)
+                ids = self.do_elem(elem.left, affectation=True)
+                self.vars[ids] = val
+                if self.debug: print('[EXEC] =', val, 'to', ids)
+                return self.vars[ids]
+            # Boolean
+            elif op in ['and', 'or']:
+                return self.do_elem(elem.left).send(op, self.do_elem(elem.right))
+            # Not
+            elif op == 'not':
+                return self.do_elem(elem.right).send(op)
+            # Function Call
+            elif elem.operator.content.val == 'call(':
+                a = self.do_elem(elem.left)
+                return self.do_elem(elem.left).__call__(self.do_elem(elem.right))
+            # Range create
+            elif elem.operator.content.val == '..':
+                a = self.do_elem(elem.left)
+                b = self.do_elem(elem.right)
+                return range(a, b)
+            # Call
+            elif elem.operator.content.val == '.':
+                #if self.debug:
+                #    print(elem)
+                obj = self.do_elem(elem.left)
+                if isinstance(elem.right, Operation) and elem.right.operator.content.val == 'call(':
+                    # TODO: PARAMETERS ARE NOT HANDLED
+                    msg = elem.right.left.content.val
+                else:
+                    raise Exception("don't known what to do with" + str(type(elem.right)))
+                #b = self.do_elem(elem.right, scope={random})
+                if hasattr(obj, msg):
+                    fun = getattr(obj, msg)
+                    if callable(fun):
+                        return fun()
+                    else:
+                        raise Exception("not callable :" + msg)
+                elif b == 'random' and type(a) == range:
+                    # TODO: HERE SHOULD BE THE BASE LIBRARY
+                    import random
+                    return random.sample(a, 1)[0]
+                else:
+                    raise Exception("not implemented yet")
+            # Concat expression
+            elif elem.operator.content.val == ',':
+                args = []
+                args.append(self.do_elem(elem.left))
+                right = self.do_elem(elem.right)
+                if isinstance(right, list):
+                    args.extend(right)
+                else:
+                    args.extend([right])
+                return args
+            else:
+                raise Exception("Operator not known: " + elem.operator.content.val)
+        elif type(elem) == Statement:
+            cond = self.do_elem(elem.cond)
+            executed = 0
+            result = False
+            if self.debug: print('[EXEC] Statement cond=', cond, 'executed=', executed)
+            while cond.val and (executed == 0 or elem.loop):
+                result = self.do_elem(elem.action)
+                executed += 1
+                if elem.loop:
+                    cond = self.do_elem(elem.cond)
+                if self.debug: print('[EXEC] Looping cond=', cond, 'executed=', executed, 'loop=', elem.loop)
+            if executed == 0 and elem.alter is not None:
+                return self.do_elem(elem.alter)
+            else:
+                return result
+        elif type(elem) == Terminal:
+            if elem.content.typ == Token.Integer:
+                return f'AshObject(AshInteger, val={elem.content.val})'
+            elif elem.content.typ == Token.Float:
+                return f'AshObject(AshFloat, val={elem.content.val})'
+            elif elem.content.typ == Token.Boolean:
+                return f'AshObject(AshBoolean, val={elem.content.val == "true"})'
+            elif elem.content.typ == Token.String:
+                return elem.content.val
+            elif elem.content.typ == Token.Identifier:
+                if affectation == True:
+                    return elem.content.val
+                else:
+                    if elem.content.val not in self.vars:
+                        raise Exception(f"[ERROR] Interpreter: Identifier not know: {elem.content.val}")
+                    return self.vars[elem.content.val]
+            else:
+                raise Exception(f"Terminal not known:\nelem.content.typ = {elem.content.typ} and type(elem) = {type(elem)}")
+        #elif type(elem) == FunCall:
+        #    if elem.name.content.val == 'writeln':
+        #        arg = self.do_elem(elem.arg)
+        #        print(arg)
+        #        return len(str(arg))
+        #    else:
+        #        raise Exception("Function not known: " + str(elem.name))
+        elif elem is None:
+            return None
+        elif type(elem) == Block:
+            res = ''
+            for el in elem.actions:
+                res += self.do_elem(el) + '\n'
+                print(res)
+            return res
+        else:
+            raise Exception(f"Elem not known {type(elem).__name__}")
 
 #-------------------------------------------------------------------------------
 # V. Test framework [TESTS]
@@ -1422,8 +1545,8 @@ def run(command, interpreter, output=None):
         f.write(command)
         f.write('    </pre>\n')
         f.write('    <h2>Tokens</h2>\n      <table border="1">\n')
-        for t in tokens:
-            f.write('      <tr><td>' + t.typ.name + '</td><td>' + t.val + '</td></tr>\n')
+        for i, t in enumerate(tokens):
+            f.write(f'      <tr><td>{i}</td><td>{t.typ.name}</td><td>{t.val}</td></tr>\n')
         f.write('    </table>\n')
         f.write('    <h2>Abstract syntax tree</h2>\n')
         f.write(ast.to_html())
@@ -1452,13 +1575,14 @@ if __name__ == '__main__':
                 break
             elif command == 'help':
                 print('Ash language v0.1 2017-2019')
-                print('help     : this help')
-                print('tests    : run multiple tests')
-                print('reset    : reset interpreter')
-                print('debug    : set/unset debug. You can specify true or false')
-                print('locals   : get local variable')
-                print('exec <f> : exec a file')
-                print('exit     : exit this shell')
+                print('help      : this help')
+                print('tests     : run multiple tests')
+                print('reset     : reset interpreter')
+                print('debug     : set/unset debug. You can specify true or false')
+                print('locals    : get local variable')
+                print('exec <f>  : execute a file')
+                print('trans <f> : transpile a file')
+                print('exit      : exit this shell')
             elif command.startswith('debug'):
                 args = command.split(' ')
                 if len(args) < 2:
@@ -1469,6 +1593,25 @@ if __name__ == '__main__':
             elif command == 'locals':
                 for k in sorted(interpreter.vars):
                     print(f"{k:10}", interpreter.vars[k])
+            elif command.startswith('trans'):
+                args = command.split(' ')
+                args = command.split(' ')
+                if len(args) < 2:
+                    console.error('You must indicate a file to process.')
+                else:
+                    arg = args[1]
+                    if not arg.endswith('.ash'):
+                            arg += '.ash'
+                    if not os.path.isfile(arg):
+                        console.error('File ' + arg + ' does not exist')
+                    else:
+                        c = read(arg)
+                        tokenizer = Tokenizer()
+                        parser = Parser()
+                        console.outputs = []
+                        tokens = tokenizer.tokenize(c)
+                        ast = parser.parse(tokens)
+                        TranspilerPython().transpile(ast.root, 'last.py') 
             elif command.startswith('exec') or command == 'tests':
                 if command == 'tests': # hack
                     command = 'exec tests'
