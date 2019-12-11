@@ -914,6 +914,42 @@ def readstr(arg=None):
     
 # III.B Engine
 
+class AshObject:
+
+    def __init__(self, cls=None, val=None):
+        self.val = val
+        self.cls = cls
+        self.attributes = {}
+        if self.cls is not None and hasattr(self.cls, 'instance_methods'):
+            self.methods = self.cls.instance_methods
+
+    def send(self, msg, *params):
+        self.methods[msg](*params)
+
+    def __repr__(self):
+        if self.val is not None:
+            return f'{self.val} : {self.cls.name}'
+        else:
+            return "pipo"
+
+
+class AshClass(AshObject):
+
+    def __init__(self, name):
+        super().__init__(cls=self)
+        self.name = name
+        self.instance_attributes = {}
+        self.instance_methods = {}
+
+AshInteger = AshClass('Integer')
+def int_add(a1, a2):
+    return AshObject(AshInteger, val=a1.val + a2.val)
+AshInteger.instance_methods['+'] = int_add
+
+AshBoolean = AshClass('Boolean')
+AshFloat = AshClass('Float')
+AshString = AshClass('String')
+
 class Interpreter:
     
     def __init__(self, debug=False):
@@ -936,7 +972,8 @@ class Interpreter:
         if type(elem) == Operation:
             #print('do operation', elem)
             if elem.operator.content.val == '+':
-                return self.do_elem(elem.left) + self.do_elem(elem.right)
+                return self.do_elem(elem.left).send('+', self.do_elem(elem.right))
+                #return self.do_elem(elem.left) + self.do_elem(elem.right)
             elif elem.operator.content.val == '-':
                 return self.do_elem(elem.left) - self.do_elem(elem.right)
             elif elem.operator.content.val == '*':
@@ -1065,7 +1102,7 @@ class Interpreter:
                 return result
         elif type(elem) == Terminal:
             if elem.content.typ == Token.Integer:
-                return int(elem.content.val)
+                return AshObject(AshInteger, val=int(elem.content.val))
             elif elem.content.typ == Token.Float:
                 return float(elem.content.val)
             elif elem.content.typ == Token.Boolean:
