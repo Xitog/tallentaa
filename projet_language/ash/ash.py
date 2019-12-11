@@ -543,7 +543,7 @@ class Statement(Node):
 class Parser:
     
     PRIORITIES = { 
-        '=' : 1, '+=' : 1, '-=' : 1, '*=' : 1,
+        '=' : 1, '+=' : 1, '-=' : 1, '*=' : 1, '/=' : 1, '//=' : 1, '**=' : 1, '%=' : 1,
         ',' : 2,
         'and' : 5, 'or' : 5, 'xor' : 5, 
         '>' : 8, '<' : 8, '>=' : 8, '<=' : 8, '==' : 8, '!=' : 8, '<=>' : 8, 
@@ -779,6 +779,8 @@ class Parser:
                 op = working_list[operator_index]
                 if (type(op) == Token and op.val == 'not') or (type(op) == Operation and op.operator.content.val == 'not'):
                     left = None
+                elif (type(op) == Token and op.val == '-') or (type(op) == Operation and op.operator.content.val == '-'):
+                    left = None
                 else:
                     left = working_list[operator_index - 1]
                     if not isinstance(left, Node):
@@ -924,8 +926,15 @@ class AshObject:
             self.methods = self.cls.instance_methods
 
     def send(self, msg, *params):
-        self.methods[msg](*params)
+        res = self.methods[msg](self, *params)
+        return res
 
+    def __gt__(self, o):
+        if self.val is not None and type(o) == AshObject and o.val is not None:
+            return self.val > o.val
+        else:
+            raise Exception("Unable to compare to: " + str(o))
+    
     def __repr__(self):
         if self.val is not None:
             return f'{self.val} : {self.cls.name}'
@@ -941,13 +950,111 @@ class AshClass(AshObject):
         self.instance_attributes = {}
         self.instance_methods = {}
 
+def int_flt(op, res, v1, v2):
+    if v1.cls not in [AshInteger, AshFloat] or v2.cls not in [AshInteger, AshFloat]:
+        raise Exception(f'[ERROR] Interpreter: v1 and v2 must be Integer or Float, not {v1.cls} and {v2.cls}')
+    if op not in ['/', '//']:
+        if v1.cls == v2.cls:
+            return v1.cls
+        else:
+            return AshFloat
+    elif op == '/':
+        return AshFloat
+    elif op == '//':
+        return AshInteger
+    else:
+        raise Exception(f'[ERROR] Interpreter: Operator {op} not known')
+    
 AshInteger = AshClass('Integer')
-def int_add(a1, a2):
-    return AshObject(AshInteger, val=a1.val + a2.val)
-AshInteger.instance_methods['+'] = int_add
+
+def ari_add(a1, a2):
+    val = a1.val + a2.val
+    return AshObject(int_flt('+', val, a1, a2), val=val)
+def ari_sub(a1, a2):
+    val=a1.val - a2.val
+    return AshObject(int_flt('-', val, a1, a2), val=val)
+def ari_mul(a1, a2):
+    val=a1.val * a2.val
+    return AshObject(int_flt('*', val, a1, a2), val=val)
+def ari_div(a1, a2):
+    val=a1.val / a2.val
+    return AshObject(int_flt('/', val, a1, a2), val=val)
+def ari_divint(a1, a2):
+    val=a1.val // a2.val
+    return AshObject(int_flt('//', val, a1, a2), val=val)
+def ari_mod(a1, a2):
+    val=a1.val % a2.val
+    return AshObject(int_flt('%', val, a1, a2), val=val)
+def ari_pow(a1, a2):
+    val=a1.val ** a2.val
+    return AshObject(int_flt('**', val, a1, a2), val=val)
+def ari_lshift(a1, a2):
+    val=a1.val << a2.val
+    return AshObject(int_flt('<<', val, a1, a2), val=val)
+def ari_rshift(a1, a2):
+    val=a1.val >> a2.val
+    return AshObject(int_flt('>>', val, a1, a2), val=val)
+def ari_unary_minus(a1):
+    return AshObject(a1.cls, val=-a1.val)
+
+def ari_cmp_eq(a1, a2):
+    return AshObject(AshBoolean, val=a1.val == a2.val)
+def ari_cmp_le(a1, a2):
+    return AshObject(AshBoolean, val=a1.val <= a2.val)
+def ari_cmp_lt(a1, a2):
+    return AshObject(AshBoolean, val=a1.val < a2.val)
+def ari_cmp_ge(a1, a2):
+    return AshObject(AshBoolean, val=a1.val >= a2.val)
+def ari_cmp_gt(a1, a2):
+    return AshObject(AshBoolean, val=a1.val > a2.val)
+def ari_cmp_dif(a1, a2):
+    return AshObject(AshBoolean, val=a1.val != a2.val)
+
+AshInteger.instance_methods['+'] = ari_add
+AshInteger.instance_methods['-'] = ari_sub
+AshInteger.instance_methods['*'] = ari_mul
+AshInteger.instance_methods['/'] = ari_div
+AshInteger.instance_methods['//'] = ari_divint
+AshInteger.instance_methods['%'] = ari_mod
+AshInteger.instance_methods['**'] = ari_pow
+AshInteger.instance_methods['<<'] = ari_lshift
+AshInteger.instance_methods['>>'] = ari_rshift
+AshInteger.instance_methods['=='] = ari_cmp_eq
+AshInteger.instance_methods['<'] = ari_cmp_lt
+AshInteger.instance_methods['<='] = ari_cmp_le
+AshInteger.instance_methods['>='] = ari_cmp_ge
+AshInteger.instance_methods['>'] = ari_cmp_gt
+AshInteger.instance_methods['!='] = ari_cmp_dif
+AshInteger.instance_methods['unary-'] = ari_unary_minus
+
+def boo_and(b1, b2):
+    return AshObject(AshBoolean, val=b1.val and b2.val)
+def boo_or(b1, b2):
+    return AshObject(AshBoolean, val=b1.val or b2.val)
 
 AshBoolean = AshClass('Boolean')
+
+AshBoolean.instance_methods['and'] = boo_and
+AshBoolean.instance_methods['or'] = boo_or
+
 AshFloat = AshClass('Float')
+
+AshFloat.instance_methods['+'] = ari_add
+AshFloat.instance_methods['-'] = ari_sub
+AshFloat.instance_methods['*'] = ari_mul
+AshFloat.instance_methods['/'] = ari_div
+AshFloat.instance_methods['//'] = ari_divint
+AshFloat.instance_methods['%'] = ari_mod
+AshFloat.instance_methods['**'] = ari_pow
+AshFloat.instance_methods['<<'] = ari_lshift
+AshFloat.instance_methods['>>'] = ari_rshift
+AshFloat.instance_methods['=='] = ari_cmp_eq
+AshFloat.instance_methods['<'] = ari_cmp_lt
+AshFloat.instance_methods['<='] = ari_cmp_le
+AshFloat.instance_methods['>='] = ari_cmp_ge
+AshFloat.instance_methods['>'] = ari_cmp_gt
+AshFloat.instance_methods['!='] = ari_cmp_dif
+
 AshString = AshClass('String')
 
 class Interpreter:
@@ -970,22 +1077,22 @@ class Interpreter:
             else:
                 print(type(elem), '::\n', elem)
         if type(elem) == Operation:
-            #print('do operation', elem)
-            if elem.operator.content.val == '+':
-                return self.do_elem(elem.left).send('+', self.do_elem(elem.right))
-                #return self.do_elem(elem.left) + self.do_elem(elem.right)
-            elif elem.operator.content.val == '-':
-                return self.do_elem(elem.left) - self.do_elem(elem.right)
-            elif elem.operator.content.val == '*':
-                return self.do_elem(elem.left) * self.do_elem(elem.right)
-            elif elem.operator.content.val == '/':
-                return self.do_elem(elem.left) / self.do_elem(elem.right)
-            elif elem.operator.content.val == '%':
-                return self.do_elem(elem.left) % self.do_elem(elem.right)
-            elif elem.operator.content.val == '**':
-                return self.do_elem(elem.left) ** self.do_elem(elem.right)
-            elif elem.operator.content.val == '//':
-                return self.do_elem(elem.left) // self.do_elem(elem.right)
+            op = elem.operator.content.val
+            # Arithmetic
+            if op in ['+', '-', '*', '/', '//', '%', '**', '<<', '>>']:
+                if elem.left is None:
+                    return self.do_elem(elem.right).send('unary-')
+                else:
+                    return self.do_elem(elem.left).send(op, self.do_elem(elem.right))
+            # Comparison
+            elif op in ['==', '<=', '<', '>=', '>', '!=']:
+                return self.do_elem(elem.left).send(op, self.do_elem(elem.right))
+            elif op in ['+=', '-=', '*=', '/=', '//=', '%=', '**=']:
+                ids = self.do_elem(elem.left, affectation=True)
+                val = self.do_elem(elem.right)
+                true_op = op[:-1]
+                self.vars[ids] = self.vars[ids].send(true_op, val)
+                return self.vars[ids]
             # Affectation
             elif elem.operator.content.val == '=':
                 val = self.do_elem(elem.right)
@@ -993,51 +1100,9 @@ class Interpreter:
                 self.vars[ids] = val
                 if self.debug: print('[EXEC] =', val, 'to', ids)
                 return self.vars[ids]
-            elif elem.operator.content.val == '+=':
-                val = self.do_elem(elem.right)
-                ids = self.do_elem(elem.left, affectation=True)
-                self.vars[ids] += val
-                return self.vars[ids]
-            elif elem.operator.content.val == '-=':
-                val = self.do_elem(elem.right)
-                ids = self.do_elem(elem.left, affectation=True)
-                self.vars[ids] -= val
-                return self.vars[ids]
-            elif elem.operator.content.val == '*=':
-                val = self.do_elem(elem.right)
-                ids = self.do_elem(elem.left, affectation=True)
-                self.vars[ids] *= val
-                return self.vars[ids]
-            elif elem.operator.content.val == '>>':
-                val = self.do_elem(elem.right)
-                ids = self.do_elem(elem.left)
-                if type(ids) != int: raise Exception('[ERROR] Unsupported operator >> on ' + str(type(ids)))
-                return ids >> val
-            elif elem.operator.content.val == '<<':
-                val = self.do_elem(elem.right)
-                ids = self.do_elem(elem.left)
-                if type(ids) != int: raise Exception('[ERROR] Unsupported operator << on ' + str(type(ids)))
-                return ids << val
-            # Comparison
-            elif elem.operator.content.val == '==':
-                r = self.do_elem(elem.left) == self.do_elem(elem.right)
-                if self.debug: print('[EXEC] == ', r)
-                return r
-            elif elem.operator.content.val == '!=':
-                return self.do_elem(elem.left) != self.do_elem(elem.right)
-            elif elem.operator.content.val == '<':
-                return self.do_elem(elem.left) < self.do_elem(elem.right)
-            elif elem.operator.content.val == '<=':
-                return self.do_elem(elem.left) <= self.do_elem(elem.right)
-            elif elem.operator.content.val == '>=':
-                return self.do_elem(elem.left) >= self.do_elem(elem.right)
-            elif elem.operator.content.val == '>':
-                return self.do_elem(elem.left) > self.do_elem(elem.right)
             # Boolean
-            elif elem.operator.content.val == 'and':
-                return self.do_elem(elem.left) and self.do_elem(elem.right)
-            elif elem.operator.content.val == 'or':
-                return self.do_elem(elem.left) or self.do_elem(elem.right)
+            elif op in ['and', 'or']:
+                return self.do_elem(elem.left).send(op, self.do_elem(elem.right))
             # Not
             elif elem.operator.content.val == 'not':
                 return not self.do_elem(elem.right)
@@ -1104,9 +1169,9 @@ class Interpreter:
             if elem.content.typ == Token.Integer:
                 return AshObject(AshInteger, val=int(elem.content.val))
             elif elem.content.typ == Token.Float:
-                return float(elem.content.val)
+                return AshObject(AshFloat, val=float(elem.content.val))
             elif elem.content.typ == Token.Boolean:
-                return elem.content.val == "true"
+                return AshObject(AshBoolean, val=elem.content.val == "true")
             elif elem.content.typ == Token.String:
                 return elem.content.val
             elif elem.content.typ == Token.Identifier:
