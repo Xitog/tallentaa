@@ -2,31 +2,33 @@
   <body>
     <h2>Command</h2>
       <pre>
-4
-2.0
-true    </pre>
+sdl.run()    </pre>
     <h2>Tokens</h2>
       <table border="1">
-      <tr><td>0</td><td>Integer</td><td>4</td></tr>
-      <tr><td>1</td><td>New Line</td><td>NEWLINE</td></tr>
-      <tr><td>2</td><td>Float</td><td>2.0</td></tr>
-      <tr><td>3</td><td>New Line</td><td>NEWLINE</td></tr>
-      <tr><td>4</td><td>Boolean</td><td>true</td></tr>
+      <tr><td>0</td><td>Identifier</td><td>sdl</td></tr>
+      <tr><td>1</td><td>Operator</td><td>.</td></tr>
+      <tr><td>2</td><td>Identifier</td><td>run</td></tr>
+      <tr><td>3</td><td>Separator</td><td>(</td></tr>
+      <tr><td>4</td><td>Separator</td><td>)</td></tr>
     </table>
     <h2>Abstract syntax tree</h2>
     <ul>
       <li>{Block}
         <ol>
-          <li>{Terminal} Integer 4 (0 +1)
+          <li>Unary call(
             <ul>
-            </ul>
-          </li>
-          <li>{Terminal} Float 2.0 (0 +3)
-            <ul>
-            </ul>
-          </li>
-          <li>{Terminal} Boolean true (0 +4)
-            <ul>
+              <li>{Operation} Binary .
+                <ul>
+                  <li>{Terminal} Identifier sdl (0 +3)
+                    <ul>
+                    </ul>
+                  </li>
+                  <li>{Terminal} Identifier run (0 +3)
+                    <ul>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
             </ul>
           </li>
         </ol>
@@ -34,9 +36,9 @@ true    </pre>
     </ul>
     <h2>Outputs</h2>
       <table border="1">
-      <tr><td>= True : Boolean</td></tr>
+      <tr><td>= None</td></tr>
     </table>
     <h2>Result</h2>
-    <h1>True : Boolean</h1>
+    <h1>None</h1>
   </body>
 </html>

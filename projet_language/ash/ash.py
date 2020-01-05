@@ -552,8 +552,8 @@ class Parser:
         '*' : 20, '/' : 20, '//' : 20,
         '**' : 30, '%' : 30,
         'call' : 35,
-        '.' : 40,
-        'call(' : 50,
+        'call(' : 40,
+        '.' : 50,
         'not' : 51,
         'unary-' : 52,
         'expr(' : 60,
@@ -823,6 +823,10 @@ class Parser:
                     del working_list[operator_index + 1] # right
                     del working_list[operator_index] # op
                     working_list.insert(operator_index, node)
+                elif left is not None and right is None: # call( without arg
+                    del working_list[operator_index] # op
+                    del working_list[operator_index - 1] # left
+                    working_list.insert(operator_index - 1, node)
                 else: # left is None and right is None
                     del working_list[operator_index]
                     working_list.insert(operator_index, node)
@@ -919,6 +923,9 @@ class AshObject:
         res = self.methods[msg](self, *params)
         return res
 
+    def get_method(self, name):
+        return self.methods[name]
+    
     def __gt__(self, o):
         if self.val is not None and type(o) == AshObject and o.val is not None:
             return self.val > o.val
@@ -929,7 +936,7 @@ class AshObject:
         if self.val is not None:
             return f'{self.val} : {self.cls.name}'
         else:
-            return "pipo"
+            return '{AshObject}'
 
 
 class AshClass(AshObject):
@@ -1050,6 +1057,41 @@ AshFloat.instance_methods['!='] = ari_cmp_dif
 
 AshString = AshClass('String')
 
+AshModule = AshClass('Module')
+
+AshModuleSDL = AshObject(cls=AshModule)
+
+global tk_root
+global tk_screen
+
+def SDL_init(self):
+    from tkinter import Tk, Label, Canvas
+    global tk_root, tk_screen
+    tk_root = Tk()
+    tk_root.title('Init')
+    tk_root.geometry("645x485")
+    #w = Label(root, text="Hello")
+    tk_screen = Canvas(tk_root, width=640, height=480, background='#000000')
+    tk_screen.create_text(30, 30, text="Hello", fill='#FF0000')
+    tk_screen.pack()
+    tk_root.wm_attributes("-topmost", 1)
+    #root.focus_force()
+
+def SDL_run(self):
+    global tk_root
+    tk_root.mainloop()
+
+def SDL_text(self, args):
+    global tk_screen
+    x = args[0]
+    y = args[1]
+    t = args[2]
+    tk_screen.create_text(x, y, text=t, fill='#FF0000')
+
+AshModuleSDL.methods['init'] = SDL_init
+AshModuleSDL.methods['run'] = SDL_run
+AshModuleSDL.methods['text'] = SDL_text
+
 class Interpreter:
     
     def __init__(self, debug=False):
@@ -1058,6 +1100,7 @@ class Interpreter:
         self.vars['write'] = write
         self.vars['readint'] = readint
         self.vars['readstr'] = readstr
+        self.vars['sdl'] = AshModuleSDL
         self.debug = debug
 
     #def set_debug(self):
@@ -1110,27 +1153,28 @@ class Interpreter:
                 return range(a, b)
             # Call
             elif elem.operator.content.val == '.':
-                #if self.debug:
-                #    print(elem)
                 obj = self.do_elem(elem.left)
-                if isinstance(elem.right, Operation) and elem.right.operator.content.val == 'call(':
-                    # TODO: PARAMETERS ARE NOT HANDLED
-                    msg = elem.right.left.content.val
-                else:
-                    raise Exception("don't known what to do with" + str(type(elem.right)))
-                #b = self.do_elem(elem.right, scope={random})
-                if hasattr(obj, msg):
-                    fun = getattr(obj, msg)
-                    if callable(fun):
-                        return fun()
-                    else:
-                        raise Exception("not callable :" + msg)
-                elif b == 'random' and type(a) == range:
-                    # TODO: HERE SHOULD BE THE BASE LIBRARY
-                    import random
-                    return random.sample(a, 1)[0]
-                else:
-                    raise Exception("not implemented yet")
+                msg = elem.right.content.val
+                return obj.get_method(msg)
+                # NOT USED BELOW
+                #if isinstance(elem.right, Operation) and elem.right.operator.content.val == 'call(':
+                #    # TODO: PARAMETERS ARE NOT HANDLED
+                #    msg = elem.right.left.content.val
+                #else:
+                #    raise Exception("don't known what to do with <" + type(elem.right).__name__ + '>' + str(elem.right))
+                ##b = self.do_elem(elem.right, scope={random})
+                #if hasattr(obj, msg):
+                #    fun = getattr(obj, msg)
+                #    if callable(fun):
+                #        return fun()
+                #    else:
+                #        raise Exception("not callable :" + msg)
+                #elif b == 'random' and type(a) == range: # TODO: do not work
+                #    # TODO: HERE SHOULD BE THE BASE LIBRARY
+                #    import random
+                #    return random.sample(a, 1)[0]
+                #else:
+                #    raise Exception("not implemented yet")
             # Concat expression
             elif elem.operator.content.val == ',':
                 args = []
@@ -1531,12 +1575,19 @@ def run(command, interpreter, output=None):
     tokenizer = Tokenizer()
     parser = Parser()
     console.outputs = []
-                    
-    tokens = tokenizer.tokenize(command)
-    ast = parser.parse(tokens)
-    res = interpreter.do_ast(ast)
-    console.puts('= ' + str(res))
-                    
+
+    tokens = []
+    ast = None
+    res = None
+    try:
+        tokens = tokenizer.tokenize(command)
+        ast = parser.parse(tokens)
+        res = interpreter.do_ast(ast)
+        console.puts('= ' + str(res))
+    except Exception as e:
+        console.error(e)
+        traceback.print_exc(file=sys.stdout)
+    
     if debug:
         filename = output if output is not None else 'last.html'
         f = open(filename, mode='w', encoding='utf8')
@@ -1549,7 +1600,10 @@ def run(command, interpreter, output=None):
             f.write(f'      <tr><td>{i}</td><td>{t.typ.name}</td><td>{t.val}</td></tr>\n')
         f.write('    </table>\n')
         f.write('    <h2>Abstract syntax tree</h2>\n')
-        f.write(ast.to_html())
+        if ast is not None:
+            f.write(ast.to_html())
+        else:
+            f.write('    <p>No AST defined.</p>\n')
         f.write('    <h2>Outputs</h2>\n      <table border="1">\n')
         for t in console.outputs:
             f.write('      <tr><td>' + str(t) + '</td></tr>\n')
