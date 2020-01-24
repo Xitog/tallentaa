@@ -21,6 +21,7 @@ from tkinter.filedialog import askopenfilename, asksaveasfilename
 from tkinter.messagebox import showinfo
 #from tkinter.ttk import Treeview, Button
 import json
+import os
 import os.path
 
 #-----------------------------------------------------------
@@ -47,6 +48,7 @@ except TclError:
     print("Unable to load image.")
     img = False
 
+# Texture codes
 DEEP = -2
 WATER = -1
 MUD = 0
@@ -59,26 +61,62 @@ current_tex = WATER
 pencil='1x1'
 status_var =  StringVar()
 status_var.set('Welcome')
-content = []
+current_map = None
 dic = { DEEP : deep, WATER : water, MUD : mud, DRY : dry, GRASS : grass, DARK : dark }
 
 #-----------------------------------------------------------
 # Map functions
 #-----------------------------------------------------------
 
-def create_map(max_col, max_row, default=0):
-    ground = []
-    for row in range(max_row):
-        r = []
-        for col in range(max_col):
-            r.append(default)
-        ground.append(r)
-    return ground
+class Map:
 
-def to_json(filepath, ground):
-    f = open(filepath, 'w')
-    json.dump(ground, f, indent="    ")
-    f.close()
+    def __init__(self, name, max_col, max_row, default=0):
+        self.set_name(name)
+        self.ground = []
+        for row in range(max_row):
+            r = []
+            for col in range(max_col):
+                r.append(default)
+            self.ground.append(r)
+
+    def set_name(self, name):
+        self.name = name
+
+    def set(self, row, col, tex):
+        self.ground[row][col] = tex
+
+    def get(self, row, col):
+        return self.ground[row][col]
+    
+    def to_json(self, filepath, test=False):
+        f = open(filepath, 'w')
+        s = '{\n'
+        s += f'    "name": "{self.name}",\n'
+        s += '    "ground" : [\n'
+        for irow, row in enumerate(self.ground):
+            s += '        ['
+            for icol, col in enumerate(row):
+                if icol != len(row) - 1:
+                    s += f'{col}, '
+                else:
+                    s += f'{col}'
+            if irow != len(self.ground) - 1:
+                s += '],\n'
+            else:
+                s += ']\n'
+        s += '    ]\n'
+        s += '}'
+        f.write(s)
+        f.close()
+        if test:
+            try:
+                f = open(filepath, 'r')
+                data = json.load(f)
+                f.close()
+            except Exception:
+                print('Something went wrong when trying to load map. Map may be corrupted.')
+                print('Stack info:')
+                traceback.print_exc(file=sys.stdout)
 
 def num2tex(n):
     return dic[n]
@@ -109,13 +147,14 @@ def menu_tools_image():
     pass
     
 def menu_file_save_as():
-    filepath = asksaveasfilename(initialdir = "/",title = "Select where to save", filetypes = (("map files","*.map"),("all files","*.*")))
+    filepath = asksaveasfilename(initialdir = os.getcwd(),title = "Select where to save", filetypes = (("map files","*.map"),("all files","*.*")))
     if filepath != '':
         if not filepath.endswith('.map'):
             filepath += '.map'
-        to_json(filepath, content)
         bn = os.path.basename(filepath)
         n = os.path.splitext(bn)[0]
+        current_map.set_name(n)
+        current_map.to_json(filepath, True)
         root.title(f"{application_title} - {n}")
 
 #-----------------------------------------------------------
@@ -204,7 +243,7 @@ def put_texture(event):
     if 0 <= x32 < 32 and 0 <= y32 < 32:
         tex = num2tex(current_tex)
         canvas.create_image(x32 * 32, y32 * 32, anchor=NW, image=tex)
-        content[y32][x32] = current_tex
+        current_map.set(y32, x32, current_tex)
 
 #-----------------------------------------------------------
 # GUI
@@ -312,10 +351,10 @@ canvas.bind('<Motion>', refresh_status_bar)
 #-----------------------------------------------------------
 
 if __name__ == "__main__":
-    content = create_map(32, 32, 2)
+    current_map = Map('New', 32, 32, 2)
     for row in range(0, 32):
         for col in range(0, 32):
-            val = content[row][col]
+            val = current_map.get(row, col)
             tex = num2tex(val)
             canvas.create_image(row * 32, col * 32, anchor=NW, image=tex)
     root.mainloop()
