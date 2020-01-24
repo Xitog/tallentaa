@@ -23,6 +23,32 @@ from tkinter.messagebox import showinfo
 import json
 import os
 import os.path
+from functools import partial
+
+#-----------------------------------------------------------
+# Mods
+#-----------------------------------------------------------
+mod_cur = 'rts'
+mod_dir = os.path.join(os.getcwd(), 'mod')
+if not os.path.isdir(mod_dir):
+    raise Exception('No mod directory. Impossible to start.')
+else:
+    found = False
+    for mod in os.listdir(mod_dir):
+        if mod == mod_cur:
+            found = True
+            break
+    mod_file = os.path.join(mod_dir, mod_cur, mod_cur + '.mod')
+    if not found:
+        raise Exception('Current mod not found. Impossible to start.')
+    elif not os.path.isfile(mod_file):
+        raise Exception(f'No mod file {mod_file} found. Impossible to start.')
+    else:
+        f = open(mod_file, 'r', encoding='utf8')
+        mod_data = json.load(f)
+        mod_graphics = os.path.join(mod_dir, mod_cur, 'graphics')
+        if not os.path.isdir(mod_graphics):
+            raise Exception('No graphics dir for mod. Impossible to start.')
 
 #-----------------------------------------------------------
 # Constants & Global variables
@@ -32,37 +58,34 @@ canvas_width = 200
 canvas_height = 100
 
 root = Tk()
+textures = {}
+
+class Texture:
+
+    def __init__(self, rep, name, num):
+        self.name = name
+        self.num = num
+        self.first = self.name + '-1.png'
+        self.path = os.path.join(rep, self.first)
+        self.tkimg = PhotoImage(file=self.path)
 
 # Load images
 img = True
 try:
     root.iconbitmap(r'media\icons\editor.ico')
     save = PhotoImage(file=r"media\icons\save.png")
-    deep = PhotoImage(file=r"media\icons\deep-1.png")
-    water = PhotoImage(file=r"media\icons\water-1.png")
-    mud = PhotoImage(file=r"media\icons\mud-1.png")
-    dry = PhotoImage(file=r"media\icons\dry-1.png")
-    grass = PhotoImage(file=r"media\icons\grass-1.png")
-    dark = PhotoImage(file=r"media\icons\dark-1.png")
+    for name, num in mod_data['textures'].items():
+        textures[name] = Texture(mod_graphics, name, num)
 except TclError:
-    print("Unable to load image.")
-    img = False
-
-# Texture codes
-DEEP = -2
-WATER = -1
-MUD = 0
-DRY = 1
-GRASS = 2
-DARK = 3
+    raise("Unable to load image. Impossible to start.")
+    #img = False
 
 application_title = 'Map editor'
-current_tex = WATER
+current_tex = mod_data['cursor_default']
 pencil='1x1'
 status_var =  StringVar()
 status_var.set('Welcome')
 current_map = None
-dic = { DEEP : deep, WATER : water, MUD : mud, DRY : dry, GRASS : grass, DARK : dark }
 
 #-----------------------------------------------------------
 # Map functions
@@ -119,7 +142,9 @@ class Map:
                 traceback.print_exc(file=sys.stdout)
 
 def num2tex(n):
-    return dic[n]
+    for _, tex in textures.items():
+        if tex.num == n:
+            return tex.tkimg
 
 #-----------------------------------------------------------
 # Menu actions
@@ -164,65 +189,14 @@ def menu_file_save_as():
 def cmd_save():
     pass
 
-def cmd_deep():
+def bt_refresh(tkimg):
     global current_tex
-    current_tex = DEEP
-    bt_tex_deep.config(relief=SUNKEN)
-    bt_tex_water.config(relief=RAISED)
-    bt_tex_mud.config(relief=RAISED)
-    bt_tex_dry.config(relief=RAISED)
-    bt_tex_grass.config(relief=RAISED)
-    bt_tex_dark.config(relief=RAISED)
-    
-def cmd_water():
-    global current_tex
-    current_tex = WATER
-    bt_tex_deep.config(relief=RAISED)
-    bt_tex_water.config(relief=SUNKEN)
-    bt_tex_mud.config(relief=RAISED)
-    bt_tex_dry.config(relief=RAISED)
-    bt_tex_grass.config(relief=RAISED)
-    bt_tex_dark.config(relief=RAISED)
-
-def cmd_mud():
-    global current_tex
-    current_tex = MUD
-    bt_tex_deep.config(relief=RAISED)
-    bt_tex_water.config(relief=RAISED)
-    bt_tex_mud.config(relief=SUNKEN)
-    bt_tex_dry.config(relief=RAISED)
-    bt_tex_grass.config(relief=RAISED)
-    bt_tex_dark.config(relief=RAISED)
-
-def cmd_dry():
-    global current_tex
-    current_tex = DRY
-    bt_tex_deep.config(relief=RAISED)
-    bt_tex_water.config(relief=RAISED)
-    bt_tex_mud.config(relief=RAISED)
-    bt_tex_dry.config(relief=SUNKEN)
-    bt_tex_grass.config(relief=RAISED)
-    bt_tex_dark.config(relief=RAISED)
-
-def cmd_grass():
-    global current_tex
-    current_tex = GRASS
-    bt_tex_deep.config(relief=RAISED)
-    bt_tex_water.config(relief=RAISED)
-    bt_tex_mud.config(relief=RAISED)
-    bt_tex_dry.config(relief=RAISED)
-    bt_tex_grass.config(relief=SUNKEN)
-    bt_tex_dark.config(relief=RAISED)
-
-def cmd_dark():
-    global current_tex
-    current_tex = DARK
-    bt_tex_deep.config(relief=RAISED)
-    bt_tex_water.config(relief=RAISED)
-    bt_tex_mud.config(relief=RAISED)
-    bt_tex_dry.config(relief=RAISED)
-    bt_tex_grass.config(relief=RAISED)
-    bt_tex_dark.config(relief=SUNKEN)
+    for key, bt in bt_all.items():
+        if textures[key].tkimg == tkimg:
+            bt.config(relief=SUNKEN)
+            current_tex = textures[key].num
+        else:
+            bt.config(relief=RAISED)
 
 #-----------------------------------------------------------
 # Apply texture functions
@@ -293,22 +267,12 @@ helpmenu.add_command(label="About...", command=About)
 # Frame & button bar
 content = Frame(root, width=600, height=600)
 toolbar = Frame(content)
-if img:
-    bt_tex_save = Button(toolbar, image=save, width=32, height=32, command=cmd_save)
-    bt_tex_deep = Button(toolbar, image=deep, width=32, height=32, command=cmd_deep)
-    bt_tex_water = Button(toolbar, image=water, width=32, height=32, command=cmd_water, relief=SUNKEN)
-    bt_tex_mud = Button(toolbar, image=mud, width=32, height=32, command=cmd_mud)
-    bt_tex_dry = Button(toolbar, image=dry, width=32, height=32, command=cmd_dry)
-    bt_tex_grass = Button(toolbar, image=grass, width=32, height=32, command=cmd_grass)
-    bt_tex_dark = Button(toolbar, image=dark, width=32, height=32, command=cmd_dark)
-else:
-    bt_tex_save = Button(toolbar, text="Save")
-    bt_tex_deep = Button(toolbar, text="De")
-    bt_tex_water = Button(toolbar, text="Wa")
-    bt_tex_mud = Button(toolbar, text="Mu")
-    bt_tex_dry = Button(toolbar, text="Dr")
-    bt_tex_grass = Button(toolbar, text="Gr")
-    bt_tex_dark = Button(toolbar, text="Da")
+#if img:
+bt_tex_save = Button(toolbar, image=save, width=32, height=32, command=cmd_save)
+bt_all = {}
+for _, tex in textures.items():
+    print(tex.tkimg)
+    bt_all[tex.name] = Button(toolbar, image=tex.tkimg, width=32, height=32, command=partial(bt_refresh, tex.tkimg))
 
 sep1 = Label(toolbar, text=" ")
 x_scrollbar = Scrollbar(content, orient=HORIZONTAL)
@@ -329,18 +293,14 @@ y_scrollbar.config(command=canvas.yview)
 status.pack(side=BOTTOM, fill=X)
 bt_tex_save.pack(side=LEFT)
 sep1.pack(side=LEFT)
-bt_tex_deep.pack(side=LEFT)
-bt_tex_water.pack(side=LEFT)
-bt_tex_mud.pack(side=LEFT)
-bt_tex_dry.pack(side=LEFT)
-bt_tex_grass.pack(side=LEFT)
-bt_tex_dark.pack(side=LEFT)
+for _, bt in bt_all.items():
+    bt.pack(side=LEFT)
 
 # Canvas
-canvas.create_line(0, 0, 200, 100)
-canvas.create_line(0, 100, 200, 0, fill="red", dash=(4, 4))
-canvas.create_rectangle(50, 25, 150, 75, fill="blue")
-canvas.create_text(canvas_width / 2, canvas_height / 2, text="Python")
+#canvas.create_line(0, 0, 200, 100)
+#canvas.create_line(0, 100, 200, 0, fill="red", dash=(4, 4))
+#canvas.create_rectangle(50, 25, 150, 75, fill="blue")
+#canvas.create_text(canvas_width / 2, canvas_height / 2, text="Python")
 canvas.bind('<ButtonPress-1>', put_texture)
 canvas.bind('<B1-Motion>', put_texture)
 #canvas.bind('<ButtonRelease-1>', end_texture)
@@ -351,7 +311,7 @@ canvas.bind('<Motion>', refresh_status_bar)
 #-----------------------------------------------------------
 
 if __name__ == "__main__":
-    current_map = Map('New', 32, 32, 2)
+    current_map = Map('New', 32, 32, mod_data["ground_default"])
     for row in range(0, 32):
         for col in range(0, 32):
             val = current_map.get(row, col)
