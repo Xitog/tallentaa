@@ -58,6 +58,7 @@ canvas_width = 200
 canvas_height = 100
 
 root = Tk()
+icons = {}
 textures = {}
 
 class Texture:
@@ -73,19 +74,25 @@ class Texture:
 img = True
 try:
     root.iconbitmap(r'media\icons\editor.ico')
-    save = PhotoImage(file=r"media\icons\save.png")
+    icons['new'] = PhotoImage(file=r"media\icons\Actions-document-new-icon.png")
+    icons['open'] = PhotoImage(file=r"media\icons\Actions-document-open-icon.png")
+    icons['save'] = PhotoImage(file=r"media\icons\Actions-document-save-icon.png")
+    icons['save_as'] = PhotoImage(file=r"media\icons\Actions-document-save-as-icon.png")
+    icons['1x1'] = PhotoImage(file=r"media\icons\Little.png")
+    icons['3x3'] = PhotoImage(file=r"media\icons\Medium.png")
+    icons['5x5'] = PhotoImage(file=r"media\icons\Big.png")
     for name, num in mod_data['textures'].items():
         textures[name] = Texture(mod_graphics, name, num)
 except TclError:
     raise("Unable to load image. Impossible to start.")
     #img = False
 
-application_title = 'Map editor'
 current_tex = mod_data['cursor_default']
-pencil='1x1'
+
+current_pencil = '1x1'
+
 status_var =  StringVar()
 status_var.set('Welcome')
-current_map = None
 
 #-----------------------------------------------------------
 # Map functions
@@ -110,6 +117,15 @@ class Map:
 
     def get(self, row, col):
         return self.ground[row][col]
+
+    @staticmethod
+    def from_json(filepath):
+        f = open(filepath, 'r')
+        data = json.load(f)
+        f.close()
+        m = Map(data["name"], len(data["ground"][0]), len(data["ground"]), mod_data["ground_default"])
+        m.ground = data["ground"]
+        return m
     
     def to_json(self, filepath, test=False):
         f = open(filepath, 'w')
@@ -146,48 +162,125 @@ def num2tex(n):
         if tex.num == n:
             return tex.tkimg
 
+
+#-----------------------------------------------------------
+        
+class Application:
+
+    def __init__(self, tk, m=None):
+        self.tk = tk
+        self.canvas = None
+        self.title = 'Map editor'
+        self.map = m
+        self.filepath = None
+        self.dirty = False
+
+    def link_canvas(self, canvas):
+        self.canvas = canvas
+
+    def is_linked(self):
+        return self.filepath is not None
+    
+    def create_map(self, name, width, height, default):
+        self.map = Map(name, width, height, default)
+        self.filepath = None
+        self.dirty = False
+        self.refresh_map()
+
+    def change_map(self, col, lin, val):
+        self.map.set(lin, col, val)
+        self.dirty = True
+        self.refresh_title()
+    
+    def rename_map(self, name):
+        self.map.set_name(name)
+        self.dirty = True
+        self.refresh_title()
+
+    def load_map(self, filepath):
+        self.map = Map.from_json(filepath)
+        self.filepath = filepath
+        self.dirty = False
+        self.refresh_map()
+    
+    def save_map(self, filepath=None):
+        if filepath is None and self.filepath is None:
+            raise Exception("Cannot save to None")
+        elif filepath is None:
+            filepath = self.filepath
+        self.map.to_json(filepath, True)
+        self.filepath = filepath
+        self.dirty = False
+        self.refresh_title()
+    
+    def refresh_title(self):
+        if self.map is None:
+            txt = f'{self.title}'
+        else:
+            dirty = '*' if self.dirty else ''
+            txt = f'{self.title} - {self.map.name} {dirty}'
+        self.tk.title(txt)
+
+    def refresh_map(self):
+        for row in range(0, 32):
+            for col in range(0, 32):
+                val = self.map.get(row, col)
+                tex = num2tex(val)
+                self.canvas.create_image(col * 32, row * 32, anchor=NW, image=tex)
+        self.refresh_title()
+
+    def quit(self):
+        self.canvas.destroy()
+        self.tk.destroy()
+
+app = Application(root)
+
 #-----------------------------------------------------------
 # Menu actions
 #-----------------------------------------------------------
 
-def NewFile():
-    print("New File!")
+def menu_file_new():
+    app.create_map('New map', 32, 32, default=mod_data["ground_default"])
 
-def OpenFile():
-    name = askopenfilename()
-    print(name)
+def menu_file_open():
+    filepath = askopenfilename(initialdir = os.getcwd(), title = "Select a file to open", filetypes = (("map files","*.map"),("all files","*.*")))
+    if filepath != '':
+        app.load_map(filepath)
+
+def menu_file_save():
+    if app.is_linked():
+        app.save_map()
+    else:
+        menu_file_save_as()
+
+def menu_file_save_as():
+    filepath = asksaveasfilename(initialdir = os.getcwd(), title = "Select where to save", filetypes = (("map files","*.map"),("all files","*.*")))
+    if filepath != '':
+        if not filepath.endswith('.map'):
+            filepath += '.map'
+        bn = os.path.basename(filepath)
+        n = os.path.splitext(bn)[0]
+        app.rename_map(n)
+        app.save_map(filepath)
+
+def menu_file_exit():
+    global app
+    app.quit()
+    del app
 
 def About():
     showinfo("About", "This is a simple example of a menu")
 
-def menu_file_quit():
-    global canvas, root
-    canvas.destroy()
-    root.destroy()
 
 def menu_tools_check():
     print('Checking map conformity')
 
 def menu_tools_image():
     pass
-    
-def menu_file_save_as():
-    filepath = asksaveasfilename(initialdir = os.getcwd(),title = "Select where to save", filetypes = (("map files","*.map"),("all files","*.*")))
-    if filepath != '':
-        if not filepath.endswith('.map'):
-            filepath += '.map'
-        bn = os.path.basename(filepath)
-        n = os.path.splitext(bn)[0]
-        current_map.set_name(n)
-        current_map.to_json(filepath, True)
-        root.title(f"{application_title} - {n}")
 
 #-----------------------------------------------------------
 # Button actions
 #-----------------------------------------------------------
-
-def cmd_save():
-    pass
 
 def bt_refresh(tkimg):
     global current_tex
@@ -197,6 +290,15 @@ def bt_refresh(tkimg):
             current_tex = textures[key].num
         else:
             bt.config(relief=RAISED)
+
+def set_pencil(p):
+    global current_pencil
+    for key, bt in bt_pencils.items():
+        if key == p:
+            bt.config(relief=SUNKEN)
+        else:
+            bt.config(relief=RAISED)
+    current_pencil = p
 
 #-----------------------------------------------------------
 # Apply texture functions
@@ -214,28 +316,43 @@ def refresh_status_bar(event):
 
 def put_texture(event):
     x32, y32 = get_map_coord(event)
-    if 0 <= x32 < 32 and 0 <= y32 < 32:
-        tex = num2tex(current_tex)
-        canvas.create_image(x32 * 32, y32 * 32, anchor=NW, image=tex)
-        current_map.set(y32, x32, current_tex)
+    if current_pencil == '1x1':
+        start_x = x32
+        end_x = x32 + 1
+        start_y = y32
+        end_y = y32 + 1
+    elif current_pencil == '3x3':
+        start_x = x32 - 1
+        end_x = x32 + 2
+        start_y = y32 - 1
+        end_y = y32 + 2
+    elif current_pencil == '5x5':
+        start_x = x32 - 2
+        end_x = x32 + 3
+        start_y = y32 - 2
+        end_y = y32 + 3
+    for x in range(start_x, end_x):
+        for y in range(start_y, end_y):
+            if 0 <= x < 32 and 0 <= y < 32:
+                tex = num2tex(current_tex)
+                canvas.create_image(x * 32, y * 32, anchor=NW, image=tex)
+                app.change_map(x, y, current_tex)
 
 #-----------------------------------------------------------
 # GUI
 #-----------------------------------------------------------
-
-root.title(f"{application_title} - New map")
 
 # Menu
 menu = Menu(root)
 root.config(menu=menu)
 filemenu = Menu(menu, tearoff=0)
 menu.add_cascade(label="File", menu=filemenu)
-filemenu.add_command(label="New...", command=NewFile)
-filemenu.add_command(label="Open...", command=OpenFile)
-filemenu.add_command(label="Save", command=OpenFile)
+filemenu.add_command(label="New...", command=menu_file_new)
+filemenu.add_command(label="Open...", command=menu_file_open)
+filemenu.add_command(label="Save", command=menu_file_save)
 filemenu.add_command(label="Save As...", command=menu_file_save_as)
 filemenu.add_separator()
-filemenu.add_command(label="Exit", command=menu_file_quit)
+filemenu.add_command(label="Exit", command=menu_file_exit)
 
 editmenu = Menu(menu, tearoff=0)
 menu.add_cascade(label="Edit", menu=editmenu)
@@ -267,22 +384,37 @@ helpmenu.add_command(label="About...", command=About)
 # Frame & button bar
 content = Frame(root, width=600, height=600)
 toolbar = Frame(content)
-#if img:
-bt_tex_save = Button(toolbar, image=save, width=32, height=32, command=cmd_save)
+
+bt_new = Button(toolbar, image=icons['new'], width=32, height=32, command=menu_file_new)
+bt_open = Button(toolbar, image=icons['open'], width=32, height=32, command=menu_file_open)
+bt_save = Button(toolbar, image=icons['save'], width=32, height=32, command=menu_file_save)
+bt_save_as = Button(toolbar, image=icons['save_as'], width=32, height=32, command=menu_file_save_as)
+
+bt_pencils = {}
+bt_pencils['1x1'] = Button(toolbar, image=icons['1x1'], width=32, height=32, command=lambda: set_pencil('1x1'), relief=SUNKEN)
+bt_pencils['3x3'] = Button(toolbar, image=icons['3x3'], width=32, height=32, command=lambda: set_pencil('3x3'), relief=RAISED)
+bt_pencils['5x5'] = Button(toolbar, image=icons['5x5'], width=32, height=32, command=lambda: set_pencil('5x5'), relief=RAISED)
+#bt_pencils['1x1'].config(relief=SUNKEN)
+
 bt_all = {}
 for _, tex in textures.items():
-    print(tex.tkimg)
     bt_all[tex.name] = Button(toolbar, image=tex.tkimg, width=32, height=32, command=partial(bt_refresh, tex.tkimg))
+    if current_tex == tex.num:
+        bt_all[tex.name].config(relief=SUNKEN)
 
-sep1 = Label(toolbar, text=" ")
+# Canvas
 x_scrollbar = Scrollbar(content, orient=HORIZONTAL)
 y_scrollbar = Scrollbar(content, orient=VERTICAL)
 canvas = Canvas(content,
                 scrollregion=(0, 0, 32*32, 32*32),
                 xscrollcommand=x_scrollbar.set,
                 yscrollcommand=y_scrollbar.set)
+app.link_canvas(canvas)
+
+# Status
 status = Label(content, textvariable = status_var, relief=SUNKEN, anchor=E)
 
+# Packing
 content.pack(fill=BOTH,expand=True)
 toolbar.pack(side=TOP, fill=X)
 y_scrollbar.pack(side=RIGHT, fill=Y)
@@ -291,8 +423,19 @@ canvas.pack(side=TOP, fill=BOTH, expand=True)
 x_scrollbar.config(command=canvas.xview)
 y_scrollbar.config(command=canvas.yview)
 status.pack(side=BOTTOM, fill=X)
-bt_tex_save.pack(side=LEFT)
+
+bt_new.pack(side=LEFT)
+bt_open.pack(side=LEFT)
+bt_save.pack(side=LEFT)
+bt_save_as.pack(side=LEFT)
+sep1 = Label(toolbar, text=" ")
 sep1.pack(side=LEFT)
+
+for _, bt in bt_pencils.items():
+    bt.pack(side=LEFT)
+sep2 = Label(toolbar, text=" ")
+sep2.pack(side=LEFT)
+
 for _, bt in bt_all.items():
     bt.pack(side=LEFT)
 
@@ -311,10 +454,5 @@ canvas.bind('<Motion>', refresh_status_bar)
 #-----------------------------------------------------------
 
 if __name__ == "__main__":
-    current_map = Map('New', 32, 32, mod_data["ground_default"])
-    for row in range(0, 32):
-        for col in range(0, 32):
-            val = current_map.get(row, col)
-            tex = num2tex(val)
-            canvas.create_image(row * 32, col * 32, anchor=NW, image=tex)
+    app.create_map("New map", 32, 32, mod_data["ground_default"])
     root.mainloop()
