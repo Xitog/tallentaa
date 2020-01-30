@@ -207,3 +207,9 @@ void set_pixel(int x, int y, Uint32 color) {
     *px = color;
 }
 
+void display(SDL_Surface * surf, int x, int y) {
+    SDL_Rect r;
+    r.x = x;
+    r.y = y;
+    SDL_BlitSurface(surf, NULL, screen,  &r);
+}

@@ -2,15 +2,20 @@
 # Map Editor for 2D square maps (RTS, RPG)
 #-----------------------------------------------------------
 # Created: May 11, 2019
-# Modified: May 13, 2019
-
-# Imports
-# Constants & Global variables
-# Menu actions
-# Button actions
-# Apply texture functions
-# GUI
-# Main
+# Modified: January 28, 2020
+#-----------------------------------------------------------
+# Summary
+#   Imports
+#   Mods
+#   Constants & Global variables
+#   Map class
+#   Application class
+#   Menu actions
+#   Button actions
+#   Apply texture functions
+#   GUI building
+#   Main
+#-----------------------------------------------------------
 
 #-----------------------------------------------------------
 # Imports
@@ -95,7 +100,7 @@ status_var =  StringVar()
 status_var.set('Welcome')
 
 #-----------------------------------------------------------
-# Map functions
+# Map class
 #-----------------------------------------------------------
 
 class Map:
@@ -164,7 +169,9 @@ def num2tex(n):
 
 
 #-----------------------------------------------------------
-        
+# Application class
+#-----------------------------------------------------------
+
 class Application:
 
     def __init__(self, tk, m=None):
@@ -174,6 +181,7 @@ class Application:
         self.map = m
         self.filepath = None
         self.dirty = False
+        self.show_grid = False
 
     def link_canvas(self, canvas):
         self.canvas = canvas
@@ -227,8 +235,20 @@ class Application:
                 val = self.map.get(row, col)
                 tex = num2tex(val)
                 self.canvas.create_image(col * 32, row * 32, anchor=NW, image=tex)
+                if self.show_grid:
+                    self.canvas.create_rectangle(col * 32, row * 32, (col + 1) * 32, (row + 1) * 32, outline='black')
         self.refresh_title()
 
+    def set_show_grid(self, index, value, op):
+        self.show_grid = not self.show_grid
+        print('set', 'i=', index, 'v=', value, 'op=', op, 'show_grid=', self.show_grid)
+        self.refresh_map()
+
+    def get_show_grid(self, index, value, op):
+        print('get', 'i=', index, 'v=', value, 'op=', op, 'show_grid=', self.show_grid)
+        return self.show_grid
+        
+        
     def quit(self):
         self.canvas.destroy()
         self.tk.destroy()
@@ -336,10 +356,12 @@ def put_texture(event):
             if 0 <= x < 32 and 0 <= y < 32:
                 tex = num2tex(current_tex)
                 canvas.create_image(x * 32, y * 32, anchor=NW, image=tex)
+                if app.show_grid:
+                    canvas.create_rectangle(x * 32, y * 32, (x + 1) * 32, (y + 1) * 32, outline='black')
                 app.change_map(x, y, current_tex)
 
 #-----------------------------------------------------------
-# GUI
+# GUI building
 #-----------------------------------------------------------
 
 # Menu
@@ -357,12 +379,18 @@ filemenu.add_command(label="Exit", command=menu_file_exit)
 editmenu = Menu(menu, tearoff=0)
 menu.add_cascade(label="Edit", menu=editmenu)
 
+varShowGrid = BooleanVar()
+varShowGrid.set(app.show_grid)
+varShowGrid.trace('r', app.get_show_grid)
+varShowGrid.trace('w', app.set_show_grid)
+
 viewmenu = Menu(menu, tearoff=0)
 menu.add_cascade(label="View", menu=viewmenu)
 viewmenu.add_command(label="Toolbar")
 viewmenu.add_command(label="Status Bar")
 viewmenu.add_command(label="Animate")
 viewmenu.add_command(label="Mini Map")
+viewmenu.add_checkbutton(label="Show Grid", variable=varShowGrid)
 
 toolsmenu = Menu(menu, tearoff=0)
 menu.add_cascade(label="Tools", menu=toolsmenu)

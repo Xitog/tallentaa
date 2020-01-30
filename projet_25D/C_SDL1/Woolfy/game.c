@@ -27,23 +27,37 @@ const float M_PI = 3.14159265358979323846;
 const int MAP_WIDTH = 18;
 const int MAP_HEIGHT = 12;
 const Uint32 map[12][18] = {
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 2, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 3, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    { 1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1},
+    { 1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1},
+    { 1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1},
+    { 1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1},
+    { 1,  0,  0,  0,  0,  0,  0,  1,  1,  1,  0,  0,  0,  0,  0,  0,  0,  1},
+    { 1,  0,  0,  0,  0,  0,  0,  2,  0,  1,  0,  0,  0,  0,  0,  0,  0,  1},
+    { 1,  0,  0,  0,  0,  0,  0,  1,  1,  1,  0,  0,  0,  0,  0,  0,  0,  1},
+    { 1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1},
+    { 1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1},
+    { 1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1},
+    { 1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1},
+    { 1,  3,  4,  3,  3,  5,  3,  3,  6,  7,  8,  9, 10,  9, 11, 10, 12,  1},
+};
+const Uint32 height_map[12][18] = {
+    { 1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1},
+    { 1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1},
+    { 1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1},
+    { 1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1},
+    { 1,  0,  0,  0,  0,  0,  0,  2,  2,  2,  0,  0,  0,  0,  0,  0,  0,  1},
+    { 1,  0,  0,  0,  0,  0,  0,  2,  0,  2,  0,  0,  0,  0,  0,  0,  0,  1},
+    { 1,  0,  0,  0,  0,  0,  0,  2,  2,  2,  0,  0,  0,  0,  0,  0,  0,  1},
+    { 1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1},
+    { 1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1},
+    { 1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1},
+    { 1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1},
+    { 1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1},
 };
 
 const int TEXTURE_WIDTH = 32;
 const int TEXTURE_HEIGHT = 32;
-SDL_Surface * TEXTURES[10];
+SDL_Surface * TEXTURES[20];
 
 // retro calc 1/3
 double dirX = -1, dirY = 0;
@@ -79,8 +93,8 @@ void game_raycast(void) {
     for(int x = 0; x < screen->w; x++) {
         double factor = ((float) x / screen->w) * 2 - 1;
         
-        double camVectorX = - player.sin_a * 0.66 * factor;
-        double camVectorY = player.cos_a * 0.66 * factor;
+        //double camVectorX = - player.sin_a * 0.66 * factor;
+        //double camVectorY = player.cos_a * 0.66 * factor;
 
         double vectorRayX = player.cos_a - player.sin_a * 0.66 * factor;
         double vectorRayY = player.sin_a + player.cos_a * 0.66 * factor;
@@ -91,8 +105,6 @@ void game_raycast(void) {
         
         double x2 = player.x + vectorRayX;
         double y2 = player.y + vectorRayY;
-        int mapX2 = (int) x2;
-        int mapY2 = (int) y2;
         int player_xi = (int) player.x;
         int player_yi = (int) player.y;
         
@@ -106,6 +118,7 @@ void game_raycast(void) {
         double final_d = 0;
         double final_w = 0; // where we hit the wall
         int tex = 0;
+        int size = 0;
 
         if (vectorRayX != 0 && vectorRayY != 0) {
             // y = a * x + b
@@ -127,10 +140,10 @@ void game_raycast(void) {
             double crossLine_d = sqrt(pow(crossLine_x - player.x, 2) + pow(crossLine_y - player.y, 2));
             
             // applied vector ray (try)
-            double vectorCameraPlaneNorme_x = player.sin_a;
-            double vectorCameraPlaneNorme_y = - player.cos_a;
-            double crossCameraPlane_x = player.x + vectorRayX;
-            double crossCameraPlane_y = player.y + vectorRayY;
+            //double vectorCameraPlaneNorme_x = player.sin_a;
+            //double vectorCameraPlaneNorme_y = - player.cos_a;
+            //double crossCameraPlane_x = player.x + vectorRayX;
+            //double crossCameraPlane_y = player.y + vectorRayY;
             double lenOnCameraPlane = fabs(0.66*factor);
             double diffAngleRayPlayer = atan(lenOnCameraPlane);
 
@@ -140,6 +153,7 @@ void game_raycast(void) {
                     while (crossLine_d < crossColumn_d) {
                         if (map[crossLine_yi][crossLine_xi] > 0) {
                             tex = map[crossLine_yi][crossLine_xi];
+                            size = height_map[crossLine_yi][crossLine_xi];
                             hit = 1;
                             final_x = crossLine_x;
                             final_y = crossLine_y;
@@ -160,6 +174,7 @@ void game_raycast(void) {
                     while (crossLine_d >= crossColumn_d) {
                         if (map[crossColumn_yi][crossColumn_xi] > 0) {
                             tex = map[crossColumn_yi][crossColumn_xi];
+                            size = height_map[crossColumn_yi][crossColumn_xi];
                             hit = 1;
                             final_x = crossColumn_x;
                             final_y = crossColumn_y;
@@ -197,6 +212,7 @@ void game_raycast(void) {
                 crossColumn_xi += dirX;
                 if (map[player_yi][crossColumn_xi] > 0) {
                     tex = map[player_yi][crossColumn_xi];
+                    size = height_map[player_yi][crossColumn_xi];
                     hit = true;
                 }
             }
@@ -211,6 +227,7 @@ void game_raycast(void) {
                 crossLine_yi += dirY;
                 if (map[crossLine_yi][player_xi] > 0) {
                     tex = map[crossLine_yi][player_xi];
+                    size = height_map[crossLine_yi][player_xi];
                     hit = true;
                 }
             }
@@ -220,7 +237,7 @@ void game_raycast(void) {
             final_w = final_x;
         }
 
-        Uint32 color;
+        Uint32 color = BLACK;
         switch (tex) {
             case 1:
                 color = BLUE;
@@ -231,6 +248,9 @@ void game_raycast(void) {
             case 3:
                 color = YELLOW;
                 break;
+            default:
+                color = GREEN;
+                break;
         }
 
         if (debug) {
@@ -239,20 +259,27 @@ void game_raycast(void) {
 
         // 2.5D
         final_distances[x] = final_d;
-        int column_height = (int) (FPS_SCREEN_HEIGHT / final_d);
-        //if (d > FPS_SCREEN_HEIGHT) d = FPS_SCREEN_HEIGHT;
-        //if (d < 0) d = 0;
-        int column_start = START_SCREEN + FPS_SCREEN_HEIGHT / 2 - (int) (column_height / 2);
-        int column_end = START_SCREEN + FPS_SCREEN_HEIGHT / 2 + (int) (column_height / 2);
-        for (int s = column_start ; s <= column_end ; s++) {
-            if (s >= START_SCREEN && s < screen->h) {
-                int col_tex = (final_w - (int) final_w) * (TEXTURE_WIDTH - 1);
-                int lin_tex = ((s - column_start) / (float) column_height) * (TEXTURE_HEIGHT - 1);
-                //printf("%d\n", col_tex);
-                Uint32 c = get_pixel(TEXTURES[0], col_tex, lin_tex);
-                set_pixel(x, s, c);
+        int column_base_height = (int) (FPS_SCREEN_HEIGHT / final_d);
+        int column_half_base_height = (int) (column_base_height / 2);
+        int column_sized_height = (int) (FPS_SCREEN_HEIGHT / final_d) * size;
+        
+        int column_end = START_SCREEN + FPS_SCREEN_HEIGHT / 2 + column_half_base_height;
+        int column_start = column_end - column_sized_height;
+
+        for (int ss = 0; ss < size; ss++) {
+            int inside_s = 0;
+            for (int s = 0 + column_base_height * ss; s < column_base_height * (ss + 1); s++) {
+                int screen_y = s + column_start;
+                if (screen_y >= START_SCREEN && screen_y < screen->h) {
+                    int col_tex = (final_w - (int) final_w) * (TEXTURE_WIDTH - 1);
+                    int lin_tex = (inside_s / (float) column_base_height) * (TEXTURE_HEIGHT - 1);
+                    Uint32 c = get_pixel(TEXTURES[tex], col_tex, lin_tex);
+                    set_pixel(x, screen_y, c);
+                }
+                inside_s += 1;
             }
         }
+        
         //line(x, START_SCREEN + FPS_SCREEN_HEIGHT / 2 - (int) (d / 2), x, START_SCREEN + FPS_SCREEN_HEIGHT / 2 + (int) (d / 2), color);
 
         for(int yy = 0; yy < TEXTURE_HEIGHT; yy++) {
@@ -262,100 +289,6 @@ void game_raycast(void) {
             }
         }
     }
-}
-
-void game_raycast2(void) {
-    for(int x = 0; x < screen->w; x++) {
-
-        //float factor = ((float) x / screen->w) * 2 - 1;
-        float factor = 1;
-        float vectorRayX = player.cos_a + player.sin_a * 0.66 * factor;
-        float vectorRayY = player.sin_a + player.cos_a * 0.66 * factor;
-        int mapJustInFrontX = (int) (player.cos_a * 0.1 + player.sin_a * 0.66 * factor);
-        int mapJustInFrontY = (int) (player.sin_a * 0.1 + player.cos_a * 0.66 * factor);
-
-        // rayX et rayY
-        //float vectorRayX = player.cos_a;
-        //float vectorRayY = player.sin_a;
-        float appliedRayX = player.x + vectorRayX;
-        float appliedRayY = player.y + vectorRayY;
-        int mapRayX = (int) appliedRayX;
-        int mapRayY = (int) appliedRayY;
-    
-        // Hypo X et Y
-        float hypoRayX = 0.0;
-        if (vectorRayX != 0) {
-            hypoRayX = fabs(1 / vectorRayX);
-        }
-        float hypoRayY = 0.0;
-        if (vectorRayY != 0) {
-            hypoRayY = fabs(1 / vectorRayY);
-        }
-        
-        // Sens de rayX et rayY
-        int dirRayX = 0;
-        int dirRayY = 0;
-    
-        if (vectorRayX > 0) {
-            dirRayX = 1;
-        } else if (vectorRayX < 0) {
-            dirRayX = -1;
-        }
-        if (vectorRayY > 0) {
-            dirRayY = 1;
-        } else if (vectorRayY < 0) {
-            dirRayY = -1;
-        }
-        
-        // Distance next
-        float dist2nextX = 0;
-        float dist2nextY = 0;
-    
-        if (dirRayX > 0) {
-            dist2nextX = (1 + ((int) appliedRayX) - appliedRayX) * hypoRayX;
-        } else {
-            dist2nextX = (appliedRayX - ((int) appliedRayX)) * hypoRayX;
-        }
-        if (dirRayY > 0) {
-            dist2nextY = (1 + ((int) appliedRayY) - appliedRayY) * hypoRayY;
-        } else {
-            dist2nextY = (appliedRayY - ((int) appliedRayY)) * hypoRayY;
-        }
-        
-        // Next case
-        bool hit = false;
-        if (map[mapRayY][mapRayX] > 0 || map[mapJustInFrontY][mapJustInFrontX] > 0) {
-            hit = true;
-        }
-        float dist = 0;
-        while (!hit) {
-            if (dirRayX == 0 && dirRayY == 0) {
-                printf("[ERROR] Ray without direction.");
-                break;
-            }
-            if (dist2nextX < dist2nextY || dirRayY == 0) {
-                mapRayX += dirRayX;
-                dist2nextX += hypoRayX;
-                dist += hypoRayX;
-            } else {
-                mapRayY += dirRayY;
-                dist2nextY += hypoRayY;
-                dist += hypoRayY;
-            }
-            if (map[mapRayY][mapRayX] > 0) {
-                hit = true;
-            }
-        }
-        
-        int xx = mapRayX;
-        int yy = mapRayY;
-        line((int) (player.x * FACTOR), (int) (player.y * FACTOR), xx * FACTOR + FACTOR / 2, yy * FACTOR + FACTOR / 2, RED);       
-    }
-
-    line((int) (player.x * FACTOR), (int) (player.y * FACTOR), (int) ((player.x + player.cos_a) * FACTOR), (int) ((player.y + player.sin_a) * FACTOR), WHITE);
-    
-    line((int) (player.x * FACTOR), (int) (player.y * FACTOR), (int) ((player.x + player.cos_a - player.sin_a * 0.66) * FACTOR), (int) ((player.y + player.sin_a + player.cos_a * 0.66) * FACTOR), YELLOW);
-    line((int) (player.x * FACTOR), (int) (player.y * FACTOR), (int) ((player.x + player.cos_a + player.sin_a * 0.66) * FACTOR), (int) ((player.y + player.sin_a - player.cos_a * 0.66) * FACTOR), YELLOW);
 }
 
 void game_draw(void) {
@@ -369,9 +302,11 @@ void game_draw(void) {
         // Grid
         for (int row = 0; row < MAP_HEIGHT; row++) {
             for (int col = 0; col < MAP_WIDTH; col++) {
-                if (map[row][col] > 0) {
-                    Uint32 color;
-                    switch (map[row][col]) {
+                int tex = map[row][col];
+                if (tex > 0) {
+                    display(TEXTURES[tex], col * FACTOR, row * FACTOR);
+                    Uint32 color = BLACK;
+                    switch (tex) {
                         case 1:
                             color = BLUE;
                             break;
@@ -381,10 +316,14 @@ void game_draw(void) {
                         case 3:
                             color = YELLOW;
                             break;
+                        default:
+                            color = GREEN;
+                            break;
                     }
-                    rect(col * FACTOR, row * FACTOR, FACTOR, FACTOR, color, true);
+                    rect(col * FACTOR, row * FACTOR, FACTOR, FACTOR, color, false);
+                } else {
+                    rect(col * FACTOR, row * FACTOR, FACTOR, FACTOR, WHITE, false);
                 }
-                rect(col * FACTOR, row * FACTOR, FACTOR, FACTOR, WHITE, false);
             }
         }
         // Player
