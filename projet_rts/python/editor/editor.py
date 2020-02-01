@@ -79,13 +79,14 @@ class Texture:
 img = True
 try:
     root.iconbitmap(r'media\icons\editor.ico')
-    icons['new'] = PhotoImage(file=r"media\icons\Actions-document-new-icon.png")
-    icons['open'] = PhotoImage(file=r"media\icons\Actions-document-open-icon.png")
-    icons['save'] = PhotoImage(file=r"media\icons\Actions-document-save-icon.png")
-    icons['save_as'] = PhotoImage(file=r"media\icons\Actions-document-save-as-icon.png")
-    icons['1x1'] = PhotoImage(file=r"media\icons\Little.png")
-    icons['3x3'] = PhotoImage(file=r"media\icons\Medium.png")
-    icons['5x5'] = PhotoImage(file=r"media\icons\Big.png")
+    basedir = os.path.join('media', 'icons')
+    icons['new'] = PhotoImage(file=os.path.join(basedir, 'Actions-document-new-icon.png'))
+    icons['open'] = PhotoImage(file=os.path.join(basedir, 'Actions-document-open-icon.png'))
+    icons['save'] = PhotoImage(file=os.path.join(basedir, 'Actions-document-save-icon.png'))
+    icons['save_as'] = PhotoImage(file=os.path.join(basedir, 'Actions-document-save-as-icon.png'))
+    icons['1x1'] = PhotoImage(file=os.path.join(basedir, 'Little.png'))
+    icons['3x3'] = PhotoImage(file=os.path.join(basedir, 'Medium.png'))
+    icons['5x5'] = PhotoImage(file=os.path.join(basedir, 'Big.png'))
     for name, num in mod_data['textures'].items():
         textures[name] = Texture(mod_graphics, name, num)
 except TclError:
