@@ -22,6 +22,7 @@
 #-----------------------------------------------------------
 
 from tkinter import *
+from tkinter import messagebox
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 from tkinter.messagebox import showinfo
 #from tkinter.ttk import Treeview, Button
@@ -29,6 +30,7 @@ import json
 import os
 import os.path
 from functools import partial
+import configparser
 
 #-----------------------------------------------------------
 # Mods
@@ -168,7 +170,6 @@ def num2tex(n):
         if tex.num == n:
             return tex.tkimg
 
-
 #-----------------------------------------------------------
 # Application class
 #-----------------------------------------------------------
@@ -177,16 +178,57 @@ class Application:
 
     def __init__(self, tk, m=None):
         self.tk = tk
+        self.tk.protocol("WM_DELETE_WINDOW", self.exit_app)
         self.canvas = None
         self.title = 'Map editor'
         self.map = m
         self.filepath = None
         self.dirty = False
-        self.show_grid = False
-
+        self.options = {}
+        if os.path.isfile('config.ini'):
+            config = configparser.ConfigParser()
+            config.read('config.ini')
+            if 'MAIN' in config:
+                if 'show_grid' in config['MAIN']:
+                    self.options['show_grid'] = (config['MAIN']['show_grid'] == 'True')
+                    print('Show grid is : ' + str(self.options['show_grid']))
+                if 'confirm_exit' in config['MAIN']:
+                    self.options['confirm_exit'] = (config['MAIN']['confirm_exit'] == 'True')
+                    print('Confirm exit is : ' + str(self.options['confirm_exit']))
+        # create default option file
+        else:
+            self.options['show_grid'] = False
+            self.options['confirm_exit'] = True
+            self.write_options()
+    
+    def change_option(self, opt, value):
+        self.options[opt] = value
+        self.write_options()
+    
+    def write_options(self):
+        config = configparser.ConfigParser()
+        config['MAIN'] = {
+            'show_grid' : str(self.options['show_grid']),
+            'confirm_exit' : str(self.options['confirm_exit']),
+        }
+        with open('config.ini', 'w') as configfile:
+            config.write(configfile)
+    
+    def exit_app(self):
+        if self.dirty and self.options['confirm_exit']:
+            if messagebox.askyesno("Unsaved changes", "There are unsaved changes.\nDo you really want to quit?", default=messagebox.NO):
+                self.canvas.destroy()
+                self.tk.destroy()
+                return True
+        else:
+            self.canvas.destroy()
+            self.tk.destroy()
+            return True
+        return False
+    
     def link_canvas(self, canvas):
         self.canvas = canvas
-
+    
     def is_linked(self):
         return self.filepath is not None
     
@@ -195,7 +237,7 @@ class Application:
         self.filepath = None
         self.dirty = False
         self.refresh_map()
-
+    
     def change_map(self, col, lin, val):
         self.map.set(lin, col, val)
         self.dirty = True
@@ -205,7 +247,7 @@ class Application:
         self.map.set_name(name)
         self.dirty = True
         self.refresh_title()
-
+    
     def load_map(self, filepath):
         self.map = Map.from_json(filepath)
         self.filepath = filepath
@@ -229,30 +271,26 @@ class Application:
             dirty = '*' if self.dirty else ''
             txt = f'{self.title} - {self.map.name} {dirty}'
         self.tk.title(txt)
-
+    
     def refresh_map(self):
         for row in range(0, 32):
             for col in range(0, 32):
                 val = self.map.get(row, col)
                 tex = num2tex(val)
                 self.canvas.create_image(col * 32, row * 32, anchor=NW, image=tex)
-                if self.show_grid:
+                if self.options['show_grid']:
                     self.canvas.create_rectangle(col * 32, row * 32, (col + 1) * 32, (row + 1) * 32, outline='black')
         self.refresh_title()
-
+    
     def set_show_grid(self, index, value, op):
-        self.show_grid = not self.show_grid
-        print('set', 'i=', index, 'v=', value, 'op=', op, 'show_grid=', self.show_grid)
+        self.change_option('show_grid', not self.options['show_grid'])
+        print('set', 'i=', index, 'v=', value, 'op=', op, 'show_grid=', self.options['show_grid'])
         self.refresh_map()
-
+    
     def get_show_grid(self, index, value, op):
-        print('get', 'i=', index, 'v=', value, 'op=', op, 'show_grid=', self.show_grid)
-        return self.show_grid
+        print('get', 'i=', index, 'v=', value, 'op=', op, 'show_grid=', self.options['show_grid'])
+        return self.options['show_grid']
         
-        
-    def quit(self):
-        self.canvas.destroy()
-        self.tk.destroy()
 
 app = Application(root)
 
@@ -286,8 +324,9 @@ def menu_file_save_as():
 
 def menu_file_exit():
     global app
-    app.quit()
-    del app
+    res = app.exit_app()
+    if res:
+        del app
 
 def About():
     showinfo("About", "This is a simple example of a menu")
@@ -357,7 +396,7 @@ def put_texture(event):
             if 0 <= x < 32 and 0 <= y < 32:
                 tex = num2tex(current_tex)
                 canvas.create_image(x * 32, y * 32, anchor=NW, image=tex)
-                if app.show_grid:
+                if app.options['show_grid']:
                     canvas.create_rectangle(x * 32, y * 32, (x + 1) * 32, (y + 1) * 32, outline='black')
                 app.change_map(x, y, current_tex)
 
@@ -381,7 +420,7 @@ editmenu = Menu(menu, tearoff=0)
 menu.add_cascade(label="Edit", menu=editmenu)
 
 varShowGrid = BooleanVar()
-varShowGrid.set(app.show_grid)
+varShowGrid.set(app.options['show_grid'])
 varShowGrid.trace('r', app.get_show_grid)
 varShowGrid.trace('w', app.set_show_grid)
 
