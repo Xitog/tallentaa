@@ -6,8 +6,9 @@
 #-----------------------------------------------------------
 # Summary
 #   Imports
-#   Mods
 #   Constants & Global variables
+#   Texture class
+#   Mods
 #   Map class
 #   Application class
 #   Menu actions
@@ -33,31 +34,6 @@ from functools import partial
 import configparser
 
 #-----------------------------------------------------------
-# Mods
-#-----------------------------------------------------------
-mod_cur = 'rts'
-mod_dir = os.path.join(os.getcwd(), 'mod')
-if not os.path.isdir(mod_dir):
-    raise Exception('No mod directory. Impossible to start.')
-else:
-    found = False
-    for mod in os.listdir(mod_dir):
-        if mod == mod_cur:
-            found = True
-            break
-    mod_file = os.path.join(mod_dir, mod_cur, mod_cur + '.mod')
-    if not found:
-        raise Exception('Current mod not found. Impossible to start.')
-    elif not os.path.isfile(mod_file):
-        raise Exception(f'No mod file {mod_file} found. Impossible to start.')
-    else:
-        f = open(mod_file, 'r', encoding='utf8')
-        mod_data = json.load(f)
-        mod_graphics = os.path.join(mod_dir, mod_cur, 'graphics')
-        if not os.path.isdir(mod_graphics):
-            raise Exception('No graphics dir for mod. Impossible to start.')
-
-#-----------------------------------------------------------
 # Constants & Global variables
 #-----------------------------------------------------------
 
@@ -68,39 +44,18 @@ root = Tk()
 icons = {}
 textures = {}
 
+#-----------------------------------------------------------
+# Texture class
+#-----------------------------------------------------------
+
 class Texture:
 
-    def __init__(self, rep, name, num):
+    def __init__(self, rep, name, num, filename):
         self.name = name
         self.num = num
-        self.first = self.name + '-1.png'
+        self.first = filename
         self.path = os.path.join(rep, self.first)
         self.tkimg = PhotoImage(file=self.path)
-
-# Load images
-img = True
-try:
-    root.iconbitmap(r'media\icons\editor.ico')
-    basedir = os.path.join('media', 'icons')
-    icons['new'] = PhotoImage(file=os.path.join(basedir, 'Actions-document-new-icon.png'))
-    icons['open'] = PhotoImage(file=os.path.join(basedir, 'Actions-document-open-icon.png'))
-    icons['save'] = PhotoImage(file=os.path.join(basedir, 'Actions-document-save-icon.png'))
-    icons['save_as'] = PhotoImage(file=os.path.join(basedir, 'Actions-document-save-as-icon.png'))
-    icons['1x1'] = PhotoImage(file=os.path.join(basedir, 'Little.png'))
-    icons['3x3'] = PhotoImage(file=os.path.join(basedir, 'Medium.png'))
-    icons['5x5'] = PhotoImage(file=os.path.join(basedir, 'Big.png'))
-    for name, num in mod_data['textures'].items():
-        textures[name] = Texture(mod_graphics, name, num)
-except TclError:
-    raise("Unable to load image. Impossible to start.")
-    #img = False
-
-current_tex = mod_data['cursor_default']
-
-current_pencil = '1x1'
-
-status_var =  StringVar()
-status_var.set('Welcome')
 
 #-----------------------------------------------------------
 # Map class
@@ -127,11 +82,11 @@ class Map:
         return self.ground[row][col]
 
     @staticmethod
-    def from_json(filepath):
+    def from_json(filepath, default):
         f = open(filepath, 'r')
         data = json.load(f)
         f.close()
-        m = Map(data["name"], len(data["ground"][0]), len(data["ground"]), mod_data["ground_default"])
+        m = Map(data["name"], len(data["ground"][0]), len(data["ground"]), default)
         m.ground = data["ground"]
         return m
     
@@ -184,7 +139,11 @@ class Application:
         self.map = m
         self.filepath = None
         self.dirty = False
+        self.mod_data = None
         self.options = {}
+        self.options['show_grid'] = False
+        self.options['confirm_exit'] = True
+        self.options['mod'] = 'rts'
         if os.path.isfile('config.ini'):
             config = configparser.ConfigParser()
             config.read('config.ini')
@@ -195,12 +154,44 @@ class Application:
                 if 'confirm_exit' in config['MAIN']:
                     self.options['confirm_exit'] = (config['MAIN']['confirm_exit'] == 'True')
                     print('Confirm exit is : ' + str(self.options['confirm_exit']))
+                if 'mod' in config['MAIN']:
+                    self.options['mod'] = config['MAIN']['mod']
         # create default option file
         else:
-            self.options['show_grid'] = False
-            self.options['confirm_exit'] = True
             self.write_options()
+        self.all_mods = []
+        self.init_mod()
     
+    def init_mod(self):
+        global textures, current_tex, default_tex, current_pencil
+        textures.clear()
+        mod_dir = os.path.join(os.getcwd(), 'mod')
+        if not os.path.isdir(mod_dir):
+            raise Exception('No mod directory. Impossible to start.')
+        else:
+            found = False
+            for mod in os.listdir(mod_dir):
+                if os.path.isdir(os.path.join(os.getcwd(), 'mod', mod)):
+                    self.all_mods.append(mod)
+                if mod == self.options['mod']:
+                    found = True
+            if not found:
+                raise Exception('Current mod not found. Impossible to start.')
+            mod_file = os.path.join(mod_dir, self.options['mod'], self.options['mod'] + '.mod')
+            if not os.path.isfile(mod_file):
+                raise Exception(f'No mod file {mod_file} found. Impossible to start.')
+            f = open(mod_file, 'r', encoding='utf8')
+            self.mod_data = json.load(f)
+            mod_graphics = os.path.join(mod_dir, self.options['mod'], 'graphics')
+            if not os.path.isdir(mod_graphics):
+                raise Exception('No graphics dir for mod. Impossible to start.')
+        # Load textures
+        for name, num in self.mod_data['textures_code'].items():
+            textures[name] = Texture(mod_graphics, name, num, self.mod_data['textures_files'][name])
+        current_tex = self.mod_data['textures_code'][self.mod_data['cursor_default']]
+        default_tex = self.mod_data['textures_code'][self.mod_data['ground_default']]
+        current_pencil = '1x1'
+
     def change_option(self, opt, value):
         self.options[opt] = value
         self.write_options()
@@ -210,6 +201,7 @@ class Application:
         config['MAIN'] = {
             'show_grid' : str(self.options['show_grid']),
             'confirm_exit' : str(self.options['confirm_exit']),
+            'mod' : self.options['mod'],
         }
         with open('config.ini', 'w') as configfile:
             config.write(configfile)
@@ -225,6 +217,11 @@ class Application:
             self.tk.destroy()
             return True
         return False
+    
+    def change_mod(self, index, value, op):
+        self.change_option('mod', varMods.get())
+        self.init_mod()
+        build()
     
     def link_canvas(self, canvas):
         self.canvas = canvas
@@ -249,7 +246,7 @@ class Application:
         self.refresh_title()
     
     def load_map(self, filepath):
-        self.map = Map.from_json(filepath)
+        self.map = Map.from_json(filepath, self.mod_data)
         self.filepath = filepath
         self.dirty = False
         self.refresh_map()
@@ -299,7 +296,7 @@ app = Application(root)
 #-----------------------------------------------------------
 
 def menu_file_new():
-    app.create_map('New map', 32, 32, default=mod_data["ground_default"])
+    app.create_map('New map', 32, 32, default=default_tex)
 
 def menu_file_open():
     filepath = askopenfilename(initialdir = os.getcwd(), title = "Select a file to open", filetypes = (("map files","*.map"),("all files","*.*")))
@@ -404,6 +401,26 @@ def put_texture(event):
 # GUI building
 #-----------------------------------------------------------
 
+# Load images
+img = True
+try:
+    root.iconbitmap(r'media\icons\editor.ico')
+    basedir = os.path.join('media', 'icons')
+    icons['new'] = PhotoImage(file=os.path.join(basedir, 'Actions-document-new-icon.png'))
+    icons['open'] = PhotoImage(file=os.path.join(basedir, 'Actions-document-open-icon.png'))
+    icons['save'] = PhotoImage(file=os.path.join(basedir, 'Actions-document-save-icon.png'))
+    icons['save_as'] = PhotoImage(file=os.path.join(basedir, 'Actions-document-save-as-icon.png'))
+    icons['1x1'] = PhotoImage(file=os.path.join(basedir, 'Little.png'))
+    icons['3x3'] = PhotoImage(file=os.path.join(basedir, 'Medium.png'))
+    icons['5x5'] = PhotoImage(file=os.path.join(basedir, 'Big.png'))
+except TclError:
+    raise("Unable to load image. Impossible to start.")
+    #img = False
+
+# Status bar
+status_var =  StringVar()
+status_var.set('Welcome')
+
 # Menu
 menu = Menu(root)
 root.config(menu=menu)
@@ -437,6 +454,16 @@ menu.add_cascade(label="Tools", menu=toolsmenu)
 toolsmenu.add_command(label="Check", command=menu_tools_check)
 toolsmenu.add_command(label="Export image", command=menu_tools_image)
 
+varMods = StringVar()
+varMods.set(app.options['mod'])
+print(app.options['mod'])
+varMods.trace('w', app.change_mod)
+
+modsmenu = Menu(menu, tearoff=0)
+menu.add_cascade(label="Mods", menu=modsmenu)
+for mod in app.all_mods:
+    modsmenu.add_radiobutton(label=mod.upper(), variable=varMods, value=mod)
+
 varPlayer = IntVar()
 varPlayer.set(1)
 
@@ -462,13 +489,16 @@ bt_pencils = {}
 bt_pencils['1x1'] = Button(toolbar, image=icons['1x1'], width=32, height=32, command=lambda: set_pencil('1x1'), relief=SUNKEN)
 bt_pencils['3x3'] = Button(toolbar, image=icons['3x3'], width=32, height=32, command=lambda: set_pencil('3x3'), relief=RAISED)
 bt_pencils['5x5'] = Button(toolbar, image=icons['5x5'], width=32, height=32, command=lambda: set_pencil('5x5'), relief=RAISED)
-#bt_pencils['1x1'].config(relief=SUNKEN)
 
 bt_all = {}
-for _, tex in textures.items():
-    bt_all[tex.name] = Button(toolbar, image=tex.tkimg, width=32, height=32, command=partial(bt_refresh, tex.tkimg))
-    if current_tex == tex.num:
-        bt_all[tex.name].config(relief=SUNKEN)
+def build():
+    global bt_all
+    bt_all.clear()
+    for _, tex in textures.items():
+        bt_all[tex.name] = Button(toolbar, image=tex.tkimg, width=32, height=32, command=partial(bt_refresh, tex.tkimg))
+        if current_tex == tex.num:
+            bt_all[tex.name].config(relief=SUNKEN)
+build()
 
 # Canvas
 x_scrollbar = Scrollbar(content, orient=HORIZONTAL)
@@ -522,5 +552,5 @@ canvas.bind('<Motion>', refresh_status_bar)
 #-----------------------------------------------------------
 
 if __name__ == "__main__":
-    app.create_map("New map", 32, 32, mod_data["ground_default"])
+    app.create_map("New map", 32, 32, default_tex)
     root.mainloop()
