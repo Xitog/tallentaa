@@ -32,6 +32,10 @@ import os
 import os.path
 from functools import partial
 import configparser
+<<<<<<< HEAD
+from PIL import Image, ImageTk
+=======
+>>>>>>> origin/master
 
 #-----------------------------------------------------------
 # Constants & Global variables
@@ -40,9 +44,11 @@ import configparser
 canvas_width = 200
 canvas_height = 100
 
-root = Tk()
 icons = {}
-textures = {}
+
+#-----------------------------------------------------------
+# Texture class
+#-----------------------------------------------------------
 
 #-----------------------------------------------------------
 # Texture class
@@ -55,7 +61,13 @@ class Texture:
         self.num = num
         self.first = filename
         self.path = os.path.join(rep, self.first)
+<<<<<<< HEAD
+        img = Image.open(self.path)
+        self.tkimg = ImageTk.PhotoImage(img)
+        #self.tkimg = PhotoImage(file=self.path)
+=======
         self.tkimg = PhotoImage(file=self.path)
+>>>>>>> origin/master
 
 #-----------------------------------------------------------
 # Map class
@@ -120,23 +132,31 @@ class Map:
                 print('Stack info:')
                 traceback.print_exc(file=sys.stdout)
 
+<<<<<<< HEAD
+=======
 def num2tex(n):
     for _, tex in textures.items():
         if tex.num == n:
             return tex.tkimg
 
+>>>>>>> origin/master
 #-----------------------------------------------------------
 # Application class
 #-----------------------------------------------------------
 
 class Application:
 
+<<<<<<< HEAD
+    def __init__(self):
+        self.tk = Tk()
+=======
     def __init__(self, tk, m=None):
         self.tk = tk
+>>>>>>> origin/master
         self.tk.protocol("WM_DELETE_WINDOW", self.exit_app)
         self.canvas = None
         self.title = 'Map editor'
-        self.map = m
+        self.map = None
         self.filepath = None
         self.dirty = False
         self.mod_data = None
@@ -150,21 +170,43 @@ class Application:
             if 'MAIN' in config:
                 if 'show_grid' in config['MAIN']:
                     self.options['show_grid'] = (config['MAIN']['show_grid'] == 'True')
+<<<<<<< HEAD
+                if 'confirm_exit' in config['MAIN']:
+                    self.options['confirm_exit'] = (config['MAIN']['confirm_exit'] == 'True')
+=======
                     print('Show grid is : ' + str(self.options['show_grid']))
                 if 'confirm_exit' in config['MAIN']:
                     self.options['confirm_exit'] = (config['MAIN']['confirm_exit'] == 'True')
                     print('Confirm exit is : ' + str(self.options['confirm_exit']))
+>>>>>>> origin/master
                 if 'mod' in config['MAIN']:
                     self.options['mod'] = config['MAIN']['mod']
         # create default option file
         else:
             self.write_options()
+<<<<<<< HEAD
+        print('[INFO] All options:')
+        for o in self.options:
+            print(f"[INFO]     {o:15} = {self.options[o]}")
+        self.all_mods = []
+        self.init_mod()
+
+    def num2tex(self, n):
+        for _, tex in self.textures.items():
+            if tex.num == n:
+                return tex.tkimg
+    
+    def init_mod(self):
+        print(f"[INFO] Loading mod *** {self.options['mod']} ***")
+        self.textures = {}
+=======
         self.all_mods = []
         self.init_mod()
     
     def init_mod(self):
         global textures, current_tex, default_tex, current_pencil
         textures.clear()
+>>>>>>> origin/master
         mod_dir = os.path.join(os.getcwd(), 'mod')
         if not os.path.isdir(mod_dir):
             raise Exception('No mod directory. Impossible to start.')
@@ -187,10 +229,22 @@ class Application:
                 raise Exception('No graphics dir for mod. Impossible to start.')
         # Load textures
         for name, num in self.mod_data['textures_code'].items():
+<<<<<<< HEAD
+            try:
+                print(f"[INFO] Loading textures {name:>18} ({num:4d}) in file {self.mod_data['textures_files'][name]}")
+                self.textures[name] = Texture(mod_graphics, name, num, self.mod_data['textures_files'][name])
+            except TclError:
+                print(f"[ERROR] Impossible to load texture.")
+        print(f"[INFO] {len(self.textures)} textures loaded")
+        self.current_tex = self.mod_data['textures_code'][self.mod_data['cursor_default']]
+        self.default_tex = self.mod_data['textures_code'][self.mod_data['ground_default']]
+        self.current_pencil = '1x1'
+=======
             textures[name] = Texture(mod_graphics, name, num, self.mod_data['textures_files'][name])
         current_tex = self.mod_data['textures_code'][self.mod_data['cursor_default']]
         default_tex = self.mod_data['textures_code'][self.mod_data['ground_default']]
         current_pencil = '1x1'
+>>>>>>> origin/master
 
     def change_option(self, opt, value):
         self.options[opt] = value
@@ -219,18 +273,28 @@ class Application:
         return False
     
     def change_mod(self, index, value, op):
+<<<<<<< HEAD
+        self.change_option('mod', self.varMods.get())
+        self.exit_app()
+        self.__init__()
+        self.build_gui()
+=======
         self.change_option('mod', varMods.get())
         self.init_mod()
         build()
     
     def link_canvas(self, canvas):
         self.canvas = canvas
+>>>>>>> origin/master
     
     def is_linked(self):
         return self.filepath is not None
-    
-    def create_map(self, name, width, height, default):
-        self.map = Map(name, width, height, default)
+
+    #-----------------------------------------------------------
+    # Map manipulation
+    #-----------------------------------------------------------
+    def create_map(self, name, width, height):
+        self.map = Map(name, width, height, self.default_tex)
         self.filepath = None
         self.dirty = False
         self.refresh_map()
@@ -273,7 +337,7 @@ class Application:
         for row in range(0, 32):
             for col in range(0, 32):
                 val = self.map.get(row, col)
-                tex = num2tex(val)
+                tex = self.num2tex(val)
                 self.canvas.create_image(col * 32, row * 32, anchor=NW, image=tex)
                 if self.options['show_grid']:
                     self.canvas.create_rectangle(col * 32, row * 32, (col + 1) * 32, (row + 1) * 32, outline='black')
@@ -287,9 +351,214 @@ class Application:
     def get_show_grid(self, index, value, op):
         print('get', 'i=', index, 'v=', value, 'op=', op, 'show_grid=', self.options['show_grid'])
         return self.options['show_grid']
-        
+<<<<<<< HEAD
 
-app = Application(root)
+    #-----------------------------------------------------------
+    # GUI building
+    #-----------------------------------------------------------
+    def build_gui(self):
+        # Load images
+        try:
+            self.tk.iconbitmap(r'media\icons\editor.ico')
+            basedir = os.path.join('media', 'icons')
+            icons['new'] = PhotoImage(file=os.path.join(basedir, 'Actions-document-new-icon.png'))
+            icons['open'] = PhotoImage(file=os.path.join(basedir, 'Actions-document-open-icon.png'))
+            icons['save'] = PhotoImage(file=os.path.join(basedir, 'Actions-document-save-icon.png'))
+            icons['save_as'] = PhotoImage(file=os.path.join(basedir, 'Actions-document-save-as-icon.png'))
+            icons['1x1'] = PhotoImage(file=os.path.join(basedir, 'Little.png'))
+            icons['3x3'] = PhotoImage(file=os.path.join(basedir, 'Medium.png'))
+            icons['5x5'] = PhotoImage(file=os.path.join(basedir, 'Big.png'))
+        except TclError:
+            raise("Unable to load image. Impossible to start.")
+
+        # Status bar
+        self.status_var =  StringVar()
+        self.status_var.set('Welcome')
+        
+        # Menu
+        menu = Menu(self.tk)
+        self.tk.config(menu=menu)
+        filemenu = Menu(menu, tearoff=0)
+        menu.add_cascade(label="File", menu=filemenu)
+        filemenu.add_command(label="New...", command=menu_file_new)
+        filemenu.add_command(label="Open...", command=menu_file_open)
+        filemenu.add_command(label="Save", command=menu_file_save)
+        filemenu.add_command(label="Save As...", command=menu_file_save_as)
+        filemenu.add_separator()
+        filemenu.add_command(label="Exit", command=menu_file_exit)
+
+        editmenu = Menu(menu, tearoff=0)
+        menu.add_cascade(label="Edit", menu=editmenu)
+        
+        self.varShowGrid = BooleanVar()
+        self.varShowGrid.set(self.options['show_grid'])
+        #self.varShowGrid.trace('r', app.get_show_grid)
+        self.varShowGrid.trace('w', app.set_show_grid)
+
+        viewmenu = Menu(menu, tearoff=0)
+        menu.add_cascade(label="View", menu=viewmenu)
+        viewmenu.add_command(label="Toolbar")
+        viewmenu.add_command(label="Status Bar")
+        viewmenu.add_command(label="Animate")
+        viewmenu.add_command(label="Mini Map")
+        viewmenu.add_checkbutton(label="Show Grid", variable=self.varShowGrid)
+        
+        toolsmenu = Menu(menu, tearoff=0)
+        menu.add_cascade(label="Tools", menu=toolsmenu)
+        toolsmenu.add_command(label="Check", command=menu_tools_check)
+        toolsmenu.add_command(label="Export image", command=menu_tools_image)
+        
+        self.varMods = StringVar()
+        self.varMods.set(app.options['mod'])
+        self.varMods.trace('w', self.change_mod)
+        
+        modsmenu = Menu(menu, tearoff=0)
+        menu.add_cascade(label="Mods", menu=modsmenu)
+        for mod in self.all_mods:
+            modsmenu.add_radiobutton(label=mod.upper(), variable=self.varMods, value=mod)
+        
+        self.varPlayer = IntVar()
+        self.varPlayer.set(1)
+        
+        playermenu = Menu(menu, tearoff=0)
+        menu.add_cascade(label="Player", menu=playermenu)
+        playermenu.add_radiobutton(label="Player 1", variable=self.varPlayer, value=1)
+        playermenu.add_radiobutton(label="Player 2", variable=self.varPlayer, value=2)
+        
+        helpmenu = Menu(menu, tearoff=0)
+        menu.add_cascade(label="Help", menu=helpmenu)
+        helpmenu.add_command(label="About...", command=About)
+        
+        # Frame & button bar
+        content = Frame(self.tk, width=600, height=600)
+        toolbar = Frame(content)
+        
+        bt_new = Button(toolbar, image=icons['new'], width=32, height=32, command=menu_file_new)
+        bt_open = Button(toolbar, image=icons['open'], width=32, height=32, command=menu_file_open)
+        bt_save = Button(toolbar, image=icons['save'], width=32, height=32, command=menu_file_save)
+        bt_save_as = Button(toolbar, image=icons['save_as'], width=32, height=32, command=menu_file_save_as)
+        
+        self.bt_pencils = {}
+        self.bt_pencils['1x1'] = Button(toolbar, image=icons['1x1'], width=32, height=32, command=lambda: self.set_pencil('1x1'), relief=SUNKEN)
+        self.bt_pencils['3x3'] = Button(toolbar, image=icons['3x3'], width=32, height=32, command=lambda: self.set_pencil('3x3'), relief=RAISED)
+        self.bt_pencils['5x5'] = Button(toolbar, image=icons['5x5'], width=32, height=32, command=lambda: self.set_pencil('5x5'), relief=RAISED)
+        
+        self.bt_all = {}
+        for _, tex in self.textures.items():
+            self.bt_all[tex.name] = Button(toolbar, image=tex.tkimg, width=32, height=32, command=partial(self.bt_refresh, tex.tkimg))
+            if self.current_tex == tex.num:
+                self.bt_all[tex.name].config(relief=SUNKEN)
+
+        # Canvas
+        x_scrollbar = Scrollbar(content, orient=HORIZONTAL)
+        y_scrollbar = Scrollbar(content, orient=VERTICAL)
+        self.canvas = Canvas(content,
+                        scrollregion=(0, 0, 32*32, 32*32),
+                        xscrollcommand=x_scrollbar.set,
+                        yscrollcommand=y_scrollbar.set)
+
+        # Status
+        status = Label(content, textvariable = self.status_var, relief=SUNKEN, anchor=E)
+
+        # Packing
+        content.pack(fill=BOTH,expand=True)
+        toolbar.pack(side=TOP, fill=X)
+        y_scrollbar.pack(side=RIGHT, fill=Y)
+        x_scrollbar.pack(side=BOTTOM, fill=X)
+        self.canvas.pack(side=TOP, fill=BOTH, expand=True)
+        x_scrollbar.config(command=self.canvas.xview)
+        y_scrollbar.config(command=self.canvas.yview)
+        status.pack(side=BOTTOM, fill=X)
+
+        bt_new.pack(side=LEFT)
+        bt_open.pack(side=LEFT)
+        bt_save.pack(side=LEFT)
+        bt_save_as.pack(side=LEFT)
+        sep1 = Label(toolbar, text=" ")
+        sep1.pack(side=LEFT)
+
+        for _, bt in self.bt_pencils.items():
+            bt.pack(side=LEFT)
+        sep2 = Label(toolbar, text=" ")
+        sep2.pack(side=LEFT)
+
+        for _, bt in self.bt_all.items():
+            bt.pack(side=LEFT)
+
+        # Canvas
+        #canvas.create_line(0, 0, 200, 100)
+        #canvas.create_line(0, 100, 200, 0, fill="red", dash=(4, 4))
+        #canvas.create_rectangle(50, 25, 150, 75, fill="blue")
+        #canvas.create_text(canvas_width / 2, canvas_height / 2, text="Python")
+        self.canvas.bind('<ButtonPress-1>', self.put_texture)
+        self.canvas.bind('<B1-Motion>', self.put_texture)
+        #canvas.bind('<ButtonRelease-1>', end_texture)
+        self.canvas.bind('<Motion>', self.refresh_status_bar)
+
+    def run(self):
+        self.tk.mainloop()
+
+    #-----------------------------------------------------------
+    # Apply texture functions
+    #-----------------------------------------------------------
+    def get_map_coord(self, event):
+        x32 = int(self.canvas.canvasx(event.x) // 32)
+        y32 = int(self.canvas.canvasy(event.y) // 32)
+        return x32, y32
+
+    def refresh_status_bar(self, event):
+        x32, y32 = self.get_map_coord(event)
+        if 0 <= x32 < 32 and 0 <= y32 < 32:
+            self.status_var.set(f"x/col = {x32}, y/row = {y32}")
+
+    def put_texture(self, event):
+        x32, y32 = self.get_map_coord(event)
+        if self.current_pencil == '1x1':
+            start_x = x32
+            end_x = x32 + 1
+            start_y = y32
+            end_y = y32 + 1
+        elif self.current_pencil == '3x3':
+            start_x = x32 - 1
+            end_x = x32 + 2
+            start_y = y32 - 1
+            end_y = y32 + 2
+        elif self.current_pencil == '5x5':
+            start_x = x32 - 2
+            end_x = x32 + 3
+            start_y = y32 - 2
+            end_y = y32 + 3
+        for x in range(start_x, end_x):
+            for y in range(start_y, end_y):
+                if 0 <= x < 32 and 0 <= y < 32:
+                    tex = self.num2tex(self.current_tex)
+                    self.canvas.create_image(x * 32, y * 32, anchor=NW, image=tex)
+                    if app.options['show_grid']:
+                        self.canvas.create_rectangle(x * 32, y * 32, (x + 1) * 32, (y + 1) * 32, outline='black')
+                    self.change_map(x, y, self.current_tex)
+
+    #-----------------------------------------------------------
+    # Button actions
+    #-----------------------------------------------------------
+    def bt_refresh(self, tkimg):
+        for key, bt in self.bt_all.items():
+            if self.textures[key].tkimg == tkimg:
+                bt.config(relief=SUNKEN)
+                self.current_tex = self.textures[key].num
+            else:
+                bt.config(relief=RAISED)
+
+    def set_pencil(self, p):
+        for key, bt in self.bt_pencils.items():
+            if key == p:
+                bt.config(relief=SUNKEN)
+            else:
+                bt.config(relief=RAISED)
+        self.current_pencil = p
+=======
+        
+>>>>>>> origin/master
+
 
 #-----------------------------------------------------------
 # Menu actions
@@ -336,6 +605,8 @@ def menu_tools_image():
     pass
 
 #-----------------------------------------------------------
+<<<<<<< HEAD
+=======
 # Button actions
 #-----------------------------------------------------------
 
@@ -548,9 +819,17 @@ canvas.bind('<B1-Motion>', put_texture)
 canvas.bind('<Motion>', refresh_status_bar)
 
 #-----------------------------------------------------------
+>>>>>>> origin/master
 # Main
 #-----------------------------------------------------------
 
 if __name__ == "__main__":
+<<<<<<< HEAD
+    app = Application()
+    app.build_gui()
+    app.create_map("New map", 32, 32)
+    app.run()
+=======
     app.create_map("New map", 32, 32, default_tex)
     root.mainloop()
+>>>>>>> origin/master
