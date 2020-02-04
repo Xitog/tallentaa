@@ -32,10 +32,7 @@ import os
 import os.path
 from functools import partial
 import configparser
-<<<<<<< HEAD
 from PIL import Image, ImageTk
-=======
->>>>>>> origin/master
 
 #-----------------------------------------------------------
 # Constants & Global variables
@@ -61,13 +58,9 @@ class Texture:
         self.num = num
         self.first = filename
         self.path = os.path.join(rep, self.first)
-<<<<<<< HEAD
         img = Image.open(self.path)
         self.tkimg = ImageTk.PhotoImage(img)
         #self.tkimg = PhotoImage(file=self.path)
-=======
-        self.tkimg = PhotoImage(file=self.path)
->>>>>>> origin/master
 
 #-----------------------------------------------------------
 # Map class
@@ -132,27 +125,14 @@ class Map:
                 print('Stack info:')
                 traceback.print_exc(file=sys.stdout)
 
-<<<<<<< HEAD
-=======
-def num2tex(n):
-    for _, tex in textures.items():
-        if tex.num == n:
-            return tex.tkimg
-
->>>>>>> origin/master
 #-----------------------------------------------------------
 # Application class
 #-----------------------------------------------------------
 
 class Application:
 
-<<<<<<< HEAD
-    def __init__(self):
+    def __init__(self, m=None):
         self.tk = Tk()
-=======
-    def __init__(self, tk, m=None):
-        self.tk = tk
->>>>>>> origin/master
         self.tk.protocol("WM_DELETE_WINDOW", self.exit_app)
         self.canvas = None
         self.title = 'Map editor'
@@ -170,27 +150,24 @@ class Application:
             if 'MAIN' in config:
                 if 'show_grid' in config['MAIN']:
                     self.options['show_grid'] = (config['MAIN']['show_grid'] == 'True')
-<<<<<<< HEAD
                 if 'confirm_exit' in config['MAIN']:
                     self.options['confirm_exit'] = (config['MAIN']['confirm_exit'] == 'True')
-=======
-                    print('Show grid is : ' + str(self.options['show_grid']))
                 if 'confirm_exit' in config['MAIN']:
                     self.options['confirm_exit'] = (config['MAIN']['confirm_exit'] == 'True')
-                    print('Confirm exit is : ' + str(self.options['confirm_exit']))
->>>>>>> origin/master
                 if 'mod' in config['MAIN']:
                     self.options['mod'] = config['MAIN']['mod']
         # create default option file
         else:
             self.write_options()
-<<<<<<< HEAD
         print('[INFO] All options:')
         for o in self.options:
             print(f"[INFO]     {o:15} = {self.options[o]}")
         self.all_mods = []
         self.init_mod()
-
+        self.build_gui()
+        if self.map is None:
+            self.create_map("New map", 32, 32)
+    
     def num2tex(self, n):
         for _, tex in self.textures.items():
             if tex.num == n:
@@ -199,14 +176,7 @@ class Application:
     def init_mod(self):
         print(f"[INFO] Loading mod *** {self.options['mod']} ***")
         self.textures = {}
-=======
         self.all_mods = []
-        self.init_mod()
-    
-    def init_mod(self):
-        global textures, current_tex, default_tex, current_pencil
-        textures.clear()
->>>>>>> origin/master
         mod_dir = os.path.join(os.getcwd(), 'mod')
         if not os.path.isdir(mod_dir):
             raise Exception('No mod directory. Impossible to start.')
@@ -229,7 +199,6 @@ class Application:
                 raise Exception('No graphics dir for mod. Impossible to start.')
         # Load textures
         for name, num in self.mod_data['textures_code'].items():
-<<<<<<< HEAD
             try:
                 print(f"[INFO] Loading textures {name:>18} ({num:4d}) in file {self.mod_data['textures_files'][name]}")
                 self.textures[name] = Texture(mod_graphics, name, num, self.mod_data['textures_files'][name])
@@ -239,12 +208,6 @@ class Application:
         self.current_tex = self.mod_data['textures_code'][self.mod_data['cursor_default']]
         self.default_tex = self.mod_data['textures_code'][self.mod_data['ground_default']]
         self.current_pencil = '1x1'
-=======
-            textures[name] = Texture(mod_graphics, name, num, self.mod_data['textures_files'][name])
-        current_tex = self.mod_data['textures_code'][self.mod_data['cursor_default']]
-        default_tex = self.mod_data['textures_code'][self.mod_data['ground_default']]
-        current_pencil = '1x1'
->>>>>>> origin/master
 
     def change_option(self, opt, value):
         self.options[opt] = value
@@ -273,19 +236,9 @@ class Application:
         return False
     
     def change_mod(self, index, value, op):
-<<<<<<< HEAD
         self.change_option('mod', self.varMods.get())
         self.exit_app()
         self.__init__()
-        self.build_gui()
-=======
-        self.change_option('mod', varMods.get())
-        self.init_mod()
-        build()
-    
-    def link_canvas(self, canvas):
-        self.canvas = canvas
->>>>>>> origin/master
     
     def is_linked(self):
         return self.filepath is not None
@@ -351,7 +304,6 @@ class Application:
     def get_show_grid(self, index, value, op):
         print('get', 'i=', index, 'v=', value, 'op=', op, 'show_grid=', self.options['show_grid'])
         return self.options['show_grid']
-<<<<<<< HEAD
 
     #-----------------------------------------------------------
     # GUI building
@@ -393,7 +345,7 @@ class Application:
         self.varShowGrid = BooleanVar()
         self.varShowGrid.set(self.options['show_grid'])
         #self.varShowGrid.trace('r', app.get_show_grid)
-        self.varShowGrid.trace('w', app.set_show_grid)
+        self.varShowGrid.trace('w', self.set_show_grid)
 
         viewmenu = Menu(menu, tearoff=0)
         menu.add_cascade(label="View", menu=viewmenu)
@@ -409,7 +361,7 @@ class Application:
         toolsmenu.add_command(label="Export image", command=menu_tools_image)
         
         self.varMods = StringVar()
-        self.varMods.set(app.options['mod'])
+        self.varMods.set(self.options['mod'])
         self.varMods.trace('w', self.change_mod)
         
         modsmenu = Menu(menu, tearoff=0)
@@ -555,10 +507,6 @@ class Application:
             else:
                 bt.config(relief=RAISED)
         self.current_pencil = p
-=======
-        
->>>>>>> origin/master
-
 
 #-----------------------------------------------------------
 # Menu actions
@@ -605,30 +553,6 @@ def menu_tools_image():
     pass
 
 #-----------------------------------------------------------
-<<<<<<< HEAD
-=======
-# Button actions
-#-----------------------------------------------------------
-
-def bt_refresh(tkimg):
-    global current_tex
-    for key, bt in bt_all.items():
-        if textures[key].tkimg == tkimg:
-            bt.config(relief=SUNKEN)
-            current_tex = textures[key].num
-        else:
-            bt.config(relief=RAISED)
-
-def set_pencil(p):
-    global current_pencil
-    for key, bt in bt_pencils.items():
-        if key == p:
-            bt.config(relief=SUNKEN)
-        else:
-            bt.config(relief=RAISED)
-    current_pencil = p
-
-#-----------------------------------------------------------
 # Apply texture functions
 #-----------------------------------------------------------
 
@@ -669,167 +593,9 @@ def put_texture(event):
                 app.change_map(x, y, current_tex)
 
 #-----------------------------------------------------------
-# GUI building
-#-----------------------------------------------------------
-
-# Load images
-img = True
-try:
-    root.iconbitmap(r'media\icons\editor.ico')
-    basedir = os.path.join('media', 'icons')
-    icons['new'] = PhotoImage(file=os.path.join(basedir, 'Actions-document-new-icon.png'))
-    icons['open'] = PhotoImage(file=os.path.join(basedir, 'Actions-document-open-icon.png'))
-    icons['save'] = PhotoImage(file=os.path.join(basedir, 'Actions-document-save-icon.png'))
-    icons['save_as'] = PhotoImage(file=os.path.join(basedir, 'Actions-document-save-as-icon.png'))
-    icons['1x1'] = PhotoImage(file=os.path.join(basedir, 'Little.png'))
-    icons['3x3'] = PhotoImage(file=os.path.join(basedir, 'Medium.png'))
-    icons['5x5'] = PhotoImage(file=os.path.join(basedir, 'Big.png'))
-except TclError:
-    raise("Unable to load image. Impossible to start.")
-    #img = False
-
-# Status bar
-status_var =  StringVar()
-status_var.set('Welcome')
-
-# Menu
-menu = Menu(root)
-root.config(menu=menu)
-filemenu = Menu(menu, tearoff=0)
-menu.add_cascade(label="File", menu=filemenu)
-filemenu.add_command(label="New...", command=menu_file_new)
-filemenu.add_command(label="Open...", command=menu_file_open)
-filemenu.add_command(label="Save", command=menu_file_save)
-filemenu.add_command(label="Save As...", command=menu_file_save_as)
-filemenu.add_separator()
-filemenu.add_command(label="Exit", command=menu_file_exit)
-
-editmenu = Menu(menu, tearoff=0)
-menu.add_cascade(label="Edit", menu=editmenu)
-
-varShowGrid = BooleanVar()
-varShowGrid.set(app.options['show_grid'])
-varShowGrid.trace('r', app.get_show_grid)
-varShowGrid.trace('w', app.set_show_grid)
-
-viewmenu = Menu(menu, tearoff=0)
-menu.add_cascade(label="View", menu=viewmenu)
-viewmenu.add_command(label="Toolbar")
-viewmenu.add_command(label="Status Bar")
-viewmenu.add_command(label="Animate")
-viewmenu.add_command(label="Mini Map")
-viewmenu.add_checkbutton(label="Show Grid", variable=varShowGrid)
-
-toolsmenu = Menu(menu, tearoff=0)
-menu.add_cascade(label="Tools", menu=toolsmenu)
-toolsmenu.add_command(label="Check", command=menu_tools_check)
-toolsmenu.add_command(label="Export image", command=menu_tools_image)
-
-varMods = StringVar()
-varMods.set(app.options['mod'])
-print(app.options['mod'])
-varMods.trace('w', app.change_mod)
-
-modsmenu = Menu(menu, tearoff=0)
-menu.add_cascade(label="Mods", menu=modsmenu)
-for mod in app.all_mods:
-    modsmenu.add_radiobutton(label=mod.upper(), variable=varMods, value=mod)
-
-varPlayer = IntVar()
-varPlayer.set(1)
-
-playermenu = Menu(menu, tearoff=0)
-menu.add_cascade(label="Player", menu=playermenu)
-playermenu.add_radiobutton(label="Player 1", variable=varPlayer, value=1)
-playermenu.add_radiobutton(label="Player 2", variable=varPlayer, value=2)
-
-helpmenu = Menu(menu, tearoff=0)
-menu.add_cascade(label="Help", menu=helpmenu)
-helpmenu.add_command(label="About...", command=About)
-
-# Frame & button bar
-content = Frame(root, width=600, height=600)
-toolbar = Frame(content)
-
-bt_new = Button(toolbar, image=icons['new'], width=32, height=32, command=menu_file_new)
-bt_open = Button(toolbar, image=icons['open'], width=32, height=32, command=menu_file_open)
-bt_save = Button(toolbar, image=icons['save'], width=32, height=32, command=menu_file_save)
-bt_save_as = Button(toolbar, image=icons['save_as'], width=32, height=32, command=menu_file_save_as)
-
-bt_pencils = {}
-bt_pencils['1x1'] = Button(toolbar, image=icons['1x1'], width=32, height=32, command=lambda: set_pencil('1x1'), relief=SUNKEN)
-bt_pencils['3x3'] = Button(toolbar, image=icons['3x3'], width=32, height=32, command=lambda: set_pencil('3x3'), relief=RAISED)
-bt_pencils['5x5'] = Button(toolbar, image=icons['5x5'], width=32, height=32, command=lambda: set_pencil('5x5'), relief=RAISED)
-
-bt_all = {}
-def build():
-    global bt_all
-    bt_all.clear()
-    for _, tex in textures.items():
-        bt_all[tex.name] = Button(toolbar, image=tex.tkimg, width=32, height=32, command=partial(bt_refresh, tex.tkimg))
-        if current_tex == tex.num:
-            bt_all[tex.name].config(relief=SUNKEN)
-build()
-
-# Canvas
-x_scrollbar = Scrollbar(content, orient=HORIZONTAL)
-y_scrollbar = Scrollbar(content, orient=VERTICAL)
-canvas = Canvas(content,
-                scrollregion=(0, 0, 32*32, 32*32),
-                xscrollcommand=x_scrollbar.set,
-                yscrollcommand=y_scrollbar.set)
-app.link_canvas(canvas)
-
-# Status
-status = Label(content, textvariable = status_var, relief=SUNKEN, anchor=E)
-
-# Packing
-content.pack(fill=BOTH,expand=True)
-toolbar.pack(side=TOP, fill=X)
-y_scrollbar.pack(side=RIGHT, fill=Y)
-x_scrollbar.pack(side=BOTTOM, fill=X)
-canvas.pack(side=TOP, fill=BOTH, expand=True)
-x_scrollbar.config(command=canvas.xview)
-y_scrollbar.config(command=canvas.yview)
-status.pack(side=BOTTOM, fill=X)
-
-bt_new.pack(side=LEFT)
-bt_open.pack(side=LEFT)
-bt_save.pack(side=LEFT)
-bt_save_as.pack(side=LEFT)
-sep1 = Label(toolbar, text=" ")
-sep1.pack(side=LEFT)
-
-for _, bt in bt_pencils.items():
-    bt.pack(side=LEFT)
-sep2 = Label(toolbar, text=" ")
-sep2.pack(side=LEFT)
-
-for _, bt in bt_all.items():
-    bt.pack(side=LEFT)
-
-# Canvas
-#canvas.create_line(0, 0, 200, 100)
-#canvas.create_line(0, 100, 200, 0, fill="red", dash=(4, 4))
-#canvas.create_rectangle(50, 25, 150, 75, fill="blue")
-#canvas.create_text(canvas_width / 2, canvas_height / 2, text="Python")
-canvas.bind('<ButtonPress-1>', put_texture)
-canvas.bind('<B1-Motion>', put_texture)
-#canvas.bind('<ButtonRelease-1>', end_texture)
-canvas.bind('<Motion>', refresh_status_bar)
-
-#-----------------------------------------------------------
->>>>>>> origin/master
 # Main
 #-----------------------------------------------------------
 
 if __name__ == "__main__":
-<<<<<<< HEAD
     app = Application()
-    app.build_gui()
-    app.create_map("New map", 32, 32)
     app.run()
-=======
-    app.create_map("New map", 32, 32, default_tex)
-    root.mainloop()
->>>>>>> origin/master
