@@ -27,7 +27,7 @@ void infosurf(SDL_Surface * surf) {
     printf("Surface.Pitch = %d\n", surf->pitch); // 2560
 }
 
-void load_textures(void) {
+void load_textures() {
     // Textures
     TEXTURES[0] = SDL_ConvertSurface(SDL_LoadBMP(".\\data\\tex\\0-placeholder.bmp"), screen->format, SDL_SWSURFACE);
     TEXTURES[1] = SDL_ConvertSurface(SDL_LoadBMP(".\\data\\tex\\1-grey_stone_wall.bmp"), screen->format, SDL_SWSURFACE);
@@ -47,6 +47,15 @@ void load_textures(void) {
 
 int main(int argc, char * argv[]) {
     
+    FILE * fp = fopen("D:\\Tools\\Perso\\Projets\\map_editor\\New map.bin", "rb");
+    short s1;
+    fread(&s1, 2, 1, fp);
+    int l1;
+    fread(&l1, 4, 1, fp);
+    float f1;
+    fread(&f1, 4, 1, fp);
+    printf("%hd %d %f\n", s1, l1, f1);
+
     int err = init("Woolfy 2.5 FLAT", SCREEN_WIDTH, SCREEN_HEIGHT, 32, false);
     if (err == EXIT_FAILURE) {
         return err;
