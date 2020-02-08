@@ -527,6 +527,20 @@ class Application:
                 if self.options['show_grid']:
                     self.canvas.create_rectangle(col * 32, row * 32, (col + 1) * 32, (row + 1) * 32, outline='black')
         self.refresh_title()
+
+    def refresh_map(self):
+        img = Image.new('RGB', (self.map.width * 32, self.map.height * 32), color = 'black')
+        for row in range(0, self.map.height):
+            for col in range(0, self.map.width):
+                val = self.map.get(row, col)
+                tex = self.num2tex[val].img
+                img.paste(tex, (col * 32, row * 32))
+                if self.options['show_grid']:
+                    d = ImageDraw.Draw(img)
+                    d.rectangle((col * 32, row * 32, (col + 1) * 32, (row + 1) * 32), fill=None, outline='black', width=1)
+        self.background = ImageTk.PhotoImage(img)
+        self.canvas.create_image(0, 0, anchor=NW, image=self.background)
+        self.refresh_title()
     
     def set_show_grid(self, index, value, op):
         self.change_option('show_grid', not self.options['show_grid'])
