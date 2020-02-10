@@ -43,6 +43,7 @@ try:
 except ModuleNotFoundError:
     PILLOW = False
 from struct import *
+import copy
 
 #-----------------------------------------------------------
 # Constants & Global variables
@@ -82,22 +83,23 @@ class Map:
             for col in range(max_col):
                 r.append(default)
             self.ground.append(r)
+        self.objects = copy.deepcopy(self.ground)
         self.width = max_col
         self.height = max_row
         self.filepath = None
-
+    
     def __repr__(self):
         return f"{self.name} {self.width}x{self.height} [{self.mod}]"
     
     def set_name(self, name):
         self.name = name
-
+    
     def set(self, row, col, tex):
         self.ground[row][col] = tex
-
+    
     def get(self, row, col):
         return self.ground[row][col]
-
+    
     @staticmethod
     def from_json(filepath):
         f = open(filepath, 'r')
@@ -250,6 +252,7 @@ class ChooseSizeDialog:
         self.top.wait_window(self.top)
 
     def cancel(self):
+        print("[INFO] ChooseSizeDialog cancelled")
         self.top.destroy()
     
     def ok(self):
@@ -323,42 +326,49 @@ class Application:
         height = 32 if height is None else height
         self.init_mod()
         self.dirty = False
-        self.map = Map(title, width, height, self.options['mod'], self.default_tex) # set the map and its size
+        self.set_map(Map(title, width, height, self.options['mod'], self.default_tex)) # set the map and its size
         self.build_gui() # need the size of the map in order to create the scrollbars
         self.refresh_map() # need the canvas in order to display the map
         self.run()
 
-    def start_load_mod(self, mod):
-        if mod == self.options['mod']:
+    def start_load_mod(self, mod=None, amap=None):
+        # load a different mod or a map with optionnally a new mod
+        if mod is None and amap is None:
             return
-        else:
-            self.exit_app()
+        elif mod is None:
+            mod = amap.mod
+        if mod != self.options['mod']:
+            self.clean_mod_buttons()
             self.change_option('mod', mod)
-            self.start_new_map()
-
-    def start_load_map(self, mapfilepath):
-        self.map = Map.from_json(mapfilepath)
-        self.dirty = False
-        if self.map.mod != self.options['mod']:
-            self.exit_app()
-            self.change_option('mod', self.map.mod)
             self.init_mod()
-            self.build_gui() # need the size of the map in order to create the scrollbars
-            self.refresh_map() # need the canvas in order to display the map
-            self.run()
+            self.load_mod_textures()
+            self.build_mod_buttons()
+        if amap is None:
+            self.restart_new_map()
         else:
+            self.set_map(amap)
             self.canvas.config(scrollregion=(0, 0, self.map.width * 32, self.map.height * 32))
             self.refresh_map() # need the canvas in order to display the map
-
+    
+    def start_load_map(self, mapfilepath):
+        print(f'[INFO] Loading {mapfilepath}')
+        amap = Map.from_json(mapfilepath)
+        print(f'[INFO] Mod of map is {amap.mod}')
+        self.start_load_mod(amap=amap)
+    
     def restart_new_map(self, title=None, width=None, height=None):
         title = 'New map' if title is None else title
         width = 32 if width is None else width
         height = 32 if height is None else height
         self.dirty = False
-        self.map = Map(title, width, height, self.options['mod'], self.default_tex) # set the map and its size
+        self.set_map(Map(title, width, height, self.options['mod'], self.default_tex)) # set the map and its size
         self.canvas.config(scrollregion=(0, 0, self.map.width * 32, self.map.height * 32))
         self.refresh_map() # need the canvas in order to display the map
 
+    def set_map(self, amap):
+         self.dirty = False
+         self.map = amap
+    
     #-----------------------------------------------------------
     # Exit
     #-----------------------------------------------------------
@@ -428,8 +438,6 @@ class Application:
     def init_mod(self):
         print(f"[INFO] Loading mod *** {self.options['mod']} ***")
         self.all_mods = []
-        self.textures = {}
-        self.num2tex = {}
         self.all_mods = []
         mod_dir = os.path.join(os.getcwd(), 'mod')
         loading_mod_error = False
@@ -444,7 +452,7 @@ class Application:
                 if mod == self.options['mod']:
                     found = True
             if not found:
-                print(f"[ERROR] No self.options['mod'] mod directory found. Creating default mod.")
+                print(f"[ERROR] No {self.options['mod']} mod directory found. Creating default mod.")
                 loading_mod_error = True
             else:
                 mod_file = os.path.join(mod_dir, self.options['mod'], self.options['mod'] + '.mod')
@@ -475,8 +483,17 @@ class Application:
             raise Exception('[ERROR] No graphics dir for mod. Impossible to start.')
         self.current_tex = self.mod_data['textures_code'][self.mod_data['cursor_default']]
         self.default_tex = self.mod_data['textures_code'][self.mod_data['ground_default']]
-        self.current_pencil = '1x1'
+        self.current_pencil = 1 # 1, 3 or 5
 
+    def menu_change_pencil(self, index, value, op):
+        if self.varPencils.get() != self.current_pencil:
+            self.current_pencil = self.varPencils.get()
+        for val, bt in self.bt_pencils.items():
+            if val == self.current_pencil:
+                bt.config(relief=SUNKEN)
+            else:
+                bt.config(relief=RAISED)
+    
     def menu_change_mod(self, index, value, op):
         if self.varMods.get() != self.options['mod']:
             if self.dirty and self.options['confirm_exit']: 
@@ -484,6 +501,34 @@ class Application:
                 if save:
                     self.save_map()
             self.start_load_mod(self.varMods.get())
+
+    def load_mod_textures(self):
+        # Load mod textures. Tk() object must be created.
+        self.textures = {}
+        self.num2tex = {}
+        for name, num in self.mod_data['textures_code'].items():
+            try:
+                print(f"[INFO] Loading textures {name:>18} ({num:4d}) in file {self.mod_data['textures_files'][name]}")
+                self.textures[name] = Texture(self.mod_data['graphics_dir'], name, num, self.mod_data['textures_files'][name]) # get texture object by name
+                self.num2tex[self.textures[name].num] = self.textures[name] # get texture object by number
+            except TclError:
+                print(f"[ERROR] Impossible to load texture.")
+        print(f"[INFO] {len(self.textures)} textures loaded")
+
+    def build_mod_buttons(self):
+        # Create texture buttons for the mod. Tk() object must be created.
+        self.bt_textures = {}
+        for _, tex in self.textures.items():
+            print(f'[INFO] Creating button for {tex.name}')
+            self.bt_textures[tex.name] = Button(self.toolbar, image=tex.tkimg, width=32, height=32, command=partial(self.bt_refresh, tex.tkimg))
+            if self.current_tex == tex.num:
+                self.bt_textures[tex.name].config(relief=SUNKEN)
+            self.bt_textures[tex.name].pack(side=LEFT)
+    
+    def clean_mod_buttons(self):
+        # Clean texture buttons for the mod. Tk() object must be created.
+        for _, b in self.bt_textures.items():
+            b.destroy()
     
     #-----------------------------------------------------------
     # Map manipulation
@@ -562,15 +607,7 @@ class Application:
         self.tk = Tk()
         self.tk.protocol("WM_DELETE_WINDOW", self.safe_exit_app)
 
-        # Load mod textures
-        for name, num in self.mod_data['textures_code'].items():
-            try:
-                print(f"[INFO] Loading textures {name:>18} ({num:4d}) in file {self.mod_data['textures_files'][name]}")
-                self.textures[name] = Texture(self.mod_data['graphics_dir'], name, num, self.mod_data['textures_files'][name]) # get texture object by name
-                self.num2tex[self.textures[name].num] = self.textures[name] # get texture object by number
-            except TclError:
-                print(f"[ERROR] Impossible to load texture.")
-        print(f"[INFO] {len(self.textures)} textures loaded")
+        self.load_mod_textures()
         
         # Load images
         BASE_ICONS = True
@@ -584,6 +621,7 @@ class Application:
             icons['1x1'] = PhotoImage(file=os.path.join(basedir, 'Little.png'))
             icons['3x3'] = PhotoImage(file=os.path.join(basedir, 'Medium.png'))
             icons['5x5'] = PhotoImage(file=os.path.join(basedir, 'Big.png'))
+            icons['objects'] = PhotoImage(file=os.path.join(basedir, 'Objects.png'))
         except TclError:
             print("[ERROR] Unable to load button icons. No button will be created.")
             BASE_ICONS = False
@@ -616,10 +654,20 @@ class Application:
         viewmenu.add_command(label="Animate")
         viewmenu.add_command(label="Mini Map")
         viewmenu.add_checkbutton(label="Show Grid", variable=self.varShowGrid)
+
+        self.varPencils = IntVar()
+        self.varPencils.set(1)
+        self.varPencils.trace('w', self.menu_change_pencil)
         
         toolsmenu = Menu(menu, tearoff=0)
         menu.add_cascade(label="Tools", menu=toolsmenu)
+        pencilmenu = Menu(toolsmenu, tearoff=0)
+        toolsmenu.add_cascade(label="Pencils", menu=pencilmenu)
+        pencilmenu.add_radiobutton(label="1x1", variable=self.varPencils, value=1)
+        pencilmenu.add_radiobutton(label="3x3", variable=self.varPencils, value=3)
+        pencilmenu.add_radiobutton(label="5x5", variable=self.varPencils, value=5)
         toolsmenu.add_command(label="Check", command=self.menu_tools_check)
+        toolsmenu.add_separator()
         export_sta = "normal" if PILLOW else "disabled"
         toolsmenu.add_command(label="Export image", command=self.menu_tools_export_image, state=export_sta)
         toolsmenu.add_command(label="Export binary", command=self.menu_tools_export_binary)
@@ -653,24 +701,36 @@ class Application:
 
         # Button bar
         print("[INFO] Creating toolbar")
-        toolbar = Frame(self.content)
+        self.toolbar = Frame(self.content)
 
         if BASE_ICONS:
-            bt_new = Button(toolbar, image=icons['new'], width=32, height=32, command=self.menu_file_new)
-            bt_open = Button(toolbar, image=icons['open'], width=32, height=32, command=self.menu_file_open)
-            bt_save = Button(toolbar, image=icons['save'], width=32, height=32, command=self.menu_file_save)
-            bt_save_as = Button(toolbar, image=icons['save_as'], width=32, height=32, command=self.menu_file_save_as)
+            bt_new = Button(self.toolbar, image=icons['new'], width=32, height=32, command=self.menu_file_new)
+            bt_open = Button(self.toolbar, image=icons['open'], width=32, height=32, command=self.menu_file_open)
+            bt_save = Button(self.toolbar, image=icons['save'], width=32, height=32, command=self.menu_file_save)
+            bt_save_as = Button(self.toolbar, image=icons['save_as'], width=32, height=32, command=self.menu_file_save_as)
         
             self.bt_pencils = {}
-            self.bt_pencils['1x1'] = Button(toolbar, image=icons['1x1'], width=32, height=32, command=lambda: self.set_pencil('1x1'), relief=SUNKEN)
-            self.bt_pencils['3x3'] = Button(toolbar, image=icons['3x3'], width=32, height=32, command=lambda: self.set_pencil('3x3'), relief=RAISED)
-            self.bt_pencils['5x5'] = Button(toolbar, image=icons['5x5'], width=32, height=32, command=lambda: self.set_pencil('5x5'), relief=RAISED)
+            self.bt_pencils[1] = Button(self.toolbar, image=icons['1x1'], width=32, height=32, command=lambda: self.set_pencil(1), relief=SUNKEN)
+            self.bt_pencils[3] = Button(self.toolbar, image=icons['3x3'], width=32, height=32, command=lambda: self.set_pencil(3), relief=RAISED)
+            self.bt_pencils[5] = Button(self.toolbar, image=icons['5x5'], width=32, height=32, command=lambda: self.set_pencil(5), relief=RAISED)
+
+            bt_object = Button(self.toolbar, image=icons['objects'], width=32, height=32, command=self.menu_choose_object)
+            
+            bt_new.pack(side=LEFT)
+            bt_open.pack(side=LEFT)
+            bt_save.pack(side=LEFT)
+            bt_save_as.pack(side=LEFT)
+            sep1 = Label(self.toolbar, text=" ")
+            sep1.pack(side=LEFT)
+            for _, bt in self.bt_pencils.items():
+                bt.pack(side=LEFT)
+            sep2 = Label(self.toolbar, text=" ")
+            sep2.pack(side=LEFT)
+            bt_object.pack(side=LEFT)
+            sep3 = Label(self.toolbar, text= " ")
+            sep3.pack(side=LEFT)
         
-        self.bt_all = {}
-        for _, tex in self.textures.items():
-            self.bt_all[tex.name] = Button(toolbar, image=tex.tkimg, width=32, height=32, command=partial(self.bt_refresh, tex.tkimg))
-            if self.current_tex == tex.num:
-                self.bt_all[tex.name].config(relief=SUNKEN)
+        self.build_mod_buttons()
 
         # Canvas
         print("[INFO] Creating canvas")
@@ -690,29 +750,14 @@ class Application:
         # Packing
         print("[INFO] Packing GUI")
         self.content.pack(fill=BOTH,expand=True)
-        toolbar.pack(side=TOP, fill=X)
+        self.toolbar.pack(side=TOP, fill=X)
         y_scrollbar.pack(side=RIGHT, fill=Y)
         x_scrollbar.pack(side=BOTTOM, fill=X)
         self.canvas.pack(side=TOP, fill=BOTH, expand=True)
         x_scrollbar.config(command=self.canvas.xview)
         y_scrollbar.config(command=self.canvas.yview)
         status.pack(side=BOTTOM, fill=X)
-
-        if BASE_ICONS:
-            bt_new.pack(side=LEFT)
-            bt_open.pack(side=LEFT)
-            bt_save.pack(side=LEFT)
-            bt_save_as.pack(side=LEFT)
-            sep1 = Label(toolbar, text=" ")
-            sep1.pack(side=LEFT)
-            for _, bt in self.bt_pencils.items():
-                bt.pack(side=LEFT)
-            sep2 = Label(toolbar, text=" ")
-            sep2.pack(side=LEFT)
-
-        for _, bt in self.bt_all.items():
-            bt.pack(side=LEFT)
-
+        
         # Canvas
         print("[INFO] Binding")
         #canvas.create_line(0, 0, 200, 100)
@@ -728,6 +773,9 @@ class Application:
     def run(self):
         self.tk.mainloop()
 
+    def menu_choose_object(self):
+        pass
+    
     #-----------------------------------------------------------
     # Apply texture functions
     #-----------------------------------------------------------
@@ -743,17 +791,17 @@ class Application:
 
     def put_texture(self, event):
         x32, y32 = self.get_map_coord(event)
-        if self.current_pencil == '1x1':
+        if self.current_pencil == 1:
             start_x = x32
             end_x = x32 + 1
             start_y = y32
             end_y = y32 + 1
-        elif self.current_pencil == '3x3':
+        elif self.current_pencil == 3:
             start_x = x32 - 1
             end_x = x32 + 2
             start_y = y32 - 1
             end_y = y32 + 2
-        elif self.current_pencil == '5x5':
+        elif self.current_pencil == 5:
             start_x = x32 - 2
             end_x = x32 + 3
             start_y = y32 - 2
@@ -771,7 +819,7 @@ class Application:
     # Button actions
     #-----------------------------------------------------------
     def bt_refresh(self, tkimg):
-        for key, bt in self.bt_all.items():
+        for key, bt in self.bt_textures.items():
             if self.textures[key].tkimg == tkimg:
                 bt.config(relief=SUNKEN)
                 self.current_tex = self.textures[key].num
@@ -785,13 +833,15 @@ class Application:
             else:
                 bt.config(relief=RAISED)
         self.current_pencil = p
-
+        self.varPencils.set(p)
+        
     #-----------------------------------------------------------
     # Menu actions
     #-----------------------------------------------------------
     def menu_file_new(self):
         d = ChooseSizeDialog(self.tk)
-        self.restart_new_map('New map', d.width, d.height)
+        if d.width is not None:
+            self.restart_new_map('New map', d.width, d.height)
     
     def menu_file_open(self):
         filepath = askopenfilename(initialdir = os.getcwd(), title = "Select a file to open", filetypes = (("map files","*.map"),("all files","*.*")))
