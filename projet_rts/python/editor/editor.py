@@ -52,16 +52,15 @@ import copy
 icons = {}
 
 #-----------------------------------------------------------
-# Texture class
+# Image class
 #-----------------------------------------------------------
 
-class Texture:
+class SimpleImage:
 
-    def __init__(self, rep, name, num, filename):
+    def __init__(self, filepath, name=None, num=None):
         self.name = name
         self.num = num
-        self.first = filename
-        self.path = os.path.join(rep, self.first)
+        self.path = filepath
         if PILLOW:
             self.img = Image.open(self.path)
             self.tkimg = ImageTk.PhotoImage(self.img)
@@ -203,22 +202,51 @@ class ChooseSizeDialog:
 # Dialog
 #-----------------------------------------------------------
 
-class ChooseSizeDialog:
+class Dialog:
 
     def __init__(self, parent):
-        self.width = None
-        self.height = None
-        
         self.top = Toplevel(parent, takefocus=True)
         self.top.title('Map size')
         self.top.resizable(False, False)
         self.top.transient(parent)
+
+        self.build()
+
+        self.top.protocol("WM_DELETE_WINDOW", self.cancel)
+        self.top.geometry("+%d+%d" % (parent.winfo_rootx()+50, parent.winfo_rooty()+50))
+        self.top.grab_set()
+        self.top.wait_window(self.top)
+    
+    def build(self):
+        pass
+
+    def cancel(self):
+        print(f"[INFO] {self.__class__.__name__} cancelled")
+        self.close()
+
+    def close(self):
+        self.top.destroy()
+
+class ChooseObjectDialog(Dialog):
+
+    def build(self):
+        self.top.iconbitmap(os.path.join('media', 'icons', 'editor.ico'))
+        Label(self.top, text="Select object:").pack()
+        b = Button(self.top, text="OK", command=self.submit)
+        b.pack(pady=5)
+
+    def submit(self):
+        self.close()
+
+class ChooseSizeDialog(Dialog):
+    
+    def build(self):
+        self.top.iconbitmap(os.path.join('media', 'icons', 'editor.ico'))
+        self.width = None
+        self.height = None
         
-        Label(self.top, text="Map size :").pack()
-
-        #self.e = Entry(self.top)
-        #self.e.pack(padx=5)
-
+        Label(self.top, text="Map size:").pack()
+        
         available_width = [32, 64, 128, 256]
         available_height = [32, 64, 128, 256]
 
@@ -243,22 +271,13 @@ class ChooseSizeDialog:
 
         wh.pack(side=TOP, fill=X)
         
-        b = Button(self.top, text="OK", command=self.ok)
+        b = Button(self.top, text="OK", command=self.submit)
         b.pack(pady=5)
-
-        self.top.protocol("WM_DELETE_WINDOW", self.cancel)
-        self.top.geometry("+%d+%d" % (parent.winfo_rootx()+50, parent.winfo_rooty()+50))
-        self.top.grab_set()
-        self.top.wait_window(self.top)
-
-    def cancel(self):
-        print("[INFO] ChooseSizeDialog cancelled")
-        self.top.destroy()
     
-    def ok(self):
+    def submit(self):
         self.width = self.widthVar.get()
         self.height = self.heightVar.get()
-        self.top.destroy()
+        self.close()
 
 #-----------------------------------------------------------
 # Application class
@@ -341,7 +360,7 @@ class Application:
             self.clean_mod_buttons()
             self.change_option('mod', mod)
             self.init_mod()
-            self.load_mod_textures()
+            self.load_mod_graphics()
             self.build_mod_buttons()
         if amap is None:
             self.restart_new_map()
@@ -502,24 +521,33 @@ class Application:
                     self.save_map()
             self.start_load_mod(self.varMods.get())
 
-    def load_mod_textures(self):
+    def load_mod_graphics(self):
         # Load mod textures. Tk() object must be created.
-        self.textures = {}
-        self.num2tex = {}
-        for name, num in self.mod_data['textures_code'].items():
+        # {name:>18} ({num:4d}) in file {self.mod_data['textures_files'][name]}
+        g = {}
+        for file in os.listdir(self.mod_data['graphics_dir']):
             try:
-                print(f"[INFO] Loading textures {name:>18} ({num:4d}) in file {self.mod_data['textures_files'][name]}")
-                self.textures[name] = Texture(self.mod_data['graphics_dir'], name, num, self.mod_data['textures_files'][name]) # get texture object by name
-                self.num2tex[self.textures[name].num] = self.textures[name] # get texture object by number
+                print(f"[INFO] Loading graphic {file:18}")
+                g[file] = SimpleImage(os.path.join(self.mod_data['graphics_dir'], file)) #, name, num, self.mod_data['textures_files'][name]) # get texture object by name
             except TclError:
                 print(f"[ERROR] Impossible to load texture.")
-        print(f"[INFO] {len(self.textures)} textures loaded")
-
+        print(f"[INFO] {len(g)} graphics loaded")
+        # Load texture
+        self.textures = {}
+        self.num2tex = {}
+        for name, file in self.mod_data['textures_files'].items():
+            self.textures[name] = g[file]
+            n = self.mod_data['textures_code'][name]
+            self.textures[name].num = n
+            self.textures[name].name = name
+            self.num2tex[n] = self.textures[name] # get texture object by number
+        print(f"[INFO]   -> including {len(self.textures)} textures loaded")
+                
     def build_mod_buttons(self):
         # Create texture buttons for the mod. Tk() object must be created.
         self.bt_textures = {}
         for _, tex in self.textures.items():
-            print(f'[INFO] Creating button for {tex.name}')
+            print(f'[INFO] Creating button for texture {tex.name}')
             self.bt_textures[tex.name] = Button(self.toolbar, image=tex.tkimg, width=32, height=32, command=partial(self.bt_refresh, tex.tkimg))
             if self.current_tex == tex.num:
                 self.bt_textures[tex.name].config(relief=SUNKEN)
@@ -607,12 +635,12 @@ class Application:
         self.tk = Tk()
         self.tk.protocol("WM_DELETE_WINDOW", self.safe_exit_app)
 
-        self.load_mod_textures()
+        self.load_mod_graphics()
         
         # Load images
         BASE_ICONS = True
         try:
-            self.tk.iconbitmap(r'media\icons\editor.ico')
+            self.tk.iconbitmap(os.path.join('media', 'icons', 'editor.ico'))
             basedir = os.path.join('media', 'icons')
             icons['new'] = PhotoImage(file=os.path.join(basedir, 'Actions-document-new-icon.png'))
             icons['open'] = PhotoImage(file=os.path.join(basedir, 'Actions-document-open-icon.png'))
@@ -774,7 +802,7 @@ class Application:
         self.tk.mainloop()
 
     def menu_choose_object(self):
-        pass
+        o = ChooseObjectDialog(self.tk)
     
     #-----------------------------------------------------------
     # Apply texture functions
