@@ -35,5 +35,11 @@
     "ground_default" : "void",
     "cursor_default" : "greystone",
     "has_button" : true,
-    "has_transition" : false
+    "has_transition" : false,
+    "objects" : {
+        "ammo" : "ammo.png",
+        "life" : "burger.png",
+        "key-gold" : "key-gold.png",
+        "key-silver" : "key-silver.png"
+    }
 }
