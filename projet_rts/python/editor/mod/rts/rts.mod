@@ -21,5 +21,6 @@
     "ground_default" : "grass",
     "cursor_default" : "water",
     "has_button" : true,
-    "has_transition" : true
+    "has_transition" : true,
+    "objects" : {}
 }

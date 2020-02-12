@@ -205,15 +205,16 @@ class ChooseSizeDialog:
 class Dialog:
 
     def __init__(self, parent):
-        self.top = Toplevel(parent, takefocus=True)
+        self.top = Toplevel(parent.tk, takefocus=True)
         self.top.title('Map size')
         self.top.resizable(False, False)
-        self.top.transient(parent)
+        self.top.transient(parent.tk)
+        self.parent = parent
 
         self.build()
 
         self.top.protocol("WM_DELETE_WINDOW", self.cancel)
-        self.top.geometry("+%d+%d" % (parent.winfo_rootx()+50, parent.winfo_rooty()+50))
+        self.top.geometry("+%d+%d" % (parent.tk.winfo_rootx()+50, parent.tk.winfo_rooty()+50))
         self.top.grab_set()
         self.top.wait_window(self.top)
     
@@ -232,6 +233,8 @@ class ChooseObjectDialog(Dialog):
     def build(self):
         self.top.iconbitmap(os.path.join('media', 'icons', 'editor.ico'))
         Label(self.top, text="Select object:").pack()
+        for o in self.objects:
+        	Label(self.top, text=o).pack()
         b = Button(self.top, text="OK", command=self.submit)
         b.pack(pady=5)
 
@@ -504,15 +507,6 @@ class Application:
         self.default_tex = self.mod_data['textures_code'][self.mod_data['ground_default']]
         self.current_pencil = 1 # 1, 3 or 5
 
-    def menu_change_pencil(self, index, value, op):
-        if self.varPencils.get() != self.current_pencil:
-            self.current_pencil = self.varPencils.get()
-        for val, bt in self.bt_pencils.items():
-            if val == self.current_pencil:
-                bt.config(relief=SUNKEN)
-            else:
-                bt.config(relief=RAISED)
-    
     def menu_change_mod(self, index, value, op):
         if self.varMods.get() != self.options['mod']:
             if self.dirty and self.options['confirm_exit']: 
@@ -542,7 +536,11 @@ class Application:
             self.textures[name].name = name
             self.num2tex[n] = self.textures[name] # get texture object by number
         print(f"[INFO]   -> including {len(self.textures)} textures loaded")
-                
+        self.objects = {}
+        for name, file in self.mod_data['objects'].items():
+        	self.objects[name] = g[file]
+        	self.objects[name].name = name
+    
     def build_mod_buttons(self):
         # Create texture buttons for the mod. Tk() object must be created.
         self.bt_textures = {}
@@ -801,9 +799,6 @@ class Application:
     def run(self):
         self.tk.mainloop()
 
-    def menu_choose_object(self):
-        o = ChooseObjectDialog(self.tk)
-    
     #-----------------------------------------------------------
     # Apply texture functions
     #-----------------------------------------------------------
@@ -844,7 +839,7 @@ class Application:
                     self.edit_map(x, y, self.current_tex)
 
     #-----------------------------------------------------------
-    # Button actions
+    # Button and menu actions
     #-----------------------------------------------------------
     def bt_refresh(self, tkimg):
         for key, bt in self.bt_textures.items():
@@ -862,12 +857,18 @@ class Application:
                 bt.config(relief=RAISED)
         self.current_pencil = p
         self.varPencils.set(p)
-        
-    #-----------------------------------------------------------
-    # Menu actions
-    #-----------------------------------------------------------
+
+    def menu_change_pencil(self, index, value, op):
+        if self.varPencils.get() != self.current_pencil:
+            self.current_pencil = self.varPencils.get()
+        for val, bt in self.bt_pencils.items():
+            if val == self.current_pencil:
+                bt.config(relief=SUNKEN)
+            else:
+                bt.config(relief=RAISED)
+    
     def menu_file_new(self):
-        d = ChooseSizeDialog(self.tk)
+        d = ChooseSizeDialog(self)
         if d.width is not None:
             self.restart_new_map('New map', d.width, d.height)
     
@@ -930,6 +931,9 @@ class Application:
         img.save(f'{self.map.name}.png')
         print(f"[INFO] Map exported as image in file {self.map.name}.png")
 
+    def menu_choose_object(self):
+        o = ChooseObjectDialog(self)
+    
 #-----------------------------------------------------------
 # Main
 #-----------------------------------------------------------
