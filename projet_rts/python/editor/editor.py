@@ -43,7 +43,6 @@ try:
 except ModuleNotFoundError:
     PILLOW = False
 from struct import *
-import copy
 
 #-----------------------------------------------------------
 # Constants & Global variables
@@ -73,16 +72,26 @@ class SimpleImage:
 
 class Map:
 
-    def __init__(self, name, max_col, max_row, mod, default=0):
-        self.set_name(name)
-        self.mod = mod
-        self.ground = []
+    TEXTURE = 0
+    OBJECT = 1
+
+    def create_matrix(self, max_col, max_row, val):
+        matrix = []
         for row in range(max_row):
             r = []
             for col in range(max_col):
-                r.append(default)
-            self.ground.append(r)
-        self.objects = copy.deepcopy(self.ground)
+                r.append(val)
+            matrix.append(r)
+        return matrix
+    
+    def __init__(self, name, max_col, max_row, mod, default=0):
+        if type(default) != int:
+            raise Exception(f"[ERROR] Default should be an integer not a {default.__class__.__name__} of value={default}")
+        self.set_name(name)
+        self.mod = mod
+        self.ground = self.create_matrix(max_col, max_row, default)
+        self.objects = self.create_matrix(max_col, max_row, 0)
+        self.area = self.create_matrix(max_col, max_row, 0)
         self.width = max_col
         self.height = max_row
         self.filepath = None
@@ -93,11 +102,19 @@ class Map:
     def set_name(self, name):
         self.name = name
     
-    def set(self, row, col, tex):
-        self.ground[row][col] = tex
+    def set(self, row, col, tex, layer=0):
+        if layer == Map.TEXTURE:
+            self.ground[row][col] = tex
+        elif layer == Map.OBJECT:
+            self.objects[row][col] = tex
     
-    def get(self, row, col):
-        return self.ground[row][col]
+    def get(self, row, col, layer=0):
+        if layer == Map.TEXTURE:
+            return self.ground[row][col]
+        elif layer == Map.OBJECT:
+            return self.objects[row][col]
+        else:
+            raise Exception(f"[ERROR] Layer value unknown: {layer}")
     
     @staticmethod
     def from_json(filepath):
@@ -145,63 +162,6 @@ class Map:
 # Dialog
 #-----------------------------------------------------------
 
-class ChooseSizeDialog:
-
-    def __init__(self, parent):
-        self.width = None
-        self.height = None
-        
-        self.top = Toplevel(parent, takefocus=True)
-        self.top.title('Select grid size')
-        self.top.resizable(False, False)
-        self.top.transient(parent)
-        
-        Label(self.top, text="Choose grid size :").pack()
-
-        available_width = [32, 64, 128, 256]
-        available_height = [32, 64, 128, 256]
-
-        wh = Frame(self.top)
-        
-        self.widthVar = IntVar()
-        self.widthVar.set(32)
-        self.heightVar = IntVar()
-        self.heightVar.set(32)
-
-        w_group = LabelFrame(wh, text="Width", padx=5, pady=5)
-        for w in available_width:
-            b = Radiobutton(w_group, text=str(w), variable=self.widthVar, value=w)
-            b.pack()
-        w_group.pack(side=LEFT, padx=5)
-        
-        h_group = LabelFrame(wh, text="Height", padx=5, pady=5)
-        for h in available_height:
-            b = Radiobutton(h_group, text=str(h), variable=self.heightVar, value=h)
-            b.pack()
-        h_group.pack(side=RIGHT, padx=5)
-
-        wh.pack(side=TOP, fill=X)
-        
-        b = Button(self.top, text="OK", command=self.ok)
-        b.pack(pady=5)
-
-        self.top.protocol("WM_DELETE_WINDOW", self.cancel)
-        self.top.geometry("+%d+%d" % (parent.winfo_rootx()+50, parent.winfo_rooty()+50))
-        self.top.grab_set()
-        self.top.wait_window(self.top)
-
-    def cancel(self):
-        self.top.destroy()
-    
-    def ok(self):
-        self.width = self.widthVar.get()
-        self.height = self.heightVar.get()
-        self.top.destroy()
-
-#-----------------------------------------------------------
-# Dialog
-#-----------------------------------------------------------
-
 class Dialog:
 
     def __init__(self, parent):
@@ -231,22 +191,45 @@ class Dialog:
 class ChooseObjectDialog(Dialog):
 
     def build(self):
+        self.object = None
+        
         self.top.iconbitmap(os.path.join('media', 'icons', 'editor.ico'))
         Label(self.top, text="Select object:").pack()
-        for o in self.objects:
-        	Label(self.top, text=o).pack()
-        b = Button(self.top, text="OK", command=self.submit)
+        
+        wh = Frame(self.top)
+        
+        ln = len(self.parent.objects)
+        nb_rows = ln // 6 + 1
+        nb_elem_by_row = ln // nb_rows
+        cp = 0
+        objnames = list(self.parent.objects.keys())
+        for row in range(0, nb_rows):
+            for col in range(0, nb_elem_by_row):
+                b = Button(wh, image=self.parent.objects[objnames[cp]].tkimg, width=32, height=32, command=partial(self.setval, objnames[cp]))
+                b.grid(row=row, column=col)
+                #print(row, col, objnames[cp], self.parent.objects[objnames[cp]].tkimg)
+                cp += 1
+        
+        wh.pack(side=TOP, fill=BOTH)
+        
+        b = Button(self.top, text="Cancel", command=self.submit)
         b.pack(pady=5)
 
+    def setval(self, val):
+        print(f"[INFO] {val}")
+        self.object = val
+        self.close()
+    
     def submit(self):
         self.close()
 
 class ChooseSizeDialog(Dialog):
     
     def build(self):
-        self.top.iconbitmap(os.path.join('media', 'icons', 'editor.ico'))
         self.width = None
         self.height = None
+        
+        self.top.iconbitmap(os.path.join('media', 'icons', 'editor.ico'))
         
         Label(self.top, text="Map size:").pack()
         
@@ -348,7 +331,8 @@ class Application:
         height = 32 if height is None else height
         self.init_mod()
         self.dirty = False
-        self.set_map(Map(title, width, height, self.options['mod'], self.default_tex)) # set the map and its size
+        valdef = self.mod_data['textures_code'][self.default_tex]
+        self.set_map(Map(title, width, height, self.options['mod'], valdef)) # set the map and its size
         self.build_gui() # need the size of the map in order to create the scrollbars
         self.refresh_map() # need the canvas in order to display the map
         self.run()
@@ -383,7 +367,8 @@ class Application:
         width = 32 if width is None else width
         height = 32 if height is None else height
         self.dirty = False
-        self.set_map(Map(title, width, height, self.options['mod'], self.default_tex)) # set the map and its size
+        valdef = self.mod_data['textures_code'][self.default_tex]
+        self.set_map(Map(title, width, height, self.options['mod'], valdef)) # set the map and its size
         self.canvas.config(scrollregion=(0, 0, self.map.width * 32, self.map.height * 32))
         self.refresh_map() # need the canvas in order to display the map
 
@@ -442,7 +427,9 @@ class Application:
             "ground_default" : "blue",
             "cursor_default" : "green",
             "has_button" : True,
-            "has_transition" : False
+            "has_transition" : False,
+            "objects_code" : {},
+            "objects_files" : {}
         }
         json.dump(data, f, indent='    ')
         graphics_dir = os.path.join(default_dir, 'graphics')
@@ -503,10 +490,24 @@ class Application:
         self.mod_data['graphics_dir'] = mod_graphics
         if not os.path.isdir(mod_graphics):
             raise Exception('[ERROR] No graphics dir for mod. Impossible to start.')
-        self.current_tex = self.mod_data['textures_code'][self.mod_data['cursor_default']]
-        self.default_tex = self.mod_data['textures_code'][self.mod_data['ground_default']]
+        # Current
+        self.current_start_pos = None
+        self.current_tex = self.mod_data['cursor_default']
+        self.default_tex = self.mod_data['ground_default']
+        self.current_object = None
+        self.current_area = 1
+        self.current_layer = Map.TEXTURE
         self.current_pencil = 1 # 1, 3 or 5
 
+    def menu_change_pencil(self, index, value, op):
+        if self.varPencils.get() != self.current_pencil:
+            self.current_pencil = self.varPencils.get()
+        for val, bt in self.bt_pencils.items():
+            if val == self.current_pencil:
+                bt.config(relief=SUNKEN)
+            else:
+                bt.config(relief=RAISED)
+    
     def menu_change_mod(self, index, value, op):
         if self.varMods.get() != self.options['mod']:
             if self.dirty and self.options['confirm_exit']: 
@@ -529,6 +530,7 @@ class Application:
         # Load texture
         self.textures = {}
         self.num2tex = {}
+        self.num2obj = {}
         for name, file in self.mod_data['textures_files'].items():
             self.textures[name] = g[file]
             n = self.mod_data['textures_code'][name]
@@ -537,17 +539,21 @@ class Application:
             self.num2tex[n] = self.textures[name] # get texture object by number
         print(f"[INFO]   -> including {len(self.textures)} textures loaded")
         self.objects = {}
-        for name, file in self.mod_data['objects'].items():
-        	self.objects[name] = g[file]
-        	self.objects[name].name = name
+        for name, file in self.mod_data['objects_files'].items():
+            self.objects[name] = g[file]
+            n = self.mod_data['objects_code'][name]
+            self.objects[name].num = n
+            self.objects[name].name = name
+            self.num2obj[n] = self.objects[name]
+        print(f"[INFO]   -> including {len(self.objects)} objects loaded")
     
     def build_mod_buttons(self):
         # Create texture buttons for the mod. Tk() object must be created.
         self.bt_textures = {}
         for _, tex in self.textures.items():
             print(f'[INFO] Creating button for texture {tex.name}')
-            self.bt_textures[tex.name] = Button(self.toolbar, image=tex.tkimg, width=32, height=32, command=partial(self.bt_refresh, tex.tkimg))
-            if self.current_tex == tex.num:
+            self.bt_textures[tex.name] = Button(self.toolbar, image=tex.tkimg, width=32, height=32, command=partial(self.bt_change_tex, tex.tkimg))
+            if self.current_tex == tex.name:
                 self.bt_textures[tex.name].config(relief=SUNKEN)
             self.bt_textures[tex.name].pack(side=LEFT)
     
@@ -559,11 +565,6 @@ class Application:
     #-----------------------------------------------------------
     # Map manipulation
     #-----------------------------------------------------------
-    def edit_map(self, col, lin, val):
-        self.map.set(lin, col, val)
-        self.dirty = True
-        self.refresh_title()
-    
     def rename_map(self, name):
         self.map.set_name(name)
         self.dirty = True
@@ -588,15 +589,22 @@ class Application:
             dirty = '*' if self.dirty else ''
             txt = f'{self.title} - {self.map.name} {dirty}'
         self.tk.title(txt)
+
+    def refresh_tile(self, row, col):
+        ntex = self.map.get(row, col, Map.TEXTURE)
+        nobj = self.map.get(row, col, Map.OBJECT)
+        tex = self.num2tex[ntex]
+        self.canvas.create_image(col * 32, row * 32, anchor=NW, image=tex.tkimg)
+        if nobj != 0:
+            obj = self.num2obj[nobj]
+            self.canvas.create_image(col * 32, row * 32, anchor=NW, image=obj.tkimg)
+        if self.options['show_grid']:
+            self.canvas.create_rectangle(col * 32, row * 32, (col + 1) * 32, (row + 1) * 32, outline='black')
     
     def refresh_map(self):
         for row in range(0, self.map.height):
             for col in range(0, self.map.width):
-                val = self.map.get(row, col)
-                tex = self.num2tex[val]
-                self.canvas.create_image(col * 32, row * 32, anchor=NW, image=tex.tkimg)
-                if self.options['show_grid']:
-                    self.canvas.create_rectangle(col * 32, row * 32, (col + 1) * 32, (row + 1) * 32, outline='black')
+                self.refresh_tile(row, col)
         self.refresh_title()
 
     def refresh_map(self):
@@ -736,9 +744,9 @@ class Application:
             bt_save_as = Button(self.toolbar, image=icons['save_as'], width=32, height=32, command=self.menu_file_save_as)
         
             self.bt_pencils = {}
-            self.bt_pencils[1] = Button(self.toolbar, image=icons['1x1'], width=32, height=32, command=lambda: self.set_pencil(1), relief=SUNKEN)
-            self.bt_pencils[3] = Button(self.toolbar, image=icons['3x3'], width=32, height=32, command=lambda: self.set_pencil(3), relief=RAISED)
-            self.bt_pencils[5] = Button(self.toolbar, image=icons['5x5'], width=32, height=32, command=lambda: self.set_pencil(5), relief=RAISED)
+            self.bt_pencils[1] = Button(self.toolbar, image=icons['1x1'], width=32, height=32, command=lambda: self.bt_change_pencil(1), relief=SUNKEN)
+            self.bt_pencils[3] = Button(self.toolbar, image=icons['3x3'], width=32, height=32, command=lambda: self.bt_change_pencil(3), relief=RAISED)
+            self.bt_pencils[5] = Button(self.toolbar, image=icons['5x5'], width=32, height=32, command=lambda: self.bt_change_pencil(5), relief=RAISED)
 
             bt_object = Button(self.toolbar, image=icons['objects'], width=32, height=32, command=self.menu_choose_object)
             
@@ -814,6 +822,7 @@ class Application:
 
     def put_texture(self, event):
         x32, y32 = self.get_map_coord(event)
+        print(f'[INFO] {y32} {x32} l={self.current_layer} t={self.current_tex} o={self.current_object}')
         if self.current_pencil == 1:
             start_x = x32
             end_x = x32 + 1
@@ -832,24 +841,28 @@ class Application:
         for x in range(start_x, end_x):
             for y in range(start_y, end_y):
                 if 0 <= x < self.map.width and 0 <= y < self.map.height:
-                    tex = self.num2tex[self.current_tex]
-                    self.canvas.create_image(x * 32, y * 32, anchor=NW, image=tex.tkimg)
-                    if self.options['show_grid']:
-                        self.canvas.create_rectangle(x * 32, y * 32, (x + 1) * 32, (y + 1) * 32, outline='black')
-                    self.edit_map(x, y, self.current_tex)
-
+                    if self.current_layer == Map.TEXTURE:
+                        val = self.textures[self.current_tex].num
+                    elif self.current_layer == Map.OBJECT:
+                        val = self.objects[self.current_object].num
+                    self.map.set(y, x, val, self.current_layer)
+                    self.refresh_tile(y, x)
+        self.dirty = True
+        self.refresh_title()
+    
     #-----------------------------------------------------------
     # Button and menu actions
     #-----------------------------------------------------------
-    def bt_refresh(self, tkimg):
+    def bt_change_tex(self, tkimg):
         for key, bt in self.bt_textures.items():
             if self.textures[key].tkimg == tkimg:
                 bt.config(relief=SUNKEN)
-                self.current_tex = self.textures[key].num
+                self.current_tex = self.textures[key].name
             else:
                 bt.config(relief=RAISED)
-
-    def set_pencil(self, p):
+        self.current_layer = Map.TEXTURE
+    
+    def bt_change_pencil(self, p):
         for key, bt in self.bt_pencils.items():
             if key == p:
                 bt.config(relief=SUNKEN)
@@ -857,7 +870,7 @@ class Application:
                 bt.config(relief=RAISED)
         self.current_pencil = p
         self.varPencils.set(p)
-
+        
     def menu_change_pencil(self, index, value, op):
         if self.varPencils.get() != self.current_pencil:
             self.current_pencil = self.varPencils.get()
@@ -933,7 +946,10 @@ class Application:
 
     def menu_choose_object(self):
         o = ChooseObjectDialog(self)
-    
+        if o.object is not None:
+            self.current_layer = Map.OBJECT
+            self.current_object = o.object
+
 #-----------------------------------------------------------
 # Main
 #-----------------------------------------------------------

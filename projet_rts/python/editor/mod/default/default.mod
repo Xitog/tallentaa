@@ -15,5 +15,7 @@
     "ground_default": "blue",
     "cursor_default": "green",
     "has_button": true,
-    "has_transition": false
+    "has_transition": false,
+    "objects_code": {},
+    "objects_files": {}
 }

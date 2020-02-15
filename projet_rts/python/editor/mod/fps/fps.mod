@@ -36,10 +36,16 @@
     "cursor_default" : "greystone",
     "has_button" : true,
     "has_transition" : false,
-    "objects" : {
+    "objects_files" : {
         "ammo" : "ammo.png",
         "life" : "burger.png",
         "key-gold" : "key-gold.png",
         "key-silver" : "key-silver.png"
+    },
+    "objects_code" : {
+        "ammo" : 1,
+        "life" : 2,
+        "key-gold" : 3,
+        "key-silver" : 4
     }
 }
