@@ -71,10 +71,7 @@ class SimpleImage:
 #-----------------------------------------------------------
 
 class Map:
-
-    TEXTURE = 0
-    OBJECT = 1
-
+    
     def create_matrix(self, max_col, max_row, val):
         matrix = []
         for row in range(max_row):
@@ -84,37 +81,38 @@ class Map:
             matrix.append(r)
         return matrix
     
-    def __init__(self, name, max_col, max_row, mod, default=0):
-        if type(default) != int:
-            raise Exception(f"[ERROR] Default should be an integer not a {default.__class__.__name__} of value={default}")
+    def __init__(self, name, max_col, max_row, mod):
         self.set_name(name)
         self.mod = mod
-        self.ground = self.create_matrix(max_col, max_row, default)
-        self.objects = self.create_matrix(max_col, max_row, 0)
-        self.area = self.create_matrix(max_col, max_row, 0)
+        self.layers = {}
         self.width = max_col
         self.height = max_row
         self.filepath = None
+
+    def add_layer(self, name, val):
+        self.layers[name] = self.create_matrix(self.width, self.height, val)
     
     def __repr__(self):
         return f"{self.name} {self.width}x{self.height} [{self.mod}]"
     
     def set_name(self, name):
         self.name = name
-    
-    def set(self, row, col, tex, layer=0):
-        if layer == Map.TEXTURE:
-            self.ground[row][col] = tex
-        elif layer == Map.OBJECT:
-            self.objects[row][col] = tex
-    
-    def get(self, row, col, layer=0):
-        if layer == Map.TEXTURE:
-            return self.ground[row][col]
-        elif layer == Map.OBJECT:
-            return self.objects[row][col]
-        else:
+
+    def check(self, row, col, layer):
+        if layer not in self.layers:
             raise Exception(f"[ERROR] Layer value unknown: {layer}")
+        elif row < 0 or row >= self.height:
+            raise Exception(f"[ERROR] Out of row: {row} / {self.height}")
+        elif col < 0 or col >= self.width:
+            raise Exception(f"[ERROR] Out of col: {col} / {self.width}")
+    
+    def set(self, row, col, val, layer):
+        self.check(row, col, layer)
+        self.layers[layer][row][col] = val
+    
+    def get(self, row, col, layer):
+        self.check(row, col, layer)
+        return self.layers[layer][row][col]
     
     @staticmethod
     def from_json(filepath):
@@ -266,6 +264,20 @@ class ChooseSizeDialog(Dialog):
         self.close()
 
 #-----------------------------------------------------------
+# Layer handler
+#-----------------------------------------------------------
+
+class LayerHandler:
+
+    def __init__(name, default, pencil=1):
+        self.name = name
+        self.default = default
+        self.pencil = pencil
+        self.min = None
+        self.max = None
+        self.type = None # SimpleImage or Integer
+
+#-----------------------------------------------------------
 # Application class
 #-----------------------------------------------------------
 
@@ -276,6 +288,8 @@ class Application:
         self.base_geometry = { 'w' : 600, 'h' : 400, 'geometry' : '600x400+0+0'}
         self.old_geometry = self.base_geometry
         self.load_options()
+        self.create_default_mod()
+        self.all_mods = self.detect_mods()
         self.mod_data = None
         self.tk = None
         self.start_new_map(title, width, height)
@@ -329,10 +343,18 @@ class Application:
         title = 'New map' if title is None else title
         width = 32 if width is None else width
         height = 32 if height is None else height
-        self.init_mod()
+        self.load_mod()
         self.dirty = False
-        valdef = self.mod_data['textures_code'][self.default_tex]
-        self.set_map(Map(title, width, height, self.options['mod'], valdef)) # set the map and its size
+        self.set_map(Map(title, width, height, self.options['mod']))
+        for lay in self.mod_data['layers']:
+            lay_cont = lay['content']
+            def_code = lay['default']
+            if lay_cont != '__integer__':
+                content = self.mod_data[lay_cont]
+                def_num = content[def_code]
+            else:
+                def_num = def_code
+            self.map.add_layer(lay['name'], def_num) # set the map and its size
         self.build_gui() # need the size of the map in order to create the scrollbars
         self.refresh_map() # need the canvas in order to display the map
         self.run()
@@ -414,91 +436,75 @@ class Application:
             "filetype" : "mod",
             "version" : 1.0,
             "name" : "default",
-            "textures_code" : {
-                "blue"  : 1,
-                "green" : 2,
-                "red"   : 3,
+            "layers" : [
+                {'code': "wal", 'name': "walls",   'content': "textures",    'default': "blue",   'show': True},
+                {'code': "grd", 'name': "ground",  'content': "textures",    'default': "black",  'show': True},
+                {'code': "cei", 'name': "ceiling", 'content': "textures",    'default': "red",    'show': False},
+                {'code': "are", 'name': "area",    'content': "__integer__", 'default': 0,        'show': True},
+                {'code': "obj", 'name': "objects", 'content': "objects",     'default': "circle", 'show': True}
+            ],
+            "textures" :{
+                "__none__" : {'val': 0},
+                "black" :    {'val': 1, 'file': "black.png"},
+                "blue"  :    {'val': 2, 'file': "blue.png"},
+                "green" :    {'val': 3, 'file': "green.png"},
+                "red"   :    {'val': 4, 'file': "red.png"}
             },
-            "textures_files" : {
-                "blue"  : "blue.png",
-                "green" : "green.png",
-                "red"   : "red.png",
+            "objects" : {
+                "__none__" : {'val': 0},
+                "circle"   : {'val': 1, 'file': "circle.png"}
             },
-            "ground_default" : "blue",
-            "cursor_default" : "green",
-            "has_button" : True,
-            "has_transition" : False,
-            "objects_code" : {},
-            "objects_files" : {}
+            "default_layer" : "wal",
+            "buttons" : "textures",
         }
         json.dump(data, f, indent='    ')
         graphics_dir = os.path.join(default_dir, 'graphics')
         os.makedirs(graphics_dir, exist_ok=True)
         color = {
-            'green' : b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00 \x00\x00\x00 \x08\x02\x00\x00\x00\xfc\x18\xed\xa3\x00\x00\x00\x01sRGB\x00\xae\xce\x1c\xe9\x00\x00\x00\x04gAMA\x00\x00\xb1\x8f\x0b\xfca\x05\x00\x00\x00\tpHYs\x00\x00\x0e\xc3\x00\x00\x0e\xc3\x01\xc7o\xa8d\x00\x00\x006IDATHK\xed\xcd\xa1\x01\x000\x08\xc4\xc0\xa7\xa3t\x9e.\xcb\x865\xf8(\\\xceD\xa6n\xbfl:\xd35\x0e\x90\x03\xe4\x009@\x0e\x90\x03\xe4\x009@\x0e\x90\x03\x90|&y\x01_\xc9\xe9\xe5\xe5\x00\x00\x00\x00IEND\xaeB`\x82',
-            'blue'  : b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00 \x00\x00\x00 \x08\x02\x00\x00\x00\xfc\x18\xed\xa3\x00\x00\x00\x01sRGB\x00\xae\xce\x1c\xe9\x00\x00\x00\x04gAMA\x00\x00\xb1\x8f\x0b\xfca\x05\x00\x00\x00\tpHYs\x00\x00\x0e\xc3\x00\x00\x0e\xc3\x01\xc7o\xa8d\x00\x00\x00NIDATHK\xb5\xc71\r\x000\x0c\xc0\xb0\xf2\x87Qt\x85\xb1?\xb7'\xf9\xf1\xcc\xde_=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s\xbd\xb5\xf7\x00\x1b\xdf([v\xdd\xdf|\x00\x00\x00\x00IEND\xaeB`\x82",
-            'red'   : b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00 \x00\x00\x00 \x08\x02\x00\x00\x00\xfc\x18\xed\xa3\x00\x00\x00\x01sRGB\x00\xae\xce\x1c\xe9\x00\x00\x00\x04gAMA\x00\x00\xb1\x8f\x0b\xfca\x05\x00\x00\x00\tpHYs\x00\x00\x0e\xc3\x00\x00\x0e\xc3\x01\xc7o\xa8d\x00\x00\x007IDATHK\xed\xcd\xa1\x01\x000\x08\xc4\xc0\xa7sTv\xff\xcd\xd8\xa1\x06\x1f\x85\xcb\x99\xc8T\xdf\x97Mg\xba\xc6\x01r\x80\x1c \x07\xc8\x01r\x80\x1c \x07\xc8\x01r\x00\x92\x0f\xd1\x10\x01m\x9a\xa8\x01\x8a\x00\x00\x00\x00IEND\xaeB`\x82',
+            'green'  : b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00 \x00\x00\x00 \x08\x02\x00\x00\x00\xfc\x18\xed\xa3\x00\x00\x00\x01sRGB\x00\xae\xce\x1c\xe9\x00\x00\x00\x04gAMA\x00\x00\xb1\x8f\x0b\xfca\x05\x00\x00\x00\tpHYs\x00\x00\x0e\xc3\x00\x00\x0e\xc3\x01\xc7o\xa8d\x00\x00\x006IDATHK\xed\xcd\xa1\x01\x000\x08\xc4\xc0\xa7\xa3t\x9e.\xcb\x865\xf8(\\\xceD\xa6n\xbfl:\xd35\x0e\x90\x03\xe4\x009@\x0e\x90\x03\xe4\x009@\x0e\x90\x03\x90|&y\x01_\xc9\xe9\xe5\xe5\x00\x00\x00\x00IEND\xaeB`\x82',
+            'blue'   : b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00 \x00\x00\x00 \x08\x02\x00\x00\x00\xfc\x18\xed\xa3\x00\x00\x00\x01sRGB\x00\xae\xce\x1c\xe9\x00\x00\x00\x04gAMA\x00\x00\xb1\x8f\x0b\xfca\x05\x00\x00\x00\tpHYs\x00\x00\x0e\xc3\x00\x00\x0e\xc3\x01\xc7o\xa8d\x00\x00\x00NIDATHK\xb5\xc71\r\x000\x0c\xc0\xb0\xf2\x87Qt\x85\xb1?\xb7'\xf9\xf1\xcc\xde_=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s\xbd\xb5\xf7\x00\x1b\xdf([v\xdd\xdf|\x00\x00\x00\x00IEND\xaeB`\x82",
+            'red'    : b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00 \x00\x00\x00 \x08\x02\x00\x00\x00\xfc\x18\xed\xa3\x00\x00\x00\x01sRGB\x00\xae\xce\x1c\xe9\x00\x00\x00\x04gAMA\x00\x00\xb1\x8f\x0b\xfca\x05\x00\x00\x00\tpHYs\x00\x00\x0e\xc3\x00\x00\x0e\xc3\x01\xc7o\xa8d\x00\x00\x007IDATHK\xed\xcd\xa1\x01\x000\x08\xc4\xc0\xa7sTv\xff\xcd\xd8\xa1\x06\x1f\x85\xcb\x99\xc8T\xdf\x97Mg\xba\xc6\x01r\x80\x1c \x07\xc8\x01r\x80\x1c \x07\xc8\x01r\x00\x92\x0f\xd1\x10\x01m\x9a\xa8\x01\x8a\x00\x00\x00\x00IEND\xaeB`\x82',
+            'black'  : b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00 \x00\x00\x00 \x08\x02\x00\x00\x00\xfc\x18\xed\xa3\x00\x00\x00\x01sRGB\x00\xae\xce\x1c\xe9\x00\x00\x00\x04gAMA\x00\x00\xb1\x8f\x0b\xfca\x05\x00\x00\x00\tpHYs\x00\x00\x0e\xc3\x00\x00\x0e\xc3\x01\xc7o\xa8d\x00\x00\x00\x1aIDATHK\xed\xc1\x01\r\x00\x00\x00\xc2\xa0\xf7O\xedf\x0e \x00\x00\x80\xab\x01\x0c \x00\x016"\n\xad\x00\x00\x00\x00IEND\xaeB`\x82',
+            'circle' : b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00 \x00\x00\x00 \x08\x02\x00\x00\x00\xfc\x18\xed\xa3\x00\x00\x00\x01sRGB\x00\xae\xce\x1c\xe9\x00\x00\x00\x04gAMA\x00\x00\xb1\x8f\x0b\xfca\x05\x00\x00\x00\tpHYs\x00\x00\x0e\xc3\x00\x00\x0e\xc3\x01\xc7o\xa8d\x00\x00\x00\xccIDATHK\xed\x961\x0e\xc20\x0cES\x8e\xc0\x0c\x1b\xdc\xff@\x8c\xccp\x85`\xe4(\xb4q\xb0\x7fZ\xbb\x03\xe2-\x8dT\xfb\xff|[\xaa:\xe5\x9c\x93\xe0y\xbe\xf2\xe1x\xbf\xf1AA/^\x18\xd4R\x89l\x06\x8b\x0f\xe5\xa96\x10\xcd[\xbc\xb8\x18\xe8\rL\xad\x19*\xfe$@\xa06D}\xce\xdb`\xb4\x07\x84e\xc7\x12\xac`z\x9c.\xe5\x18Cx\x82\xbf\x81I\xbc\x01\xf29\xdbBl\x02\xba\xfdo,9h\r,\xbb\xd7\x88\xdcCT\xc1\x1d\x97\xec\x18b.\xb5H\xe0\xe2\xd1\x88\xb4#r\xcc\xc1tv\xb0\xc5C\xf6z.\xb9{\xb3\xfe\x9f\x1d3\xf43\xf0-\xb7f@ \x1e\xfaH\x8d\x11\x99\xfb0\x0b\x8c\x04\x15\x19\xc5\x94f\xd0%7r\xa0:\x81&XIJ/jdW5\xf8\xe4]\x82\x00\x00\x00\x00IEND\xaeB`\x82'
         }
         for c in color:
             f = open(os.path.join(graphics_dir, c + '.png'), mode='wb')
             f.write(color[c])
             f.close()
-    
-    def init_mod(self):
-        print(f"[INFO] Loading mod *** {self.options['mod']} ***")
-        self.all_mods = []
-        self.all_mods = []
+
+    def detect_mods(self):
+        all_mods = []
         mod_dir = os.path.join(os.getcwd(), 'mod')
-        loading_mod_error = False
-        if not os.path.isdir(mod_dir):
-            print('[ERROR] No mod directory found. Creating default mod.')
-            loading_mod_error = True
-        else:
-            found = False
-            for mod in os.listdir(mod_dir):
-                if os.path.isdir(os.path.join(os.getcwd(), 'mod', mod)):
-                    self.all_mods.append(mod)
-                if mod == self.options['mod']:
-                    found = True
-            if not found:
-                print(f"[ERROR] No {self.options['mod']} mod directory found. Creating default mod.")
-                loading_mod_error = True
-            else:
-                mod_file = os.path.join(mod_dir, self.options['mod'], self.options['mod'] + '.mod')
-                if not os.path.isfile(mod_file):
-                    print(f"[ERROR] No {self.options['mod']} mod file found. Creating default mod mod file.")
-                    loading_mod_error = True
-                mod_graphics = os.path.join(mod_dir, self.options['mod'], 'graphics')
-                print(mod_graphics)
-                if not os.path.isdir(mod_graphics):
-                    print(f"[ERROR] No {self.options['mod']} graphics dir found. Creating default mod graphics dir.")
-                    loading_mod_error = True
-        if loading_mod_error:
-            self.create_default_mod()
-            self.change_option('mod', 'default')
-            mod_dir = os.path.join(os.getcwd(), 'mod')
-            if not os.path.isdir(mod_dir):
-                raise Exception('[ERROR] No mod directory found.')
-            mod_file = os.path.join(mod_dir, self.options['mod'], self.options['mod'] + '.mod')
-            if not os.path.isfile(mod_file):
-                raise Exception(f"[ERROR] No {self.options['mod']} mod file found.")
-            mod_graphics = os.path.join(mod_dir, self.options['mod'], 'graphics')
-            if not os.path.isdir(mod_graphics):
-                raise Exception(f"[ERROR] No {self.options['mod']} graphics dir found.")
+        for mod in os.listdir(mod_dir):
+            if os.path.isdir(os.path.join(os.getcwd(), 'mod', mod)):
+                all_mods.append(mod)
+        return all_mods
+    
+    def load_mod(self):
+        print(f"[INFO] Loading mod *** {self.options['mod']} ***")
+        mod_dir = os.path.join(os.getcwd(), 'mod', self.options['mod'])
+        mod_file = os.path.join(mod_dir, self.options['mod'] + '.mod')
+        mod_graphics = os.path.join(mod_dir, 'graphics')
         f = open(mod_file, 'r', encoding='utf8')
         self.mod_data = json.load(f)
+        f.close()
         self.mod_data['graphics_dir'] = mod_graphics
-        if not os.path.isdir(mod_graphics):
-            raise Exception('[ERROR] No graphics dir for mod. Impossible to start.')
-        # Current
+        self.current_layer = self.mod_data["default_layer"]
+        self.nb_layers = len(self.mod_data["layers"])
+        self.current_pencil = []
+        self.current_apply = []
+        self.visible_layers = {}
+        self.resources = {}
+        self.num2resources = {}
+        for lay in self.mod_data["layers"]:
+            if lay['content'] not in self.resources and lay['content'] != '__integer__':
+                self.resources[lay['content']] = {}
+                self.num2resources[lay['content']] = {} # get texture object by number
+            self.current_apply.append(lay["default"])
+            self.current_pencil.append(1)
+            self.visible_layers[lay['name']] = lay['show']
         self.current_start_pos = None
-        self.current_tex = self.mod_data['cursor_default']
-        self.default_tex = self.mod_data['ground_default']
-        self.current_object = None
-        self.current_area = 1
-        self.current_layer = Map.TEXTURE
-        self.current_pencil = 1 # 1, 3 or 5
-
+    
     def menu_change_pencil(self, index, value, op):
         if self.varPencils.get() != self.current_pencil:
             self.current_pencil = self.varPencils.get()
@@ -527,35 +533,29 @@ class Application:
             except TclError:
                 print(f"[ERROR] Impossible to load texture.")
         print(f"[INFO] {len(g)} graphics loaded")
-        # Load texture
-        self.textures = {}
-        self.num2tex = {}
-        self.num2obj = {}
-        for name, file in self.mod_data['textures_files'].items():
-            self.textures[name] = g[file]
-            n = self.mod_data['textures_code'][name]
-            self.textures[name].num = n
-            self.textures[name].name = name
-            self.num2tex[n] = self.textures[name] # get texture object by number
-        print(f"[INFO]   -> including {len(self.textures)} textures loaded")
-        self.objects = {}
-        for name, file in self.mod_data['objects_files'].items():
-            self.objects[name] = g[file]
-            n = self.mod_data['objects_code'][name]
-            self.objects[name].num = n
-            self.objects[name].name = name
-            self.num2obj[n] = self.objects[name]
-        print(f"[INFO]   -> including {len(self.objects)} objects loaded")
+        # Load resources
+        for keyres in self.resources:
+            data = self.mod_data[keyres]
+            for code, content in data.items():
+                if code == '__none__': continue
+                self.resources[keyres][code] = g[content['file']]
+                self.resources[keyres][code].num = content['val']
+                self.resources[keyres][code].name = code
+                self.num2resources[keyres][content['val']] = self.resources[keyres][code]
+            print(f"[INFO]   -> including {len(self.resources[keyres])} {keyres} loaded")
     
     def build_mod_buttons(self):
         # Create texture buttons for the mod. Tk() object must be created.
         self.bt_textures = {}
-        for _, tex in self.textures.items():
-            print(f'[INFO] Creating button for texture {tex.name}')
-            self.bt_textures[tex.name] = Button(self.toolbar, image=tex.tkimg, width=32, height=32, command=partial(self.bt_change_tex, tex.tkimg))
-            if self.current_tex == tex.name:
-                self.bt_textures[tex.name].config(relief=SUNKEN)
-            self.bt_textures[tex.name].pack(side=LEFT)
+        bt = self.mod_data['buttons']
+        print('>>>', bt, self.resources)
+        for _, res in self.resources[bt].items():
+            print(res)
+            print(f'[INFO] Creating button for {bt} : {res.name}')
+            self.bt_textures[res.name] = Button(self.toolbar, image=res.tkimg, width=32, height=32, command=partial(self.bt_change_tex, res.tkimg))
+            if self.current_layer == bt and self.current_apply[bt] == res.name:
+                self.bt_textures[res.name].config(relief=SUNKEN)
+            self.bt_textures[res.name].pack(side=LEFT)
     
     def clean_mod_buttons(self):
         # Clean texture buttons for the mod. Tk() object must be created.
@@ -591,6 +591,10 @@ class Application:
         self.tk.title(txt)
 
     def refresh_tile(self, row, col):
+        for lay, visible in self.visible_layers.items():
+            if not visible: continue
+            XXX
+        
         ntex = self.map.get(row, col, Map.TEXTURE)
         nobj = self.map.get(row, col, Map.OBJECT)
         tex = self.num2tex[ntex]
