@@ -90,6 +90,8 @@ class Map:
         self.filepath = None
 
     def add_layer(self, name, val):
+        if type(val) != int:
+            raise Exception(f'[ERROR] Only integer accepted, not {val.__class__.__name__}')
         self.layers[name] = self.create_matrix(self.width, self.height, val)
     
     def __repr__(self):
@@ -98,8 +100,10 @@ class Map:
     def set_name(self, name):
         self.name = name
 
-    def check(self, row, col, layer):
-        if layer not in self.layers:
+    def check(self, row, col, layer, layer_none_ok=False):
+        if layer is None and not layer_none_ok:
+            raise Exception("[ERROR] Layer not defined.")
+        elif layer is not None and layer not in self.layers:
             raise Exception(f"[ERROR] Layer value unknown: {layer}")
         elif row < 0 or row >= self.height:
             raise Exception(f"[ERROR] Out of row: {row} / {self.height}")
@@ -110,9 +114,15 @@ class Map:
         self.check(row, col, layer)
         self.layers[layer][row][col] = val
     
-    def get(self, row, col, layer):
-        self.check(row, col, layer)
-        return self.layers[layer][row][col]
+    def get(self, row, col, layer=None):
+        self.check(row, col, layer, True)
+        if layer is not None:
+            return self.layers[layer][row][col]
+        else:
+            res = {}
+            for lay in self.layers:
+                res[lay] = self.layers[lay][row][col]
+            return res
     
     @staticmethod
     def from_json(filepath):
@@ -269,13 +279,19 @@ class ChooseSizeDialog(Dialog):
 
 class LayerHandler:
 
-    def __init__(name, default, pencil=1):
+    def __init__(self, name, content, default, apply, pencil=1, visible=True):
         self.name = name
+        self.res = content
         self.default = default
         self.pencil = pencil
         self.min = None
         self.max = None
         self.type = None # SimpleImage or Integer
+        self.visible = visible
+        self.apply = apply
+    
+    def __str__(self):
+        return f"name={self.name} default={self.default} pencil={self.pencil} visible={self.visible}"
 
 #-----------------------------------------------------------
 # Application class
@@ -346,15 +362,14 @@ class Application:
         self.load_mod()
         self.dirty = False
         self.set_map(Map(title, width, height, self.options['mod']))
-        for lay in self.mod_data['layers']:
-            lay_cont = lay['content']
-            def_code = lay['default']
-            if lay_cont != '__integer__':
-                content = self.mod_data[lay_cont]
-                def_num = content[def_code]
+        for layname, lay in self.layerHandlers.items():
+            lay_cont = lay.res
+            def_code = lay.default
+            if lay_cont != 'int' and def_code != 0:
+                def_num = self.resources[lay_cont][def_code][0] # at this step, contains (val, file)
             else:
                 def_num = def_code
-            self.map.add_layer(lay['name'], def_num) # set the map and its size
+            self.map.add_layer(lay.name, def_num) # set the map and its size
         self.build_gui() # need the size of the map in order to create the scrollbars
         self.refresh_map() # need the canvas in order to display the map
         self.run()
@@ -433,45 +448,62 @@ class Application:
         os.makedirs(default_dir, exist_ok=True)
         f = open(os.path.join(default_dir, 'default.mod'), mode='w', encoding='utf8')
         data = {
-            "filetype" : "mod",
-            "version" : 1.0,
-            "name" : "default",
-            "layers" : [
-                {'code': "wal", 'name': "walls",   'content': "textures",    'default': "blue",   'show': True},
-                {'code': "grd", 'name': "ground",  'content': "textures",    'default': "black",  'show': True},
-                {'code': "cei", 'name': "ceiling", 'content': "textures",    'default': "red",    'show': False},
-                {'code': "are", 'name': "area",    'content': "__integer__", 'default': 0,        'show': True},
-                {'code': "obj", 'name': "objects", 'content': "objects",     'default': "circle", 'show': True}
-            ],
-            "textures" :{
-                "__none__" : {'val': 0},
-                "black" :    {'val': 1, 'file': "black.png"},
-                "blue"  :    {'val': 2, 'file': "blue.png"},
-                "green" :    {'val': 3, 'file': "green.png"},
-                "red"   :    {'val': 4, 'file': "red.png"}
+            'filetype' : 'mod',
+            'version' : 1.0,
+            'name' : 'default',
+            'layers' : {
+                'ground'  : {'res': "textures", 'default': "blue", 'apply': 'green',  'visible': True},
+                'wall'    : {'res': "textures", 'default': 0,      'apply': 'black',  'visible': True},
+                'ceiling' : {'res': "textures", 'default': 0,      'apply': 'red',    'visible': False},
+                'height'  : {'res': "int",      'default': 0,      'apply': 1,        'visible': False},
+                'area'    : {'res': "int",      'default': 0,      'apply': 1,        'visible': False},
+                'object'  : {'res': "objects",  'default': 0,      'apply': 'circle', 'visible': True}
             },
-            "objects" : {
-                "__none__" : {'val': 0},
-                "circle"   : {'val': 1, 'file': "circle.png"}
+            'resources' : {
+                'textures' : {
+                    'black'  : {'val': 1, 'file': 'black.png'},
+                    'blue'   : {'val': 2, 'file': 'blue.png'},
+                    'green'  : {'val': 3, 'file': 'green.png'},
+                    'red'    : {'val': 4, 'file': 'red.png'}
+                },
+                'objects' : {
+                    'circle' : {'val': 1, 'file': 'circle.png'}
+                },
+                'icons' : {
+                    'ground'  : {'val' : 1, 'file': 'ground.png'},
+                    'wall'    : {'val' : 2, 'file': 'wall.png'},
+                    'ceiling' : {'val' : 3, 'file': 'ceiling.png'},
+                    'height'  : {'val' : 4, 'file': 'height.png'},
+                    'area'    : {'val' : 5, 'file': 'area.png'},
+                    'object'  : {'val' : 6, 'file': 'object.png'}
+                },
             },
-            "default_layer" : "wal",
-            "buttons" : "textures",
+            'default_layer' : 'wall',
+            'buttons' : 'textures',
         }
         json.dump(data, f, indent='    ')
         graphics_dir = os.path.join(default_dir, 'graphics')
         os.makedirs(graphics_dir, exist_ok=True)
-        color = {
+        images = {
             'green'  : b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00 \x00\x00\x00 \x08\x02\x00\x00\x00\xfc\x18\xed\xa3\x00\x00\x00\x01sRGB\x00\xae\xce\x1c\xe9\x00\x00\x00\x04gAMA\x00\x00\xb1\x8f\x0b\xfca\x05\x00\x00\x00\tpHYs\x00\x00\x0e\xc3\x00\x00\x0e\xc3\x01\xc7o\xa8d\x00\x00\x006IDATHK\xed\xcd\xa1\x01\x000\x08\xc4\xc0\xa7\xa3t\x9e.\xcb\x865\xf8(\\\xceD\xa6n\xbfl:\xd35\x0e\x90\x03\xe4\x009@\x0e\x90\x03\xe4\x009@\x0e\x90\x03\x90|&y\x01_\xc9\xe9\xe5\xe5\x00\x00\x00\x00IEND\xaeB`\x82',
             'blue'   : b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00 \x00\x00\x00 \x08\x02\x00\x00\x00\xfc\x18\xed\xa3\x00\x00\x00\x01sRGB\x00\xae\xce\x1c\xe9\x00\x00\x00\x04gAMA\x00\x00\xb1\x8f\x0b\xfca\x05\x00\x00\x00\tpHYs\x00\x00\x0e\xc3\x00\x00\x0e\xc3\x01\xc7o\xa8d\x00\x00\x00NIDATHK\xb5\xc71\r\x000\x0c\xc0\xb0\xf2\x87Qt\x85\xb1?\xb7'\xf9\xf1\xcc\xde_=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s=\xd7s\xbd\xb5\xf7\x00\x1b\xdf([v\xdd\xdf|\x00\x00\x00\x00IEND\xaeB`\x82",
             'red'    : b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00 \x00\x00\x00 \x08\x02\x00\x00\x00\xfc\x18\xed\xa3\x00\x00\x00\x01sRGB\x00\xae\xce\x1c\xe9\x00\x00\x00\x04gAMA\x00\x00\xb1\x8f\x0b\xfca\x05\x00\x00\x00\tpHYs\x00\x00\x0e\xc3\x00\x00\x0e\xc3\x01\xc7o\xa8d\x00\x00\x007IDATHK\xed\xcd\xa1\x01\x000\x08\xc4\xc0\xa7sTv\xff\xcd\xd8\xa1\x06\x1f\x85\xcb\x99\xc8T\xdf\x97Mg\xba\xc6\x01r\x80\x1c \x07\xc8\x01r\x80\x1c \x07\xc8\x01r\x00\x92\x0f\xd1\x10\x01m\x9a\xa8\x01\x8a\x00\x00\x00\x00IEND\xaeB`\x82',
             'black'  : b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00 \x00\x00\x00 \x08\x02\x00\x00\x00\xfc\x18\xed\xa3\x00\x00\x00\x01sRGB\x00\xae\xce\x1c\xe9\x00\x00\x00\x04gAMA\x00\x00\xb1\x8f\x0b\xfca\x05\x00\x00\x00\tpHYs\x00\x00\x0e\xc3\x00\x00\x0e\xc3\x01\xc7o\xa8d\x00\x00\x00\x1aIDATHK\xed\xc1\x01\r\x00\x00\x00\xc2\xa0\xf7O\xedf\x0e \x00\x00\x80\xab\x01\x0c \x00\x016"\n\xad\x00\x00\x00\x00IEND\xaeB`\x82',
-            'circle' : b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00 \x00\x00\x00 \x08\x02\x00\x00\x00\xfc\x18\xed\xa3\x00\x00\x00\x01sRGB\x00\xae\xce\x1c\xe9\x00\x00\x00\x04gAMA\x00\x00\xb1\x8f\x0b\xfca\x05\x00\x00\x00\tpHYs\x00\x00\x0e\xc3\x00\x00\x0e\xc3\x01\xc7o\xa8d\x00\x00\x00\xccIDATHK\xed\x961\x0e\xc20\x0cES\x8e\xc0\x0c\x1b\xdc\xff@\x8c\xccp\x85`\xe4(\xb4q\xb0\x7fZ\xbb\x03\xe2-\x8dT\xfb\xff|[\xaa:\xe5\x9c\x93\xe0y\xbe\xf2\xe1x\xbf\xf1AA/^\x18\xd4R\x89l\x06\x8b\x0f\xe5\xa96\x10\xcd[\xbc\xb8\x18\xe8\rL\xad\x19*\xfe$@\xa06D}\xce\xdb`\xb4\x07\x84e\xc7\x12\xac`z\x9c.\xe5\x18Cx\x82\xbf\x81I\xbc\x01\xf29\xdbBl\x02\xba\xfdo,9h\r,\xbb\xd7\x88\xdcCT\xc1\x1d\x97\xec\x18b.\xb5H\xe0\xe2\xd1\x88\xb4#r\xcc\xc1tv\xb0\xc5C\xf6z.\xb9{\xb3\xfe\x9f\x1d3\xf43\xf0-\xb7f@ \x1e\xfaH\x8d\x11\x99\xfb0\x0b\x8c\x04\x15\x19\xc5\x94f\xd0%7r\xa0:\x81&XIJ/jdW5\xf8\xe4]\x82\x00\x00\x00\x00IEND\xaeB`\x82'
+            'circle' : b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00 \x00\x00\x00 \x08\x02\x00\x00\x00\xfc\x18\xed\xa3\x00\x00\x00\x01sRGB\x00\xae\xce\x1c\xe9\x00\x00\x00\x04gAMA\x00\x00\xb1\x8f\x0b\xfca\x05\x00\x00\x00\tpHYs\x00\x00\x0e\xc3\x00\x00\x0e\xc3\x01\xc7o\xa8d\x00\x00\x00\xccIDATHK\xed\x961\x0e\xc20\x0cES\x8e\xc0\x0c\x1b\xdc\xff@\x8c\xccp\x85`\xe4(\xb4q\xb0\x7fZ\xbb\x03\xe2-\x8dT\xfb\xff|[\xaa:\xe5\x9c\x93\xe0y\xbe\xf2\xe1x\xbf\xf1AA/^\x18\xd4R\x89l\x06\x8b\x0f\xe5\xa96\x10\xcd[\xbc\xb8\x18\xe8\rL\xad\x19*\xfe$@\xa06D}\xce\xdb`\xb4\x07\x84e\xc7\x12\xac`z\x9c.\xe5\x18Cx\x82\xbf\x81I\xbc\x01\xf29\xdbBl\x02\xba\xfdo,9h\r,\xbb\xd7\x88\xdcCT\xc1\x1d\x97\xec\x18b.\xb5H\xe0\xe2\xd1\x88\xb4#r\xcc\xc1tv\xb0\xc5C\xf6z.\xb9{\xb3\xfe\x9f\x1d3\xf43\xf0-\xb7f@ \x1e\xfaH\x8d\x11\x99\xfb0\x0b\x8c\x04\x15\x19\xc5\x94f\xd0%7r\xa0:\x81&XIJ/jdW5\xf8\xe4]\x82\x00\x00\x00\x00IEND\xaeB`\x82',
+            'ground' : b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00 \x00\x00\x00 \x08\x02\x00\x00\x00\xfc\x18\xed\xa3\x00\x00\x00\x01sRGB\x00\xae\xce\x1c\xe9\x00\x00\x00\x04gAMA\x00\x00\xb1\x8f\x0b\xfca\x05\x00\x00\x00\tpHYs\x00\x00\x0e\xc3\x00\x00\x0e\xc3\x01\xc7o\xa8d\x00\x00\x00\xaaIDATHK\xed\x8dK\x0e\x80 \x0cD9\x88K\xef\x7f3\xcf\xa0\x98i\x14\xa1\x1f\xacea\xc2d\xa2\xfc\xfa^\xca\xd9\x87\x85\xe8\x83\x1c\x04/7\x81\xb9\x8077\xd0Q\xa2\x1e\xd0\x10G\x05\xa9\x89\x1f\x1d\xed8\x83s;\xd8A\x9e\xe5pH#"\xe8\x95Cy\xacQ:\x1d\xfa3\x03\x91\x87\xcd\xd0S!\xb6\x80VB\xa6`\n\xa6\xe0\x1f\x023\xf4T\x88v\x9d\x87\xb7e5\xab;\xc4\xbbN:\xaa8\xf8\x8bWtTr0\xa7\x0e:\xca:\xea#7\x1dm\x1d\x8f\xfdG:Z9\xeeM\x08\x1d-\x1d\xb4\n\xa4\xa3\x97\xe3\xfc\x85\xd3Q8\xf2w\x08\x1dM)\x1d!(|\xe4\x89\x9d\x91\xc3\x00\x00\x00\x00IEND\xaeB`\x82',
+            'wall'   : b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00 \x00\x00\x00 \x08\x02\x00\x00\x00\xfc\x18\xed\xa3\x00\x00\x00\x01sRGB\x00\xae\xce\x1c\xe9\x00\x00\x00\x04gAMA\x00\x00\xb1\x8f\x0b\xfca\x05\x00\x00\x00\tpHYs\x00\x00\x0e\xc3\x00\x00\x0e\xc3\x01\xc7o\xa8d\x00\x00\x00\xd4IDATHK\xed\xd41\x12\xc20\x0cDQ+W\xa0\xa5\xe4\xfe\'\xa2\xa4\xe5\x0cf=\xd28\x89#\xc9I\xacT\xe4\x17\x10\x18\xb3\xaf\xc2\x94R\xca9\xe3\xf5\x8a\x88h\xfa>_x\x93/B\xc3,\xc6\'<]a\xf0:\x1e\n\x80b\x8d\xba\x8e\x04@Q\xc6r\x1d\xcd\x00\x1a7\x9au\xb4\x02\xd0\x88\xb1]G-\x80\xce\x19\xea:R\x00t\xd4\xb0\xd6\x91\x0e\xa0\xfd\x86\xb3\x8eL\x00\xb1\xd1\xcdYG\x1e\xc0\xe1"q\x92Cv}`\xb0\x1b\xe8v\x03\xdd\xfe\x01\x90\x0b\xc1H\x0e\xd9y\xc0\xe3\xf3\x96\x0b\xc1\r\xc7\xe4\x07Z&\xc0\xeb\xf2\xc1\xcd7t`\xff:\xe7\x18\npt\x9d\xb3\x8c\x168\xb7\xce\xa9\xc6\n\x18Y\xe7\xb6\xc6\x0c\x8c\xafs\x8d!@\xd4:\xb74\n\x10\xbb\xceU\xa3\xfc\x15\xc3\xd7kD\xf4\x03\xbdg\xb0\x9f\xe54\xdf-\x00\x00\x00\x00IEND\xaeB`\x82',
+            'ceiling': b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00 \x00\x00\x00 \x08\x02\x00\x00\x00\xfc\x18\xed\xa3\x00\x00\x00\x01sRGB\x00\xae\xce\x1c\xe9\x00\x00\x00\x04gAMA\x00\x00\xb1\x8f\x0b\xfca\x05\x00\x00\x00\tpHYs\x00\x00\x0e\xc3\x00\x00\x0e\xc3\x01\xc7o\xa8d\x00\x00\x00\xcdIDATHK\xed\x94A\x0e\x83 \x10E\x19\xaf\xd0m\x97\xbd\xff\x89\xba\xec\xb6g\xa0\x9f\x0cA\xc5a\x06e\x8ci\xe2K\x14\xa2\xe4\xbdH"\x14B\xf8>_\xb8\x9f\xc1\xe3\xf3\x9eb\x8c\x18\xf2\x03W\xa0\x85|\xc2\xec\x8c\x06\xdb1I\x01\xe0\xdb(v\x90\x03\xc0\xab\xb1\xb4\x839\x00\xc6\x1b\x95\x1d\xac\x02`\xa4\xb1\xb5\x83:\x00\x8e5D;\x10\x02`o\xa3e\x07r\x00\xf47\x14; \xe5\x1d J\xbf\xba\x8ea0\x03\x83\x0b\x9a[\xe4\xc5\x1d0\xb9\x03&\xff\x1f\xb8\xf4\xa80\x8f\x01F_\xd6\xdc\xa2N;\xc02\xe5C\xe5@\xbf\x9dQ\x1aB`\xaf\x9di5\xea\xc01;#6V\x81\x11;\xb3m\xcc\x81q;S5r\xc0\xcb\xce,\x1b)\xe0kgJ#]\xee\xf6\x02\x11\xfd\x00\x86\xde\xaa\xcf\x8dt\x1c\xb8\x00\x00\x00\x00IEND\xaeB`\x82',
+            'height' : b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00 \x00\x00\x00 \x08\x02\x00\x00\x00\xfc\x18\xed\xa3\x00\x00\x00\x01sRGB\x00\xae\xce\x1c\xe9\x00\x00\x00\x04gAMA\x00\x00\xb1\x8f\x0b\xfca\x05\x00\x00\x00\tpHYs\x00\x00\x0e\xc3\x00\x00\x0e\xc3\x01\xc7o\xa8d\x00\x00\x00@IDATHKc\xa0\x07\xf8O30j\x01A0j\x01A@/\x0b\x86>x+\xa3B#4j\x01A4j\x01A4l,\x18\xfa\x00Z\xf4\xd1\x00\x8cZ@\x10\x8cZ@\x10\x0c\x1b\x0bh\x08\x18\x18\x00\xbeD1\xe6\xa7\x08\x82s\x00\x00\x00\x00IEND\xaeB`\x82',
+            'area'   : b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00 \x00\x00\x00 \x08\x03\x00\x00\x00D\xa4\x8a\xc6\x00\x00\x00\x04gAMA\x00\x00\xb1\x8f\x0b\xfca\x05\x00\x00\x03\x00PLTE\x00\x00\x00\x00\x00::\x00\x00:\x00:\x00\x00f:\x00f::fB\x00(f\x00\x00f\x00:f:\x00uE\x00fff\x00:\x90\x00f\xb6:\x90\xb6:\x90\xdbf\xb6\xff\x90:\x00\xb6f\x00\xa4\x93f\xdb\x90:\xff\xb6f\xa4\xab\xb6\xa5\xac\xb6\xb2\xb9\xc1\xb6\xdb\x90\x90\xdb\xff\xbc\xc2\xc8\xb6\xff\xff\xff\xdb\x90\xff\xff\xb6\xd9\xdc\xe1\xdb\xff\xff\xff\xff\xdb\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00Eya\x81\x00\x00\x01\x00tRNS\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x00S\xf7\x07%\x00\x00\x00\tpHYs\x00\x00\x0e\xc3\x00\x00\x0e\xc3\x01\xc7o\xa8d\x00\x00\x00\x18tEXtSoftware\x00Paint.NET v3.36\xa9\xe7\xe2%\x00\x00\x00\xdcIDAT8O\xcd\x93[\x13\x82 \x10\x85\xc9\xb4\xec\xa2yI\x84\xbc\xcb\xff\xff\x8dv\x16\xb0\x99\x1c\x8b\x87|\xe8\xbc\x00\xbb\x1fgw\x1dd\x93C\x9b\x00\xbd\x14\xe5\xaa\x84\xec\t\xe8k\xf5Qu\x0f@\xda\xc3\xaa$\x00a\xf7\xab\x12\x00J\xbb_U\xb9\x19\xc0w\x95\t,e\x811\xbb\xc66\xb2\x90\x05\xda\xe0\x1146\xf4.\x0b\x14\xb1\xca\x13p\x87\xb3\xdft!\xf3\x01s\xc6\x18\\\r\xd0\x9d*\xc5\xa3A\xb5^\x8aj\xa9*\xa2\xa1\x0bS\xdd\x98\x01(I\x91v_\xa1Z\xa3/@\xb4h\x80g\xb0#CJ\xb6\x1e\xb6\xb8J\xeb\xecp\xd7\r\xe2\xba\x06L\xb7d\xf6r\xb8\x98\x11\xf3\x84\x92\xd4\x03V\x8eF\xf3\xd9\xe1h>\x12\xf7\xf5\xac\x98\x02\x89\x11eo`M\x93_\xf4/\x80\xf3\xc99\x1f\xad\xf3\xd9;\x7f\x1c\x87~\x05\xa6\xe9\tR\x8aR\x01\xc5\xaf\xb2\xce\x00\x00\x00\x00IEND\xaeB`\x82',
+            'object' : b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00 \x00\x00\x00 \x08\x03\x00\x00\x00D\xa4\x8a\xc6\x00\x00\x00\x04gAMA\x00\x00\xb1\x8f\x0b\xfca\x05\x00\x00\x03\x00PLTE\x00\x00\x00\x00\x00::\x00\x00:\x00:\x00\x00ff\x00\x00\x00:\x90\x00f\xb6:\x90\xdbf\x90\x90f\xb6\xff\xb6f\x00\xdb\x90:\xff\xb6f\xa4\xab\xb6\xa5\xac\xb6\xb2\xb9\xc1\x90\xdb\xff\xbc\xc2\xc8\xb6\xff\xff\xff\xdb\x90\xff\xff\xb6\xd9\xdc\xe1\xdb\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x86\xf9C \x00\x00\x01\x00tRNS\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x00S\xf7\x07%\x00\x00\x00\tpHYs\x00\x00\x0e\xc2\x00\x00\x0e\xc2\x01\x15(J\x80\x00\x00\x00\x18tEXtSoftware\x00Paint.NET v3.36\xa9\xe7\xe2%\x00\x00\x00\xc6IDAT8O\xad\x93\xdb\x0e\xc2 \x0c\x86\x19\x1e6\xdd\x01\x98\x88\xbe\xff\x8bb\xdb\x95\x05"X\x13\xfd/H\xbb~\xf4@:\x15\x05\xfd\x05\x08\xd6,U\x19\x1b\x10\x08\xeb\xb3\xa95\x00`\xd9\xa9\xca\x02`\xd8\xae\xca\x00\xb0\xb0]\xd5\xf25\xe0\xb5R\xeaJ\x06\x9e\xbb\x91\x80\t\x83^\xf7\x19\xb0\x89\x01\x7fp\xe8\xddOC\x03\x18\xe1*j:?\xbc\xbe@\xb5\xa1,\x817Is\xe7\xbc\xee\x1c\x04S\xaa\x04pZ\xf8\x881Hu\xbc\xb5\x01\xb4)U\x0ed%\xa8_8s\xa0l\xb2\x92\x81\x1b\xe21\xa9\x87D2P<\x14L1\x83[\x02\xe0\xeeO\x8d\xef@x\x01\xbcK\x06h\x9c60*\x9a\xecC\x86M\x08\x88+\'.\xad\xb8\xf6\xe2\x8f#\xe8W \xc6\x17\xbe\x822c\xa5\xc5\xf7o\x00\x00\x00\x00IEND\xaeB`\x82'
         }
-        for c in color:
-            f = open(os.path.join(graphics_dir, c + '.png'), mode='wb')
-            f.write(color[c])
-            f.close()
-
+        for i in images:
+            filepath = os.path.join(graphics_dir, i + '.png')
+            if not os.path.isfile(filepath):
+                f = open(filepath, mode='wb')
+                f.write(images[i])
+                f.close()
+    
     def detect_mods(self):
         all_mods = []
         mod_dir = os.path.join(os.getcwd(), 'mod')
@@ -484,26 +516,26 @@ class Application:
         print(f"[INFO] Loading mod *** {self.options['mod']} ***")
         mod_dir = os.path.join(os.getcwd(), 'mod', self.options['mod'])
         mod_file = os.path.join(mod_dir, self.options['mod'] + '.mod')
-        mod_graphics = os.path.join(mod_dir, 'graphics')
+        self.current_start_pos = None
         f = open(mod_file, 'r', encoding='utf8')
         self.mod_data = json.load(f)
         f.close()
-        self.mod_data['graphics_dir'] = mod_graphics
-        self.current_layer = self.mod_data["default_layer"]
-        self.nb_layers = len(self.mod_data["layers"])
-        self.current_pencil = []
-        self.current_apply = []
-        self.visible_layers = {}
+        self.mod_data['graphics_dir'] = os.path.join(mod_dir, 'graphics')
+        # Prepare resources
         self.resources = {}
-        self.num2resources = {}
-        for lay in self.mod_data["layers"]:
-            if lay['content'] not in self.resources and lay['content'] != '__integer__':
-                self.resources[lay['content']] = {}
-                self.num2resources[lay['content']] = {} # get texture object by number
-            self.current_apply.append(lay["default"])
-            self.current_pencil.append(1)
-            self.visible_layers[lay['name']] = lay['show']
-        self.current_start_pos = None
+        self.num2res = {}
+        for resname, rescontent in self.mod_data['resources'].items():
+            self.resources[resname] = {}
+            self.num2res[resname] = {}
+            for objname, objcontent in rescontent.items():
+                self.resources[resname][objname] = (objcontent['val'], objcontent['file'])
+                self.num2res[resname][objcontent['val']] = objname
+        # Prepare layers
+        self.current_layer = self.mod_data["default_layer"]
+        self.layerHandlers = {}
+        for layname, laycontent in self.mod_data["layers"].items():
+            self.layerHandlers[layname] = LayerHandler(layname, laycontent['res'], laycontent['default'], laycontent['apply'], 1, laycontent['visible'])
+        print(f"[INFO] Mod *** {self.options['mod']} *** loaded.")
     
     def menu_change_pencil(self, index, value, op):
         if self.varPencils.get() != self.current_pencil:
@@ -523,34 +555,43 @@ class Application:
             self.start_load_mod(self.varMods.get())
 
     def load_mod_graphics(self):
-        # Load mod textures. Tk() object must be created.
-        # {name:>18} ({num:4d}) in file {self.mod_data['textures_files'][name]}
-        g = {}
-        for file in os.listdir(self.mod_data['graphics_dir']):
-            try:
+        # Load mod graphical resources. Tk() object must be created.
+        print(f"[INFO] Loading mod *** {self.options['mod']} *** graphical resources")
+        count = 0
+        #try:
+        for resname, rescontent in self.resources.items():
+            for objname, objcontent in rescontent.items():
+                val, file = self.resources[resname][objname]
                 print(f"[INFO] Loading graphic {file:18}")
-                g[file] = SimpleImage(os.path.join(self.mod_data['graphics_dir'], file)) #, name, num, self.mod_data['textures_files'][name]) # get texture object by name
-            except TclError:
-                print(f"[ERROR] Impossible to load texture.")
-        print(f"[INFO] {len(g)} graphics loaded")
-        # Load resources
-        for keyres in self.resources:
-            data = self.mod_data[keyres]
-            for code, content in data.items():
-                if code == '__none__': continue
-                self.resources[keyres][code] = g[content['file']]
-                self.resources[keyres][code].num = content['val']
-                self.resources[keyres][code].name = code
-                self.num2resources[keyres][content['val']] = self.resources[keyres][code]
-            print(f"[INFO]   -> including {len(self.resources[keyres])} {keyres} loaded")
+                self.resources[resname][objname] = SimpleImage(os.path.join(self.mod_data['graphics_dir'], file))
+                self.resources[resname][objname].num = val
+                self.resources[resname][objname].name = objname
+                self.num2res[resname][val] = self.resources[resname][objname]
+                count += 1
+            print(f"[INFO]   + loaded {len(self.resources[resname])} for {resname}")
+        #except:
+        #    raise Exception(f"[ERROR] Impossible to load texture.")  
+        print(f"[INFO]   = {count} graphics loaded")      
     
     def build_mod_buttons(self):
-        # Create texture buttons for the mod. Tk() object must be created.
+        # Create dynamic buttons for the mod. Tk() and toolbar objects must be created.
+        # Layer buttons
+        self.bt_layers = {}
+        for layname, lay in self.layerHandlers.items():
+            self.bt_layers[layname] = Button(self.toolbar, image=self.resources['icons'][layname].tkimg, width=32, height=32, command=partial(self.bt_change_layer, layname))
+            if self.current_layer == layname:
+                self.bt_layers[layname].config(relief=SUNKEN)
+            else:
+                self.bt_layers[layname].config(relief=RAISED)
+            self.bt_layers[layname].pack(side=LEFT)
+        sep = Label(self.toolbar, text= " ")
+        sep.pack(side=LEFT)
+    
+    def build_layer_buttons(self):
+        # Textures buttons 
         self.bt_textures = {}
         bt = self.mod_data['buttons']
-        print('>>>', bt, self.resources)
         for _, res in self.resources[bt].items():
-            print(res)
             print(f'[INFO] Creating button for {bt} : {res.name}')
             self.bt_textures[res.name] = Button(self.toolbar, image=res.tkimg, width=32, height=32, command=partial(self.bt_change_tex, res.tkimg))
             if self.current_layer == bt and self.current_apply[bt] == res.name:
@@ -591,40 +632,47 @@ class Application:
         self.tk.title(txt)
 
     def refresh_tile(self, row, col):
-        for lay, visible in self.visible_layers.items():
-            if not visible: continue
-            XXX
-        
-        ntex = self.map.get(row, col, Map.TEXTURE)
-        nobj = self.map.get(row, col, Map.OBJECT)
-        tex = self.num2tex[ntex]
-        self.canvas.create_image(col * 32, row * 32, anchor=NW, image=tex.tkimg)
-        if nobj != 0:
-            obj = self.num2obj[nobj]
-            self.canvas.create_image(col * 32, row * 32, anchor=NW, image=obj.tkimg)
+        val = self.map.get(row, col)
+        for lay, val in val.items():
+            if self.layerHandlers[lay].visible:
+                cont = self.layerHandlers[lay].res
+                if cont == '__integer__':
+                    pass
+                elif val != 0:
+                    tex = self.num2res[cont][val]
+                    self.canvas.create_image(col * 32, row * 32, anchor=NW, image=tex.tkimg)
         if self.options['show_grid']:
             self.canvas.create_rectangle(col * 32, row * 32, (col + 1) * 32, (row + 1) * 32, outline='black')
-    
-    def refresh_map(self):
-        for row in range(0, self.map.height):
-            for col in range(0, self.map.width):
-                self.refresh_tile(row, col)
-        self.refresh_title()
 
     def refresh_map(self):
         img = Image.new('RGB', (self.map.width * 32, self.map.height * 32), color = 'black')
         for row in range(0, self.map.height):
             for col in range(0, self.map.width):
                 val = self.map.get(row, col)
-                tex = self.num2tex[val].img
-                img.paste(tex, (col * 32, row * 32))
+                for lay, val in val.items():
+                    if self.layerHandlers[lay].visible:
+                        cont = self.layerHandlers[lay].res
+                        if cont == '__integer__':
+                            pass
+                        elif val != 0:
+                            tex = self.num2res[cont][val] 
+                            img.paste(tex.img, (col * 32, row * 32))
                 if self.options['show_grid']:
                     d = ImageDraw.Draw(img)
                     d.rectangle((col * 32, row * 32, (col + 1) * 32, (row + 1) * 32), fill=None, outline='black', width=1)
         self.background = ImageTk.PhotoImage(img)
         self.canvas.create_image(0, 0, anchor=NW, image=self.background)
         self.refresh_title()
-    
+
+    def refresh_status(self, x32=None, y32=None):
+        apply = self.layerHandlers[self.current_layer].apply
+        if x32 is None:
+            old = self.status_var.get()
+            end = old.find('x/col')
+            self.status_var.set(f"layer = {self.current_layer} apply = {apply} " + old[end:])
+        else:
+            self.status_var.set(f"layer = {self.current_layer} apply = {apply} x/col = {x32}, y/row = {y32}")
+        
     def set_show_grid(self, index, value, op):
         self.change_option('show_grid', not self.options['show_grid'])
         print('set', 'i=', index, 'v=', value, 'op=', op, 'show_grid=', self.options['show_grid'])
@@ -639,9 +687,6 @@ class Application:
     #-----------------------------------------------------------
     def build_gui(self):
         print("[INFO] Building GUI")
-        #if self.tk is not None:
-        #    self.exit_app()
-        #else:
         self.tk = Tk()
         self.tk.protocol("WM_DELETE_WINDOW", self.safe_exit_app)
 
@@ -659,7 +704,6 @@ class Application:
             icons['1x1'] = PhotoImage(file=os.path.join(basedir, 'Little.png'))
             icons['3x3'] = PhotoImage(file=os.path.join(basedir, 'Medium.png'))
             icons['5x5'] = PhotoImage(file=os.path.join(basedir, 'Big.png'))
-            icons['objects'] = PhotoImage(file=os.path.join(basedir, 'Objects.png'))
         except TclError:
             print("[ERROR] Unable to load button icons. No button will be created.")
             BASE_ICONS = False
@@ -751,8 +795,6 @@ class Application:
             self.bt_pencils[1] = Button(self.toolbar, image=icons['1x1'], width=32, height=32, command=lambda: self.bt_change_pencil(1), relief=SUNKEN)
             self.bt_pencils[3] = Button(self.toolbar, image=icons['3x3'], width=32, height=32, command=lambda: self.bt_change_pencil(3), relief=RAISED)
             self.bt_pencils[5] = Button(self.toolbar, image=icons['5x5'], width=32, height=32, command=lambda: self.bt_change_pencil(5), relief=RAISED)
-
-            bt_object = Button(self.toolbar, image=icons['objects'], width=32, height=32, command=self.menu_choose_object)
             
             bt_new.pack(side=LEFT)
             bt_open.pack(side=LEFT)
@@ -764,12 +806,10 @@ class Application:
                 bt.pack(side=LEFT)
             sep2 = Label(self.toolbar, text=" ")
             sep2.pack(side=LEFT)
-            bt_object.pack(side=LEFT)
-            sep3 = Label(self.toolbar, text= " ")
-            sep3.pack(side=LEFT)
         
         self.build_mod_buttons()
-
+        self.build_layer_buttons()
+		
         # Canvas
         print("[INFO] Creating canvas")
         x_scrollbar = Scrollbar(self.content, orient=HORIZONTAL)
@@ -822,22 +862,24 @@ class Application:
     def refresh_status_bar(self, event):
         x32, y32 = self.get_map_coord(event)
         if 0 <= x32 < 32 and 0 <= y32 < 32:
-            self.status_var.set(f"x/col = {x32}, y/row = {y32}")
+            self.refresh_status(x32, y32)
 
     def put_texture(self, event):
         x32, y32 = self.get_map_coord(event)
-        print(f'[INFO] {y32} {x32} l={self.current_layer} t={self.current_tex} o={self.current_object}')
-        if self.current_pencil == 1:
+        apply = self.layerHandlers[self.current_layer].apply
+        pencil = self.layerHandlers[self.current_layer].pencil
+        #print(f'[INFO] {y32} {x32} l={self.current_layer} t={apply} p={pencil}')
+        if pencil == 1:
             start_x = x32
             end_x = x32 + 1
             start_y = y32
             end_y = y32 + 1
-        elif self.current_pencil == 3:
+        elif pencil == 3:
             start_x = x32 - 1
             end_x = x32 + 2
             start_y = y32 - 1
             end_y = y32 + 2
-        elif self.current_pencil == 5:
+        elif pencil == 5:
             start_x = x32 - 2
             end_x = x32 + 3
             start_y = y32 - 2
@@ -845,10 +887,7 @@ class Application:
         for x in range(start_x, end_x):
             for y in range(start_y, end_y):
                 if 0 <= x < self.map.width and 0 <= y < self.map.height:
-                    if self.current_layer == Map.TEXTURE:
-                        val = self.textures[self.current_tex].num
-                    elif self.current_layer == Map.OBJECT:
-                        val = self.objects[self.current_object].num
+                    val = self.resources[self.layerHandlers[self.current_layer].res][apply].num
                     self.map.set(y, x, val, self.current_layer)
                     self.refresh_tile(y, x)
         self.dirty = True
@@ -857,6 +896,16 @@ class Application:
     #-----------------------------------------------------------
     # Button and menu actions
     #-----------------------------------------------------------
+    def bt_change_layer(self, layname):
+        for key, bt in self.bt_layers.items():
+            if key == layname:
+                bt.config(relief=SUNKEN)
+            else:
+                bt.config(relief=RAISED)
+        self.current_layer = layname
+        self.bt_change_pencil(self.layerHandlers[layname].pencil)
+        self.refresh_status()
+    
     def bt_change_tex(self, tkimg):
         for key, bt in self.bt_textures.items():
             if self.textures[key].tkimg == tkimg:
@@ -872,17 +921,13 @@ class Application:
                 bt.config(relief=SUNKEN)
             else:
                 bt.config(relief=RAISED)
-        self.current_pencil = p
+        self.layerHandlers[self.current_layer].pencil = p
         self.varPencils.set(p)
-        
+    
     def menu_change_pencil(self, index, value, op):
-        if self.varPencils.get() != self.current_pencil:
-            self.current_pencil = self.varPencils.get()
-        for val, bt in self.bt_pencils.items():
-            if val == self.current_pencil:
-                bt.config(relief=SUNKEN)
-            else:
-                bt.config(relief=RAISED)
+        pencil = self.layerHandlers[self.current_layer].pencil
+        if self.varPencils.get() != pencil:
+            self.but_change_pencil(self.varPencils.get())
     
     def menu_file_new(self):
         d = ChooseSizeDialog(self)
