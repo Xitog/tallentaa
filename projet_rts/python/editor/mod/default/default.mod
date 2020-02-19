@@ -22,21 +22,21 @@
             "visible": false
         },
         "height": {
-            "res": "int",
-            "default": 0,
-            "apply": 1,
+            "res": "numbers",
+            "default": "one",
+            "apply": "two",
             "visible": false
         },
         "area": {
-            "res": "int",
+            "res": "numbers",
             "default": 0,
-            "apply": 1,
+            "apply": "one",
             "visible": false
         },
         "object": {
             "res": "objects",
             "default": 0,
-            "apply": "circle",
+            "apply": "heart",
             "visible": true
         }
     },
@@ -60,9 +60,35 @@
             }
         },
         "objects": {
-            "circle": {
+            "heart": {
                 "val": 1,
-                "file": "circle.png"
+                "file": "heart.png"
+            },
+            "goldkey": {
+                "val": 2,
+                "file": "goldkey.png"
+            }
+        },
+        "numbers": {
+            "one": {
+                "val": 1,
+                "file": "one.png"
+            },
+            "two": {
+                "val": 2,
+                "file": "two.png"
+            },
+            "three": {
+                "val": 3,
+                "file": "three.png"
+            },
+            "four": {
+                "val": 4,
+                "file": "four.png"
+            },
+            "five": {
+                "val": 5,
+                "file": "five.png"
             }
         },
         "icons": {
@@ -92,6 +118,5 @@
             }
         }
     },
-    "default_layer": "wall",
-    "buttons": "textures"
+    "default_layer": "wall"
 }
