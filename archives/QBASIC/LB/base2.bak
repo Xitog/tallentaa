@@ -1,0 +1,19 @@
+c:\lb142w\base2.bak - Saved by Liberty BASIC
+before running. You must delete these lines and save
+this file as a *.BAS file before using.
+-----------------------------------------------------
+
+       'ittyclok
+
+    titlebar "Maker Perso v1.0"
+[main]
+    scan
+    goto [main]
+
+[loop]
+    if time$ <> time$() then
+        time$ = time$()
+        titlebar time$
+    end if
+    scan
+    goto [loop]

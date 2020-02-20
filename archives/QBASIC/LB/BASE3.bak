@@ -1,0 +1,27 @@
+C:\LB142W\BASE3.bak - Saved by Liberty BASIC
+before running. You must delete these lines and save
+this file as a *.BAS file before using.
+-----------------------------------------------------
+
+    button #graph, Exit, [exit], LR, 35, 20  'window will have a button
+    open "Example" for graphics as #graph    'open graphics window
+    print #graph, "up"                     'make sure pen is up
+    print #graph, "home"                   'center the pen
+    print #graph, "down"                   'make sure pen is down
+    for index = 1 to 30                    'draw 30 spiral segments
+      print #graph, "go "; index           'go foreward 'index' places
+
+      print #graph, "turn 118"             'turn 118 degrees
+    next index                             'loop back 30 times
+    print #graph, "flush"                  'make the image 'stick'
+
+  [inputLoop]
+    input b$ : goto [inputLoop]            'wait for button press
+
+  [exit]
+    confirm "Close Window?"; answer$       'dialog to confirm exit
+    if answer$ = "no" then [inputLoop]     'if answer$ = "no" loop back
+
+    close #graph
+
+  end
