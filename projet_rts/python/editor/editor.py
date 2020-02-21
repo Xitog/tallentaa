@@ -61,7 +61,7 @@ class SimpleImage:
         self.num = num
         self.path = filepath
         if PILLOW:
-            self.img = Image.open(self.path)
+            self.img = Image.open(self.path).convert("RGBA")
             self.tkimg = ImageTk.PhotoImage(self.img)
         else: # only work with PNG
             self.tkimg = PhotoImage(file=self.path)
@@ -559,6 +559,12 @@ class Application:
             else:
                 bt.config(relief=RAISED)
     
+    def menu_change_visibilty(self, index, value, op):
+        for name, var in self.varVisibleLayers.items():
+            if var.get() != self.layerHandlers[name].visible:
+                 self.layerHandlers[name].visible = var.get()
+        self.refresh_map()
+    
     def menu_change_mod(self, index, value, op):
         if self.varMods.get() != self.options['mod']:
             if self.dirty and self.options['confirm_exit']: 
@@ -650,27 +656,25 @@ class Application:
         for lay, val in val.items():
             if self.layerHandlers[lay].visible:
                 cont = self.layerHandlers[lay].res
-                if cont == '__integer__':
-                    pass
-                elif val != 0:
+                if val != 0:
                     tex = self.num2res[cont][val]
                     self.canvas.create_image(col * 32, row * 32, anchor=NW, image=tex.tkimg)
         if self.options['show_grid']:
             self.canvas.create_rectangle(col * 32, row * 32, (col + 1) * 32, (row + 1) * 32, outline='black')
 
     def refresh_map(self):
-        img = Image.new('RGB', (self.map.width * 32, self.map.height * 32), color = 'black')
+        self.canvas.delete("all")
+        img = Image.new('RGBA', (self.map.width * 32, self.map.height * 32), color = 'black')
         for row in range(0, self.map.height):
             for col in range(0, self.map.width):
                 val = self.map.get(row, col)
                 for lay, val in val.items():
                     if self.layerHandlers[lay].visible:
                         cont = self.layerHandlers[lay].res
-                        if cont == '__integer__':
-                            pass
-                        elif val != 0:
+                        if val != 0:
                             tex = self.num2res[cont][val] 
-                            img.paste(tex.img, (col * 32, row * 32))
+                            img.alpha_composite(tex.img, (col * 32, row * 32))
+                            #img.paste(tex.img, (col * 32, row * 32))
                 if self.options['show_grid']:
                     d = ImageDraw.Draw(img)
                     d.rectangle((col * 32, row * 32, (col + 1) * 32, (row + 1) * 32), fill=None, outline='black', width=1)
@@ -775,7 +779,22 @@ class Application:
         modsmenu = Menu(menu, tearoff=0)
         menu.add_cascade(label="Mods", menu=modsmenu)
         for mod in self.all_mods:
-            modsmenu.add_radiobutton(label=mod.upper(), variable=self.varMods, value=mod)
+            modsmenu.add_radiobutton(label=mod.title(), variable=self.varMods, value=mod)
+        
+        self.varVisibleLayers = {}
+        
+        layersmenu = Menu(menu, tearoff=0)
+        menu.add_cascade(label="Layers", menu=layersmenu)
+        layervisibilitymenu = Menu(layersmenu, tearoff=0)
+        layersmenu.add_cascade(label="Visible layers", menu= layervisibilitymenu)
+        
+        for name, layer in self.layerHandlers.items():
+            self.varVisibleLayers[name] = BooleanVar()
+            self.varVisibleLayers[name].set(layer.visible)
+            self.varVisibleLayers[name].trace('w', self.menu_change_visibilty)
+            layervisibilitymenu.add_checkbutton(label=name.title(), variable=self.varVisibleLayers[name])#, value=True)
+        
+        # todo: make a menu for changing active layer
         
         self.varPlayer = IntVar()
         self.varPlayer.set(1)
