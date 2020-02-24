@@ -1,7 +1,7 @@
 {
     "filetype": "mod",
     "version": 1.0,
-    "name": "default",
+    "name": "Default",
     "layers": {
         "ground": {
             "res": "textures",
@@ -22,13 +22,13 @@
             "visible": false
         },
         "height": {
-            "res": "numbers",
+            "res": "numbers_HL",
             "default": "one",
             "apply": "two",
             "visible": false
         },
         "area": {
-            "res": "numbers",
+            "res": "numbers_BR",
             "default": 0,
             "apply": "one",
             "visible": false
@@ -69,26 +69,56 @@
                 "file": "goldkey.png"
             }
         },
-        "numbers": {
+        "numbers_HL": {
             "one": {
                 "val": 1,
-                "file": "one.png"
+                "file": "num_hl_1.png"
             },
             "two": {
                 "val": 2,
-                "file": "two.png"
+                "file": "num_hl_2.png"
             },
             "three": {
                 "val": 3,
-                "file": "three.png"
+                "file": "num_hl_3.png"
             },
             "four": {
                 "val": 4,
-                "file": "four.png"
+                "file": "num_hl_4.png"
             },
             "five": {
                 "val": 5,
-                "file": "five.png"
+                "file": "num_hl_5.png"
+            },
+            "six": {
+                "val": 6,
+                "file": "num_hl_6.png"
+            }
+        },
+        "numbers_BR": {
+            "one": {
+                "val": 1,
+                "file": "num_br_1.png"
+            },
+            "two": {
+                "val": 2,
+                "file": "num_br_2.png"
+            },
+            "three": {
+                "val": 3,
+                "file": "num_br_3.png"
+            },
+            "four": {
+                "val": 4,
+                "file": "num_br_4.png"
+            },
+            "five": {
+                "val": 5,
+                "file": "num_br_5.png"
+            },
+            "six": {
+                "val": 6,
+                "file": "num_br_6.png"
             }
         },
         "icons": {
