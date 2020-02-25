@@ -148,5 +148,6 @@
             }
         }
     },
-    "default_layer": "wall"
+    "default_layer": "wall",
+    "has_transition": true
 }
