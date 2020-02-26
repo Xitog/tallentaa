@@ -484,16 +484,19 @@ class ModHandler:
 
 class Action:
 
-    def __init__(self, amap, layer, x32, y32, content, pencil):
-        print(f"[INFO] Action on map '{amap.name}' on layer '{layer.name}' with {content} and pencil={pencil}")
+    def __init__(self, app, amap, layer, x32, y32, content, pencil):
+        #print(f"[INFO] Action on map '{amap.name}' on layer '{layer.name}' with {content} and pencil={pencil}")
+        self.app = app
         self.map = amap
         self.layer = layer
         self.x32 = x32
         self.y32 = y32
         self.content = content
         self.pencil = pencil
+        self.save = []
+        self.resolve()
 
-    def resolve(self, app):
+    def resolve(self):
         if self.pencil == 1:
             start_x = self.x32
             end_x = self.x32 + 1
@@ -510,25 +513,47 @@ class Action:
             start_y = self.y32 - 2
             end_y = self.y32 + 3
         for x in range(start_x, end_x):
+            row = []
             for y in range(start_y, end_y):
                 if 0 <= x < self.map.width and 0 <= y < self.map.height:
+                    row.append((y, x, self.map.get(y, x, self.layer.name)))
+                    #print(f"set   ({y}, {x}) -> {self.content} {self.layer.name}")
                     self.map.set(y, x, self.content, self.layer.name)
-                    app.refresh_tile(y, x)
-
+                    self.app.refresh_tile(y, x)
+                self.save.append(row)
+        self.done = True
+    
     def unresolve(self):
-        pass
+        #print("unresolve")
+        for row in range(len(self.save)):
+            arow = self.save[row]
+            for col in range(len(arow)):
+                elem = arow[col]
+                #print(f"reset ({elem[0]}, {elem[1]}) -> {elem[2]} {self.layer.name}")
+                self.map.set(elem[0], elem[1], elem[2], self.layer.name)
+                self.app.refresh_tile(elem[0], elem[1])
+        self.done = False
 
 
 class ActionList:
 
-    def __init__(self, size):
+    def __init__(self, max_size):
         self.previous = []
-        self.size = size
+        self.max_size = max_size
 
-    def append(self, amap, layer, x32, y32, content, pencil):
-        a = Action(amap, layer, x32, y32, content, pencil)
-        self.previous.append(a)
-        return a
+    def do(self, app, amap, layer, x32, y32, content, pencil):
+        #print('col', x32, 'row', y32, layer.name, amap.get(row=y32, col=x32, layer=layer.name), 'vs', content)
+        if amap.get(row=y32, col=x32, layer=layer.name) != content:
+            self.previous.append(Action(app, amap, layer, x32, y32, content, pencil))
+            #print(f"set   ({x32}, {y32}) -> {content} {layer.name} {len(self.previous)}")
+            if len(self.previous) > self.max_size:
+                #print('too many')
+                del self.previous[0]
+    
+    def undo(self):
+        if len(self.previous) > 0:
+            self.previous[-1].unresolve()
+            self.previous.pop()
 
 #-----------------------------------------------------------
 # Application class
@@ -882,15 +907,16 @@ class Application:
         self.tk.config(menu=menu)
         filemenu = Menu(menu, tearoff=0)
         menu.add_cascade(label="File", menu=filemenu)
-        filemenu.add_command(label="New...", command=self.menu_file_new)
-        filemenu.add_command(label="Open...", command=self.menu_file_open)
-        filemenu.add_command(label="Save", command=self.menu_file_save)
+        filemenu.add_command(label="New...", command=self.menu_file_new, accelerator="Ctrl+N")
+        filemenu.add_command(label="Open...", command=self.menu_file_open, accelerator="Ctrl+O")
+        filemenu.add_command(label="Save", command=self.menu_file_save, accelerator="Ctrl+S")
         filemenu.add_command(label="Save As...", command=self.menu_file_save_as)
         filemenu.add_separator()
-        filemenu.add_command(label="Exit", command=self.menu_file_exit)
+        filemenu.add_command(label="Exit", command=self.menu_file_exit, accelerator="Ctrl+Q")
 
         editmenu = Menu(menu, tearoff=0)
         menu.add_cascade(label="Edit", menu=editmenu)
+        editmenu.add_command(label="Undo", command=self.menu_undo, accelerator="Ctrl+Z")
         
         self.varShowGrid = BooleanVar()
         self.varShowGrid.set(self.options['show_grid'])
@@ -1036,6 +1062,13 @@ class Application:
         #canvas.bind('<ButtonRelease-1>', end_texture)
         self.canvas.bind('<Motion>', self.refresh_status_bar)
         print("[INFO] GUI init end")
+        
+        #Shortcuts
+        self.tk.bind('<Control-n>', self.menu_file_new)
+        self.tk.bind('<Control-o>', self.menu_file_open)
+        self.tk.bind('<Control-s>', self.menu_file_save)
+        self.tk.bind('<Control-z>', self.menu_undo)
+        self.tk.bind('<Control-q>', self.menu_file_exit)
     
     def run(self):
         self.tk.mainloop()
@@ -1059,7 +1092,7 @@ class Application:
         val = self.mod.resources[self.mod.layer.res][self.mod.layer.apply].num
         #print(f'[INFO] {y32} {x32} l={self.layer.name} t={apply} p={pencil}')
         self.dirty = True
-        self.previous.append(self.map, self.mod.layer, x32, y32, val, pencil).resolve(self)
+        self.previous.do(self, self.map, self.mod.layer, x32, y32, val, pencil)
         self.refresh_title()
     
     #-----------------------------------------------------------
@@ -1088,18 +1121,21 @@ class Application:
     def menu_change_pencil(self, index, value, op):
         if self.varPencils.get() != self.mod.layer.pencil:
             self.but_change_pencil(self.varPencils.get())
+
+    def menu_undo(self, event=None):
+        self.previous.undo()
     
-    def menu_file_new(self):
+    def menu_file_new(self, event=None):
         d = ChooseSizeDialog(self)
         if d.width is not None:
             self.start_new_map('New map', d.width, d.height, restart=True)
     
-    def menu_file_open(self):
+    def menu_file_open(self, event=None):
         filepath = askopenfilename(initialdir = os.getcwd(), title = "Select a file to open", filetypes = (("map files","*.map"),("all files","*.*")))
         if filepath != '' and os.path.isfile(filepath):
             self.start_load_map(filepath)
     
-    def menu_file_save(self):
+    def menu_file_save(self, event=None):
         if self.is_linked():
             self.save_map()
         else:
@@ -1122,7 +1158,7 @@ class Application:
             self.rename_map(name)
             self.save_map(filepath)
     
-    def menu_file_exit(self):
+    def menu_file_exit(self, event=None):
         res = self.exit_app()
     
     def menu_about(self):
