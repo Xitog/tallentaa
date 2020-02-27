@@ -2,6 +2,10 @@
     "filetype" : "mod",
     "version" : 1.0,
     "name" : "RTS",
+    "licence" : "?",
+    "creator" : "?",
+    "websites" : {
+    },
     "layers" : {
         "ground"  : { "res" : "textures",   "default" : "grass", "apply" : "water",  "visible" : true  },
         "height"  : { "res" : "numbers_HL", "default" : 0,       "apply" : "one",    "visible" : false },

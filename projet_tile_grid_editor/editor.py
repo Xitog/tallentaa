@@ -306,10 +306,25 @@ def pic2str(file):
     f.close()
     return content
 
+class ModInfo:
+
+    def __init__(self, name, licence, creator, websites):
+        self.name = name
+        self.licence = licence
+        self.creator = creator
+        self.websites = websites
+
+    def __str__(self):
+        s = f"{self.name}\n{'_'*len(self.name)}\n{self.creator}\n{self.licence}\n"
+        for w in self.websites:
+            s += w + '\n'
+        return s
+
 class ModHandler:
 
     def __init__(self, code : str, force_recreate_default : bool = False):
         self.code = code
+        self.info = {}
         wrong = False
         self.mod_dir = os.path.join(os.getcwd(), 'mod')
         if force_recreate_default:
@@ -317,8 +332,8 @@ class ModHandler:
         if not os.path.isdir(self.mod_dir):
             wrong = True
         else:
-            self.all_mods = self.detect_mods()
-            if self.code not in self.all_mods:
+            self.detect_mods()
+            if self.code not in self.info:
                 wrong = True
             else:
                 try:
@@ -333,17 +348,6 @@ class ModHandler:
     
     def get_loaded_mod(self):
         return self.code
-
-    def get_name(self, code):
-        if code == self.code:
-            return self.mod_data['name']
-        else:
-            print('[INFO] Getting name for ' + code)
-            mod_dir = os.path.join(self.mod_dir, code)
-            f = open(os.path.join(mod_dir, code + '.mod'), mode='r', encoding='utf8')
-            name = json.load(f)['name']
-            f.close()
-            return name
 
     IMAGES = {
         'green.png'    : b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00 \x00\x00\x00 \x08\x02\x00\x00\x00\xfc\x18\xed\xa3\x00\x00\x00\x01sRGB\x00\xae\xce\x1c\xe9\x00\x00\x00\x04gAMA\x00\x00\xb1\x8f\x0b\xfca\x05\x00\x00\x00\tpHYs\x00\x00\x0e\xc3\x00\x00\x0e\xc3\x01\xc7o\xa8d\x00\x00\x006IDATHK\xed\xcd\xa1\x01\x000\x08\xc4\xc0\xa7\xa3t\x9e.\xcb\x865\xf8(\\\xceD\xa6n\xbfl:\xd35\x0e\x90\x03\xe4\x009@\x0e\x90\x03\xe4\x009@\x0e\x90\x03\x90|&y\x01_\xc9\xe9\xe5\xe5\x00\x00\x00\x00IEND\xaeB`\x82',
@@ -381,6 +385,11 @@ class ModHandler:
             'filetype' : 'mod',
             'version' : 1.0,
             'name' : 'Default',
+            'licence' : 'Creative Commons Zero (CC0)',
+            'creator' : 'Created by Damien Gouteux',
+            'websites' : {
+                'Main' : 'https://xitog.github.io/dgx/'
+            },
             'layers' : {
                 'ground'  : {'res': "textures",   'default': "blue", 'apply': 'green',  'visible': True},
                 'wall'    : {'res': "textures",   'default': 0,      'apply': 'black',  'visible': True},
@@ -446,12 +455,16 @@ class ModHandler:
         return target
     
     def detect_mods(self):
-        all_mods = []
-        mod_dir = os.path.join(os.getcwd(), 'mod')
-        for mod in os.listdir(mod_dir):
-            if os.path.isdir(os.path.join(os.getcwd(), 'mod', mod)):
-                all_mods.append(mod)
-        return all_mods
+        all_mod_dir = os.path.join(os.getcwd(), 'mod')
+        for mod in os.listdir(all_mod_dir):
+            mod_dir = os.path.join(os.getcwd(), 'mod', mod)
+            if os.path.isdir(mod_dir):
+                mod_file = os.path.join(mod_dir, mod + '.mod')
+                if os.path.isfile(mod_file):
+                    f = open(mod_file, mode='r', encoding='utf8')
+                    data = json.load(f)
+                    f.close()
+                    self.info[mod] = ModInfo(data['name'], data['licence'], data['creator'], data['websites'])
     
     def load_mod(self):
         print(f"[INFO] Loading mod *** {self.code} ***")
@@ -542,6 +555,8 @@ class ActionList:
         self.max_size = max_size
 
     def do(self, app, amap, layer, x32, y32, content, pencil):
+        if x32 < 0 or y32 < 0 or x32 >= amap.width or y32 >= amap.height:
+            return
         #print('col', x32, 'row', y32, layer.name, amap.get(row=y32, col=x32, layer=layer.name), 'vs', content)
         if amap.get(row=y32, col=x32, layer=layer.name) != content:
             self.previous.append(Action(app, amap, layer, x32, y32, content, pencil))
@@ -555,33 +570,22 @@ class ActionList:
             self.previous[-1].unresolve()
             self.previous.pop()
 
+
 #-----------------------------------------------------------
-# Application class
+# Option handler class
 #-----------------------------------------------------------
 
-class Application:
+class OptionHandler:
 
-    def __init__(self, title=None, width=None, height=None):
-        self.title = 'Tile Grid Editor'
-        self.base_geometry = { 'w' : 600, 'h' : 400, 'geometry' : '600x400+0+0'}
-        self.old_geometry = self.base_geometry
+    def __init__(self, filepath='config.ini'):
+        self.options = {'filepath' : filepath}
         self.load_options()
-        self.mod = ModHandler(self.options['mod'], force_recreate_default=True)
-        self.options['mod'] = self.mod.get_loaded_mod()
-        self.tk = None
-        self.start_new_map(title, width, height)
-        self.previous = ActionList(10)
-        self.run()
-
-    #-----------------------------------------------------------
-    # Options
-    #-----------------------------------------------------------
+    
     def load_options(self):
-        self.options = {}
         self.options['show_grid'] = False
         self.options['confirm_exit'] = True
-        self.options['mod'] = 'rts'
-        if os.path.isfile('config.ini'):
+        self.options['mod'] = 'default'
+        if os.path.isfile(self.options['filepath']):
             config = configparser.ConfigParser()
             config.read('config.ini')
             if 'MAIN' in config:
@@ -600,7 +604,7 @@ class Application:
         for o in self.options:
             print(f"[INFO]     {o:15} = {self.options[o]}")
     
-    def change_option(self, opt, value):
+    def __setitem__(self, opt, value):
         print(f"[INFO] Setting option {opt} to {value}")
         self.options[opt] = value
         self.write_options()
@@ -612,8 +616,29 @@ class Application:
             'confirm_exit' : str(self.options['confirm_exit']),
             'mod' : self.options['mod'],
         }
-        with open('config.ini', 'w') as configfile:
+        with open(self.options['filepath'], 'w') as configfile:
             config.write(configfile)
+
+    def __getitem__(self, key):
+        return self.options[key]
+
+#-----------------------------------------------------------
+# Application class
+#-----------------------------------------------------------
+
+class Application:
+
+    def __init__(self, title=None, width=None, height=None):
+        self.title = 'Tile Grid Editor'
+        self.base_geometry = { 'w' : 600, 'h' : 400, 'geometry' : '600x400+0+0'}
+        self.old_geometry = self.base_geometry
+        self.options = OptionHandler()
+        self.mod = ModHandler(self.options['mod'], force_recreate_default=True)
+        self.options['mod'] = self.mod.get_loaded_mod()
+        self.tk = None
+        self.start_new_map(title, width, height)
+        self.previous = ActionList(10)
+        self.run()
     
     #-----------------------------------------------------------
     # Start
@@ -649,9 +674,10 @@ class Application:
             mod = amap.mod
         if mod != self.options['mod']:
             self.clean_mod_buttons()
-            self.change_option('mod', mod)
+            self.options['mod'] = mod
             self.mod = ModHandler(self.options['mod'], force_recreate_default=True)
             self.options['mod'] = self.mod.get_loaded_mod()
+            self.action_change_pencil('data', self.mod.layer.pencil)
             # all things dependant on mod from build_gui but we are not destroying it
             self.load_mod_graphics()
             self.build_mod_buttons()
@@ -690,49 +716,62 @@ class Application:
     def is_linked(self):
         return self.map.filepath is not None
     
-    def menu_change_pencil(self, index=None, value=None, op=None):
-        if self.varPencils.get() != self.current_pencil:
-            self.current_pencil = self.varPencils.get()
-        for val, bt in self.bt_pencils.items():
-            if val == self.current_pencil:
-                bt.config(relief=SUNKEN)
-            else:
-                bt.config(relief=RAISED)
-    
-    def action_change_layer(self, source, code=None):
-        if self.varActiveLayer.get() != self.mod.layer.name:
-            if source == 'var':
-                code = self.varActiveLayer.get()
-                self.mod.layer = self.mod.layerHandlers[code]
-            elif source == 'py':
-                self.varActiveLayer.set(code)
-            for key, bt in self.bt_layers.items():
-                if key == code:
+    def action_change_pencil(self, index, value, op=None):
+        # index is an index of TKINTER OR the source of the call which can be button (from a button) or data (from code). In both case, the value is retrieved from the arg and op is not used.
+        print(f'[INFO] action_change_pencil : {index} {value}')
+        if index in ['button', 'data']:
+            if value != self.varPencils.get():
+                self.varPencils.set(value) # will call again action_change_pencil
+        else:
+            print('[INFO] Refreshing data and bt_pencils')
+            self.mod.layer.pencil = self.varPencils.get()
+            for val, bt in self.bt_pencils.items():
+                if val == self.mod.layer.pencil:
                     bt.config(relief=SUNKEN)
                 else:
                     bt.config(relief=RAISED)
-            self.bt_change_pencil(self.mod.layer.pencil)
+
+    def action_change_texture(self, index, value, op=None):
+        if index in ['button', 'data']:
+            for key, bt in self.bt_textures.items():
+                if value == self.mod.resources[self.mod.layer.res][key].num:
+                    bt.config(relief=SUNKEN)
+                    self.mod.layer.apply = self.mod.resources[self.mod.layer.res][key].name
+                else:
+                    bt.config(relief=RAISED)
+    
+    def action_change_layer(self, index, value, op=None):
+        print(f'[INFO] action_change_layer : {index} {value}')
+        if index in ['button', 'data']:
+            if value != self.varActiveLayer.get():
+                self.varActiveLayer.set(value) # will call again action_change_layer
+        else:
+            print('[INFO] Refreshing data and bt_layers')
+            value = self.varActiveLayer.get()
+            self.mod.layer = self.mod.layerHandlers[value]
+            for key, bt in self.bt_layers.items():
+                if key == value:
+                    bt.config(relief=SUNKEN)
+                else:
+                    bt.config(relief=RAISED)
+            self.action_change_pencil('data', self.mod.layer.pencil)
             self.build_layer_buttons()
             self.refresh_status()
             if not self.mod.layer.visible:
                 self.mod.layer.visible = True
-                self.action_change_visibility(source='py')
-
-    def action_change_visibility(self, source):
-        # if there is incoherency between vars and py vars, we resolve it depending on the var which is the default from the menu
-        for name, var in self.varVisibleLayers.items():
-            if var.get() != self.mod.layerHandlers[name].visible:
-                if source == 'var':
-                     self.mod.layerHandlers[name].visible = var.get()
-                elif source == 'py':
-                    var.set(self.mod.layerHandlers[name].visible)
-        self.refresh_map()
+                self.action_change_visibility('data', True)
     
-    def menu_change_layer(self, index, value, op):
-        self.action_change_layer(source='var')
-
-    def menu_change_visibility(self, index, value, op):
-        self.action_change_visibility(source='var')
+    def action_change_visibility(self, index, value, op=None):
+        # if there is incoherency between vars and py vars, we resolve it depending on the var which is the default from the menu
+        print(f'[INFO] action_change_visibility : {index} {value}')
+        if index == 'data':
+            self.varVisibleLayers[self.mod.layer.name].set(self.mod.layerHandlers[self.mod.layer.name].visible)
+        else:
+            print('[INFO] Searching for incoherency')
+            for name, var in self.varVisibleLayers.items():
+                if var.get() != self.mod.layerHandlers[name].visible:
+                    self.mod.layerHandlers[name].visible = var.get()
+            self.refresh_map()
     
     def menu_change_mod(self, index, value, op):
         if self.varMods.get() != self.options['mod']:
@@ -766,7 +805,7 @@ class Application:
         # Layer buttons
         self.bt_layers = {}
         for layname, lay in self.mod.layerHandlers.items():
-            self.bt_layers[layname] = Button(self.toolbar, image=self.mod.resources['icons'][layname].tkimg, width=32, height=32, command=partial(self.bt_change_layer, layname))
+            self.bt_layers[layname] = Button(self.toolbar, image=self.mod.resources['icons'][layname].tkimg, width=32, height=32, command=partial(self.action_change_layer, 'button', layname))
             if self.mod.layer.name == layname:
                 self.bt_layers[layname].config(relief=SUNKEN)
             else:
@@ -782,7 +821,7 @@ class Application:
         self.bt_textures = {}
         for _, res in self.mod.resources[self.mod.layer.res].items():
             #print(f'[INFO] Creating button for {self.layer.name} : {res.name}')
-            self.bt_textures[res.name] = Button(self.toolbar, image=res.tkimg, width=32, height=32, command=partial(self.bt_change_tex, res.tkimg))
+            self.bt_textures[res.name] = Button(self.toolbar, image=res.tkimg, width=32, height=32, command=partial(self.action_change_texture, 'button', res.num))
             if self.mod.layer.apply == res.name:
                 self.bt_textures[res.name].config(relief=SUNKEN)
             self.bt_textures[res.name].pack(side=LEFT)
@@ -867,7 +906,7 @@ class Application:
             self.status_var.set(f"layer = {self.mod.layer.name} apply = {apply} x/col = {x32}, y/row = {y32}")
         
     def set_show_grid(self, index, value, op):
-        self.change_option('show_grid', not self.options['show_grid'])
+        self.options['show_grid'] = not self.options['show_grid']
         print('set', 'i=', index, 'v=', value, 'op=', op, 'show_grid=', self.options['show_grid'])
         self.refresh_map()
     
@@ -933,7 +972,7 @@ class Application:
 
         self.varPencils = IntVar()
         self.varPencils.set(1)
-        self.varPencils.trace('w', self.menu_change_pencil)
+        self.varPencils.trace('w', self.action_change_pencil)
         
         toolsmenu = Menu(menu, tearoff=0)
         menu.add_cascade(label="Tools", menu=toolsmenu)
@@ -954,13 +993,13 @@ class Application:
         
         modsmenu = Menu(menu, tearoff=0)
         menu.add_cascade(label="Mods", menu=modsmenu)
-        for mod in self.mod.all_mods:
-            modsmenu.add_radiobutton(label=self.mod.get_name(mod), variable=self.varMods, value=mod)
+        for code, modinfo in self.mod.info.items():
+            modsmenu.add_radiobutton(label=modinfo.name, variable=self.varMods, value=code)
         
         self.varVisibleLayers = {}
         self.varActiveLayer = StringVar()
         self.varActiveLayer.set(self.mod.layer.name)
-        self.varActiveLayer.trace('w', self.menu_change_layer)
+        self.varActiveLayer.trace('w', self.action_change_layer)
         
         layersmenu = Menu(menu, tearoff=0)
         menu.add_cascade(label="Layers", menu=layersmenu)
@@ -970,7 +1009,7 @@ class Application:
         for name, layer in self.mod.layerHandlers.items():
             self.varVisibleLayers[name] = BooleanVar()
             self.varVisibleLayers[name].set(layer.visible)
-            self.varVisibleLayers[name].trace('w', self.menu_change_visibility)
+            self.varVisibleLayers[name].trace('w', self.action_change_visibility)
             layervisibilitymenu.add_checkbutton(label=name.title(), variable=self.varVisibleLayers[name])#, value=True)
 
         activelayermenu = Menu(layersmenu, tearoff=0)
@@ -1007,9 +1046,9 @@ class Application:
             bt_save_as = Button(self.toolbar, image=icons['save_as'], width=32, height=32, command=self.menu_file_save_as)
         
             self.bt_pencils = {}
-            self.bt_pencils[1] = Button(self.toolbar, image=icons['1x1'], width=32, height=32, command=lambda: self.bt_change_pencil(1), relief=SUNKEN)
-            self.bt_pencils[3] = Button(self.toolbar, image=icons['3x3'], width=32, height=32, command=lambda: self.bt_change_pencil(3), relief=RAISED)
-            self.bt_pencils[5] = Button(self.toolbar, image=icons['5x5'], width=32, height=32, command=lambda: self.bt_change_pencil(5), relief=RAISED)
+            self.bt_pencils[1] = Button(self.toolbar, image=icons['1x1'], width=32, height=32, command=lambda: self.action_change_pencil('button', 1), relief=SUNKEN)
+            self.bt_pencils[3] = Button(self.toolbar, image=icons['3x3'], width=32, height=32, command=lambda: self.action_change_pencil('button', 3), relief=RAISED)
+            self.bt_pencils[5] = Button(self.toolbar, image=icons['5x5'], width=32, height=32, command=lambda: self.action_change_pencil('button', 5), relief=RAISED)
             
             bt_new.pack(side=LEFT)
             bt_open.pack(side=LEFT)
@@ -1098,29 +1137,6 @@ class Application:
     #-----------------------------------------------------------
     # Button and menu actions
     #-----------------------------------------------------------
-    def bt_change_layer(self, layname):
-        self.action_change_layer(source='py', code=layname)
-    
-    def bt_change_tex(self, tkimg):
-        for key, bt in self.bt_textures.items():
-            if self.mod.resources[self.mod.layer.res][key].tkimg == tkimg:
-                bt.config(relief=SUNKEN)
-                self.mod.layer.apply = self.mod.resources[self.mod.layer.res][key].name
-            else:
-                bt.config(relief=RAISED)
-    
-    def bt_change_pencil(self, p):
-        for key, bt in self.bt_pencils.items():
-            if key == p:
-                bt.config(relief=SUNKEN)
-            else:
-                bt.config(relief=RAISED)
-        self.mod.layer.pencil = p
-        self.varPencils.set(p)
-    
-    def menu_change_pencil(self, index, value, op):
-        if self.varPencils.get() != self.mod.layer.pencil:
-            self.but_change_pencil(self.varPencils.get())
 
     def menu_undo(self, event=None):
         self.previous.undo()
@@ -1162,7 +1178,17 @@ class Application:
         res = self.exit_app()
     
     def menu_about(self):
-        showinfo("About", "This is a simple example of a menu")
+        info = """
+Teddy, the Tile Grid Editor (or TGE), is a tool for editing grid of tiles.
+
+It is designed to be simple to use and modify to your own needs.
+It is programmed with Python and Tkinter for the interface.
+It only uses the library Pillow as an external dependency.
+
+Damien Gouteux - 2020\n\n"""
+        for key, mod in self.mod.info.items():
+            info += (str(mod) + '\n')
+        showinfo("About Teddy", info)
     
     def menu_tools_check(self):
         print('Checking map conformity')

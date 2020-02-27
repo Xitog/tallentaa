@@ -1,7 +1,15 @@
 {
     "filetype" : "mod",
     "version" : 1.0,
-    "name" : "FPS",
+    "name" : "Western FPS",
+    "licence" : "Creative Commons Zero (CC0)",
+    "creator" : "Created at Sparklin Labs by Pixel-boy",
+    "websites" : {
+        "Pixel-boy" : "https://twitter.com/2pblog1",
+        "Sparklin Labs" : "https://sparklinlabs.itch.io/superpowers",
+        "Superpowers" : "http://superpowers-html5.com/",
+        "Github" : "https://github.com/sparklinlabs/superpowers-asset-packs"
+    },
     "layers" : {
         "ground"  : { "res" : "textures",   "default" : "void", "apply" : "redbrick",  "visible" : true },
         "wall"    : { "res" : "textures",   "default" : 0,      "apply" : "greystone", "visible" : true  },
