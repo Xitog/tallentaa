@@ -696,7 +696,7 @@ class Application:
         self.options['mod'] = self.mod.get_loaded_mod()
         self.tk = None
         self.dirty = False
-        self.sep = None
+        self.bt_sep = None
         self.bt_layers = None
         self.bt_textures = None
         self.bt_pencils = None
@@ -723,6 +723,7 @@ class Application:
     # Start
     #-----------------------------------------------------------
     def start_new_map(self, title=None, width=None, height=None, restart=False):
+        "Start application with a new map, build entire GUI"
         title = 'New map' if title is None else title
         width = 32 if width is None else width
         height = 32 if height is None else height
@@ -747,7 +748,7 @@ class Application:
         self.refresh_map() # need the canvas in order to display the map
 
     def start_load_mod(self, mod=None, amap=None):
-        # load a different mod or a map with optionnally a new mod
+        "Load a different mod or a map with optionnally a new mod. Partial GUI"
         if mod is None and amap is None:
             raise Exception("Cannot run without a mod or a map")
         elif mod is None:
@@ -771,6 +772,7 @@ class Application:
         self.refresh_status()
 
     def start_load_map(self, mapfilepath):
+        "Load a map. Partial GUI rebuild."
         if self.debug:
             print(f'[INFO] start_load_map: Loading {mapfilepath}')
         amap = Map.from_json(mapfilepath)
@@ -779,10 +781,12 @@ class Application:
         self.start_load_mod(amap=amap)
 
     def set_map(self, amap):
+        "Set the working map"
         self.dirty = False
         self.map = amap
 
     def exit_app(self, force_exit=False):
+        "Exit the application and clean before"
         sure = True
         if self.dirty and self.options['confirm_exit']:
             sure = messagebox.askyesno("Unsaved changes", "There are unsaved changes.\nDo you really want to quit?", default=messagebox.NO)
@@ -797,6 +801,7 @@ class Application:
                 print('[INFO] end of exiting')
 
     def is_linked(self):
+        "If the map is linked to a file on the hard drive"
         return self.map.filepath is not None
 
     def action_change_pencil(self, index, value, op=None):
