@@ -2,6 +2,11 @@
     "filetype": "mod",
     "version": 1.0,
     "name": "Default",
+    "licence": "Creative Commons Zero (CC0)",
+    "creator": "Created by Damien Gouteux",
+    "websites": {
+        "Main": "https://xitog.github.io/dgx/"
+    },
     "layers": {
         "ground": {
             "res": "textures",

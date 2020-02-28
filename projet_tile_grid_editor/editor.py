@@ -1,72 +1,97 @@
-#-----------------------------------------------------------
-# Tile Grid Editor for 2D square maps (FPS, RTS, RPG)
-#-----------------------------------------------------------
-# Created: May 11, 2019
-# Last Modified: February 7, 2020
-#-----------------------------------------------------------
-# Summary
-#   Imports
-#   Constants & Global variables
-#   Texture class
-#   Map class
-#   Dialog
-#   Application class
-#     Options
-#     Start
-#     Exit
-#     Mod manipulation
-#     Map manipulation
-#     GUI building
-#     Apply texture functions
-#     Button actions
-#     Menu actions
-#   Main
-#-----------------------------------------------------------
+"""-----------------------------------------------------------
+Teddy: A Tile Grid Editor for 2D square maps (FPS, RTS, RPG)
+-----------------------------------------------------------
+Created: May 11, 2019
+Last Modified: February 28, 2020
+version: 0.1.0
+-----------------------------------------------------------
+MIT Licence (Expat License Wording)
+-----------------------------------------------------------
+Copyright © 2012-2020, Damien Gouteux
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-----------------------------------------------------------
+Code Summary
+-----------------------------------------------------------
+    Imports
+    SimpleImage class
+    Map class
+    Dialog classes
+        Dialog class
+        ChooseObjectDialog class
+        ChooseSizeDialog class
+    LayerHandler class
+    pic2str function
+    ModInfo class
+    ModHandler class
+    Action class
+    ActionList class
+    OptionHandler class
+    Application class
+        Start
+        Exit
+        Map manipulation
+        GUI building
+        Apply texture functions
+        Menu actions
+   Main
+-----------------------------------------------------------"""
 
 #-----------------------------------------------------------
 # Imports
 #-----------------------------------------------------------
 
-from tkinter import *
-from tkinter import messagebox
-from tkinter.filedialog import askopenfilename, asksaveasfilename
-from tkinter.messagebox import showinfo
-#from tkinter.ttk import Treeview, Button
 import json
 import os
 import os.path
-from functools import partial
 import configparser
-try:
-    from PIL import Image, ImageTk, ImageDraw
-    PILLOW = True
-except ModuleNotFoundError:
-    PILLOW = False
-from struct import *
+import struct # pack
 
-#-----------------------------------------------------------
-# Constants & Global variables
-#-----------------------------------------------------------
-
-icons = {}
+from tkinter import Tk, TclError, PhotoImage, Menu, BooleanVar, StringVar, IntVar, Frame, Button,\
+     SUNKEN, RAISED, LEFT, Label, Scrollbar, HORIZONTAL, VERTICAL, Canvas, E, BOTH, TOP, X, RIGHT, Y,\
+     BOTTOM, NW, Toplevel, LabelFrame, Radiobutton
+from tkinter import messagebox
+from tkinter.filedialog import askopenfilename, asksaveasfilename
+from tkinter.messagebox import showinfo
+from functools import partial
+from PIL import Image, ImageTk, ImageDraw
 
 #-----------------------------------------------------------
 # Image class
 #-----------------------------------------------------------
 
 class SimpleImage:
+    "A class for handling simple image, with both Pillow and Tkinter formats."
 
     def __init__(self, filepath, name=None, num=None):
         self.name = name
         self.num = num
         self.path = filepath
-        if PILLOW:
-            self.img = Image.open(self.path).convert("RGBA")
-            self.tkimg = ImageTk.PhotoImage(self.img)
-        else: # only work with PNG
-            self.tkimg = PhotoImage(file=self.path)
+        self.img = Image.open(self.path).convert("RGBA")
+        self.tkimg = ImageTk.PhotoImage(self.img)
+        # only work with PNG and with Tkinter only PILLOW not needed
+        # self.tkimg = PhotoImage(file=self.path)
 
     def __str__(self):
+        return self.name
+
+    def __repr__(self):
         return self.path
 
 #-----------------------------------------------------------
@@ -74,16 +99,18 @@ class SimpleImage:
 #-----------------------------------------------------------
 
 class Map:
-    
-    def create_matrix(self, max_col, max_row, val):
+    "A class representing a map/level."
+
+    @staticmethod
+    def create_matrix(max_col, max_row, val):
         matrix = []
-        for row in range(max_row):
+        for _ in range(max_row):
             r = []
-            for col in range(max_col):
+            for _ in range(max_col):
                 r.append(val)
             matrix.append(r)
         return matrix
-    
+
     def __init__(self, name, max_col, max_row, mod):
         self.set_name(name)
         self.mod = mod
@@ -93,13 +120,13 @@ class Map:
         self.filepath = None
 
     def add_layer(self, name, val):
-        if type(val) != int:
+        if not isinstance(val, int):
             raise Exception(f'[ERROR] Only integer accepted, not {val.__class__.__name__}')
-        self.layers[name] = self.create_matrix(self.width, self.height, val)
-    
+        self.layers[name] = Map.create_matrix(self.width, self.height, val)
+
     def __repr__(self):
         return f"{self.name} {self.width}x{self.height} [{self.mod}]"
-    
+
     def set_name(self, name):
         self.name = name
 
@@ -112,11 +139,11 @@ class Map:
             raise Exception(f"[ERROR] Out of row: {row} / {self.height}")
         elif col < 0 or col >= self.width:
             raise Exception(f"[ERROR] Out of col: {col} / {self.width}")
-    
+
     def set(self, row, col, val, layer):
         self.check(row, col, layer)
         self.layers[layer][row][col] = val
-    
+
     def get(self, row, col, layer=None):
         self.check(row, col, layer, True)
         if layer is not None:
@@ -126,43 +153,54 @@ class Map:
             for lay in self.layers:
                 res[lay] = self.layers[lay][row][col]
             return res
-    
+
     @staticmethod
     def from_json(filepath):
         f = open(filepath, 'r')
         data = json.load(f)
         f.close()
-        m = Map(data["name"], len(data["ground"][0]), len(data["ground"]), data['mod'])
-        m.ground = data["ground"]
+        m = Map(data["name"], data["width"], data["height"], data['mod'])
+        for key, content in data['layers'].items():
+            m.layers[key] = content
         m.filepath = filepath
         return m
-    
+
     def to_json(self, filepath, test=False):
-        f = open(filepath, 'w')
-        s = '{\n'
-        s += f'    "name": "{self.name}",\n'
-        s += f'    "mod" : "{self.mod}",\n'
-        s += '    "ground" : [\n'
-        for irow, row in enumerate(self.ground):
-            s += '        ['
-            for icol, col in enumerate(row):
-                if icol != len(row) - 1:
-                    s += f'{col}, '
+        file = open(filepath, 'w')
+        content = '{\n'
+        content += f'    "name": "{self.name}",\n'
+        content += f'    "mod" : "{self.mod}",\n'
+        content += f'    "width": {self.width},\n'
+        content += f'    "height": {self.height},\n'
+        content += '    "layers" : {\n'
+        count = 0
+        for key, lay in self.layers.items():
+            count += 1
+            content += f'        "{key}" : [\n'
+            for irow, row in enumerate(lay):
+                content += '            ['
+                for icol, col in enumerate(row):
+                    if icol != len(row) - 1:
+                        content += f'{col}, '
+                    else:
+                        content += f'{col}'
+                if irow != len(lay) - 1:
+                    content += '],\n'
                 else:
-                    s += f'{col}'
-            if irow != len(self.ground) - 1:
-                s += '],\n'
+                    content += ']\n'
+            if count == len(self.layers):
+                content += '        ]\n'
             else:
-                s += ']\n'
-        s += '    ]\n'
-        s += '}'
-        f.write(s)
-        f.close()
+                content += '        ],\n'
+        content += '    }\n'
+        content += '}'
+        file.write(content)
+        file.close()
         if test:
             try:
-                f = open(filepath, 'r')
-                data = json.load(f)
-                f.close()
+                file = open(filepath, 'r')
+                json.load(file)
+                file.close()
             except Exception:
                 print('Something went wrong when trying to load map. Map may be corrupted.')
                 print('Stack info:')
@@ -188,7 +226,7 @@ class Dialog:
         self.top.geometry("+%d+%d" % (parent.tk.winfo_rootx()+50, parent.tk.winfo_rooty()+50))
         self.top.grab_set()
         self.top.wait_window(self.top)
-    
+
     def build(self):
         pass
 
@@ -203,12 +241,12 @@ class ChooseObjectDialog(Dialog):
 
     def build(self):
         self.object = None
-        
+
         self.top.iconbitmap(os.path.join('media', 'icons', 'editor.ico'))
         Label(self.top, text="Select object:").pack()
-        
+
         wh = Frame(self.top)
-        
+
         ln = len(self.parent.objects)
         nb_rows = ln // 6 + 1
         nb_elem_by_row = ln // nb_rows
@@ -216,13 +254,14 @@ class ChooseObjectDialog(Dialog):
         objnames = list(self.parent.objects.keys())
         for row in range(0, nb_rows):
             for col in range(0, nb_elem_by_row):
-                b = Button(wh, image=self.parent.objects[objnames[cp]].tkimg, width=32, height=32, command=partial(self.setval, objnames[cp]))
+                b = Button(wh, image=self.parent.objects[objnames[cp]].tkimg,
+                           width=32, height=32, command=partial(self.setval, objnames[cp]))
                 b.grid(row=row, column=col)
                 #print(row, col, objnames[cp], self.parent.objects[objnames[cp]].tkimg)
                 cp += 1
-        
+
         wh.pack(side=TOP, fill=BOTH)
-        
+
         b = Button(self.top, text="Cancel", command=self.submit)
         b.pack(pady=5)
 
@@ -230,25 +269,25 @@ class ChooseObjectDialog(Dialog):
         print(f"[INFO] {val}")
         self.object = val
         self.close()
-    
+
     def submit(self):
         self.close()
 
 class ChooseSizeDialog(Dialog):
-    
+
     def build(self):
         self.width = None
         self.height = None
-        
+
         self.top.iconbitmap(os.path.join('media', 'icons', 'editor.ico'))
-        
+
         Label(self.top, text="Map size:").pack()
-        
+
         available_width = [32, 64, 128, 256]
         available_height = [32, 64, 128, 256]
 
         wh = Frame(self.top)
-        
+
         self.widthVar = IntVar()
         self.widthVar.set(32)
         self.heightVar = IntVar()
@@ -259,7 +298,7 @@ class ChooseSizeDialog(Dialog):
             b = Radiobutton(w_group, text=str(w), variable=self.widthVar, value=w)
             b.pack()
         w_group.pack(side=LEFT, padx=5)
-        
+
         h_group = LabelFrame(wh, text="Height", padx=5, pady=5)
         for h in available_height:
             b = Radiobutton(h_group, text=str(h), variable=self.heightVar, value=h)
@@ -267,10 +306,10 @@ class ChooseSizeDialog(Dialog):
         h_group.pack(side=RIGHT, padx=5)
 
         wh.pack(side=TOP, fill=X)
-        
+
         b = Button(self.top, text="OK", command=self.submit)
         b.pack(pady=5)
-    
+
     def submit(self):
         self.width = self.widthVar.get()
         self.height = self.heightVar.get()
@@ -292,9 +331,11 @@ class LayerHandler:
         self.type = None # SimpleImage or Integer
         self.visible = visible
         self.apply = apply
-    
+
     def __str__(self):
-        return f"name={self.name} default={self.default} pencil={self.pencil} visible={self.visible}"
+        s = f"name={self.name} default={self.default} " + \
+            f"pencil={self.pencil} visible={self.visible}"
+        return s
 
 #-----------------------------------------------------------
 # Mod class
@@ -322,7 +363,8 @@ class ModInfo:
 
 class ModHandler:
 
-    def __init__(self, code : str, force_recreate_default : bool = False):
+    def __init__(self, application, code: str, force_recreate_default: bool = False):
+        self.debug = application.debug
         self.code = code
         self.info = {}
         wrong = False
@@ -339,12 +381,16 @@ class ModHandler:
                 try:
                     self.load_mod()
                 except:
-                    print('[ERROR] Something went wrong when loading mod ' + self.code + '. Recovering.')
+                    if self.debug: print('[ERROR] Something went wrong when loading mod ' +
+                                         self.code + '. Recovering.')
                     wrong = True
         if wrong:
             self.create_default_mod()
             self.code = 'default'
             self.load_mod()
+
+    def __str__(self):
+        return str(self.info[self.code])
     
     def get_loaded_mod(self):
         return self.code
@@ -375,12 +421,13 @@ class ModHandler:
         'num_br_5.png' : b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00 \x00\x00\x00 \x08\x03\x00\x00\x00D\xa4\x8a\xc6\x00\x00\x00\x04gAMA\x00\x00\xb1\x8f\x0b\xfca\x05\x00\x00\x03\x00PLTE\x00\x00\x00\x00\x00\x08\x00\x00\x0e\x00\x06\x14\x00\x0b\x195\x00\x005\x06\x005\x00\x085\x06\x145\x10\x1f_\x00\x08_\x00\x0e\x85\x06\x08\x85\x18$\xa9\x0b\x00\xa9\x1c$\xcc\x10\x08\xcc\x1c$\xed\x14\x0e\xed\x18\x14\xed\x1c\x19\xed\x1c\x1f\xed\x1c$\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xe9\x0e!\xb4\x00\x00\x01\x00tRNS\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x00S\xf7\x07%\x00\x00\x00\tpHYs\x00\x00\x0e\xc2\x00\x00\x0e\xc2\x01\x15(J\x80\x00\x00\x00\x18tEXtSoftware\x00Paint.NET v3.36\xa9\xe7\xe2%\x00\x00\x00cIDAT8O\xed\xd0K\x0e\x80 \x0cE\xd1\xe7_\xd1\x8a\x02\xb2\xff\x9d*\x06Id@It\xca\x1d6'-\x01g\xa6\x02|\x05\xf8>\x02\xbczFq\xb0\xa14\xd0\x1d\xd0\xec\x0cPmf\xc3:\xf1\xe0X\x88\x07F\xf4\xa8\x9cI\x02=\x905\xb3d\xde\xe02\x82~\x00UK\xabG\xee\x1f6\xc0\x19\xfe\xc4]\n\x84\x80\x0b\x94.jHg%\x85~\x00\x00\x00\x00IEND\xaeB`\x82",
         'num_br_6.png' : b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00 \x00\x00\x00 \x08\x03\x00\x00\x00D\xa4\x8a\xc6\x00\x00\x00\x04gAMA\x00\x00\xb1\x8f\x0b\xfca\x05\x00\x00\x03\x00PLTE\x00\x00\x00\x00\x00%%\x00%\x00\x00B\x00\x11\\%\x00B\\\x11\x00B\x00%t\x1d\x00t*%%*\x8dB4\xa4\\>\xa4tI\xa4\xa34B\xa3>\\\xa3Iu\x8cI\xa4\xa3I\x8d\xa3I\xa4\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00O\n8t\x00\x00\x01\x00tRNS\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x00S\xf7\x07%\x00\x00\x00\tpHYs\x00\x00\x0e\xc2\x00\x00\x0e\xc2\x01\x15(J\x80\x00\x00\x00\x18tEXtSoftware\x00Paint.NET v3.36\xa9\xe7\xe2%\x00\x00\x00cIDAT8O\xed\xd0\xcd\n\x80 \x18D\xd1\xa9\xac,\xff2\xdf\xffY\xcb\xb0\x0fj\xe1\x04\xad\xbdK9\xe0(\x8e\x8f\x1a(5P\xfa\t\xf0\xe8>z\x87$\xd5\xc1>\x01+\x03Z\xc5\xd0\xdb:\xd8f\xcb\xaf\x08\xa3\xe3\xc0\xab\x050\x0c\xe4\x85\xbe#\x1b\xbc\x8a\xf9!\x86o\xa0 \xe9|\xc5\xe0\x08\xb8>\x8a\x8d\x94j@\x02NWWh\xd9\x002\x17\xba\x00\x00\x00\x00IEND\xaeB`\x82'
     }
-    
+
     def create_default_mod(self):
         os.makedirs(self.mod_dir, exist_ok=True)
         default_dir = os.path.join(self.mod_dir, 'default')
         os.makedirs(default_dir, exist_ok=True)
-        f = open(os.path.join(default_dir, 'default.mod'), mode='w', encoding='utf8')
+        f = open(os.path.join(default_dir, 'default.mod'), mode='w',
+                 encoding='utf8')
         data = {
             'filetype' : 'mod',
             'version' : 1.0,
@@ -391,72 +438,80 @@ class ModHandler:
                 'Main' : 'https://xitog.github.io/dgx/'
             },
             'layers' : {
-                'ground'  : {'res': "textures",   'default': "blue", 'apply': 'green',  'visible': True},
-                'wall'    : {'res': "textures",   'default': 0,      'apply': 'black',  'visible': True},
-                'ceiling' : {'res': "textures",   'default': 0,      'apply': 'red',    'visible': False},
-                'height'  : {'res': "numbers_HL", 'default': "one",  'apply': 'two',    'visible': False},
-                'area'    : {'res': "numbers_BR", 'default': 0,      'apply': 'one',    'visible': False},
-                'object'  : {'res': "objects",    'default': 0,      'apply': 'heart',  'visible': True}
+                'ground': {'res': "textures", 'default': "blue",
+                           'apply': 'green', 'visible': True},
+                'wall': {'res': "textures", 'default': 0,
+                         'apply': 'black', 'visible': True},
+                'ceiling': {'res': "textures", 'default': 0,
+                            'apply': 'red', 'visible': False},
+                'height': {'res': "numbers_HL", 'default': "one",
+                           'apply': 'two', 'visible': False},
+                'area': {'res': "numbers_BR", 'default': 0,
+                         'apply': 'one', 'visible': False},
+                'object': {'res': "objects", 'default': 0,
+                           'apply': 'heart', 'visible': True}
             },
             'resources' : {
-                'textures' : {
-                    'black'   : {'val': 1, 'file': 'black.png'},
-                    'blue'    : {'val': 2, 'file': 'blue.png'},
-                    'green'   : {'val': 3, 'file': 'green.png'},
-                    'red'     : {'val': 4, 'file': 'red.png'}
+                'textures': {
+                    'black': {'val': 1, 'file': 'black.png'},
+                    'blue': {'val': 2, 'file': 'blue.png'},
+                    'green': {'val': 3, 'file': 'green.png'},
+                    'red': {'val': 4, 'file': 'red.png'}
                 },
                 'objects' : {
-                    'heart'   : {'val': 1, 'file': 'heart.png'},
-                    'goldkey' : {'val': 2, 'file': 'goldkey.png'}
+                    'heart': {'val': 1, 'file': 'heart.png'},
+                    'goldkey': {'val': 2, 'file': 'goldkey.png'}
                 },
                 'numbers_HL' : {
-                    'one'     : {'val': 1, 'file': 'num_hl_1.png'},
-                    'two'     : {'val': 2, 'file': 'num_hl_2.png'},
-                    'three'   : {'val': 3, 'file': 'num_hl_3.png'},
-                    'four'    : {'val': 4, 'file': 'num_hl_4.png'},
-                    'five'    : {'val': 5, 'file': 'num_hl_5.png'},
-                    'six'     : {'val': 6, 'file': 'num_hl_6.png'}
+                    'one': {'val': 1, 'file': 'num_hl_1.png'},
+                    'two': {'val': 2, 'file': 'num_hl_2.png'},
+                    'three': {'val': 3, 'file': 'num_hl_3.png'},
+                    'four': {'val': 4, 'file': 'num_hl_4.png'},
+                    'five': {'val': 5, 'file': 'num_hl_5.png'},
+                    'six': {'val': 6, 'file': 'num_hl_6.png'}
                 },
                 'numbers_BR' : {
-                    'one'     : {'val': 1, 'file': 'num_br_1.png'},
-                    'two'     : {'val': 2, 'file': 'num_br_2.png'},
-                    'three'   : {'val': 3, 'file': 'num_br_3.png'},
-                    'four'    : {'val': 4, 'file': 'num_br_4.png'},
-                    'five'    : {'val': 5, 'file': 'num_br_5.png'},
-                    'six'     : {'val': 6, 'file': 'num_br_6.png'}
+                    'one': {'val': 1, 'file': 'num_br_1.png'},
+                    'two': {'val': 2, 'file': 'num_br_2.png'},
+                    'three': {'val': 3, 'file': 'num_br_3.png'},
+                    'four': {'val': 4, 'file': 'num_br_4.png'},
+                    'five': {'val': 5, 'file': 'num_br_5.png'},
+                    'six': {'val': 6, 'file': 'num_br_6.png'}
                 },
                 'icons' : {
-                    'ground'  : {'val' : 1, 'file': 'ground.png'},
-                    'wall'    : {'val' : 2, 'file': 'wall.png'},
-                    'ceiling' : {'val' : 3, 'file': 'ceiling.png'},
-                    'height'  : {'val' : 4, 'file': 'height.png'},
-                    'area'    : {'val' : 5, 'file': 'area.png'},
-                    'object'  : {'val' : 6, 'file': 'object.png'}
+                    'ground': {'val' : 1, 'file': 'ground.png'},
+                    'wall': {'val' : 2, 'file': 'wall.png'},
+                    'ceiling': {'val' : 3, 'file': 'ceiling.png'},
+                    'height': {'val' : 4, 'file': 'height.png'},
+                    'area': {'val' : 5, 'file': 'area.png'},
+                    'object': {'val' : 6, 'file': 'object.png'}
                 }
             },
-            'default_layer' : 'wall',
-            'has_transition' : True
+            'default_layer': 'wall',
+            'has_transition': True
         }
         json.dump(data, f, indent='    ')
-    
+
     def autoload(self, filename):
-        print(f"[INFO] autoload -> Loading {filename}")
+        if self.debug: print(f"[INFO] autoload -> Loading {filename}")
         graphics_dir = os.path.join(self.mod_dir, self.code, 'graphics')
         if not os.path.isdir(graphics_dir):
             os.makedirs(graphics_dir)
         target = os.path.join(graphics_dir, filename)
         if not os.path.isfile(target):
             if filename not in ModHandler.IMAGES:
-                print(f"[ERROR] autoload -> {filename} not found in dynamic image library, defaulting to black.png")
+                if self.debug: print(f"[ERROR] autoload -> {filename} not found in dynamic image library, defaulting to black.png")
                 filename = 'black.png'
             f = open(target, mode='wb')
             f.write(ModHandler.IMAGES[filename])
             f.close()
         return target
-    
+
     def detect_mods(self):
         all_mod_dir = os.path.join(os.getcwd(), 'mod')
         for mod in os.listdir(all_mod_dir):
+            if self.debug:
+                print('[INFO] Found:', mod)
             mod_dir = os.path.join(os.getcwd(), 'mod', mod)
             if os.path.isdir(mod_dir):
                 mod_file = os.path.join(mod_dir, mod + '.mod')
@@ -465,9 +520,9 @@ class ModHandler:
                     data = json.load(f)
                     f.close()
                     self.info[mod] = ModInfo(data['name'], data['licence'], data['creator'], data['websites'])
-    
+
     def load_mod(self):
-        print(f"[INFO] Loading mod *** {self.code} ***")
+        if self.debug: print(f"[INFO] Loading mod *** {self.code} ***")
         mod_dir = os.path.join(self.mod_dir, self.code)
         mod_file = os.path.join(mod_dir, self.code + '.mod')
         self.current_start_pos = None
@@ -482,14 +537,15 @@ class ModHandler:
             self.resources[resname] = {}
             self.num2res[resname] = {}
             for objname, objcontent in rescontent.items():
-                self.resources[resname][objname] = (objcontent['val'], objcontent['file'])
+                self.resources[resname][objname] = (objcontent['val'],
+                                                    objcontent['file'])
                 self.num2res[resname][objcontent['val']] = objname
         # Prepare layers
         self.layerHandlers = {}
         for layname, laycontent in self.mod_data["layers"].items():
             self.layerHandlers[layname] = LayerHandler(layname, laycontent['res'], laycontent['default'], laycontent['apply'], 1, laycontent['visible'])
         self.layer = self.layerHandlers[self.mod_data["default_layer"]]
-        print(f"[INFO] Mod *** {self.code} *** loaded.")
+        if self.debug: print(f"[INFO] Mod *** {self.code} *** loaded.")
 
 #-----------------------------------------------------------
 # Action class (for undo/redo)
@@ -535,14 +591,13 @@ class Action:
                     self.app.refresh_tile(y, x)
                 self.save.append(row)
         self.done = True
-    
+
     def unresolve(self):
         #print("unresolve")
         for row in range(len(self.save)):
             arow = self.save[row]
             for col in range(len(arow)):
                 elem = arow[col]
-                #print(f"reset ({elem[0]}, {elem[1]}) -> {elem[2]} {self.layer.name}")
                 self.map.set(elem[0], elem[1], elem[2], self.layer.name)
                 self.app.refresh_tile(elem[0], elem[1])
         self.done = False
@@ -557,14 +612,11 @@ class ActionList:
     def do(self, app, amap, layer, x32, y32, content, pencil):
         if x32 < 0 or y32 < 0 or x32 >= amap.width or y32 >= amap.height:
             return
-        #print('col', x32, 'row', y32, layer.name, amap.get(row=y32, col=x32, layer=layer.name), 'vs', content)
         if amap.get(row=y32, col=x32, layer=layer.name) != content:
             self.previous.append(Action(app, amap, layer, x32, y32, content, pencil))
-            #print(f"set   ({x32}, {y32}) -> {content} {layer.name} {len(self.previous)}")
             if len(self.previous) > self.max_size:
-                #print('too many')
                 del self.previous[0]
-    
+
     def undo(self):
         if len(self.previous) > 0:
             self.previous[-1].unresolve()
@@ -577,14 +629,17 @@ class ActionList:
 
 class OptionHandler:
 
-    def __init__(self, filepath='config.ini'):
+    def __init__(self, application, filepath='config.ini'):
+        self.debug = application.debug
         self.options = {'filepath' : filepath}
         self.load_options()
-    
+
     def load_options(self):
         self.options['show_grid'] = False
         self.options['confirm_exit'] = True
         self.options['mod'] = 'default'
+        self.options['width'] = 800
+        self.options['height'] = 600
         if os.path.isfile(self.options['filepath']):
             config = configparser.ConfigParser()
             config.read('config.ini')
@@ -597,25 +652,30 @@ class OptionHandler:
                     self.options['confirm_exit'] = (config['MAIN']['confirm_exit'] == 'True')
                 if 'mod' in config['MAIN']:
                     self.options['mod'] = config['MAIN']['mod']
+                if 'width' in config['MAIN']:
+                    self.options['width'] = int(config['MAIN']['width'])
+                if 'height' in config['MAIN']:
+                    self.options['height'] = int(config['MAIN']['height'])
         # create default option file
         else:
             self.write_options()
-        print('[INFO] All options:')
+        if self.debug:
+            print('[INFO] All options:')
         for o in self.options:
-            print(f"[INFO]     {o:15} = {self.options[o]}")
-    
+            if self.debug:
+                print(f"[INFO]     {o:15} = {self.options[o]}")
+
     def __setitem__(self, opt, value):
-        print(f"[INFO] Setting option {opt} to {value}")
+        if self.debug:
+            print(f"[INFO] Setting option {opt} to {value}")
         self.options[opt] = value
         self.write_options()
-    
+
     def write_options(self):
         config = configparser.ConfigParser()
-        config['MAIN'] = {
-            'show_grid' : str(self.options['show_grid']),
-            'confirm_exit' : str(self.options['confirm_exit']),
-            'mod' : self.options['mod'],
-        }
+        config['MAIN'] = {}
+        for key, val in self.options.items():
+            config['MAIN'][key] = str(val)
         with open(self.options['filepath'], 'w') as configfile:
             config.write(configfile)
 
@@ -628,18 +688,37 @@ class OptionHandler:
 
 class Application:
 
-    def __init__(self, title=None, width=None, height=None):
+    def __init__(self, debug=False):
         self.title = 'Tile Grid Editor'
-        self.base_geometry = { 'w' : 600, 'h' : 400, 'geometry' : '600x400+0+0'}
-        self.old_geometry = self.base_geometry
-        self.options = OptionHandler()
-        self.mod = ModHandler(self.options['mod'], force_recreate_default=True)
+        self.debug = debug
+        self.options = OptionHandler(self)
+        self.mod = ModHandler(self, self.options['mod'], force_recreate_default=True)
         self.options['mod'] = self.mod.get_loaded_mod()
         self.tk = None
-        self.start_new_map(title, width, height)
-        self.previous = ActionList(10)
+        self.dirty = False
+        self.sep = None
+        self.bt_layers = None
+        self.bt_textures = None
+        self.bt_pencils = None
+        self.background = None
+        self.varShowGrid = None
+        self.varPencils = None
+        self.varMods = None
+        self.varVisibleLayers = None
+        self.varActiveLayer = None
+        self.varPlayer = None
+        self.content = None
+        self.toolbar = None
+        self.canvas = None
+        self.status_bar = None
+        self.var_status_bar_content = None
+        self.var_status_bar_display = None
+        self.icons = {}
+        self.map = None
+        self.start_new_map()
+        self.previous = ActionList(50)
         self.run()
-    
+
     #-----------------------------------------------------------
     # Start
     #-----------------------------------------------------------
@@ -654,7 +733,8 @@ class Application:
             def_code = lay.default
             if lay_cont != 'int' and def_code != 0:
                 if type(self.mod.resources[lay_cont][def_code]) != SimpleImage:
-                    def_num = self.mod.resources[lay_cont][def_code][0] # if restart=False, at this step, contains (val, file). Else SimpleImage
+                    # if restart=False, at this step, contains (val, file). Else SimpleImage
+                    def_num = self.mod.resources[lay_cont][def_code][0]
                 else:
                     def_num = self.mod.resources[lay_cont][def_code].num
             else:
@@ -669,13 +749,13 @@ class Application:
     def start_load_mod(self, mod=None, amap=None):
         # load a different mod or a map with optionnally a new mod
         if mod is None and amap is None:
-            return
+            raise Exception("Cannot run without a mod or a map")
         elif mod is None:
             mod = amap.mod
         if mod != self.options['mod']:
             self.clean_mod_buttons()
             self.options['mod'] = mod
-            self.mod = ModHandler(self.options['mod'], force_recreate_default=True)
+            self.mod = ModHandler(self, self.options['mod'], force_recreate_default=True)
             self.options['mod'] = self.mod.get_loaded_mod()
             self.action_change_pencil('data', self.mod.layer.pencil)
             # all things dependant on mod from build_gui but we are not destroying it
@@ -689,47 +769,53 @@ class Application:
             self.canvas.config(scrollregion=(0, 0, self.map.width * 32, self.map.height * 32))
             self.refresh_map() # need the canvas in order to display the map
         self.refresh_status()
-    
+
     def start_load_map(self, mapfilepath):
-        print(f'[INFO] Loading {mapfilepath}')
+        if self.debug:
+            print(f'[INFO] start_load_map: Loading {mapfilepath}')
         amap = Map.from_json(mapfilepath)
-        print(f'[INFO] Mod of map is {amap.mod}')
+        if self.debug:
+            print(f'[INFO] start_load_map: Mod of map is {amap.mod}')
         self.start_load_mod(amap=amap)
 
     def set_map(self, amap):
-         self.dirty = False
-         self.map = amap
-       
+        self.dirty = False
+        self.map = amap
+
     def exit_app(self, force_exit=False):
         sure = True
-        if self.dirty and self.options['confirm_exit']: 
+        if self.dirty and self.options['confirm_exit']:
             sure = messagebox.askyesno("Unsaved changes", "There are unsaved changes.\nDo you really want to quit?", default=messagebox.NO)
         if sure:
-            print('[INFO] exiting')
-            self.old_geometry['w'] = self.tk.winfo_width()
-            self.old_geometry['h'] = self.tk.winfo_height() + 20 # don't know why but the window is downsized of 20 pixels compared to asked geometry
-            self.old_geometry['geometry'] = f"{self.old_geometry['w']}x{self.old_geometry['h']}+0+0"
+            if self.debug: print('[INFO] exiting')
+            self.options['width'] = self.tk.winfo_width()
+            # don't know why but the window is downsized of 20 pixels compared to asked geometry
+            self.options['height'] = self.tk.winfo_height() + 20
             self.canvas.destroy()
             self.tk.destroy()
-            print('[INFO] end of exiting')
-    
+            if self.debug:
+                print('[INFO] end of exiting')
+
     def is_linked(self):
         return self.map.filepath is not None
-    
+
     def action_change_pencil(self, index, value, op=None):
         # index is an index of TKINTER OR the source of the call which can be button (from a button) or data (from code). In both case, the value is retrieved from the arg and op is not used.
-        print(f'[INFO] action_change_pencil : {index} {value}')
+        if self.debug:
+            print(f'[INFO] action_change_pencil : {index} {value}')
         if index in ['button', 'data']:
             if value != self.varPencils.get():
                 self.varPencils.set(value) # will call again action_change_pencil
         else:
-            print('[INFO] Refreshing data and bt_pencils')
+            if self.debug:
+                print('[INFO] Refreshing data and bt_pencils')
             self.mod.layer.pencil = self.varPencils.get()
             for val, bt in self.bt_pencils.items():
                 if val == self.mod.layer.pencil:
                     bt.config(relief=SUNKEN)
                 else:
                     bt.config(relief=RAISED)
+            self.refresh_status()
 
     def action_change_texture(self, index, value, op=None):
         if index in ['button', 'data']:
@@ -739,14 +825,17 @@ class Application:
                     self.mod.layer.apply = self.mod.resources[self.mod.layer.res][key].name
                 else:
                     bt.config(relief=RAISED)
-    
+            self.refresh_status()
+
     def action_change_layer(self, index, value, op=None):
-        print(f'[INFO] action_change_layer : {index} {value}')
+        if self.debug:
+            print(f'[INFO] action_change_layer : {index} {value}')
         if index in ['button', 'data']:
             if value != self.varActiveLayer.get():
                 self.varActiveLayer.set(value) # will call again action_change_layer
         else:
-            print('[INFO] Refreshing data and bt_layers')
+            if self.debug:
+                print('[INFO] Refreshing data and bt_layers')
             value = self.varActiveLayer.get()
             self.mod.layer = self.mod.layerHandlers[value]
             for key, bt in self.bt_layers.items():
@@ -760,22 +849,24 @@ class Application:
             if not self.mod.layer.visible:
                 self.mod.layer.visible = True
                 self.action_change_visibility('data', True)
-    
+
     def action_change_visibility(self, index, value, op=None):
         # if there is incoherency between vars and py vars, we resolve it depending on the var which is the default from the menu
-        print(f'[INFO] action_change_visibility : {index} {value}')
+        if self.debug:
+            print(f'[INFO] action_change_visibility : {index} {value}')
         if index == 'data':
             self.varVisibleLayers[self.mod.layer.name].set(self.mod.layerHandlers[self.mod.layer.name].visible)
         else:
-            print('[INFO] Searching for incoherency')
+            if self.debug:
+                print('[INFO] Searching for incoherency')
             for name, var in self.varVisibleLayers.items():
                 if var.get() != self.mod.layerHandlers[name].visible:
                     self.mod.layerHandlers[name].visible = var.get()
             self.refresh_map()
-    
+
     def menu_change_mod(self, index, value, op):
         if self.varMods.get() != self.options['mod']:
-            if self.dirty and self.options['confirm_exit']: 
+            if self.dirty and self.options['confirm_exit']:
                 save = messagebox.askyesno("Unsaved changes", "Do you want to save unsaved changes on the current map?", default=messagebox.YES)
                 if save:
                     self.save_map()
@@ -783,7 +874,7 @@ class Application:
 
     def load_mod_graphics(self):
         # Load mod graphical resources. Tk() object must be created.
-        print(f"[INFO] Loading mod *** {self.options['mod']} *** graphical resources")
+        if self.debug: print(f"[INFO] Loading mod *** {self.options['mod']} *** graphical resources")
         count = 0
         #try:
         for resname, rescontent in self.mod.resources.items():
@@ -795,13 +886,15 @@ class Application:
                 self.mod.resources[resname][objname].name = objname
                 self.mod.num2res[resname][val] = self.mod.resources[resname][objname]
                 count += 1
-            print(f"[INFO]   + loaded {len(self.mod.resources[resname])} for {resname}")
+            if self.debug:
+                print(f"[INFO]   + loaded {len(self.mod.resources[resname])} for {resname}")
         #except:
-        #    raise Exception(f"[ERROR] Impossible to load texture.")  
-        print(f"[INFO]   = {count} graphics loaded")      
-    
+        #    raise Exception(f"[ERROR] Impossible to load texture.")
+        if self.debug:
+            print(f"[INFO]   = {count} graphics loaded")
+
     def build_mod_buttons(self):
-        # Create dynamic buttons for the mod. Tk() and toolbar objects must be created.
+        "Create dynamic buttons for the layers of the mod. Tk() and toolbar objects must be created."
         # Layer buttons
         self.bt_layers = {}
         for layname, lay in self.mod.layerHandlers.items():
@@ -811,12 +904,12 @@ class Application:
             else:
                 self.bt_layers[layname].config(relief=RAISED)
             self.bt_layers[layname].pack(side=LEFT)
-        sep = Label(self.toolbar, text= " ")
-        sep.pack(side=LEFT)
-    
+        self.bt_sep = Label(self.toolbar, text=" ")
+        self.bt_sep.pack(side=LEFT)
+
     def build_layer_buttons(self):
-        # Textures buttons
-        if hasattr(self, 'bt_textures') and len(self.bt_textures) > 0:
+        "Create dynamic buttons for the textures of the layer."
+        if hasattr(self, 'bt_textures') and self.bt_textures is not None and len(self.bt_textures) > 0:
             self.clean_layer_buttons()
         self.bt_textures = {}
         for _, res in self.mod.resources[self.mod.layer.res].items():
@@ -827,36 +920,42 @@ class Application:
             self.bt_textures[res.name].pack(side=LEFT)
 
     def clean_mod_buttons(self):
-        for _, b in self.bt_layers.items():
-            b.destroy()
+        "Clean dynamic buttons for the layers and the textures."
+        for _, button in self.bt_layers.items():
+            button.destroy()
+        self.bt_sep.destroy()
         self.clean_layer_buttons()
-    
+
     def clean_layer_buttons(self):
-        # Clean texture buttons for the mod. Tk() object must be created.
-        for _, b in self.bt_textures.items():
-            b.destroy()
-     
+        "Clean dynamic buttons for the textures of the layer. Tk() object must be created."
+        for _, button in self.bt_textures.items():
+            button.destroy()
+
     #-----------------------------------------------------------
     # Map manipulation
     #-----------------------------------------------------------
     def rename_map(self, name):
+        "Rename current map."
         self.map.set_name(name)
         self.dirty = True
         self.refresh_title()
-    
+
     def save_map(self, filepath=None):
+        "Save current map."
         if filepath is None and self.map.filepath is None:
             name, filepath = self.get_target()
             if name is None:
-                print("[INFO] Unable to save to None")
+                if self.debug:
+                    print("[INFO] Unable to save to None")
                 return
         elif filepath is None:
             filepath = self.map.filepath
         self.map.to_json(filepath, True)
         self.dirty = False
         self.refresh_title()
-    
+
     def refresh_title(self):
+        "Refresh the window title depending on the name of the map."
         if self.map is None:
             txt = f'{self.title}'
         else:
@@ -865,6 +964,7 @@ class Application:
         self.tk.title(txt)
 
     def refresh_tile(self, row, col):
+        "Refresh a tile."
         val = self.map.get(row, col)
         for lay, val in val.items():
             if self.mod.layerHandlers[lay].visible:
@@ -876,8 +976,9 @@ class Application:
             self.canvas.create_rectangle(col * 32, row * 32, (col + 1) * 32, (row + 1) * 32, outline='black')
 
     def refresh_map(self):
+        "Refresh the entire map."
         self.canvas.delete("all")
-        img = Image.new('RGBA', (self.map.width * 32, self.map.height * 32), color = 'black')
+        img = Image.new('RGBA', (self.map.width * 32, self.map.height * 32), color='black')
         for row in range(0, self.map.height):
             for col in range(0, self.map.width):
                 val = self.map.get(row, col)
@@ -885,62 +986,81 @@ class Application:
                     if self.mod.layerHandlers[lay].visible:
                         cont = self.mod.layerHandlers[lay].res
                         if val != 0:
-                            tex = self.mod.num2res[cont][val] 
+                            tex = self.mod.num2res[cont][val]
                             img.alpha_composite(tex.img, (col * 32, row * 32))
                             #img.paste(tex.img, (col * 32, row * 32))
                 if self.options['show_grid']:
                     d = ImageDraw.Draw(img)
-                    d.rectangle((col * 32, row * 32, (col + 1) * 32, (row + 1) * 32), fill=None, outline='black', width=1)
+                    d.rectangle((col * 32, row * 32, (col + 1) * 32, (row + 1) \
+                                 * 32), fill=None, outline='black', width=1)
         self.background = ImageTk.PhotoImage(img)
         self.canvas.create_image(0, 0, anchor=NW, image=self.background)
         self.refresh_title()
         return img
 
     def refresh_status(self, x32=None, y32=None):
+        "Refresh the status bar."
         apply = self.mod.layer.apply
+        pencil = self.mod.layer.pencil
+        start = f"layer = {self.mod.layer.name} apply = {apply} pencil = {pencil}x{pencil} "
         if x32 is None:
-            old = self.status_var.get()
+            old = self.var_status_bar_content.get()
             end = old.find('x/col')
-            self.status_var.set(f"layer = {self.mod.layer.name} apply = {apply} " + old[end:])
+            self.var_status_bar_content.set(start + old[end:])
         else:
-            self.status_var.set(f"layer = {self.mod.layer.name} apply = {apply} x/col = {x32}, y/row = {y32}")
-        
+            self.var_status_bar_content.set(start +
+                                            f"x/col = {x32}, y/row = {y32}")
+
     def set_show_grid(self, index, value, op):
+        "Set show grid."
         self.options['show_grid'] = not self.options['show_grid']
-        print('set', 'i=', index, 'v=', value, 'op=', op, 'show_grid=', self.options['show_grid'])
+        if self.debug:
+            print('set', 'i=', index, 'v=', value, 'op=', op, 'show_grid=', self.options['show_grid'])
         self.refresh_map()
-    
-    def get_show_grid(self, index, value, op):
-        print('get', 'i=', index, 'v=', value, 'op=', op, 'show_grid=', self.options['show_grid'])
-        return self.options['show_grid']
+
+    def set_show_toolbar(self, index, value, op):
+        "Set show toolbar"
+        if self.var_status_bar_display.get():
+            if self.status_bar is None:
+                self.status_bar = Label(self.content,
+                                        textvariable=self.var_status_bar_content,
+                                        relief=SUNKEN, anchor=E)
+                self.status_bar.pack(side=BOTTOM, fill=X)
+        else:
+            if self.status_bar is not None:
+                self.status_bar.destroy()
+                self.status_bar = None
 
     #-----------------------------------------------------------
     # GUI building
     #-----------------------------------------------------------
     def build_gui(self):
-        print("[INFO] Building GUI")
+        if self.debug:
+            print("[INFO] Building GUI")
         self.tk = Tk()
         self.tk.protocol("WM_DELETE_WINDOW", self.exit_app)
 
         self.load_mod_graphics()
-        
+
         # Load images
         BASE_ICONS = True
         try:
             self.tk.iconbitmap(os.path.join('media', 'icons', 'editor.ico'))
             basedir = os.path.join('media', 'icons')
-            icons['new'] = PhotoImage(file=os.path.join(basedir, 'Actions-document-new-icon.png'))
-            icons['open'] = PhotoImage(file=os.path.join(basedir, 'Actions-document-open-icon.png'))
-            icons['save'] = PhotoImage(file=os.path.join(basedir, 'Actions-document-save-icon.png'))
-            icons['save_as'] = PhotoImage(file=os.path.join(basedir, 'Actions-document-save-as-icon.png'))
-            icons['1x1'] = PhotoImage(file=os.path.join(basedir, 'Little.png'))
-            icons['3x3'] = PhotoImage(file=os.path.join(basedir, 'Medium.png'))
-            icons['5x5'] = PhotoImage(file=os.path.join(basedir, 'Big.png'))
+            self.icons['new'] = PhotoImage(file=os.path.join(basedir, 'Actions-document-new-icon.png'))
+            self.icons['open'] = PhotoImage(file=os.path.join(basedir, 'Actions-document-open-icon.png'))
+            self.icons['save'] = PhotoImage(file=os.path.join(basedir, 'Actions-document-save-icon.png'))
+            self.icons['save_as'] = PhotoImage(file=os.path.join(basedir, 'Actions-document-save-as-icon.png'))
+            self.icons['1x1'] = PhotoImage(file=os.path.join(basedir, 'Little.png'))
+            self.icons['3x3'] = PhotoImage(file=os.path.join(basedir, 'Medium.png'))
+            self.icons['5x5'] = PhotoImage(file=os.path.join(basedir, 'Big.png'))
         except TclError:
-            print("[ERROR] Unable to load button icons. No button will be created.")
+            if self.debug:
+                print("[ERROR] Unable to load button icons. No button will be created.")
             BASE_ICONS = False
-        
-        print("[INFO] Creating menu")
+
+        if self.debug:
+            print("[INFO] Creating menu")
         # Menu
         menu = Menu(self.tk)
         self.tk.config(menu=menu)
@@ -956,24 +1076,28 @@ class Application:
         editmenu = Menu(menu, tearoff=0)
         menu.add_cascade(label="Edit", menu=editmenu)
         editmenu.add_command(label="Undo", command=self.menu_undo, accelerator="Ctrl+Z")
-        
+
         self.varShowGrid = BooleanVar()
         self.varShowGrid.set(self.options['show_grid'])
-        #self.varShowGrid.trace('r', app.get_show_grid)
         self.varShowGrid.trace('w', self.set_show_grid)
 
+        self.var_status_bar_display = BooleanVar()
+        self.var_status_bar_display.set(True)
+        self.var_status_bar_display.trace('w', self.set_show_toolbar)
+        
         viewmenu = Menu(menu, tearoff=0)
         menu.add_cascade(label="View", menu=viewmenu)
         viewmenu.add_command(label="Toolbar")
-        viewmenu.add_command(label="Status Bar")
-        viewmenu.add_command(label="Animate")
+        viewmenu.add_checkbutton(label="Status Bar",
+                                 variable=self.var_status_bar_display)
+        #viewmenu.add_command(label="Animate")
         viewmenu.add_command(label="Mini Map")
         viewmenu.add_checkbutton(label="Show Grid", variable=self.varShowGrid)
 
         self.varPencils = IntVar()
         self.varPencils.set(1)
         self.varPencils.trace('w', self.action_change_pencil)
-        
+
         toolsmenu = Menu(menu, tearoff=0)
         menu.add_cascade(label="Tools", menu=toolsmenu)
         pencilmenu = Menu(toolsmenu, tearoff=0)
@@ -983,29 +1107,29 @@ class Application:
         pencilmenu.add_radiobutton(label="5x5", variable=self.varPencils, value=5)
         toolsmenu.add_command(label="Check", command=self.menu_tools_check)
         toolsmenu.add_separator()
-        export_sta = "normal" if PILLOW else "disabled"
+        export_sta = "normal" #if PILLOW else "disabled"
         toolsmenu.add_command(label="Export image", command=self.menu_tools_export_image, state=export_sta)
         toolsmenu.add_command(label="Export binary", command=self.menu_tools_export_binary)
-        
+
         self.varMods = StringVar()
         self.varMods.set(self.options['mod'])
         self.varMods.trace('w', self.menu_change_mod)
-        
+
         modsmenu = Menu(menu, tearoff=0)
         menu.add_cascade(label="Mods", menu=modsmenu)
         for code, modinfo in self.mod.info.items():
             modsmenu.add_radiobutton(label=modinfo.name, variable=self.varMods, value=code)
-        
+
         self.varVisibleLayers = {}
         self.varActiveLayer = StringVar()
         self.varActiveLayer.set(self.mod.layer.name)
         self.varActiveLayer.trace('w', self.action_change_layer)
-        
+
         layersmenu = Menu(menu, tearoff=0)
         menu.add_cascade(label="Layers", menu=layersmenu)
         layervisibilitymenu = Menu(layersmenu, tearoff=0)
         layersmenu.add_cascade(label="Visible layers", menu=layervisibilitymenu)
-        
+
         for name, layer in self.mod.layerHandlers.items():
             self.varVisibleLayers[name] = BooleanVar()
             self.varVisibleLayers[name].set(layer.visible)
@@ -1016,40 +1140,48 @@ class Application:
         layersmenu.add_cascade(label="Active layer", menu=activelayermenu)
         for name, layer in self.mod.layerHandlers.items():
             activelayermenu.add_radiobutton(label=name.title(), variable=self.varActiveLayer, value=name)
-        
+
         self.varPlayer = IntVar()
         self.varPlayer.set(1)
-        
+
         playermenu = Menu(menu, tearoff=0)
         menu.add_cascade(label="Player", menu=playermenu)
         playermenu.add_radiobutton(label="Player 1", variable=self.varPlayer, value=1)
         playermenu.add_radiobutton(label="Player 2", variable=self.varPlayer, value=2)
-        
+
         helpmenu = Menu(menu, tearoff=0)
         menu.add_cascade(label="Help", menu=helpmenu)
         helpmenu.add_command(label="About...", command=self.menu_about)
-        
+
         # Frame
         self.content = Frame(self.tk)
         self.content.pack_propagate(0) # don't let the widget inside it resize it
-        self.tk.geometry(self.old_geometry['geometry'])
+        self.tk.geometry(f"{self.options['width']}x{self.options['height']}+0+0")
         #self.tk.state('zoomed')
 
         # Button bar
-        print("[INFO] Creating toolbar")
+        if self.debug:
+            print("[INFO] Creating toolbar")
         self.toolbar = Frame(self.content)
 
         if BASE_ICONS:
-            bt_new = Button(self.toolbar, image=icons['new'], width=32, height=32, command=self.menu_file_new)
-            bt_open = Button(self.toolbar, image=icons['open'], width=32, height=32, command=self.menu_file_open)
-            bt_save = Button(self.toolbar, image=icons['save'], width=32, height=32, command=self.menu_file_save)
-            bt_save_as = Button(self.toolbar, image=icons['save_as'], width=32, height=32, command=self.menu_file_save_as)
-        
+            bt_new = Button(self.toolbar, image=self.icons['new'], width=32, height=32,
+                            command=self.menu_file_new)
+            bt_open = Button(self.toolbar, image=self.icons['open'], width=32, height=32,
+                             command=self.menu_file_open)
+            bt_save = Button(self.toolbar, image=self.icons['save'], width=32, height=32,
+                             command=self.menu_file_save)
+            bt_save_as = Button(self.toolbar, image=self.icons['save_as'], width=32, height=32,
+                                command=self.menu_file_save_as)
+
             self.bt_pencils = {}
-            self.bt_pencils[1] = Button(self.toolbar, image=icons['1x1'], width=32, height=32, command=lambda: self.action_change_pencil('button', 1), relief=SUNKEN)
-            self.bt_pencils[3] = Button(self.toolbar, image=icons['3x3'], width=32, height=32, command=lambda: self.action_change_pencil('button', 3), relief=RAISED)
-            self.bt_pencils[5] = Button(self.toolbar, image=icons['5x5'], width=32, height=32, command=lambda: self.action_change_pencil('button', 5), relief=RAISED)
-            
+            self.bt_pencils[1] = Button(self.toolbar, image=self.icons['1x1'], width=32, height=32,
+                                        command=lambda: self.action_change_pencil('button', 1), relief=SUNKEN)
+            self.bt_pencils[3] = Button(self.toolbar, image=self.icons['3x3'], width=32, height=32,
+                                        command=lambda: self.action_change_pencil('button', 3), relief=RAISED)
+            self.bt_pencils[5] = Button(self.toolbar, image=self.icons['5x5'], width=32, height=32,
+                                        command=lambda: self.action_change_pencil('button', 5), relief=RAISED)
+
             bt_new.pack(side=LEFT)
             bt_open.pack(side=LEFT)
             bt_save.pack(side=LEFT)
@@ -1060,55 +1192,57 @@ class Application:
                 bt.pack(side=LEFT)
             sep2 = Label(self.toolbar, text=" ")
             sep2.pack(side=LEFT)
-        
+
         self.build_mod_buttons()
         self.build_layer_buttons()
 
         # Canvas
-        print("[INFO] Creating canvas")
+        if self.debug:
+            print("[INFO] Creating canvas")
         x_scrollbar = Scrollbar(self.content, orient=HORIZONTAL)
         y_scrollbar = Scrollbar(self.content, orient=VERTICAL)
         self.canvas = Canvas(self.content,
-                        scrollregion=(0, 0, self.map.width * 32, self.map.height * 32),
-                        xscrollcommand=x_scrollbar.set,
-                        yscrollcommand=y_scrollbar.set)
+                             scrollregion=(0, 0, self.map.width * 32, self.map.height * 32),
+                             xscrollcommand=x_scrollbar.set,
+                             yscrollcommand=y_scrollbar.set)
 
         # Status bar
-        print("[INFO] Creating status bar")
-        self.status_var =  StringVar()
-        self.status_var.set('Welcome')
-        status = Label(self.content, textvariable = self.status_var, relief=SUNKEN, anchor=E)
+        if self.debug:
+            print("[INFO] Creating status bar")
+        self.var_status_bar_content = StringVar()
+        self.var_status_bar_content.set('Welcome')
+        self.status_bar = Label(self.content,
+                                textvariable=self.var_status_bar_content,
+                                relief=SUNKEN, anchor=E)
 
         # Packing
-        print("[INFO] Packing GUI")
-        self.content.pack(fill=BOTH,expand=True)
+        if self.debug:
+            print("[INFO] Packing GUI")
+        self.content.pack(fill=BOTH, expand=True)
         self.toolbar.pack(side=TOP, fill=X)
         y_scrollbar.pack(side=RIGHT, fill=Y)
         x_scrollbar.pack(side=BOTTOM, fill=X)
         self.canvas.pack(side=TOP, fill=BOTH, expand=True)
         x_scrollbar.config(command=self.canvas.xview)
         y_scrollbar.config(command=self.canvas.yview)
-        status.pack(side=BOTTOM, fill=X)
-        
+        self.status_bar.pack(side=BOTTOM, fill=X)
+
         # Canvas
-        print("[INFO] Binding")
-        #canvas.create_line(0, 0, 200, 100)
-        #canvas.create_line(0, 100, 200, 0, fill="red", dash=(4, 4))
-        #canvas.create_rectangle(50, 25, 150, 75, fill="blue")
-        #canvas.create_text(canvas_width / 2, canvas_height / 2, text="Python")
+        if self.debug:
+            print("[INFO] Binding")
         self.canvas.bind('<ButtonPress-1>', self.put_texture)
         self.canvas.bind('<B1-Motion>', self.put_texture)
         #canvas.bind('<ButtonRelease-1>', end_texture)
         self.canvas.bind('<Motion>', self.refresh_status_bar)
-        print("[INFO] GUI init end")
-        
+        if self.debug: print("[INFO] GUI init end")
+
         #Shortcuts
         self.tk.bind('<Control-n>', self.menu_file_new)
         self.tk.bind('<Control-o>', self.menu_file_open)
         self.tk.bind('<Control-s>', self.menu_file_save)
         self.tk.bind('<Control-z>', self.menu_undo)
         self.tk.bind('<Control-q>', self.menu_file_exit)
-    
+
     def run(self):
         self.tk.mainloop()
 
@@ -1133,32 +1267,33 @@ class Application:
         self.dirty = True
         self.previous.do(self, self.map, self.mod.layer, x32, y32, val, pencil)
         self.refresh_title()
-    
-    #-----------------------------------------------------------
-    # Button and menu actions
-    #-----------------------------------------------------------
 
+    #-----------------------------------------------------------
+    # Menu actions
+    #-----------------------------------------------------------
     def menu_undo(self, event=None):
         self.previous.undo()
-    
+
     def menu_file_new(self, event=None):
         d = ChooseSizeDialog(self)
         if d.width is not None:
             self.start_new_map('New map', d.width, d.height, restart=True)
-    
+
     def menu_file_open(self, event=None):
-        filepath = askopenfilename(initialdir = os.getcwd(), title = "Select a file to open", filetypes = (("map files","*.map"),("all files","*.*")))
+        filepath = askopenfilename(initialdir=os.getcwd(), title="Select a file to open",
+                                   filetypes=(("map files", "*.map"), ("all files", "*.*")))
         if filepath != '' and os.path.isfile(filepath):
             self.start_load_map(filepath)
-    
+
     def menu_file_save(self, event=None):
         if self.is_linked():
             self.save_map()
         else:
             self.menu_file_save_as()
-    
+
     def get_target(self):
-        filepath = asksaveasfilename(initialdir = os.getcwd(), title = "Select where to save", filetypes = (("map files","*.map"),("all files","*.*")))
+        filepath = asksaveasfilename(initialdir=os.getcwd(), title="Select where to save",
+                                     filetypes=(("map files", "*.map"), ("all files", "*.*")))
         if filepath != '':
             if not filepath.endswith('.map'):
                 filepath += '.map'
@@ -1167,16 +1302,16 @@ class Application:
             return n, filepath # mymap C:\...\mymap.map
         else:
             return None, None
-    
+
     def menu_file_save_as(self):
         name, filepath = self.get_target()
         if name is not None:
             self.rename_map(name)
             self.save_map(filepath)
-    
+
     def menu_file_exit(self, event=None):
-        res = self.exit_app()
-    
+        self.exit_app()
+
     def menu_about(self):
         info = """
 Teddy, the Tile Grid Editor (or TGE), is a tool for editing grid of tiles.
@@ -1185,25 +1320,26 @@ It is designed to be simple to use and modify to your own needs.
 It is programmed with Python and Tkinter for the interface.
 It only uses the library Pillow as an external dependency.
 
-Damien Gouteux - 2020\n\n"""
-        for key, mod in self.mod.info.items():
-            info += (str(mod) + '\n')
+Damien Gouteux - 2020 - Made with ♥ in Occitania\n\n"""
+        info += "Actual mod: " + str(self.mod)
+        #for _, mod in self.mod.info.items():
+        #    info += (str(mod) + '\n')
         showinfo("About Teddy", info)
-    
+
     def menu_tools_check(self):
-        print('Checking map conformity')
-    
+        if self.debug: print('Checking map conformity')
+
     def menu_tools_export_binary(self):
-        s = pack('<hlf', 1, 2, 3.5) # h:short=2 l:long=4 f:float=4
-        f = open(f"{self.map.name}.bin", "wb")
-        f.write(s)
-        f.close()
-        print(f"[INFO] Map exported as binary in file {self.map.name}.bin")
-    
+        content = struct.pack('<hlf', 1, 2, 3.5) # h:short=2 l:long=4 f:float=4
+        file = open(f"{self.map.name}.bin", "wb")
+        file.write(content)
+        file.close()
+        if self.debug: print(f"[INFO] Map exported as binary in file {self.map.name}.bin")
+
     def menu_tools_export_image(self):
         img = self.refresh_map()
         img.save(f'{self.map.name}.png')
-        print(f"[INFO] Map exported as image in file {self.map.name}.png")
+        if self.debug: print(f"[INFO] Map exported as image in file {self.map.name}.png")
 
     #def menu_choose_object(self):
     #    o = ChooseObjectDialog(self)
@@ -1216,4 +1352,4 @@ Damien Gouteux - 2020\n\n"""
 #-----------------------------------------------------------
 
 if __name__ == "__main__":
-    app = Application()
+    Application(debug=False)
