@@ -2,7 +2,7 @@
 Teddy: A Tile Grid Editor for 2D square maps (FPS, RTS, RPG)
 -----------------------------------------------------------
 Created: May 11, 2019
-Last Modified: February 28, 2020
+Last Modified: March 2, 2020
 version: 0.1.0
 -----------------------------------------------------------
 MIT Licence (Expat License Wording)
@@ -62,6 +62,7 @@ import os
 import os.path
 import configparser
 import struct # pack
+import typedini
 
 from tkinter import Tk, TclError, PhotoImage, Menu, BooleanVar, StringVar, IntVar, Frame, Button,\
      SUNKEN, RAISED, LEFT, Label, Scrollbar, HORIZONTAL, VERTICAL, Canvas, E, BOTH, TOP, X, RIGHT, Y,\
@@ -130,6 +131,9 @@ class Map:
     def set_name(self, name):
         self.name = name
 
+    def check_xy(self, col, row):
+        return row >= 0 and row < self.height and col >= 0 and col <= self.width
+    
     def check(self, row, col, layer, layer_none_ok=False):
         if layer is None and not layer_none_ok:
             raise Exception("[ERROR] Layer not defined.")
@@ -553,11 +557,13 @@ class ModHandler:
 
 class Action:
 
-    def __init__(self, app, amap, layer, x32, y32, content, pencil):
+    def __init__(self, app, amap, layer, start_x, start_y, x32, y32, content, pencil):
         #print(f"[INFO] Action on map '{amap.name}' on layer '{layer.name}' with {content} and pencil={pencil}")
         self.app = app
         self.map = amap
         self.layer = layer
+        self.start_x = start_x
+        self.start_y = start_y
         self.x32 = x32
         self.y32 = y32
         self.content = content
@@ -571,6 +577,11 @@ class Action:
             end_x = self.x32 + 1
             start_y = self.y32
             end_y = self.y32 + 1
+            if self.start_x != self.x32 or self.start_y != self.y32:
+                start_x = min(self.start_x, self.x32)
+                end_x = max(self.start_x, self.x32) + 1
+                start_y = min(self.start_y, self.y32)
+                end_y = max(self.start_y, self.y32) + 1
         elif self.pencil == 3:
             start_x = self.x32 - 1
             end_x = self.x32 + 2
@@ -609,78 +620,20 @@ class ActionList:
         self.previous = []
         self.max_size = max_size
 
-    def do(self, app, amap, layer, x32, y32, content, pencil):
-        if x32 < 0 or y32 < 0 or x32 >= amap.width or y32 >= amap.height:
+    def do(self, app, amap, layer, start_x, start_y, x32, y32, content, pencil):
+        if not amap.check_xy(x32, y32) or not amap.check_xy(start_x, start_y):
             return
-        if amap.get(row=y32, col=x32, layer=layer.name) != content:
-            self.previous.append(Action(app, amap, layer, x32, y32, content, pencil))
-            if len(self.previous) > self.max_size:
-                del self.previous[0]
+        do = False
+        if start_x == x32 and start_y == y32 and amap.get(row=y32, col=x32, layer=layer.name) == content:
+            return
+        self.previous.append(Action(app, amap, layer, start_x, start_y, x32, y32, content, pencil))
+        if len(self.previous) > self.max_size:
+            del self.previous[0]
 
     def undo(self):
         if len(self.previous) > 0:
             self.previous[-1].unresolve()
             self.previous.pop()
-
-
-#-----------------------------------------------------------
-# Option handler class
-#-----------------------------------------------------------
-
-class OptionHandler:
-
-    def __init__(self, application, filepath='config.ini'):
-        self.debug = application.debug
-        self.options = {'filepath' : filepath}
-        self.load_options()
-
-    def load_options(self):
-        self.options['show_grid'] = False
-        self.options['confirm_exit'] = True
-        self.options['mod'] = 'default'
-        self.options['width'] = 800
-        self.options['height'] = 600
-        if os.path.isfile(self.options['filepath']):
-            config = configparser.ConfigParser()
-            config.read('config.ini')
-            if 'MAIN' in config:
-                if 'show_grid' in config['MAIN']:
-                    self.options['show_grid'] = (config['MAIN']['show_grid'] == 'True')
-                if 'confirm_exit' in config['MAIN']:
-                    self.options['confirm_exit'] = (config['MAIN']['confirm_exit'] == 'True')
-                if 'confirm_exit' in config['MAIN']:
-                    self.options['confirm_exit'] = (config['MAIN']['confirm_exit'] == 'True')
-                if 'mod' in config['MAIN']:
-                    self.options['mod'] = config['MAIN']['mod']
-                if 'width' in config['MAIN']:
-                    self.options['width'] = int(config['MAIN']['width'])
-                if 'height' in config['MAIN']:
-                    self.options['height'] = int(config['MAIN']['height'])
-        # create default option file
-        else:
-            self.write_options()
-        if self.debug:
-            print('[INFO] All options:')
-        for o in self.options:
-            if self.debug:
-                print(f"[INFO]     {o:15} = {self.options[o]}")
-
-    def __setitem__(self, opt, value):
-        if self.debug:
-            print(f"[INFO] Setting option {opt} to {value}")
-        self.options[opt] = value
-        self.write_options()
-
-    def write_options(self):
-        config = configparser.ConfigParser()
-        config['MAIN'] = {}
-        for key, val in self.options.items():
-            config['MAIN'][key] = str(val)
-        with open(self.options['filepath'], 'w') as configfile:
-            config.write(configfile)
-
-    def __getitem__(self, key):
-        return self.options[key]
 
 #-----------------------------------------------------------
 # Application class
@@ -691,7 +644,15 @@ class Application:
     def __init__(self, debug=False):
         self.title = 'Tile Grid Editor'
         self.debug = debug
-        self.options = OptionHandler(self)
+        
+        self.options = typedini.OptionSet('config.ini', autosave=True)
+        self.options.register('show_grid', bool, True)
+        self.options.register('confirm_exit', bool, True)
+        self.options.register('mod', str, 'default')
+        self.options.register('width', int, 800)
+        self.options.register('height', int, 600)
+        self.options.read_or_create()
+        
         self.mod = ModHandler(self, self.options['mod'], force_recreate_default=True)
         self.options['mod'] = self.mod.get_loaded_mod()
         self.tk = None
@@ -713,6 +674,10 @@ class Application:
         self.status_bar = None
         self.var_status_bar_content = None
         self.var_status_bar_display = None
+        self.start_x = None
+        self.start_y = None
+        self.drag = False
+        self.drag_rect = None
         self.icons = {}
         self.map = None
         self.start_new_map()
@@ -1235,9 +1200,9 @@ class Application:
         # Canvas
         if self.debug:
             print("[INFO] Binding")
-        self.canvas.bind('<ButtonPress-1>', self.put_texture)
-        self.canvas.bind('<B1-Motion>', self.put_texture)
-        #canvas.bind('<ButtonRelease-1>', end_texture)
+        self.canvas.bind('<ButtonPress-1>', self.enter_drag)
+        self.canvas.bind('<ButtonRelease-1>', self.put_texture)
+        self.canvas.bind('<B1-Motion>', self.draw_drag)
         self.canvas.bind('<Motion>', self.refresh_status_bar)
         if self.debug: print("[INFO] GUI init end")
 
@@ -1264,14 +1229,31 @@ class Application:
         if 0 <= x32 < 32 and 0 <= y32 < 32:
             self.refresh_status(x32, y32)
 
+    def enter_drag(self, event):
+        self.start_x, self.start_y = self.get_map_coord(event)
+        self.drag = True
+    
     def put_texture(self, event):
+        self.drag = False
         x32, y32 = self.get_map_coord(event)
         pencil = self.mod.layer.pencil
         val = self.mod.resources[self.mod.layer.res][self.mod.layer.apply].num
         #print(f'[INFO] {y32} {x32} l={self.layer.name} t={apply} p={pencil}')
         self.dirty = True
-        self.previous.do(self, self.map, self.mod.layer, x32, y32, val, pencil)
+        self.previous.do(self, self.map, self.mod.layer, self.start_x, self.start_y, x32, y32, val, pencil)
         self.refresh_title()
+
+    def draw_drag(self, event):
+        if self.mod.layer.pencil != 1 or not self.drag:
+            return
+        if self.drag_rect is not None:
+            self.canvas.delete(self.drag_rect)
+        x32, y32 = self.get_map_coord(event)
+        minx = min(self.start_x, x32)
+        miny = min(self.start_y, y32)
+        maxx = max(self.start_x, x32)
+        maxy = max(self.start_y, y32)
+        self.drag_rect = self.canvas.create_rectangle(minx * 32, miny * 32, (maxx + 1) * 32, (maxy + 1) * 32, outline='green')
 
     #-----------------------------------------------------------
     # Menu actions
