@@ -67,11 +67,11 @@
         "objects": {
             "heart": {
                 "val": 1,
-                "file": "heart.png"
+                "file": "object-heart.png"
             },
             "goldkey": {
                 "val": 2,
-                "file": "goldkey.png"
+                "file": "object-goldkey.png"
             }
         },
         "numbers_HL": {
@@ -129,27 +129,27 @@
         "icons": {
             "ground": {
                 "val": 1,
-                "file": "ground.png"
+                "file": "layer-ground.png"
             },
             "wall": {
                 "val": 2,
-                "file": "wall.png"
+                "file": "layer-wall.png"
             },
             "ceiling": {
                 "val": 3,
-                "file": "ceiling.png"
+                "file": "layer-ceiling.png"
             },
             "height": {
                 "val": 4,
-                "file": "height.png"
+                "file": "layer-height.png"
             },
             "area": {
                 "val": 5,
-                "file": "area.png"
+                "file": "layer-area.png"
             },
             "object": {
                 "val": 6,
-                "file": "object.png"
+                "file": "layer-object.png"
             }
         }
     },

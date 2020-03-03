@@ -35,12 +35,25 @@
             "redbrick3bars"    : { "val" : 13, "file" : "12-red_brick_wall_bars.bmp"   }
         },
         "objects" : {
-            "ammo"      : { "val" : 1, "file" : "ammo.png"       },
-            "life"      : { "val" : 2, "file" : "burger.png"     },
-            "goldkey"   : { "val" : 3, "file" : "key-gold.png"   },
-            "silverkey" : { "val" : 4, "file" : "key-silver.png" },
-            "heart"     : { "val" : 5, "file" : "heart.png"      },
-            "start"     : { "val" : 6, "file" : "start.png"      }
+            "ammo"       : { "val" :   1, "file" : "object-ammo.png"            },
+            "burger"     : { "val" :   2, "file" : "object-burger.png"          },
+            "goldkey"    : { "val" :   3, "file" : "object-key-gold.png"        },
+            "silverkey"  : { "val" :   4, "file" : "object-key-silver.png"      },
+            "heart"      : { "val" :   5, "file" : "object-heart.png"           },
+            "start"      : { "val" :   6, "file" : "object-start.png"           },
+            "coin"       : { "val" :   7, "file" : "object-coin.png"            },
+            "gold-lingo" : { "val" :   8, "file" : "object-gold-lingo.png"      },
+            "lantern"    : { "val" :   9, "file" : "object-lantern.png"         },
+            "purse"      : { "val" :  10, "file" : "object-purse.png"           },
+            "rose"       : { "val" :  11, "file" : "object-rose.png"            },
+            "rubis"      : { "val" :  12, "file" : "object-rubis.png"           },
+            "badge"      : { "val" :  13, "file" : "object-sheriff-badge.png"   },
+            "knife"      : { "val" : 100, "file" : "object-weapon-knife.png"    },
+            "pistol"     : { "val" : 101, "file" : "object-weapon-pistol.png"   },
+            "shotgun"    : { "val" : 102, "file" : "object-weapon-shotgun.png"  },
+            "rifle"      : { "val" : 103, "file" : "object-weapon-rifle.png"    },
+            "chaingun"   : { "val" : 104, "file" : "object-weapon-chaingun.png" },
+            "dynamite"   : { "val" : 105, "file" : "object-weapon-dynamite.png" }
         },
         "numbers_HL" : {
             "one"     : { "val" : 1, "file" : "num_hl_1.png" },
@@ -59,12 +72,12 @@
             "six"     : { "val" : 6, "file" : "num_br_6.png" }
         },
         "icons" : {
-            "ground"  : { "val" : 1, "file" : "ground.png"  },
-            "wall"    : { "val" : 2, "file" : "wall.png"    },
-            "ceiling" : { "val" : 3, "file" : "ceiling.png" },
-            "height"  : { "val" : 4, "file" : "height.png"  },
-            "area"    : { "val" : 5, "file" : "area.png"    },
-            "object"  : { "val" : 6, "file" : "object.png"  }
+            "ground"  : { "val" : 1, "file" : "layer-ground.png"  },
+            "wall"    : { "val" : 2, "file" : "layer-wall.png"    },
+            "ceiling" : { "val" : 3, "file" : "layer-ceiling.png" },
+            "height"  : { "val" : 4, "file" : "layer-height.png"  },
+            "area"    : { "val" : 5, "file" : "layer-area.png"    },
+            "object"  : { "val" : 6, "file" : "layer-object.png"  }
         }
     },
     "default_layer" : "wall",
