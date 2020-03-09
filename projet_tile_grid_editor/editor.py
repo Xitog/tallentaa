@@ -1231,7 +1231,7 @@ class Application:
         self.canvas.bind('<ButtonRelease-1>', self.put_texture)
         self.canvas.bind('<B1-Motion>', self.draw_drag)
         self.canvas.bind('<Motion>', self.refresh_status_bar)
-        self.canvas.bind('<Leave>', self.exit_drag)
+        self.canvas.bind('<Leave>', self.invalid_drag)
         if self.debug: print("[INFO] GUI init end")
 
         #Shortcuts
@@ -1257,8 +1257,11 @@ class Application:
         if 0 <= x32 < 32 and 0 <= y32 < 32:
             self.refresh_status(x32, y32)
 
-    def exit_drag(self, event):
+    def invalid_drag(self, event):
         self.start_x, self.start_y = None, None
+        self.exit_drag(event)
+    
+    def exit_drag(self, event=None):
         self.drag = False
         if self.drag_rect is not None:
             self.canvas.delete(self.drag_rect)
@@ -1268,7 +1271,7 @@ class Application:
         self.drag = True
     
     def put_texture(self, event):
-        self.drag = False
+        self.exit_drag(event)
         x32, y32 = self.get_map_coord(event)
         pencil = self.mod.layer.pencil
         val = self.mod.resources[self.mod.layer.res][self.mod.layer.apply].num
