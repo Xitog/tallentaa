@@ -145,7 +145,7 @@ class Map:
 
     def check_xy(self, col, row):
         if col is None or row is None: return False
-        return row >= 0 and row < self.height and col >= 0 and col <= self.width
+        return row >= 0 and row < self.height and col >= 0 and col < self.width
     
     def check(self, row, col, layer, layer_none_ok=False):
         if layer is None and not layer_none_ok:
@@ -642,11 +642,12 @@ class ActionList:
         self.max_size = max_size
 
     def do(self, app, amap, layer, start_x, start_y, x32, y32, content, pencil):
-        if not amap.check_xy(x32, y32) or not amap.check_xy(start_x, start_y):
+        if not amap.check_xy(col=x32, row=y32) or not amap.check_xy(start_x, start_y):
             return
         do = False
-        if start_x == x32 and start_y == y32 and amap.get(row=y32, col=x32, layer=layer.name) == content:
-            return
+        if start_x == x32 and start_y == y32:
+            if not amap.check_xy(col=x32, row=y32) or amap.get(row=y32, col=x32, layer=layer.name) == content:
+                return
         self.previous.append(Action(app, amap, layer, start_x, start_y, x32, y32, content, pencil))
         if len(self.previous) > self.max_size:
             del self.previous[0]
