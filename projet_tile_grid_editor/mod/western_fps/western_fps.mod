@@ -1,22 +1,23 @@
 {
     "filetype" : "mod",
-    "version" : 1.0,
-    "name" : "Western FPS",
-    "licence" : "Creative Commons Zero (CC0)",
-    "creator" : "Created at Sparklin Labs by Pixel-boy",
+    "version"  : 1.0,
+    "name"     : "Western FPS",
+    "licence"  : "Creative Commons Zero (CC0)",
+    "creator"  : "Created at Sparklin Labs by Pixel-boy",
     "websites" : {
-        "Pixel-boy" : "https://twitter.com/2pblog1",
+        "Pixel-boy"     : "https://twitter.com/2pblog1",
         "Sparklin Labs" : "https://sparklinlabs.itch.io/superpowers",
-        "Superpowers" : "http://superpowers-html5.com/",
-        "Github" : "https://github.com/sparklinlabs/superpowers-asset-packs"
+        "Superpowers"   : "http://superpowers-html5.com/",
+        "Github"        : "https://github.com/sparklinlabs/superpowers-asset-packs"
     },
     "layers" : {
-        "ground"  : { "res" : "textures",   "default" : "void", "apply" : "redbrick",  "visible" : true },
+        "ground"  : { "res" : "textures",   "default" : "void", "apply" : "redbrick",  "visible" : true  },
         "wall"    : { "res" : "textures",   "default" : 0,      "apply" : "greystone", "visible" : true  },
         "ceiling" : { "res" : "textures",   "default" : 0,      "apply" : "red",       "visible" : false },
         "height"  : { "res" : "numbers_HL", "default" : "one",  "apply" : "two",       "visible" : false },
         "area"    : { "res" : "numbers_BR", "default" : 0,      "apply" : "one",       "visible" : false },
-        "object"  : { "res" : "objects",    "default" : 0,      "apply" : "ammo",      "visible" : true  }
+        "object"  : { "res" : "objects",    "default" : 0,      "apply" : "ammo",      "visible" : true  },
+        "monster" : { "res" : "monsters",   "default" : 0,      "apply" : "enemy1",    "visible" : true, "parent" : "object"}
     },
     "resources" : {
         "textures" : {
@@ -32,45 +33,58 @@
             "redbrick"         : { "val" : 10, "file" : "9-red_brick_wall.bmp"         },
             "redbrick1light"   : { "val" : 11, "file" : "10-red_brick_wall_light.bmp"  },
             "redbrick2pillar"  : { "val" : 12, "file" : "11-red_brick_wall_pillar.bmp" },
-            "redbrick3bars"    : { "val" : 13, "file" : "12-red_brick_wall_bars.bmp"   }
+            "redbrick3bars"    : { "val" : 13, "file" : "12-red_brick_wall_bars.bmp"   },
+            "cream-wall"       : { "val" : 14, "file" : "texture-cream-wall.png"       },
+            "yellow-wall"      : { "val" : 15, "file" : "texture-yellow-wall.png"      }            
         },
         "objects" : {
-            "ammo"       : { "val" :   1, "file" : "object-ammo-ico.png"            },
-            "burger"     : { "val" :   2, "file" : "object-burger-ico.png"          },
-            "goldkey"    : { "val" :   3, "file" : "object-key-gold-ico.png"        },
-            "silverkey"  : { "val" :   4, "file" : "object-key-silver-ico.png"      },
-            "heart"      : { "val" :   5, "file" : "object-heart.png"               },
-            "start"      : { "val" :   6, "file" : "object-start-ico.png"           },
-            "coin"       : { "val" :   7, "file" : "object-coin-ico.png"            },
-            "gold-lingo" : { "val" :   8, "file" : "object-gold-lingo-ico.png"      },
-            "lantern"    : { "val" :   9, "file" : "object-lantern-ico.png"         },
-            "purse"      : { "val" :  10, "file" : "object-purse-ico.png"           },
-            "rose"       : { "val" :  11, "file" : "object-rose-ico.png"            },
-            "rubis"      : { "val" :  12, "file" : "object-rubis-ico.png"           },
-            "badge"      : { "val" :  13, "file" : "object-sheriff-badge-ico.png"   },
+            "start"      : { "val" :   1, "file" : "object-start-ico.png"           },
+            "goldkey"    : { "val" :   2, "file" : "object-key-gold-ico.png"        },
+            "silverkey"  : { "val" :   3, "file" : "object-key-silver-ico.png"      },
+            "burger"     : { "val" :   4, "file" : "object-burger-ico.png"          },
+            "coin"       : { "val" :   5, "file" : "object-coin-ico.png"            },
+            "gold-lingo" : { "val" :   6, "file" : "object-gold-lingo-ico.png"      },
+            "purse"      : { "val" :   7, "file" : "object-purse-ico.png"           },
+            "lantern"    : { "val" :   8, "file" : "object-lantern-ico.png"         },
+            "rose"       : { "val" :   9, "file" : "object-rose-ico.png"            },
+            "rubis"      : { "val" :  10, "file" : "object-rubis-ico.png"           },
+            "badge"      : { "val" :  11, "file" : "object-sheriff-badge-ico.png"   },
+            "ammo"       : { "val" :  12, "file" : "object-ammo-ico.png"            },
             "knife"      : { "val" : 100, "file" : "object-weapon-knife-ico.png"    },
             "pistol"     : { "val" : 101, "file" : "object-weapon-pistol-ico.png"   },
             "shotgun"    : { "val" : 102, "file" : "object-weapon-shotgun-ico.png"  },
             "rifle"      : { "val" : 103, "file" : "object-weapon-rifle-ico.png"    },
             "chaingun"   : { "val" : 104, "file" : "object-weapon-chaingun-ico.png" },
-            "dynamite"   : { "val" : 105, "file" : "object-weapon-dynamite-ico.png" },
-            "enemy1"     : { "val" : 200, "file" : "enemy-cowboy-1-ico.png"         }
+            "dynamite"   : { "val" : 105, "file" : "object-weapon-dynamite-ico.png" }
+        },
+        "monsters" : {
+            "enemy1"     : { "val" : 200, "file" : "enemy-cowboy-1-ico.png"         },
+            "poncho"     : { "val" : 201, "file" : "enemy-cowboy-poncho-ico.png"    },
+            "clerc"      : { "val" : 202, "file" : "enemy-cowboy-clerc-ico.png"     }
         },
         "numbers_HL" : {
-            "one"     : { "val" : 1, "file" : "num_hl_1.png" },
-            "two"     : { "val" : 2, "file" : "num_hl_2.png" },
-            "three"   : { "val" : 3, "file" : "num_hl_3.png" },
-            "four"    : { "val" : 4, "file" : "num_hl_4.png" },
-            "five"    : { "val" : 5, "file" : "num_hl_5.png" },
-            "six"     : { "val" : 6, "file" : "num_hl_6.png" }
+            "one"     : { "val" :  1, "file" : "num_hl_1.png"  },
+            "two"     : { "val" :  2, "file" : "num_hl_2.png"  },
+            "three"   : { "val" :  3, "file" : "num_hl_3.png"  },
+            "four"    : { "val" :  4, "file" : "num_hl_4.png"  },
+            "five"    : { "val" :  5, "file" : "num_hl_5.png"  },
+            "six"     : { "val" :  6, "file" : "num_hl_6.png"  },
+            "seven"   : { "val" :  7, "file" : "num_hl_7.png"  },
+            "eight"   : { "val" :  8, "file" : "num_hl_8.png"  },
+            "nine"    : { "val" :  9, "file" : "num_hl_9.png"  },
+            "ten"     : { "val" : 10, "file" : "num_hl_10.png" }
         },
         "numbers_BR" : {
-            "one"     : { "val" : 1, "file" : "num_br_1.png" },
-            "two"     : { "val" : 2, "file" : "num_br_2.png" },
-            "three"   : { "val" : 3, "file" : "num_br_3.png" },
-            "four"    : { "val" : 4, "file" : "num_br_4.png" },
-            "five"    : { "val" : 5, "file" : "num_br_5.png" },
-            "six"     : { "val" : 6, "file" : "num_br_6.png" }
+            "one"     : { "val" :  1, "file" : "num_br_1.png" },
+            "two"     : { "val" :  2, "file" : "num_br_2.png" },
+            "three"   : { "val" :  3, "file" : "num_br_3.png" },
+            "four"    : { "val" :  4, "file" : "num_br_4.png" },
+            "five"    : { "val" :  5, "file" : "num_br_5.png" },
+            "six"     : { "val" :  6, "file" : "num_br_6.png" },
+            "seven"   : { "val" :  7, "file" : "num_br_7.png"  },
+            "eight"   : { "val" :  8, "file" : "num_br_8.png"  },
+            "nine"    : { "val" :  9, "file" : "num_br_9.png"  },
+            "ten"     : { "val" : 10, "file" : "num_br_10.png" }
         },
         "icons" : {
             "ground"  : { "val" : 1, "file" : "layer-ground.png"  },
@@ -78,9 +92,10 @@
             "ceiling" : { "val" : 3, "file" : "layer-ceiling.png" },
             "height"  : { "val" : 4, "file" : "layer-height.png"  },
             "area"    : { "val" : 5, "file" : "layer-area.png"    },
-            "object"  : { "val" : 6, "file" : "layer-object.png"  }
+            "object"  : { "val" : 6, "file" : "layer-object.png"  },
+            "monster" : { "val" : 7, "file" : "layer-monster.png" }
         }
     },
-    "default_layer" : "wall",
+    "default_layer"  : "wall",
     "has_transition" : false
 }

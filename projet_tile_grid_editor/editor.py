@@ -90,7 +90,7 @@ class SimpleImage:
         # self.tkimg = PhotoImage(file=self.path)
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     def __repr__(self):
         return self.path
@@ -117,6 +117,8 @@ class Map:
         self.mod = mod
         self.layers = {}
         self.defaults = {}
+        self.virtuals = {}
+        self.values = {}
         self.width = max_col
         self.height = max_row
         self.filepath = None
@@ -131,11 +133,15 @@ class Map:
         self.width = width
         self.height = height
 
-    def add_layer(self, name, val):
+    def add_layer(self, name, val, values, parent=None):
         if not isinstance(val, int):
             raise Exception(f'[ERROR] Only integer accepted, not {val.__class__.__name__}')
-        self.layers[name] = Map.create_matrix(self.width, self.height, val)
-        self.defaults[name] = val
+        if parent is None:
+            self.layers[name] = Map.create_matrix(self.width, self.height, val)
+            self.defaults[name] = val
+        else:
+            self.virtuals[name] = parent
+        self.values[name] = values
 
     def __repr__(self):
         return f"{self.name} {self.width}x{self.height} [{self.mod}]"
@@ -148,6 +154,7 @@ class Map:
         return row >= 0 and row < self.height and col >= 0 and col < self.width
     
     def check(self, row, col, layer, layer_none_ok=False):
+        layer = self.resolve(layer)
         if layer is None and not layer_none_ok:
             raise Exception("[ERROR] Layer not defined.")
         elif layer is not None and layer not in self.layers:
@@ -157,18 +164,30 @@ class Map:
         elif col < 0 or col >= self.width:
             raise Exception(f"[ERROR] Out of col: {col} / {self.width}")
 
+    def resolve(self, layer):
+        if layer in self.virtuals:
+            return self.virtuals[layer]
+        else:
+            return layer
+    
     def set(self, row, col, val, layer):
         self.check(row, col, layer)
-        self.layers[layer][row][col] = val
+        self.layers[self.resolve(layer)][row][col] = val
 
     def get(self, row, col, layer=None):
         self.check(row, col, layer, True)
         if layer is not None:
-            return self.layers[layer][row][col]
+            return self.layers[self.resolve(layer)][row][col]
         else:
             res = {}
             for lay in self.layers:
-                res[lay] = self.layers[lay][row][col]
+                c = self.layers[lay][row][col]
+                if c in self.values[lay]: # filter all 0
+                    res[lay] = c
+                else: # virtual layers
+                    for vlay, values in self.values.items():
+                        if c in values and self.virtuals[vlay] == lay:
+                            res[vlay] = c
             return res
 
     @staticmethod
@@ -344,9 +363,54 @@ class ChooseSizeDialog(Dialog):
 # Layer handler
 #-----------------------------------------------------------
 
+class ContentSet:
+
+    def __init__(self, mod, name):
+        self.mod = mod
+        self.name = name
+        self.resources = {}
+        self.num2name = {}
+        self.name2num = {}
+
+    def register(self, name, val, file):
+        self.resources[name] = file
+        self.num2name[val] = name
+        self.name2num[name] = val
+    
+    def get_default_num(self, val):
+        if isinstance(val, str):
+            return self.name2num[val]
+        else:
+            return val
+
+    def nums(self):
+        return list(self.num2name.keys())
+
+    def load(self):
+        count = 0
+        for name, f in self.resources.items():
+            num = self.name2num[name]
+            self.resources[name] = SimpleImage(self.mod.autoload(f), name, num)
+            count += 1
+            if self.mod.debug:
+                print(f"[INFO]   + loaded for {self.name:10} [{count:2d}] : {f}")
+        #except:
+        #    raise Exception(f"[ERROR] Impossible to load texture.")
+        return count
+
+    def __getitem__(self, val):
+        if isinstance(val, str):
+            return self.resources[val]
+        elif isinstance(val, int):
+            return self.resources[self.num2name[val]]
+        else:
+            raise Exception(f"Type unknwon: {type(val)}")
+
+
 class LayerHandler:
 
-    def __init__(self, name, content, default, apply, pencil=1, visible=True):
+    def __init__(self, name, content, default, apply, pencil=1, visible=True,
+                 parent=None):
         self.name = name
         self.res = content
         self.default = default
@@ -356,7 +420,14 @@ class LayerHandler:
         self.type = None # SimpleImage or Integer
         self.visible = visible
         self.apply = apply
+        self.parent = parent
 
+    def get_parent_name(self):
+        if self.parent is None:
+            return None
+        else:
+            return self.parent.name
+    
     def __str__(self):
         s = f"name={self.name} default={self.default} " + \
             f"pencil={self.pencil} visible={self.visible}"
@@ -382,8 +453,8 @@ class ModInfo:
 
     def __str__(self):
         s = f"{self.name}\n{'_'*len(self.name)}\n{self.creator}\n{self.licence}\n"
-        for w in self.websites:
-            s += w + '\n'
+        for w, url in self.websites.items():
+            s += w + ' : ' + url + '\n'
         return s
 
 class ModHandler:
@@ -518,7 +589,7 @@ class ModHandler:
         json.dump(data, f, indent='    ')
 
     def autoload(self, filename):
-        if self.debug: print(f"[INFO] autoload -> Loading {filename}")
+        #if self.debug: print(f"[INFO] autoload -> Loading {filename}")
         graphics_dir = os.path.join(self.mod_dir, self.code, 'graphics')
         if not os.path.isdir(graphics_dir):
             os.makedirs(graphics_dir)
@@ -557,18 +628,22 @@ class ModHandler:
         self.mod_data['graphics_dir'] = os.path.join(mod_dir, 'graphics')
         # Prepare resources
         self.resources = {}
-        self.num2res = {}
         for resname, rescontent in self.mod_data['resources'].items():
-            self.resources[resname] = {}
-            self.num2res[resname] = {}
+            self.resources[resname] = ContentSet(self, resname)
             for objname, objcontent in rescontent.items():
-                self.resources[resname][objname] = (objcontent['val'],
-                                                    objcontent['file'])
-                self.num2res[resname][objcontent['val']] = objname
+                self.resources[resname].register(objname, objcontent['val'],
+                                                 objcontent['file'])
         # Prepare layers
         self.layerHandlers = {}
         for layname, laycontent in self.mod_data["layers"].items():
-            self.layerHandlers[layname] = LayerHandler(layname, laycontent['res'], laycontent['default'], laycontent['apply'], 1, laycontent['visible'])
+            p = None
+            if 'parent' in laycontent:
+                p =  self.layerHandlers[laycontent['parent']]
+            self.layerHandlers[layname] = LayerHandler(layname,
+                                                       laycontent['res'],
+                                                       laycontent['default'],
+                                                       laycontent['apply'], 1,
+                                                       laycontent['visible'], p)
         self.layer = self.layerHandlers[self.mod_data["default_layer"]]
         if self.debug: print(f"[INFO] Mod *** {self.code} *** loaded.")
 
@@ -692,6 +767,7 @@ class Application:
         self.varPlayer = None
         self.content = None
         self.toolbar = None
+        self.toolbar_content = None
         self.canvas = None
         self.status_bar = None
         self.var_status_bar_content = None
@@ -718,16 +794,9 @@ class Application:
         self.set_map(Map(title, width, height, self.options['mod']))
         for layname, lay in self.mod.layerHandlers.items():
             lay_cont = lay.res
-            def_code = lay.default
-            if lay_cont != 'int' and def_code != 0:
-                if type(self.mod.resources[lay_cont][def_code]) != SimpleImage:
-                    # if restart=False, at this step, contains (val, file). Else SimpleImage
-                    def_num = self.mod.resources[lay_cont][def_code][0]
-                else:
-                    def_num = self.mod.resources[lay_cont][def_code].num
-            else:
-                def_num = def_code
-            self.map.add_layer(lay.name, def_num) # set the map and its size
+            def_code = self.mod.resources[lay.res].get_default_num(lay.default)
+            values   = self.mod.resources[lay.res].nums()
+            self.map.add_layer(lay.name, def_code, values, lay.get_parent_name())
         if not restart:
             self.build_gui() # need the size of the map in order to create the scrollbars
         else:
@@ -868,20 +937,8 @@ class Application:
         # Load mod graphical resources. Tk() object must be created.
         if self.debug: print(f"[INFO] Loading mod *** {self.options['mod']} *** graphical resources")
         count = 0
-        #try:
-        for resname, rescontent in self.mod.resources.items():
-            for objname, objcontent in rescontent.items():
-                val, file = self.mod.resources[resname][objname]
-                #print(f"[INFO] Loading graphic {file:18}")
-                self.mod.resources[resname][objname] = SimpleImage(self.mod.autoload(file))
-                self.mod.resources[resname][objname].num = val
-                self.mod.resources[resname][objname].name = objname
-                self.mod.num2res[resname][val] = self.mod.resources[resname][objname]
-                count += 1
-            if self.debug:
-                print(f"[INFO]   + loaded {len(self.mod.resources[resname])} for {resname}")
-        #except:
-        #    raise Exception(f"[ERROR] Impossible to load texture.")
+        for _, ct in self.mod.resources.items():
+            count += ct.load()
         if self.debug:
             print(f"[INFO]   = {count} graphics loaded")
 
@@ -909,9 +966,14 @@ class Application:
         if hasattr(self, 'bt_textures') and self.bt_textures is not None and len(self.bt_textures) > 0:
             self.clean_content_buttons()
         self.bt_textures = {}
-        for _, res in self.mod.resources[self.mod.layer.res].items():
+        for _, res in self.mod.resources[self.mod.layer.res].resources.items():
             #print(f'[INFO] Creating button for {self.layer.name} : {res.name}')
-            self.bt_textures[res.name] = Button(self.toolbar, image=res.tkimg, width=32, height=32, command=partial(self.action_change_texture, 'button', res.num))
+            self.bt_textures[res.name] = Button(self.toolbar_content,
+                                                image=res.tkimg, width=32,
+                                                height=32,
+                                                command=partial(
+                                                    self.action_change_texture,
+                                                    'button', res.num))
             if self.mod.layer.apply == res.name:
                 self.bt_textures[res.name].config(relief=SUNKEN)
             self.bt_textures[res.name].pack(side=LEFT)
@@ -965,9 +1027,9 @@ class Application:
         val = self.map.get(row, col)
         for lay, val in val.items():
             if self.mod.layerHandlers[lay].visible:
-                cont = self.mod.layerHandlers[lay].res
+                res = self.mod.layerHandlers[lay].res
                 if val != 0:
-                    tex = self.mod.num2res[cont][val]
+                    tex = self.mod.resources[res][val]
                     self.canvas.create_image(col * 32, row * 32, anchor=NW, image=tex.tkimg)
         if self.options['show_grid']:
             self.canvas.create_rectangle(col * 32, row * 32, (col + 1) * 32, (row + 1) * 32, outline='black')
@@ -981,9 +1043,9 @@ class Application:
                 val = self.map.get(row, col)
                 for lay, val in val.items():
                     if self.mod.layerHandlers[lay].visible:
-                        cont = self.mod.layerHandlers[lay].res
+                        res = self.mod.layerHandlers[lay].res
                         if val != 0:
-                            tex = self.mod.num2res[cont][val]
+                            tex = self.mod.resources[res][val]
                             img.alpha_composite(tex.img, (col * 32, row * 32))
                             #img.paste(tex.img, (col * 32, row * 32))
                 if self.options['show_grid']:
@@ -1015,8 +1077,8 @@ class Application:
             print('set', 'i=', index, 'v=', value, 'op=', op, 'show_grid=', self.options['show_grid'])
         self.refresh_map()
 
-    def set_show_toolbar(self, index, value, op):
-        "Set show toolbar"
+    def set_show_statusbar(self, index, value, op):
+        "Set show statusbar"
         if self.var_status_bar_display.get():
             if self.status_bar is None:
                 self.status_bar = Label(self.content,
@@ -1081,7 +1143,7 @@ class Application:
 
         self.var_status_bar_display = BooleanVar()
         self.var_status_bar_display.set(True)
-        self.var_status_bar_display.trace('w', self.set_show_toolbar)
+        self.var_status_bar_display.trace('w', self.set_show_statusbar)
         
         viewmenu = Menu(menu, tearoff=0)
         menu.add_cascade(label="View", menu=viewmenu)
@@ -1161,7 +1223,8 @@ class Application:
         if self.debug:
             print("[INFO] Creating toolbar")
         self.toolbar = Frame(self.content)
-
+        self.toolbar_content = Frame(self.content)
+        
         if BASE_ICONS:
             bt_new = Button(self.toolbar, image=self.icons['new'], width=32, height=32,
                             command=self.menu_file_new)
@@ -1218,6 +1281,7 @@ class Application:
             print("[INFO] Packing GUI")
         self.content.pack(fill=BOTH, expand=True)
         self.toolbar.pack(side=TOP, fill=X)
+        self.toolbar_content.pack(side=TOP, fill=X)
         y_scrollbar.pack(side=RIGHT, fill=Y)
         x_scrollbar.pack(side=BOTTOM, fill=X)
         self.canvas.pack(side=TOP, fill=BOTH, expand=True)
