@@ -60,7 +60,9 @@
         "monsters" : {
             "enemy1"     : { "val" : 200, "file" : "enemy-cowboy-1-ico.png"         },
             "poncho"     : { "val" : 201, "file" : "enemy-cowboy-poncho-ico.png"    },
-            "clerc"      : { "val" : 202, "file" : "enemy-cowboy-clerc-ico.png"     }
+            "clerc"      : { "val" : 202, "file" : "enemy-cowboy-clerc-ico.png"     },
+            "grizzly1"   : { "val" : 203, "file" : "enemy-grizzli-1-ico.png"        },
+            "grizzly2"   : { "val" : 204, "file" : "enemy-grizzli-2-ico.png"        }
         },
         "numbers_HL" : {
             "one"     : { "val" :  1, "file" : "num_hl_1.png"  },
