@@ -13,8 +13,8 @@
     "layers" : {
         "ground"  : { "res" : "textures",   "default" : "void", "apply" : "redbrick",  "visible" : true  },
         "wall"    : { "res" : "textures",   "default" : 0,      "apply" : "greystone", "visible" : true  },
-        "ceiling" : { "res" : "textures",   "default" : 0,      "apply" : "red",       "visible" : false },
-        "height"  : { "res" : "numbers_HL", "default" : "one",  "apply" : "two",       "visible" : false },
+        "ceiling" : { "res" : "textures",   "default" : 0,      "apply" : "redbrick",  "visible" : false },
+        "height"  : { "res" : "numbers_HL", "default" : 0,      "apply" : "one",       "visible" : false },
         "area"    : { "res" : "numbers_BR", "default" : 0,      "apply" : "one",       "visible" : false },
         "object"  : { "res" : "objects",    "default" : 0,      "apply" : "ammo",      "visible" : true  },
         "monster" : { "res" : "monsters",   "default" : 0,      "apply" : "enemy1",    "visible" : true, "parent" : "object"}

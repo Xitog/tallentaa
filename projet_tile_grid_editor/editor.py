@@ -182,12 +182,19 @@ class Map:
             res = {}
             for lay in self.layers:
                 c = self.layers[lay][row][col]
-                if c in self.values[lay]: # filter all 0
+                if c == 0 or c in self.values[lay]: # accept always 0
                     res[lay] = c
                 else: # virtual layers
+                    found = False
                     for vlay, values in self.values.items():
-                        if c in values and self.virtuals[vlay] == lay:
-                            res[vlay] = c
+                        if vlay in self.virtuals:
+                            if c in values and self.virtuals[vlay] == lay:
+                                res[vlay] = c
+                                found = True
+                    if not found:
+                        print(f'Unknown value = {c} for layer {vlay}')
+                        print(f'Authorized values are: {self.values[vlay]}')
+                        raise Exception(f"FATAL ERROR: UNKOWN VALUE {c} FOR LAYER {vlay}")
             return res
 
     @staticmethod
@@ -372,6 +379,12 @@ class ContentSet:
         self.num2name = {}
         self.name2num = {}
 
+    def __str__(self):
+        return f"{self.name} : ContentSet ({len(self.resources)})"
+
+    def __repr__(self):
+        return str(self)
+
     def register(self, name, val, file):
         self.resources[name] = file
         self.num2name[val] = name
@@ -390,21 +403,23 @@ class ContentSet:
         count = 0
         for name, f in self.resources.items():
             num = self.name2num[name]
-            self.resources[name] = SimpleImage(self.mod.autoload(f), name, num)
-            count += 1
-            if self.mod.debug:
-                print(f"[INFO]   + loaded for {self.name:10} [{count:2d}] : {f}")
-        #except:
-        #    raise Exception(f"[ERROR] Impossible to load texture.")
+            try:
+                self.resources[name] = SimpleImage(self.mod.autoload(f), name, num)
+                count += 1
+                if self.mod.debug:
+                    print(f"[INFO]   + loaded for {self.name:10} [{count:2d}] : {name} -> {f}")
+            except:
+                raise Exception(f"[ERROR] Impossible to load texture {f}.")
         return count
 
     def __getitem__(self, val):
-        if isinstance(val, str):
-            return self.resources[val]
-        elif isinstance(val, int):
-            return self.resources[self.num2name[val]]
-        else:
-            raise Exception(f"Type unknwon: {type(val)}")
+        if isinstance(val, int):
+            val = self.num2name[val]
+        elif not isinstance(val, str):
+            raise Exception(f"Type unknwon for index: {type(val)}")
+        if val not in self.resources:
+            raise Exception(f"Texture '{val}' not found in {self}")
+        return self.resources[val]
 
 
 class LayerHandler:
@@ -755,8 +770,8 @@ class Application:
         self.tk = None
         self.dirty = False
         self.bt_sep = None
-        self.bt_layers = None
-        self.bt_textures = None
+        self.bt_layers = {}
+        self.bt_textures = {}
         self.bt_pencils = None
         self.background = None
         self.varShowGrid = None
@@ -815,10 +830,10 @@ class Application:
             self.mod = ModHandler(self, self.options['mod'], force_recreate_default=True)
             self.options['mod'] = self.mod.get_loaded_mod()
             self.action_change_pencil('data', self.mod.layer.pencil)
-            self.varActiveLayer.set(self.mod.layer.name) # needed
             # all things dependant on mod from build_gui but we are not destroying it
             self.load_mod_graphics()
             self.build_layer_buttons()
+            self.varActiveLayer.set(self.mod.layer.name) # needed AFTER building buttons
         if amap is None:
             self.start_new_map(restart=True)
         else:
@@ -890,7 +905,7 @@ class Application:
 
     def action_change_layer(self, index, value, op=None):
         if self.debug:
-            print(f'[INFO] action_change_layer : {index} {value}')
+            print(f'[INFO] action_change_layer : index={index} value={value}')
         if index in ['button', 'data']:
             if value != self.varActiveLayer.get():
                 self.varActiveLayer.set(value) # will call again action_change_layer
@@ -939,6 +954,7 @@ class Application:
         count = 0
         for _, ct in self.mod.resources.items():
             count += ct.load()
+            print(f"[INFO] {ct}")
         if self.debug:
             print(f"[INFO]   = {count} graphics loaded")
 
@@ -949,7 +965,6 @@ class Application:
         if self.bt_layers is not None and len(self.bt_layers) > 0:
             self.clean_layer_buttons()
         # Layer buttons
-        self.bt_layers = {}
         for layname, lay in self.mod.layerHandlers.items():
             self.bt_layers[layname] = Button(self.toolbar, image=self.mod.resources['icons'][layname].tkimg, width=32, height=32, command=partial(self.action_change_layer, 'button', layname))
             if self.mod.layer.name == layname:
@@ -965,7 +980,6 @@ class Application:
         "Create dynamic buttons for the textures of the layer."
         if hasattr(self, 'bt_textures') and self.bt_textures is not None and len(self.bt_textures) > 0:
             self.clean_content_buttons()
-        self.bt_textures = {}
         for _, res in self.mod.resources[self.mod.layer.res].resources.items():
             #print(f'[INFO] Creating button for {self.layer.name} : {res.name}')
             self.bt_textures[res.name] = Button(self.toolbar_content,
@@ -983,12 +997,15 @@ class Application:
         for _, button in self.bt_layers.items():
             button.destroy()
         self.bt_sep.destroy()
+        self.bt_layers.clear()
+        self.bt_sep = None
         self.clean_content_buttons()
 
     def clean_content_buttons(self):
         "Clean dynamic buttons for the textures of the layer. Tk() object must be created."
         for _, button in self.bt_textures.items():
             button.destroy()
+        self.bt_textures.clear()
 
     #-----------------------------------------------------------
     # Map manipulation
