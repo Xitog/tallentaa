@@ -57,12 +57,12 @@ Code Summary
 # Imports
 #-----------------------------------------------------------
 
+# Standard import
 import json
 import os
 import os.path
-import configparser
+#import configparser
 import struct # pack
-import typedini
 
 from tkinter import Tk, TclError, PhotoImage, Menu, BooleanVar, StringVar, IntVar, Frame, Button,\
      SUNKEN, RAISED, LEFT, Label, Scrollbar, HORIZONTAL, VERTICAL, Canvas, E, BOTH, TOP, X, RIGHT, Y,\
@@ -72,6 +72,9 @@ from tkinter.filedialog import askopenfilename, asksaveasfilename
 from tkinter.messagebox import showinfo
 from functools import partial
 from PIL import Image, ImageTk, ImageDraw
+
+# Third party import
+import typedini
 
 #-----------------------------------------------------------
 # Image class
@@ -424,8 +427,8 @@ class ContentSet:
 
 class LayerHandler:
 
-    def __init__(self, name, content, default, apply, pencil=1, visible=True,
-                 parent=None):
+    def __init__(self, name, content, default, apply, icon, pencil=1,
+                 visible=True, parent=None):
         self.name = name
         self.res = content
         self.default = default
@@ -435,6 +438,7 @@ class LayerHandler:
         self.type = None # SimpleImage or Integer
         self.visible = visible
         self.apply = apply
+        self.icon = icon
         self.parent = parent
 
     def get_parent_name(self):
@@ -478,6 +482,7 @@ class ModHandler:
         self.debug = application.debug
         self.code = code
         self.info = {}
+        self.stakeholders = []
         wrong = False
         self.mod_dir = os.path.join(os.getcwd(), 'mod')
         if force_recreate_default:
@@ -550,17 +555,17 @@ class ModHandler:
             },
             'layers' : {
                 'ground': {'res': "textures", 'default': "blue",
-                           'apply': 'green', 'visible': True},
+                           'apply': 'green', 'visible': True, 'icon': 'ground'},
                 'wall': {'res': "textures", 'default': 0,
-                         'apply': 'black', 'visible': True},
+                         'apply': 'black', 'visible': True, 'icon': 'wall'},
                 'ceiling': {'res': "textures", 'default': 0,
-                            'apply': 'red', 'visible': False},
+                            'apply': 'red', 'visible': False, 'icon': 'ceiling'},
                 'height': {'res': "numbers_HL", 'default': "one",
-                           'apply': 'two', 'visible': False},
+                           'apply': 'two', 'visible': False, 'icon': 'height'},
                 'area': {'res': "numbers_BR", 'default': 0,
-                         'apply': 'one', 'visible': False},
+                         'apply': 'one', 'visible': False, 'icon': 'area'},
                 'object': {'res': "objects", 'default': 0,
-                           'apply': 'heart', 'visible': True}
+                           'apply': 'heart', 'visible': True, 'icon': 'object'}
             },
             'resources' : {
                 'textures': {
@@ -598,6 +603,12 @@ class ModHandler:
                     'object': {'val' : 6, 'file': 'layer-object.png'}
                 }
             },
+            'stakeholders' : [
+                'Player 1',
+                'Player 2',
+                'Player 3',
+                'Player 4'
+            ],
             'default_layer': 'wall',
             'has_transition': True
         }
@@ -653,13 +664,15 @@ class ModHandler:
         for layname, laycontent in self.mod_data["layers"].items():
             p = None
             if 'parent' in laycontent:
-                p =  self.layerHandlers[laycontent['parent']]
+                p = self.layerHandlers[laycontent['parent']]
             self.layerHandlers[layname] = LayerHandler(layname,
                                                        laycontent['res'],
                                                        laycontent['default'],
-                                                       laycontent['apply'], 1,
+                                                       laycontent['apply'],
+                                                       laycontent['icon'], 1,
                                                        laycontent['visible'], p)
         self.layer = self.layerHandlers[self.mod_data["default_layer"]]
+        self.stakeholders = self.mod_data["stakeholders"]
         if self.debug: print(f"[INFO] Mod *** {self.code} *** loaded.")
 
 #-----------------------------------------------------------
@@ -966,7 +979,7 @@ class Application:
             self.clean_layer_buttons()
         # Layer buttons
         for layname, lay in self.mod.layerHandlers.items():
-            self.bt_layers[layname] = Button(self.toolbar, image=self.mod.resources['icons'][layname].tkimg, width=32, height=32, command=partial(self.action_change_layer, 'button', layname))
+            self.bt_layers[layname] = Button(self.toolbar, image=self.mod.resources['icons'][lay.icon].tkimg, width=32, height=32, command=partial(self.action_change_layer, 'button', layname))
             if self.mod.layer.name == layname:
                 self.bt_layers[layname].config(relief=SUNKEN)
             else:
@@ -1218,13 +1231,13 @@ class Application:
         for name, layer in self.mod.layerHandlers.items():
             activelayermenu.add_radiobutton(label=name.title(), variable=self.varActiveLayer, value=name)
 
-        self.varPlayer = IntVar()
-        self.varPlayer.set(1)
+        self.varPlayer = StringVar()
+        self.varPlayer.set(self.mod.stakeholders[0])
 
         playermenu = Menu(menu, tearoff=0)
         menu.add_cascade(label="Player", menu=playermenu)
-        playermenu.add_radiobutton(label="Player 1", variable=self.varPlayer, value=1)
-        playermenu.add_radiobutton(label="Player 2", variable=self.varPlayer, value=2)
+        for side in self.mod.stakeholders:
+            playermenu.add_radiobutton(label=side, variable=self.varPlayer, value=side)
 
         helpmenu = Menu(menu, tearoff=0)
         menu.add_cascade(label="Help", menu=helpmenu)
@@ -1413,8 +1426,7 @@ class Application:
             bn = os.path.basename(filepath)
             n = os.path.splitext(bn)[0]
             return n, filepath # mymap C:\...\mymap.map
-        else:
-            return None, None
+        return None, None
 
     def menu_file_save_as(self):
         name, filepath = self.get_target()

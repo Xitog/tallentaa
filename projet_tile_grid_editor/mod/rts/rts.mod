@@ -7,10 +7,10 @@
     "websites" : {
     },
     "layers" : {
-        "ground"  : { "res" : "textures",   "default" : "grass", "apply" : "water",  "visible" : true  },
-        "height"  : { "res" : "numbers_HL", "default" : 0,       "apply" : "one",    "visible" : false },
-        "area"    : { "res" : "numbers_BR", "default" : 0,       "apply" : "one",    "visible" : false },
-        "object"  : { "res" : "objects",    "default" : 0,       "apply" : "heart",  "visible" : true  }
+        "ground"  : { "res" : "textures",   "default" : "grass", "apply" : "water",  "visible" : true, "icon" : "ground"  },
+        "height"  : { "res" : "numbers_HL", "default" : 0,       "apply" : "one",    "visible" : false, "icon" : "height" },
+        "area"    : { "res" : "numbers_BR", "default" : 0,       "apply" : "one",    "visible" : false, "icon" : "area"   },
+        "object"  : { "res" : "objects",    "default" : 0,       "apply" : "heart",  "visible" : true, "icon" : "object"  }
     },
     "resources" : {
         "textures" : {
@@ -50,6 +50,12 @@
             "object"  : { "val" : 6, "file" : "object.png"  }
         }
     },
+    "stakeholders" : [
+        "Player 1",
+        "Player 2",
+        "Player 3",
+        "Player 4"
+    ],
     "default_layer" : "ground",
     "has_transition" : true
 }

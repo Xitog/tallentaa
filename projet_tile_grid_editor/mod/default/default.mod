@@ -12,37 +12,43 @@
             "res": "textures",
             "default": "blue",
             "apply": "green",
-            "visible": true
+            "visible": true,
+            "icon": "ground"
         },
         "wall": {
             "res": "textures",
             "default": 0,
             "apply": "black",
-            "visible": true
+            "visible": true,
+            "icon": "wall"
         },
         "ceiling": {
             "res": "textures",
             "default": 0,
             "apply": "red",
-            "visible": false
+            "visible": false,
+            "icon": "ceiling"
         },
         "height": {
             "res": "numbers_HL",
             "default": "one",
             "apply": "two",
-            "visible": false
+            "visible": false,
+            "icon": "height"
         },
         "area": {
             "res": "numbers_BR",
             "default": 0,
             "apply": "one",
-            "visible": false
+            "visible": false,
+            "icon": "area"
         },
         "object": {
             "res": "objects",
             "default": 0,
             "apply": "heart",
-            "visible": true
+            "visible": true,
+            "icon": "object"
         }
     },
     "resources": {
@@ -153,6 +159,12 @@
             }
         }
     },
+    "stakeholders": [
+        "Player 1",
+        "Player 2",
+        "Player 3",
+        "Player 4"
+    ],
     "default_layer": "wall",
     "has_transition": true
 }

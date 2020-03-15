@@ -11,13 +11,13 @@
         "Github"        : "https://github.com/sparklinlabs/superpowers-asset-packs"
     },
     "layers" : {
-        "ground"  : { "res" : "textures",   "default" : "void", "apply" : "redbrick",  "visible" : true  },
-        "wall"    : { "res" : "textures",   "default" : 0,      "apply" : "greystone", "visible" : true  },
-        "ceiling" : { "res" : "textures",   "default" : 0,      "apply" : "redbrick",  "visible" : false },
-        "height"  : { "res" : "numbers_HL", "default" : 0,      "apply" : "one",       "visible" : false },
-        "area"    : { "res" : "numbers_BR", "default" : 0,      "apply" : "one",       "visible" : false },
-        "object"  : { "res" : "objects",    "default" : 0,      "apply" : "ammo",      "visible" : true  },
-        "monster" : { "res" : "monsters",   "default" : 0,      "apply" : "enemy1",    "visible" : true, "parent" : "object"}
+        "ground"  : { "res" : "textures",   "default" : "void", "apply" : "redbrick",  "visible" : true, "icon" : "ground"   },
+        "wall"    : { "res" : "textures",   "default" : 0,      "apply" : "greystone", "visible" : true, "icon" : "wall"     },
+        "ceiling" : { "res" : "textures",   "default" : 0,      "apply" : "redbrick",  "visible" : false, "icon" : "ceiling" },
+        "height"  : { "res" : "numbers_HL", "default" : 0,      "apply" : "one",       "visible" : false, "icon" : "height"  },
+        "area"    : { "res" : "numbers_BR", "default" : 0,      "apply" : "one",       "visible" : false, "icon" : "area"    },
+        "object"  : { "res" : "objects",    "default" : 0,      "apply" : "ammo",      "visible" : true, "icon" : "object"   },
+        "monster" : { "res" : "monsters",   "default" : 0,      "apply" : "enemy1",    "visible" : true, "icon" : "monster", "parent" : "object"}
     },
     "resources" : {
         "textures" : {
@@ -98,6 +98,12 @@
             "monster" : { "val" : 7, "file" : "layer-monster.png" }
         }
     },
+    "stakeholders" : [
+        "Player 1",
+        "Player 2",
+        "Player 3",
+        "Player 4"
+    ],
     "default_layer"  : "wall",
     "has_transition" : false
 }
