@@ -159,12 +159,24 @@
             }
         }
     },
-    "stakeholders": [
-        "Player 1",
-        "Player 2",
-        "Player 3",
-        "Player 4"
-    ],
+    "stakeholders": {
+        "Player 1": {
+            "val": 1,
+            "color": "blue"
+        },
+        "Player 2": {
+            "val": 2,
+            "color": "red"
+        },
+        "Player 3": {
+            "val": 3,
+            "color": "green"
+        },
+        "Player 4": {
+            "val": 4,
+            "color": "yellow"
+        }
+    },
     "default_layer": "wall",
     "has_transition": true
 }

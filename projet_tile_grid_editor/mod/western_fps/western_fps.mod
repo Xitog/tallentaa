@@ -16,7 +16,7 @@
         "ceiling" : { "res" : "textures",   "default" : 0,      "apply" : "redbrick",  "visible" : false, "icon" : "ceiling" },
         "height"  : { "res" : "numbers_HL", "default" : 0,      "apply" : "one",       "visible" : false, "icon" : "height"  },
         "area"    : { "res" : "numbers_BR", "default" : 0,      "apply" : "one",       "visible" : false, "icon" : "area"    },
-        "object"  : { "res" : "objects",    "default" : 0,      "apply" : "ammo",      "visible" : true, "icon" : "object"   },
+        "object"  : { "res" : "objects",    "default" : 0,      "apply" : "ammo",      "visible" : true, "icon" : "object", "linked" : "player" },
         "monster" : { "res" : "monsters",   "default" : 0,      "apply" : "enemy1",    "visible" : true, "icon" : "monster", "parent" : "object"}
     },
     "resources" : {
@@ -98,12 +98,12 @@
             "monster" : { "val" : 7, "file" : "layer-monster.png" }
         }
     },
-    "stakeholders" : [
-        "Player 1",
-        "Player 2",
-        "Player 3",
-        "Player 4"
-    ],
+    "stakeholders" : {
+        "Player 1": { "val" : 1, "color" : "blue"   },
+        "Player 2": { "val" : 2, "color" : "red"    },
+        "Player 3": { "val" : 3, "color" : "green"  },
+        "Player 4": { "val" : 4, "color" : "yellow" }
+    },
     "default_layer"  : "wall",
     "has_transition" : false
 }

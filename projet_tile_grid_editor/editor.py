@@ -64,6 +64,7 @@ import os.path
 #import configparser
 import struct # pack
 
+from sys import stdout
 from tkinter import Tk, TclError, PhotoImage, Menu, BooleanVar, StringVar, IntVar, Frame, Button,\
      SUNKEN, RAISED, LEFT, Label, Scrollbar, HORIZONTAL, VERTICAL, Canvas, E, BOTH, TOP, X, RIGHT, Y,\
      BOTTOM, NW, Toplevel, LabelFrame, Radiobutton
@@ -72,6 +73,7 @@ from tkinter.filedialog import askopenfilename, asksaveasfilename
 from tkinter.messagebox import showinfo
 from functools import partial
 from PIL import Image, ImageTk, ImageDraw
+from traceback import print_exc
 
 # Third party import
 import typedini
@@ -109,10 +111,10 @@ class Map:
     def create_matrix(max_col, max_row, val):
         matrix = []
         for _ in range(max_row):
-            r = []
+            rows = []
             for _ in range(max_col):
-                r.append(val)
-            matrix.append(r)
+                rows.append(val)
+            matrix.append(rows)
         return matrix
 
     def __init__(self, name, max_col, max_row, mod):
@@ -122,9 +124,14 @@ class Map:
         self.defaults = {}
         self.virtuals = {}
         self.values = {}
+        self.derived = {}
         self.width = max_col
         self.height = max_row
         self.filepath = None
+        self.app = None
+
+    def set_app(self, app):
+        self.app = app
 
     def resize(self, width, height):
         for lay in self.layers:
@@ -136,7 +143,7 @@ class Map:
         self.width = width
         self.height = height
 
-    def add_layer(self, name, val, values, parent=None):
+    def add_layer(self, name, val, values, parent=None, linked=None):
         if not isinstance(val, int):
             raise Exception(f'[ERROR] Only integer accepted, not {val.__class__.__name__}')
         if parent is None:
@@ -144,6 +151,10 @@ class Map:
             self.defaults[name] = val
         else:
             self.virtuals[name] = parent
+        if linked is not None:
+            if name not in self.derived:
+                self.derived[name] = {}
+            self.derived[name][linked] = Map.create_matrix(self.width, self.height, 0)
         self.values[name] = values
 
     def __repr__(self):
@@ -153,52 +164,57 @@ class Map:
         self.name = name
 
     def check_xy(self, col, row):
-        if col is None or row is None: return False
+        if col is None or row is None:
+            return False
         return row >= 0 and row < self.height and col >= 0 and col < self.width
-    
+
     def check(self, row, col, layer, layer_none_ok=False):
         layer = self.resolve(layer)
         if layer is None and not layer_none_ok:
             raise Exception("[ERROR] Layer not defined.")
-        elif layer is not None and layer not in self.layers:
+        if layer is not None and layer not in self.layers:
             raise Exception(f"[ERROR] Layer value unknown: {layer}")
-        elif row < 0 or row >= self.height:
+        if row < 0 or row >= self.height:
             raise Exception(f"[ERROR] Out of row: {row} / {self.height}")
-        elif col < 0 or col >= self.width:
+        if col < 0 or col >= self.width:
             raise Exception(f"[ERROR] Out of col: {col} / {self.width}")
 
     def resolve(self, layer):
         if layer in self.virtuals:
             return self.virtuals[layer]
-        else:
-            return layer
-    
+        return layer
+
     def set(self, row, col, val, layer):
         self.check(row, col, layer)
-        self.layers[self.resolve(layer)][row][col] = val
+        true_layer = self.resolve(layer)
+        self.layers[true_layer][row][col] = val
+        if true_layer in self.derived:
+            for derived in self.derived[true_layer]:
+                if derived == 'player':
+                    lay = self.derived[true_layer][derived]
+                    lay[row][col] = self.app.varPlayer.get()
 
     def get(self, row, col, layer=None):
         self.check(row, col, layer, True)
         if layer is not None:
             return self.layers[self.resolve(layer)][row][col]
-        else:
-            res = {}
-            for lay in self.layers:
-                c = self.layers[lay][row][col]
-                if c == 0 or c in self.values[lay]: # accept always 0
-                    res[lay] = c
-                else: # virtual layers
-                    found = False
-                    for vlay, values in self.values.items():
-                        if vlay in self.virtuals:
-                            if c in values and self.virtuals[vlay] == lay:
-                                res[vlay] = c
-                                found = True
-                    if not found:
-                        print(f'Unknown value = {c} for layer {vlay}')
-                        print(f'Authorized values are: {self.values[vlay]}')
-                        raise Exception(f"FATAL ERROR: UNKOWN VALUE {c} FOR LAYER {vlay}")
-            return res
+        res = {}
+        for lay in self.layers:
+            c = self.layers[lay][row][col]
+            if c == 0 or c in self.values[lay]: # accept always 0
+                res[lay] = c
+            else: # virtual layers
+                found = False
+                for vlay, values in self.values.items():
+                    if vlay in self.virtuals:
+                        if c in values and self.virtuals[vlay] == lay:
+                            res[vlay] = c
+                            found = True
+                if not found:
+                    print(f'Unknown value = {c} for layer {vlay}')
+                    print(f'Authorized values are: {self.values[vlay]}')
+                    raise Exception(f"FATAL ERROR: UNKOWN VALUE {c} FOR LAYER {vlay}")
+        return res
 
     @staticmethod
     def from_json(filepath):
@@ -206,9 +222,10 @@ class Map:
         data = json.load(f)
         f.close()
         m = Map(data["name"], data["width"], data["height"], data['mod'])
-        for key, content in data['layers'].items():
-            m.layers[key] = content
+        m.layers = data['layers']
+        m.derived = data['derived']  
         m.filepath = filepath
+        # values & mod_handler & virtuals will be set later
         return m
 
     def to_json(self, filepath, test=False):
@@ -238,8 +255,38 @@ class Map:
                 content += '        ]\n'
             else:
                 content += '        ],\n'
+        content += '    },\n'
+        content += '    "derived" : {\n'
+        count = 0
+        for key_layer in self.derived:
+            count += 1
+            content += f'        "{key_layer}" : ' + '{\n'
+            derived_count = 0
+            for key_derived in self.derived[key_layer]:
+                derived_count += 1
+                content += f'            "{key_derived}" : [\n'
+                lay = self.derived[key_layer][key_derived]
+                for irow, row in enumerate(lay):
+                    content += '                ['
+                    for icol, col in enumerate(row):
+                        if icol != len(row) - 1:
+                            content += f'{col}, '
+                        else:
+                            content += f'{col}'
+                    if irow != len(lay) - 1:
+                        content += '],\n'
+                    else:
+                        content += ']\n'
+                if derived_count == len(self.derived[key_layer]):
+                    content += '            ]\n'
+                else:
+                    content += '            ],\n'
+            if count == len(self.derived):
+                content += '        }\n'
+            else:
+                content += '        },\n'
         content += '    }\n'
-        content += '}'
+        content += '}\n'
         file.write(content)
         file.close()
         if test:
@@ -250,7 +297,7 @@ class Map:
             except Exception:
                 print('Something went wrong when trying to load map. Map may be corrupted.')
                 print('Stack info:')
-                traceback.print_exc(file=sys.stdout)
+                print_exc(file=stdout)
         self.filepath = filepath
 
 #-----------------------------------------------------------
@@ -267,7 +314,7 @@ class Dialog:
         self.parent = parent
         for key, val in kwargs.items():
             setattr(self, key, val)
-
+        self.vars = {}
         self.build()
 
         self.top.protocol("WM_DELETE_WINDOW", self.cancel)
@@ -365,8 +412,8 @@ class ChooseSizeDialog(Dialog):
         b.pack(pady=5)
 
     def submit(self):
-        self.width = self.widthVar.get()
-        self.height = self.heightVar.get()
+        self.vars['width'] = self.widthVar.get()
+        self.vars['height'] = self.heightVar.get()
         self.close()
 
 #-----------------------------------------------------------
@@ -392,7 +439,7 @@ class ContentSet:
         self.resources[name] = file
         self.num2name[val] = name
         self.name2num[name] = val
-    
+
     def get_default_num(self, val):
         if isinstance(val, str):
             return self.name2num[val]
@@ -428,7 +475,7 @@ class ContentSet:
 class LayerHandler:
 
     def __init__(self, name, content, default, apply, icon, pencil=1,
-                 visible=True, parent=None):
+                 visible=True, parent=None, linked=None):
         self.name = name
         self.res = content
         self.default = default
@@ -440,13 +487,17 @@ class LayerHandler:
         self.apply = apply
         self.icon = icon
         self.parent = parent
+        self.linked = linked
 
     def get_parent_name(self):
         if self.parent is None:
             return None
         else:
             return self.parent.name
-    
+
+    def get_linked(self):
+        return self.linked
+
     def __str__(self):
         s = f"name={self.name} default={self.default} " + \
             f"pencil={self.pencil} visible={self.visible}"
@@ -507,7 +558,7 @@ class ModHandler:
 
     def __str__(self):
         return str(self.info[self.code])
-    
+
     def get_loaded_mod(self):
         return self.code
 
@@ -603,12 +654,12 @@ class ModHandler:
                     'object': {'val' : 6, 'file': 'layer-object.png'}
                 }
             },
-            'stakeholders' : [
-                'Player 1',
-                'Player 2',
-                'Player 3',
-                'Player 4'
-            ],
+            "stakeholders" : {
+                "Player 1": { "val" : 1, "color" : "blue"   },
+                "Player 2": { "val" : 2, "color" : "red"    },
+                "Player 3": { "val" : 3, "color" : "green"  },
+                "Player 4": { "val" : 4, "color" : "yellow" }
+            },
             'default_layer': 'wall',
             'has_transition': True
         }
@@ -662,15 +713,20 @@ class ModHandler:
         # Prepare layers
         self.layerHandlers = {}
         for layname, laycontent in self.mod_data["layers"].items():
-            p = None
+            parent = None
+            linked = None
             if 'parent' in laycontent:
-                p = self.layerHandlers[laycontent['parent']]
+                parent = self.layerHandlers[laycontent['parent']]
+            if 'linked' in laycontent:
+                linked = laycontent['linked']
             self.layerHandlers[layname] = LayerHandler(layname,
                                                        laycontent['res'],
                                                        laycontent['default'],
                                                        laycontent['apply'],
                                                        laycontent['icon'], 1,
-                                                       laycontent['visible'], p)
+                                                       laycontent['visible'],
+                                                       parent=parent,
+                                                       linked=linked)
         self.layer = self.layerHandlers[self.mod_data["default_layer"]]
         self.stakeholders = self.mod_data["stakeholders"]
         if self.debug: print(f"[INFO] Mod *** {self.code} *** loaded.")
@@ -769,7 +825,7 @@ class Application:
     def __init__(self, debug=False):
         self.title = 'Tile Grid Editor'
         self.debug = debug
-        
+
         self.options = typedini.OptionSet('config.ini', autosave=True)
         self.options.register('show_grid', bool, True)
         self.options.register('confirm_exit', bool, True)
@@ -777,7 +833,7 @@ class Application:
         self.options.register('width', int, 800)
         self.options.register('height', int, 600)
         self.options.read_or_create()
-        
+
         self.mod = ModHandler(self, self.options['mod'], force_recreate_default=True)
         self.options['mod'] = self.mod.get_loaded_mod()
         self.tk = None
@@ -820,11 +876,12 @@ class Application:
         height = 32 if height is None else height
         self.dirty = False
         self.set_map(Map(title, width, height, self.options['mod']))
-        for layname, lay in self.mod.layerHandlers.items():
-            lay_cont = lay.res
+        for _, lay in self.mod.layerHandlers.items():
             def_code = self.mod.resources[lay.res].get_default_num(lay.default)
-            values   = self.mod.resources[lay.res].nums()
-            self.map.add_layer(lay.name, def_code, values, lay.get_parent_name())
+            values = self.mod.resources[lay.res].nums()
+            self.map.add_layer(lay.name, def_code, values,
+                               parent=lay.get_parent_name(),
+                               linked=lay.get_linked())
         if not restart:
             self.build_gui() # need the size of the map in order to create the scrollbars
         else:
@@ -835,7 +892,7 @@ class Application:
         "Load a different mod or a map with optionnally a new mod. Partial GUI"
         if mod is None and amap is None:
             raise Exception("Cannot run without a mod or a map")
-        elif mod is None:
+        if mod is None:
             mod = amap.mod
         if mod != self.options['mod']:
             self.clean_layer_buttons()
@@ -868,14 +925,26 @@ class Application:
         "Set the working map"
         self.dirty = False
         self.map = amap
+        # set the application in order to fill the linked/derived table (player)
+        self.map.set_app(self)
+        # set values and virtuals
+        if len(self.map.values) == 0:
+            for _, lay in self.mod.layerHandlers.items():
+                #print('>>>', lay.name, self.mod.resources[lay.res].nums())
+                self.map.values[lay.name] = self.mod.resources[lay.res].nums()
+                if lay.parent is not None:
+                    self.map.virtuals[lay.name] = lay.get_parent_name()
 
     def exit_app(self, force_exit=False):
         "Exit the application and clean before"
         sure = True
         if self.dirty and self.options['confirm_exit']:
-            sure = messagebox.askyesno("Unsaved changes", "There are unsaved changes.\nDo you really want to quit?", default=messagebox.NO)
+            txt = "There are unsaved changes.\nDo you really want to quit?"
+            sure = messagebox.askyesno("Unsaved changes", txt,
+                                       default=messagebox.NO)
         if sure:
-            if self.debug: print('[INFO] exiting')
+            if self.debug:
+                print('[INFO] exiting')
             self.options['width'] = self.tk.winfo_width()
             # don't know why but the window is downsized of 20 pixels compared to asked geometry
             self.options['height'] = self.tk.winfo_height() + 20
@@ -1174,7 +1243,7 @@ class Application:
         self.var_status_bar_display = BooleanVar()
         self.var_status_bar_display.set(True)
         self.var_status_bar_display.trace('w', self.set_show_statusbar)
-        
+
         viewmenu = Menu(menu, tearoff=0)
         menu.add_cascade(label="View", menu=viewmenu)
         viewmenu.add_command(label="Toolbar")
@@ -1231,13 +1300,14 @@ class Application:
         for name, layer in self.mod.layerHandlers.items():
             activelayermenu.add_radiobutton(label=name.title(), variable=self.varActiveLayer, value=name)
 
-        self.varPlayer = StringVar()
-        self.varPlayer.set(self.mod.stakeholders[0])
+        self.varPlayer = IntVar()
+        first_key = res = next(iter(self.mod.stakeholders))
+        self.varPlayer.set(self.mod.stakeholders[first_key]['val'])
 
         playermenu = Menu(menu, tearoff=0)
         menu.add_cascade(label="Player", menu=playermenu)
-        for side in self.mod.stakeholders:
-            playermenu.add_radiobutton(label=side, variable=self.varPlayer, value=side)
+        for side, content in self.mod.stakeholders.items():
+            playermenu.add_radiobutton(label=side, variable=self.varPlayer, value=content['val'])
 
         helpmenu = Menu(menu, tearoff=0)
         menu.add_cascade(label="Help", menu=helpmenu)
@@ -1254,23 +1324,27 @@ class Application:
             print("[INFO] Creating toolbar")
         self.toolbar = Frame(self.content)
         self.toolbar_content = Frame(self.content)
-        
+
         if BASE_ICONS:
-            bt_new = Button(self.toolbar, image=self.icons['new'], width=32, height=32,
-                            command=self.menu_file_new)
-            bt_open = Button(self.toolbar, image=self.icons['open'], width=32, height=32,
-                             command=self.menu_file_open)
-            bt_save = Button(self.toolbar, image=self.icons['save'], width=32, height=32,
-                             command=self.menu_file_save)
-            bt_save_as = Button(self.toolbar, image=self.icons['save_as'], width=32, height=32,
+            bt_new = Button(self.toolbar, image=self.icons['new'], width=32,
+                            height=32, command=self.menu_file_new)
+            bt_open = Button(self.toolbar, image=self.icons['open'], width=32,
+                             height=32, command=self.menu_file_open)
+            bt_save = Button(self.toolbar, image=self.icons['save'],
+                             width=32, height=32, command=self.menu_file_save)
+            bt_save_as = Button(self.toolbar, image=self.icons['save_as'],
+                                width=32, height=32,
                                 command=self.menu_file_save_as)
 
             self.bt_pencils = {}
-            self.bt_pencils[1] = Button(self.toolbar, image=self.icons['1x1'], width=32, height=32,
+            self.bt_pencils[1] = Button(self.toolbar, image=self.icons['1x1'],
+                                        width=32, height=32,
                                         command=lambda: self.action_change_pencil('button', 1), relief=SUNKEN)
-            self.bt_pencils[3] = Button(self.toolbar, image=self.icons['3x3'], width=32, height=32,
+            self.bt_pencils[3] = Button(self.toolbar, image=self.icons['3x3'],
+                                        width=32, height=32,
                                         command=lambda: self.action_change_pencil('button', 3), relief=RAISED)
-            self.bt_pencils[5] = Button(self.toolbar, image=self.icons['5x5'], width=32, height=32,
+            self.bt_pencils[5] = Button(self.toolbar, image=self.icons['5x5'],
+                                        width=32, height=32,
                                         command=lambda: self.action_change_pencil('button', 5), relief=RAISED)
 
             bt_new.pack(side=LEFT)
@@ -1293,7 +1367,8 @@ class Application:
         x_scrollbar = Scrollbar(self.content, orient=HORIZONTAL)
         y_scrollbar = Scrollbar(self.content, orient=VERTICAL)
         self.canvas = Canvas(self.content,
-                             scrollregion=(0, 0, self.map.width * 32, self.map.height * 32),
+                             scrollregion=(0, 0, self.map.width * 32,
+                                           self.map.height * 32),
                              xscrollcommand=x_scrollbar.set,
                              yscrollcommand=y_scrollbar.set)
 
@@ -1355,7 +1430,7 @@ class Application:
     def invalid_drag(self, event):
         self.start_x, self.start_y = None, None
         self.exit_drag(event)
-    
+
     def exit_drag(self, event=None):
         self.drag = False
         if self.drag_rect is not None:
@@ -1364,7 +1439,7 @@ class Application:
     def enter_drag(self, event):
         self.start_x, self.start_y = self.get_map_coord(event)
         self.drag = True
-    
+
     def put_texture(self, event):
         self.exit_drag(event)
         x32, y32 = self.get_map_coord(event)
@@ -1372,7 +1447,8 @@ class Application:
         val = self.mod.resources[self.mod.layer.res][self.mod.layer.apply].num
         #print(f'[INFO] {y32} {x32} l={self.layer.name} t={apply} p={pencil}')
         self.dirty = True
-        self.previous.do(self, self.map, self.mod.layer, self.start_x, self.start_y, x32, y32, val, pencil)
+        self.previous.do(self, self.map, self.mod.layer, self.start_x,
+                         self.start_y, x32, y32, val, pencil)
         self.refresh_title()
 
     def draw_drag(self, event):
@@ -1385,7 +1461,10 @@ class Application:
         miny = min(self.start_y, y32)
         maxx = max(self.start_x, x32)
         maxy = max(self.start_y, y32)
-        self.drag_rect = self.canvas.create_rectangle(minx * 32, miny * 32, (maxx + 1) * 32, (maxy + 1) * 32, outline='green', width=2)
+        self.drag_rect = self.canvas.create_rectangle(minx * 32, miny * 32,
+                                                      (maxx + 1) * 32,
+                                                      (maxy + 1) * 32,
+                                                      outline='green', width=2)
 
     #-----------------------------------------------------------
     # Menu actions
@@ -1396,18 +1475,22 @@ class Application:
     def menu_file_new(self, event=None):
         d = ChooseSizeDialog(self, title='New Map')
         if d.width is not None:
-            self.start_new_map('New map', d.width, d.height, restart=True)
+            self.start_new_map('New map', d.vars['width'], d.vars['height'],
+                               restart=True)
 
     def menu_file_resize(self, event=None):
         d = ChooseSizeDialog(self, title='Resize Map')
         if d.width is not None and (d.width != self.map.width or d.height != self.map.height):
             self.map.resize(d.width, d.height)
-            self.canvas.config(scrollregion=(0, 0, self.map.width * 32, self.map.height * 32))
+            self.canvas.config(scrollregion=(0, 0, self.map.width * 32,
+                                             self.map.height * 32))
             self.refresh_map()
-    
+
     def menu_file_open(self, event=None):
-        filepath = askopenfilename(initialdir=os.getcwd(), title="Select a file to open",
-                                   filetypes=(("map files", "*.map"), ("all files", "*.*")))
+        filepath = askopenfilename(initialdir=os.getcwd(),
+                                   title="Select a file to open",
+                                   filetypes=(("map files", "*.map"),
+                                              ("all files", "*.*")))
         if filepath != '' and os.path.isfile(filepath):
             self.start_load_map(filepath)
 
@@ -1418,8 +1501,10 @@ class Application:
             self.menu_file_save_as()
 
     def get_target(self):
-        filepath = asksaveasfilename(initialdir=os.getcwd(), title="Select where to save",
-                                     filetypes=(("map files", "*.map"), ("all files", "*.*")))
+        filepath = asksaveasfilename(initialdir=os.getcwd(),
+                                     title="Select where to save",
+                                     filetypes=(("map files", "*.map"),
+                                                ("all files", "*.*")))
         if filepath != '':
             if not filepath.endswith('.map'):
                 filepath += '.map'
@@ -1459,12 +1544,14 @@ Damien Gouteux - 2020 - Made with ♥ in Occitania\n\n"""
         file = open(f"{self.map.name}.bin", "wb")
         file.write(content)
         file.close()
-        if self.debug: print(f"[INFO] Map exported as binary in file {self.map.name}.bin")
+        if self.debug:
+            print(f"[INFO] Map exported as binary in file {self.map.name}.bin")
 
     def menu_tools_export_image(self):
         img = self.refresh_map()
         img.save(f'{self.map.name}.png')
-        if self.debug: print(f"[INFO] Map exported as image in file {self.map.name}.png")
+        if self.debug:
+            print(f"[INFO] Map exported as image in file {self.map.name}.png")
 
     #def menu_choose_object(self):
     #    o = ChooseObjectDialog(self)
