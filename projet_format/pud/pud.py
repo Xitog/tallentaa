@@ -1,113 +1,112 @@
-from __future__ import print_function
 import os
 import sys
 
+# bytes
 WORD = 2
 LONG = 4
 
 # http://cade.datamax.bg/war2x/pudspec.html
 
-class PUD(object):
+class PUD:
 
     def __init__(self, filepath):
         self.filepath = filepath
-        self.filename = os.path.basename(self.filepath)
-        self.mapname = self.filename[:-4]
-
-        print("Info file -------------------------")
-        print("Reading : " + self.filepath)
-        print("Name of the file : " + self.filename)
-        print("Name of the map : " + self.mapname)
+        self.filename = os.path.basename(filepath)
+        self.mapname = os.path.splitext(self.filename)[0]
         content = None
         with open(filepath, "rb") as pud:
             content = pud.read()
         self.content = bytearray(content)
-        print("Length of file : " + str(len(self.content)) + " bytes")
-        print()
-        
-        print("Areas -----------------------------") 
-        self.type = self.find_suite("TYPE")
-        print("pos TYPE = ", self.type)
-        self.ver = self.find_suite("VER ")
-        print("pos VER  = ", self.ver)
-        self.desc = self.find_suite("DESC")
-        print("pos DESC = ", self.desc)
-        self.ownr = self.find_suite("OWNR")
-        print("pos OWNR = ", self.ownr)
-        self.era  = self.find_suite("ERA ")
-        print("pos ERA  = ", self.era)
+        self.sections = {}
+        pos = 0
+        while pos < len(self.content):
+            tag, length = self.section(pos)
+            self.sections[tag] = (pos, length)
+            pos += length + 8 # 4 for tag, 4 for length
+            print(f"{tag:4} {pos:6d} {len(self.content):6d}")
+        # null terminated string
+        info = self.sections['DESC']
+        self.desc = self.read_str(info[0] + 8, info[1])
+        # 128 or 96 or 64 or 32. x must be equal to y.
+        info = self.sections['DIM ']
+        self.width = self.read_int(info[0] + 8, WORD)
+        self.height = self.read_int(info[0] + 8 + WORD, WORD)
+        #
+        info = self.sections['MTXM']
+        self.map = self.read_matrix(info[0], self.width * self.height, self.width)
+
+    def info(self):
+        print(f"{self.mapname} {self.width}x{self.height}")
+        print(self.desc)
+        print(f"Size: {len(self)} bytes")
+
+    def __str__(self):
+        return self.mapname
+
+    def __repr__(self):
+        return str(self)
+
+    def __len__(self):
+        return len(self.content)
+
+    def get(row, col):
+        pass
+
+    def __getitem__(self, i):
+        return self.content[i]
+
+    def read_str(self, start, length):
+        s = ''
+        for i in range(length):
+            c = chr(self[start + i])
+            if c == '\x00':
+                break
+            s += c
+        return s
+
+    def read_int(self, pos, length):
+        cpt = 0
+        for i in range(0, length):
+            cpt += self[i + pos] * (256 ** i)
+        return cpt
+
+    def read_matrix(self, pos, size, width):
+        content = []
+        line = []
+        cpt = 0
+        values = {}
+        while cpt < size:
+            elem = self.read_int(pos + cpt * WORD, WORD)
+            if elem not in values:
+                values[elem] = 0
+            values[elem] += 1
+            line.append(elem)
+            if len(line) == width:
+                content.append(line)
+                line = []
+            cpt += 1
+        for val in sorted(values, key=values.get, reverse=True):
+            print(f"{val:04x} {values[val]:10d}")
+        return content
+
+    def section(self, start):
+        "A section is 4 CHARs as a name then a 1 LONG as size then DATA"
+        tag = self.read_str(start, 4)
+        length = self.read_int(start + 4, 4)
+        return tag, length
+
+
+class PUD2(object):
+
+    def __init__(self, filepath):
         self.era_length = self.read_nbytes_as_int(self.era + LONG, LONG)
         print("\tlength ERA = ", self.era_length)
         self.era_value = self.read_nbytes_as_int(self.era + LONG + LONG, WORD)
         print("\tvalue ERA= ", self.era_value)
-        self.erax = self.find_suite("ERAX") # not found
-        print("pos ERAX = ", self.erax)
-        self.dim  = self.find_suite("DIM ")
-        print("pos DIM  = ", self.dim)
-        self.dim_size = self.read_nbytes_as_int(self.dim + LONG, LONG)
-        self.x = self.read_nbytes_as_int(self.dim + LONG + LONG, WORD)
-        self.y = self.read_nbytes_as_int(self.dim + LONG + LONG + WORD, WORD)
-        print("\tvalue x = ", self.x)
-        print("\tvalue y = ", self.y)
-        # 128 or 96 or 64 or 32. x must be equal to y.
-        # other areas between:
-        # UDTA
-        # ALOW
-        # UGRD
-        # SIDE
-        # SGLD
-        # SLBR
-        # SOIL
-        # AIPL
-        self.mtxm = self.find_suite("MTXM")
-        print("pos MTXM = ", self.mtxm)
-        self.mtxm_length = self.read_nbytes_as_int(self.mtxm + LONG, LONG)
-        print("\tlength mtxm = ", self.mtxm_length, "bytes")
         # 128*128*2 = 32 768
         #   96*96*2 = 18 432
         #   64*64*2 =  8 192
         #   32*32*2 =  2 048
-        self.sqm  = self.find_suite("SQM ")
-        print("pos SQM  = ", self.sqm)
-        self.oilm = self.find_suite("OILM")
-        print("pos OILM = ", self.oilm)
-        self.regm = self.find_suite("REGM")
-        print("pos REGM = ", self.regm)
-        self.unit = self.find_suite("UNIT")
-        print("pos UNIT = ", self.unit)
-        print()
-        
-        self.mtxm_content = self.read_nb_square(self.mtxm + LONG + LONG, 1024, 32)
-        
-    def __len__(self):
-        return len(self.content)
-
-    def read_nbytes_as_int(self, pos, length):
-        cpt = 0    
-        for i in range(0, length):
-            cpt += self.content[i + pos] * (256 ** i)
-        return cpt
-
-    def read_nb_square(self, pos, nb, size=-1, debug=False):
-        print("Started at ", pos, "(= pos mxtm + \"mxtm\" LONG 4 + size LONG 4)")
-        map_content = []
-        line = []
-        cpt = 0
-        while cpt < nb:
-            #square = self.content[pos + cpt*2] + self.content[pos + cpt*2 + 1] * 256
-            square = self.read_nbytes_as_int(pos + cpt * WORD, WORD)
-            if debug:
-                print(str(cpt) + ". " + "[" + str(pos + cpt * 2) + "] " + '{0:0=4x}'.format(square)) # 4 chars hexa = 2 bytes = 1 word
-            line.append(square)
-            if len(line) == size:
-                map_content.append(line)
-                line = []
-            cpt += 1
-        if size == -1:
-            map_content = line
-        print("Ended at ", pos + cpt * 2)
-        print("With cpt = ", cpt)
-        return map_content
 
     def save_to_file(self):
         out = open(self.mapname + "-out-v2.txt", "w")
@@ -140,48 +139,12 @@ class PUD(object):
         else:
             return None
 
-#filename = r"C:\Documents and Settings\Damien\Bureau\Projet PUD\eau-5-5.pud"
-#filename = r"C:\Documents and Settings\Damien\Bureau\Projet PUD\eau-1-1.pud"
-#filename = r"C:\Documents and Settings\Damien\Bureau\Projet PUD\eau-1-1-31-1.pud"
 filename = "eau-1-1-31-1.pud"
+filename = "map-32x32-forest-water-5-5-start-10-10.pud"
 
 pud = PUD(filename)
-pud.save_to_file()
+#pud.save_to_file()
 
-if False:
-
-    cpt = 0
-    with open(filename, "rb") as pud:
-        byte = pud.read(1)
-        cpt += 1
-        while byte != b"":
-            if byte == b"M":
-                byte = pud.read(1)
-                cpt += 1
-                if byte == b"T":
-                    byte = pud.read(1)
-                    cpt += 1
-                    if byte == b"X":
-                        byte = pud.read(1)
-                        cpt += 1
-                        if byte == b"M":
-                            print("MXTM!", cpt)
-            # Do stuff with byte.
-            byte = pud.read(1)
-            cpt += 1
-
-    cpt = 0
-    while cpt < len(content):
-        char = content[cpt]
-        if char == ord("M"):
-            print(chr(char), cpt)
-        cpt += 1
-    
-    print(chr(content[6782]))
-    print(chr(content[6782+1]))
-    print(chr(content[6782+2]))
-    print(chr(content[6782+3]))
-    
 # ils sont separes de 2056 = 1024 * 2 = 32 x 32 x 2
 # 2 chars hexa = 16 * 16 = 256 = 1 byte
 
