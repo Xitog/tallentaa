@@ -31,9 +31,9 @@ class PUD:
         info = self.sections['DIM ']
         self.width = self.read_int(info[0] + 8, WORD)
         self.height = self.read_int(info[0] + 8 + WORD, WORD)
-        #
+        # seems to stock row first then col so y (row) then x (col)
         info = self.sections['MTXM']
-        self.map = self.read_matrix(info[0], self.width * self.height, self.width)
+        self.map = self.read_matrix(info[0] + 8, self.width * self.height, self.width)
 
     def info(self):
         print(f"{self.mapname} {self.width}x{self.height}")
