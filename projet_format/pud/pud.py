@@ -142,7 +142,8 @@ class PUD(object):
 
 #filename = r"C:\Documents and Settings\Damien\Bureau\Projet PUD\eau-5-5.pud"
 #filename = r"C:\Documents and Settings\Damien\Bureau\Projet PUD\eau-1-1.pud"
-filename = r"C:\Documents and Settings\Damien\Bureau\Projet PUD\eau-1-1-31-1.pud"
+#filename = r"C:\Documents and Settings\Damien\Bureau\Projet PUD\eau-1-1-31-1.pud"
+filename = "eau-1-1-31-1.pud"
 
 pud = PUD(filename)
 pud.save_to_file()
