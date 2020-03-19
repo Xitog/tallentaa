@@ -77,6 +77,7 @@ from traceback import print_exc
 
 # Third party import
 import typedini
+from layeredmap import Map
 
 #-----------------------------------------------------------
 # Image class
@@ -99,206 +100,6 @@ class SimpleImage:
 
     def __repr__(self):
         return self.path
-
-#-----------------------------------------------------------
-# Map class
-#-----------------------------------------------------------
-
-class Map:
-    "A class representing a map/level."
-
-    @staticmethod
-    def create_matrix(max_col, max_row, val):
-        matrix = []
-        for _ in range(max_row):
-            rows = []
-            for _ in range(max_col):
-                rows.append(val)
-            matrix.append(rows)
-        return matrix
-
-    def __init__(self, name, max_col, max_row, mod):
-        self.set_name(name)
-        self.mod = mod
-        self.layers = {}
-        self.defaults = {}
-        self.virtuals = {}
-        self.values = {}
-        self.derived = {}
-        self.width = max_col
-        self.height = max_row
-        self.filepath = None
-        self.app = None
-
-    def set_app(self, app):
-        self.app = app
-
-    def resize(self, width, height):
-        for lay in self.layers:
-            old = self.layers[lay]
-            self.layers[lay] = Map.create_matrix(width, height, self.defaults[lay])
-            for row in range(min(height, self.height)):
-                for col in range(min(width, self.width)):
-                    self.layers[lay][row][col] = old[row][col]
-        self.width = width
-        self.height = height
-
-    def add_layer(self, name, val, values, parent=None, linked=None):
-        if not isinstance(val, int):
-            raise Exception(f'[ERROR] Only integer accepted, not {val.__class__.__name__}')
-        if parent is None:
-            self.layers[name] = Map.create_matrix(self.width, self.height, val)
-            self.defaults[name] = val
-        else:
-            self.virtuals[name] = parent
-        if linked is not None:
-            if name not in self.derived:
-                self.derived[name] = {}
-            self.derived[name][linked] = Map.create_matrix(self.width, self.height, 0)
-        self.values[name] = values
-
-    def __repr__(self):
-        return f"{self.name} {self.width}x{self.height} [{self.mod}]"
-
-    def set_name(self, name):
-        self.name = name
-
-    def check_xy(self, col, row):
-        if col is None or row is None:
-            return False
-        return row >= 0 and row < self.height and col >= 0 and col < self.width
-
-    def check(self, row, col, layer, layer_none_ok=False):
-        layer = self.resolve(layer)
-        if layer is None and not layer_none_ok:
-            raise Exception("[ERROR] Layer not defined.")
-        if layer is not None and layer not in self.layers:
-            raise Exception(f"[ERROR] Layer value unknown: {layer}")
-        if row < 0 or row >= self.height:
-            raise Exception(f"[ERROR] Out of row: {row} / {self.height}")
-        if col < 0 or col >= self.width:
-            raise Exception(f"[ERROR] Out of col: {col} / {self.width}")
-
-    def resolve(self, layer):
-        if layer in self.virtuals:
-            return self.virtuals[layer]
-        return layer
-
-    def set(self, row, col, val, layer):
-        self.check(row, col, layer)
-        true_layer = self.resolve(layer)
-        self.layers[true_layer][row][col] = val
-        if true_layer in self.derived:
-            for derived in self.derived[true_layer]:
-                if derived == 'player':
-                    lay = self.derived[true_layer][derived]
-                    lay[row][col] = self.app.varPlayer.get()
-
-    def get(self, row, col, layer=None):
-        self.check(row, col, layer, True)
-        if layer is not None:
-            return self.layers[self.resolve(layer)][row][col]
-        res = {}
-        for lay in self.layers:
-            c = self.layers[lay][row][col]
-            if c == 0 or c in self.values[lay]: # accept always 0
-                res[lay] = c
-            else: # virtual layers
-                found = False
-                for vlay, values in self.values.items():
-                    if vlay in self.virtuals:
-                        if c in values and self.virtuals[vlay] == lay:
-                            res[vlay] = c
-                            found = True
-                if not found:
-                    print(f'Unknown value = {c} for layer {vlay}')
-                    print(f'Authorized values are: {self.values[vlay]}')
-                    raise Exception(f"FATAL ERROR: UNKOWN VALUE {c} FOR LAYER {vlay}")
-        return res
-
-    @staticmethod
-    def from_json(filepath):
-        f = open(filepath, 'r')
-        data = json.load(f)
-        f.close()
-        m = Map(data["name"], data["width"], data["height"], data['mod'])
-        m.layers = data['layers']
-        m.derived = data['derived']  
-        m.filepath = filepath
-        # values & mod_handler & virtuals will be set later
-        return m
-
-    def to_json(self, filepath, test=False):
-        file = open(filepath, 'w')
-        content = '{\n'
-        content += f'    "name": "{self.name}",\n'
-        content += f'    "mod" : "{self.mod}",\n'
-        content += f'    "width": {self.width},\n'
-        content += f'    "height": {self.height},\n'
-        content += '    "layers" : {\n'
-        count = 0
-        for key, lay in self.layers.items():
-            count += 1
-            content += f'        "{key}" : [\n'
-            for irow, row in enumerate(lay):
-                content += '            ['
-                for icol, col in enumerate(row):
-                    if icol != len(row) - 1:
-                        content += f'{col}, '
-                    else:
-                        content += f'{col}'
-                if irow != len(lay) - 1:
-                    content += '],\n'
-                else:
-                    content += ']\n'
-            if count == len(self.layers):
-                content += '        ]\n'
-            else:
-                content += '        ],\n'
-        content += '    },\n'
-        content += '    "derived" : {\n'
-        count = 0
-        for key_layer in self.derived:
-            count += 1
-            content += f'        "{key_layer}" : ' + '{\n'
-            derived_count = 0
-            for key_derived in self.derived[key_layer]:
-                derived_count += 1
-                content += f'            "{key_derived}" : [\n'
-                lay = self.derived[key_layer][key_derived]
-                for irow, row in enumerate(lay):
-                    content += '                ['
-                    for icol, col in enumerate(row):
-                        if icol != len(row) - 1:
-                            content += f'{col}, '
-                        else:
-                            content += f'{col}'
-                    if irow != len(lay) - 1:
-                        content += '],\n'
-                    else:
-                        content += ']\n'
-                if derived_count == len(self.derived[key_layer]):
-                    content += '            ]\n'
-                else:
-                    content += '            ],\n'
-            if count == len(self.derived):
-                content += '        }\n'
-            else:
-                content += '        },\n'
-        content += '    }\n'
-        content += '}\n'
-        file.write(content)
-        file.close()
-        if test:
-            try:
-                file = open(filepath, 'r')
-                json.load(file)
-                file.close()
-            except Exception:
-                print('Something went wrong when trying to load map. Map may be corrupted.')
-                print('Stack info:')
-                print_exc(file=stdout)
-        self.filepath = filepath
 
 #-----------------------------------------------------------
 # Dialog
@@ -475,7 +276,7 @@ class ContentSet:
 class LayerHandler:
 
     def __init__(self, name, content, default, apply, icon, pencil=1,
-                 visible=True, parent=None, linked=None):
+                 visible=True, obj=None):
         self.name = name
         self.res = content
         self.default = default
@@ -486,8 +287,7 @@ class LayerHandler:
         self.visible = visible
         self.apply = apply
         self.icon = icon
-        self.parent = parent
-        self.linked = linked
+        self.obj = obj
 
     def get_parent_name(self):
         if self.parent is None:
@@ -713,20 +513,19 @@ class ModHandler:
         # Prepare layers
         self.layerHandlers = {}
         for layname, laycontent in self.mod_data["layers"].items():
-            parent = None
-            linked = None
-            if 'parent' in laycontent:
-                parent = self.layerHandlers[laycontent['parent']]
-            if 'linked' in laycontent:
-                linked = laycontent['linked']
+            obj = None
+            if 'object' in laycontent:
+                obj = laycontent['object']
+                if obj not in self.mod_data["types"]:
+                    raise Exception('[ERROR] Undefined type: ' + obj)
+                obj = self.mod_data["types"][obj]
             self.layerHandlers[layname] = LayerHandler(layname,
                                                        laycontent['res'],
                                                        laycontent['default'],
                                                        laycontent['apply'],
                                                        laycontent['icon'], 1,
                                                        laycontent['visible'],
-                                                       parent=parent,
-                                                       linked=linked)
+                                                       obj)
         self.layer = self.layerHandlers[self.mod_data["default_layer"]]
         self.stakeholders = self.mod_data["stakeholders"]
         if self.debug: print(f"[INFO] Mod *** {self.code} *** loaded.")
@@ -742,13 +541,13 @@ class Action:
         self.app = app
         self.map = amap
         self.layer = layer
-        self.start_x = start_x
-        self.start_y = start_y
+        self.start_x = start_x if start_x is not None else x32
+        self.start_y = start_y if start_y is not None else y32
         self.x32 = x32
         self.y32 = y32
         self.content = content
         self.pencil = pencil
-        self.save = []
+        self.changes = []
         self.resolve()
 
     def resolve(self):
@@ -778,19 +577,29 @@ class Action:
                 if 0 <= x < self.map.width and 0 <= y < self.map.height:
                     row.append((y, x, self.map.get(y, x, self.layer.name)))
                     #print(f"set   ({y}, {x}) -> {self.content} {self.layer.name}")
-                    self.map.set(y, x, self.content, self.layer.name)
+                    if not self.map.has_objects(self.layer.name):
+                        act = self.map.set(self.content, y, x, self.layer.name)
+                    else:
+                        definition = self.layer.obj
+                        instance = {}
+                        for key, val in definition.items():
+                            if val == 'Content_Name':
+                                instance[key] = self.app.mod.resources[self.layer.res][self.content].name
+                            elif val == 'Meta_Player':
+                                instance[key] = self.app.varPlayer.get()
+                            else:
+                                raise Exception('[ERROR] Unknwon type: ' + val)
+                        instance['val'] = self.content
+                        act = self.map.set(instance, y, x, self.layer.name)
+                    self.changes.append(act)
                     self.app.refresh_tile(y, x)
-                self.save.append(row)
         self.done = True
 
     def unresolve(self):
         #print("unresolve")
-        for row in range(len(self.save)):
-            arow = self.save[row]
-            for col in range(len(arow)):
-                elem = arow[col]
-                self.map.set(elem[0], elem[1], elem[2], self.layer.name)
-                self.app.refresh_tile(elem[0], elem[1])
+        for act in self.changes:
+            self.map.set(act['prev'], act['row'], act['col'], act['name'])
+            self.app.refresh_tile(act['row'], act['col'])
         self.done = False
 
 
@@ -801,13 +610,17 @@ class ActionList:
         self.max_size = max_size
 
     def do(self, app, amap, layer, start_x, start_y, x32, y32, content, pencil):
-        if not amap.check_xy(col=x32, row=y32) or not amap.check_xy(start_x, start_y):
+        if not amap.check(col=x32, row=y32): 
+            return
+        if start_x is not None and not amap.check(start_x, start_y):
             return
         do = False
         if start_x == x32 and start_y == y32:
-            if not amap.check_xy(col=x32, row=y32) or amap.get(row=y32, col=x32, layer=layer.name) == content:
+            if not amap.check(col=x32, row=y32) or \
+               amap.get(row=y32, col=x32, layer=layer.name) == content:
                 return
-        self.previous.append(Action(app, amap, layer, start_x, start_y, x32, y32, content, pencil))
+        self.previous.append(Action(app, amap, layer, start_x, start_y,
+                                    x32, y32, content, pencil))
         if len(self.previous) > self.max_size:
             del self.previous[0]
 
@@ -875,13 +688,11 @@ class Application:
         width = 32 if width is None else width
         height = 32 if height is None else height
         self.dirty = False
-        self.set_map(Map(title, width, height, self.options['mod']))
+        self.map = Map(self, title, width, height)
         for _, lay in self.mod.layerHandlers.items():
             def_code = self.mod.resources[lay.res].get_default_num(lay.default)
-            values = self.mod.resources[lay.res].nums()
-            self.map.add_layer(lay.name, def_code, values,
-                               parent=lay.get_parent_name(),
-                               linked=lay.get_linked())
+            obj = lay.obj
+            self.map.add_layer(lay.name, def_code, obj)
         if not restart:
             self.build_gui() # need the size of the map in order to create the scrollbars
         else:
@@ -893,7 +704,7 @@ class Application:
         if mod is None and amap is None:
             raise Exception("Cannot run without a mod or a map")
         if mod is None:
-            mod = amap.mod
+            mod = amap.modcode
         if mod != self.options['mod']:
             self.clean_layer_buttons()
             self.options['mod'] = mod
@@ -907,7 +718,8 @@ class Application:
         if amap is None:
             self.start_new_map(restart=True)
         else:
-            self.set_map(amap)
+            self.dirty = False
+            self.map = amap
             self.canvas.config(scrollregion=(0, 0, self.map.width * 32, self.map.height * 32))
             self.refresh_map() # need the canvas in order to display the map
         self.refresh_status()
@@ -916,24 +728,10 @@ class Application:
         "Load a map. Partial GUI rebuild."
         if self.debug:
             print(f'[INFO] start_load_map: Loading {mapfilepath}')
-        amap = Map.from_json(mapfilepath)
+        amap = Map.from_json(self, mapfilepath)
         if self.debug:
-            print(f'[INFO] start_load_map: Mod of map is {amap.mod}')
+            print(f'[INFO] start_load_map: Mod of map is {amap.app.mod.code}')
         self.start_load_mod(amap=amap)
-
-    def set_map(self, amap):
-        "Set the working map"
-        self.dirty = False
-        self.map = amap
-        # set the application in order to fill the linked/derived table (player)
-        self.map.set_app(self)
-        # set values and virtuals
-        if len(self.map.values) == 0:
-            for _, lay in self.mod.layerHandlers.items():
-                #print('>>>', lay.name, self.mod.resources[lay.res].nums())
-                self.map.values[lay.name] = self.mod.resources[lay.res].nums()
-                if lay.parent is not None:
-                    self.map.virtuals[lay.name] = lay.get_parent_name()
 
     def exit_app(self, force_exit=False):
         "Exit the application and clean before"
@@ -1108,7 +906,7 @@ class Application:
                 return
         elif filepath is None:
             filepath = self.map.filepath
-        self.map.to_json(filepath, True)
+        self.map.save(filepath)
         self.dirty = False
         self.refresh_title()
 
@@ -1123,12 +921,17 @@ class Application:
 
     def refresh_tile(self, row, col):
         "Refresh a tile."
-        val = self.map.get(row, col)
-        for lay, val in val.items():
+        values = self.map.get(row, col)
+        for lay, val in values.items():
             if self.mod.layerHandlers[lay].visible:
                 res = self.mod.layerHandlers[lay].res
                 if val != 0:
-                    tex = self.mod.resources[res][val]
+                    if isinstance(val, int):
+                        tex = self.mod.resources[res][val]
+                    elif isinstance(val, dict):
+                        tex = self.mod.resources[res][val['val']]
+                    else:
+                        raise Exception('[ERROR] Wrong type of val: ' + type(val))
                     self.canvas.create_image(col * 32, row * 32, anchor=NW, image=tex.tkimg)
         if self.options['show_grid']:
             self.canvas.create_rectangle(col * 32, row * 32, (col + 1) * 32, (row + 1) * 32, outline='black')
@@ -1474,7 +1277,7 @@ class Application:
 
     def menu_file_new(self, event=None):
         d = ChooseSizeDialog(self, title='New Map')
-        if d.width is not None:
+        if d.vars['width'] is not None:
             self.start_new_map('New map', d.vars['width'], d.vars['height'],
                                restart=True)
 
@@ -1564,4 +1367,4 @@ Damien Gouteux - 2020 - Made with ♥ in Occitania\n\n"""
 #-----------------------------------------------------------
 
 if __name__ == "__main__":
-    Application(debug=True)
+    app = Application(debug=True)
