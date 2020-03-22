@@ -22,3 +22,4 @@ web/Thumbs.db
 *.db
 *.db
 .DS_Store
+projet_tile_grid_editor/build

@@ -63,6 +63,7 @@ import os
 import os.path
 #import configparser
 import struct # pack
+import importlib.util
 
 from sys import stdout
 from tkinter import Tk, TclError, PhotoImage, Menu, BooleanVar, StringVar, IntVar, Frame, Button,\
@@ -231,7 +232,7 @@ class ContentSet:
         self.name2num = {}
 
     def __str__(self):
-        return f"{self.name} : ContentSet ({len(self.resources)})"
+        return f"Loading ContentSet {self.name:15} ({len(self.resources):5})"
 
     def __repr__(self):
         return str(self)
@@ -257,8 +258,8 @@ class ContentSet:
             try:
                 self.resources[name] = SimpleImage(self.mod.autoload(f), name, num)
                 count += 1
-                if self.mod.debug:
-                    print(f"[INFO]   + loaded for {self.name:10} [{count:2d}] : {name} -> {f}")
+                #if self.mod.debug:
+                #    print(f"[INFO]   + loaded for {self.name:10} [{count:2d}] : {name} -> {f}")
             except:
                 raise Exception(f"[ERROR] Impossible to load texture {f}.")
         return count
@@ -334,6 +335,7 @@ class ModHandler:
         self.code = code
         self.info = {}
         self.stakeholders = []
+        self.plugin_file = None
         wrong = False
         self.mod_dir = os.path.join(os.getcwd(), 'mod')
         if force_recreate_default:
@@ -484,7 +486,7 @@ class ModHandler:
         all_mod_dir = os.path.join(os.getcwd(), 'mod')
         for mod in os.listdir(all_mod_dir):
             if self.debug:
-                print('[INFO] Found:', mod)
+                print('[INFO] Mod found:', mod)
             mod_dir = os.path.join(os.getcwd(), 'mod', mod)
             if os.path.isdir(mod_dir):
                 mod_file = os.path.join(mod_dir, mod + '.mod')
@@ -528,6 +530,10 @@ class ModHandler:
                                                        obj)
         self.layer = self.layerHandlers[self.mod_data["default_layer"]]
         self.stakeholders = self.mod_data["stakeholders"]
+        # Load plugin
+        path = os.path.join(mod_dir, self.code + '.py')
+        if os.path.isfile(path):
+            self.plugin_file = os.path.join(mod_dir, self.code + '.py')
         if self.debug: print(f"[INFO] Mod *** {self.code} *** loaded.")
 
 #-----------------------------------------------------------
@@ -742,14 +748,14 @@ class Application:
                                        default=messagebox.NO)
         if sure:
             if self.debug:
-                print('[INFO] exiting')
+                print('[INFO] Exiting')
             self.options['width'] = self.tk.winfo_width()
             # don't know why but the window is downsized of 20 pixels compared to asked geometry
             self.options['height'] = self.tk.winfo_height() + 20
             self.canvas.destroy()
             self.tk.destroy()
             if self.debug:
-                print('[INFO] end of exiting')
+                print('[INFO] End of exiting')
 
     def is_linked(self):
         "If the map is linked to a file on the hard drive"
@@ -835,13 +841,20 @@ class Application:
         for _, ct in self.mod.resources.items():
             count += ct.load()
             print(f"[INFO] {ct}")
+        if self.mod.plugin_file is not None:
+            spec = importlib.util.spec_from_file_location("plugin", self.mod.plugin_file)
+            module = importlib.util.module_from_spec(spec)
+            #sys.modules[module_name] = module #XXX
+            spec.loader.exec_module(module)
+            print(module, type(module))
+            print(module.exports)
         if self.debug:
             print(f"[INFO]   = {count} graphics loaded")
 
     def build_layer_buttons(self):
         "Create dynamic buttons for the layers of the mod. Tk() and toolbar objects must be created."
         if self.debug:
-            print(f'[INFO] build_layer_buttons len={len(self.bt_layers) if self.bt_layers is not None else 0}')
+            print(f'[INFO] Creating layer buttons len={len(self.bt_layers) if self.bt_layers is not None else 0}')
         if self.bt_layers is not None and len(self.bt_layers) > 0:
             self.clean_layer_buttons()
         # Layer buttons
@@ -947,7 +960,12 @@ class Application:
                     if self.mod.layerHandlers[lay].visible:
                         res = self.mod.layerHandlers[lay].res
                         if val != 0:
-                            tex = self.mod.resources[res][val]
+                            if isinstance(val, int):
+                                tex = self.mod.resources[res][val]
+                            elif isinstance(val, dict):
+                                tex = self.mod.resources[res][val['val']]
+                            else:
+                                raise Exception('[ERROR] Wrong type of val: ' + type(val))
                             img.alpha_composite(tex.img, (col * 32, row * 32))
                             #img.paste(tex.img, (col * 32, row * 32))
                 if self.options['show_grid']:
@@ -1067,7 +1085,7 @@ class Application:
         pencilmenu.add_radiobutton(label="1x1", variable=self.varPencils, value=1)
         pencilmenu.add_radiobutton(label="3x3", variable=self.varPencils, value=3)
         pencilmenu.add_radiobutton(label="5x5", variable=self.varPencils, value=5)
-        toolsmenu.add_command(label="Check", command=self.menu_tools_check)
+        toolsmenu.add_command(label="Check", command=self.menu_tools_check) #XXX
         toolsmenu.add_separator()
         export_sta = "normal" #if PILLOW else "disabled"
         toolsmenu.add_command(label="Export image", command=self.menu_tools_export_image, state=export_sta)
