@@ -114,9 +114,17 @@ class Layer:
         if self.object is None:
             self.content[row][col] = val
         else:
-            self.ido += 1
-            self.objects[self.ido] = val
-            self.content[row][col] = self.ido
+            if isinstance(val, dict):
+                if val['val'] == 0:
+                    # delete
+                    self.content[row][col] = 0
+                else:
+                    self.ido += 1
+                    self.objects[self.ido] = val
+                    self.content[row][col] = self.ido
+            elif isinstance(val, int):
+                # for undo (val is only an integer)
+                self.content[row][col] = val
         return {'name': self.name, 'row': row, 'col': col,
                 'prev': prev, 'next': val}
 
@@ -315,5 +323,5 @@ if __name__ == '__main__':
     print("With Unit:")
     Unit = {'name': 'Content_Name', 'player': 'Meta_Player'}
     A_MAP.add_layer('unit', 0, Unit)
-    A_MAP.set({"name": "kbot", "player": 1}, 3, 3, "unit")
+    A_MAP.set({"name": "kbot", "player": 1, "val": 28}, 3, 3, "unit")
     A_MAP.info()

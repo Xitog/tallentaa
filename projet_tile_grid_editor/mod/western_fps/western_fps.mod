@@ -35,9 +35,11 @@
             "redbrick2pillar"  : { "val" : 12, "file" : "11-red_brick_wall_pillar.bmp" },
             "redbrick3bars"    : { "val" : 13, "file" : "12-red_brick_wall_bars.bmp"   },
             "cream-wall"       : { "val" : 14, "file" : "texture-cream-wall.png"       },
-            "yellow-wall"      : { "val" : 15, "file" : "texture-yellow-wall.png"      }            
+            "yellow-wall"      : { "val" : 15, "file" : "texture-yellow-wall.png"      },
+            "door-closed"      : { "val" : 16, "file" : "texture-door-closed.png"      }
         },
         "objects" : {
+            "suppress"   : { "val" :   0, "file" : "suppress.png"                   },
             "start"      : { "val" :   1, "file" : "object-start-ico.png"           },
             "goldkey"    : { "val" :   2, "file" : "object-key-gold-ico.png"        },
             "silverkey"  : { "val" :   3, "file" : "object-key-silver-ico.png"      },
@@ -58,6 +60,7 @@
             "dynamite"   : { "val" : 105, "file" : "object-weapon-dynamite-ico.png" }
         },
         "monsters" : {
+            "suppress"   : { "val" :   0, "file" : "suppress.png"                   },
             "enemy1"     : { "val" : 200, "file" : "enemy-cowboy-1-ico.png"         },
             "poncho"     : { "val" : 201, "file" : "enemy-cowboy-poncho-ico.png"    },
             "clerc"      : { "val" : 202, "file" : "enemy-cowboy-clerc-ico.png"     },
@@ -65,6 +68,7 @@
             "grizzly2"   : { "val" : 204, "file" : "enemy-grizzli-2-ico.png"        }
         },
         "numbers_HL" : {
+            "suppress": { "val" :  0, "file" : "suppress.png"  },
             "one"     : { "val" :  1, "file" : "num_hl_1.png"  },
             "two"     : { "val" :  2, "file" : "num_hl_2.png"  },
             "three"   : { "val" :  3, "file" : "num_hl_3.png"  },
@@ -77,6 +81,7 @@
             "ten"     : { "val" : 10, "file" : "num_hl_10.png" }
         },
         "numbers_BR" : {
+            "suppress": { "val" :  0, "file" : "suppress.png" },
             "one"     : { "val" :  1, "file" : "num_br_1.png" },
             "two"     : { "val" :  2, "file" : "num_br_2.png" },
             "three"   : { "val" :  3, "file" : "num_br_3.png" },

@@ -65,16 +65,14 @@ import os.path
 import struct # pack
 import importlib.util
 
-from sys import stdout
 from tkinter import Tk, TclError, PhotoImage, Menu, BooleanVar, StringVar, IntVar, Frame, Button,\
      SUNKEN, RAISED, LEFT, Label, Scrollbar, HORIZONTAL, VERTICAL, Canvas, E, BOTH, TOP, X, RIGHT, Y,\
-     BOTTOM, NW, Toplevel, LabelFrame, Radiobutton
+     BOTTOM, NW, Toplevel, LabelFrame, Radiobutton, NORMAL, DISABLED
 from tkinter import messagebox
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 from tkinter.messagebox import showinfo
 from functools import partial
 from PIL import Image, ImageTk, ImageDraw
-from traceback import print_exc
 
 # Third party import
 import typedini
@@ -331,7 +329,8 @@ class ModInfo:
 class ModHandler:
 
     def __init__(self, application, code: str, force_recreate_default: bool = False):
-        self.debug = application.debug
+        self.app = application
+        self.debug = self.app.debug
         self.code = code
         self.info = {}
         self.stakeholders = []
@@ -348,7 +347,7 @@ class ModHandler:
                 wrong = True
             else:
                 try:
-                    self.load_mod()
+                    self.load()
                 except:
                     if self.debug: print('[ERROR] Something went wrong when loading mod ' +
                                          self.code + '. Recovering.')
@@ -356,7 +355,7 @@ class ModHandler:
         if wrong:
             self.create_default_mod()
             self.code = 'default'
-            self.load_mod()
+            self.load()
 
     def __str__(self):
         return str(self.info[self.code])
@@ -448,19 +447,19 @@ class ModHandler:
                     'six': {'val': 6, 'file': 'num_br_6.png'}
                 },
                 'icons' : {
-                    'ground': {'val' : 1, 'file': 'layer-ground.png'},
-                    'wall': {'val' : 2, 'file': 'layer-wall.png'},
-                    'ceiling': {'val' : 3, 'file': 'layer-ceiling.png'},
-                    'height': {'val' : 4, 'file': 'layer-height.png'},
-                    'area': {'val' : 5, 'file': 'layer-area.png'},
-                    'object': {'val' : 6, 'file': 'layer-object.png'}
+                    'ground': {'val': 1, 'file': 'layer-ground.png'},
+                    'wall': {'val': 2, 'file': 'layer-wall.png'},
+                    'ceiling': {'val': 3, 'file': 'layer-ceiling.png'},
+                    'height': {'val': 4, 'file': 'layer-height.png'},
+                    'area': {'val': 5, 'file': 'layer-area.png'},
+                    'object': {'val': 6, 'file': 'layer-object.png'}
                 }
             },
             "stakeholders" : {
-                "Player 1": { "val" : 1, "color" : "blue"   },
-                "Player 2": { "val" : 2, "color" : "red"    },
-                "Player 3": { "val" : 3, "color" : "green"  },
-                "Player 4": { "val" : 4, "color" : "yellow" }
+                "Player 1": { "val": 1, "color": "blue"   },
+                "Player 2": { "val": 2, "color": "red"    },
+                "Player 3": { "val": 3, "color": "green"  },
+                "Player 4": { "val": 4, "color": "yellow" }
             },
             'default_layer': 'wall',
             'has_transition': True
@@ -483,10 +482,12 @@ class ModHandler:
         return target
 
     def detect_mods(self):
+        if self.debug:
+            print('[INFO] Detecting mods:')
         all_mod_dir = os.path.join(os.getcwd(), 'mod')
         for mod in os.listdir(all_mod_dir):
             if self.debug:
-                print('[INFO] Mod found:', mod)
+                print('[INFO]     Mod found:', mod)
             mod_dir = os.path.join(os.getcwd(), 'mod', mod)
             if os.path.isdir(mod_dir):
                 mod_file = os.path.join(mod_dir, mod + '.mod')
@@ -496,7 +497,17 @@ class ModHandler:
                     f.close()
                     self.info[mod] = ModInfo(data['name'], data['licence'], data['creator'], data['websites'])
 
-    def load_mod(self):
+    def load_graphics(self):
+        # Load mod graphical resources. Tk() object must be created.
+        if self.debug: print(f"[INFO] Loading mod *** {self.code} *** graphical resources")
+        count = 0
+        for _, ct in self.resources.items():
+            count += ct.load()
+            print(f"[INFO]     {ct}")
+        if self.debug:
+            print(f"[INFO]     = {count} graphics loaded")
+
+    def load(self):
         if self.debug: print(f"[INFO] Loading mod *** {self.code} ***")
         mod_dir = os.path.join(self.mod_dir, self.code)
         mod_file = os.path.join(mod_dir, self.code + '.mod')
@@ -657,6 +668,7 @@ class Application:
         self.options['mod'] = self.mod.get_loaded_mod()
         self.tk = None
         self.dirty = False
+        self.plugin_code_menu = None
         self.bt_sep = None
         self.bt_layers = {}
         self.bt_textures = {}
@@ -717,9 +729,7 @@ class Application:
             self.mod = ModHandler(self, self.options['mod'], force_recreate_default=True)
             self.options['mod'] = self.mod.get_loaded_mod()
             self.action_change_pencil('data', self.mod.layer.pencil)
-            # all things dependant on mod from build_gui but we are not destroying it
-            self.load_mod_graphics()
-            self.build_layer_buttons()
+            self.load_mod()
             self.varActiveLayer.set(self.mod.layer.name) # needed AFTER building buttons
         if amap is None:
             self.start_new_map(restart=True)
@@ -754,8 +764,6 @@ class Application:
             self.options['height'] = self.tk.winfo_height() + 20
             self.canvas.destroy()
             self.tk.destroy()
-            if self.debug:
-                print('[INFO] End of exiting')
 
     def is_linked(self):
         "If the map is linked to a file on the hard drive"
@@ -834,27 +842,42 @@ class Application:
                     self.save_map()
             self.start_load_mod(self.varMods.get())
 
-    def load_mod_graphics(self):
-        # Load mod graphical resources. Tk() object must be created.
-        if self.debug: print(f"[INFO] Loading mod *** {self.options['mod']} *** graphical resources")
-        count = 0
-        for _, ct in self.mod.resources.items():
-            count += ct.load()
-            print(f"[INFO] {ct}")
+    def load_mod(self):
+        self.mod.load_graphics()
+        self.build_layer_buttons()
+        self.load_mod_code()
+    
+    def display_info(self, title, msg):
+        "Display an infobox for plugin"
+        showinfo(title, msg)
+
+    def load_mod_code(self):
+        if self.debug:
+            print("[INFO] Loading mod plugin code.")
+        # clean
+        last_item = self.plugin_code_menu.index("end")
+        if last_item is not None:
+            for item_count in range(last_item+1):
+                self.plugin_code_menu.delete(item_count)
+        # load
         if self.mod.plugin_file is not None:
             spec = importlib.util.spec_from_file_location("plugin", self.mod.plugin_file)
             module = importlib.util.module_from_spec(spec)
             #sys.modules[module_name] = module #XXX
             spec.loader.exec_module(module)
-            print(module, type(module))
-            print(module.exports)
-        if self.debug:
-            print(f"[INFO]   = {count} graphics loaded")
+            if len(module.exports) > 0:
+                for name, fun in module.exports.items():
+                    self.plugin_code_menu.add_command(label=name, command=lambda: fun(self))
+                self.plugin_code_menu.master.entryconfig("Plugins", state=NORMAL)
+            else:
+                self.plugin_code_menu.master.entryconfig("Plugins", state=DISABLED)
+        else:
+            self.plugin_code_menu.master.entryconfig("Plugins", state=DISABLED)
 
     def build_layer_buttons(self):
         "Create dynamic buttons for the layers of the mod. Tk() and toolbar objects must be created."
         if self.debug:
-            print(f'[INFO] Creating layer buttons len={len(self.bt_layers) if self.bt_layers is not None else 0}')
+            print(f'[INFO] Creating layer buttons (previous len={len(self.bt_layers) if self.bt_layers is not None else 0})')
         if self.bt_layers is not None and len(self.bt_layers) > 0:
             self.clean_layer_buttons()
         # Layer buttons
@@ -1019,8 +1042,6 @@ class Application:
         self.tk = Tk()
         self.tk.protocol("WM_DELETE_WINDOW", self.exit_app)
 
-        self.load_mod_graphics()
-
         # Load images
         BASE_ICONS = True
         try:
@@ -1039,7 +1060,7 @@ class Application:
             BASE_ICONS = False
 
         if self.debug:
-            print("[INFO] Creating menu")
+            print("[INFO]     Creating menu")
         # Menu
         menu = Menu(self.tk)
         self.tk.config(menu=menu)
@@ -1085,10 +1106,11 @@ class Application:
         pencilmenu.add_radiobutton(label="1x1", variable=self.varPencils, value=1)
         pencilmenu.add_radiobutton(label="3x3", variable=self.varPencils, value=3)
         pencilmenu.add_radiobutton(label="5x5", variable=self.varPencils, value=5)
-        toolsmenu.add_command(label="Check", command=self.menu_tools_check) #XXX
         toolsmenu.add_separator()
-        export_sta = "normal" #if PILLOW else "disabled"
-        toolsmenu.add_command(label="Export image", command=self.menu_tools_export_image, state=export_sta)
+        self.plugin_code_menu = Menu(toolsmenu, tearoff=0)
+        toolsmenu.add_cascade(label="Plugins", menu=self.plugin_code_menu)
+        toolsmenu.add_separator()
+        toolsmenu.add_command(label="Export image", command=self.menu_tools_export_image)
         toolsmenu.add_command(label="Export binary", command=self.menu_tools_export_binary)
 
         self.varMods = StringVar()
@@ -1142,7 +1164,7 @@ class Application:
 
         # Button bar
         if self.debug:
-            print("[INFO] Creating toolbar")
+            print("[INFO]     Creating toolbar")
         self.toolbar = Frame(self.content)
         self.toolbar_content = Frame(self.content)
 
@@ -1179,12 +1201,11 @@ class Application:
             sep2 = Label(self.toolbar, text=" ")
             sep2.pack(side=LEFT)
 
-        self.build_layer_buttons()
-        self.build_content_buttons()
-
+        self.load_mod()
+        
         # Canvas
         if self.debug:
-            print("[INFO] Creating canvas")
+            print("[INFO]     Creating canvas")
         x_scrollbar = Scrollbar(self.content, orient=HORIZONTAL)
         y_scrollbar = Scrollbar(self.content, orient=VERTICAL)
         self.canvas = Canvas(self.content,
@@ -1195,7 +1216,7 @@ class Application:
 
         # Status bar
         if self.debug:
-            print("[INFO] Creating status bar")
+            print("[INFO]     Creating status bar")
         self.var_status_bar_content = StringVar()
         self.var_status_bar_content.set('Welcome')
         self.status_bar = Label(self.content,
@@ -1204,7 +1225,7 @@ class Application:
 
         # Packing
         if self.debug:
-            print("[INFO] Packing GUI")
+            print("[INFO]     Packing GUI")
         self.content.pack(fill=BOTH, expand=True)
         self.toolbar.pack(side=TOP, fill=X)
         self.toolbar_content.pack(side=TOP, fill=X)
@@ -1217,7 +1238,7 @@ class Application:
 
         # Canvas
         if self.debug:
-            print("[INFO] Binding")
+            print("[INFO]     Binding")
         self.canvas.bind('<ButtonPress-1>', self.enter_drag)
         self.canvas.bind('<ButtonRelease-1>', self.put_texture)
         self.canvas.bind('<B1-Motion>', self.draw_drag)
