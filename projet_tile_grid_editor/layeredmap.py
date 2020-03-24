@@ -112,19 +112,23 @@ class Layer:
         "Set int at row, col."
         prev = self.content[row][col]
         if self.object is None:
+            print(f'set row={row} col={col} val={val}')
             self.content[row][col] = val
         else:
             if isinstance(val, dict):
                 if val['val'] == 0:
                     # delete
                     self.content[row][col] = 0
+                    print(f'obj row={row} col={col} val=0 len={len(self.objects)}')
                 else:
                     self.ido += 1
                     self.objects[self.ido] = val
                     self.content[row][col] = self.ido
+                    print(f'obj row={row} col={col} val={self.ido} len={len(self.objects)}')
             elif isinstance(val, int):
                 # for undo (val is only an integer)
                 self.content[row][col] = val
+                print(f'obj row={row} col={col} val={val} len={len(self.objects)}')
         return {'name': self.name, 'row': row, 'col': col,
                 'prev': prev, 'next': val}
 

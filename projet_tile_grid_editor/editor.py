@@ -221,46 +221,71 @@ class ChooseSizeDialog(Dialog):
 #-----------------------------------------------------------
 
 class ContentSet:
-
-    def __init__(self, mod, name):
+    """A content set is a set of SimpleImage.
+       Each member of the set can be accessed through its name or its number.
+       A composite content set is composed of two or more content set."""
+    
+    def __init__(self, mod, name, icon, subsets=None):
         self.mod = mod
         self.name = name
+        self.icon = icon
         self.resources = {}
         self.num2name = {}
         self.name2num = {}
+        self.subsets = subsets if isinstance(subsets, dict) and \
+                                  len(subsets) > 0 and isinstance(subsets[next(iter(subsets))], ContentSet) else \
+                                  {}
+        self.loaded = False
 
+    def is_composite(self):
+        "Return True if the set is composite." 
+        return len(self.subsets) != 0
+    
     def __str__(self):
-        return f"Loading ContentSet {self.name:15} ({len(self.resources):5})"
+        return f"Loading ContentSet {self.name:15} ({len(self):5})"
 
     def __repr__(self):
         return str(self)
 
+    def __len__(self):
+        return len(self.resources)
+
     def register(self, name, val, file):
+        "Register a resource file name in the content set but doesn't load it."
         self.resources[name] = file
         self.num2name[val] = name
         self.name2num[name] = val
 
     def get_default_num(self, val):
+        "Get the number of the default content from its name or its number."
         if isinstance(val, str):
             return self.name2num[val]
         else:
             return val
 
-    def nums(self):
-        return list(self.num2name.keys())
-
     def load(self):
-        count = 0
-        for name, f in self.resources.items():
-            num = self.name2num[name]
-            try:
-                self.resources[name] = SimpleImage(self.mod.autoload(f), name, num)
-                count += 1
-                #if self.mod.debug:
-                #    print(f"[INFO]   + loaded for {self.name:10} [{count:2d}] : {name} -> {f}")
-            except:
-                raise Exception(f"[ERROR] Impossible to load texture {f}.")
-        return count
+        "Load all the picture of the content set, creating the SimpleImage objects."
+        if not self.is_composite() and not self.loaded:
+            count = 0
+            for name, f in self.resources.items():
+                num = self.name2num[name]
+                try:
+                    self.resources[name] = SimpleImage(self.mod.autoload(f), name, num)
+                    count += 1
+                    #if self.mod.debug:
+                    #    print(f"[INFO]   + loaded for {self.name:10} [{count:2d}] : {name} -> {f}")
+                except:
+                    raise Exception(f"[ERROR] Impossible to load texture {f}.")
+            self.loaded = True
+        else:
+            for _, contentset in self.subsets.items():
+                if not contentset.loaded:
+                    contentset.load()
+                self.resources.update(contentset.resources)
+                self.num2name.update(contentset.num2name)
+                self.name2num.update(contentset.name2num)
+            self.loaded = True
+        return len(self)
 
     def __getitem__(self, val):
         if isinstance(val, int):
@@ -275,7 +300,7 @@ class ContentSet:
 class LayerHandler:
 
     def __init__(self, name, content, default, apply, icon, pencil=1,
-                 visible=True, obj=None):
+                 visible=True, obj=None, default_content=None):
         self.name = name
         self.res = content
         self.default = default
@@ -287,15 +312,7 @@ class LayerHandler:
         self.apply = apply
         self.icon = icon
         self.obj = obj
-
-    def get_parent_name(self):
-        if self.parent is None:
-            return None
-        else:
-            return self.parent.name
-
-    def get_linked(self):
-        return self.linked
+        self.default_content = default_content
 
     def __str__(self):
         s = f"name={self.name} default={self.default} " + \
@@ -333,6 +350,8 @@ class ModHandler:
         self.debug = self.app.debug
         self.code = code
         self.info = {}
+        self.layers = {}
+        self.layer = None
         self.stakeholders = []
         self.plugin_file = None
         wrong = False
@@ -346,12 +365,12 @@ class ModHandler:
             if self.code not in self.info:
                 wrong = True
             else:
-                try:
-                    self.load()
-                except:
-                    if self.debug: print('[ERROR] Something went wrong when loading mod ' +
-                                         self.code + '. Recovering.')
-                    wrong = True
+                #try:
+                self.load()
+                #except:
+                #    if self.debug: print('[ERROR] Something went wrong when loading mod ' +
+                #                         self.code + '. Recovering.')
+                #    wrong = True
         if wrong:
             self.create_default_mod()
             self.code = 'default'
@@ -421,38 +440,53 @@ class ModHandler:
             },
             'resources' : {
                 'textures': {
-                    'black': {'val': 1, 'file': 'black.png'},
-                    'blue': {'val': 2, 'file': 'blue.png'},
-                    'green': {'val': 3, 'file': 'green.png'},
-                    'red': {'val': 4, 'file': 'red.png'}
+                    'icon': 'black',
+                    'content' : {
+                        'black': {'val': 1, 'file': 'black.png'},
+                        'blue': {'val': 2, 'file': 'blue.png'},
+                        'green': {'val': 3, 'file': 'green.png'},
+                        'red': {'val': 4, 'file': 'red.png'}
+                    }
                 },
                 'objects' : {
-                    'heart': {'val': 1, 'file': 'object-heart.png'},
-                    'goldkey': {'val': 2, 'file': 'object-goldkey.png'}
+                    'icon': 'heart',
+                    'content': {
+                        'heart': {'val': 1, 'file': 'object-heart.png'},
+                        'goldkey': {'val': 2, 'file': 'object-goldkey.png'}
+                    }
                 },
                 'numbers_HL' : {
-                    'one': {'val': 1, 'file': 'num_hl_1.png'},
-                    'two': {'val': 2, 'file': 'num_hl_2.png'},
-                    'three': {'val': 3, 'file': 'num_hl_3.png'},
-                    'four': {'val': 4, 'file': 'num_hl_4.png'},
-                    'five': {'val': 5, 'file': 'num_hl_5.png'},
-                    'six': {'val': 6, 'file': 'num_hl_6.png'}
+                    'icon': 'one',
+                    'content': {
+                        'one': {'val': 1, 'file': 'num_hl_1.png'},
+                        'two': {'val': 2, 'file': 'num_hl_2.png'},
+                        'three': {'val': 3, 'file': 'num_hl_3.png'},
+                        'four': {'val': 4, 'file': 'num_hl_4.png'},
+                        'five': {'val': 5, 'file': 'num_hl_5.png'},
+                        'six': {'val': 6, 'file': 'num_hl_6.png'}
+                    }
                 },
                 'numbers_BR' : {
-                    'one': {'val': 1, 'file': 'num_br_1.png'},
-                    'two': {'val': 2, 'file': 'num_br_2.png'},
-                    'three': {'val': 3, 'file': 'num_br_3.png'},
-                    'four': {'val': 4, 'file': 'num_br_4.png'},
-                    'five': {'val': 5, 'file': 'num_br_5.png'},
-                    'six': {'val': 6, 'file': 'num_br_6.png'}
+                    'icon': 'one',
+                    'content': {
+                        'one': {'val': 1, 'file': 'num_br_1.png'},
+                        'two': {'val': 2, 'file': 'num_br_2.png'},
+                        'three': {'val': 3, 'file': 'num_br_3.png'},
+                        'four': {'val': 4, 'file': 'num_br_4.png'},
+                        'five': {'val': 5, 'file': 'num_br_5.png'},
+                        'six': {'val': 6, 'file': 'num_br_6.png'}
+                    }
                 },
                 'icons' : {
-                    'ground': {'val': 1, 'file': 'layer-ground.png'},
-                    'wall': {'val': 2, 'file': 'layer-wall.png'},
-                    'ceiling': {'val': 3, 'file': 'layer-ceiling.png'},
-                    'height': {'val': 4, 'file': 'layer-height.png'},
-                    'area': {'val': 5, 'file': 'layer-area.png'},
-                    'object': {'val': 6, 'file': 'layer-object.png'}
+                    'icon': 'ground',
+                    'content': {
+                        'ground': {'val': 1, 'file': 'layer-ground.png'},
+                        'wall': {'val': 2, 'file': 'layer-wall.png'},
+                        'ceiling': {'val': 3, 'file': 'layer-ceiling.png'},
+                        'height': {'val': 4, 'file': 'layer-height.png'},
+                        'area': {'val': 5, 'file': 'layer-area.png'},
+                        'object': {'val': 6, 'file': 'layer-object.png'}
+                    }
                 }
             },
             "stakeholders" : {
@@ -502,10 +536,17 @@ class ModHandler:
         if self.debug: print(f"[INFO] Loading mod *** {self.code} *** graphical resources")
         count = 0
         for _, ct in self.resources.items():
+            # replace the string by the actual SimpleImage
             count += ct.load()
             print(f"[INFO]     {ct}")
+            # replace the name of the icon by the actual SimpleImage for contentsets
+            if ct.icon is not None:
+                ct.icon = ct[ct.icon]
         if self.debug:
             print(f"[INFO]     = {count} graphics loaded")
+        # replace the name of the icon by the actual SimpleImage for layers
+        for _, lay in self.layers.items():
+            lay.icon = self.resources['icons'][lay.icon]
 
     def load(self):
         if self.debug: print(f"[INFO] Loading mod *** {self.code} ***")
@@ -518,13 +559,15 @@ class ModHandler:
         self.mod_data['graphics_dir'] = os.path.join(mod_dir, 'graphics')
         # Prepare resources
         self.resources = {}
-        for resname, rescontent in self.mod_data['resources'].items():
-            self.resources[resname] = ContentSet(self, resname)
+        for resname, resdata in self.mod_data['resources'].items():
+            resicon = resdata['icon']
+            rescontent = resdata['content']
+            self.resources[resname] = ContentSet(self, resname, resicon)
             for objname, objcontent in rescontent.items():
                 self.resources[resname].register(objname, objcontent['val'],
                                                  objcontent['file'])
         # Prepare layers
-        self.layerHandlers = {}
+        self.layers.clear()
         for layname, laycontent in self.mod_data["layers"].items():
             obj = None
             if 'object' in laycontent:
@@ -532,14 +575,24 @@ class ModHandler:
                 if obj not in self.mod_data["types"]:
                     raise Exception('[ERROR] Undefined type: ' + obj)
                 obj = self.mod_data["types"][obj]
-            self.layerHandlers[layname] = LayerHandler(layname,
-                                                       laycontent['res'],
-                                                       laycontent['default'],
-                                                       laycontent['apply'],
-                                                       laycontent['icon'], 1,
-                                                       laycontent['visible'],
-                                                       obj)
-        self.layer = self.layerHandlers[self.mod_data["default_layer"]]
+            if isinstance(laycontent['res'], list):
+                vname = '::'.join(laycontent['res'])
+                sub = {}
+                for n in laycontent['res']:
+                    sub[n] = self.resources[n]
+                self.resources[vname] = ContentSet(self, vname, None, sub)
+                default_content = laycontent['res'][0]
+                laycontent['res'] = vname
+            else:
+                default_content = laycontent['res']
+            self.layers[layname] = LayerHandler(layname,
+                                                self.resources[laycontent['res']],
+                                                laycontent['default'],
+                                                laycontent['apply'],
+                                                laycontent['icon'], 1,
+                                                laycontent['visible'],
+                                                obj, default_content)
+        self.layer = self.layers[self.mod_data["default_layer"]]
         self.stakeholders = self.mod_data["stakeholders"]
         # Load plugin
         path = os.path.join(mod_dir, self.code + '.py')
@@ -601,7 +654,7 @@ class Action:
                         instance = {}
                         for key, val in definition.items():
                             if val == 'Content_Name':
-                                instance[key] = self.app.mod.resources[self.layer.res][self.content].name
+                                instance[key] = self.layer.res[self.content].name
                             elif val == 'Meta_Player':
                                 instance[key] = self.app.varPlayer.get()
                             else:
@@ -672,6 +725,7 @@ class Application:
         self.bt_sep = None
         self.bt_layers = {}
         self.bt_textures = {}
+        self.bt_contentsets = {}
         self.bt_pencils = None
         self.background = None
         self.varShowGrid = None
@@ -707,8 +761,8 @@ class Application:
         height = 32 if height is None else height
         self.dirty = False
         self.map = Map(self, title, width, height)
-        for _, lay in self.mod.layerHandlers.items():
-            def_code = self.mod.resources[lay.res].get_default_num(lay.default)
+        for _, lay in self.mod.layers.items():
+            def_code = lay.res.get_default_num(lay.default)
             obj = lay.obj
             self.map.add_layer(lay.name, def_code, obj)
         if not restart:
@@ -790,9 +844,24 @@ class Application:
     def action_change_texture(self, index, value, op=None):
         if index in ['button', 'data']:
             for key, bt in self.bt_textures.items():
-                if value == self.mod.resources[self.mod.layer.res][key].num:
+                if value == self.mod.layer.res[key].num:
                     bt.config(relief=SUNKEN)
-                    self.mod.layer.apply = self.mod.resources[self.mod.layer.res][key].name
+                    self.mod.layer.apply = self.mod.layer.res[key].name
+                else:
+                    bt.config(relief=RAISED)
+            self.refresh_status()
+
+    def action_change_set(self, index, value, op=None):
+        if index in ['button', 'data']:
+            for key, bt in self.bt_contentsets.items():
+                if value == key:
+                    bt.config(relief=SUNKEN)
+                    self.mod.layer.default_content = value
+                    for _, image in self.mod.layer.res.subsets[value].resources.items():
+                        if image.num != 0:
+                            self.mod.layer.apply = image.name
+                            break
+                    self.build_content_buttons()
                 else:
                     bt.config(relief=RAISED)
             self.refresh_status()
@@ -807,7 +876,7 @@ class Application:
             if self.debug:
                 print('[INFO] Refreshing data and bt_layers')
             value = self.varActiveLayer.get()
-            self.mod.layer = self.mod.layerHandlers[value]
+            self.mod.layer = self.mod.layers[value]
             for key, bt in self.bt_layers.items():
                 if key == value:
                     bt.config(relief=SUNKEN)
@@ -825,13 +894,13 @@ class Application:
         if self.debug:
             print(f'[INFO] action_change_visibility : {index} {value}')
         if index == 'data':
-            self.varVisibleLayers[self.mod.layer.name].set(self.mod.layerHandlers[self.mod.layer.name].visible)
+            self.varVisibleLayers[self.mod.layer.name].set(self.mod.layers[self.mod.layer.name].visible)
         else:
             if self.debug:
                 print('[INFO] Searching for incoherency')
             for name, var in self.varVisibleLayers.items():
-                if var.get() != self.mod.layerHandlers[name].visible:
-                    self.mod.layerHandlers[name].visible = var.get()
+                if var.get() != self.mod.layers[name].visible:
+                    self.mod.layers[name].visible = var.get()
             self.refresh_map()
 
     def menu_change_mod(self, index, value, op):
@@ -881,22 +950,28 @@ class Application:
         if self.bt_layers is not None and len(self.bt_layers) > 0:
             self.clean_layer_buttons()
         # Layer buttons
-        for layname, lay in self.mod.layerHandlers.items():
-            self.bt_layers[layname] = Button(self.toolbar, image=self.mod.resources['icons'][lay.icon].tkimg, width=32, height=32, command=partial(self.action_change_layer, 'button', layname))
+        for layname, lay in self.mod.layers.items():
+            self.bt_layers[layname] = Button(self.toolbar, image=lay.icon.tkimg,
+                                             width=32, height=32,
+                                             command=partial(
+                                                 self.action_change_layer,
+                                                 'button', layname))
             if self.mod.layer.name == layname:
                 self.bt_layers[layname].config(relief=SUNKEN)
             else:
                 self.bt_layers[layname].config(relief=RAISED)
             self.bt_layers[layname].pack(side=LEFT)
-        self.bt_sep = Label(self.toolbar, text=" ")
-        self.bt_sep.pack(side=LEFT)
         self.build_content_buttons()
 
     def build_content_buttons(self):
         "Create dynamic buttons for the textures of the layer."
         if hasattr(self, 'bt_textures') and self.bt_textures is not None and len(self.bt_textures) > 0:
             self.clean_content_buttons()
-        for _, res in self.mod.resources[self.mod.layer.res].resources.items():
+            self.clean_content_set_buttons()
+        contentset = self.mod.layer.res
+        if contentset.is_composite():
+            contentset = contentset.subsets[self.mod.layer.default_content]
+        for _, res in contentset.resources.items():
             #print(f'[INFO] Creating button for {self.layer.name} : {res.name}')
             self.bt_textures[res.name] = Button(self.toolbar_content,
                                                 image=res.tkimg, width=32,
@@ -907,14 +982,26 @@ class Application:
             if self.mod.layer.apply == res.name:
                 self.bt_textures[res.name].config(relief=SUNKEN)
             self.bt_textures[res.name].pack(side=LEFT)
+        # If we have a composite layer (multiple content sets)
+        if self.mod.layer.res.is_composite():
+            self.bt_sep = Label(self.toolbar, text=" ")
+            self.bt_sep.pack(side=LEFT)
+            for name, sub in self.mod.layer.res.subsets.items():
+                self.bt_contentsets[name] = Button(self.toolbar,
+                                                   image=sub.icon.tkimg,
+                                                   width=32, height=32,
+                                                   command=partial(
+                                                       self.action_change_set,
+                                                       'button', name))
+                if self.mod.layer.default_content == name:
+                    self.bt_contentsets[name].config(relief=SUNKEN)
+                self.bt_contentsets[name].pack(side=LEFT)
 
     def clean_layer_buttons(self):
         "Clean dynamic buttons for the layers and the textures."
         for _, button in self.bt_layers.items():
             button.destroy()
-        self.bt_sep.destroy()
         self.bt_layers.clear()
-        self.bt_sep = None
         self.clean_content_buttons()
 
     def clean_content_buttons(self):
@@ -922,6 +1009,16 @@ class Application:
         for _, button in self.bt_textures.items():
             button.destroy()
         self.bt_textures.clear()
+
+    def clean_content_set_buttons(self):
+        "Clean dynamic buttons for the content sets of the layer if they are several of them."
+        if self.bt_sep is not None:
+            self.bt_sep.destroy()
+            self.bt_sep = None
+        if self.bt_contentsets is not None:
+            for _, button in self.bt_contentsets.items():
+                button.destroy()
+            self.bt_contentsets.clear()
 
     #-----------------------------------------------------------
     # Map manipulation
@@ -959,13 +1056,12 @@ class Application:
         "Refresh a tile."
         values = self.map.get(row, col)
         for lay, val in values.items():
-            if self.mod.layerHandlers[lay].visible:
-                res = self.mod.layerHandlers[lay].res
+            if self.mod.layers[lay].visible:
                 if val != 0:
                     if isinstance(val, int):
-                        tex = self.mod.resources[res][val]
+                        tex = self.mod.layers[lay].res[val]
                     elif isinstance(val, dict):
-                        tex = self.mod.resources[res][val['val']]
+                        tex = self.mod.layers[lay].res[val['val']]
                     else:
                         raise Exception('[ERROR] Wrong type of val: ' + type(val))
                     self.canvas.create_image(col * 32, row * 32, anchor=NW, image=tex.tkimg)
@@ -980,13 +1076,12 @@ class Application:
             for col in range(0, self.map.width):
                 val = self.map.get(row, col)
                 for lay, val in val.items():
-                    if self.mod.layerHandlers[lay].visible:
-                        res = self.mod.layerHandlers[lay].res
+                    if self.mod.layers[lay].visible:
                         if val != 0:
                             if isinstance(val, int):
-                                tex = self.mod.resources[res][val]
+                                tex = self.mod.layers[lay].res[val]
                             elif isinstance(val, dict):
-                                tex = self.mod.resources[res][val['val']]
+                                tex = self.mod.layers[lay].res[val['val']]
                             else:
                                 raise Exception('[ERROR] Wrong type of val: ' + type(val))
                             img.alpha_composite(tex.img, (col * 32, row * 32))
@@ -1132,7 +1227,7 @@ class Application:
         layervisibilitymenu = Menu(layersmenu, tearoff=0)
         layersmenu.add_cascade(label="Visible layers", menu=layervisibilitymenu)
 
-        for name, layer in self.mod.layerHandlers.items():
+        for name, layer in self.mod.layers.items():
             self.varVisibleLayers[name] = BooleanVar()
             self.varVisibleLayers[name].set(layer.visible)
             self.varVisibleLayers[name].trace('w', self.action_change_visibility)
@@ -1140,7 +1235,7 @@ class Application:
 
         activelayermenu = Menu(layersmenu, tearoff=0)
         layersmenu.add_cascade(label="Active layer", menu=activelayermenu)
-        for name, layer in self.mod.layerHandlers.items():
+        for name, layer in self.mod.layers.items():
             activelayermenu.add_radiobutton(label=name.title(), variable=self.varActiveLayer, value=name)
 
         self.varPlayer = IntVar()
@@ -1286,7 +1381,7 @@ class Application:
         self.exit_drag(event)
         x32, y32 = self.get_map_coord(event)
         pencil = self.mod.layer.pencil
-        val = self.mod.resources[self.mod.layer.res][self.mod.layer.apply].num
+        val = self.mod.layer.res[self.mod.layer.apply].num
         #print(f'[INFO] {y32} {x32} l={self.layer.name} t={apply} p={pencil}')
         self.dirty = True
         self.previous.do(self, self.map, self.mod.layer, self.start_x,
