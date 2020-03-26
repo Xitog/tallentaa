@@ -12,7 +12,7 @@ def pretty_json(data, level=0, indent=4):
         level += 1
         count = 0
         for key, val in data.items():
-            content += ' ' * indent * level + '"' + key + '": '
+            content += ' ' * indent * level + '"' + str(key) + '": '
             content += pretty_json(val, level, indent)
             count += 1
             if count == len(data):
@@ -51,12 +51,14 @@ def pretty_json(data, level=0, indent=4):
                     content += '\n'
     elif isinstance(data, str):
         content += '"' + data + '"'
+    elif isinstance(data, bool):
+        content += "true" if data else "false"
     elif isinstance(data, int):
         content += str(data)
     elif isinstance(data, float):
         content += str(data)
-    elif isinstance(data, bool):
-        content += "true" if data else "false"
+    else:
+        raise Exception('Type unknown: ' + data.__class__.__name__)
     return content
 
 class Layer:
@@ -110,36 +112,57 @@ class Layer:
 
     def set(self, val, row: int, col: int):
         "Set int at row, col."
-        prev = self.content[row][col]
         if self.object is None:
-            print(f'set row={row} col={col} val={val}')
+            # Texture Layer
+            prev = self.content[row][col]
+            print(f'set row={row} col={col} val={val} prev={prev}')
             self.content[row][col] = val
+            return {'name': self.name, 'row': row, 'col': col,
+                    'prev': prev, 'next': val}
         else:
-            if isinstance(val, dict):
-                if val['val'] == 0:
-                    # delete
-                    self.content[row][col] = 0
-                    print(f'obj row={row} col={col} val=0 len={len(self.objects)}')
-                else:
-                    self.ido += 1
-                    self.objects[self.ido] = val
-                    self.content[row][col] = self.ido
-                    print(f'obj row={row} col={col} val={self.ido} len={len(self.objects)}')
-            elif isinstance(val, int):
-                # for undo (val is only an integer)
+            return self.set_object(val, row, col)
+
+    def set_object(self, val, row: int, col: int):
+        "Set an object at row, col."
+        prev = self.content[row][col] # always an integer index to an object
+        if prev != 0:
+            print(f'Killing previous object at {row},{col} id={prev}')
+            self.objects[prev]['alive'] = False
+        if isinstance(val, int): # when undoing
+            if val != 0:
+                self.objects[val]['alive'] = True
+                print(f'UNDO: Restoring object at {row},{col} id={val} prev={prev}')
                 self.content[row][col] = val
-                print(f'obj row={row} col={col} val={val} len={len(self.objects)}')
+            else:
+                print(f'UNDO: Deleting object at {row},{col} id={self.content[row][col]} prev={prev}')
+                self.content[row][col] = 0
+        else: # val is a dict
+            if val['val'] == 0:
+                print(f'DO: Deleting object at {row},{col} id={self.content[row][col]} prev={prev}')
+                self.content[row][col] = 0
+            else:
+                self.ido += 1
+                val['ido'] = self.ido
+                val['alive'] = True
+                self.objects[self.ido] = val
+                print(f'DO: Creating object at {row},{col} id={val["ido"]} prev={prev}')
+                self.content[row][col] = self.ido
+        #print(f'set object row={row} col={col} val={val} prev={prev}')
         return {'name': self.name, 'row': row, 'col': col,
-                'prev': prev, 'next': val}
+                    'prev': prev, 'next': val}
 
     def to_json(self):
         "Return a JSON representation of the layer."
+        filtered = {} # save only alive objects
+        for k, o in self.objects.items():
+            if o['alive']:
+                filtered[k] = o
         return {
             "object": str(self.object),
             "ido": self.ido,
             "default": self.default,
             "content": self.content,
-            "objects": self.objects
+            "objects": filtered
         }
 
 
@@ -161,7 +184,14 @@ class Map:
             else:
                 a_map.layers[name].object = None
             a_map.layers[name].ido = lay["ido"]
-            a_map.layers[name].objects = lay["objects"]
+            # convert str key to int key
+            objects = {}
+            maxx = 0
+            for k, v in lay["objects"].items():
+                a_map.layers[name].objects[int(k)] = v
+                if int(k)> maxx:
+                    maxx = int(k)
+            a_map.layers[name].ido = maxx
         a_map.filepath = filepath
         a_map.modcode = data["mod"]
         return a_map
