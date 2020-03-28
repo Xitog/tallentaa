@@ -49,6 +49,9 @@ def pretty_json(data, level=0, indent=4):
                 content += ', '
                 if list_in_list:
                     content += '\n'
+        if len(data) == 0:
+            level -= 1
+            content += ' ' * indent * level + ']'
     elif isinstance(data, str):
         content += '"' + data + '"'
     elif isinstance(data, bool):
@@ -60,6 +63,17 @@ def pretty_json(data, level=0, indent=4):
     else:
         raise Exception('Type unknown: ' + data.__class__.__name__)
     return content
+
+
+class Obj:
+
+    def __init__(self, name, attributes):
+        self.name = name
+        self.attr = attributes
+
+    def __str__(self):
+        return f"<Obj {self.name}>"
+
 
 class Layer:
     "A class representing a layer of the map."
@@ -75,20 +89,19 @@ class Layer:
             matrix.append(row)
         return matrix
 
-    def __init__(self, mymap: str, name: str, default: int, obj = None):
+    def __init__(self, mymap: str, name: str, default: int, obj : Obj = None):
         self.map = mymap
         self.name = name
         self.default = default
         self.content = Layer.create_matrix(self.map.width,
                                            self.map.height,
                                            default)
-        self.object = obj
-        self.objects = {}
-        self.ido = 0
+        self.prototype = obj
+        self.objects = []
 
-    def has_objects(self):
+    def is_object_layer(self):
         "This layer is an object layer."
-        return self.object is not None
+        return self.prototype is not None
 
     def resize(self):
         "Resize a layer."
@@ -102,72 +115,42 @@ class Layer:
 
     def get(self, row: int, col: int):
         "Return int at row, col."
-        if self.has_objects():
-            i = self.content[row][col]
-            if i != 0:
-                return self.objects[i]
-            return 0
-        else:
-            return self.content[row][col]
+        return self.content[row][col]
 
     def set(self, val, row: int, col: int):
-        "Set int at row, col."
-        if self.object is None:
-            # Texture Layer
-            prev = self.content[row][col]
-            print(f'set row={row} col={col} val={val} prev={prev}')
-            self.content[row][col] = val
-            return {'name': self.name, 'row': row, 'col': col,
-                    'prev': prev, 'next': val}
-        else:
-            return self.set_object(val, row, col)
-
-    def set_object(self, val, row: int, col: int):
-        "Set an object at row, col."
-        prev = self.content[row][col] # always an integer index to an object
-        if prev != 0:
-            print(f'Killing previous object at {row},{col} id={prev}')
-            self.objects[prev]['alive'] = False
-        if isinstance(val, int): # when undoing
-            if val != 0:
-                self.objects[val]['alive'] = True
-                print(f'UNDO: Restoring object at {row},{col} id={val} prev={prev}')
-                self.content[row][col] = val
-            else:
-                print(f'UNDO: Deleting object at {row},{col} id={self.content[row][col]} prev={prev}')
-                self.content[row][col] = 0
-        else: # val is a dict
-            if val['val'] == 0:
-                print(f'DO: Deleting object at {row},{col} id={self.content[row][col]} prev={prev}')
-                self.content[row][col] = 0
-            else:
-                self.ido += 1
-                val['ido'] = self.ido
-                val['alive'] = True
-                self.objects[self.ido] = val
-                print(f'DO: Creating object at {row},{col} id={val["ido"]} prev={prev}')
-                self.content[row][col] = self.ido
-        #print(f'set object row={row} col={col} val={val} prev={prev}')
+        "Set val at row, col. val can be int or dict"
+        prev = self.content[row][col]
+        if not isinstance(prev, int):
+            self.objects.remove(prev)
+        self.content[row][col] = val
+        if not isinstance(val, int):
+            self.objects.append(val)
         return {'name': self.name, 'row': row, 'col': col,
-                    'prev': prev, 'next': val}
+                'prev': prev, 'next': val}
 
     def to_json(self):
         "Return a JSON representation of the layer."
-        filtered = {} # save only alive objects
-        for k, o in self.objects.items():
-            if o['alive']:
-                filtered[k] = o
-        return {
-            "object": str(self.object),
-            "ido": self.ido,
-            "default": self.default,
-            "content": self.content,
-            "objects": filtered
+        res = {
+            "default": self.default
         }
+        if self.is_object_layer():
+            res['object'] = self.prototype.name
+            res['content'] = self.objects
+        else:
+            res['content'] = self.content
+        return res
 
 
 class Map:
     "A class representing a map/level/floor."
+
+    @staticmethod
+    def get_mod(filepath):
+        "Get the mod of a map from a JSON file."
+        file = open(filepath, mode='r', encoding='utf8')
+        data = json.load(file)
+        file.close()
+        return data['mod']
 
     @staticmethod
     def from_json(app, filepath):
@@ -177,21 +160,18 @@ class Map:
         file.close()
         a_map = Map(app, data["name"], data["width"], data["height"])
         for name, lay in data["layers"].items():
-            a_map.add_layer(name, lay["default"])
-            a_map.layers[name].content = lay["content"]
-            if lay["object"] != "None":
-                a_map.layers[name].object = lay["object"]
+            obj = None
+            if 'object' in lay:
+                obj = app.mod.layers[name].obj
+            a_map.add_layer(name, lay["default"], obj)
+            if 'object' in lay:
+                # populate with the objects
+                for obj in lay['content']:
+                    a_map.layers[name].content[obj['y']][obj['x']] = obj
+                    a_map.layers[name].objects.append(obj)
             else:
-                a_map.layers[name].object = None
-            a_map.layers[name].ido = lay["ido"]
-            # convert str key to int key
-            objects = {}
-            maxx = 0
-            for k, v in lay["objects"].items():
-                a_map.layers[name].objects[int(k)] = v
-                if int(k)> maxx:
-                    maxx = int(k)
-            a_map.layers[name].ido = maxx
+                # replace with the content saved
+                a_map.layers[name].content = lay["content"]
         a_map.filepath = filepath
         a_map.modcode = data["mod"]
         return a_map
@@ -243,7 +223,7 @@ class Map:
 
     def has_objects(self, name):
         "The layer name is an object layer."
-        return self.layers[name].has_objects()
+        return self.layers[name].is_object_layer()
 
     def check(self, row, col, layer=None):
         "Check row, col and layer if not None."

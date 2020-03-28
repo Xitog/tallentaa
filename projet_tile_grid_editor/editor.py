@@ -76,7 +76,7 @@ from PIL import Image, ImageTk, ImageDraw
 
 # Third party import
 import typedini
-from layeredmap import Map
+from layeredmap import Map, Obj
 
 #-----------------------------------------------------------
 # Image class
@@ -131,6 +131,13 @@ class Dialog:
 
     def close(self):
         self.top.destroy()
+
+    def __getitem__(self, var):
+        if var in self.vars:
+            return self.vars[var]
+        else:
+            return None
+
 
 class ChooseObjectDialog(Dialog):
 
@@ -574,7 +581,7 @@ class ModHandler:
                 obj = laycontent['object']
                 if obj not in self.mod_data["types"]:
                     raise Exception('[ERROR] Undefined type: ' + obj)
-                obj = self.mod_data["types"][obj]
+                obj = Obj(obj, self.mod_data["types"][obj])
             if isinstance(laycontent['res'], list):
                 vname = '::'.join(laycontent['res'])
                 sub = {}
@@ -651,8 +658,8 @@ class Action:
                         act = self.map.set(self.content, y, x, self.layer.name)
                     else:
                         definition = self.layer.obj
-                        instance = {}
-                        for key, val in definition.items():
+                        instance = { 'x': x, 'y': y}
+                        for key, val in definition.attr.items():
                             if val == 'Content_Name':
                                 instance[key] = self.layer.res[self.content].name
                             elif val == 'Meta_Player':
@@ -771,37 +778,39 @@ class Application:
             self.canvas.config(scrollregion=(0, 0, self.map.width * 32, self.map.height * 32))
         self.refresh_map() # need the canvas in order to display the map
 
-    def start_load_mod(self, mod=None, amap=None):
+    def charge_mod(self, mod):
+        self.clean_layer_buttons()
+        self.options['mod'] = mod
+        self.mod = ModHandler(self, self.options['mod'], force_recreate_default=True)
+        self.options['mod'] = self.mod.get_loaded_mod()
+        self.action_change_pencil('data', self.mod.layer.pencil)
+        self.load_mod()
+        self.varActiveLayer.set(self.mod.layer.name) # needed AFTER building buttons
+
+    def start_load_mod(self, mod):
         "Load a different mod or a map with optionnally a new mod. Partial GUI"
-        if mod is None and amap is None:
-            raise Exception("Cannot run without a mod or a map")
-        if mod is None:
-            mod = amap.modcode
-        if mod != self.options['mod']:
-            self.clean_layer_buttons()
-            self.options['mod'] = mod
-            self.mod = ModHandler(self, self.options['mod'], force_recreate_default=True)
-            self.options['mod'] = self.mod.get_loaded_mod()
-            self.action_change_pencil('data', self.mod.layer.pencil)
-            self.load_mod()
-            self.varActiveLayer.set(self.mod.layer.name) # needed AFTER building buttons
-        if amap is None:
-            self.start_new_map(restart=True)
-        else:
-            self.dirty = False
-            self.map = amap
-            self.canvas.config(scrollregion=(0, 0, self.map.width * 32, self.map.height * 32))
-            self.refresh_map() # need the canvas in order to display the map
+        if self.debug:
+            print('[INFO] start_load_mod: Loading {mod} {amap}')
+        self.charge_mod(mod)
+        self.start_new_map(restart=True)
         self.refresh_status()
 
     def start_load_map(self, mapfilepath):
         "Load a map. Partial GUI rebuild."
         if self.debug:
             print(f'[INFO] start_load_map: Loading {mapfilepath}')
+        map_mod = Map.get_mod(mapfilepath)
+        if map_mod != self.mod.code:
+            print(f'[INFO] map is not from the current mod {self.mod.code}. Loading {map_mod}...')
+            self.charge_mod(map_mod)
         amap = Map.from_json(self, mapfilepath)
         if self.debug:
             print(f'[INFO] start_load_map: Mod of map is {amap.app.mod.code}')
-        self.start_load_mod(amap=amap)
+        self.dirty = False
+        self.map = amap
+        self.canvas.config(scrollregion=(0, 0, self.map.width * 32, self.map.height * 32))
+        self.refresh_map() # need the canvas in order to display the map
+        self.refresh_status()
 
     def exit_app(self, force_exit=False):
         "Exit the application and clean before"
@@ -1411,8 +1420,8 @@ class Application:
 
     def menu_file_new(self, event=None):
         d = ChooseSizeDialog(self, title='New Map')
-        if d.vars['width'] is not None:
-            self.start_new_map('New map', d.vars['width'], d.vars['height'],
+        if d['width'] is not None:
+            self.start_new_map('New map', d['width'], d['height'],
                                restart=True)
 
     def menu_file_resize(self, event=None):
