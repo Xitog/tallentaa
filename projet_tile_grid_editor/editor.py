@@ -132,11 +132,17 @@ class Dialog:
     def close(self):
         self.top.destroy()
 
-    def __getitem__(self, var):
+    def __getattr__(self, var):
+        res = None
         if var in self.vars:
-            return self.vars[var]
-        else:
-            return None
+            res = self.vars[var]
+        return res
+
+    def __getitem__(self, var):
+        res = None
+        if var in self.vars:
+            res = self.vars[var]
+        return res
 
 
 class ChooseObjectDialog(Dialog):
@@ -178,9 +184,6 @@ class ChooseObjectDialog(Dialog):
 class ChooseSizeDialog(Dialog):
 
     def build(self):
-        self.width = None
-        self.height = None
-
         self.top.iconbitmap(os.path.join('media', 'icons', 'editor.ico'))
 
         if hasattr(self, 'title'):
@@ -1420,13 +1423,14 @@ class Application:
 
     def menu_file_new(self, event=None):
         d = ChooseSizeDialog(self, title='New Map')
-        if d['width'] is not None:
-            self.start_new_map('New map', d['width'], d['height'],
+        if d.width is not None:
+            self.start_new_map('New map', d.width, d.height,
                                restart=True)
 
     def menu_file_resize(self, event=None):
         d = ChooseSizeDialog(self, title='Resize Map')
-        if d.width is not None and (d.width != self.map.width or d.height != self.map.height):
+        if d.width is not None and (d.width != self.map.width or \
+                                    d.height != self.map.height):
             self.map.resize(d.width, d.height)
             self.canvas.config(scrollregion=(0, 0, self.map.width * 32,
                                              self.map.height * 32))

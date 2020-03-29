@@ -228,11 +228,14 @@ class Map:
     def check(self, row, col, layer=None):
         "Check row, col and layer if not None."
         if layer is not None and layer not in self.layers:
-            raise Exception(f"[ERROR] Layer {layer} not defined.")
+            return False
+            #raise Exception(f"[ERROR] Layer {layer} not defined.")
         if not 0 <= row < self.height:
-            raise Exception(f"[ERROR] Out of row: {row} / {self.height}")
+            return False
+            #raise Exception(f"[ERROR] Out of row: {row} / {self.height}")
         if not 0 <= col < self.width:
-            raise Exception(f"[ERROR] Out of col: {col} / {self.width}")
+            return False
+            #raise Exception(f"[ERROR] Out of col: {col} / {self.width}")
         return True
 
     def get(self, row, col, layer=None):
