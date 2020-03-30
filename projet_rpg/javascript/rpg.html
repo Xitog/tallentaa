@@ -1,10 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
+  <!---------------------------------------------------------------------------
+    BSP Dungeons in JavaScript + HTML + CSS
+    Inspired by http://www.roguebasin.com/index.php?title=Basic_BSP_Dungeon_generation
+    First version in Lua/Löve February/March 2017
+    This version is the second or the third.
+    1) Making a tree of spaces with divide()
+    2) Digging the rooms inside the spaces with dig()
+    3) Connecting with spade() the rooms
+    4) Drawing the dungeon
+    Search TODO for the next thing to do.
+    Author: Damien Gouteux
+    -------------------------------------------------------------------------->
   <head>
     <meta charset="utf-8"/>
     <title>Test</title>
     <style type="text/css">
-      canvas { 
+      canvas {
         border: 1px solid black;
       }
       html {
@@ -45,7 +57,7 @@
     <img class="shadow" id="lobster" src="graphics/lobster.png">
     
     <script type="text/javascript">
-    
+
       // 20 => 640 25 => 800 30 => 960
       const SCREEN_WIDTH = 960;
       const SCREEN_HEIGHT = 800;
@@ -233,7 +245,12 @@
             this.second().spade();
             // make a hole for yourself by looking at your child
             // TODO
-          } else {
+            if (this.parent != null && this == this.parent.first()) { // only the first child will do something
+                console.log("What do to?");
+                console.log(this.first().hole);
+                console.log(this.second().hole);
+            }
+          } else { // no child = it is a leaf
             // make a hole for yourself without children IF you are the first child
             // take always the smallest starting point and dimension between first and second child
             if (this == this.parent.first()) {
