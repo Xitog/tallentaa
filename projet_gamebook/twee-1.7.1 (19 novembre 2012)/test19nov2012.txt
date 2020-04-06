@@ -1,0 +1,17 @@
+:: StoryTitle
+Hello
+
+:: StorySubtitle
+A quick story
+
+:: Start
+Il y a longtemps que j'aime les nouilles. [[texte affiché|A Second Passage]].
+
+:: One Passage
+This is the body of a single passage. A passage title is set off by two colons at the start of a line.
+
+You can place line breaks directly in the passage text.
+
+:: A Second Passage [tag1 tag2]
+You can leave as much space as you like between passages. Enclose tags with single square brackets on the same line as the passage title, separating them with spaces. 
+
