@@ -1,3 +1,26 @@
+"""
+Simple language derived from markdown
+
+**bold**
+--strikethrough-- (insted of ~~, too hard to type)
+__underline__ (instead of using __ for bold)
+''italic'' (instead of * or _, too difficult to parse)
+
+[link_ref] or [link_name->link_ref]
+
+|Table|
+|-----|
+|data |
+
+* liste
+
+[link_ref]: http://youradress
+
+Created 2020-04-03 as a buggy Markdown processor
+Evolved 2020-04-07 as yet another language
+
+"""
+
 file_name = 'Passe-temps'
 
 source = open(file_name + '.md', mode='r', encoding='utf8')
@@ -34,13 +57,20 @@ for index, raw_line in enumerate(content):
 
 for index, raw_line in enumerate(filtered_content):
     line = raw_line
-    # Bold & Italic
-    if line.find('**') != -1 or line.find('~~') != -1 \
-       or (line.find('*') != -1 and not line.startswith('* ')):
+    if index < len(filtered_content) - 2:
+        next_line = filtered_content[index + 1]
+    else:
+        next_line = None
+    # Bold & Italic & Strikethrough & Underline & Power
+    #or (line.find('*') != -1 and not line.startswith('* ')) \
+    if line.find('**') != -1 or line.find('--') != -1 \
+       or line.find('__') != -1 or line.find('^^') != -1 or line.find("''"):
         new_line = ''
         in_bold = False
         in_italic = False
         in_strikethrough = False
+        in_underline = False
+        in_power = False
         char_index = -1
         while char_index < len(line) - 1:
             char_index += 1
@@ -53,15 +83,43 @@ for index, raw_line in enumerate(filtered_content):
                 next_char = line[char_index + 1]
             else:
                 next_char = None
-            if char == '*' and next_char == '*':
+            # Italic
+            #if char == '*' and next_char != '*' and prev_char != '*':
+            #    if not in_italic and next_char != ' ':
+            #        new_line += '<i>'
+            #        in_italic = True
+            #    elif in_italic:
+            #        new_line += '</i>'
+            #        in_italic = False
+            #    else:
+            #        new_line += char # for * liste with **thing**
+            #    continue
+            # Link
+            if char == '[' and char_index < len(line) - 1:
+                ending = line.find(']', char_index)
+                if ending != -1:
+                    link = line[char_index + 1:ending]
+                    if link not in links and link.find('->') != -1:
+                        link_name, link = link.split('->', 1)
+                    else:
+                        link_name = link
+                    if link in links:
+                        new_line += f'<a href="{links[link]}">{link_name}</a>'
+                    char_index = ending
+                    continue
+            # Italic
+            if char == "'" and next_char == "'":
                 continue
-            if char == '*' and next_char != '*' and prev_char != '*':
+            if char == "'" and prev_char == "'":
                 if not in_italic:
                     new_line += '<i>'
                     in_italic = True
                 else:
                     new_line += '</i>'
                     in_italic = False
+                continue
+            # Strong
+            if char == '*' and next_char == '*':
                 continue
             if char == '*' and prev_char == '*':
                 if not in_bold:
@@ -71,23 +129,38 @@ for index, raw_line in enumerate(filtered_content):
                     new_line += '</b>'
                     in_bold = False
                 continue
-            if char == '[' and char_index < len(line) - 1:
-                ending = line.find(']', char_index)
-                if ending != -1:
-                    link = line[char_index + 1:ending]
-                    if link in links:
-                        new_line += f'<a href="{links[link]}">{link}</a>'
-                    char_index += len(link) + 1
-                    continue
-            if char == '~' and next_char == '~':
+            # Strikethrough
+            if char == '-' and next_char == '-':
                 continue
-            if char == '~' and prev_char == '~':
+            if char == '-' and prev_char == '-':
                 if not in_strikethrough:
                     new_line += '<s>'
                     in_strikethrough = True
                 else:
                     new_line += '</s>'
                     in_strikethrough = False
+                continue
+            # Underline
+            if char == '_' and next_char == '_':
+                continue
+            if char == '_' and prev_char == '_':
+                if not in_underline:
+                    new_line += '<u>'
+                    in_underline = True
+                else:
+                    new_line += '</u>'
+                    in_underline = False
+                continue
+            # Power
+            if char == '^' and next_char == '^':
+                continue
+            if char == '^' and prev_char == '^':
+                if not in_power:
+                    new_line += '<sup>'
+                    in_power = True
+                else:
+                    new_line += '</sup>'
+                    in_power = False
                 continue
             new_line += char
         line = new_line
@@ -120,22 +193,21 @@ for index, raw_line in enumerate(filtered_content):
         if not in_table:
             output.write('<table>\n')
             in_table = True
-        if index < len(content) - 2:
-            if content[index + 1].strip().startswith('|-'):
-                element = 'th'
-            else:
-                element = 'td'
-            columns = line.split('|')
-            skip = True
+        if next_line is not None and next_line.strip().startswith('|-'):
+            element = 'th'
+        else:
+            element = 'td'
+        columns = line.split('|')
+        skip = True
+        for col in columns:
+            if len(col.replace('-', '').strip()) != 0:
+                skip = False
+        if not skip:
+            output.write('<tr>')
             for col in columns:
-                if len(col.replace('-', '').strip()) != 0:
-                    skip = False
-            if not skip:
-                output.write('<tr>')
-                for col in columns:
-                    if col != '':
-                        output.write(f'<{element}>{col}</{element}>')
-                output.write('</tr>\n')
+                if col != '':
+                    output.write(f'<{element}>{col}</{element}>')
+            output.write('</tr>\n')
         continue
     elif in_table:
         output.write('</table>\n')
