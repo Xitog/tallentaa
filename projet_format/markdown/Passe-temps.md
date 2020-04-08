@@ -89,6 +89,8 @@ J'ai beaucoup étudié les règles du jeu ''[Star Wars D20]'', qui n'existait qu
 
 Les jeux vidéo ont leur propre page.
 
+-- Tests
+
 Tests : --barré-- __souligné__.
 
 % Un premier item
