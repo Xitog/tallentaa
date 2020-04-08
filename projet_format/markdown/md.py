@@ -33,9 +33,16 @@ output.write('<head>\n')
 output.write('</head>\n')
 output.write('<body>\n')
 
-in_list = False
+list_level = []
 in_table = False
 links = {}
+
+list_starter = {'* ': 'ul', '- ': 'ul', '% ': 'ol'}
+
+def multi_start(string, starts):
+    for key in starts:
+        if string.startswith(key):
+            return key
 
 # prefetch links
 filtered_content = []
@@ -43,12 +50,15 @@ for index, raw_line in enumerate(content):
     # Strip
     line = raw_line.strip()
     # Empty
-    if len(line) == 0:
+    #if len(line) == 0:
+    #    continue keep empty to separate line!
+    # Comment
+    if line.startswith('--'):
         continue
     # Special chars
     line = line.replace('&', '&amp;')
     # Links
-    if line[0] == '[' and (line.find(']: https://') != -1 or line.find(']: http://') != -1):
+    if len(line) > 0 and line[0] == '[' and (line.find(']: https://') != -1 or line.find(']: http://') != -1):
         name = line[1:line.find(']: ')]
         link = line[line.find(']: ') + len(']: '):]
         links[name] = link
@@ -178,18 +188,47 @@ for index, raw_line in enumerate(filtered_content):
         output.write(line)
         continue
     # Liste
-    if line.startswith('* '):
-        if not in_list:
-            output.write('<ul>\n')
-            in_list = True
-        line = '<li>' + line.replace('* ', '', 1).strip() + '</li>\n'
+    line_level = []
+    tested = line
+    to_cut = 0
+    while found := multi_start(tested, list_starter):
+        line_level.append(found)
+        tested = tested.replace(found, '', 1)
+        to_cut += len(found)
+    # reconciliation of lists: we must close before starting another
+    if len(line_level) > 0:
+        if line == '- No':
+            print('line:', line_level)
+            print('file:', list_level)
+        for level in range(min(len(line_level), len(list_level))):
+            if list_level[level] != line_level[level]:
+                # on dépile le dessus
+                for after in range(len(list_level) - 1, level - 1, -1):
+                    output.write(f'</{list_starter[list_level[-1]]}>\n')
+                    list_level.pop()
+        if len(list_level) != len(line_level):
+            if len(line_level) >= len(list_level):
+                # on ouvre pour rattraper le level de la ligne
+                for level in range(len(list_level), len(line_level)):
+                    list_level.append(line_level[level])
+                    output.write(f'<{list_starter[list_level[-1]]}>\n')
+            else:
+                if line == '- No':
+                    print("youhou")
+                # on ferme pour rattraper le level de la ligne
+                for level in range(len(list_level) - 1, level, -1):
+                    print(level)
+                    output.write(f'</{list_starter[list_level[-1]]}>\n')
+                    list_level.pop()
+        line = '<li>' + line[to_cut:] + '</li>\n'
         output.write(line)
         continue
-    elif in_list:
-        output.write('</ul>\n')
-        in_list = False
+    elif len(list_level) > 0:
+        for level in range(len(list_level) - 1, -1, -1):
+            output.write(f'</{list_starter[list_level[-1]]}>\n')
+            list_level.pop()
     # Table
-    if line[0] == '|':
+    if len(line) > 0 and line[0] == '|':
         if not in_table:
             output.write('<table>\n')
             in_table = True
@@ -214,5 +253,14 @@ for index, raw_line in enumerate(filtered_content):
         in_table = False
     # Paragraph
     output.write('<p>' + line.strip() + '</p>\n')
+# Are they list still open?
+if len(list_level) > 0:
+    for level in range(len(list_level) - 1, -1, -1):
+        output.write(f'</{list_starter[list_level[-1]]}>\n')
+        list_level.pop()
+# Are they table still open?
+if in_table:
+    output.write('</table>\n')
+    in_table = False
 output.write('</body>')
 output.close()

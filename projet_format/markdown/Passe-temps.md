@@ -87,4 +87,20 @@ J'ai beaucoup étudié les règles du jeu ''[Star Wars D20]'', qui n'existait qu
 
 ## Les jeux vidéo
 
-Les jeux vidéo ont leur propre page --barré-- __souligné__.
+Les jeux vidéo ont leur propre page.
+
+Tests : --barré-- __souligné__.
+
+% Un premier item
+% Un deuxième item
+
+- Un item sans chiffre
+- Un autre item sans chiffre
+- - Un sous item de l'autre item
+- - Un autre sous item !
+
+- - Mad list
+- - - - Truly
+- No
+- - - it is !
+
