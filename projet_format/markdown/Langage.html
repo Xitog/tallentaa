@@ -1,0 +1,48 @@
+<html>
+<head>
+<link href="https://xitog.github.io/dgx/css/palatino.css" rel="stylesheet">
+</head>
+<body id="content" class="palatino">
+<h1>Marklight</h1>
+<p>Ce document décrit le langage <b>marklight</b>. Comme <a href="https://en.wikipedia.org/wiki/Markdown">Markdown</a> ou <a href="https://en.wikipedia.org/wiki/Textile_(markup_language)">Textile</a>, c'est un <a href="https://en.wikipedia.org/wiki/Lightweight_markup_language">langage de balisage léger</a> pour écrire de la documentation dans un fichier texte, directement lisible sans transformation, mais pouvant également être transformé en HTML.</p>
+<p>On peut faire des commentaires en commençant une ligne par --.</p>
+<!-- Ceci est un commentaire il sera exporté en HTML -->
+<h2>Modification de texte</h2>
+<ul>
+<li>**<b>gras</b>** : pour mettre en gras</li>
+<li>''<i>italique</i>'' : pour mettre en italique</li>
+<li>--<s>barré</s>-- : pour barré</li>
+<li>__<u>souligné</u>__ : pour souligner</li>
+<li>^^<sup>exposant</sup>^^ : pour mettre en exposant</li>
+</ul>
+<h2>Listes</h2>
+<ul>
+<li>* une liste non numérotée</li>
+</ul>
+<ul>
+<li>- une autre liste non numérotée</li>
+</ul>
+<ol>
+<li>\% une liste numérotée</li>
+</ol>
+<h2>Tables</h2>
+<ul>
+<li>Un tableau s'écrit ainsi : |col1|col2|col3|</li>
+<li>La ligne de titre doit être la première et séparée par des colonnes |----|</li>
+</ul>
+<table>
+<tr><th>Ceci</th><th>est</th><th>un  </th><th>tableau    </th></tr>
+<tr><td><s></td><td></s></td><td><s></td><td></s></td></tr>
+<tr><td>Il  </td><td>est</td><td>beau</td><td>mon tableau</td></tr>
+</table>
+<h2>Liens</h2>
+<ul>
+<li>à mettre</li>
+</ul>
+<h2>Doctrines</h2>
+<p>On peut utiliser !doctrine en début de ligne pour modifier des variables globales de transformation en HTML. Par exemple :</p>
+<ul>
+<li>!doctrine EXPORT_COMMENT = true/false spécifie si les commentaires seront exportés en HTML ou pas</li>
+<li>!doctrine ADD_CSS=lien vers un fichier CSS spécifie un fichier CSS à ajouter</li>
+</ul>
+</body>

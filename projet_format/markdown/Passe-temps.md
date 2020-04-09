@@ -106,3 +106,5 @@ Tests : --barré-- __souligné__.
 - No
 - - - it is !
 
+\ Un antislah
+\* ceci n'est pas une liste mais un paragraphe avec une étoile
