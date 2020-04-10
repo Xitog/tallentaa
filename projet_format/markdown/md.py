@@ -142,7 +142,7 @@ def to_html(input_name, output_name=None):
                     prev_prev_char = line[char_index - 2]
                 else:
                     prev_prev_char = None
-                if char_index < len(line) - 2:
+                if char_index < len(line) - 1:
                     next_char = line[char_index + 1]
                 else:
                     next_char = None
@@ -321,7 +321,8 @@ def to_html(input_name, output_name=None):
     output.write('</body>')
     output.close()
 
-file_names = ['Passe-temps.md', 'Langage.md']
+file_names = ['Passe-temps.md', 'Langage.md', 'Tests.md']
+#file_names = ['Tests.md']
 
 if __name__ == '__main__':
     for file in file_names:
