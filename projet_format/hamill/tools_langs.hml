@@ -1,0 +1,159 @@
+!doctrine TITLE=Tools & Languages
+!doctrine ADD_CSS=neo.css
+
+# Tools & Languages
+---
+
+Une liste de logiciels utiles et de langages de programmation.
+
+Pour les langages que j'utilise le plus, [Python->#], [C->#], je détaille :
+
+* IDE, interpréteurs ou compilateurs
+* Bibliothèques
+* Documentation
+
+## [#Summary]
+
+* Programming
+* * Python
+* * C
+* * JavaScript
+* * Ruby
+* * Lua
+* * List of languages
+* Publishing
+
+## [#Programming]
+
+* **Version control**
+* * [Git->https://git-scm.com/]
+* * [GitHub->https://github.com/]
+* **Data description language**
+* * [JSON->http://www.json.org/json-fr.html]
+* * [JSON Schema->http://json-schema.org/]
+* * [XML->https://developer.mozilla.org/fr/docs/Web/XML]
+* * [XSD->https://tecfa.unige.ch/guides/tie/html/xml-schema/xml-schema-3.html]
+* **General documentation**
+* * [Cheat sheets->http://www.cheat-sheets.org/]
+* **List of libraries**
+* * [SFML->https://www.sfml-dev.org/] for C, Crystal, D, Go, Nim, OCaml, Python, Ruby, Rust
+* * [Kha->http://kha.tech/] : multimedia framework based on Haxe
+
+### [#Python]
+
+* **Implementations**
+* * [Official C intepreter->https://www.python.org/] : the classic Python
+* * [Jython->http://www.jython.org/] : Python on the JVM
+* * [Cython->http://cython.org/] : Compile Python to C
+* * [IronPython->http://ironpython.net/] : Python on .Net
+* * [PyJS->http://pyjs.org/] : Python to JavaScript (ex-Pyjama)
+* * [Brython->https://brython.info/] : Client-side Python on JavaScript
+* **Libraries**
+* * ''Repositories''
+* * * [PyPI->https://pypi.org/] : Python Package Index
+* * * [Pythonlibs->http://www.lfd.uci.edu/~gohlke/pythonlibs/] : Repository of compiled libraries
+* * ''Media''
+* * * [Pygame->https://www.pygame.org/news] : Multimedia library for Python based on [SDL->https://www.libsdl.org/]
+* * * [Pillow->http://python-pillow.org/] : Images, fork of the older --[PIL->http://www.pythonware.com/products/pil/]--
+* * ''GUI''
+* * * [PyFLTK->http://pyfltk.sourceforge.net/] : FLTK GUI
+* * * [Kivy->https://kivy.org/#home] : Kivy Multitouch GUI
+* **Documentation**
+* * [Official->https://docs.python.org/3/]
+* * * [What's new->https://docs.python.org/3/whatsnew/index.html]
+* * * [4. Standard types->https://docs.python.org/3/library/stdtypes.html]
+* * * [6. Expressions->https://docs.python.org/3/reference/expressions.html]
+* * * [7. Statements->https://docs.python.org/3/reference/simple_stmts.html]
+* * * [8. Collections->https://docs.python.org/3/library/collections.html]
+* * * [17. Threading->https://docs.python.org/3/library/threading.html]
+* * * [17. Queue->https://docs.python.org/3/library/queue.html]
+* * * [18. Coroutine->https://docs.python.org/3/library/asyncio-task.html]
+* * * [19. JSON->https://docs.python.org/3/library/json.html]
+* * * [20. ElementTree->https://docs.python.org/3/library/xml.etree.elementtree.html]
+* * * [21. Socket server->https://docs.python.org/3/library/socketserver.html]
+* * Tkinter GUI
+* * * [Effbot->http://effbot.org/tkinterbook/tkinter-index.htm]
+* * * [FDEX->http://tkinter.fdex.eu/]
+* * * --[New Mexico Tech->http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/index.html]-- [archived->https://anzeljg.github.io/rin2/book2/2405/docs/tkinter/index.html]
+* * --[PQR 2.7->http://rgruet.free.fr/PQR27/PQR2.7.html]-- Cheat sheet for Py 2.7
+* * [GUI Programming->https://wiki.python.org/moin/GuiProgramming]
+
+### [#C]
+
+* **Compilers and IDE**
+* * [Pelles C->http://www.smorgasbordet.com/pellesc/]
+* * [MinGW->http://www.mingw.org/] : Linux tools including GCC
+* **Libraries**
+* * ''Media''
+* * * [Allegro->http://liballeg.org/]
+* * * [SDL->http://libsdl.org/]
+
+### [#JavaScript]
+
+* **Libraries**
+* * ''Media''
+* * * [D3JS->https://d3js.org/]
+* * [TogetherJS->https://togetherjs.com/] : real time collaboration
+
+### [#Ruby]
+
+* **Implementations**
+* * [Official C intepreter->https://www.ruby-lang.org/] : the classic Ruby interpreter
+* * [JRuby->https://www.jruby.org/] : Ruby on the JVM
+* * [IronRuby->http://ironruby.net/] : Ruby on .Net
+* * [Ruby Installer->https://rubyinstaller.org/] Binary Windows distribution
+* **Libraries**
+* * ''Repositories''
+* * * [Ruby Gems->https://rubygems.org/]
+* * * [Ruby Toolbox->https://www.ruby-toolbox.com/]
+* * ''Media''
+* * * [Gosu->https://www.libgosu.org/]
+
+### [#Lua]
+
+* **Platforms**
+* * [Official C interpreter->https://www.lua.org/]
+* * [Corona->https://docs.coronalabs.com/daily/guide/start/introLua/index.html]
+* * [Zerobrane IDE->https://studio.zerobrane.com/]
+* **Libraries**
+* * ''Media''
+* * * [LÖVE->https://love2d.org/]
+* **Documentation**
+* * [Programming in Lua (PIL)->https://www.lua.org/pil/contents.html]^^1st edition^^, slightly outdated
+
+### [#List of languages]
+
+% C [Microsoft->https://docs.microsoft.com/fr-fr/cpp/c-language/c-language-reference?view=vs-2019]
+% C++ [Microsoft->https://msdn.microsoft.com/en-us/library/3bstk3k5.aspx]
+% C# [Github->https://github.com/dotnet/csharplang]
+% [Common Lisp->https://common-lisp.net/]
+% [Crystal->https://crystal-lang.org/]
+% [D->https://dlang.org/]
+% [Elixir->https://elixir-lang.org/]
+% [Erlang->http://www.erlang.org/]
+% [Genie->https://wiki.gnome.org/Projects/Genie]
+% [Go->https://golang.org/]
+% [Haskell->https://www.haskell.org/]
+% [Haxe->https://haxe.org/]
+% [Java->https://docs.oracle.com/javase/9/]
+% JavaScript [Mozilla->https://developer.mozilla.org/fr/docs/Web/JavaScript]
+% [Julia->https://julialang.org/]
+% [Kotlin->https://kotlinlang.org/]
+% [Lua->https://www.lua.org/]
+% [Nim->https://nim-lang.org/] ''(ex-Nimrod)''
+% [OCaml->https://ocaml.org/]
+% --[Oden->https://oden-lang.github.io/]--
+% [ooc->https://ooc-lang.org/]
+% [PureScript->http://www.purescript.org/]
+% [Python->https://www.python.org/]
+% --[Reia->http://reia-lang.org/]--
+% [Ruby->https://www.ruby-lang.org/]
+% [Rust->https://www.rust-lang.org/]
+% [Scala->http://www.scala-lang.org/]
+% [Scheme->http://www.schemers.org/]
+% [Vala->https://wiki.gnome.org/Projects/Vala]
+% [Zig->http://ziglang.org/]
+
+## [#Publishing]
+
+* [GitHub Pages->https://pages.github.com/]

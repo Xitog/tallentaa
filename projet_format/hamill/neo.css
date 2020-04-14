@@ -1,0 +1,33 @@
+h1 {
+    color: #CC6714;
+    font-family: "Palatino Linotype";
+}
+
+h2 {
+    color: #ccc314; /* #6714CC; */
+    font-family: "Palatino Linotype";
+    margin-bottom: 12px;
+}
+
+h3 {
+    color: #cc141d; /* #14CC67; */
+    font-family: "Palatino Linotype";
+    margin-bottom: 10px;
+}
+
+hr {
+    margin-top: 18px;
+    margin-bottom: 18px;
+    border: 0;
+    border-top: 1px solid #dddddd;
+}
+
+p {
+    font-family: "Palatino Linotype";
+    font-size: 16px;
+}
+
+li {
+    font-family: "Palatino Linotype";
+    font-size: 16px;
+}
