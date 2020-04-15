@@ -1,8 +1,20 @@
+!doctrine TITLE=Hamill
+!doctrine ICON=https://xitog.github.io/dgx/img/favicon.ico
+!doctrine BODY_ID=content
+!doctrine BODY_CLASS=palatino
+!doctrine ADD_CSS=https://xitog.github.io/dgx/css/simplex.bootstrap.css
 !doctrine ADD_CSS=https://xitog.github.io/dgx/css/palatino.css
+!doctrine ADD_SCRIPT=https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
+!doctrine ADD_SCRIPT=https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js
 
-# Marklight
+!include menu.html
 
-Ce document décrit le langage **marklight**. Comme [Markdown] ou [Textile], c'est un [langage de balisage léger] pour écrire de la documentation dans un fichier texte, directement lisible sans transformation, mais pouvant également être transformé en HTML.
+!html <div id="content-div">
+
+# Hamill
+---
+
+Ce document décrit le langage **Hamill**. Comme [Markdown] ou [Textile], c'est un [langage de balisage léger] pour écrire de la documentation dans un fichier texte, directement lisible sans transformation, mais pouvant également être transformé en HTML.
 
 On peut faire des commentaires en commençant une ligne par \-\-.
 
@@ -11,6 +23,10 @@ On peut faire des commentaires en commençant une ligne par \-\-.
 !doctrine EXPORT_COMMENT=true
 
 -- Ceci est un commentaire il sera exporté en HTML
+
+On peut faire une ligne horizontale avec une ligne constituée uniquement de - d'une longueur quelconque.
+
+Pour faire une ligne de commentaire vide, il faut donc impérativement mettre un espace après \-\- .
 
 ## Modification de texte
 
@@ -43,11 +59,18 @@ On peut faire des commentaires en commençant une ligne par \-\-.
 
 ## Doctrines
 
-On peut utiliser !doctrine en début de ligne pour modifier des variables globales de transformation en HTML. Par exemple :
+On peut utiliser @@!doctrine@@ en début de ligne pour modifier des variables globales de transformation en HTML. On peut définir la valeur d'une doctrine plusieurs fois mais **seule la dernière valeur définie sera prise en compte** pour la génération. En effet, on ne peut pas être versatile quand il s'agit de doctrine. Par exemple :
 
-* !doctrine EXPORT_COMMENT = true/false spécifie si les commentaires seront exportés en HTML ou pas
-* !doctrine ADD_CSS=lien vers un fichier CSS spécifie un fichier CSS à ajouter
+* @@!doctrine TITLE=titre@@ pour définir le titre de la page
+* @@!doctrine ICON=icon@@ pour définir une icône pour la page
+* @@!doctrine EXPORT_COMMENT=true/false@@ spécifie si les commentaires seront exportés en HTML ou pas
+* @@!doctrine ADD_CSS=lien vers un fichier CSS@@ spécifie un fichier CSS à ajouter
+* @@!doctrine ADD_SCRIPT=lien vers un fichier de script@@ spécifie un fichier JavaScript à ajouter
+* @@!doctrine BODY_CLASS=classe@@ pour définir la classe du body
+* @@!doctrine BODY_ID=id@@ pour définir l'id du body
 
 [Markdown]: https://en.wikipedia.org/wiki/Markdown
 [Textile]: https://en.wikipedia.org/wiki/Textile_(markup_language)
 [langage de balisage léger]: https://en.wikipedia.org/wiki/Lightweight_markup_language
+
+!html </div>

@@ -1,5 +1,15 @@
 !doctrine TITLE=Tools & Languages
-!doctrine ADD_CSS=neo.css
+!doctrine ICON=https://xitog.github.io/dgx/img/favicon.ico
+!doctrine BODY_ID=content
+!doctrine BODY_CLASS=palatino
+!doctrine ADD_CSS=https://xitog.github.io/dgx/css/simplex.bootstrap.css
+!doctrine ADD_CSS=https://xitog.github.io/dgx/css/palatino.css
+!doctrine ADD_SCRIPT=https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
+!doctrine ADD_SCRIPT=https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js
+
+!include menu.html
+
+!html <div id="content-div">
 
 # Tools & Languages
 ---
@@ -12,7 +22,7 @@ Pour les langages que j'utilise le plus, [Python->#], [C->#], je détaille :
 * Bibliothèques
 * Documentation
 
-## [#Summary]
+## Summary
 
 * Programming
 * * Python
@@ -23,7 +33,7 @@ Pour les langages que j'utilise le plus, [Python->#], [C->#], je détaille :
 * * List of languages
 * Publishing
 
-## [#Programming]
+## Programming
 
 * **Version control**
 * * [Git->https://git-scm.com/]
@@ -39,7 +49,7 @@ Pour les langages que j'utilise le plus, [Python->#], [C->#], je détaille :
 * * [SFML->https://www.sfml-dev.org/] for C, Crystal, D, Go, Nim, OCaml, Python, Ruby, Rust
 * * [Kha->http://kha.tech/] : multimedia framework based on Haxe
 
-### [#Python]
+### Python
 
 * **Implementations**
 * * [Official C intepreter->https://www.python.org/] : the classic Python
@@ -78,7 +88,7 @@ Pour les langages que j'utilise le plus, [Python->#], [C->#], je détaille :
 * * --[PQR 2.7->http://rgruet.free.fr/PQR27/PQR2.7.html]-- Cheat sheet for Py 2.7
 * * [GUI Programming->https://wiki.python.org/moin/GuiProgramming]
 
-### [#C]
+### C
 
 * **Compilers and IDE**
 * * [Pelles C->http://www.smorgasbordet.com/pellesc/]
@@ -88,14 +98,14 @@ Pour les langages que j'utilise le plus, [Python->#], [C->#], je détaille :
 * * * [Allegro->http://liballeg.org/]
 * * * [SDL->http://libsdl.org/]
 
-### [#JavaScript]
+### JavaScript
 
 * **Libraries**
 * * ''Media''
 * * * [D3JS->https://d3js.org/]
 * * [TogetherJS->https://togetherjs.com/] : real time collaboration
 
-### [#Ruby]
+### Ruby
 
 * **Implementations**
 * * [Official C intepreter->https://www.ruby-lang.org/] : the classic Ruby interpreter
@@ -109,7 +119,7 @@ Pour les langages que j'utilise le plus, [Python->#], [C->#], je détaille :
 * * ''Media''
 * * * [Gosu->https://www.libgosu.org/]
 
-### [#Lua]
+### Lua
 
 * **Platforms**
 * * [Official C interpreter->https://www.lua.org/]
@@ -121,7 +131,7 @@ Pour les langages que j'utilise le plus, [Python->#], [C->#], je détaille :
 * **Documentation**
 * * [Programming in Lua (PIL)->https://www.lua.org/pil/contents.html]^^1st edition^^, slightly outdated
 
-### [#List of languages]
+### List of languages
 
 % C [Microsoft->https://docs.microsoft.com/fr-fr/cpp/c-language/c-language-reference?view=vs-2019]
 % C++ [Microsoft->https://msdn.microsoft.com/en-us/library/3bstk3k5.aspx]
@@ -154,6 +164,8 @@ Pour les langages que j'utilise le plus, [Python->#], [C->#], je détaille :
 % [Vala->https://wiki.gnome.org/Projects/Vala]
 % [Zig->http://ziglang.org/]
 
-## [#Publishing]
+## Publishing
 
 * [GitHub Pages->https://pages.github.com/]
+
+!html </div>

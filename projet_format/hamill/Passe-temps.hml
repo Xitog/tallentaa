@@ -1,11 +1,25 @@
+!doctrine TITLE=Passe-temps
+!doctrine ICON=https://xitog.github.io/dgx/img/favicon.ico
+!doctrine BODY_ID=content
+!doctrine BODY_CLASS=palatino
+!doctrine ADD_CSS=https://xitog.github.io/dgx/css/simplex.bootstrap.css
+!doctrine ADD_CSS=https://xitog.github.io/dgx/css/palatino.css
+!doctrine ADD_SCRIPT=https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
+!doctrine ADD_SCRIPT=https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js
+
+!include menu.html
+
+!html <div id="content-div">
+
 # Passe-temps
+---
 
 Cette page concerne mes passe-temps ludiques :
 
-* Les jeux de figurines : Warhammer, X-Wing
-* Les jeux de cartes : Magic: The Gathering
-* Les jeux de rôles : D&D
-* Les jeux vidéo : surtout les FPS, les RPG et les RTS
+* [Les jeux de figurines->#] : Warhammer, X-Wing
+* [Les jeux de cartes->#] : Magic: The Gathering
+* [Les jeux de rôles->#] : D&D
+* [Les jeux vidéo->#] : surtout les FPS, les RPG et les RTS
 
 Ce qui suit présente rapidement les différents passe-temps.
 
@@ -40,7 +54,7 @@ Le jeu de cartes auquel j'ai le plus joué, c'est le plus vieux, celui qui a cr�
 
 |Titre|Abréviation|Depuis|Création|Statut|Lien|
 |-----|-----|-----|-----|-----|-----|
-|**Magic: the Gathering**|MTG|1996|1993|Actif, Core Set 2021|[Wikipedia][7]|
+|**Magic: the Gathering**|MTG|1996|1993|Actif, Core Set 2021|[Wikipedia->7]|
 
 J'ai joué ponctuellement à d'autres jeux comme Behind, ''[Star Wars: The Trading Card Game]'' (2002-2005), et fait une partie mémorable du ''[Middle-earth CCG]'' aux illustrations merveilleuses mais aux règles assez complexes. MTG reste une valeur sûre, pratiquée pa rde nombreux joueurs aussi bien dans des tournois internationaux que dans des tournois locaux organisés par les boutiques de passe-temps.
 
@@ -89,3 +103,4 @@ J'ai beaucoup étudié les règles du jeu ''[Star Wars D20]'', qui n'existait qu
 
 Les jeux vidéo ont leur propre page.
 
+!html </div>

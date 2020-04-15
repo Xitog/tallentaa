@@ -106,6 +106,24 @@ def escape(line):
             index_char += 1
     return new_line
 
+def find_title(line):
+    c = 0
+    nb = 0
+    while c < len(line):
+        if line[c] == '#':
+            nb += 1
+        else:
+            break
+        c += 1
+    if nb > 0:
+        title = line.replace('#' * nb, '', 1).strip()
+        id_title = make_title(title)
+        return nb, title, id_title
+    return 0, None, None
+
+def make_title(string):
+    return string.replace(' ', '-').lower()
+
 #-------------------------------------------------------------------------------
 # Processors
 #-------------------------------------------------------------------------------
@@ -114,6 +132,8 @@ def to_html(input_name, output_name=None):
     EXPORT_COMMENT=False
     ADD_CSS=None
     TITLE=None
+    BODY_CLASS=None
+    BODY_ID=None
 
     source = open(input_name, mode='r', encoding='utf8')
     content = source.readlines()
@@ -128,15 +148,20 @@ def to_html(input_name, output_name=None):
     output = open(output_name, mode='w', encoding='utf8')
     output.write('<html>\n')
     output.write('<head>\n')
+    output.write('<meta charset="utf-8">\n')
+    output.write('<meta http-equiv="X-UA-Compatible" content="IE=edge">\n')
+    output.write('<meta name="viewport" content="width=device-width, initial-scale=1">\n')
 
     list_level = []
     in_table = False
     links = {}
+    inner_links = []
 
     list_starter = {'* ': 'ul', '- ': 'ul', '% ': 'ol'}
 
     # prefetch links, replace special HTML char, skip comments
     filtered_content = []
+    final_lines = []
     for index, raw_line in enumerate(content):
         # Strip
         line = raw_line.strip()
@@ -153,8 +178,17 @@ def to_html(input_name, output_name=None):
                     EXPORT_COMMENT = False
             elif command == 'ADD_CSS':
                 output.write(f'<link href="{value}" rel="stylesheet">\n')
+            elif command == 'ADD_SCRIPT':
+                final_lines.append(f'<script src="{value}"></script>\n')
             elif command == 'TITLE':
                 output.write(f'<title>{value}</title>\n')
+            elif command == 'ICON':
+                output.write(f'<link rel="icon" href="{value}" type="image/x-icon" />')
+                output.write(f'<link rel="shortcut icon" href="{value}" type="image/x-icon" />')
+            elif command == 'BODY_CLASS':
+                BODY_CLASS = value
+            elif command == 'BODY_ID':
+                BODY_ID = value
             continue
         # Empty
         #if len(line) == 0:
@@ -173,17 +207,43 @@ def to_html(input_name, output_name=None):
             link = line[line.find(']: ') + len(']: '):]
             links[name] = link
             continue
+        # Inner links
+        nb, title, id_title = find_title(line)
+        if nb > 0:
+            inner_links.append(id_title)
         filtered_content.append(line)
 
     output.write('</head>\n')
-    output.write('<body>\n')
-    #output.write('<body id="content" class="palatino">\n')
+
+    if BODY_CLASS is None and BODY_ID is None:
+        output.write('<body>\n')
+    elif BODY_ID is None:
+        output.write(f'<body class="{BODY_CLASS}">\n')
+    elif BODY_CLASS is None:
+        output.write(f'<body id="{BODY_ID}">\n')
+    else:
+        output.write(f'<body id="{BODY_ID}" class="{BODY_CLASS}">\n')
+    output.write('<div id="main" class="container">\n')
 
     for index, raw_line in enumerate(filtered_content):
         line = raw_line
+        # Comment
         if line.startswith('<!-- '):
             output.write(line + '\n')
             continue
+        # Include
+        if line.startswith('!include '):
+            included = line.replace('!include ', '', 1)
+            file = open(included, mode='r', encoding='utf8')
+            file_content = file.read()
+            file.close()
+            output.write(file_content + '\n')
+            continue
+        # HTML
+        if line.startswith('!html '):
+            output.write(line.replace('!html ', '', 1) + '\n')
+            continue
+        # Next line
         if index < len(filtered_content) - 2:
             next_line = filtered_content[index + 1]
         else:
@@ -194,7 +254,8 @@ def to_html(input_name, output_name=None):
                 output.write('<hr>\n')
                 continue
         # Bold & Italic & Strikethrough & Underline & Power
-        if multi_find(line, ('**', '--', '__', '^^', "''", "[")):
+        if multi_find(line, ('**', '--', '__', '^^', "''", "[", '@@')) and \
+           not line.startswith('|-'):
             new_line = ''
             in_bold = False
             in_italic = False
@@ -254,7 +315,10 @@ def to_html(input_name, output_name=None):
                         elif multi_start(link, ('https://', 'http://')):
                             new_line += f'<a href="{link}">{link_name}</a>'
                         elif link == '#': # [Python->#] = to #Python
-                            new_line += f'<a href="#{link_name}">{link_name}</a>'
+                            if make_title(link_name) in inner_links:
+                                new_line += f'<a href="#{make_title(link_name)}">{link_name}</a>'
+                            else:
+                                new_line += f'<a href="#{link_name}">{link_name}</a>'
                         else:
                             warn('Undefined link:', link_name)
                             new_line += link_name
@@ -315,19 +379,23 @@ def to_html(input_name, output_name=None):
                         new_line += '</sup>'
                         in_power = False
                     continue
+                # Code
+                if char == '@' and next_char == '@' and prev_char != '\\':
+                    continue
+                if char == '@' and prev_char == '@' and prev_prev_char != '\\':
+                    if not in_power:
+                        new_line += '<code>'
+                        in_power = True
+                    else:
+                        new_line += '</code>'
+                        in_power = False
+                    continue
                 new_line += char
             line = new_line
         # Title
-        c = 0
-        nb = 0
-        while c < len(line):
-            if line[c] == '#':
-                nb += 1
-            else:
-                break
-            c += 1
+        nb, title, id_title = find_title(line)
         if nb > 0:
-            line = f'<h{nb}>' + line.replace('#' * nb, '', 1).strip() + f'</h{nb}>\n'
+            line = f'<h{nb} id="{id_title}">{title}</h{nb}>\n'
             output.write(line)
             continue
         # Liste
@@ -375,7 +443,7 @@ def to_html(input_name, output_name=None):
             if not in_table:
                 output.write('<table>\n')
                 in_table = True
-            if next_line is not None and next_line.strip().startswith('|-'):
+            if next_line is not None and next_line.startswith('|-'):
                 element = 'th'
             else:
                 element = 'td'
@@ -408,6 +476,10 @@ def to_html(input_name, output_name=None):
     if in_table:
         output.write('</table>\n')
         in_table = False
+    # Do we have registered lines to write at the end?
+    output.write('</div>\n')
+    for line in final_lines:
+        output.write(line)
     output.write('</body>')
     output.close()
 
@@ -415,9 +487,9 @@ def to_html(input_name, output_name=None):
 # Main
 #-------------------------------------------------------------------------------
 
-#file_names = ['Passe-temps.hml', 'hamill.hml', 'Tests.hml', 'tools_langs.hml']
+file_names = ['Passe-temps.hml', 'hamill.hml', 'Tests.hml', 'tools_langs.hml']
 #file_names = ['Tests.hml']
-file_names = ['tools_langs.hml']
+#file_names = ['tools_langs.hml']
 
 if __name__ == '__main__':
     for file in file_names:
