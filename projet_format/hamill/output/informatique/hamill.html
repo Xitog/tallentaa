@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tools & Languages</title>
+<title>Hamill</title>
 <link rel="icon" href="https://xitog.github.io/dgx/img/favicon.ico" type="image/x-icon" /><link rel="shortcut icon" href="https://xitog.github.io/dgx/img/favicon.ico" type="image/x-icon" /><link href="https://xitog.github.io/dgx/css/simplex.bootstrap.css" rel="stylesheet">
 <link href="https://xitog.github.io/dgx/css/palatino.css" rel="stylesheet">
 </head>
@@ -125,212 +125,68 @@
         </div><!--/.container-fluid -->
       </nav>
 <div id="content-div">
-<h1 id="tools-&amp;-languages">Tools &amp; Languages</h1>
+<h1 id="hamill">Hamill</h1>
 <hr>
-<p>Une liste de logiciels utiles et de langages de programmation.</p>
-<p>Pour les langages que j'utilise le plus, <a href="#python">Python</a>, <a href="#c">C</a>, je détaille :</p>
+<p>Ce document décrit le langage <b>Hamill</b>. Comme <a href="https://en.wikipedia.org/wiki/Markdown">Markdown</a> ou <a href="https://en.wikipedia.org/wiki/Textile_(markup_language)">Textile</a>, c'est un <a href="https://en.wikipedia.org/wiki/Lightweight_markup_language">langage de balisage léger</a> pour écrire de la documentation dans un fichier texte, directement lisible sans transformation, mais pouvant également être transformé en HTML.</p>
+<p>On peut faire des commentaires en commençant une ligne par --.</p>
+<!-- Ceci est un commentaire il sera exporté en HTML -->
+<p>On peut faire une ligne horizontale avec une ligne constituée uniquement de - d'une longueur supérieure ou égale à 3.</p>
+<p>Pour faire une ligne de commentaire vide, il faut donc impérativement mettre un espace après -- .</p>
+<h2 id="modification-de-texte">Modification de texte</h2>
 <ul>
-<li>IDE, interpréteurs ou compilateurs</li>
-<li>Bibliothèques</li>
-<li>Documentation</li>
+<li>**<b>gras</b>** : pour mettre en gras</li>
+<li>''<i>italique</i>'' : pour mettre en italique</li>
+<li>--<s>barré</s>-- : pour barré</li>
+<li>__<u>souligné</u>__ : pour souligner</li>
+<li>^^<sup>exposant</sup>^^ : pour mettre en exposant</li>
 </ul>
-<h2 id="summary">Summary</h2>
+<h2 id="listes">Listes</h2>
 <ul>
-<li>Programming</li>
+<li>* une liste non numérotée</li>
+</ul>
 <ul>
-<li>Python</li>
-<li>C</li>
-<li>JavaScript</li>
-<li>Ruby</li>
-<li>Lua</li>
-<li>List of languages</li>
+<li>- une autre liste non numérotée</li>
 </ul>
-<li>Publishing</li>
-</ul>
-<h2 id="programming">Programming</h2>
-<ul>
-<li><b>Version control</b></li>
-<ul>
-<li><a href="https://git-scm.com/">Git</a></li>
-<li><a href="https://github.com/">GitHub</a></li>
-</ul>
-<li><b>Data description language</b></li>
-<ul>
-<li><a href="http://www.json.org/json-fr.html">JSON</a></li>
-<li><a href="http://json-schema.org/">JSON Schema</a></li>
-<li><a href="https://developer.mozilla.org/fr/docs/Web/XML">XML</a></li>
-<li><a href="https://tecfa.unige.ch/guides/tie/html/xml-schema/xml-schema-3.html">XSD</a></li>
-</ul>
-<li><b>General documentation</b></li>
-<ul>
-<li><a href="http://www.cheat-sheets.org/">Cheat sheets</a></li>
-</ul>
-<li><b>List of libraries</b></li>
-<ul>
-<li><a href="https://www.sfml-dev.org/">SFML</a> for C, Crystal, D, Go, Nim, OCaml, Python, Ruby, Rust</li>
-<li><a href="http://kha.tech/">Kha</a> : multimedia framework based on Haxe</li>
-</ul>
-</ul>
-<h3 id="python">Python</h3>
-<ul>
-<li><b>Implementations</b></li>
-<ul>
-<li><a href="https://www.python.org/">Official C intepreter</a> : the classic Python</li>
-<li><a href="http://www.jython.org/">Jython</a> : Python on the JVM</li>
-<li><a href="http://cython.org/">Cython</a> : Compile Python to C</li>
-<li><a href="http://ironpython.net/">IronPython</a> : Python on .Net</li>
-<li><a href="http://pyjs.org/">PyJS</a> : Python to JavaScript (ex-Pyjama)</li>
-<li><a href="https://brython.info/">Brython</a> : Client-side Python on JavaScript</li>
-</ul>
-<li><b>Libraries</b></li>
-<ul>
-<li><i>Repositories</i></li>
-<ul>
-<li><a href="https://pypi.org/">PyPI</a> : Python Package Index</li>
-<li><a href="http://www.lfd.uci.edu/~gohlke/pythonlibs/">Pythonlibs</a> : Repository of compiled libraries</li>
-</ul>
-<li><i>Media</i></li>
-<ul>
-<li><a href="https://www.pygame.org/news">Pygame</a> : Multimedia library for Python based on <a href="https://www.libsdl.org/">SDL</a></li>
-<li><a href="http://python-pillow.org/">Pillow</a> : Images, fork of the older <s><a href="http://www.pythonware.com/products/pil/">PIL</a></s></li>
-</ul>
-<li><i>GUI</i></li>
-<ul>
-<li><a href="http://pyfltk.sourceforge.net/">PyFLTK</a> : FLTK GUI</li>
-<li><a href="https://kivy.org/#home">Kivy</a> : Kivy Multitouch GUI</li>
-</ul>
-</ul>
-<li><b>Documentation</b></li>
-<ul>
-<li><a href="https://docs.python.org/3/">Official</a></li>
-<ul>
-<li><a href="https://docs.python.org/3/whatsnew/index.html">What's new</a></li>
-<li><a href="https://docs.python.org/3/library/stdtypes.html">4. Standard types</a></li>
-<li><a href="https://docs.python.org/3/reference/expressions.html">6. Expressions</a></li>
-<li><a href="https://docs.python.org/3/reference/simple_stmts.html">7. Statements</a></li>
-<li><a href="https://docs.python.org/3/library/collections.html">8. Collections</a></li>
-<li><a href="https://docs.python.org/3/library/threading.html">17. Threading</a></li>
-<li><a href="https://docs.python.org/3/library/queue.html">17. Queue</a></li>
-<li><a href="https://docs.python.org/3/library/asyncio-task.html">18. Coroutine</a></li>
-<li><a href="https://docs.python.org/3/library/json.html">19. JSON</a></li>
-<li><a href="https://docs.python.org/3/library/xml.etree.elementtree.html">20. ElementTree</a></li>
-<li><a href="https://docs.python.org/3/library/socketserver.html">21. Socket server</a></li>
-</ul>
-<li>Tkinter GUI</li>
-<ul>
-<li><a href="http://effbot.org/tkinterbook/tkinter-index.htm">Effbot</a></li>
-<li><a href="http://tkinter.fdex.eu/">FDEX</a></li>
-<li><s><a href="http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/index.html">New Mexico Tech</a></s> <a href="https://anzeljg.github.io/rin2/book2/2405/docs/tkinter/index.html">archived</a></li>
-</ul>
-<li><s><a href="http://rgruet.free.fr/PQR27/PQR2.7.html">PQR 2.7</a></s> Cheat sheet for Py 2.7</li>
-<li><a href="https://wiki.python.org/moin/GuiProgramming">GUI Programming</a></li>
-</ul>
-</ul>
-<h3 id="c">C</h3>
-<ul>
-<li><b>Compilers and IDE</b></li>
-<ul>
-<li><a href="http://www.smorgasbordet.com/pellesc/">Pelles C</a></li>
-<li><a href="http://www.mingw.org/">MinGW</a> : Linux tools including GCC</li>
-</ul>
-<li><b>Libraries</b></li>
-<ul>
-<li><i>Media</i></li>
-<ul>
-<li><a href="http://liballeg.org/">Allegro</a></li>
-<li><a href="http://libsdl.org/">SDL</a></li>
-</ul>
-</ul>
-</ul>
-<h3 id="javascript">JavaScript</h3>
-<ul>
-<li><b>Libraries</b></li>
-<ul>
-<li><i>Media</i></li>
-<ul>
-<li><a href="https://d3js.org/">D3JS</a></li>
-</ul>
-<li><a href="https://togetherjs.com/">TogetherJS</a> : real time collaboration</li>
-</ul>
-</ul>
-<h3 id="ruby">Ruby</h3>
-<ul>
-<li><b>Implementations</b></li>
-<ul>
-<li><a href="https://www.ruby-lang.org/">Official C intepreter</a> : the classic Ruby interpreter</li>
-<li><a href="https://www.jruby.org/">JRuby</a> : Ruby on the JVM</li>
-<li><a href="http://ironruby.net/">IronRuby</a> : Ruby on .Net</li>
-<li><a href="https://rubyinstaller.org/">Ruby Installer</a> Binary Windows distribution</li>
-</ul>
-<li><b>Libraries</b></li>
-<ul>
-<li><i>Repositories</i></li>
-<ul>
-<li><a href="https://rubygems.org/">Ruby Gems</a></li>
-<li><a href="https://www.ruby-toolbox.com/">Ruby Toolbox</a></li>
-</ul>
-<li><i>Media</i></li>
-<ul>
-<li><a href="https://www.libgosu.org/">Gosu</a></li>
-</ul>
-</ul>
-</ul>
-<h3 id="lua">Lua</h3>
-<ul>
-<li><b>Platforms</b></li>
-<ul>
-<li><a href="https://www.lua.org/">Official C interpreter</a></li>
-<li><a href="https://docs.coronalabs.com/daily/guide/start/introLua/index.html">Corona</a></li>
-<li><a href="https://studio.zerobrane.com/">Zerobrane IDE</a></li>
-</ul>
-<li><b>Libraries</b></li>
-<ul>
-<li><i>Media</i></li>
-<ul>
-<li><a href="https://love2d.org/">LÖVE</a></li>
-</ul>
-</ul>
-<li><b>Documentation</b></li>
-<ul>
-<li><a href="https://www.lua.org/pil/contents.html">Programming in Lua (PIL)</a><sup>1st edition</sup>, slightly outdated</li>
-</ul>
-</ul>
-<h3 id="list-of-languages">List of languages</h3>
 <ol>
-<li>C <a href="https://docs.microsoft.com/fr-fr/cpp/c-language/c-language-reference?view=vs-2019">Microsoft</a></li>
-<li>C++ <a href="https://msdn.microsoft.com/en-us/library/3bstk3k5.aspx">Microsoft</a></li>
-<li>C# <a href="https://github.com/dotnet/csharplang">Github</a></li>
-<li><a href="https://common-lisp.net/">Common Lisp</a></li>
-<li><a href="https://crystal-lang.org/">Crystal</a></li>
-<li><a href="https://dlang.org/">D</a></li>
-<li><a href="https://elixir-lang.org/">Elixir</a></li>
-<li><a href="http://www.erlang.org/">Erlang</a></li>
-<li><a href="https://wiki.gnome.org/Projects/Genie">Genie</a></li>
-<li><a href="https://golang.org/">Go</a></li>
-<li><a href="https://www.haskell.org/">Haskell</a></li>
-<li><a href="https://haxe.org/">Haxe</a></li>
-<li><a href="https://docs.oracle.com/javase/9/">Java</a></li>
-<li>JavaScript <a href="https://developer.mozilla.org/fr/docs/Web/JavaScript">Mozilla</a></li>
-<li><a href="https://julialang.org/">Julia</a></li>
-<li><a href="https://kotlinlang.org/">Kotlin</a></li>
-<li><a href="https://www.lua.org/">Lua</a></li>
-<li><a href="https://nim-lang.org/">Nim</a> <i>(ex-Nimrod)</i></li>
-<li><a href="https://ocaml.org/">OCaml</a></li>
-<li><s><a href="https://oden-lang.github.io/">Oden</a></s></li>
-<li><a href="https://ooc-lang.org/">ooc</a></li>
-<li><a href="http://www.purescript.org/">PureScript</a></li>
-<li><a href="https://www.python.org/">Python</a></li>
-<li><s><a href="http://reia-lang.org/">Reia</a></s></li>
-<li><a href="https://www.ruby-lang.org/">Ruby</a></li>
-<li><a href="https://www.rust-lang.org/">Rust</a></li>
-<li><a href="http://www.scala-lang.org/">Scala</a></li>
-<li><a href="http://www.schemers.org/">Scheme</a></li>
-<li><a href="https://wiki.gnome.org/Projects/Vala">Vala</a></li>
-<li><a href="http://ziglang.org/">Zig</a></li>
+<li>\% une liste numérotée</li>
 </ol>
-<h2 id="publishing">Publishing</h2>
+<h2 id="listes-de-définition">Listes de définition</h2>
 <ul>
-<li><a href="https://pages.github.com/">GitHub Pages</a></li>
+<li>$ une liste de définition. On fait suivre directement la définition</li>
+</ul>
+<h2 id="tables">Tables</h2>
+<ul>
+<li>Un tableau s'écrit ainsi : |col1|col2|col3|</li>
+<li>La ligne de titre doit être la première et séparée par des colonnes |----|</li>
+</ul>
+<table>
+<tr><th>Ceci</th><th>est</th><th>un  </th><th>tableau    </th></tr>
+<tr><td>Il  </td><td>est</td><td>beau</td><td>mon tableau</td></tr>
+</table>
+<h2 id="liens">Liens</h2>
+<ul>
+<li>On utilise les crochets [ nom affiché -> lien ]</li>
+<li>Le lien peut être directement http:// ou https://</li>
+<li>Ou le lien peut être une redirection [ nom affiché -> code ] puis une défintion de la forme : [code]: http://...</li>
+<li>Ou le lien peut être seulement <b>#</b>. Dans ce cas, il essaye de faire pointé sur le nom affiché ou, si c'est un titre, le nom affiché transformé <i>(voir ci-dessous)</i></li>
+<li>Les titres sont automatiquement transformés en ancre en remplaçant les espaces par - et en les mettant en minuscules : ainsi <b>Les jeux</b> devient <b>les-jeux</b></li>
+</ul>
+<h2 id="doctrines">Doctrines</h2>
+<p>On peut utiliser <code>!doctrine</code> en début de ligne pour modifier des variables globales de transformation en HTML. On peut définir la valeur d'une doctrine plusieurs fois mais <b>seule la dernière valeur définie sera prise en compte</b> pour la génération. En effet, on ne peut pas être versatile quand il s'agit de doctrine. Par exemple :</p>
+<ul>
+<li><code>!doctrine TITLE=titre</code> pour définir le titre de la page</li>
+<li><code>!doctrine ICON=icon</code> pour définir une icône pour la page</li>
+<li><code>!doctrine EXPORT_COMMENT=true/false</code> spécifie si les commentaires seront exportés en HTML ou pas</li>
+<li><code>!doctrine ADD_CSS=lien vers un fichier CSS</code> spécifie un fichier CSS à ajouter</li>
+<li><code>!doctrine ADD_SCRIPT=lien vers un fichier de script</code> spécifie un fichier JavaScript à ajouter</li>
+<li><code>!doctrine BODY_CLASS=classe</code> pour définir la classe du body</li>
+<li><code>!doctrine BODY_ID=id</code> pour définir l'id du body</li>
+<li><code>!doctrine PARAGRAPH_DEFINITION=true/false</code> spécifie si les dd doivent être mis dans des balises p</li>
+</ul>
+<h2 id="spécial">Spécial</h2>
+<ul>
+<li><code>!css css-code</code> permet de rajouter du code css</li>
+<li><code>!html html-code</code> permet de rajouter du code html</li>
 </ul>
 </div>
 </div>

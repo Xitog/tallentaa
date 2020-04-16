@@ -22,6 +22,14 @@ Pour les langages que j'utilise le plus, [Python->#], [C->#], je détaille :
 * Bibliothèques
 * Documentation
 
+Sur un nouveau PC, j'installe généralement comme base de travail :
+
+* Python (interpréteur + IDLE)
+* Pelles C (IDE + compilateur)
+* Git (pour le contrôle de version)
+* Winmerge (pour comparer deux versions)
+* Firefox ou Chrome (pour exécuter JavaScript et afficher du HTML et du CSS)
+
 ## Summary
 
 * Programming
@@ -38,6 +46,7 @@ Pour les langages que j'utilise le plus, [Python->#], [C->#], je détaille :
 * **Version control**
 * * [Git->https://git-scm.com/]
 * * [GitHub->https://github.com/]
+* * [Winmerge->https://winmerge.org/?lang=fr]
 * **Data description language**
 * * [JSON->http://www.json.org/json-fr.html]
 * * [JSON Schema->http://json-schema.org/]

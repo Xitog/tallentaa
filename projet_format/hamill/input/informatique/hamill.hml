@@ -24,7 +24,7 @@ On peut faire des commentaires en commençant une ligne par \-\-.
 
 -- Ceci est un commentaire il sera exporté en HTML
 
-On peut faire une ligne horizontale avec une ligne constituée uniquement de - d'une longueur quelconque.
+On peut faire une ligne horizontale avec une ligne constituée uniquement de - d'une longueur supérieure ou égale à 3.
 
 Pour faire une ligne de commentaire vide, il faut donc impérativement mettre un espace après \-\- .
 
@@ -44,6 +44,10 @@ Pour faire une ligne de commentaire vide, il faut donc impérativement mettre un
 
 % \% une liste numérotée
 
+## Listes de définition
+
+* $ une liste de définition. On fait suivre directement la définition
+
 ## Tables
 
 * Un tableau s'écrit ainsi : |col1|col2|col3|
@@ -55,7 +59,11 @@ Pour faire une ligne de commentaire vide, il faut donc impérativement mettre un
 
 ## Liens
 
-* à mettre
+* On utilise les crochets \[ nom affiché -> lien ]
+* Le lien peut être directement http:// ou https://
+* Ou le lien peut être une redirection \[ nom affiché -> code ] puis une défintion de la forme : \[code]: http://...
+* Ou le lien peut être seulement **#**. Dans ce cas, il essaye de faire pointé sur le nom affiché ou, si c'est un titre, le nom affiché transformé ''(voir ci-dessous)''
+* Les titres sont automatiquement transformés en ancre en remplaçant les espaces par - et en les mettant en minuscules : ainsi **Les jeux** devient **les-jeux**
 
 ## Doctrines
 
@@ -68,6 +76,12 @@ On peut utiliser @@!doctrine@@ en début de ligne pour modifier des variables gl
 * @@!doctrine ADD_SCRIPT=lien vers un fichier de script@@ spécifie un fichier JavaScript à ajouter
 * @@!doctrine BODY_CLASS=classe@@ pour définir la classe du body
 * @@!doctrine BODY_ID=id@@ pour définir l'id du body
+* @@!doctrine PARAGRAPH_DEFINITION=true/false@@ spécifie si les dd doivent être mis dans des balises p
+
+## Spécial
+
+* @@!css css-code@@ permet de rajouter du code css
+* @@!html html-code@@ permet de rajouter du code html
 
 [Markdown]: https://en.wikipedia.org/wiki/Markdown
 [Textile]: https://en.wikipedia.org/wiki/Textile_(markup_language)

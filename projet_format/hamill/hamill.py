@@ -25,7 +25,10 @@ Evolved 2020-04-07 as yet another language
 # Imports
 #-------------------------------------------------------------------------------
 
-import sys
+import os # for walk
+import sys # colored output for IDLE
+import os.path # test if it is a directory or a file
+import shutil
 
 #-------------------------------------------------------------------------------
 # Logging
@@ -98,7 +101,7 @@ def escape(line):
             next_char = line[index_char + 1]
         else:
             next_char = None
-        if char == '\\' and next_char in ['*', "'", '^', '-', '_']:
+        if char == '\\' and next_char in ['*', "'", '^', '-', '_', '[']:
             new_line += next_char
             index_char += 2    
         else:
@@ -134,6 +137,7 @@ def to_html(input_name, output_name=None):
     TITLE=None
     BODY_CLASS=None
     BODY_ID=None
+    DEFINITION_AS_PARAGRAPH=False
 
     source = open(input_name, mode='r', encoding='utf8')
     content = source.readlines()
@@ -156,6 +160,7 @@ def to_html(input_name, output_name=None):
     in_table = False
     links = {}
     inner_links = []
+    in_definition_list = False
 
     list_starter = {'* ': 'ul', '- ': 'ul', '% ': 'ol'}
 
@@ -189,19 +194,30 @@ def to_html(input_name, output_name=None):
                 BODY_CLASS = value
             elif command == 'BODY_ID':
                 BODY_ID = value
+            elif command == 'PARAGRAPH_DEFINITION':
+                if value == 'true':
+                    DEFINITION_AS_PARAGRAPH = True
+                else:
+                    DEFINITION_AS_PARAGRAPH = False
             continue
         # Empty
         #if len(line) == 0:
         #    continue keep empty to separate lists!
+        # CSS
+        if line.startswith('!css '):
+            output.write('<style type="text/css">\n')
+            output.write(line.replace('!css ', '', 1).strip() + '\n')
+            output.write('</style>\n')
+            continue
         # Special chars
         line = line.replace('&', '&amp;')
         # Comment
-        if line.startswith('--') and line.count('-') != len(line):
+        if line.startswith('--') and line.count('-') != len(line) and line.count('-') < 3:
             if EXPORT_COMMENT:
                 line = line.replace('--', '<!--', 1) + ' -->'
             else:
                 continue
-        # Links
+        # Link library
         elif len(line) > 0 and line[0] == '[' and (line.find(']: https://') != -1 or line.find(']: http://') != -1):
             name = line[1:line.find(']: ')]
             link = line[line.find(']: ') + len(']: '):]
@@ -253,6 +269,9 @@ def to_html(input_name, output_name=None):
             if line.count('-') == len(line):
                 output.write('<hr>\n')
                 continue
+        # BR
+        if line.find(' !! ') != -1:
+            line = line.replace(' !! ', '<br>')
         # Bold & Italic & Strikethrough & Underline & Power
         if multi_find(line, ('**', '--', '__', '^^', "''", "[", '@@')) and \
            not line.startswith('|-'):
@@ -290,14 +309,14 @@ def to_html(input_name, output_name=None):
                 #        new_line += char # for * liste with **thing**
                 #    continue
                 # Link
-                if char == '[' and next_char == '#':
+                if char == '[' and next_char == '#' and prev_char != '\\':
                     ending = line.find(']', char_index)
                     if ending != -1:
                         link = line[char_index + 2:ending]
                         new_line += f'<a id="{link}">' + link + '</a>'
                         char_index = ending
                         continue
-                elif char == '[' and char_index < len(line) - 1:
+                elif char == '[' and char_index < len(line) - 1 and prev_char != '\\':
                     ending = line.find(']', char_index)
                     if ending != -1:
                         link = line[char_index + 1:ending]
@@ -462,17 +481,40 @@ def to_html(input_name, output_name=None):
         elif in_table:
             output.write('</table>\n')
             in_table = False
+        # Definition list
+        if line.startswith('$ '):
+            if not in_definition_list:
+                in_definition_list = True
+                output.write('<dl>\n')
+            else:
+                output.write('</dd>\n')
+            output.write(f'<dt>{line.replace("$ ", "", 1)}</dt>\n<dd>\n')
+            continue
+        elif len(line) != 0 and in_definition_list:
+            if not DEFINITION_AS_PARAGRAPH:
+                output.write(escape(line) +'\n')
+            else:
+                output.write('<p>' + escape(line) +'</p>\n')
+            continue
+        # empty line
+        elif len(line) == 0 and in_definition_list:
+            in_definition_list = False
+            output.write('</dl>\n')
+            continue
         # Replace escaped char
         line = escape(line)
         # Paragraph
         if len(line) > 0:
             output.write('<p>' + line.strip() + '</p>\n')
-    # Are they list still open?
+    # Are a definition list still open?
+    if in_definition_list:
+        output.write('</dl>\n')
+    # Are some lists still open?
     if len(list_level) > 0:
         for level in range(len(list_level) - 1, -1, -1):
             output.write(f'</{list_starter[list_level[-1]]}>\n')
             list_level.pop()
-    # Are they table still open?
+    # Are a table still open?
     if in_table:
         output.write('</table>\n')
         in_table = False
@@ -487,11 +529,43 @@ def to_html(input_name, output_name=None):
 # Main
 #-------------------------------------------------------------------------------
 
-file_names = ['Passe-temps.hml', 'hamill.hml', 'Tests.hml', 'tools_langs.hml']
-#file_names = ['Tests.hml']
-#file_names = ['tools_langs.hml']
+paths = ['input']
+#paths = ['Passe-temps.hml', 'hamill.hml', 'Tests.hml', 'tools_langs.hml']
+#paths = ['Tests.hml']
+#paths = ['tools_langs.hml']
+
+def process(path):
+    if os.path.isfile(path):
+        info('Processing file:', path)
+        to_html(path)
+    elif os.path.isdir(path):
+        info('Processing directory:', path)
+        for dirpath, dirnames, filenames in os.walk(path):
+            for file in filenames:
+                process(os.path.join(path, file))
+            for directory in dirnames:
+                process(os.path.join(path, directory))
+
+def mirror(path_input_dir, path_output_dir):
+    for path in os.listdir(path_input_dir):
+        if os.path.isfile(os.path.join(path_input_dir, path)):
+            if path.endswith('.hml'):
+                info('Processing file:', path)
+                to_html(os.path.join(path_input_dir, path),
+                        os.path.join(path_output_dir, path.replace('.hml', '.html')))
+            else:
+                shutil.copy2(os.join(path_input_dir, path), os.join(path_output_dir, path))
+        elif os.path.isdir(os.path.join(path_input_dir, path)):
+            os.mkdir(os.path.join(path_output_dir, path))
+            mirror(os.path.join(path_input_dir, path), os.path.join(path_output_dir, path))
 
 if __name__ == '__main__':
-    for file in file_names:
-        info('Processing:', file)
-        to_html(file)
+    if len(paths) == 1 and os.path.isdir(paths[0]):
+        info('Mirroring:', paths[0])
+        if os.path.isdir('output'):
+            shutil.rmtree('output')
+        os.mkdir('output')
+        mirror(paths[0], 'output')
+    else:
+        for path in paths:
+            process(path)
