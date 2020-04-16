@@ -530,7 +530,7 @@ def to_html(input_name, output_name=None):
 #-------------------------------------------------------------------------------
 
 paths = ['input']
-#paths = ['Passe-temps.hml', 'hamill.hml', 'Tests.hml', 'tools_langs.hml']
+#paths = ['jeux.hml', 'hamill.hml', 'Tests.hml', 'tools_langs.hml']
 #paths = ['Tests.hml']
 #paths = ['tools_langs.hml']
 

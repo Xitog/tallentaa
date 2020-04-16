@@ -1,4 +1,4 @@
-!doctrine TITLE=Passe-temps
+!doctrine TITLE=Jeux
 !doctrine ICON=https://xitog.github.io/dgx/img/favicon.ico
 !doctrine BODY_ID=content
 !doctrine BODY_CLASS=palatino
@@ -11,17 +11,15 @@
 
 !html <div id="content-div">
 
-# Passe-temps
+# Jeux
 ---
 
-Cette page concerne mes passe-temps ludiques :
+Cette page concerne mes passe-temps ludiques. Ce qui suit présente rapidement les différents types de jeux auxquels je m'adonne :
 
 * [Les jeux de figurines->#] : Warhammer, X-Wing
 * [Les jeux de cartes->#] : Magic: The Gathering
 * [Les jeux de rôles->#] : D&D
 * [Les jeux vidéo->#] : surtout les FPS, les RPG et les RTS
-
-Ce qui suit présente rapidement les différents passe-temps.
 
 ## Les jeux de figurines
 
