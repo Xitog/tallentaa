@@ -1,7 +1,5 @@
 !doctrine TITLE=Jeux
 !doctrine ICON=https://xitog.github.io/dgx/img/favicon.ico
-!doctrine BODY_ID=content
-!doctrine BODY_CLASS=palatino
 !doctrine ADD_CSS=https://xitog.github.io/dgx/css/simplex.bootstrap.css
 !doctrine ADD_CSS=https://xitog.github.io/dgx/css/palatino.css
 !doctrine ADD_SCRIPT=https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
