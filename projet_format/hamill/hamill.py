@@ -161,6 +161,7 @@ def to_html(input_name, output_name=None):
     links = {}
     inner_links = []
     in_definition_list = False
+    in_code_block = False
 
     list_starter = {'* ': 'ul', '- ': 'ul', '% ': 'ol'}
 
@@ -168,8 +169,17 @@ def to_html(input_name, output_name=None):
     filtered_content = []
     final_lines = []
     for index, raw_line in enumerate(content):
+        # Block of code
+        if raw_line.startswith('@@') and len(raw_line) in [2, 3]:
+            if not in_code_block:
+                in_code_block = True
+            else:
+                in_code_block = False
         # Strip
-        line = raw_line.strip()
+        if in_code_block:
+            line = raw_line
+        else:
+            line = raw_line.strip()
         # Doctrines
         if line.startswith('!doctrine '):
             command, value = line.replace('!doctrine ', '').split('=')
@@ -272,6 +282,18 @@ def to_html(input_name, output_name=None):
         # BR
         if line.find(' !! ') != -1:
             line = line.replace(' !! ', '<br>')
+        # Block of code
+        if line.startswith('@@') and len(line) in [2, 3]:
+            if not in_code_block:
+                output.write('<pre class="code">\n')
+                in_code_block = True
+            else:
+                output.write('</pre>\n')
+                in_code_block = False
+            continue
+        if in_code_block:
+            output.write(escape(line))
+            continue
         # Bold & Italic & Strikethrough & Underline & Power
         if multi_find(line, ('**', '--', '__', '^^', "''", "[", '@@')) and \
            not line.startswith('|-'):
@@ -281,6 +303,7 @@ def to_html(input_name, output_name=None):
             in_strikethrough = False
             in_underline = False
             in_power = False
+            in_code = False
             char_index = -1
             while char_index < len(line) - 1:
                 char_index += 1
@@ -402,12 +425,12 @@ def to_html(input_name, output_name=None):
                 if char == '@' and next_char == '@' and prev_char != '\\':
                     continue
                 if char == '@' and prev_char == '@' and prev_prev_char != '\\':
-                    if not in_power:
+                    if not in_code:
                         new_line += '<code>'
-                        in_power = True
+                        in_code = True
                     else:
                         new_line += '</code>'
-                        in_power = False
+                        in_code = False
                     continue
                 new_line += char
             line = new_line

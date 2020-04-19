@@ -31,12 +31,14 @@ Sur un nouveau PC, j'installe généralement comme base de travail :
 ## Summary
 
 * Programming
+* * Computer Languages
 * * Python
 * * C
 * * JavaScript
 * * Ruby
 * * Lua
 * * List of languages
+* * Game programming
 * Publishing
 
 ## Programming
@@ -55,6 +57,12 @@ Sur un nouveau PC, j'installe généralement comme base de travail :
 * **List of libraries**
 * * [SFML->https://www.sfml-dev.org/] for C, Crystal, D, Go, Nim, OCaml, Python, Ruby, Rust
 * * [Kha->http://kha.tech/] : multimedia framework based on Haxe
+
+### Computer Languages
+
+* **[Syntax across languages->http://rigaux.org/language-study/syntax-across-languages.html]** by Pascal Rigaux 
+* **[Let’s Build A Simple Interpreter->https://ruslanspivak.com/lsbasi-part1/]** by Ruslan Spivak
+* ** [BNF/EBNF variants->http://www.cs.man.ac.uk/~pjj/bnf/ebnf.html] by Pete Jinks
 
 ### Python
 
@@ -107,6 +115,9 @@ Sur un nouveau PC, j'installe généralement comme base de travail :
 
 ### JavaScript
 
+* **Implementations**
+* * [Duktape->https://duktape.org/] : Javascript engine in C embeddable in C
+* * [tinyJS->https://github.com/gfwilliams/tiny-js] : a tiny Javascript interpreter in C++ embeddable in C/C++
 * **Libraries**
 * * ''Media''
 * * * [D3JS->https://d3js.org/]
@@ -170,6 +181,13 @@ Sur un nouveau PC, j'installe généralement comme base de travail :
 % [Scheme->http://www.schemers.org/]
 % [Vala->https://wiki.gnome.org/Projects/Vala]
 % [Zig->http://ziglang.org/]
+
+### Game programming
+
+* [War2Tools->https://github.com/war2/war2tools] : set of tools for the PUD map format and resources of Warcraft II
+* [War2Edit->https://war2.github.io/war2edit/] : a free tool for producing PUD map
+* [PUD unofficial format spec->http://cade.datamax.bg/war2x/pudspec.html] : the unofficial specification of the PUD map format
+* [BSP Dungeon->http://www.roguebasin.com/index.php?title=Basic_BSP_Dungeon_generation] : BSP dungeon generation
 
 ## Publishing
 
