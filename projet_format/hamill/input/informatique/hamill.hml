@@ -24,7 +24,7 @@ On peut faire des commentaires en commençant une ligne par \-\-.
 
 On peut faire une ligne horizontale avec une ligne constituée uniquement de - d'une longueur supérieure ou égale à 3.
 
-Pour faire une ligne de commentaire vide, il faut donc impérativement mettre un espace après \-\- .
+On peut forcer un retour à la ligne avec \!\! entouré d'un espace : ceci est un retour !! à la ligne.
 
 ## Modification de texte
 
@@ -33,6 +33,44 @@ Pour faire une ligne de commentaire vide, il faut donc impérativement mettre un
 * \-\---barré--\-\- : pour barré
 * \_\___souligné__\_\_ : pour souligner
 * \^\^^^exposant^^\^\^ : pour mettre en exposant
+
+## Code
+
+On utilise \@\@@@pour du code inline@@\@\@. Hamill dispose d'un colorisateur syntaxique pour Python et JSON, on précise ainsi : \@\@python@@python def function(par1, par2)@@\@\@.
+
+Pour un bloc de code, il ya deux solutions :
+
+On peut faire une ligne avec seulement \@\@ suivi éventuellement du langage qu'on souhaite puis des lignes avec \@\@ au début jusqu'à une ligne ne comportant que \@\@. Ainsi :
+
+>>\@\@python
+>>\@\@     # Ceci est un commentaire
+>>\@\@     def function(par1, par2):
+>>\@\@         return "Ceci est une fonction"
+>>\@\@
+
+Donnera :
+
+@@python
+@@    # Ceci est un commentaire
+@@    def function(par1, par2):
+@@        return "Ceci est une fonction"
+@@
+
+On peut également faire une ligne avec seulement \@\@\@ suivi éventuellement du langage qu'on souhaite puis des lignes __sans rien__ jusqu'à une ligne ne comportant que \@\@\@. Ainsi :
+
+>>\@\@\@python
+>>     # Ceci est un commentaire
+>>     def function(par1, par2):
+>>         return "Ceci est une fonction"
+>>\@\@\@
+
+Donnera :
+
+@@@python
+    # Ceci est un commentaire
+    def function(par1, par2):
+        return "Ceci est une fonction"
+@@@
 
 ## Listes
 
@@ -75,6 +113,7 @@ On peut utiliser @@!doctrine@@ en début de ligne pour modifier des variables gl
 * @@!doctrine BODY_CLASS=classe@@ pour définir la classe du body
 * @@!doctrine BODY_ID=id@@ pour définir l'id du body
 * @@!doctrine PARAGRAPH_DEFINITION=true/false@@ spécifie si les dd doivent être mis dans des balises p
+* @@!doctrine DEFAULT_CODE=python/json@@ définit la coloration syntaxique par défaut du code (text par défaut)
 
 ## Spécial
 

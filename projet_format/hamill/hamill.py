@@ -29,6 +29,7 @@ import os # for walk
 import sys # colored output for IDLE
 import os.path # test if it is a directory or a file
 import shutil
+from tokenizer import RECOGNIZED_LANGUAGES, tokenize
 
 #-------------------------------------------------------------------------------
 # Logging
@@ -90,7 +91,14 @@ def multi_find(string, finds):
         if string.find(key) != -1:
             return key
 
+def contains_only(string, things):
+    for t in things:
+        if string.startswith(t) and len(string.strip()) == len(t):
+            return True
+    return False
+
 def escape(line):
+    # Escaping
     if line.find('\\') == -1:
         return line
     new_line = ''
@@ -101,12 +109,45 @@ def escape(line):
             next_char = line[index_char + 1]
         else:
             next_char = None
-        if char == '\\' and next_char in ['*', "'", '^', '-', '_', '[']:
+        if char == '\\' and next_char in ['*', "'", '^', '-', '_', '[', '@', '%', '!']:
             new_line += next_char
             index_char += 2    
         else:
             new_line += char
             index_char += 1
+    return new_line
+
+def safe(line):
+    # Do not escape !html line
+    if line.startswith('!html'):
+        return line
+    # Replace HTML special char
+    new_line = ''
+    index_char = 0
+    while index_char < len(line):
+        # current, next, prev
+        char = line[index_char]
+        if index_char < len(line) - 1:
+            next_char = line[index_char + 1]
+        else:
+            next_char = None
+        if index_char > 0:
+            prev_char = line[index_char -1 ]
+        else:
+            prev_char = None
+        # replace
+        if char == '&':
+            new_line += '&amp;'
+        elif char == '<':
+            new_line += '&lt;'
+        elif char == '>' and next_char == '>' and index_char == 0: # must not replace >>
+            new_line += '>>'
+            index_char += 1
+        elif char == '>' and prev_char != '-': # must not replace ->
+            new_line += '&gt;'
+        else:
+            new_line += char
+        index_char += 1
     return new_line
 
 def find_title(line):
@@ -127,6 +168,27 @@ def find_title(line):
 def make_title(string):
     return string.replace(' ', '-').lower()
 
+def write_code(line, code_lang, output=None):
+    tokens = tokenize(line, code_lang)
+    tokens_by_index = {}
+    next_stop = None
+    string = ''
+    for tok in tokens:
+        tokens_by_index[tok.start] = tok
+    for index_char, char in enumerate(line):
+        if index_char in tokens_by_index:
+            tok = tokens_by_index[index_char]
+            string += f'<span class="{tok.typ}">{char}'
+            next_stop = tok.stop
+        elif next_stop is not None and index_char == next_stop:
+            string += f'{char}</span>'
+        else:
+            string += safe(char)
+    if output is not None and hasattr(output, 'write'):
+        output.write(string)
+    else:
+        return string
+
 #-------------------------------------------------------------------------------
 # Processors
 #-------------------------------------------------------------------------------
@@ -138,6 +200,7 @@ def to_html(input_name, output_name=None):
     BODY_CLASS=None
     BODY_ID=None
     DEFINITION_AS_PARAGRAPH=False
+    DEFAULT_CODE='text'
 
     source = open(input_name, mode='r', encoding='utf8')
     content = source.readlines()
@@ -161,8 +224,11 @@ def to_html(input_name, output_name=None):
     links = {}
     inner_links = []
     in_definition_list = False
+    in_code_free_block = False
     in_code_block = False
-
+    in_pre_block = False
+    code_lang = None
+    
     list_starter = {'* ': 'ul', '- ': 'ul', '% ': 'ol'}
 
     # prefetch links, replace special HTML char, skip comments
@@ -170,16 +236,22 @@ def to_html(input_name, output_name=None):
     final_lines = []
     for index, raw_line in enumerate(content):
         # Block of code
-        if raw_line.startswith('@@') and len(raw_line) in [2, 3]:
-            if not in_code_block:
-                in_code_block = True
+        if len(raw_line) > 2 and raw_line[0:3] == '@@@':
+            if not in_code_free_block:
+                in_code_free_block = True
             else:
-                in_code_block = False
+                in_code_free_block = False
+        if raw_line.startswith('@@'):
+            in_code_block = True
+        else:
+            in_code_block = False
         # Strip
-        if in_code_block:
+        if in_code_free_block or in_code_block:
             line = raw_line
         else:
             line = raw_line.strip()
+        # Special chars
+        line = safe(line)
         # Doctrines
         if line.startswith('!doctrine '):
             command, value = line.replace('!doctrine ', '').split('=')
@@ -209,6 +281,11 @@ def to_html(input_name, output_name=None):
                     DEFINITION_AS_PARAGRAPH = True
                 else:
                     DEFINITION_AS_PARAGRAPH = False
+            elif command == 'DEFAULT_CODE':
+                if value in RECOGNIZED_LANGUAGES:
+                    DEFAULT_CODE = value
+                else:
+                    warn('Not recognized language in doctrine DEFAULT_CODE:', value)
             continue
         # Empty
         #if len(line) == 0:
@@ -219,8 +296,6 @@ def to_html(input_name, output_name=None):
             output.write(line.replace('!css ', '', 1).strip() + '\n')
             output.write('</style>\n')
             continue
-        # Special chars
-        line = line.replace('&', '&amp;')
         # Comment
         if line.startswith('--') and line.count('-') != len(line) and line.count('-') < 3:
             if EXPORT_COMMENT:
@@ -253,6 +328,11 @@ def to_html(input_name, output_name=None):
 
     for index, raw_line in enumerate(filtered_content):
         line = raw_line
+        # Next line
+        if index < len(filtered_content) - 2:
+            next_line = filtered_content[index + 1]
+        else:
+            next_line = None
         # Comment
         if line.startswith('<!-- '):
             output.write(line + '\n')
@@ -269,11 +349,6 @@ def to_html(input_name, output_name=None):
         if line.startswith('!html '):
             output.write(line.replace('!html ', '', 1) + '\n')
             continue
-        # Next line
-        if index < len(filtered_content) - 2:
-            next_line = filtered_content[index + 1]
-        else:
-            next_line = None
         # HR
         if line.startswith('---'):
             if line.count('-') == len(line):
@@ -282,17 +357,46 @@ def to_html(input_name, output_name=None):
         # BR
         if line.find(' !! ') != -1:
             line = line.replace(' !! ', '<br>')
-        # Block of code
-        if line.startswith('@@') and len(line) in [2, 3]:
+        # Block of pre
+        if line.startswith('>>'):
+            if not in_pre_block:
+                output.write('<pre>\n')
+                in_pre_block = True
+            line = escape(line[2:])
+            output.write(line + '\n')
+            continue
+        elif in_pre_block:
+            output.write('</pre>\n')
+            in_pre_block = False
+        # Block of code 1
+        if len(line) > 2 and line[0:3] == '@@@':
+            if not in_code_free_block:
+                output.write('<pre class="code">\n')
+                in_code_free_block = True
+                code_lang = line.replace('@@@', '', 1).strip()
+                if len(code_lang) == 0:
+                    code_lang = DEFAULT_CODE
+            else:
+                output.write('</pre>\n')
+                in_code_free_block = False
+            continue 
+        # Block of code 2
+        if line.startswith('@@') and (len(line.strip()) == 2 or line[2] != '@'):
             if not in_code_block:
                 output.write('<pre class="code">\n')
                 in_code_block = True
-            else:
-                output.write('</pre>\n')
-                in_code_block = False
-            continue
-        if in_code_block:
-            output.write(escape(line))
+                code_lang = line.replace('@@', '', 1).strip()
+                if len(code_lang) == 0:
+                    code_lang = DEFAULT_CODE
+                continue
+        elif in_code_block:
+            output.write('</pre>\n')
+            in_code_block = False
+        if in_code_free_block or in_code_block:
+            if in_code_block:
+                line = line[2:] # remove starting @@
+            write_code(line, code_lang, output)
+            # output.write('\n')
             continue
         # Bold & Italic & Strikethrough & Underline & Power
         if multi_find(line, ('**', '--', '__', '^^', "''", "[", '@@')) and \
@@ -304,6 +408,7 @@ def to_html(input_name, output_name=None):
             in_underline = False
             in_power = False
             in_code = False
+            code = ''
             char_index = -1
             while char_index < len(line) - 1:
                 char_index += 1
@@ -320,17 +425,6 @@ def to_html(input_name, output_name=None):
                     next_char = line[char_index + 1]
                 else:
                     next_char = None
-                # Italic
-                #if char == '*' and next_char != '*' and prev_char != '*':
-                #    if not in_italic and next_char != ' ':
-                #        new_line += '<i>'
-                #        in_italic = True
-                #    elif in_italic:
-                #        new_line += '</i>'
-                #        in_italic = False
-                #    else:
-                #        new_line += char # for * liste with **thing**
-                #    continue
                 # Link
                 if char == '[' and next_char == '#' and prev_char != '\\':
                     ending = line.find(']', char_index)
@@ -428,11 +522,22 @@ def to_html(input_name, output_name=None):
                     if not in_code:
                         new_line += '<code>'
                         in_code = True
+                        code = ''
                     else:
+                        s = multi_start(code, ('python ', 'json '))
+                        if s is not None:
+                            code = code.replace(s, '', 1)
+                            s = s[:-1]
+                        else:
+                            s = DEFAULT_CODE
+                        new_line += write_code(code, s)
                         new_line += '</code>'
                         in_code = False
                     continue
-                new_line += char
+                if in_code:
+                    code += char
+                else:
+                    new_line += char
             line = new_line
         # Title
         nb, title, id_title = find_title(line)
@@ -541,6 +646,12 @@ def to_html(input_name, output_name=None):
     if in_table:
         output.write('</table>\n')
         in_table = False
+    # Are we stil in in_pre_block?
+    if in_pre_block:
+        output.write('</pre>')
+    # Are we still in in_code_block?
+    if in_code_block:
+        output.write('</pre>')
     # Do we have registered lines to write at the end?
     output.write('</div>\n')
     for line in final_lines:

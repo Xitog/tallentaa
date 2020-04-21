@@ -133,7 +133,7 @@
 <p>On peut faire des commentaires en commençant une ligne par --.</p>
 <!-- Ceci est un commentaire il sera exporté en HTML -->
 <p>On peut faire une ligne horizontale avec une ligne constituée uniquement de - d'une longueur supérieure ou égale à 3.</p>
-<p>Pour faire une ligne de commentaire vide, il faut donc impérativement mettre un espace après -- .</p>
+<p>On peut forcer un retour à la ligne avec !! entouré d'un espace : ceci est un retour<br>à la ligne.</p>
 <h2 id="modification-de-texte">Modification de texte</h2>
 <ul>
 <li>**<b>gras</b>** : pour mettre en gras</li>
@@ -142,6 +142,38 @@
 <li>__<u>souligné</u>__ : pour souligner</li>
 <li>^^<sup>exposant</sup>^^ : pour mettre en exposant</li>
 </ul>
+<h2 id="code">Code</h2>
+<p>On utilise @@<code><span class="normal">pour</span> <span class="normal">du</span> <span class="normal">code</span> <span class="normal">inline</span></code>@@. Hamill dispose d'un colorisateur syntaxique pour Python et JSON, on précise ainsi : @@python<code><span class="keyword">def</span> <span class="identifier">function</span><span class="separator">(<span class="normal">par1</span><span class="separator">, <span class="normal">par2</span><span class="separator">)</code>@@.</p>
+<p>Pour un bloc de code, il ya deux solutions :</p>
+<p>On peut faire une ligne avec seulement @@ suivi éventuellement du langage qu'on souhaite puis des lignes avec @@ au début jusqu'à une ligne ne comportant que @@. Ainsi :</p>
+<pre>
+@@python
+@@     # Ceci est un commentaire
+@@     def function(par1, par2):
+@@         return "Ceci est une fonction"
+@@
+</pre>
+<p>Donnera :</p>
+<pre class="code">
+    <span class="comment"># Ceci est un commentaire</span><span class="newline">
+    <span class="keyword">def</span> <span class="identifier">function</span><span class="separator">(<span class="normal">par1</span><span class="separator">, <span class="normal">par2</span><span class="separator">)<span class="operator">:<span class="newline">
+        <span class="keyword">return</span> <span class="string">"Ceci est une fonction"</span><span class="newline">
+<span class="newline">
+</pre>
+<p>On peut également faire une ligne avec seulement @@@ suivi éventuellement du langage qu'on souhaite puis des lignes <u>sans rien</u> jusqu'à une ligne ne comportant que @@@. Ainsi :</p>
+<pre>
+@@@python
+     # Ceci est un commentaire
+     def function(par1, par2):
+         return "Ceci est une fonction"
+@@@
+</pre>
+<p>Donnera :</p>
+<pre class="code">
+    <span class="comment"># Ceci est un commentaire</span><span class="newline">
+    <span class="keyword">def</span> <span class="identifier">function</span><span class="separator">(<span class="normal">par1</span><span class="separator">, <span class="normal">par2</span><span class="separator">)<span class="operator">:<span class="newline">
+        <span class="keyword">return</span> <span class="string">"Ceci est une fonction"</span><span class="newline">
+</pre>
 <h2 id="listes">Listes</h2>
 <ul>
 <li>* une liste non numérotée</li>
@@ -150,7 +182,7 @@
 <li>- une autre liste non numérotée</li>
 </ul>
 <ol>
-<li>\% une liste numérotée</li>
+<li>% une liste numérotée</li>
 </ol>
 <h2 id="listes-de-définition">Listes de définition</h2>
 <ul>
@@ -174,21 +206,22 @@
 <li>Les titres sont automatiquement transformés en ancre en remplaçant les espaces par - et en les mettant en minuscules : ainsi <b>Les jeux</b> devient <b>les-jeux</b></li>
 </ul>
 <h2 id="doctrines">Doctrines</h2>
-<p>On peut utiliser <code>!doctrine</code> en début de ligne pour modifier des variables globales de transformation en HTML. On peut définir la valeur d'une doctrine plusieurs fois mais <b>seule la dernière valeur définie sera prise en compte</b> pour la génération. En effet, on ne peut pas être versatile quand il s'agit de doctrine. Par exemple :</p>
+<p>On peut utiliser <code>!<span class="normal">doctrine</span></code> en début de ligne pour modifier des variables globales de transformation en HTML. On peut définir la valeur d'une doctrine plusieurs fois mais <b>seule la dernière valeur définie sera prise en compte</b> pour la génération. En effet, on ne peut pas être versatile quand il s'agit de doctrine. Par exemple :</p>
 <ul>
-<li><code>!doctrine TITLE=titre</code> pour définir le titre de la page</li>
-<li><code>!doctrine ICON=icon</code> pour définir une icône pour la page</li>
-<li><code>!doctrine EXPORT_COMMENT=true/false</code> spécifie si les commentaires seront exportés en HTML ou pas</li>
-<li><code>!doctrine ADD_CSS=lien vers un fichier CSS</code> spécifie un fichier CSS à ajouter</li>
-<li><code>!doctrine ADD_SCRIPT=lien vers un fichier de script</code> spécifie un fichier JavaScript à ajouter</li>
-<li><code>!doctrine BODY_CLASS=classe</code> pour définir la classe du body</li>
-<li><code>!doctrine BODY_ID=id</code> pour définir l'id du body</li>
-<li><code>!doctrine PARAGRAPH_DEFINITION=true/false</code> spécifie si les dd doivent être mis dans des balises p</li>
+<li><code>!<span class="normal">doctrine</span> <span class="normal">TITLE</span>=<span class="normal">titre</span></code> pour définir le titre de la page</li>
+<li><code>!<span class="normal">doctrine</span> <span class="normal">ICON</span>=<span class="normal">icon</span></code> pour définir une icône pour la page</li>
+<li><code>!<span class="normal">doctrine</span> <span class="normal">EXPORT_COMMENT</span>=<span class="normal">true</span>/<span class="normal">false</span></code> spécifie si les commentaires seront exportés en HTML ou pas</li>
+<li><code>!<span class="normal">doctrine</span> <span class="normal">ADD_CSS</span>=<span class="normal">lien</span> <span class="normal">vers</span> <span class="normal">un</span> <span class="normal">fichier</span> <span class="normal">CSS</span></code> spécifie un fichier CSS à ajouter</li>
+<li><code>!<span class="normal">doctrine</span> <span class="normal">ADD_SCRIPT</span>=<span class="normal">lien</span> <span class="normal">vers</span> <span class="normal">un</span> <span class="normal">fichier</span> <span class="normal">de</span> <span class="normal">script</span></code> spécifie un fichier JavaScript à ajouter</li>
+<li><code>!<span class="normal">doctrine</span> <span class="normal">BODY_CLASS</span>=<span class="normal">classe</span></code> pour définir la classe du body</li>
+<li><code>!<span class="normal">doctrine</span> <span class="normal">BODY_ID</span>=<span class="normal">id</span></code> pour définir l'id du body</li>
+<li><code>!<span class="normal">doctrine</span> <span class="normal">PARAGRAPH_DEFINITION</span>=<span class="normal">true</span>/<span class="normal">false</span></code> spécifie si les dd doivent être mis dans des balises p</li>
+<li><code>!<span class="normal">doctrine</span> <span class="normal">DEFAULT_CODE</span>=<span class="normal">python</span>/<span class="normal">json</span></code> définit la coloration syntaxique par défaut du code (text par défaut)</li>
 </ul>
 <h2 id="spécial">Spécial</h2>
 <ul>
-<li><code>!css css-code</code> permet de rajouter du code css</li>
-<li><code>!html html-code</code> permet de rajouter du code html</li>
+<li><code>!<span class="normal">css</span> <span class="normal">css</span>-<span class="normal">code</span></code> permet de rajouter du code css</li>
+<li><code>!<span class="normal">html</span> <span class="normal">html</span>-<span class="normal">code</span></code> permet de rajouter du code html</li>
 </ul>
 </div>
 </div>

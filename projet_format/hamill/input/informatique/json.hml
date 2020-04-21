@@ -1,9 +1,10 @@
-!doctrine TITLE=Tools & Languages
+!doctrine TITLE=JSON
 !doctrine ICON=https://xitog.github.io/dgx/img/favicon.ico
 !doctrine ADD_CSS=https://xitog.github.io/dgx/css/simplex.bootstrap.css
 !doctrine ADD_CSS=https://xitog.github.io/dgx/css/palatino.css
 !doctrine ADD_SCRIPT=https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
 !doctrine ADD_SCRIPT=https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js
+!doctrine DEFAULT_CODE=json
 
 !include menu.html
 
@@ -92,7 +93,7 @@ JSON est défini dans les documents suivants :
 
 ## Exemple
 
-@@
+@@@json
     {
         "type" : "Voiture",
         "marque" : "Hyundai",
@@ -105,7 +106,7 @@ JSON est défini dans les documents suivants :
         ],
         "madeInEurope" : false
     }
-@@
+@@@
 
 ## Autres formats
 
