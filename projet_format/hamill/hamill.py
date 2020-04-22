@@ -682,16 +682,17 @@ def process(path):
 
 def mirror(path_input_dir, path_output_dir):
     for path in os.listdir(path_input_dir):
-        if os.path.isfile(os.path.join(path_input_dir, path)):
+        complete = os.path.join(path_input_dir, path)
+        if os.path.isfile(complete):
             if path.endswith('.hml'):
-                info('Processing file:', path)
-                to_html(os.path.join(path_input_dir, path),
+                info('Processing file:', complete)
+                to_html(complete,
                         os.path.join(path_output_dir, path.replace('.hml', '.html')))
             else:
-                shutil.copy2(os.join(path_input_dir, path), os.join(path_output_dir, path))
-        elif os.path.isdir(os.path.join(path_input_dir, path)):
+                shutil.copy2(complete, os.join(path_output_dir, path))
+        elif os.path.isdir(complete):
             os.mkdir(os.path.join(path_output_dir, path))
-            mirror(os.path.join(path_input_dir, path), os.path.join(path_output_dir, path))
+            mirror(complete, os.path.join(path_output_dir, path))
 
 if __name__ == '__main__':
     if len(paths) == 1 and os.path.isdir(paths[0]):

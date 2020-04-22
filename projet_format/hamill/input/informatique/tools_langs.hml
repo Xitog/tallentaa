@@ -151,35 +151,86 @@ Sur un nouveau PC, j'installe généralement comme base de travail :
 
 ### List of languages
 
-% C [Microsoft->https://docs.microsoft.com/fr-fr/cpp/c-language/c-language-reference?view=vs-2019]
-% C++ [Microsoft->https://msdn.microsoft.com/en-us/library/3bstk3k5.aspx]
-% C# [Github->https://github.com/dotnet/csharplang]
+% [ActionScript->https://www.adobe.com/devnet/actionscript/learning.html] : {} family
+% [Ada->https://fr.wikipedia.org/wiki/Ada_(langage)] : begin/end family, compile to ASM
+% Algol
+% [Amber->http://www.amber-lang.net/] : transpile to JS
+% Bash
+% [Boo->http://boo-lang.org/] : tab family, compile to CLR bytecode
+% C [Microsoft->https://docs.microsoft.com/fr-fr/cpp/c-language/c-language-reference?view=vs-2019] : {} family, compile to ASM
+% C++ [Microsoft->https://msdn.microsoft.com/en-us/library/3bstk3k5.aspx] : {} family, compile to ASM
+% C# [Github->https://github.com/dotnet/csharplang] : {} family, compile to CLR bytecode
+% [Cω->https://msdn.microsoft.com/en-us/library/ms974195.aspx] : {} family, compile to CLR bytecode 
+% Cayenne
+% [Ceylon->https://ceylon-lang.org/] : {} family, compile to JVM bytecode 
+% [Ch->http://www.softintegration.com/] : {} family, C script 
+% [Ciao->https://ciao-lang.org/],
+% Clean
+% [Clojure->https://clojure.org/] : compile to JVM bytecode
+% Cobol
+% CoffeeScript : transpile to JS
 % [Common Lisp->https://common-lisp.net/]
-% [Crystal->https://crystal-lang.org/]
-% [D->https://dlang.org/]
-% [Elixir->https://elixir-lang.org/]
+% [Crystal->https://crystal-lang.org/] : begin/end family, compile to ASM
+% [D->https://dlang.org/] : {} family, compile to ASM
+% Dart
+% Delphi
+% Dylan
+% [E->http://erights.org/] : {} family
+% ECMA Script
+% [Elixir->https://elixir-lang.org/] : begin/end family, compile to Erlang VM bytecode
+% Elm : transpile to JS
 % [Erlang->http://www.erlang.org/]
-% [Genie->https://wiki.gnome.org/Projects/Genie]
-% [Go->https://golang.org/]
+% [Euphoria->http://openeuphoria.org/] : transpile to C
+% [Falcon->http://falconpl.org/] : begin/end family
+% [Fantom->http://fantom.org/] : {} family, compile to CLR and JVM bytecodes ''(ex-Fan)''
+% [Ferite->http://ferite.sourceforge.net/] : {} family, no update since 2004
+% Fortran
+% [Free Pascal->http://www.freepascal.org/]
+% [Genie->https://wiki.gnome.org/Projects/Genie] : tab family, transpile to C
+% [Go->https://golang.org/] : {} family, compile to ASM
+% Gofer
+% [Gosu->http://gosu-lang.github.io/] : {} family, compile to JVM bytecode  ''(ex-GScript)''
+% [Groovy->http://groovy-lang.org/] : tab family, compile to JVM bytecode
 % [Haskell->https://www.haskell.org/]
 % [Haxe->https://haxe.org/]
-% [Java->https://docs.oracle.com/javase/9/]
+% Io
+% Ioke : to JVM bytecode
+% [Java->http://www.oracle.com/technetwork/java/index.html] ([doc->https://docs.oracle.com/javase/9/]) : {} family, compile to JVM bytecode
 % JavaScript [Mozilla->https://developer.mozilla.org/fr/docs/Web/JavaScript]
+% JScript
 % [Julia->https://julialang.org/]
-% [Kotlin->https://kotlinlang.org/]
-% [Lua->https://www.lua.org/]
+% [Jython->http://www.jython.org/] : tab family, compile to JVM bytecode
+% [Kotlin->https://kotlinlang.org/] : {} family, compile to JVM bytecode
+% Lisp
+% Logo
+% [Lua->https://www.lua.org/] : begin/end family
+% [Mirah->http://www.mirah.org/] : begin/end family, compile to JVM bytecode ''(ex-Duby)''
+% [Miranda->http://miranda.org.uk/]
+% [Moonscript->https://moonscript.org/] : transpile to Lua
 % [Nim->https://nim-lang.org/] ''(ex-Nimrod)''
+% Objective-C
 % [OCaml->https://ocaml.org/]
 % --[Oden->https://oden-lang.github.io/]--
 % [ooc->https://ooc-lang.org/]
+% Pascal : begin/end family, compile to ASM
+% [Perl->https://www.perl.org/] : {} family
+% [Pike->https://pike.lysator.liu.se/] : {} family 
+% PHP
 % [PureScript->http://www.purescript.org/]
-% [Python->https://www.python.org/]
+% [Python->https://www.python.org/] : tab family
 % --[Reia->http://reia-lang.org/]--
-% [Ruby->https://www.ruby-lang.org/]
-% [Rust->https://www.rust-lang.org/]
-% [Scala->http://www.scala-lang.org/]
+% [Ruby->https://www.ruby-lang.org/] : begin/end family
+% [Rust->https://www.rust-lang.org/] : {} family, compile to ASM
+% [Scala->http://www.scala-lang.org/] : {} family, compile to JVM bytecode
 % [Scheme->http://www.schemers.org/]
-% [Vala->https://wiki.gnome.org/Projects/Vala]
+% Self
+% Simula
+% Squeak
+% [Squirrel->http://www.squirrel-lang.org/] : {} family
+% Smalltalk
+% [Swift->http://www.apple.com/fr/swift/]
+% [TypeScript->https://www.typescriptlang.org/] : {} family, transpile to JS 
+% [Vala->https://wiki.gnome.org/Projects/Vala] : {} family, transpile to C
 % [Zig->http://ziglang.org/]
 
 ### Game programming
