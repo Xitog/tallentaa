@@ -26,56 +26,11 @@ Evolved 2020-04-07 as yet another language
 #-------------------------------------------------------------------------------
 
 import os # for walk
-import sys # colored output for IDLE
 import os.path # test if it is a directory or a file
 import shutil
+
 from tokenizer import RECOGNIZED_LANGUAGES, tokenize
-
-#-------------------------------------------------------------------------------
-# Logging
-#-------------------------------------------------------------------------------
-
-try:
-    out = sys.stdout.shell
-    IDLE = True
-except AttributeError:
-    out = sys.stdout
-    IDLE = False
-
-def success(*msg, sep=' '):
-    msg = sep.join(msg)
-    if IDLE:
-        out.write('[SUCCESS] ' + msg + '\n', 'STRING')
-    else:
-        out.write(msg + '\n')
-
-def fail(*msg, sep=' '):
-    msg = sep.join(msg)
-    if IDLE:
-        out.write('[FAIL] ' + msg + '\n', 'COMMENT')
-    else:
-        out.write(msg + '\n')
-
-def info(*msg, sep=' '):
-    msg = sep.join(msg)
-    if IDLE:
-        out.write('[INFO] ' + msg + '\n', 'DEFINITION')
-    else:
-        out.write(msg + '\n')
-
-def warn(*msg, sep=' '):
-    msg = sep.join(msg)
-    if IDLE:
-        out.write('[WARN] ' + msg + '\n', 'KEYWORD')
-    else:
-        out.write(msg + '\n')
-
-def error(*msg, sep=' '):
-    msg = sep.join(msg)
-    if IDLE:
-        out.write('[ERROR] ' + msg + '\n', 'COMMENT')
-    else:
-        out.write(msg + '\n')
+from log import success, fail, info, warn, error
 
 #-------------------------------------------------------------------------------
 # Tool functions
@@ -297,7 +252,7 @@ def to_html(input_name, output_name=None):
             output.write('</style>\n')
             continue
         # Comment
-        if line.startswith('--') and line.count('-') != len(line) and line.count('-') < 3:
+        if line.startswith('--') and line.count('-') != len(line): # and line.count('-') < 3:
             if EXPORT_COMMENT:
                 line = line.replace('--', '<!--', 1) + ' -->'
             else:
@@ -524,10 +479,9 @@ def to_html(input_name, output_name=None):
                         in_code = True
                         code = ''
                     else:
-                        s = multi_start(code, ('python ', 'json '))
+                        s = multi_start(code, RECOGNIZED_LANGUAGES)
                         if s is not None:
-                            code = code.replace(s, '', 1)
-                            s = s[:-1]
+                            code = code.replace(s, '', 1) # delete
                         else:
                             s = DEFAULT_CODE
                         new_line += write_code(code, s)

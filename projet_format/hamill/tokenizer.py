@@ -1,4 +1,6 @@
-RECOGNIZED_LANGUAGES = ['text', 'python', 'json']
+from log import warn
+
+RECOGNIZED_LANGUAGES = ['text', 'python', 'json', 'game']
 
 languages = {
     'text': {
@@ -8,7 +10,8 @@ languages = {
         'separators': [],
         'ante_identifier': [],
         'accept_unknown' : True,
-        'line_comment' : None
+        'line_comment' : None,
+        'string_markers' : []
     },
     'json': {
         'keywords': ['null'],
@@ -17,7 +20,8 @@ languages = {
         'separators': [],
         'ante_identifier': [],
         'accept_unknown' : True,
-        'line_comment' : None
+        'line_comment' : None,
+        'string_markers' : ['"', "'"]
     },
     'python': {
         'keywords': ['await', 'else', 'import', 'pass', 'break', 'except', 'in',
@@ -33,7 +37,18 @@ languages = {
         'separators': ['{', '}', '(', ')', '[', ']', ',', ';'],
         'ante_identifier': ['def', 'class'],
         'accept_unknown' : False,
-        'line_comment' : '#'
+        'line_comment' : '#',
+        'string_markers' : ['"', "'"]
+    },
+    'game' : {
+        'keywords': [],
+        'booleans' : [],
+        'operators': [':'],
+        'separators' : [],
+        'ante_identifier': [],
+        'accept_unknown': True,
+        'line_comment': None,
+        'string_markers': []
     }
 }
 
@@ -57,7 +72,7 @@ class Token:
 # tokenize("123 456 abc! 'defg' True (")
 def tokenize(text, lang='text'):
     if lang not in RECOGNIZED_LANGUAGES:
-        warn("Not recognized language:", str(lang), "defaulting to text") 
+        warn("Not recognized language:", str(lang), "defaulting to text in", text) 
         lang = 'text'
     index = 0
     tokens = [] # (start, stop, len, type, val)
@@ -93,6 +108,7 @@ def tokenize(text, lang='text'):
             start = index
             num = ''
             length = 0
+            wrong = False
             while index < len(text):
                 char = text[index]
                 if char.isdigit():
@@ -100,10 +116,16 @@ def tokenize(text, lang='text'):
                     stop = index
                     length += 1
                     index += 1
+                elif char.isalpha():
+                    wrong = True
+                    break
                 else:
                     break
-            tokens.append(Token(start, stop, length, NUMBER, int(num)))
-        elif char == '"' or char == "'":
+            if not wrong:
+                tokens.append(Token(start, stop, length, NUMBER, int(num)))
+            else:
+                tokens.append(Token(start, stop, length, NORMAL, num))
+        elif char in languages[lang]['string_markers']:
             start = index
             ender = char
             length = 0

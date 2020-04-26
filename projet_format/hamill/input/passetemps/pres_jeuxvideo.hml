@@ -4,10 +4,116 @@
 !doctrine ADD_CSS=https://xitog.github.io/dgx/css/palatino.css
 !doctrine ADD_SCRIPT=https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
 !doctrine ADD_SCRIPT=https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js
+!doctrine DEFAULT_CODE=game
+
+!css p { text-align: justify; }
+!css td {color: black; font-size: 14px; }
+!css table a {font-family: "Palatino Linotype", "Palatino"; font-size: 14px; }
+!css code {color: #006FDD; border: 1px solid rgb(225, 228, 229); padding-left: 3px; padding-right: 5px;}
 
 !include menu.html
 
 !html <div id="content-div">
+
+#Sommaire
+
+* [Les machines->#]
+* [Les jeux->#]
+* * [FPS->#]
+* * [RTS->#]
+* * [RPG Action->#]
+* * [RPG->#]
+* * [FPS/RPG->#]
+* [Critiques de jeux->#]
+* * [Hexen: Beyond Heretic->#]
+* [La musique de jeux vidéo->#]
+* [Index des jeux cités->#]
+
+# Les machines
+
+Les jeux vidéo sont avant tout associés à une machine. Voici la liste de mes ordinateurs au fil du temps, avec à chaque fois le jeu qui a "mis à genoux" cette machine et m'a obligé à passer à la suivante.
+
+% @@2014@@ [Asus->Asus], Intel Core i7-4510U @ 2 Ghz 2.60 Ghz 8 Go RAM 64 bits, Windows 8.1. Surnommée ''Shodan''
+% @@2010@@ [Toshiba->Toshiba], Intel, Windows 7. Surnommée ''Xerxès'', comme une des IA de @@System Shock II@@. Ce sera @@FarCry: Blood Dragon@@ qui sera de trop pour cette machine, achetée à la base pour jouer à @@Starcraft II@@.
+% Été @@2006@@ Mac, Intel, Mac OS X
+% Novembre ou décembre @@2003@@ PC assemblé par Le Comptoir Informatique (LCI), [Pentium 4->P4], Windows XP. Une merveilleuse machine, surnommée avec affection ''Big PC''. Seul @@BioShock@@ sera injouable dessus.
+% Novembre ou décembre @@2000@@ [Continental Edison->CE], [Duron->Duron], Windows Millenium. Le ''PC Joystick'' car il était vendu en partenariat avec le célèbre magazine. !! L'horreur : ce PC plantait (figement de l'image, son qui se répète en boucle) de façon aléatoire à n'importe quel moment. J'ai installé Windows 98 SE, j'ai changé l'alimentation, testé tous les drivers et rien à y faire. C'était surtout sur les jeux 3D que je rencontrais ce problème, les jeux 2D fonctionnaient mieux. D'où les longues heures sur Warcraft II, Starcraft, Alerte Rouge, Baldur's Gate...
+% C'est peut-être vers @@1998@@ que j'installais @@Total Annihilation@@ sur le PC portable professionnel de mon père pour pouvoir y jouer.
+% Novembre ou décembre @@1996@@ [Cibox->Cibox], [Cyrix PR133+->Cyrix], Windows 95.  C'est @@Total Annihilation@@ qui ne passera pas, m'obligeant à l'installer sur la machine d'après.
+
+[Asus]: https://fr.wikipedia.org/wiki/Asus
+[Toshiba]: https://fr.wikipedia.org/wiki/Toshiba
+[P4]: https://fr.wikipedia.org/wiki/Pentium_4
+[CE]: https://fr.wikipedia.org/wiki/Continental_Edison
+[Duron]: https://fr.wikipedia.org/wiki/Duron
+[Cibox]: https://fr.wikipedia.org/wiki/Cibox
+[Cyrix]: https://fr.wikipedia.org/wiki/Cyrix
+
+# Les jeux
+
+J'ai surtout joué à trois grands types de jeux vidéo :
+
+* Les jeux de tir à la première personne, ou FPS,
+* Les jeux de stratégie en temps réel, ou RTS,
+* Les jeux de rôles, ou RPG, qu'on peut diviser en trois genres : Action-RPG, RPG classiques et les FPS-RPG.
+
+Pour chacun de ces types, on peut dater ma rencontre avec un jeu initiateur, parfois double. Pour les FPS, ce fut @@Duke Nukem 3D@@ en @@1996@@. Pour les RTS, ce fut @@Starcraft@@ en @@1999@@. Pour les RPG, ce fut d'un côté @@Diablo@@ pour les action-RPG, en @@1997@@ ou @@1998@@ et de l'autre côté, celui des RPG plus classiques, @@Baldur's Gate@@. Plus tard, je découvris un mélange des mécaniques de FPS et de RPG, avec le jeu @@System Shock II@@ que j'achetais en janvier @@2006@@.
+
+|Type        |Jeux           |Sortie en France|Découverte                                        |
+|------------|---------------|----------------|--------------------------------------------------|
+|FPS         |Duke Nukem 3D  |septembre 1996  |1996, novembre ou décembre                        |
+|RTS         |Starcraft      |1998            |1999 après un voyage en Crète                     |
+|RPG (action)|Diablo         |1999            |1999                                              |
+|RPG         |Baldur's Gate  |5 janvier 1999  |2002 avec Baldur's Gate II                        |
+|FPS/RPG     |System Shock II|1999            |2006, janvier ou février (achat le 24/01 sur Ebay)|
+
+À côté de ces jeux cultes, j'ai également joué à deux autres jeux à la fin 1996 / début 1997 : le premier était @@Nitemare 3D@@ dont j'avais eu le shareware sur un CD accompagnant un magazine. Un shareware est une version amputée d'un jeu ne comportant que le premier épisode, comme une grande démo. C'était un jeu reprenant le concept de @@Wolfenstein 3D@@, auquel je jouerai bien plus tard, avec un thème gentiment horrifique inspiré des monstres de la Hammer comme une momie ou le monstre de Frankenstein. Le jeu était bien moins beau et plaisant que Duke Nukem 3D mais ce dernier me faisait peur, j'avais 12 ans à l'époque, surtout avec son épisode 2 prenant place dans l'espace : son réalisme (pour l'époque) des environnements, les lumières clignotantes, les aliens surgissants à l'improviste. Nitemare 3D, malgré son thème horrifique, était d'une réalisation déjà dépassée et permettait une mise à distance beaucoup plus grande. L'autre jeu auquel je jouais était un jeu d'aventure, le seul auquel j'ai joué : @@Woodruff et le Schnibble d'Azimuth@@.
+Je découvris plus tard qu'avec Duke Nukem 3D venait une collection de sharewares dont @@Realms of Chaos@@ un jeu de plate-forme médiéval-fantastique, un jeu de course loufoque, @@Wacky Wheels@@, inspiré de Mario Kart, et surtout un autre FPS du nom de @@Rise of the Triad@@.
+Par la suite, je n'explorais ni le genre du jeu d'aventure, ni celui du jeu de course, ni celui du jeu de plate-forme. Je m'aventurais par contre dans une exploration plus ou moins méticuleuse de mes trois genres favoris, FPS, RPG et RTS. Certains jeux découverts après les "fondateurs" ont même laissé une empreinte tout aussi forte, voire supérieure à ceux-ci, ils sont en gras dans la suite de cette page.
+  
+## FPS
+
+|Jeux     |Sortie en France|Découverte|
+|---------|----------------|----------|
+|**Quake**|                |          |
+|**Doom** |                |          |
+|Doom II  |                |          |
+
+## RTS
+
+|Jeux                  |Sortie en France|Découverte|
+|----------------------|----------------|----------|
+|**Total Annihilation**|                |          |
+|**Warcraft II**       |                |          |
+|Red Alert             |                |          |
+
+## RPG Action
+
+|Jeux         |Sortie en France|Découverte|
+|-------------|----------------|----------|
+|**Diablo**   |                |          |
+|**Diablo II**|                |          |
+|Diablo III   |                |          |
+|Sacred       |                |          |
+
+## RPG
+        
+## FPS/RPG
+
+Pour ce qui concerne les FPS/RPG, après @@System Shock II@@, ce fut @@Deus Ex@@. J'ai eu beaucoup du mal à le finir, son univers de complot m'intéressant beaucoup moins que l'univers spatial de System Shock II. J'ai même fini @@Deus Ex II@@ avant le premier. Ce dernier était très beau, surtout les niveaux arctiques. Puis vint la série culte des @@BioShock@@, @@BioShock II@@ et @@BioShock Infinite@@. L'univers des deux premiers, imprégné d'Art Déco, est bien glauque, tout le contraire du dernier, lumineux, aérien, lorgnant vers la Belle Époque. Bien plus tard, je repris la saga Deus Ex avec @@Deus Ex III: Human Revolution@@ qui possède une véritable identité visuelle, notamment par un travail sur les couleurs.
+
+|Jeux                 |Sortie en France|Découverte|
+|---------------------|----------------|----------|
+|**BioShock**         |                |          |
+|BioShock II          |                |          |
+|**BioShock Infinite**|                |          |
+|Deus Ex              |                |          |
+|Deus Ex II           |                |          |
+|Deus Ex III          |                |          |
+|System Shock         |                |          |
+|**System Shock II**  |                |          |
+
+7 jeux listés.
 
 # Critiques de jeux
 
@@ -17,7 +123,7 @@
 
 Hexen... J'avoue, il m'a été difficile d'entrer dans ce jeu. Le prologue, une sorte d'église abandonnée, met en avant sa beauté et ses combats plutôt sympa. J'étais sceptique au début : j'avais une appréhension pour un FPS centré sur le corps à corps, du moins si on choisit le guerrier comme classe, mais l'amplitude des coups portés rend cela assez agréable. On se surprend même à pouvoir toucher un ennemi qui, à l'écran, semble pourtant un tantinet trop loin.
 
-Avec Raven, il y a une attention aux détails : la technique est maîtrisée, il s'agit encore une fois d'un jeu basé sur le moteur de Doom, alors on fignole l'ambiance, les effets sonores et graphiques. Mais si les combats sont assez jouissifs, cela se gâte lorsqu'on observe l'ensemble du gameplay. Là où Heretic, le précurseur d'Hexen, proposait une succession de niveaux séparés les uns des autres, à la manière de Doom, Hexen propose cinq hubs. Les hubs sont constitués d'un niveau central et de différents niveaux interconnectés par des portails. Et là, le calvaire commence.
+Avec Raven, il y a une attention aux détails : la technique est maîtrisée, il s'agit encore une fois d'un jeu basé sur le moteur de @@ Doom@@, alors on fignole l'ambiance, les effets sonores et graphiques. Mais si les combats sont assez jouissifs, cela se gâte lorsqu'on observe l'ensemble du gameplay. Là où @@ Heretic@@, le précurseur d'Hexen, proposait une succession de niveaux séparés les uns des autres, à la manière de Doom, Hexen propose cinq hubs. Les hubs sont constitués d'un niveau central et de différents niveaux interconnectés par des portails. Et là, le calvaire commence.
 
 En gros, un bouton dans un des niveaux du hub peut ouvrir une porte ou un mur dans un autre, sans bien sûr que le joueur ait une seule indication sur sa localisation. Il faut donc arpenter et arpenter encore les mêmes niveaux, débusquer les endroits bloqués pour, à chaque bouton pressé, refaire le tour de ces endroits. C'est fastidieux, surtout dans le premier hub qui prend pour thèmes les éléments feu, glace et acier. Ces premiers niveaux sont très abstraits, ce qui n'aide pas à s'y retrouver, et je ne me suis sorti de ce labyrinthe qu'en dessinant à la main une carte avec les différentes interconnexions entre les niveaux.
 
@@ -32,4 +138,46 @@ Après l'avoir fini, je peux dire qu'Hexen est un bon, sinon grand, jeu. Sorti f
 [hexen3]: https://doom.fandom.com/wiki/Hexen
 [hexen4]: https://doomwiki.org/wiki/Hexen
 
+# La musique de jeux vidéo
+
+Quelque chose qui m'a toujours intéressé, c'est la musique des jeux vidéo. Voici quelqu'uns des compositeurs m'ayant marqué et leurs compositions :
+
+|Compositeur  |Jeux                                                                     |
+|-------------|-------------------------------------------------------------------------|
+|Robert Prince|Doom (1993) !! Rise of the Triad: Dark War (1994) !! Duke Nukem 3D (1996)|
+|Mark Morgan  |Fallout (1997) !! Fallout 2 (1998) !! Planescape: Torment (1999)         |
+|Jeremy Soule |Total Annihilation (1997) !! Icewind Dale (2000) !! Dungeon Siege (2002)  !! Guild Wars (2005) !! Prey (2006) !! Supreme Commander (2007)|
+
+# Index des jeux cités
+
+|Jeux           |Année|Développeur           |Éditeur                |Genre      |Wikipédia|Site|
+|---------------|-----|----------------------|-----------------------|-----------|---------|----|
+|Nitemare 3D    |1994 |Gray Design Associates|Accurate Research, Inc.|FPS        |[Wiki->1]|[Site Officiel->2]|
+|Realms of Chaos|1995 |Apogee Software       |Apogee Software        |Plate-forme|[Wiki->3]|    | 
+|Wacky Wheels   |1994 |Beavis Soft           |Apogee Software        |Course     |[Wiki->4]|    |
+|Woodruff et le Schnibble d'Azimuth|1994|Coktel Vision|Sierra On-Line|Aventure   |[Wiki->5]|    |
+
+[1]: https://en.wikipedia.org/wiki/Nitemare_3D
+[2]: http://www.dgray.com/n3dpage.htm
+[3]: https://en.wikipedia.org/wiki/Realms_of_Chaos_(video_game)
+[4]: https://en.wikipedia.org/wiki/Wacky_Wheels
+[5]: https://fr.wikipedia.org/wiki/Woodruff_et_le_Schnibble_d%27Azimuth
+
 !html </div>
+
+-- Wolfenstein 3D       5 mai 1992
+-- Doom                10 décembre 1993
+-- System Shock        23 septembre 1994
+-- Rise of the Triad   21 décembre 1994
+-- Heretic             23 décembre 1994
+-- Descent             31 décembre 1994
+-- Dark Forces         28 février 1995
+-- Hexen               30 octobre 1995
+-- Future Shock        Décembre 1995
+-- Duke Nukem 3D       29 janvier 1996
+-- Quake               22 juin 1996
+-- Alien Trilogy       30 novembre 1996
+-- Blood                5 mars 1997
+-- Outlaws             31 mars 1997
+-- Red Neck Rampage    30 avril 1997
+-- Shadow Warrior      13 mai 1997
