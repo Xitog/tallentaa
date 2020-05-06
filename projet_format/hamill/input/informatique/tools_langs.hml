@@ -4,6 +4,7 @@
 !doctrine ADD_CSS=https://xitog.github.io/dgx/css/palatino.css
 !doctrine ADD_SCRIPT=https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
 !doctrine ADD_SCRIPT=https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js
+!doctrine PARAGRAPH_DEFINITION=true
 
 !include menu.html
 
@@ -151,10 +152,16 @@ Sur un nouveau PC, j'installe généralement comme base de travail :
 
 ### List of languages
 
+$ Transpile
+    Transformation of the code source to another language of the same level of abstraction (Vala to C for example).
+$ Compile
+    Transformation of the code source to another language of a lesser level of abstraction (C to ASM for example).
+
 % [ActionScript->https://www.adobe.com/devnet/actionscript/learning.html] : {} family
 % [Ada->https://fr.wikipedia.org/wiki/Ada_(langage)] : begin/end family, compile to ASM
 % Algol
 % [Amber->http://www.amber-lang.net/] : transpile to JS
+% [AngelScript->https://www.angelcode.com/angelscript/] : {} family [doc->https://www.angelcode.com/angelscript/sdk/docs/manual/index.html]
 % Bash
 % [Boo->http://boo-lang.org/] : tab family, compile to CLR bytecode
 % C [Microsoft->https://docs.microsoft.com/fr-fr/cpp/c-language/c-language-reference?view=vs-2019] : {} family, compile to ASM
@@ -192,9 +199,10 @@ Sur un nouveau PC, j'installe généralement comme base de travail :
 % [Gosu->http://gosu-lang.github.io/] : {} family, compile to JVM bytecode  ''(ex-GScript)''
 % [Groovy->http://groovy-lang.org/] : tab family, compile to JVM bytecode
 % [Haskell->https://www.haskell.org/]
-% [Haxe->https://haxe.org/]
-% Io
-% Ioke : to JVM bytecode
+% [Haxe->https://haxe.org/] : transpile to Java, C++, C#, Lua, PHP, JavaScript, Python
+% [Io->https://iolanguage.org/] : minimaliste language
+% [Ioke->https://ioke.org/] : to CLR and JVM bytecodes
+% [Jai->https://inductive.no/jai/] : {} family [doc->https://github.com/BSVino/JaiPrimer/blob/master/JaiPrimer.md]
 % [Java->http://www.oracle.com/technetwork/java/index.html] ([doc->https://docs.oracle.com/javase/9/]) : {} family, compile to JVM bytecode
 % JavaScript [Mozilla->https://developer.mozilla.org/fr/docs/Web/JavaScript]
 % JScript

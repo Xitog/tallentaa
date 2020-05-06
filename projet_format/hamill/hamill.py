@@ -148,6 +148,147 @@ def write_code(line, code_lang, output=None):
 # Processors
 #-------------------------------------------------------------------------------
 
+def translate(line, links, inner_links, DEFAULT_CODE):
+    new_line = ''
+    in_bold = False
+    in_italic = False
+    in_strikethrough = False
+    in_underline = False
+    in_power = False
+    in_code = False
+    code = ''
+    char_index = -1
+    while char_index < len(line) - 1:
+        char_index += 1
+        char = line[char_index]
+        if char_index > 0:
+            prev_char = line[char_index - 1]
+        else:
+            prev_char = None
+        if char_index > 1:
+            prev_prev_char = line[char_index - 2]
+        else:
+            prev_prev_char = None
+        if char_index < len(line) - 1:
+            next_char = line[char_index + 1]
+        else:
+            next_char = None
+        # Link
+        if char == '[' and next_char == '#' and prev_char != '\\':
+            ending = line.find(']', char_index)
+            if ending != -1:
+                link = line[char_index + 2:ending]
+                new_line += f'<a id="{link}">' + link + '</a>'
+                char_index = ending
+                continue
+        elif char == '[' and char_index < len(line) - 1 and prev_char != '\\':
+            ending = line.find(']', char_index)
+            if ending != -1:
+                link = line[char_index + 1:ending]
+                if link not in links and link.find('->') != -1:
+                    link_name, link = link.split('->', 1)
+                    link_name = translate(link_name, links, inner_links, DEFAULT_CODE)
+                else:
+                    link_name = link
+                # check if we have registered this link
+                # [LINK_NAME->LINK_REF]
+                # [LINK_REF]: http://...
+                # or
+                # [LINK_NAME->http://]
+                if link in links:
+                    new_line += f'<a href="{links[link]}">{link_name}</a>'
+                elif multi_start(link, ('https://', 'http://')):
+                    new_line += f'<a href="{link}">{link_name}</a>'
+                elif link == '#': # [Python->#] = to #Python
+                    if make_title(link_name) in inner_links:
+                        new_line += f'<a href="#{make_title(link_name)}">{link_name}</a>'
+                    else:
+                        new_line += f'<a href="#{link_name}">{link_name}</a>'
+                else:
+                    warn('Undefined link:', link_name)
+                    new_line += link_name
+                char_index = ending
+                continue
+        # Italic
+        if char == "'" and next_char == "'" and prev_char != '\\':
+            continue
+        if char == "'" and prev_char == "'" and prev_prev_char != '\\':
+            if not in_italic:
+                new_line += '<i>'
+                in_italic = True
+            else:
+                new_line += '</i>'
+                in_italic = False
+            continue
+        # Strong
+        if char == '*' and next_char == '*' and prev_char != '\\':
+            continue
+        if char == '*' and prev_char == '*' and prev_prev_char != '\\':
+            if not in_bold:
+                new_line += '<b>'
+                in_bold = True
+            else:
+                new_line += '</b>'
+                in_bold = False
+            continue
+        # Strikethrough
+        if char == '-' and next_char == '-' and prev_char != '\\':
+            continue
+        if char == '-' and prev_char == '-' and prev_prev_char != '\\':
+            if not in_strikethrough:
+                new_line += '<s>'
+                in_strikethrough = True
+            else:
+                new_line += '</s>'
+                in_strikethrough = False
+            continue
+        # Underline
+        if char == '_' and next_char == '_' and prev_char != '\\':
+            continue
+        if char == '_' and prev_char == '_' and prev_prev_char != '\\':
+            if not in_underline:
+                new_line += '<u>'
+                in_underline = True
+            else:
+                new_line += '</u>'
+                in_underline = False
+            continue
+        # Power
+        if char == '^' and next_char == '^' and prev_char != '\\':
+            continue
+        if char == '^' and prev_char == '^' and prev_prev_char != '\\':
+            if not in_power:
+                new_line += '<sup>'
+                in_power = True
+            else:
+                new_line += '</sup>'
+                in_power = False
+            continue
+        # Code
+        if char == '@' and next_char == '@' and prev_char != '\\':
+            continue
+        if char == '@' and prev_char == '@' and prev_prev_char != '\\':
+            if not in_code:
+                new_line += '<code>'
+                in_code = True
+                code = ''
+            else:
+                s = multi_start(code, RECOGNIZED_LANGUAGES)
+                if s is not None:
+                    code = code.replace(s, '', 1) # delete
+                else:
+                    s = DEFAULT_CODE
+                new_line += write_code(code, s)
+                new_line += '</code>'
+                in_code = False
+            continue
+        if in_code:
+            code += char
+        else:
+            new_line += char
+    return new_line
+
+
 def to_html(input_name, output_name=None):
     EXPORT_COMMENT=False
     ADD_CSS=None
@@ -356,143 +497,7 @@ def to_html(input_name, output_name=None):
         # Bold & Italic & Strikethrough & Underline & Power
         if multi_find(line, ('**', '--', '__', '^^', "''", "[", '@@')) and \
            not line.startswith('|-'):
-            new_line = ''
-            in_bold = False
-            in_italic = False
-            in_strikethrough = False
-            in_underline = False
-            in_power = False
-            in_code = False
-            code = ''
-            char_index = -1
-            while char_index < len(line) - 1:
-                char_index += 1
-                char = line[char_index]
-                if char_index > 0:
-                    prev_char = line[char_index - 1]
-                else:
-                    prev_char = None
-                if char_index > 1:
-                    prev_prev_char = line[char_index - 2]
-                else:
-                    prev_prev_char = None
-                if char_index < len(line) - 1:
-                    next_char = line[char_index + 1]
-                else:
-                    next_char = None
-                # Link
-                if char == '[' and next_char == '#' and prev_char != '\\':
-                    ending = line.find(']', char_index)
-                    if ending != -1:
-                        link = line[char_index + 2:ending]
-                        new_line += f'<a id="{link}">' + link + '</a>'
-                        char_index = ending
-                        continue
-                elif char == '[' and char_index < len(line) - 1 and prev_char != '\\':
-                    ending = line.find(']', char_index)
-                    if ending != -1:
-                        link = line[char_index + 1:ending]
-                        if link not in links and link.find('->') != -1:
-                            link_name, link = link.split('->', 1)
-                        else:
-                            link_name = link
-                        # check if we have registered this link
-                        # [LINK_NAME->LINK_REF]
-                        # [LINK_REF]: http://...
-                        # or
-                        # [LINK_NAME->http://]
-                        if link in links:
-                            new_line += f'<a href="{links[link]}">{link_name}</a>'
-                        elif multi_start(link, ('https://', 'http://')):
-                            new_line += f'<a href="{link}">{link_name}</a>'
-                        elif link == '#': # [Python->#] = to #Python
-                            if make_title(link_name) in inner_links:
-                                new_line += f'<a href="#{make_title(link_name)}">{link_name}</a>'
-                            else:
-                                new_line += f'<a href="#{link_name}">{link_name}</a>'
-                        else:
-                            warn('Undefined link:', link_name)
-                            new_line += link_name
-                        char_index = ending
-                        continue
-                # Italic
-                if char == "'" and next_char == "'" and prev_char != '\\':
-                    continue
-                if char == "'" and prev_char == "'" and prev_prev_char != '\\':
-                    if not in_italic:
-                        new_line += '<i>'
-                        in_italic = True
-                    else:
-                        new_line += '</i>'
-                        in_italic = False
-                    continue
-                # Strong
-                if char == '*' and next_char == '*' and prev_char != '\\':
-                    continue
-                if char == '*' and prev_char == '*' and prev_prev_char != '\\':
-                    if not in_bold:
-                        new_line += '<b>'
-                        in_bold = True
-                    else:
-                        new_line += '</b>'
-                        in_bold = False
-                    continue
-                # Strikethrough
-                if char == '-' and next_char == '-' and prev_char != '\\':
-                    continue
-                if char == '-' and prev_char == '-' and prev_prev_char != '\\':
-                    if not in_strikethrough:
-                        new_line += '<s>'
-                        in_strikethrough = True
-                    else:
-                        new_line += '</s>'
-                        in_strikethrough = False
-                    continue
-                # Underline
-                if char == '_' and next_char == '_' and prev_char != '\\':
-                    continue
-                if char == '_' and prev_char == '_' and prev_prev_char != '\\':
-                    if not in_underline:
-                        new_line += '<u>'
-                        in_underline = True
-                    else:
-                        new_line += '</u>'
-                        in_underline = False
-                    continue
-                # Power
-                if char == '^' and next_char == '^' and prev_char != '\\':
-                    continue
-                if char == '^' and prev_char == '^' and prev_prev_char != '\\':
-                    if not in_power:
-                        new_line += '<sup>'
-                        in_power = True
-                    else:
-                        new_line += '</sup>'
-                        in_power = False
-                    continue
-                # Code
-                if char == '@' and next_char == '@' and prev_char != '\\':
-                    continue
-                if char == '@' and prev_char == '@' and prev_prev_char != '\\':
-                    if not in_code:
-                        new_line += '<code>'
-                        in_code = True
-                        code = ''
-                    else:
-                        s = multi_start(code, RECOGNIZED_LANGUAGES)
-                        if s is not None:
-                            code = code.replace(s, '', 1) # delete
-                        else:
-                            s = DEFAULT_CODE
-                        new_line += write_code(code, s)
-                        new_line += '</code>'
-                        in_code = False
-                    continue
-                if in_code:
-                    code += char
-                else:
-                    new_line += char
-            line = new_line
+            line = translate(line, links, inner_links, DEFAULT_CODE)
         # Title
         nb, title, id_title = find_title(line)
         if nb > 0:

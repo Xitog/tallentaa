@@ -269,7 +269,13 @@ class ContentSet:
     def get_default_num(self, val):
         "Get the number of the default content from its name or its number."
         if isinstance(val, str):
-            return self.name2num[val]
+            if val in self.name2num:
+                return self.name2num[val]
+            else:
+                for k, v in self.subsets.items():
+                    if val in v.name2num:
+                        return v.name2num[val]
+                raise Exception(f"[ERROR] Impossible to find the code of {val} in ContentSet {self.name}")
         else:
             return val
 
@@ -282,8 +288,8 @@ class ContentSet:
                 try:
                     self.resources[name] = SimpleImage(self.mod.autoload(f), name, num)
                     count += 1
-                    #if self.mod.debug:
-                    #    print(f"[INFO]   + loaded for {self.name:10} [{count:2d}] : {name} -> {f}")
+                    if self.mod.debug:
+                        print(f"[INFO]   + loaded for {self.name:10} [{count:2d}] : {name} -> {f}")
                 except:
                     raise Exception(f"[ERROR] Impossible to load texture {f}.")
             self.loaded = True
@@ -570,6 +576,7 @@ class ModHandler:
         # Prepare resources
         self.resources = {}
         for resname, resdata in self.mod_data['resources'].items():
+            if self.debug: print(f'[INFO] - Loading resource <{resname}>')
             resicon = resdata['icon']
             rescontent = resdata['content']
             self.resources[resname] = ContentSet(self, resname, resicon)
@@ -729,6 +736,7 @@ class Application:
 
         self.mod = ModHandler(self, self.options['mod'], force_recreate_default=True)
         self.options['mod'] = self.mod.get_loaded_mod()
+        if self.debug: print(f'[INFO] ModHandler created with mod {self.options["mod"]}')
         self.tk = None
         self.dirty = False
         self.plugin_code_menu = None
@@ -766,6 +774,7 @@ class Application:
     #-----------------------------------------------------------
     def start_new_map(self, title=None, width=None, height=None, restart=False):
         "Start application with a new map, build entire GUI"
+        if self.debug: print(f'[CALL] Application#start_new_map')
         title = 'New map' if title is None else title
         width = 32 if width is None else width
         height = 32 if height is None else height
