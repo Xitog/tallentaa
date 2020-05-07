@@ -87,11 +87,17 @@ Donnera :
 ## Tables
 
 * Un tableau s'écrit ainsi : |col1|col2|col3|
-* La ligne de titre doit être la première et séparée par des colonnes |\-\-\-\-|
+* La ligne de titre doit être la première et séparée des autres par une ligne de tirets : |\-\-\-\-|
 
 |Ceci|est|un  |tableau    |
 |----|---|----|-----------|
 |Il  |est|beau|mon tableau|
+
+On peut mettre bien sûr des modificateurs de textes dans un tableau mais __pas de listes dans un tableau pour l'instant__ :
+
+|^^Ceci^^|**est**|__un__            |''tableau''|
+|-----------------------------------------------|
+|Il      |est    |--beau-- différent|ce tableau.|
 
 ## Liens
 
@@ -107,11 +113,13 @@ On peut utiliser @@!doctrine@@ en début de ligne pour modifier des variables gl
 
 * @@!doctrine TITLE=titre@@ pour définir le titre de la page
 * @@!doctrine ICON=icon@@ pour définir une icône pour la page
+* @@!doctrine LANG=lang@@ pour définir la langue utilisée dans la page
+* @@!doctrine ENCODING=encoding@@ pour définir la langue utilisée dans la page, par défaut utf-8
+* @@!doctrine BODY_CLASS=classe@@ pour définir la classe du body
+* @@!doctrine BODY_ID=id@@ pour définir l'id du body
 * @@!doctrine EXPORT_COMMENT=true/false@@ spécifie si les commentaires seront exportés en HTML ou pas
 * @@!doctrine ADD_CSS=lien vers un fichier CSS@@ spécifie un fichier CSS à ajouter
 * @@!doctrine ADD_SCRIPT=lien vers un fichier de script@@ spécifie un fichier JavaScript à ajouter
-* @@!doctrine BODY_CLASS=classe@@ pour définir la classe du body
-* @@!doctrine BODY_ID=id@@ pour définir l'id du body
 * @@!doctrine PARAGRAPH_DEFINITION=true/false@@ spécifie si les dd doivent être mis dans des balises p
 * @@!doctrine DEFAULT_CODE=python/json@@ définit la coloration syntaxique par défaut du code (text par défaut)
 

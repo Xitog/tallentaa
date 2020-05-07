@@ -289,15 +289,27 @@ def translate(line, links, inner_links, DEFAULT_CODE):
     return new_line
 
 
-def to_html(input_name, output_name=None):
+def get_doctrine(line):
+    command, value = line.replace('!doctrine ', '').split('=')
+    #print('Command =', command.strip(), 'Value =', value.strip())
+    command = command.strip()
+    value = value.strip()
+    return command, value
+
+
+def to_html(input_name, output_name=None, default_lang=None):
     EXPORT_COMMENT=False
     ADD_CSS=None
-    TITLE=None
-    BODY_CLASS=None
-    BODY_ID=None
     DEFINITION_AS_PARAGRAPH=False
     DEFAULT_CODE='text'
-
+    # HTML Parameters
+    TITLE = None
+    ENCODING = 'utf-8'
+    LANG = default_lang
+    ICON = None
+    BODY_CLASS = None
+    BODY_ID = None
+    
     source = open(input_name, mode='r', encoding='utf8')
     content = source.readlines()
     source.close()
@@ -307,13 +319,6 @@ def to_html(input_name, output_name=None):
             output_name = input_name.replace('.hml', '.html')
         else:
             output_name = input_name + '.html'
-
-    output = open(output_name, mode='w', encoding='utf8')
-    output.write('<html>\n')
-    output.write('<head>\n')
-    output.write('<meta charset="utf-8">\n')
-    output.write('<meta http-equiv="X-UA-Compatible" content="IE=edge">\n')
-    output.write('<meta name="viewport" content="width=device-width, initial-scale=1">\n')
 
     list_level = []
     in_table = False
@@ -327,7 +332,47 @@ def to_html(input_name, output_name=None):
     
     list_starter = {'* ': 'ul', '- ': 'ul', '% ': 'ol'}
 
-    # prefetch links, replace special HTML char, skip comments
+    # Some doctrine must be read first
+    after = []
+    for line in content:
+        if line.startswith('!doctrine '):
+            command, value = get_doctrine(line)
+            if command == 'TITLE':
+                TITLE = value
+            elif command == 'ENCODING':
+                ENCODING = value
+            elif command == 'ICON':
+                ICON = value
+            elif command == 'LANG':
+                LANG = value
+            elif command == 'BODY_CLASS':
+                BODY_CLASS = value
+            elif command == 'BODY_ID':
+                BODY_ID = value
+            else:
+                after.append(line)
+        else:
+            after.append(line)
+    content = after
+
+    # Start of output
+    output = open(output_name, mode='w', encoding='utf8')
+    if LANG is not None:
+        output.write(f'<html lang="{LANG}">\n')
+    else:
+        output.write(f'<html>\n')
+    output.write('<head>\n')
+    output.write(f'  <meta charset={ENCODING}>\n')
+    output.write('  <meta http-equiv="X-UA-Compatible" content="IE=edge">\n')
+    output.write('  <meta name="viewport" content="width=device-width, initial-scale=1">\n')
+    if TITLE is not None:
+        output.write(f'  <title>{TITLE}</title>\n')
+    if ICON is not None:
+        output.write(f'  <link rel="icon" href="{ICON}" type="image/x-icon" />\n')
+        output.write(f'  <link rel="shortcut icon" href="{ICON}" type="image/x-icon" />\n')
+
+    # 1st Pass : prefetch links, replace special HTML char, skip comments
+    # Empty line must be kept to separate lists!
     filtered_content = []
     final_lines = []
     for index, raw_line in enumerate(content):
@@ -350,28 +395,16 @@ def to_html(input_name, output_name=None):
         line = safe(line)
         # Doctrines
         if line.startswith('!doctrine '):
-            command, value = line.replace('!doctrine ', '').split('=')
-            #print('Command =', command.strip(), 'Value =', value.strip())
-            command = command.strip()
-            value = value.strip()
+            command, value = get_doctrine(line)
             if command == 'EXPORT_COMMENT':
                 if value == 'true':
                     EXPORT_COMMENT = True
                 elif value == 'false':
                     EXPORT_COMMENT = False
             elif command == 'ADD_CSS':
-                output.write(f'<link href="{value}" rel="stylesheet">\n')
+                output.write(f'  <link href="{value}" rel="stylesheet">\n')
             elif command == 'ADD_SCRIPT':
-                final_lines.append(f'<script src="{value}"></script>\n')
-            elif command == 'TITLE':
-                output.write(f'<title>{value}</title>\n')
-            elif command == 'ICON':
-                output.write(f'<link rel="icon" href="{value}" type="image/x-icon" />')
-                output.write(f'<link rel="shortcut icon" href="{value}" type="image/x-icon" />')
-            elif command == 'BODY_CLASS':
-                BODY_CLASS = value
-            elif command == 'BODY_ID':
-                BODY_ID = value
+                final_lines.append(f'  <script src="{value}"></script>\n')
             elif command == 'PARAGRAPH_DEFINITION':
                 if value == 'true':
                     DEFINITION_AS_PARAGRAPH = True
@@ -383,9 +416,6 @@ def to_html(input_name, output_name=None):
                 else:
                     warn('Not recognized language in doctrine DEFAULT_CODE:', value)
             continue
-        # Empty
-        #if len(line) == 0:
-        #    continue keep empty to separate lists!
         # CSS
         if line.startswith('!css '):
             output.write('<style type="text/css">\n')
@@ -420,8 +450,9 @@ def to_html(input_name, output_name=None):
         output.write(f'<body id="{BODY_ID}">\n')
     else:
         output.write(f'<body id="{BODY_ID}" class="{BODY_CLASS}">\n')
-    output.write('<div id="main" class="container">\n')
+    output.write('  <div id="main" class="container">\n')
 
+    # 2nd Pass
     for index, raw_line in enumerate(filtered_content):
         line = raw_line
         # Next line
@@ -562,7 +593,8 @@ def to_html(input_name, output_name=None):
                 output.write('<tr>')
                 for col in columns:
                     if col != '':
-                        output.write(f'<{element}>{escape(col)}</{element}>')
+                        val = translate(escape(col), links, inner_links, DEFAULT_CODE)
+                        output.write(f'<{element}>{val}</{element}>')
                 output.write('</tr>\n')
             continue
         elif in_table:
@@ -612,7 +644,7 @@ def to_html(input_name, output_name=None):
     if in_code_block:
         output.write('</pre>')
     # Do we have registered lines to write at the end?
-    output.write('</div>\n')
+    output.write('  </div>\n')
     for line in final_lines:
         output.write(line)
     output.write('</body>')
@@ -646,7 +678,8 @@ def mirror(path_input_dir, path_output_dir):
             if path.endswith('.hml'):
                 info('Processing file:', complete)
                 to_html(complete,
-                        os.path.join(path_output_dir, path.replace('.hml', '.html')))
+                        os.path.join(path_output_dir, path.replace('.hml', '.html')),
+                        'fr')
             else:
                 shutil.copy2(complete, os.join(path_output_dir, path))
         elif os.path.isdir(complete):
