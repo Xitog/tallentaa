@@ -1,9 +1,9 @@
-!doctrine TITLE=DG
-!doctrine ICON=https://xitog.github.io/dgx/img/favicon.ico
-!doctrine ADD_CSS=https://xitog.github.io/dgx/css/simplex.bootstrap.css
-!doctrine ADD_CSS=https://xitog.github.io/dgx/css/palatino.css
-!doctrine ADD_SCRIPT=https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
-!doctrine ADD_SCRIPT=https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js
+!const TITLE=DG
+!const ICON=https://xitog.github.io/dgx/img/favicon.ico
+!require https://xitog.github.io/dgx/css/simplex.bootstrap.css
+!require https://xitog.github.io/dgx/css/palatino.css
+!require https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
+!require https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js
 
 !css .jumbotron { padding-top: 30px; }
 !css .jumbotron p, .jumbotron li { color: rgb(119, 119, 119); font-family: "Palatino Linotype"; font-size: 18px; font-weight: 200; line-height: 25.7167px; margin-bottom: 10px; }
@@ -33,9 +33,11 @@ Mes projets concernent trois grands domaines scientifiques :
 Ils concernent également mes passes-temps, surtout les jeux, vidéo ou non.
 
 J'espère que ce site pourra vous être utile et je vous souhaite une bonne journée !
-        
-!html <p id="signature" class="sign">Damien Gouteux, dernière mise à jour le 28 avril 2020.</p>
-      
+
+!var NEXT_PAR_CLASS=sign
+
+Damien Gouteux, dernière mise à jour le 28 avril 2020.
+
 !html </div>
 
 !html <div style="width: 50%; margin: auto; text-align: center;">2005 ❤ 2020</div>

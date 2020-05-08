@@ -1,9 +1,9 @@
-!doctrine TITLE=Favoris
-!doctrine ICON=https://xitog.github.io/dgx/img/favicon.ico
-!doctrine ADD_CSS=https://xitog.github.io/dgx/css/simplex.bootstrap.css
-!doctrine ADD_CSS=https://xitog.github.io/dgx/css/palatino.css
-!doctrine ADD_SCRIPT=https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
-!doctrine ADD_SCRIPT=https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js
+!const TITLE=Favoris
+!const ICON=https://xitog.github.io/dgx/img/favicon.ico
+!require https://xitog.github.io/dgx/css/simplex.bootstrap.css
+!require https://xitog.github.io/dgx/css/palatino.css
+!require https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
+!require https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js
 
 !include menu.html
 

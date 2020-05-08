@@ -1,9 +1,9 @@
-!doctrine TITLE=Blog
-!doctrine ICON=https://xitog.github.io/dgx/img/favicon.ico
-!doctrine ADD_CSS=https://xitog.github.io/dgx/css/simplex.bootstrap.css
-!doctrine ADD_CSS=https://xitog.github.io/dgx/css/palatino.css
-!doctrine ADD_SCRIPT=https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
-!doctrine ADD_SCRIPT=https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js
+!const TITLE=Blog
+!const ICON=https://xitog.github.io/dgx/img/favicon.ico
+!require https://xitog.github.io/dgx/css/simplex.bootstrap.css
+!require https://xitog.github.io/dgx/css/palatino.css
+!require https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
+!require https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js
 
 !css .jumbotron { padding-top: 30px; }
 !css .jumbotron p, .jumbotron li { color: rgb(119, 119, 119); font-family: "Palatino Linotype"; font-size: 18px; font-weight: 200; line-height: 25.7167px; margin-bottom: 10px; }

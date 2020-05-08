@@ -1,4 +1,7 @@
-!doctrine EXPORT_HTML=true
+!const TITLE=Tests
+!const ICON=https://xitog.github.io/dgx/img/favicon.ico
+!require https://xitog.github.io/dgx/css/palatino.css
+!var EXPORT_COMMENT=true
 
 # Tests
 

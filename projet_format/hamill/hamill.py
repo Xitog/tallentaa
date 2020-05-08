@@ -289,26 +289,31 @@ def translate(line, links, inner_links, DEFAULT_CODE):
     return new_line
 
 
-def get_doctrine(line):
-    command, value = line.replace('!doctrine ', '').split('=')
-    #print('Command =', command.strip(), 'Value =', value.strip())
+def get(line):
+    if line.startswith('!const'):
+        command, value = line.replace('!const ', '').split('=')
+    elif line.startswith('!var'):
+        command, value = line.replace('!var ', '').split('=')
+    else:
+        raise Exception('No variable or constant defined here: ' + line)
     command = command.strip()
     value = value.strip()
     return command, value
 
 
 def to_html(input_name, output_name=None, default_lang=None):
-    EXPORT_COMMENT=False
-    ADD_CSS=None
-    DEFINITION_AS_PARAGRAPH=False
-    DEFAULT_CODE='text'
+    VAR_EXPORT_COMMENT=False
+    VAR_DEFINITION_AS_PARAGRAPH=False
+    VAR_DEFAULT_CODE='text'
+    VAR_DEFAULT_PAR_CLASS=None
+    VAR_NEXT_PAR_CLASS=None
     # HTML Parameters
-    TITLE = None
-    ENCODING = 'utf-8'
-    LANG = default_lang
-    ICON = None
-    BODY_CLASS = None
-    BODY_ID = None
+    CONST_TITLE = None
+    CONST_ENCODING = 'utf-8'
+    CONST_LANG = default_lang
+    CONST_ICON = None
+    CONST_BODY_CLASS = None
+    CONST_BODY_ID = None
     
     source = open(input_name, mode='r', encoding='utf8')
     content = source.readlines()
@@ -332,139 +337,151 @@ def to_html(input_name, output_name=None, default_lang=None):
     
     list_starter = {'* ': 'ul', '- ': 'ul', '% ': 'ol'}
 
-    # Some doctrine must be read first
+    # 1st Pass : prefetch links, replace special HTML char, skip comments
+    # Empty line must be kept to separate lists!
     after = []
+    link_to_put_in_head = []
+    css_to_put_in_head = []
     for line in content:
-        if line.startswith('!doctrine '):
-            command, value = get_doctrine(line)
+        # Constant must be read first, are defined once, anywhere in the doc
+        if line.startswith('!const '):
+            command, value = get(line)
             if command == 'TITLE':
-                TITLE = value
+                CONST_TITLE = value
             elif command == 'ENCODING':
-                ENCODING = value
+                CONST_ENCODING = value
             elif command == 'ICON':
-                ICON = value
+                CONST_ICON = value
             elif command == 'LANG':
-                LANG = value
+                CONST_LANG = value
             elif command == 'BODY_CLASS':
-                BODY_CLASS = value
+                CONST_BODY_CLASS = value
             elif command == 'BODY_ID':
-                BODY_ID = value
+                CONST_BODY_ID = value
             else:
-                after.append(line)
+                raise Exception('Unknown constant: ' + command + 'with value= ' + value)
+        elif line.startswith('!require ') and line.strip().endswith('.css'):
+            required = line.replace('!require ', '', 1).strip()
+            link_to_put_in_head.append(f'  <link href="{required}" rel="stylesheet">\n')
+        # Inline CSS
+        elif line.startswith('!css '):
+            css_to_put_in_head.append(line.replace('!css ', '', 1).strip())
         else:
+            # Block of code
+            if len(line) > 2 and line[0:3] == '@@@':
+                if not in_code_free_block:
+                    in_code_free_block = True
+                else:
+                    in_code_free_block = False
+            if line.startswith('@@'):
+                in_code_block = True
+            else:
+                in_code_block = False
+            # Strip
+            if not in_code_free_block and not in_code_block:
+                line = line.strip()
+            # Special chars
+            line = safe(line)
+            # Link library
+            if len(line) > 0 and line[0] == '[' and (line.find(']: https://') != -1 or line.find(']: http://') != -1):
+                name = line[1:line.find(']: ')]
+                link = line[line.find(']: ') + len(']: '):]
+                links[name] = link
+                continue
+            # Inner links
+            nb, title, id_title = find_title(line)
+            if nb > 0:
+                inner_links.append(id_title)
             after.append(line)
     content = after
-
+    
     # Start of output
     output = open(output_name, mode='w', encoding='utf8')
-    if LANG is not None:
-        output.write(f'<html lang="{LANG}">\n')
+    if CONST_LANG is not None:
+        output.write(f'<html lang="{CONST_LANG}">\n')
     else:
         output.write(f'<html>\n')
     output.write('<head>\n')
-    output.write(f'  <meta charset={ENCODING}>\n')
+    output.write(f'  <meta charset={CONST_ENCODING}>\n')
     output.write('  <meta http-equiv="X-UA-Compatible" content="IE=edge">\n')
     output.write('  <meta name="viewport" content="width=device-width, initial-scale=1">\n')
-    if TITLE is not None:
-        output.write(f'  <title>{TITLE}</title>\n')
-    if ICON is not None:
-        output.write(f'  <link rel="icon" href="{ICON}" type="image/x-icon" />\n')
-        output.write(f'  <link rel="shortcut icon" href="{ICON}" type="image/x-icon" />\n')
+    if CONST_TITLE is not None:
+        output.write(f'  <title>{CONST_TITLE}</title>\n')
+    if CONST_ICON is not None:
+        output.write(f'  <link rel="icon" href="{CONST_ICON}" type="image/x-icon" />\n')
+        output.write(f'  <link rel="shortcut icon" href="{CONST_ICON}" type="image/x-icon" />\n')
 
-    # 1st Pass : prefetch links, replace special HTML char, skip comments
-    # Empty line must be kept to separate lists!
-    filtered_content = []
-    final_lines = []
-    for index, raw_line in enumerate(content):
-        # Block of code
-        if len(raw_line) > 2 and raw_line[0:3] == '@@@':
-            if not in_code_free_block:
-                in_code_free_block = True
-            else:
-                in_code_free_block = False
-        if raw_line.startswith('@@'):
-            in_code_block = True
-        else:
-            in_code_block = False
-        # Strip
-        if in_code_free_block or in_code_block:
-            line = raw_line
-        else:
-            line = raw_line.strip()
-        # Special chars
-        line = safe(line)
-        # Doctrines
-        if line.startswith('!doctrine '):
-            command, value = get_doctrine(line)
-            if command == 'EXPORT_COMMENT':
-                if value == 'true':
-                    EXPORT_COMMENT = True
-                elif value == 'false':
-                    EXPORT_COMMENT = False
-            elif command == 'ADD_CSS':
-                output.write(f'  <link href="{value}" rel="stylesheet">\n')
-            elif command == 'ADD_SCRIPT':
-                final_lines.append(f'  <script src="{value}"></script>\n')
-            elif command == 'PARAGRAPH_DEFINITION':
-                if value == 'true':
-                    DEFINITION_AS_PARAGRAPH = True
-                else:
-                    DEFINITION_AS_PARAGRAPH = False
-            elif command == 'DEFAULT_CODE':
-                if value in RECOGNIZED_LANGUAGES:
-                    DEFAULT_CODE = value
-                else:
-                    warn('Not recognized language in doctrine DEFAULT_CODE:', value)
-            continue
-        # CSS
-        if line.startswith('!css '):
-            output.write('<style type="text/css">\n')
-            output.write(line.replace('!css ', '', 1).strip() + '\n')
-            output.write('</style>\n')
-            continue
-        # Comment
-        if line.startswith('--') and line.count('-') != len(line): # and line.count('-') < 3:
-            if EXPORT_COMMENT:
-                line = line.replace('--', '<!--', 1) + ' -->'
-            else:
-                continue
-        # Link library
-        elif len(line) > 0 and line[0] == '[' and (line.find(']: https://') != -1 or line.find(']: http://') != -1):
-            name = line[1:line.find(']: ')]
-            link = line[line.find(']: ') + len(']: '):]
-            links[name] = link
-            continue
-        # Inner links
-        nb, title, id_title = find_title(line)
-        if nb > 0:
-            inner_links.append(id_title)
-        filtered_content.append(line)
-
+    # should I put script in head?
+    for line in link_to_put_in_head:
+        output.write(line)
+    # Inline CSS
+    for line in css_to_put_in_head:
+        output.write('<style type="text/css">\n')
+        output.write(line + '\n')
+        output.write('</style>\n')
+        
     output.write('</head>\n')
 
-    if BODY_CLASS is None and BODY_ID is None:
+    if CONST_BODY_CLASS is None and CONST_BODY_ID is None:
         output.write('<body>\n')
-    elif BODY_ID is None:
-        output.write(f'<body class="{BODY_CLASS}">\n')
-    elif BODY_CLASS is None:
-        output.write(f'<body id="{BODY_ID}">\n')
+    elif CONST_BODY_ID is None:
+        output.write(f'<body class="{CONST_BODY_CLASS}">\n')
+    elif CONST_BODY_CLASS is None:
+        output.write(f'<body id="{CONST_BODY_ID}">\n')
     else:
-        output.write(f'<body id="{BODY_ID}" class="{BODY_CLASS}">\n')
+        output.write(f'<body id="{CONST_BODY_ID}" class="{CONST_BODY_CLASS}">\n')
     output.write('  <div id="main" class="container">\n')
 
     # 2nd Pass
-    for index, raw_line in enumerate(filtered_content):
+    for index, raw_line in enumerate(content):
         line = raw_line
         # Next line
-        if index < len(filtered_content) - 2:
-            next_line = filtered_content[index + 1]
+        if index < len(content) - 2:
+            next_line = content[index + 1]
         else:
             next_line = None
-        # Comment
-        if line.startswith('<!-- '):
-            output.write(line + '\n')
+        # Variables
+        if line.startswith('!var '):
+            command, value = get(line)
+            if command == 'EXPORT_COMMENT':
+                if value == 'true':
+                    VAR_EXPORT_COMMENT = True
+                elif value == 'false':
+                    VAR_EXPORT_COMMENT = False
+            elif command == 'PARAGRAPH_DEFINITION':
+                if value == 'true':
+                    VAR_DEFINITION_AS_PARAGRAPH = True
+                else:
+                    VAR_DEFINITION_AS_PARAGRAPH = False
+            elif command == 'DEFAULT_CODE':
+                if value in RECOGNIZED_LANGUAGES:
+                    VAR_DEFAULT_CODE = value
+                else:
+                    warn('Not recognized language in var VAR_DEFAULT_CODE:', value)
+            elif command == 'NEXT_PAR_CLASS':
+                VAR_NEXT_PAR_CLASS = value
+            elif command == 'DEFAULT_PAR_CLASS':
+                VAR_DEFAULT_PAR_CLASS = value
+            else:
+                raise Exception('Var unknown: ' + command + ' with value = ' + value)
             continue
-        # Include
+        # Comment
+        if line.startswith('--') and line.count('-') != len(line):
+            if VAR_EXPORT_COMMENT:
+                line = line.replace('--', '<!--', 1) + ' -->'
+                output.write(line + '\n')    
+            else:
+                continue
+            continue
+        # Require CSS or JS file
+        if line.startswith('!require '):
+            required = line.replace('!require ', '', 1)
+            if required.endswith('.js'):
+                output.write(f'  <script src="{required}"></script>\n')
+            else:
+                raise Exception("I don't known how to handle this file: " + required)
+            continue
+        # Include HTML file
         if line.startswith('!include '):
             included = line.replace('!include ', '', 1)
             file = open(included, mode='r', encoding='utf8')
@@ -472,7 +489,7 @@ def to_html(input_name, output_name=None, default_lang=None):
             file.close()
             output.write(file_content + '\n')
             continue
-        # HTML
+        # Inline HTML
         if line.startswith('!html '):
             output.write(line.replace('!html ', '', 1) + '\n')
             continue
@@ -502,7 +519,7 @@ def to_html(input_name, output_name=None, default_lang=None):
                 in_code_free_block = True
                 code_lang = line.replace('@@@', '', 1).strip()
                 if len(code_lang) == 0:
-                    code_lang = DEFAULT_CODE
+                    code_lang = VAR_DEFAULT_CODE
             else:
                 output.write('</pre>\n')
                 in_code_free_block = False
@@ -514,7 +531,7 @@ def to_html(input_name, output_name=None, default_lang=None):
                 in_code_block = True
                 code_lang = line.replace('@@', '', 1).strip()
                 if len(code_lang) == 0:
-                    code_lang = DEFAULT_CODE
+                    code_lang = VAR_DEFAULT_CODE
                 continue
         elif in_code_block:
             output.write('</pre>\n')
@@ -528,7 +545,7 @@ def to_html(input_name, output_name=None, default_lang=None):
         # Bold & Italic & Strikethrough & Underline & Power
         if multi_find(line, ('**', '--', '__', '^^', "''", "[", '@@')) and \
            not line.startswith('|-'):
-            line = translate(line, links, inner_links, DEFAULT_CODE)
+            line = translate(line, links, inner_links, VAR_DEFAULT_CODE)
         # Title
         nb, title, id_title = find_title(line)
         if nb > 0:
@@ -593,7 +610,7 @@ def to_html(input_name, output_name=None, default_lang=None):
                 output.write('<tr>')
                 for col in columns:
                     if col != '':
-                        val = translate(escape(col), links, inner_links, DEFAULT_CODE)
+                        val = translate(escape(col), links, inner_links, VAR_DEFAULT_CODE)
                         output.write(f'<{element}>{val}</{element}>')
                 output.write('</tr>\n')
             continue
@@ -610,7 +627,7 @@ def to_html(input_name, output_name=None, default_lang=None):
             output.write(f'<dt>{line.replace("$ ", "", 1)}</dt>\n<dd>\n')
             continue
         elif len(line) != 0 and in_definition_list:
-            if not DEFINITION_AS_PARAGRAPH:
+            if not VAR_DEFINITION_AS_PARAGRAPH:
                 output.write(escape(line) +'\n')
             else:
                 output.write('<p>' + escape(line) +'</p>\n')
@@ -624,7 +641,13 @@ def to_html(input_name, output_name=None, default_lang=None):
         line = escape(line)
         # Paragraph
         if len(line) > 0:
-            output.write('<p>' + line.strip() + '</p>\n')
+            if VAR_DEFAULT_PAR_CLASS is not None:
+                output.write(f'<p class="{VAR_DEFAULT_PAR_CLASS}">' + line.strip() + '</p>\n')
+            elif VAR_NEXT_PAR_CLASS is not None:
+                output.write(f'<p class="{VAR_NEXT_PAR_CLASS}">' + line.strip() + '</p>\n')
+                VAR_NEXT_PAR_CLASS = None
+            else:
+                output.write('<p>' + line.strip() + '</p>\n')
     # Are a definition list still open?
     if in_definition_list:
         output.write('</dl>\n')
@@ -645,8 +668,8 @@ def to_html(input_name, output_name=None, default_lang=None):
         output.write('</pre>')
     # Do we have registered lines to write at the end?
     output.write('  </div>\n')
-    for line in final_lines:
-        output.write(line)
+    #for line in final_lines:
+    #    output.write(line)
     output.write('</body>')
     output.close()
 

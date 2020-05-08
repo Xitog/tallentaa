@@ -1,9 +1,9 @@
-!doctrine TITLE=Hamill
-!doctrine ICON=https://xitog.github.io/dgx/img/favicon.ico
-!doctrine ADD_CSS=https://xitog.github.io/dgx/css/simplex.bootstrap.css
-!doctrine ADD_CSS=https://xitog.github.io/dgx/css/palatino.css
-!doctrine ADD_SCRIPT=https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
-!doctrine ADD_SCRIPT=https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js
+!const TITLE=Hamill
+!const ICON=https://xitog.github.io/dgx/img/favicon.ico
+!require https://xitog.github.io/dgx/css/simplex.bootstrap.css
+!require https://xitog.github.io/dgx/css/palatino.css
+!require https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
+!require https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js
 
 !include menu.html
 
@@ -18,9 +18,11 @@ On peut faire des commentaires en commençant une ligne par \-\-.
 
 -- Ceci est un commentaire il ne sera pas exporté
 
-!doctrine EXPORT_COMMENT=true
+!var EXPORT_COMMENT=true
 
 -- Ceci est un commentaire il sera exporté en HTML
+
+**LIMITATION : les commentaires doivent être sur une ligne séparée et non à la fin d'une ligne. Hamill risque de se tromper** (mélange entre @@!require@@ qui teste la fin de la ligne)
 
 On peut faire une ligne horizontale avec une ligne constituée uniquement de - d'une longueur supérieure ou égale à 3.
 
@@ -80,9 +82,11 @@ Donnera :
 
 % \% une liste numérotée
 
+**LIMITATION : Hamill ne gère pas une inclusion d'une liste numérotée dans une non-numérotée et vice-versa.**
+
 ## Listes de définition
 
-* $ une liste de définition. On fait suivre directement la définition
+* $ indique une liste de définition. On fait suivre directement la définition en la précédant d'espaces.
 
 ## Tables
 
@@ -93,7 +97,7 @@ Donnera :
 |----|---|----|-----------|
 |Il  |est|beau|mon tableau|
 
-On peut mettre bien sûr des modificateurs de textes dans un tableau mais __pas de listes dans un tableau pour l'instant__ :
+On peut mettre bien sûr des modificateurs de textes dans un tableau mais **LIMITATION : pas de listes dans un tableau pour l'instant** :
 
 |^^Ceci^^|**est**|__un__            |''tableau''|
 |-----------------------------------------------|
@@ -107,21 +111,38 @@ On peut mettre bien sûr des modificateurs de textes dans un tableau mais __pas 
 * Ou le lien peut être seulement **#**. Dans ce cas, il essaye de faire pointé sur le nom affiché ou, si c'est un titre, le nom affiché transformé ''(voir ci-dessous)''
 * Les titres sont automatiquement transformés en ancre en remplaçant les espaces par - et en les mettant en minuscules : ainsi **Les jeux** devient **les-jeux**
 
-## Doctrines
+## Constantes
 
-On peut utiliser @@!doctrine@@ en début de ligne pour modifier des variables globales de transformation en HTML. On peut définir la valeur d'une doctrine plusieurs fois mais **seule la dernière valeur définie sera prise en compte** pour la génération. En effet, on ne peut pas être versatile quand il s'agit de doctrine. Par exemple :
+On peut définir des constantes en mettant @@!const@@ en début de ligne. Les constantes peuvent être définies n'importe où dans le document et plusieurs fois mais **__seule la dernière valeur définie est prise en compte__**.
 
-* @@!doctrine TITLE=titre@@ pour définir le titre de la page
-* @@!doctrine ICON=icon@@ pour définir une icône pour la page
-* @@!doctrine LANG=lang@@ pour définir la langue utilisée dans la page
-* @@!doctrine ENCODING=encoding@@ pour définir la langue utilisée dans la page, par défaut utf-8
-* @@!doctrine BODY_CLASS=classe@@ pour définir la classe du body
-* @@!doctrine BODY_ID=id@@ pour définir l'id du body
-* @@!doctrine EXPORT_COMMENT=true/false@@ spécifie si les commentaires seront exportés en HTML ou pas
-* @@!doctrine ADD_CSS=lien vers un fichier CSS@@ spécifie un fichier CSS à ajouter
-* @@!doctrine ADD_SCRIPT=lien vers un fichier de script@@ spécifie un fichier JavaScript à ajouter
-* @@!doctrine PARAGRAPH_DEFINITION=true/false@@ spécifie si les dd doivent être mis dans des balises p
-* @@!doctrine DEFAULT_CODE=python/json@@ définit la coloration syntaxique par défaut du code (text par défaut)
+* @@!const TITLE=titre@@ pour définir le titre de la page
+* @@!const ICON=icon@@ pour définir une icône pour la page
+* @@!const LANG=lang@@ pour définir la langue utilisée dans la page
+* @@!const ENCODING=encoding@@ pour définir la langue utilisée dans la page, par défaut utf-8
+* @@!const BODY_CLASS=classe@@ pour définir la classe du body
+* @@!const BODY_ID=id@@ pour définir l'id du body
+
+## Variables
+
+On peut définir des variables en mettant @@!var@@ en début de ligne. On peut changer sa valeur en la redéfinissant dans le document plusieurs fois. Au contraire des constantes, les variables sont lues au fur et à mesure de l'émission du HTML.
+
+* @@!var EXPORT_COMMENT=true/false@@ spécifie si les commentaires seront exportés en HTML ou pas
+* @@!var PARAGRAPH_DEFINITION=true/false@@ spécifie si les dd doivent être mis dans des balises p
+* @@!var DEFAULT_CODE=python/json@@ définit la coloration syntaxique par défaut du code (text par défaut)
+* @@!var NEXT_PAR_CLASS=cls@@ spécifie la classe du **prochain** paragraphe
+* @@!var DEFAULT_PAR_CLASS=cls@@ spécifie la classe par défaut de **tous les paragraphes qui suivent**
+
+## Inclusion de fichier HTML
+
+On peut inclure un fichier HTML avec @@!include@@ en début de ligne. Le contenu du fichier sera copié directement le document produit.
+
+## Liens vers un fichier CSS ou JavaScript
+
+On peut lier notre document à fichier CSS ou JavaScript avec la commande @@!require@@ en début de ligne.
+
+Le lien vers un fichier CSS requis est **automatiquement** placé dans la tête du document HTML.
+
+Le lien vers un fichier JavaScript requis est placé là ou se trouve le @@!require@@. **LIMITATION : Hamill ne peut pas mettre un lien vers un fichier JavaScript dans la tête pour l'instant**.
 
 ## Spécial
 
