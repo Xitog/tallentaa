@@ -116,11 +116,12 @@ def find_title(line):
         c += 1
     if nb > 0:
         title = line.replace('#' * nb, '', 1).strip()
-        id_title = make_title(title)
+        id_title = make_id(title)
         return nb, title, id_title
     return 0, None, None
 
-def make_title(string):
+def make_id(string):
+    """Translate : A simple Title -> a_simple_title"""
     return string.replace(' ', '-').lower()
 
 def write_code(line, code_lang, output=None):
@@ -148,6 +149,22 @@ def write_code(line, code_lang, output=None):
 # Processors
 #-------------------------------------------------------------------------------
 
+def prev_next(line, index):
+    if index > 0:
+        _prev = line[index - 1]
+    else:
+        _prev = None
+    if index > 1:
+        _prev_prev = line[index - 2]
+    else:
+        _prev_prev = None
+    if index < len(line) - 1:
+        _next = line[index + 1]
+    else:
+        _next = None
+    return _prev, _next, _prev_prev
+
+
 def translate(line, links, inner_links, DEFAULT_CODE):
     new_line = ''
     in_bold = False
@@ -161,24 +178,14 @@ def translate(line, links, inner_links, DEFAULT_CODE):
     while char_index < len(line) - 1:
         char_index += 1
         char = line[char_index]
-        if char_index > 0:
-            prev_char = line[char_index - 1]
-        else:
-            prev_char = None
-        if char_index > 1:
-            prev_prev_char = line[char_index - 2]
-        else:
-            prev_prev_char = None
-        if char_index < len(line) - 1:
-            next_char = line[char_index + 1]
-        else:
-            next_char = None
+        prev_char, next_char, prev_prev_char = prev_next(line, char_index)
         # Link
-        if char == '[' and next_char == '#' and prev_char != '\\':
+        if char == '[' and next_char == '#' and prev_char != '\\': # [# ... ] inner link
             ending = line.find(']', char_index)
             if ending != -1:
-                link = line[char_index + 2:ending]
-                new_line += f'<a id="{link}">' + link + '</a>'
+                link_name = line[char_index + 2:ending]
+                id_link = make_id(link_name)
+                new_line += f'<span id="{id_link}">' + link_name + '</span>'
                 char_index = ending
                 continue
         elif char == '[' and char_index < len(line) - 1 and prev_char != '\\':
@@ -200,12 +207,12 @@ def translate(line, links, inner_links, DEFAULT_CODE):
                 elif multi_start(link, ('https://', 'http://')):
                     new_line += f'<a href="{link}">{link_name}</a>'
                 elif link == '#': # [Python->#] = to #Python
-                    if make_title(link_name) in inner_links:
-                        new_line += f'<a href="#{make_title(link_name)}">{link_name}</a>'
+                    if make_id(link_name) in inner_links:
+                        new_line += f'<a href="#{make_id(link_name)}">{link_name}</a>'
                     else:
                         new_line += f'<a href="#{link_name}">{link_name}</a>'
                 else:
-                    warn('Undefined link:', link_name)
+                    warn('Undefined link:', link_name, 'in', line)
                     new_line += link_name
                 char_index = ending
                 continue
@@ -389,6 +396,23 @@ def to_html(input_name, output_name=None, default_lang=None):
                 links[name] = link
                 continue
             # Inner links
+            if line.find('[#') != -1:
+                char_index = 0
+                while char_index < len(line):
+                    char = line[char_index]
+                    prev_char, next_char, prev_prev_char = prev_next(line, char_index)
+                    if char == '[' and next_char == '#' and prev_char != '\\': # [# ... ] inner link
+                        ending = line.find(']', char_index)
+                        if ending != -1:
+                            link_name = line[char_index + 2:ending]
+                            id_link = make_id(link_name)
+                            if id_link in inner_links:
+                                log.warn("Multiple definitions of anchor: " + id_link)
+                            inner_links.append(id_link)
+                            char_index = ending
+                            continue
+                    char_index += 1
+            # Inner links from Title
             nb, title, id_title = find_title(line)
             if nb > 0:
                 inner_links.append(id_title)

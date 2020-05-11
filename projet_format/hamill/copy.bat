@@ -1,4 +1,6 @@
 copy /Y /B .\output\histoire\methode.html           ..\..\..\dgx\histoire\methode.html
+copy /Y /B .\output\histoire\bibliographie.html     ..\..\..\dgx\histoire\bibliographie.html
+copy /Y /B .\output\histoire\france19eme.html       ..\..\..\dgx\histoire\france19eme.html
 copy /Y /B .\output\informatique\hamill.html        ..\..\..\dgx\informatique\hamill.html
 copy /Y /B .\output\informatique\json.html          ..\..\..\dgx\informatique\json.html
 copy /Y /B .\output\informatique\tools_langs.html   ..\..\..\dgx\informatique\tools_langs.html
