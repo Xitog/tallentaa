@@ -76,6 +76,9 @@ def safe(line):
     # Do not escape !html line
     if line.startswith('!html'):
         return line
+    # Replace special glyph
+    line = line.replace('<==', '⇐')
+    line = line.replace('==>', '⇒')
     # Replace HTML special char
     new_line = ''
     index_char = 0
@@ -165,7 +168,7 @@ def prev_next(line, index):
     return _prev, _next, _prev_prev
 
 
-def translate(line, links, inner_links, DEFAULT_CODE):
+def translate(line, links, inner_links, DEFAULT_CODE, DEFAULT_FIND_IMAGE=None):
     new_line = ''
     in_bold = False
     in_italic = False
@@ -186,6 +189,16 @@ def translate(line, links, inner_links, DEFAULT_CODE):
                 link_name = line[char_index + 2:ending]
                 id_link = make_id(link_name)
                 new_line += f'<span id="{id_link}">' + link_name + '</span>'
+                char_index = ending
+                continue
+        elif char == '[' and next_char == '!' and prev_char != '\\': # [! ... ] image
+            ending = line.find(']', char_index)
+            if ending != -1:
+                link = line[char_index + 2:ending]
+                if DEFAULT_FIND_IMAGE is None:
+                    new_line += f'<img src="{link}"></img>'
+                else:
+                    new_line += f'<img src="{DEFAULT_FIND_IMAGE}{link}"></img>'
                 char_index = ending
                 continue
         elif char == '[' and char_index < len(line) - 1 and prev_char != '\\':
@@ -325,7 +338,10 @@ def to_html(input_name, output_name=None, default_lang=None):
     VAR_DEFINITION_AS_PARAGRAPH=False
     VAR_DEFAULT_CODE='text'
     VAR_DEFAULT_PAR_CLASS=None
+    VAR_DEFAULT_TAB_CLASS=None
     VAR_NEXT_PAR_CLASS=None
+    VAR_NEXT_TAB_CLASS=None
+    VAR_DEFAULT_FIND_IMAGE=None
     # HTML Parameters
     CONST_TITLE = None
     CONST_ENCODING = 'utf-8'
@@ -496,9 +512,15 @@ def to_html(input_name, output_name=None, default_lang=None):
                 else:
                     warn('Not recognized language in var VAR_DEFAULT_CODE:', value)
             elif command == 'NEXT_PAR_CLASS':
-                VAR_NEXT_PAR_CLASS = value
+                VAR_NEXT_PAR_CLASS = value if value != 'reset' else None
             elif command == 'DEFAULT_PAR_CLASS':
-                VAR_DEFAULT_PAR_CLASS = value
+                VAR_DEFAULT_PAR_CLASS = value if value != 'reset' else None
+            elif command == 'NEXT_TAB_CLASS':
+                VAR_NEXT_TAB_CLASS = value if value != 'reset' else None
+            elif command == 'DEFAULT_TAB_CLASS':
+                VAR_DEFAULT_TAB_CLASS = value if value != 'reset' else None
+            elif command == 'DEFAULT_FIND_IMAGE':
+                VAR_DEFAULT_FIND_IMAGE = value if value != 'reset' else None
             else:
                 raise Exception('Var unknown: ' + command + ' with value = ' + value)
             continue
@@ -582,7 +604,7 @@ def to_html(input_name, output_name=None, default_lang=None):
         # Bold & Italic & Strikethrough & Underline & Power
         if multi_find(line, ('**', '--', '__', '^^', "''", "[", '@@')) and \
            not line.startswith('|-'):
-            line = translate(line, links, inner_links, VAR_DEFAULT_CODE)
+            line = translate(line, links, inner_links, VAR_DEFAULT_CODE, VAR_DEFAULT_FIND_IMAGE)
         # Title
         nb, title, id_title = find_title(line)
         if nb > 0:
@@ -610,7 +632,13 @@ def to_html(input_name, output_name=None, default_lang=None):
         # Table
         if len(line) > 0 and line[0] == '|':
             if not in_table:
-                output.write('<table>\n')
+                if VAR_DEFAULT_TAB_CLASS is not None:
+                    output.write(f'<table class="{VAR_DEFAULT_TAB_CLASS}">\n')
+                elif VAR_NEXT_TAB_CLASS is not None:
+                    output.write(f'<table class="{VAR_NEXT_TAB_CLASS}">\n')
+                    VAR_NEXT_TAB_CLASS = None
+                else:
+                    output.write('<table>\n')
                 in_table = True
             if next_line is not None and next_line.startswith('|-'):
                 element = 'th'
@@ -624,9 +652,17 @@ def to_html(input_name, output_name=None, default_lang=None):
             if not skip:
                 output.write('<tr>')
                 for col in columns:
-                    if col != '':
-                        val = translate(escape(col), links, inner_links, VAR_DEFAULT_CODE)
-                        output.write(f'<{element}>{val}</{element}>')
+                    if col != '': # center or right-align
+                        if col[0] == '>':
+                            align = ' align="right"'
+                            col = col[1:]
+                        elif col[0] == '=':
+                            align = ' align="center"'
+                            col = col[1:]
+                        else:
+                            align = ''
+                        val = translate(escape(col), links, inner_links, VAR_DEFAULT_CODE, VAR_DEFAULT_FIND_IMAGE)
+                        output.write(f'<{element}{align}>{val}</{element}>')
                 output.write('</tr>\n')
             continue
         elif in_table:

@@ -8,6 +8,21 @@
   <link rel="shortcut icon" href="https://xitog.github.io/dgx/img/favicon.ico" type="image/x-icon" />
   <link href="https://xitog.github.io/dgx/css/simplex.bootstrap.css" rel="stylesheet">
   <link href="https://xitog.github.io/dgx/css/palatino.css" rel="stylesheet">
+<style type="text/css">
+code {color: #006FDD; border: 1px solid rgb(225, 228, 229); padding-left: 3px; padding-right: 5px;}
+</style>
+<style type="text/css">
+table.schema { display: inline-block; margin-right: 20px; }
+</style>
+<style type="text/css">
+table.schema tr:nth-child(2n) { background-color: transparent; }
+</style>
+<style type="text/css">
+table.extract { border-collapse: collapse; display: inline-block; }
+</style>
+<style type="text/css">
+table.extract td { border: None; padding: 0px; text-align: center; }
+</style>
 </head>
 <body>
   <div id="main" class="container">
@@ -132,6 +147,83 @@
         </div><!--/.container-fluid -->
       </nav>
 <div id="content-div">
+<h1 id="cartes-de-carreaux,-transitions-et-variations">Cartes de carreaux, Transitions et Variations</h1>
+<hr>
+<h2 id="sommaire">Sommaire</h2>
+<ul>
+<li><a href="#i.-un-tableau-comme-carte">I. Un tableau comme carte</a></li>
+<li><a href="#ii.-un-système-de-transition">II. Un système de transition</a></li>
+<ul>
+<li><a href="#ii.a-cinq-règles-de-transitions">II.A Cinq règles de transitions</a></li>
+<ol>
+<li><a href="#hiérarchie-d'influence">Hiérarchie d'influence</a></li>
+<li><a href="#unicité">Unicité</a></li>
+<li><a href="#étau">Étau</a></li>
+<li><a href="#continuité">Continuité</a></li>
+<li><a href="#coins-en-opposition">Coins en opposition</a></li>
+</ol>
+<li><a href="#ii.b-système-de-numérotation">II.B Système de numérotation</a></li>
+<li><a href="#ii.c-exemples-de-configurations">II.C Exemples de configurations</a></li>
+<li><a href="#II.D Correspondances configuration-transition">II.D Correspondances configuration-transition</a></li>
+<li><a href="#II.E Exemples de résultats">II.E Exemples de résultats</a></li>
+</ul>
+<li><a href="#III. Variations">III. Variations</a></li>
+<li><a href="#IV. Multitransitions">IV. Multitransitions</a></li>
+<li><a href="#V. Historique">V. Historique</a></li>
+<li><a href="#VI. Crédits">VI. Crédits</a></li>
+</ul>
+<h2 id="i.-un-tableau-comme-carte">I. Un tableau comme carte</h2>
+<p>Le jeu <code><span class="normal">WarCraft</span> <span class="normal">II</span></code> (1995) propose une vue de dessus d'une carte où se déroule la partie. Cette carte est stocké à l'aide d'un tableau. Chaque case du tableau contient une indication de textures à utiliser. Par exemple, une case peut contenir la valeur <code><span class="number">0</code>, qui désigne de l'eau, ou <code><span class="number">1</code> de la terre. Prenons une carte de 5 cases en largeur et en hauteur, une taille que nous notons 5x5, et affichons la dans un premier temps avec des bordures délimitant chaque case (A) puis sans (B) :</p>
+<p>A. <img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/img_1_no_trans_border.png"></img> B. <img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/img_2_no_trans_no_border.png"></img> C. <img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/img_3_spreadsheet_map.png"></img></p>
+<p>On voit que l'ensemble de la carte, qui comporte <code><span class="number">25</span></code> cases, ne fait que répéter deux textures. On peut ainsi décrire facilement de vastes étendues à partir de peu d'éléments. On appelle ses éléments d'après l'anglais <i><b>tiles</b></i>, que l'on pourrait traduire par carreau ou tuile, et cette technique le <i><b>tiling</b></i>, traduisible par carrelage. Une case du tableau correspond donc à un carreau. Pour construire et éditer une telle carte, on peut construire un éditeur de carte ou utiliser un simple tableur comme Microsoft Excel ou LibreOffice Calc. La même carte sous Excel se présenterait comme (C).</p>
+<p>Si on enlève les bordures de notre exemple (B), le résultat est déjà plus convaincant. Néanmoins, la transition de l'eau vers la terre est un peu abrupte, elle ne fait pas naturelle. Pour améliorer le résultat, on va créer un jeu de textures spéciales qui assureront des <b>transitions plus douces et naturelles</b>.</p>
+<h2 id="ii.-un-système-de-transition">II. Un système de transition</h2>
+<p>Nous allons établir un système de transition composé de :</p>
+<ul>
+<li>cinq règles de transition et</li>
+<li>un système de numérotation.</li>
+</ul>
+<h3 id="ii.a-cinq-règles-de-transitions">II.A Cinq règles de transitions</h3>
+<p>Nous allons établir un ensemble de règles pour les transitions :</p>
+<ol>
+<li>Première règle, on établit une <u><b><span id="hiérarchie-d'influence">hiérarchie d'influence</span></b></u> : un carreau d'eau est <b>influencé</b> par un carreau de terre. C'est-à-dire que si un carreau jouxte un carreau de terre, c'est le carreau d'eau qui changera pour refléter une transition : sa texture d'eau simple sera remplacée par une texture de transition entre l'eau et la terre : on notera <code><span class="normal">eau</span> ⇐ <span class="normal">terre</span></code></li>
+<li>Deuxième règle, celle d'<u><b><span id="unicité">unicité</span></b></u> : <b>un carreau ne peut avoir autour de lui qu'un seul type d'influenceur</b>. On a vu que les carreaux d'eau sont influencés par les carreaux de terre. Imaginons un autre type de carreau, le sable, qui influence également l'eau. Un carreau d'eau ne pourra être entouré que d'un seul type d'influenceur dans sa proximité immédiate.</li>
+<li>Troisième règle : celle de l'<u><b><span id="étau">étau</span></b></u> : un carreau ne peut avoir à sa gauche et à sa droite un carreau l'influençant en même temps. De même, un carreau ne peut avoir en haut et en bas un carreau l'influençant en même temps. Les configurations représentées ci-dessous sont donc interdites :<br><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/img_4_vice.png"></img></li>
+<li>Quatrième règle, celle de la <u><b><span id="continuité">continuité</span></b></u> : <b>Les carreaux influenceurs doivent être consécutifs. Toutes les configurations discontinues sont interdites</b> comme :<br><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/img_5_continuity.png"></img></li>
+<li>Cinquième règle, qui est une exception à la quatrième, est celle des <u><b><span id="coins-en-opposition">coins en opposition</span></b></u> : la configuration où deux coins en opposition sont des influenceurs et ceux sont les seuls influenceurs est autorisée. Cela concerne les deux configurations ci-dessous :<br><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/img_6_opposing_corners.png"></img></li>
+</ol>
+<table class="extract">
+<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+</table>
+<h3 id="ii.b-système-de-numérotation">II.B Système de numérotation</h3>
+<p>Un carreau est entouré de <code><span class="number">8</code> autres carreaux. Nous les notons et les numérotons comme ci-dessous, en partant du carreau en haut à gauche et en les parcourant dans le sens horaire :</p>
+<table>
+<tr><th>Carreau    </th><th>Nord-Ouest    </th><th>Nord     </th><th>Nord-Est    </th><th>Est     </th><th>Sud-Est  </th><th>Sud      </th><th>Sud-Ouest </th><th>Ouest     </th></tr>
+<tr><td>Code       </td><td align="center">   NO        </td><td align="center"> N      </td><td align="center">  NE       </td><td align="center"> E     </td><td align="center">   SE   </td><td align="center"> S      </td><td align="center">   SO    </td><td align="center">    O    </td></tr>
+<tr><td>Numéro     </td><td align="center">   <code><span class="number">0</code>     </td><td align="center"> <code><span class="number">1</code>  </td><td align="center">  <code><span class="number">2</code>    </td><td align="center"> <code><span class="number">3</code> </td><td align="center">  <code><span class="number">4</code> </td><td align="center"> <code><span class="number">5</code>  </td><td align="center">  <code><span class="number">6</code>  </td><td align="center">  <code><span class="number">7</code>  </td></tr>
+<tr><td>2<sup>Numéro</sup></td><td align="center">   <code><span class="number">1</code>     </td><td align="center"> <code><span class="number">2</code>  </td><td align="center">  <code><span class="number">4</code>    </td><td align="center"> <code><span class="number">8</code> </td><td align="center"> <code><span class="number">16</span></code> </td><td align="center"> <code><span class="number">32</span></code> </td><td align="center"> <code><span class="number">64</span></code>  </td><td align="center"> <code><span class="number">128</span></code> </td></tr>
+</table>
+<p>Autrement représenté ainsi :</p>
+<table class="schema">
+<tr><td align="center"> NO </td><td align="center"> N </td><td align="center"> NE </td></tr>
+<tr><td align="center"> O  </td><td align="center">   </td><td align="center"> E  </td></tr>
+<tr><td align="center"> SO </td><td align="center"> S </td><td align="center"> SE </td></tr>
+</table>
+<table class="schema">
+<tr><td align="center"> <code><span class="number">0</code> </td><td align="center"> <code><span class="number">1</code> </td><td align="center"> <code><span class="number">2</code> </td></tr>
+<tr><td align="center"> <code><span class="number">7</code> </td><td align="center">       </td><td align="center"> <code><span class="number">3</code> </td></tr>
+<tr><td align="center"> <code><span class="number">4</code> </td><td align="center"> <code><span class="number">5</code> </td><td align="center"> <code><span class="number">6</code> </td></tr>
+</table>
+<table class="schema">
+<tr><td align="center"> <code><span class="number">1</code>  </td><td align="center"> <code><span class="number">2</code> </td><td align="center"> <code><span class="number">4</code> </td></tr>
+<tr><td align="center"> <code><span class="number">128</span></code></td><td align="center">       </td><td align="center"> <code><span class="number">8</code> </td></tr>
+<tr><td align="center"> <code><span class="number">16</span></code> </td><td align="center"> <code><span class="number">32</span></code></td><td align="center"> <code><span class="number">64</span></code></td></tr>
+</table>
+<p>La règle 2 dit que s'il y a un ou plusieurs carreaux influenceurs, ils seront tous du même type. Cela revient à un choix binaire, savoir si c'est le carreau est un influenceur ou pas. Il y a donc <b>2<sup>8</sup></b>, soit <code><span class="number">256</span></code>, possibilités. Pour un carreau, chaque possibilité de configuration des carreaux qui l'entourent est identifiée par un nombre qui est le résultat de l'addition de <b>2<sup>position</sup></b> pour chaque carreau influenceur. Les règles 3 et 4 suppriment de nombreuses combinaisons et réduisent à <code><span class="number">14</span></code> le nombre de textures nécessaires pour faire la transition entre eau et terre.</p>
+<h3 id="ii.c-exemples-de-configurations">II.C Exemples de configurations</h3>
+<p>À présent, passons aux exemples. Voici sept exemples de configurations de carreaux entourant le carreau central dont une interdite :</p>
 </div>
   </div>
 </body>
