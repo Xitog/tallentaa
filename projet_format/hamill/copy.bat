@@ -7,6 +7,7 @@ copy /Y /B .\output\informatique\tools_langs.html   ..\..\..\dgx\informatique\to
 copy /Y /B .\output\passetemps\pres_favoris.html    ..\..\..\dgx\passetemps\pres_favoris.html
 copy /Y /B .\output\passetemps\pres_jeux.html       ..\..\..\dgx\passetemps\pres_jeux.html
 copy /Y /B .\output\passetemps\pres_jeuxvideo.html  ..\..\..\dgx\passetemps\pres_jeuxvideo.html
+copy /Y /B .\output\passetemps\tech_dialogues.html  ..\..\..\dgx\passetemps\tech_dialogues.html
 copy /Y /B .\output\index.html                      ..\..\..\dgx\index.html
 copy /Y /B .\output\plan.html                       ..\..\..\dgx\plan.html
 copy /Y /B .\output\blog.html                       ..\..\..\dgx\blog.html

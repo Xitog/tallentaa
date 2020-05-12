@@ -307,6 +307,18 @@ def get(line):
     value = value.strip()
     return command, value
 
+LIST_STARTERS = {'* ': 'ul', '- ': 'ul', '% ': 'ol'}
+
+def count_list_level(line):
+    starter = line[0]
+    if starter + ' ' not in LIST_STARTERS:
+        raise Exception('Unknown list starter: ' + line[0] + ' in ' + line)
+    level = 0
+    while line.startswith(starter + ' '):
+        level += 1
+        line = line[2:]
+    return level, starter
+
 
 def to_html(input_name, output_name=None, default_lang=None):
     VAR_EXPORT_COMMENT=False
@@ -332,7 +344,6 @@ def to_html(input_name, output_name=None, default_lang=None):
         else:
             output_name = input_name + '.html'
 
-    list_level = []
     in_table = False
     links = {}
     inner_links = []
@@ -342,8 +353,6 @@ def to_html(input_name, output_name=None, default_lang=None):
     in_pre_block = False
     code_lang = None
     
-    list_starter = {'* ': 'ul', '- ': 'ul', '% ': 'ol'}
-
     # 1st Pass : prefetch links, replace special HTML char, skip comments
     # Empty line must be kept to separate lists!
     after = []
@@ -456,9 +465,13 @@ def to_html(input_name, output_name=None, default_lang=None):
         output.write(f'<body id="{CONST_BODY_ID}" class="{CONST_BODY_CLASS}">\n')
     output.write('  <div id="main" class="container">\n')
 
+    prev_level_list = []
+
     # 2nd Pass
-    for index, raw_line in enumerate(content):
-        line = raw_line
+    index = -1
+    while index < len(content) - 1:
+        index += 1
+        line = content[index]
         # Next line
         if index < len(content) - 2:
             next_line = content[index + 1]
@@ -577,45 +590,23 @@ def to_html(input_name, output_name=None, default_lang=None):
             output.write(line)
             continue
         # Liste
-        line_level = []
-        tested = line
-        to_cut = 0
-        # 3.8 while found := multi_start(tested, list_starter):
-        found = multi_start(tested, list_starter)
-        while found:
-            line_level.append(found)
-            tested = tested.replace(found, '', 1)
-            to_cut += len(found)
-            found = multi_start(tested, list_starter)
-        # reconciliation of lists: we must close before starting another
-        if len(line_level) > 0:
-            #if line == '- No':
-                #print('line:', line_level)
-                #print('file:', list_level)
-            for level in range(min(len(line_level), len(list_level))):
-                if list_level[level] != line_level[level]:
-                    # on dépile le dessus
-                    for after in range(len(list_level) - 1, level - 1, -1):
-                        output.write(f'</{list_starter[list_level[-1]]}>\n')
-                        list_level.pop()
-            if len(list_level) != len(line_level):
-                if len(line_level) >= len(list_level):
-                    # on ouvre pour rattraper le level de la ligne
-                    for level in range(len(list_level), len(line_level)):
-                        list_level.append(line_level[level])
-                        output.write(f'<{list_starter[list_level[-1]]}>\n')
-                else:
-                    # on ferme pour rattraper le level de la ligne
-                    for level in range(len(list_level) - 1, level, -1):
-                        output.write(f'</{list_starter[list_level[-1]]}>\n')
-                        list_level.pop()
-            line = '<li>' + escape(line[to_cut:]) + '</li>\n'
+        found = multi_start(line, LIST_STARTERS)
+        if found:
+            level, starter = count_list_level(line)
+            list_markup = LIST_STARTERS[starter + ' ']
+            while len(prev_level_list) < level :
+                output.write(f'<{list_markup}>\n')
+                prev_level_list.append(list_markup)
+            while len(prev_level_list) > level:
+                output.write(f'</{prev_level_list[-1]}>\n')
+                prev_level_list.pop()
+            line = '<li>' + escape(line[level * 2:]) + '</li>\n'
             output.write(line)
             continue
-        elif len(list_level) > 0:
-            for level in range(len(list_level) - 1, -1, -1):
-                output.write(f'</{list_starter[list_level[-1]]}>\n')
-                list_level.pop()
+        elif len(prev_level_list) > 0:
+            while len(prev_level_list) > 0:
+                output.write(f'</{prev_level_list[-1]}>\n')
+                prev_level_list.pop()
         # Table
         if len(line) > 0 and line[0] == '|':
             if not in_table:
@@ -676,10 +667,9 @@ def to_html(input_name, output_name=None, default_lang=None):
     if in_definition_list:
         output.write('</dl>\n')
     # Are some lists still open?
-    if len(list_level) > 0:
-        for level in range(len(list_level) - 1, -1, -1):
-            output.write(f'</{list_starter[list_level[-1]]}>\n')
-            list_level.pop()
+    while len(prev_level_list) > 0:
+        output.write(f'</{prev_level_list[-1]}>\n')
+        prev_level_list.pop()
     # Are a table still open?
     if in_table:
         output.write('</table>\n')
