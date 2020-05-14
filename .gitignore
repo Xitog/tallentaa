@@ -7,19 +7,14 @@ java/working_buffer.txt
 projet_format/yodata/output/*.png
 *.jar
 *.pyc
-*.jar
-*.pyc
 __pycache__
 *.obj
 *.exe
-*.exe
-projet_25D/(c) Lode Vandevenne/traductions/lua_love/raycaster_textured/Thumbs.db
+Thumbs.db
 projet_langue/tal/titres-FR-2017-10-20-01.tsv
 projet_langue/tal/titres-FR-2017-10-20-01.tsv.gz
 projets/compagnon_sorcier/.~Sorcier.vue
-assets/graphic/textures/woolfy_wall/freedoom/Thumbs.db
 web/Thumbs.db
-*.db
 *.db
 .DS_Store
 projet_tile_grid_editor/build

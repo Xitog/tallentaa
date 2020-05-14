@@ -1,0 +1,113 @@
+!const TITLE=Transitions
+!const ICON=https://xitog.github.io/dgx/img/favicon.ico
+!require https://xitog.github.io/dgx/css/simplex.bootstrap.css
+!require https://xitog.github.io/dgx/css/palatino.css
+!require https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
+!require https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js
+
+!css code {color: #006FDD; border: 1px solid rgb(225, 228, 229); padding-left: 3px; padding-right: 5px;}
+!css table.schema { display: inline-block; margin-right: 20px; }
+!css table.schema tr:nth-child(2n) { background-color: transparent; }
+
+!css table.extract { border-collapse: collapse; display: inline-block; }
+!css table.extract td { border: None; padding: 0px; text-align: center; }
+
+!include menu.html
+
+!html <div id="content-div">
+
+
+# Cartes de carreaux, Transitions et Variations
+---
+
+## Sommaire
+
+* [I. Un tableau comme carte->#]
+* [II. Un système de transition->#]
+* * [II.A Cinq règles de transitions->#]
+% % % [Hiérarchie d'influence->#]
+% % % [Unicité->#]
+% % % [Étau->#]
+% % % [Continuité->#]
+% % % [Coins en opposition->#]
+* * [II.B Système de numérotation->#]
+* * [II.C Exemples de configurations->#]
+* * [II.D Correspondances configuration-transition->#]
+* * [II.E Exemples de résultats->#]
+* [III. Variations->#]
+* [IV. Multitransitions->#]
+* [V. Historique->#]
+* [VI. Crédits->#]
+
+## I. Un tableau comme carte
+
+Le jeu @@WarCraft II@@ (1995) propose une vue de dessus d'une carte où se déroule la partie. Cette carte est stocké à l'aide d'un tableau. Chaque case du tableau contient une indication de textures à utiliser. Par exemple, une case peut contenir la valeur @@0@@, qui désigne de l'eau, ou @@1@@ de la terre. Prenons une carte de 5 cases en largeur et en hauteur, une taille que nous notons 5x5, et affichons la dans un premier temps avec des bordures délimitant chaque case (A) puis sans (B) :
+
+A. [!https://xitog.github.io/dgx/passetemps/graphics/transitions/img_1_no_trans_border.png] B. [!https://xitog.github.io/dgx/passetemps/graphics/transitions/img_2_no_trans_no_border.png] C. [!https://xitog.github.io/dgx/passetemps/graphics/transitions/img_3_spreadsheet_map.png]
+
+On voit que l'ensemble de la carte, qui comporte @@25@@ cases, ne fait que répéter deux textures. On peut ainsi décrire facilement de vastes étendues à partir de peu d'éléments. On appelle ses éléments d'après l'anglais ''**tiles**'', que l'on pourrait traduire par carreau ou tuile, et cette technique le ''**tiling**'', traduisible par carrelage. Une case du tableau correspond donc à un carreau. Pour construire et éditer une telle carte, on peut construire un éditeur de carte ou utiliser un simple tableur comme Microsoft Excel ou LibreOffice Calc. La même carte sous Excel se présenterait comme (C).
+
+Si on enlève les bordures de notre exemple (B), le résultat est déjà plus convaincant. Néanmoins, la transition de l'eau vers la terre est un peu abrupte, elle ne fait pas naturelle. Pour améliorer le résultat, on va créer un jeu de textures spéciales qui assureront des **transitions plus douces et naturelles**.
+
+## II. Un système de transition
+
+Nous allons établir un système de transition composé de :
+
+* cinq règles de transition et
+* un système de numérotation.
+
+### II.A Cinq règles de transitions
+
+Nous allons établir un ensemble de règles pour les transitions :
+
+% Première règle, on établit une __**[#hiérarchie d'influence]**__ : un carreau d'eau est **influencé** par un carreau de terre. C'est-à-dire que si un carreau jouxte un carreau de terre, c'est le carreau d'eau qui changera pour refléter une transition : sa texture d'eau simple sera remplacée par une texture de transition entre l'eau et la terre : on notera @@eau <== terre@@
+% Deuxième règle, celle d'__**[#unicité]**__ : **un carreau ne peut avoir autour de lui qu'un seul type d'influenceur**. On a vu que les carreaux d'eau sont influencés par les carreaux de terre. Imaginons un autre type de carreau, le sable, qui influence également l'eau. Un carreau d'eau ne pourra être entouré que d'un seul type d'influenceur dans sa proximité immédiate.
+% Troisième règle : celle de l'__**[#étau]**__ : un carreau ne peut avoir à sa gauche et à sa droite un carreau l'influençant en même temps. De même, un carreau ne peut avoir en haut et en bas un carreau l'influençant en même temps. Les configurations représentées ci-dessous sont donc interdites : !! [!https://xitog.github.io/dgx/passetemps/graphics/transitions/img_4_vice.png]
+% Quatrième règle, celle de la __**[#continuité]**__ : **Les carreaux influenceurs doivent être consécutifs. Toutes les configurations discontinues sont interdites** comme : !! [!https://xitog.github.io/dgx/passetemps/graphics/transitions/img_5_continuity.png]
+% Cinquième règle, qui est une exception à la quatrième, est celle des __**[#coins en opposition]**__ : la configuration où deux coins en opposition sont des influenceurs et ceux sont les seuls influenceurs est autorisée. Cela concerne les deux configurations ci-dessous : !! [!https://xitog.github.io/dgx/passetemps/graphics/transitions/img_6_opposing_corners.png]
+
+!var NEXT_TAB_CLASS = extract
+
+!var DEFAULT_FIND_IMAGE = https://xitog.github.io/dgx/passetemps/graphics/transitions/base/
+
+|[!mud-1.png]|
+|[!water-1.png]|
+|[!water-1.png]|
+
+!var DEFAULT_FIND_IMAGE = reset
+
+### II.B Système de numérotation
+
+Un carreau est entouré de @@8@@ autres carreaux. Nous les notons et les numérotons comme ci-dessous, en partant du carreau en haut à gauche et en les parcourant dans le sens horaire :
+
+|Carreau    |Nord-Ouest    |Nord     |Nord-Est    |Est     |Sud-Est  |Sud      |Sud-Ouest |Ouest     |
+|----------------------------------------------------------------------------------------------------|
+|Code       |=   NO        |= N      |=  NE       |= E     |=   SE   |= S      |=   SO    |=    O    |
+|Numéro     |=   @@0@@     |= @@1@@  |=  @@2@@    |= @@3@@ |=  @@4@@ |= @@5@@  |=  @@6@@  |=  @@7@@  |
+|2^^Numéro^^|=   @@1@@     |= @@2@@  |=  @@4@@    |= @@8@@ |= @@16@@ |= @@32@@ |= @@64@@  |= @@128@@ |
+
+Autrement représenté ainsi :
+
+!var DEFAULT_TAB_CLASS = schema
+
+|= NO |= N |= NE |
+|= O  |=   |= E  |
+|= SO |= S |= SE |
+
+|= @@0@@ |= @@1@@ |= @@2@@ |
+|= @@7@@ |=       |= @@3@@ |
+|= @@4@@ |= @@5@@ |= @@6@@ |
+
+|= @@1@@  |= @@2@@ |= @@4@@ |
+|= @@128@@|=       |= @@8@@ |
+|= @@16@@ |= @@32@@|= @@64@@|
+
+!var DEFAULT_TAB_CLASS = reset
+
+La règle 2 dit que s'il y a un ou plusieurs carreaux influenceurs, ils seront tous du même type. Cela revient à un choix binaire, savoir si c'est le carreau est un influenceur ou pas. Il y a donc **2^^8^^**, soit @@256@@, possibilités. Pour un carreau, chaque possibilité de configuration des carreaux qui l'entourent est identifiée par un nombre qui est le résultat de l'addition de **2^^position^^** pour chaque carreau influenceur. Les règles 3 et 4 suppriment de nombreuses combinaisons et réduisent à @@14@@ le nombre de textures nécessaires pour faire la transition entre eau et terre.
+
+### II.C Exemples de configurations
+
+À présent, passons aux exemples. Voici sept exemples de configurations de carreaux entourant le carreau central dont une interdite :
+
+!html </div>
