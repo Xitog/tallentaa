@@ -10,7 +10,7 @@
 
 !include menu.html
 
-!html <div id="content-div">
+{{content-div}}
 
 # Dialogues
 ---
@@ -118,4 +118,4 @@ Ce système de dialogue doit être pensé pour être facilement internationalisa
 
 ## III. Crédits
 
-!html </div>
+{{end}}

@@ -8,7 +8,7 @@
 
 !include menu.html
 
-!html <div id="content-div">
+{{content-div}}
 
 # Tools & Languages
 ---
@@ -252,4 +252,4 @@ $ Compile
 
 * [GitHub Pages->https://pages.github.com/]
 
-!html </div>
+{{end}}

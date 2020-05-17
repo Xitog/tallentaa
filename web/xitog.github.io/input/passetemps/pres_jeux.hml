@@ -7,7 +7,7 @@
 
 !include menu.html
 
-!html <div id="content-div">
+{{content-div}}
 
 # Jeux
 ---
@@ -99,4 +99,4 @@ J'ai beaucoup étudié les règles du jeu ''[Star Wars D20]'', qui n'existait qu
 
 Les jeux vidéo ont leur [propre page->https://xitog.github.io/dgx/passetemps/pres_jeuxvideo.html].
 
-!html </div>
+{{end}}

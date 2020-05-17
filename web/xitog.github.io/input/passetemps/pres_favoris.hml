@@ -7,7 +7,7 @@
 
 !include menu.html
 
-!html <div id="content-div">
+{{content-div}}
 
 # Favoris
 ---
@@ -132,4 +132,4 @@ On note quelques récurrences intéressantes parmi les films archicultes :
 * * * Seraphim, Dead Can Dance
 * * * Mr PT1000, Soap & Skin
 
-!html </div>
+{{end}}

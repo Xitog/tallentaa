@@ -7,7 +7,7 @@
 
 !include menu.html
 
-!html <div id="content-div">
+{{content-div}}
 
 # La France au 19ème siècle
 ---
@@ -257,4 +257,4 @@ Mœurs copiées par les bourgeois.
 
 [http://www.19e.org]
 
-!html </div>
+{{end}}

@@ -12,11 +12,11 @@
 
 !include menu.html
 
-!html <div class="jumbotron">
+{{.jumbotron}}
 
 # Blog
 ---
 
 Quite empty, isn't it?
 
-!html </div>
+{{end}}

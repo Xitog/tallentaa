@@ -28,9 +28,9 @@
 """
 
 # Version of the hamill package
-__version__ = "0.1.1"
+__version__ = "0.1.9"
 
 # Imports
 from hamill.log import *
 from hamill.tokenizer import *
-from hamill.hamill import process
+from hamill.hamill import process, process_dir, process_file, process_lines, process_string

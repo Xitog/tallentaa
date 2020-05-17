@@ -90,7 +90,7 @@ def escape(line):
             next_char = line[index_char + 1]
         else:
             next_char = None
-        if char == '\\' and next_char in ['*', "'", '^', '-', '_', '[', '@', '%', '!']:
+        if char == '\\' and next_char in ['*', "'", '^', '-', '_', '[', '@', '%', '!', '|', '{']:
             new_line += next_char
             index_char += 2    
         else:
@@ -153,7 +153,7 @@ def make_id(string):
     """Translate : A simple Title -> a_simple_title"""
     return string.replace(' ', '-').lower()
 
-def write_code(line, code_lang, output=None):
+def write_code(line, code_lang):
     tokens = tokenize(line, code_lang)
     tokens_by_index = {}
     next_stop = None
@@ -169,10 +169,7 @@ def write_code(line, code_lang, output=None):
             string += f'{char}</span>'
         else:
             string += safe(char)
-    if output is not None and hasattr(output, 'write'):
-        output.write(string)
-    else:
-        return string
+    return string
 
 #-------------------------------------------------------------------------------
 # Processors
@@ -194,7 +191,19 @@ def prev_next(line, index):
     return _prev, _next, _prev_prev
 
 
-def translate(line, links, inner_links, DEFAULT_CODE, DEFAULT_FIND_IMAGE=None):
+def find_unscaped(line, start, motif):
+    index = start
+    while index < len(line):
+        found = line.find(motif, index)
+        if found != -1 and line[found - 1] != '\\':
+            return found
+        else:
+            index = found + len(motif)
+    return -1
+
+def process_string(line, links=None, inner_links=None, DEFAULT_CODE='text', DEFAULT_FIND_IMAGE=None):
+    links = {} if links is None else links
+    inner_links = [] if inner_links is None else inner_links
     new_line = ''
     in_bold = False
     in_italic = False
@@ -208,13 +217,28 @@ def translate(line, links, inner_links, DEFAULT_CODE, DEFAULT_FIND_IMAGE=None):
         char_index += 1
         char = line[char_index]
         prev_char, next_char, prev_prev_char = prev_next(line, char_index)
+        # Paragraph et span class (div class are handled elsewhere)
+        if char == '{' and next_char == '{' and prev_char != '\\':
+            continue
+        if char == '{' and prev_char == '{' and prev_prev_char != '\\':
+            ending = line.find('}}', char_index)
+            content = line[char_index + 1:ending]
+            if ' ' in content:
+                cls, txt = content.split(' ')
+                new_line += f'<span class="{cls}">{txt}</span>'
+                char_index = ending + 1
+                continue
+            else:
+                new_line += f'<span>{content}</span>'
+                char_index = ending + 1
+                continue
         # Link
         if char == '[' and next_char == '#' and prev_char != '\\': # [# ... ] inner link
             ending = line.find(']', char_index)
             if ending != -1:
                 link_name = line[char_index + 2:ending]
                 id_link = make_id(link_name)
-                new_line += f'<span id="{id_link}">' + link_name + '</span>'
+                new_line += f'<span id="{id_link}">{link_name}</span>'
                 char_index = ending
                 continue
         elif char == '[' and next_char == '!' and prev_char != '\\': # [! ... ] image
@@ -233,7 +257,7 @@ def translate(line, links, inner_links, DEFAULT_CODE, DEFAULT_FIND_IMAGE=None):
                 link = line[char_index + 1:ending]
                 if link not in links and link.find('->') != -1:
                     link_name, link = link.split('->', 1)
-                    link_name = translate(link_name, links, inner_links, DEFAULT_CODE)
+                    link_name = process_string(link_name, links, inner_links, DEFAULT_CODE)
                 else:
                     link_name = link
                 # check if we have registered this link
@@ -314,24 +338,18 @@ def translate(line, links, inner_links, DEFAULT_CODE, DEFAULT_FIND_IMAGE=None):
         if char == '@' and next_char == '@' and prev_char != '\\':
             continue
         if char == '@' and prev_char == '@' and prev_prev_char != '\\':
-            if not in_code:
-                new_line += '<code>'
-                in_code = True
-                code = ''
+            ending = find_unscaped(line, char_index, '@@')
+            code = line[char_index + 1:ending]
+            length = len(code) + 2
+            s = multi_start(code, RECOGNIZED_LANGUAGES)
+            if s is not None:
+                code = code.replace(s, '', 1) # delete
             else:
-                s = multi_start(code, RECOGNIZED_LANGUAGES)
-                if s is not None:
-                    code = code.replace(s, '', 1) # delete
-                else:
-                    s = DEFAULT_CODE
-                new_line += write_code(code, s)
-                new_line += '</code>'
-                in_code = False
+                s = DEFAULT_CODE
+            new_line += '<code>' + write_code(code, s) + '</code>'
+            char_index += length
             continue
-        if in_code:
-            code += char
-        else:
-            new_line += char
+        new_line += char
     return new_line
 
 
@@ -349,17 +367,185 @@ def get(line):
 LIST_STARTERS = {'* ': 'ul', '- ': 'ul', '% ': 'ol'}
 
 def count_list_level(line):
+    """Return the level of the list, the kind of starter and if it is
+       a continuity of a previous level."""
     starter = line[0]
     if starter + ' ' not in LIST_STARTERS:
         raise Exception('Unknown list starter: ' + line[0] + ' in ' + line)
     level = 0
+    continuity = False
     while line.startswith(starter + ' '):
         level += 1
         line = line[2:]
-    return level, starter
+    if line.startswith('| '):
+        level += 1
+        continuity = True
+    return level, starter, continuity
 
 
-def to_html(input_name, output_name=None, default_lang=None, includes=None):
+class Result:
+
+    def __init__(self, default_lang, default_encoding='utf-8'):
+        self.constants = {}
+        self.lines = []
+        self.header_links = []
+        self.header_css = []
+        self.constants['TITLE'] = None
+        self.constants['ENCODING'] = default_encoding
+        self.constants['LANG'] = default_lang
+        self.constants['ICON'] = None
+        self.constants['BODY_CLASS'] = None
+        self.constants['BODY_ID'] = None
+
+    def __getitem__(self, key):
+        if isinstance(key, str):
+            return self.constants[key]
+
+    def __setitem__(self, key, value):
+        if isinstance(key, str):
+            self.constants[key] = value
+
+    def append(self, line):
+        self.lines.append(line)
+
+    def __iter__(self):
+        for line in self.lines:
+            yield line
+
+    def __str__(self):
+        return ''.join(self.lines)
+
+
+def process_file(input_name, output_name=None, default_lang=None, includes=None):
+    info('Processing file:', input_name)
+    if not os.path.isfile(input_name):
+        raise Exception('Process_file: Invalid source file: ' + str(input_name))
+    source = open(input_name, mode='r', encoding='utf8')
+    content = source.readlines()
+    source.close()
+
+    result = process_lines(content, default_lang, includes)
+
+    if output_name is None:
+        if input_name.endswith('.hml'):
+            output_name = input_name.replace('.hml', '.html')
+        else:
+            output_name = input_name + '.html'
+    output = open(output_name, mode='w', encoding='utf8')
+
+    # Header
+    if result["LANG"] is not None:
+        output.write(f'<html lang="{result["LANG"]}">\n')
+    else:
+        output.write(f'<html>\n')
+    output.write('<head>\n')
+    output.write(f'  <meta charset={result["ENCODING"]}>\n')
+    output.write('  <meta http-equiv="X-UA-Compatible" content="IE=edge">\n')
+    output.write('  <meta name="viewport" content="width=device-width, initial-scale=1">\n')
+    if result["TITLE"] is not None:
+        output.write(f'  <title>{result["TITLE"]}</title>\n')
+    if result["ICON"] is not None:
+        output.write(f'  <link rel="icon" href="{result["ICON"]}" type="image/x-icon" />\n')
+        output.write(f'  <link rel="shortcut icon" href="{result["ICON"]}" type="image/x-icon" />\n')
+
+    # Should I put script in head?
+    for line in result.header_links:
+        output.write(line)
+    # Inline CSS
+    for line in result.header_css:
+        output.write('<style type="text/css">\n')
+        output.write(line + '\n')
+        output.write('</style>\n')
+
+    output.write('</head>\n')
+
+    if result["BODY_CLASS"] is None and result["BODY_ID"] is None:
+        output.write('<body>\n')
+    elif result["BODY_ID"] is None:
+        output.write(f'<body class="{result["BODY_CLASS"]}">\n')
+    elif result["BODY_CLASS"] is None:
+        output.write(f'<body id="{result["BODY_ID"]}">\n')
+    else:
+        output.write(f'<body id="{result["BODY_ID"]}" class="{result["BODY_CLASS"]}">\n')
+    output.write('  <div id="main" class="container">\n')
+
+    for line in result:
+        output.write(line)
+
+    # Do we have registered lines to write at the end?
+    output.write('  </div>\n')
+    output.write('</body>')
+    output.close()
+
+
+def output_list(result, list_array):
+    heap = []
+    closed = False
+    for index in range(len(list_array)):
+        elem = list_array[index]
+        level = elem['level']
+        starter = LIST_STARTERS[elem['starter'] + ' ']
+        line = elem['line']
+        cont = elem['cont']
+        # Iterate
+        if index > 0:
+            prev_level = list_array[index - 1]['level']
+        else:
+            prev_level = None
+        if index < len(list_array) - 1:
+            next_level = list_array[index + 1]['level']
+            next_cont = list_array[index + 1]['cont']
+        else:
+            next_level = None
+            next_cont = None
+        # Output
+        if prev_level is None or level > prev_level:
+            start = 0 if prev_level is None else prev_level
+            for current in range(start, level):
+                result.append('    ' * current + f'<{starter}>\n')
+                heap.append(starter)
+                if current < level - 1:
+                    result.append('    ' * current + f'  <li>\n')
+        elif prev_level == level:
+            current = level - 1
+            if not closed and not cont:
+                    result.append('    ' * current + '  </li>\n')
+        elif level < prev_level:
+            start = prev_level
+            for current in range(start, level, -1):
+                starter = heap[-1]
+                if current != start:
+                    result.append('    ' * (current - 1) + '  </li>\n')
+                result.append('    ' * (current - 1) + f'</{starter}>\n')
+                heap.pop()
+            current -= 2
+            result.append('    ' * current + '  </li>\n')
+        # Line
+        s = '    ' * current + '  '
+        if cont:
+            s += '<br>'
+        else:
+            s += '<li>'
+        s += line
+        if (next_level is None or next_level <= level) and not (next_level == level and next_cont):
+            s += '</li>\n'
+            closed = True
+        #elif next_cont is not None and not next_cont)
+        else:
+            s += '\n'
+            closed = False
+        result.append(s)
+    if len(heap) > 0:
+        while len(heap) > 0:
+            starter = heap[-1]
+            if not closed:
+                result.append('    ' * (len(heap) - 1) + '  </li>\n')
+            result.append('    ' * (len(heap) - 1) + f'</{starter}>\n')
+            closed = False
+            heap.pop()
+
+
+def process_lines(lines, default_lang=None, includes=None):
     VAR_EXPORT_COMMENT=False
     VAR_DEFINITION_AS_PARAGRAPH=False
     VAR_DEFAULT_CODE='text'
@@ -368,24 +554,8 @@ def to_html(input_name, output_name=None, default_lang=None, includes=None):
     VAR_NEXT_PAR_CLASS=None
     VAR_NEXT_TAB_CLASS=None
     VAR_DEFAULT_FIND_IMAGE=None
-    # HTML Parameters
-    CONST_TITLE = None
-    CONST_ENCODING = 'utf-8'
-    CONST_LANG = default_lang
-    CONST_ICON = None
-    CONST_BODY_CLASS = None
-    CONST_BODY_ID = None
-    
-    source = open(input_name, mode='r', encoding='utf8')
-    content = source.readlines()
-    source.close()
-
-    if output_name is None:
-        if input_name.endswith('.hml'):
-            output_name = input_name.replace('.hml', '.html')
-        else:
-            output_name = input_name + '.html'
-
+    # The 6 HTML constants are defined in Result class
+    result = Result(default_lang)
     in_table = False
     links = {}
     inner_links = []
@@ -398,32 +568,30 @@ def to_html(input_name, output_name=None, default_lang=None, includes=None):
     # 1st Pass : prefetch links, replace special HTML char, skip comments
     # Empty line must be kept to separate lists!
     after = []
-    link_to_put_in_head = []
-    css_to_put_in_head = []
-    for line in content:
+    for line in lines:
         # Constant must be read first, are defined once, anywhere in the doc
         if line.startswith('!const '):
             command, value = get(line)
             if command == 'TITLE':
-                CONST_TITLE = value
+                result["TITLE"] = value
             elif command == 'ENCODING':
-                CONST_ENCODING = value
+                result["ENCODING"] = value
             elif command == 'ICON':
-                CONST_ICON = value
+                result["ICON"] = value
             elif command == 'LANG':
-                CONST_LANG = value
+                result["LANG"] = value
             elif command == 'BODY_CLASS':
-                CONST_BODY_CLASS = value
+                results["BODY_CLASS"] = value
             elif command == 'BODY_ID':
-                CONST_BODY_ID = value
+                result["BODY_ID"] = value
             else:
                 raise Exception('Unknown constant: ' + command + 'with value= ' + value)
         elif line.startswith('!require ') and line.strip().endswith('.css'):
             required = line.replace('!require ', '', 1).strip()
-            link_to_put_in_head.append(f'  <link href="{required}" rel="stylesheet">\n')
+            result.header_links.append(f'  <link href="{required}" rel="stylesheet">\n')
         # Inline CSS
         elif line.startswith('!css '):
-            css_to_put_in_head.append(line.replace('!css ', '', 1).strip())
+            result.header_css.append(line.replace('!css ', '', 1).strip())
         else:
             # Block of code
             if len(line) > 2 and line[0:3] == '@@@':
@@ -471,44 +639,8 @@ def to_html(input_name, output_name=None, default_lang=None, includes=None):
     content = after
     
     # Start of output
-    output = open(output_name, mode='w', encoding='utf8')
-    if CONST_LANG is not None:
-        output.write(f'<html lang="{CONST_LANG}">\n')
-    else:
-        output.write(f'<html>\n')
-    output.write('<head>\n')
-    output.write(f'  <meta charset={CONST_ENCODING}>\n')
-    output.write('  <meta http-equiv="X-UA-Compatible" content="IE=edge">\n')
-    output.write('  <meta name="viewport" content="width=device-width, initial-scale=1">\n')
-    if CONST_TITLE is not None:
-        output.write(f'  <title>{CONST_TITLE}</title>\n')
-    if CONST_ICON is not None:
-        output.write(f'  <link rel="icon" href="{CONST_ICON}" type="image/x-icon" />\n')
-        output.write(f'  <link rel="shortcut icon" href="{CONST_ICON}" type="image/x-icon" />\n')
-
-    # should I put script in head?
-    for line in link_to_put_in_head:
-        output.write(line)
-    # Inline CSS
-    for line in css_to_put_in_head:
-        output.write('<style type="text/css">\n')
-        output.write(line + '\n')
-        output.write('</style>\n')
-        
-    output.write('</head>\n')
-
-    if CONST_BODY_CLASS is None and CONST_BODY_ID is None:
-        output.write('<body>\n')
-    elif CONST_BODY_ID is None:
-        output.write(f'<body class="{CONST_BODY_CLASS}">\n')
-    elif CONST_BODY_CLASS is None:
-        output.write(f'<body id="{CONST_BODY_ID}">\n')
-    else:
-        output.write(f'<body id="{CONST_BODY_ID}" class="{CONST_BODY_CLASS}">\n')
-    output.write('  <div id="main" class="container">\n')
-
-    prev_level_list = []
-
+    list_array = []
+    
     # 2nd Pass
     index = -1
     while index < len(content) - 1:
@@ -554,7 +686,7 @@ def to_html(input_name, output_name=None, default_lang=None, includes=None):
         if line.startswith('--') and line.count('-') != len(line):
             if VAR_EXPORT_COMMENT:
                 line = line.replace('--', '<!--', 1) + ' -->'
-                output.write(line + '\n')    
+                result.append(line + '\n')    
             else:
                 continue
             continue
@@ -562,7 +694,7 @@ def to_html(input_name, output_name=None, default_lang=None, includes=None):
         if line.startswith('!require '):
             required = line.replace('!require ', '', 1)
             if required.endswith('.js'):
-                output.write(f'  <script src="{required}"></script>\n')
+                result.append(f'  <script src="{required}"></script>\n')
             else:
                 raise Exception("I don't known how to handle this file: " + required)
             continue
@@ -578,7 +710,7 @@ def to_html(input_name, output_name=None, default_lang=None, includes=None):
                     file = open(filepath, mode='r', encoding='utf8')
                     file_content = file.read()
                     file.close()
-                    output.write(file_content + '\n')
+                    result.append(file_content + '\n')
                 else:
                     warn('Included file', included, 'not found in includes.')
             else:
@@ -586,12 +718,12 @@ def to_html(input_name, output_name=None, default_lang=None, includes=None):
             continue
         # Inline HTML
         if line.startswith('!html '):
-            output.write(line.replace('!html ', '', 1) + '\n')
+            result.append(line.replace('!html ', '', 1) + '\n')
             continue
         # HR
         if line.startswith('---'):
             if line.count('-') == len(line):
-                output.write('<hr>\n')
+                result.append('<hr>\n')
                 continue
         # BR
         if line.find(' !! ') != -1:
@@ -599,82 +731,87 @@ def to_html(input_name, output_name=None, default_lang=None, includes=None):
         # Block of pre
         if line.startswith('>>'):
             if not in_pre_block:
-                output.write('<pre>\n')
+                result.append('<pre>\n')
                 in_pre_block = True
             line = escape(line[2:])
-            output.write(line + '\n')
+            result.append(line + '\n')
             continue
         elif in_pre_block:
-            output.write('</pre>\n')
+            result.append('</pre>\n')
             in_pre_block = False
         # Block of code 1
         if len(line) > 2 and line[0:3] == '@@@':
             if not in_code_free_block:
-                output.write('<pre class="code">\n')
+                result.append('<pre class="code">\n')
                 in_code_free_block = True
                 code_lang = line.replace('@@@', '', 1).strip()
                 if len(code_lang) == 0:
                     code_lang = VAR_DEFAULT_CODE
             else:
-                output.write('</pre>\n')
+                result.append('</pre>\n')
                 in_code_free_block = False
             continue 
         # Block of code 2
         if line.startswith('@@') and (len(line.strip()) == 2 or line[2] != '@'):
             if not in_code_block:
-                output.write('<pre class="code">\n')
+                result.append('<pre class="code">\n')
                 in_code_block = True
                 code_lang = line.replace('@@', '', 1).strip()
                 if len(code_lang) == 0:
                     code_lang = VAR_DEFAULT_CODE
                 continue
         elif in_code_block:
-            output.write('</pre>\n')
+            result.append('</pre>\n')
             in_code_block = False
         if in_code_free_block or in_code_block:
             if in_code_block:
                 line = line[2:] # remove starting @@
-            write_code(line, code_lang, output)
-            # output.write('\n')
+            result.append(write_code(line, code_lang))
+            continue
+        # Div
+        if line.startswith('{{') and line.endswith('}}'):
+            cls = line[2:-2]
+            if cls == 'end':
+                result.append('</div>\n')
+            elif cls[0] == '.':
+                result.append(f'<div class="{cls[1:]}">\n')
+            else:
+                result.append(f'<div id="{cls}">\n')
             continue
         # Bold & Italic & Strikethrough & Underline & Power
-        if multi_find(line, ('**', '--', '__', '^^', "''", "[", '@@')) and \
+        if multi_find(line, ('**', '--', '__', '^^', "''", "[", '@@', '{{')) and \
            not line.startswith('|-'):
-            line = translate(line, links, inner_links, VAR_DEFAULT_CODE, VAR_DEFAULT_FIND_IMAGE)
+            line = process_string(line, links, inner_links, VAR_DEFAULT_CODE, VAR_DEFAULT_FIND_IMAGE)
         # Title
         nb, title, id_title = find_title(line)
         if nb > 0:
             line = f'<h{nb} id="{id_title}">{title}</h{nb}>\n'
-            output.write(line)
+            result.append(line)
             continue
         # Liste
         found = multi_start(line, LIST_STARTERS)
         if found:
-            level, starter = count_list_level(line)
-            list_markup = LIST_STARTERS[starter + ' ']
-            while len(prev_level_list) < level :
-                output.write(f'<{list_markup}>\n')
-                prev_level_list.append(list_markup)
-            while len(prev_level_list) > level:
-                output.write(f'</{prev_level_list[-1]}>\n')
-                prev_level_list.pop()
-            line = '<li>' + escape(line[level * 2:]) + '</li>\n'
-            output.write(line)
+            level, starter, cont = count_list_level(line)
+            list_array.append({'level': level, 'starter': starter, 'line': escape(line[level * 2:]), 'cont': cont})
             continue
-        elif len(prev_level_list) > 0:
-            while len(prev_level_list) > 0:
-                output.write(f'</{prev_level_list[-1]}>\n')
-                prev_level_list.pop()
+        elif len(list_array) > 0 and len(line) > 0 and line[0] == '|':
+            level = list_array[-1]['level']
+            starter = list_array[-1]['starter']
+            list_array.append({'level': level, 'starter': starter, 'line': escape(line[2:]), 'cont': True})
+            continue
+        elif len(list_array) > 0:
+            output_list(result, list_array)
+            list_array = []
         # Table
         if len(line) > 0 and line[0] == '|':
             if not in_table:
                 if VAR_DEFAULT_TAB_CLASS is not None:
-                    output.write(f'<table class="{VAR_DEFAULT_TAB_CLASS}">\n')
+                    result.append(f'<table class="{VAR_DEFAULT_TAB_CLASS}">\n')
                 elif VAR_NEXT_TAB_CLASS is not None:
-                    output.write(f'<table class="{VAR_NEXT_TAB_CLASS}">\n')
+                    result.append(f'<table class="{VAR_NEXT_TAB_CLASS}">\n')
                     VAR_NEXT_TAB_CLASS = None
                 else:
-                    output.write('<table>\n')
+                    result.append('<table>\n')
                 in_table = True
             if next_line is not None and next_line.startswith('|-'):
                 element = 'th'
@@ -686,7 +823,7 @@ def to_html(input_name, output_name=None, default_lang=None, includes=None):
                 if len(col.replace('-', '').strip()) != 0:
                     skip = False
             if not skip:
-                output.write('<tr>')
+                result.append('<tr>')
                 for col in columns:
                     if col != '': # center or right-align
                         if col[0] == '>':
@@ -697,98 +834,99 @@ def to_html(input_name, output_name=None, default_lang=None, includes=None):
                             col = col[1:]
                         else:
                             align = ''
-                        val = translate(escape(col), links, inner_links, VAR_DEFAULT_CODE, VAR_DEFAULT_FIND_IMAGE)
-                        output.write(f'<{element}{align}>{val}</{element}>')
-                output.write('</tr>\n')
+                        val = process_string(escape(col), links, inner_links, VAR_DEFAULT_CODE, VAR_DEFAULT_FIND_IMAGE)
+                        result.append(f'<{element}{align}>{val}</{element}>')
+                result.append('</tr>\n')
             continue
         elif in_table:
-            output.write('</table>\n')
+            result.append('</table>\n')
             in_table = False
         # Definition list
         if line.startswith('$ '):
             if not in_definition_list:
                 in_definition_list = True
-                output.write('<dl>\n')
+                result.append('<dl>\n')
             else:
-                output.write('</dd>\n')
-            output.write(f'<dt>{line.replace("$ ", "", 1)}</dt>\n<dd>\n')
+                result.append('</dd>\n')
+            result.append(f'<dt>{line.replace("$ ", "", 1)}</dt>\n<dd>\n')
             continue
         elif len(line) != 0 and in_definition_list:
             if not VAR_DEFINITION_AS_PARAGRAPH:
-                output.write(escape(line) +'\n')
+                result.append(escape(line) +'\n')
             else:
-                output.write('<p>' + escape(line) +'</p>\n')
+                result.append('<p>' + escape(line) +'</p>\n')
             continue
         # empty line
         elif len(line) == 0 and in_definition_list:
             in_definition_list = False
-            output.write('</dl>\n')
+            result.append('</dl>\n')
             continue
         # Replace escaped char
         line = escape(line)
         # Paragraph
         if len(line) > 0:
             if VAR_DEFAULT_PAR_CLASS is not None:
-                output.write(f'<p class="{VAR_DEFAULT_PAR_CLASS}">' + line.strip() + '</p>\n')
+                result.append(f'<p class="{VAR_DEFAULT_PAR_CLASS}">' + line.strip() + '</p>\n')
             elif VAR_NEXT_PAR_CLASS is not None:
-                output.write(f'<p class="{VAR_NEXT_PAR_CLASS}">' + line.strip() + '</p>\n')
+                result.append(f'<p class="{VAR_NEXT_PAR_CLASS}">' + line.strip() + '</p>\n')
                 VAR_NEXT_PAR_CLASS = None
             else:
-                output.write('<p>' + line.strip() + '</p>\n')
+                result.append('<p>' + line.strip() + '</p>\n')
     # Are a definition list still open?
     if in_definition_list:
-        output.write('</dl>\n')
+        result.append('</dl>\n')
     # Are some lists still open?
-    while len(prev_level_list) > 0:
-        output.write(f'</{prev_level_list[-1]}>\n')
-        prev_level_list.pop()
+    if len(list_array) > 0:
+        output_list(result, list_array)
     # Are a table still open?
     if in_table:
-        output.write('</table>\n')
+        result.append('</table>\n')
         in_table = False
     # Are we stil in in_pre_block?
     if in_pre_block:
-        output.write('</pre>')
+        result.append('</pre>')
     # Are we still in in_code_block?
     if in_code_block:
-        output.write('</pre>')
-    # Do we have registered lines to write at the end?
-    output.write('  </div>\n')
-    #for line in final_lines:
-    #    output.write(line)
-    output.write('</body>')
-    output.close()
+        result.append('</pre>')
+    return result
+
 
 #-------------------------------------------------------------------------------
 # Main functions
 #-------------------------------------------------------------------------------
 
-def process(source, dest, default_lang=None, includes=None):
-    """Process a file or directory :
+
+def process_dir(source, dest, default_lang=None, includes=None):
+    """Process a directory:
             - If it is a .hml file, it is translated in HTML
             - Else the file is copied into the new directory
        The destination directory is systematically DELETED at each run.
     """
+    info('Processing directory:', source)
+    if not os.path.isdir(source):
+        raise Exception('Process_dir: Invalid source directory: ' + str(source))
+    if os.path.isdir(dest):
+        shutil.rmtree(dest)
+    info('Making dir:', dest)
+    os.mkdir(dest)
+    for name_ext in os.listdir(source):
+        path = os.path.join(source, name_ext)
+        if os.path.isfile(path):
+            name, ext = os.path.splitext(name_ext)
+            if ext == '.hml':
+                process_file(path, os.path.join(dest, name + '.html'), default_lang, includes)
+            else:
+                info('Copying file:', path)
+                shutil.copy2(path, os.path.join(dest, name_ext))
+        elif os.path.isdir(path):
+            process_dir(path, os.path.join(dest, name_ext), default_lang, includes)
+
+
+def process(source, dest, default_lang=None, includes=None):
+    """Process a file or directory"""
     if os.path.isfile(source):
-        info('Processing file:', source)
-        to_html(source, dest, default_lang, includes)
+        process_file(source, dest, default_lang, includes)
     elif os.path.isdir(source):
-        info('Processing directory:', source)
-        if os.path.isdir(dest):
-            shutil.rmtree(dest)
-        info('Making dir:', dest)
-        os.mkdir(dest)
-        for name_ext in os.listdir(source):
-            path = os.path.join(source, name_ext)
-            if os.path.isfile(path):
-                name, ext = os.path.splitext(name_ext)
-                if ext == '.hml':
-                    info('Processing file:', path)
-                    to_html(path, os.path.join(dest, name + '.html'), default_lang, includes)
-                else:
-                    info('Copying file:', path)
-                    shutil.copy2(path, os.path.join(dest, name_ext))
-            elif os.path.isdir(path):
-                process(path, os.path.join(dest, name_ext), default_lang, includes)
+        process_dir(source, dest, default_lang, includes)
     else:
-        warn(source, 'not found.')
+        warn('Process:', source, 'not found.')

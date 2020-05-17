@@ -10,7 +10,7 @@
 
 !include menu.html
 
-!html <div id="content-div">
+{{content-div}}
 
 # Méthodologie d'Histoire
 ---
@@ -138,4 +138,4 @@ Pas de téléologie ! (interpréter un évènement passé en fonction de ce qui 
 
 Mais mise en perspective par rapport aux autres pays, au caractère exceptionnel ou banal, changement décisif ou prolongation ou amplification de qqchose de plus ancien ?
 
-!html </div>
+{{end}}

@@ -13,7 +13,7 @@
 
 !include menu.html
 
-!html <div id="content-div">
+{{content-div}}
 
 #Sommaire
 
@@ -179,7 +179,7 @@ Quelque chose qui m'a toujours intéressé, c'est la musique des jeux vidéo. Vo
 [4]: https://en.wikipedia.org/wiki/Wacky_Wheels
 [5]: https://fr.wikipedia.org/wiki/Woodruff_et_le_Schnibble_d%27Azimuth
 
-!html </div>
+{{end}}
 
 -- Wolfenstein 3D       5 mai 1992
 -- Doom                10 décembre 1993

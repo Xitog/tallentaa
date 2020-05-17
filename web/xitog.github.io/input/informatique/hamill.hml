@@ -7,7 +7,7 @@
 
 !include menu.html
 
-!html <div id="content-div">
+{{content-div}}
 
 # Hamill
 ---
@@ -35,6 +35,13 @@ On peut forcer un retour à la ligne avec \!\! entouré d'un espace : ceci est u
 * \-\---barré--\-\- : pour barré
 * \_\___souligné__\_\_ : pour souligner
 * \^\^^^exposant^^\^\^ : pour mettre en exposant
+
+## Div et span
+
+* @@{{class}}@@ : sur une ligne, seule, permet de définir une div de la classe donnée.
+* @@{{end}}@@ : sur une ligne, seule, permet de fermer une div ouverte.
+* @@{{class content}}@@ : dans un paragraphe, permet de spécifier un span de la classe donnée.
+* @@{{content}}@@ : dans un paragraphe, permet de spécifier un span.
 
 ## Code
 
@@ -82,7 +89,7 @@ Donnera :
 
 % \% une liste numérotée
 
-**LIMITATION : Hamill ne gère pas une inclusion d'une liste numérotée dans une non-numérotée et vice-versa.**
+* \| pour continuer un élément d'une liste.
 
 ## Listes de définition
 
@@ -151,6 +158,8 @@ Le lien vers un fichier JavaScript requis est placé là ou se trouve le @@!requ
 
 [Markdown]: https://en.wikipedia.org/wiki/Markdown
 [Textile]: https://en.wikipedia.org/wiki/Textile_(markup_language)
+[AsciiDoc]: http://asciidoc.org/
+[reStructuredText]: https://docutils.sourceforge.io/rst.html
 [langage de balisage léger]: https://en.wikipedia.org/wiki/Lightweight_markup_language
 
-!html </div>
+{{end}}

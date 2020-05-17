@@ -12,7 +12,7 @@
 
 !include menu.html
 
-!html <div class="jumbotron">
+{{.jumbotron}}
 
 # Bienvenue
 ---
@@ -38,7 +38,7 @@ J'espère que ce site pourra vous être utile et je vous souhaite une bonne jour
 
 Damien Gouteux, dernière mise à jour le 28 avril 2020.
 
-!html </div>
+{{end}}
 
 !html <div style="width: 50%; margin: auto; text-align: center;">2005 ❤ 2020</div>
     

@@ -9,6 +9,6 @@
 
 !include menu.html
 
-!html <div id="content-div">
+{{content-div}}
 
-!html </div>
+{{end}}

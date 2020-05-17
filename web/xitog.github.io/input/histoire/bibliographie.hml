@@ -7,7 +7,7 @@
 
 !include menu.html
 
-!html <div id="content-div">
+{{content-div}}
 
 # Bibliographie
 ---
@@ -70,4 +70,4 @@ Je mets ici au format "brut" (en attendant de les formater) les différents site
 * [Exemples pour l'APA.->http://flash1r.apa.org/apastyle/basics/data/resources/sample-references2.pdf]
 * [Page wikipédia pour BibTex.->http://en.wikipedia.org/wiki/BibTeX]
 
-!html </div>
+{{end}}
