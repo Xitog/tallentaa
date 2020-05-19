@@ -6,9 +6,11 @@
 !require https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js
 !var PARAGRAPH_DEFINITION=true
 
+{{#main .container}}
+
 !include menu.html
 
-{{content-div}}
+{{#content-div}}
 
 # Tools & Languages
 ---
@@ -252,4 +254,5 @@ $ Compile
 
 * [GitHub Pages->https://pages.github.com/]
 
+{{end}}
 {{end}}

@@ -8,9 +8,11 @@
 
 !css #content-div li { margin-bottom: 9px; }
 
+{{#main .container}}
+
 !include menu.html
 
-{{content-div}}
+{{#content-div}}
 
 # Méthodologie d'Histoire
 ---
@@ -138,4 +140,5 @@ Pas de téléologie ! (interpréter un évènement passé en fonction de ce qui 
 
 Mais mise en perspective par rapport aux autres pays, au caractère exceptionnel ou banal, changement décisif ou prolongation ou amplification de qqchose de plus ancien ?
 
+{{end}}
 {{end}}

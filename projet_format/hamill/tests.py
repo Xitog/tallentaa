@@ -28,8 +28,8 @@ def verify(answer, check, msg=None):
             raise AssertionError("Pb")
 
 # Test 1
-res = hamill.process_string("**bold** ''italic''")
-verify(res, "<b>bold</b> <i>italic</i>", "process_string => Bold/Italic error")
+res = hamill.process_string("**bold** ''italic'' __underline__ --strike-- ^^super^^")
+verify(res, "<b>bold</b> <i>italic</i> <u>underline</u> <s>strike</s> <sup>super</sup>", "process_string => Bold/Italic error")
 
 # Test 2
 res = hamill.process_string("@@code@@")
@@ -46,9 +46,35 @@ check = """<ul>
   <li>item 3</li>
 </ul>
 """
-verify(res, check, "process_lines => List error on simple list")
+verify(res, check, "process_lines => List error on simple list unordered")
 
 # Test 4
+par = """+ item 1
++ item 2
++ item 3"""
+res = hamill.process_lines(par.split('\n'))
+check = """<ol>
+  <li>item 1</li>
+  <li>item 2</li>
+  <li>item 3</li>
+</ol>
+"""
+verify(res, check, "process_lines => List error on simple list ordered")
+
+# Test 5
+par = """- item 1
+- item 2
+- item 3"""
+res = hamill.process_lines(par.split('\n'))
+check = """<ol reversed>
+  <li>item 1</li>
+  <li>item 2</li>
+  <li>item 3</li>
+</ol>
+"""
+verify(res, check, "process_lines => List error on simple list ordered reversed")
+
+# Test 6
 par = """* item 1
 * item 2
 * * item 2.1
@@ -68,7 +94,7 @@ check = """<ul>
 """
 verify(res, check, "process_lines => List error on list inner list (same)")
 
-# Test 5
+# Test 7
 par = """* item 1
 * item 2
 % % item 2.1
@@ -88,7 +114,7 @@ check = """<ul>
 """
 verify(res, check, "process_lines => List error on list inner list (mixed)")
 
-# Test 6
+# Test 8
 par = """* item 1
 * item 2 première ligne
 | item 2 seconde ligne
@@ -103,7 +129,7 @@ check = """<ul>
 """
 verify(res, check, "process_lines => List error on continuity")
 
-# Test 7
+# Test 9
 par = """{{.jumbotron}}
 Je suis dans une div !
 {{end}}"""
@@ -112,10 +138,10 @@ check = """<div class="jumbotron">
 <p>Je suis dans une div !</p>
 </div>
 """
-verify(res, check, "process_lines => Div creation and class error")
+verify(res, check, "process_lines => Div creation with class error")
 
-# Test 8
-par = """{{content-div}}
+# Test 10
+par = """{{#content-div}}
 Je suis dans une div !
 {{end}}"""
 res = hamill.process_lines(par.split('\n'))
@@ -123,10 +149,55 @@ check = """<div id="content-div">
 <p>Je suis dans une div !</p>
 </div>
 """
-verify(res, check, "process_lines => Div creation and ID error")
+verify(res, check, "process_lines => Div creation with ID error")
 
-# Test 9
-par = """{{red rouge}} ou {{green vert}} ou {{rien}}"""
+# Test 11
+par = """{{#content-div .jumbotron}}
+Je suis dans une div !
+{{end}}"""
+res = hamill.process_lines(par.split('\n'))
+check = """<div id="content-div" class="jumbotron">
+<p>Je suis dans une div !</p>
+</div>
+"""
+verify(res, check, "process_lines => Div creation with ID and class error")
+
+# Test 12
+par = """{{.red rouge}} ou {{.green vert}} ou {{rien}}"""
 res = hamill.process_string(par)
 check = """<span class="red">rouge</span> ou <span class="green">vert</span> ou <span>rien</span>"""
 verify(res, check, "process_string => Span class error")
+
+# Test 13
+par = """{{.signature}}ceci est une signature"""
+res = hamill.process_lines([par])
+check = """<p class="signature">ceci est une signature</p>\n"""
+verify(res, check, "process_lines => Paragraph creation with class error")
+
+# Test 14
+par = """{{#signature}}ceci est une signature"""
+res = hamill.process_lines([par])
+check = """<p id="signature">ceci est une signature</p>\n"""
+verify(res, check, "process_lines => Paragraph creation with ID error")
+
+# Test 15
+par = """{{#signid .signclass}}ceci est une signature"""
+res = hamill.process_lines([par])
+check = """<p id="signid" class="signclass">ceci est une signature</p>\n"""
+verify(res, check, "process_lines => Paragraph creation with ID and class error")
+
+# Test 16
+par = """* [https://pipo.html]"""
+res = hamill.process_lines([par])
+check = """<ul>
+  <li><a href="https://pipo.html">https://pipo.html</a></li>
+</ul>
+"""
+verify(res, check, "List and anchor => Error")
+
+# Test 17 link
+par = """[pipo->https://pipo.html]"""
+res = hamill.process_lines([par])
+check = """<p><a href="https://pipo.html">pipo</a></p>
+"""
+verify(res, check, "Named link => Error")

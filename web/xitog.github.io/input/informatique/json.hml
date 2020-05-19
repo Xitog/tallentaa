@@ -6,9 +6,11 @@
 !require https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js
 !var DEFAULT_CODE=json
 
+{{#main .container}}
+
 !include menu.html
 
-{{content-div}}
+{{#content-div}}
 
 # JSON
 ---
@@ -121,4 +123,5 @@ Il existe d'autres formats qui remplisse les mêmes fonctions que JSON :
 * [Apache Avro->https://avro.apache.org/] : un autre format de sérialisation de données.
 * [JSON LD->https://json-ld.org/] : format pour décrire des données liées utilisant JSON devenu une [recommandation du W3C->https://www.w3.org/TR/json-ld/].
 
+{{end}}
 {{end}}

@@ -5,9 +5,11 @@
 !require https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
 !require https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js
 
+{{#main .container}}
+
 !include menu.html
 
-!html <div id="content-div">
+{{#content-div}}
 
 # Plan du site
 ---
@@ -80,4 +82,5 @@
 * * * [Barre de liens->https://xitog.github.io/dgx/liens.html]
 * * * [Collection de liens->https://xitog.github.io/dgx/liste_liens.html]
 
-!html </div>
+{{end}}
+{{end}}

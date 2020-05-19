@@ -12,9 +12,11 @@
 !css table.extract { border-collapse: collapse; display: inline-block; }
 !css table.extract td { border: None; padding: 0px; text-align: center; }
 
+{{#main .container}}
+
 !include menu.html
 
-{{content-div}}
+{{#content-div}}
 
 # Cartes de carreaux, Transitions et Variations
 ---
@@ -112,4 +114,17 @@ La règle 2 dit que s'il y a un ou plusieurs carreaux influenceurs, ils seront t
 
 À présent, passons aux exemples. Voici sept exemples de configurations de carreaux entourant le carreau central dont une interdite :
 
+### II.D Correspondances configuration-transition
+
+### II.E Exemples de résultats
+
+## III. Variations
+
+## IV. Multitransitions
+
+## V. Historique
+
+## VI. Crédits
+
+{{end}}
 {{end}}

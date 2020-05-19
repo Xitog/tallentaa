@@ -25,9 +25,9 @@ table.extract td { border: None; padding: 0px; text-align: center; }
 </style>
 </head>
 <body>
-  <div id="main" class="container">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+<div id="main" class="container">
       <nav class="navbar navbar-default" role="navigation">
         <div class="container-fluid">
           <div class="navbar-header">
@@ -165,14 +165,14 @@ table.extract td { border: None; padding: 0px; text-align: center; }
       </li>
       <li><a href="#ii.b-système-de-numérotation">II.B Système de numérotation</a></li>
       <li><a href="#ii.c-exemples-de-configurations">II.C Exemples de configurations</a></li>
-      <li><a href="#II.D Correspondances configuration-transition">II.D Correspondances configuration-transition</a></li>
-      <li><a href="#II.E Exemples de résultats">II.E Exemples de résultats</a></li>
+      <li><a href="#ii.d-correspondances-configuration-transition">II.D Correspondances configuration-transition</a></li>
+      <li><a href="#ii.e-exemples-de-résultats">II.E Exemples de résultats</a></li>
     </ul>
   </li>
-  <li><a href="#III. Variations">III. Variations</a></li>
-  <li><a href="#IV. Multitransitions">IV. Multitransitions</a></li>
-  <li><a href="#V. Historique">V. Historique</a></li>
-  <li><a href="#VI. Crédits">VI. Crédits</a></li>
+  <li><a href="#iii.-variations">III. Variations</a></li>
+  <li><a href="#iv.-multitransitions">IV. Multitransitions</a></li>
+  <li><a href="#v.-historique">V. Historique</a></li>
+  <li><a href="#vi.-crédits">VI. Crédits</a></li>
 </ul>
 <h2 id="i.-un-tableau-comme-carte">I. Un tableau comme carte</h2>
 <p>Le jeu <code><span class="normal">WarCraft</span> <span class="normal">II</span></code> (1995) propose une vue de dessus d'une carte où se déroule la partie. Cette carte est stocké à l'aide d'un tableau. Chaque case du tableau contient une indication de textures à utiliser. Par exemple, une case peut contenir la valeur <code><span class="number">0</code>, qui désigne de l'eau, ou <code><span class="number">1</code> de la terre. Prenons une carte de 5 cases en largeur et en hauteur, une taille que nous notons 5x5, et affichons la dans un premier temps avec des bordures délimitant chaque case (A) puis sans (B) :</p>
@@ -229,6 +229,12 @@ table.extract td { border: None; padding: 0px; text-align: center; }
 <p>La règle 2 dit que s'il y a un ou plusieurs carreaux influenceurs, ils seront tous du même type. Cela revient à un choix binaire, savoir si c'est le carreau est un influenceur ou pas. Il y a donc <b>2<sup>8</sup></b>, soit <code><span class="number">256</span></code>, possibilités. Pour un carreau, chaque possibilité de configuration des carreaux qui l'entourent est identifiée par un nombre qui est le résultat de l'addition de <b>2<sup>position</sup></b> pour chaque carreau influenceur. Les règles 3 et 4 suppriment de nombreuses combinaisons et réduisent à <code><span class="number">14</span></code> le nombre de textures nécessaires pour faire la transition entre eau et terre.</p>
 <h3 id="ii.c-exemples-de-configurations">II.C Exemples de configurations</h3>
 <p>À présent, passons aux exemples. Voici sept exemples de configurations de carreaux entourant le carreau central dont une interdite :</p>
+<h3 id="ii.d-correspondances-configuration-transition">II.D Correspondances configuration-transition</h3>
+<h3 id="ii.e-exemples-de-résultats">II.E Exemples de résultats</h3>
+<h2 id="iii.-variations">III. Variations</h2>
+<h2 id="iv.-multitransitions">IV. Multitransitions</h2>
+<h2 id="v.-historique">V. Historique</h2>
+<h2 id="vi.-crédits">VI. Crédits</h2>
 </div>
-  </div>
+</div>
 </body>

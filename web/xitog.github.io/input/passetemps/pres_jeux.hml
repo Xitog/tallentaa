@@ -5,9 +5,11 @@
 !require https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
 !require https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js
 
+{{#main .container}}
+
 !include menu.html
 
-{{content-div}}
+{{#content-div}}
 
 # Jeux
 ---
@@ -99,4 +101,5 @@ J'ai beaucoup étudié les règles du jeu ''[Star Wars D20]'', qui n'existait qu
 
 Les jeux vidéo ont leur [propre page->https://xitog.github.io/dgx/passetemps/pres_jeuxvideo.html].
 
+{{end}}
 {{end}}

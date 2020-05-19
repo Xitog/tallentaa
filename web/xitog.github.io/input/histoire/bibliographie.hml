@@ -5,9 +5,11 @@
 !require https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
 !require https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js
 
+{{#main .container}}
+
 !include menu.html
 
-{{content-div}}
+{{#content-div}}
 
 # Bibliographie
 ---
@@ -70,4 +72,5 @@ Je mets ici au format "brut" (en attendant de les formater) les différents site
 * [Exemples pour l'APA.->http://flash1r.apa.org/apastyle/basics/data/resources/sample-references2.pdf]
 * [Page wikipédia pour BibTex.->http://en.wikipedia.org/wiki/BibTeX]
 
+{{end}}
 {{end}}

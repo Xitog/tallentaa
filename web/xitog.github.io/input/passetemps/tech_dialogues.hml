@@ -8,9 +8,11 @@
 !css i { color: blue; }
 !css code {color: #006FDD; border: 1px solid rgb(225, 228, 229); padding-left: 3px; padding-right: 5px;}
 
+{{#main .container}}
+
 !include menu.html
 
-{{content-div}}
+{{#content-div}}
 
 # Dialogues
 ---
@@ -118,4 +120,5 @@ Ce système de dialogue doit être pensé pour être facilement internationalisa
 
 ## III. Crédits
 
+{{end}}
 {{end}}

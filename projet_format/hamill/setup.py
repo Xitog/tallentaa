@@ -1,4 +1,5 @@
 from setuptools import setup
+import hamill
 
 f = open('README.txt', mode='r', encoding='utf8')
 long_desc = f.read()
@@ -7,7 +8,7 @@ f.close()
 setup(
     # Metadata
     name='hamill',
-    version='0.1.8',
+    version=hamill.__version__,
 
     license="MIT",
 
@@ -19,7 +20,7 @@ setup(
     
     description='A lightweight markup language',
     long_description=long_desc,
-    long_description_content_type="text/plain",
+    long_description_content_type="text/markdown",
     classifiers=[
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: MIT License',

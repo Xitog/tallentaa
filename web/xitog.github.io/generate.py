@@ -10,6 +10,6 @@ print(hamill.__version__)
 includes = ['menu.html']
 
 hamill.process('input', 'output', 'fr', includes)
-
+#hamill.process_file(r'input\histoire\bibliographie.hml', r'output\histoire\bibliographie.html', 'fr', includes)
 #hamill.process_file(r'input\tests.hml', r'output\tests.html', 'fr', includes)
 

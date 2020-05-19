@@ -5,28 +5,51 @@
 !require https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
 !require https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js
 
+{{#main .container}}
+
 !include menu.html
 
-{{content-div}}
+{{#content-div}}
 
 # Hamill
 ---
 
-Ce document décrit le langage **Hamill**. Comme [Markdown] ou [Textile], c'est un [langage de balisage léger] pour écrire de la documentation dans un fichier texte, directement lisible sans transformation, mais pouvant également être transformé en HTML.
+Ce document décrit le langage **Hamill**. Comme [Markdown], [Textile], [AsciiDoc] ou [reStructuredText], c'est un [langage de balisage léger] pour écrire de la documentation dans un fichier texte, directement lisible sans transformation, mais pouvant également être transformé en HTML.
 
-On peut faire des commentaires en commençant une ligne par \-\-.
+## Sommaire
 
--- Ceci est un commentaire il ne sera pas exporté
+* [Commentaires->#]
+* [Titres->#]
+* [Modification de texte->#]
+* [Div, p et span->#]
+* [Code->#]
+* [Listes->#]
+* [Tables->#]
+* [Liens->#]
+* [Images->#]
+* [Constantes->#]
+* [Variables->#]
+* [Inclusion de fichier HTML->#]
+* [Liens vers un fichier CSS ou JavaScript->#]
+* [Spécial->#]
+
+## Commentaires
+
+On peut faire des commentaires avec §§ soit en début de ligne, toute la ligne est alors en commentaire, soit dans la ligne, dans ce cas seulement ce qui est après est un commentaire. Une ligne entièrement en commentaire peut-être exportée vers l'HTML produit :
+
+§§ Ceci est un commentaire il ne sera pas exporté
 
 !var EXPORT_COMMENT=true
 
--- Ceci est un commentaire il sera exporté en HTML
-
-**LIMITATION : les commentaires doivent être sur une ligne séparée et non à la fin d'une ligne. Hamill risque de se tromper** (mélange entre @@!require@@ qui teste la fin de la ligne)
+§§ Ceci est un commentaire il sera exporté en HTML
 
 On peut faire une ligne horizontale avec une ligne constituée uniquement de - d'une longueur supérieure ou égale à 3.
 
 On peut forcer un retour à la ligne avec \!\! entouré d'un espace : ceci est un retour !! à la ligne.
+
+## Titres
+
+On met en début de ligne un nombre de # correspondant au niveau du titre que l'on veut.
 
 ## Modification de texte
 
@@ -36,12 +59,12 @@ On peut forcer un retour à la ligne avec \!\! entouré d'un espace : ceci est u
 * \_\___souligné__\_\_ : pour souligner
 * \^\^^^exposant^^\^\^ : pour mettre en exposant
 
-## Div et span
+## Div, p et span
 
-* @@{{class}}@@ : sur une ligne, seule, permet de définir une div de la classe donnée.
+* @@{{#id .class}}@@ : sur une ligne, seule, permet de définir une div avec un id et/ou une classe.
 * @@{{end}}@@ : sur une ligne, seule, permet de fermer une div ouverte.
-* @@{{class content}}@@ : dans un paragraphe, permet de spécifier un span de la classe donnée.
-* @@{{content}}@@ : dans un paragraphe, permet de spécifier un span.
+* @@{{#id .class content}}@@ : dans un paragraphe, permet de spécifier un span avec un id et/ou une classe.
+* @@{{#id .class}} ...@@ : dans un paragraphe, permet de spécifier l'id et/ou la classe du paragraphe.
 
 ## Code
 
@@ -83,11 +106,13 @@ Donnera :
 
 ## Listes
 
-* \* une liste non numérotée
+* \* pour une liste non numérotée
 
-- \- une autre liste non numérotée
+% \% pour une liste numérotée
 
-% \% une liste numérotée
++ \+ pour une liste numérotée
+
+- \- pour une liste numérotée inversée
 
 * \| pour continuer un élément d'une liste.
 
@@ -104,19 +129,28 @@ Donnera :
 |----|---|----|-----------|
 |Il  |est|beau|mon tableau|
 
-On peut mettre bien sûr des modificateurs de textes dans un tableau mais **LIMITATION : pas de listes dans un tableau pour l'instant** :
+On peut mettre bien sûr des modificateurs de textes, des liens ou une image dans un tableau.
 
-|^^Ceci^^|**est**|__un__            |''tableau''|
-|-----------------------------------------------|
-|Il      |est    |--beau-- différent|ce tableau.|
+!var DEFAULT_FIND_IMAGE=..\img\
+
+|^^Ceci^^                   |**est**|__un__            |''tableau''                                |
+|--------------------------------------------------------------------------------------------------|
+|Il [!background-green.png] |est    |--beau-- différent|ce [tableau->https://xitog.github.io/dgx/].|
+
+**LIMITATION : pas de listes dans un tableau pour l'instant** :
 
 ## Liens
 
-* On utilise les crochets \[ nom affiché -> lien ]
-* Le lien peut être directement http:// ou https://
-* Ou le lien peut être une redirection \[ nom affiché -> code ] puis une défintion de la forme : \[code]: http://...
-* Ou le lien peut être seulement **#**. Dans ce cas, il essaye de faire pointé sur le nom affiché ou, si c'est un titre, le nom affiché transformé ''(voir ci-dessous)''
+* On utilise les crochets @@[ nom affiché -> lien ]@@
+* Le lien peut être directement @@[ http:// ... ]@@ ou @@[ https:// ... ]@@
+* Ou le lien peut être une redirection @@[ nom affiché -> code ]@@ puis une défintion de la forme : @@[code]: http://...@@@
+* Ou le lien peut être seulement @@[ nom affiché -> # ]@@. Dans ce cas, il essaye de faire pointer sur le nom affiché ou, si c'est un titre, le nom affiché transformé ''(voir ci-dessous)''
 * Les titres sont automatiquement transformés en ancre en remplaçant les espaces par - et en les mettant en minuscules : ainsi **Les jeux** devient **les-jeux**
+
+## Images
+
+* On utilise les crochets \[ avec ! comme : \[!mon_image.png]
+* On peut définir un répertoire par défaut où les images seront prises avec la variable @@DEFAULT_FIND_IMAGE@@
 
 ## Constantes
 
@@ -136,8 +170,10 @@ On peut définir des variables en mettant @@!var@@ en début de ligne. On peut c
 * @@!var EXPORT_COMMENT=true/false@@ spécifie si les commentaires seront exportés en HTML ou pas
 * @@!var PARAGRAPH_DEFINITION=true/false@@ spécifie si les dd doivent être mis dans des balises p
 * @@!var DEFAULT_CODE=python/json@@ définit la coloration syntaxique par défaut du code (text par défaut)
+* @@!var NEXT_PAR_ID=ids@@ spécifie l'id du **prochain** paragraphe
 * @@!var NEXT_PAR_CLASS=cls@@ spécifie la classe du **prochain** paragraphe
 * @@!var DEFAULT_PAR_CLASS=cls@@ spécifie la classe par défaut de **tous les paragraphes qui suivent**
+* @@!var DEFAULT_FIND_IMAGE=path@@ spécifie un répertoire où aller chercher les images par défaut
 
 ## Inclusion de fichier HTML
 
@@ -149,7 +185,9 @@ On peut lier notre document à fichier CSS ou JavaScript avec la commande @@!req
 
 Le lien vers un fichier CSS requis est **automatiquement** placé dans la tête du document HTML.
 
-Le lien vers un fichier JavaScript requis est placé là ou se trouve le @@!require@@. **LIMITATION : Hamill ne peut pas mettre un lien vers un fichier JavaScript dans la tête pour l'instant**.
+Le lien vers un fichier JavaScript requis est placé là ou se trouve le @@!require@@. 
+
+**LIMITATION : Hamill ne peut pas mettre un lien vers un fichier JavaScript dans la tête pour l'instant**.
 
 ## Spécial
 
@@ -162,4 +200,5 @@ Le lien vers un fichier JavaScript requis est placé là ou se trouve le @@!requ
 [reStructuredText]: https://docutils.sourceforge.io/rst.html
 [langage de balisage léger]: https://en.wikipedia.org/wiki/Lightweight_markup_language
 
+{{end}}
 {{end}}

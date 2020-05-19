@@ -5,9 +5,11 @@
 !require https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
 !require https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js
 
+{{#main .container}}
+
 !include menu.html
 
-{{content-div}}
+{{#content-div}}
 
 # Favoris
 ---
@@ -132,4 +134,5 @@ On note quelques récurrences intéressantes parmi les films archicultes :
 * * * Seraphim, Dead Can Dance
 * * * Mr PT1000, Soap & Skin
 
+{{end}}
 {{end}}

@@ -90,7 +90,7 @@ def escape(line):
             next_char = line[index_char + 1]
         else:
             next_char = None
-        if char == '\\' and next_char in ['*', "'", '^', '-', '_', '[', '@', '%', '!', '|', '{']:
+        if char == '\\' and next_char in ['*', "'", '^', '-', '_', '[', '@', '%', '+', '$', '!', '|', '{']:
             new_line += next_char
             index_char += 2    
         else:
@@ -191,15 +191,19 @@ def prev_next(line, index):
     return _prev, _next, _prev_prev
 
 
-def find_unscaped(line, start, motif):
+def find_unescaped(line, motif, start=0):
+    "Used by super_strip and code handling"
     index = start
     while index < len(line):
         found = line.find(motif, index)
-        if found != -1 and line[found - 1] != '\\':
+        if found == -1:
+            break
+        elif found == 0 or line[found - 1] != '\\':
             return found
         else:
             index = found + len(motif)
     return -1
+
 
 def process_string(line, links=None, inner_links=None, DEFAULT_CODE='text', DEFAULT_FIND_IMAGE=None):
     links = {} if links is None else links
@@ -213,6 +217,7 @@ def process_string(line, links=None, inner_links=None, DEFAULT_CODE='text', DEFA
     in_code = False
     code = ''
     char_index = -1
+    res = Result()
     while char_index < len(line) - 1:
         char_index += 1
         char = line[char_index]
@@ -222,18 +227,46 @@ def process_string(line, links=None, inner_links=None, DEFAULT_CODE='text', DEFA
             continue
         if char == '{' and prev_char == '{' and prev_prev_char != '\\':
             ending = line.find('}}', char_index)
-            content = line[char_index + 1:ending]
-            if ' ' in content:
-                cls, txt = content.split(' ')
-                new_line += f'<span class="{cls}">{txt}</span>'
-                char_index = ending + 1
-                continue
+            inside = line[char_index + 1:ending]
+            cls = ''
+            ids = ''
+            txt = ''
+            state = 'start'
+            for c in inside:
+                # state
+                if c == '.':
+                    state = 'cls'
+                elif c == ' ':
+                    state = 'start'
+                elif c == '#':
+                    state = 'ids'
+                elif state == 'start':
+                    state = 'txt'
+                # save
+                if state == 'cls':
+                    cls += c
+                elif state == 'ids':
+                    ids += c
+                elif state == 'txt':
+                    txt += c
+            if len(txt) > 0:
+                if len(ids) > 0 and len(cls) > 0:
+                    new_line += f'<span id="{ids[1:]}" class="{cls[1:]}">{txt}</span>'
+                elif len(ids) > 0:
+                    new_line += f'<span id="{ids[1:]}">{txt}</span>'
+                elif len(cls) > 0:
+                    new_line += f'<span class="{cls[1:]}">{txt}</span>'
+                else:
+                    new_line += f'<span>{txt}</span>'
             else:
-                new_line += f'<span>{content}</span>'
-                char_index = ending + 1
-                continue
-        # Link
-        if char == '[' and next_char == '#' and prev_char != '\\': # [# ... ] inner link
+                if len(ids) > 0:
+                    res['PARAGRAPH_ID'] = ids[1:]
+                if len(cls) > 0:
+                    res['PARAGRAPH_CLASS'] = cls[1:]
+            char_index = ending + 1
+            continue
+        # Links and images
+        if char == '[' and next_char == '#' and prev_char != '\\': # [# ... ] creating inner link
             ending = line.find(']', char_index)
             if ending != -1:
                 link_name = line[char_index + 2:ending]
@@ -255,28 +288,30 @@ def process_string(line, links=None, inner_links=None, DEFAULT_CODE='text', DEFA
             ending = line.find(']', char_index)
             if ending != -1:
                 link = line[char_index + 1:ending]
-                if link not in links and link.find('->') != -1:
+                # Set the link_name and the link
+                if link.find('->') != -1:
                     link_name, link = link.split('->', 1)
-                    link_name = process_string(link_name, links, inner_links, DEFAULT_CODE)
                 else:
                     link_name = link
-                # check if we have registered this link
-                # [LINK_NAME->LINK_REF]
-                # [LINK_REF]: http://...
-                # or
-                # [LINK_NAME->http://]
-                if link in links:
-                    new_line += f'<a href="{links[link]}">{link_name}</a>'
-                elif multi_start(link, ('https://', 'http://')):
-                    new_line += f'<a href="{link}">{link_name}</a>'
-                elif link == '#': # [Python->#] = to #Python
-                    if make_id(link_name) in inner_links:
-                        new_line += f'<a href="#{make_id(link_name)}">{link_name}</a>'
-                    else:
-                        new_line += f'<a href="#{link_name}">{link_name}</a>'
+                if link == '#':
+                    link = link_name
+                # Check the link
+                if multi_start(link, ('https://', 'http://')):
+                    pass
+                elif make_id(link) in inner_links:
+                    link = '#' + make_id(link)
+                elif link in inner_links:
+                    link = '#' + link
+                elif link in links:
+                    link = links[link]
                 else:
-                    warn('Undefined link:', link_name, 'in', line)
-                    new_line += link_name
+                    #print(link)
+                    #print(make_id(link))
+                    #print(inner_links)
+                    warn('Undefined link:', link, 'in', line)
+                link_name = process_string(link_name, links, inner_links,
+                                           DEFAULT_CODE, DEFAULT_FIND_IMAGE).first()
+                new_line += f'<a href="{link}">{link_name}</a>'
                 char_index = ending
                 continue
         # Italic
@@ -338,7 +373,7 @@ def process_string(line, links=None, inner_links=None, DEFAULT_CODE='text', DEFA
         if char == '@' and next_char == '@' and prev_char != '\\':
             continue
         if char == '@' and prev_char == '@' and prev_prev_char != '\\':
-            ending = find_unscaped(line, char_index, '@@')
+            ending = find_unescaped(line, '@@', char_index)
             code = line[char_index + 1:ending]
             length = len(code) + 2
             s = multi_start(code, RECOGNIZED_LANGUAGES)
@@ -350,7 +385,8 @@ def process_string(line, links=None, inner_links=None, DEFAULT_CODE='text', DEFA
             char_index += length
             continue
         new_line += char
-    return new_line
+    res.append(new_line)
+    return res
 
 
 def get(line):
@@ -364,7 +400,7 @@ def get(line):
     value = value.strip()
     return command, value
 
-LIST_STARTERS = {'* ': 'ul', '- ': 'ul', '% ': 'ol'}
+LIST_STARTERS = {'* ': 'ul', '% ': 'ol', '+ ' : 'ol', '- ': 'ol reversed'}
 
 def count_list_level(line):
     """Return the level of the list, the kind of starter and if it is
@@ -385,25 +421,43 @@ def count_list_level(line):
 
 class Result:
 
-    def __init__(self, default_lang, default_encoding='utf-8'):
+    def __init__(self, default_lang='en', default_encoding='utf-8'):
         self.constants = {}
+        self.variables = {}
         self.lines = []
         self.header_links = []
         self.header_css = []
+        # 6 HTML constants
         self.constants['TITLE'] = None
         self.constants['ENCODING'] = default_encoding
         self.constants['LANG'] = default_lang
         self.constants['ICON'] = None
         self.constants['BODY_CLASS'] = None
         self.constants['BODY_ID'] = None
+        # 2 var from markup {{.cls}} or {{#id}}
+        self.variables['PARAGRAPH_ID'] = None
+        self.variables['PARAGRAPH_CLASS'] = None
+
+    def first(self):
+        return self.lines[0]
 
     def __getitem__(self, key):
         if isinstance(key, str):
-            return self.constants[key]
+            if key in self.constants:
+                return self.constants[key]
+            elif key in self.variables:
+                return self.variables[key]
+            else:
+                raise Exception('Key not known: ' + str(key))
 
     def __setitem__(self, key, value):
         if isinstance(key, str):
-            self.constants[key] = value
+            if key in self.constants:
+                self.constants[key] = value
+            elif key in self.variables:
+                self.variables[key] = value
+            else:
+                raise Exception('Key not known: ' + str(key))
 
     def append(self, line):
         self.lines.append(line)
@@ -467,13 +521,10 @@ def process_file(input_name, output_name=None, default_lang=None, includes=None)
         output.write(f'<body id="{result["BODY_ID"]}">\n')
     else:
         output.write(f'<body id="{result["BODY_ID"]}" class="{result["BODY_CLASS"]}">\n')
-    output.write('  <div id="main" class="container">\n')
 
     for line in result:
         output.write(line)
 
-    # Do we have registered lines to write at the end?
-    output.write('  </div>\n')
     output.write('</body>')
     output.close()
 
@@ -485,6 +536,7 @@ def output_list(result, list_array):
         elem = list_array[index]
         level = elem['level']
         starter = LIST_STARTERS[elem['starter'] + ' ']
+        ender = starter[:2]
         line = elem['line']
         cont = elem['cont']
         # Iterate
@@ -503,7 +555,7 @@ def output_list(result, list_array):
             start = 0 if prev_level is None else prev_level
             for current in range(start, level):
                 result.append('    ' * current + f'<{starter}>\n')
-                heap.append(starter)
+                heap.append(ender)
                 if current < level - 1:
                     result.append('    ' * current + f'  <li>\n')
         elif prev_level == level:
@@ -513,10 +565,10 @@ def output_list(result, list_array):
         elif level < prev_level:
             start = prev_level
             for current in range(start, level, -1):
-                starter = heap[-1]
+                ender = heap[-1]
                 if current != start:
                     result.append('    ' * (current - 1) + '  </li>\n')
-                result.append('    ' * (current - 1) + f'</{starter}>\n')
+                result.append('    ' * (current - 1) + f'</{ender}>\n')
                 heap.pop()
             current -= 2
             result.append('    ' * current + '  </li>\n')
@@ -537,12 +589,26 @@ def output_list(result, list_array):
         result.append(s)
     if len(heap) > 0:
         while len(heap) > 0:
-            starter = heap[-1]
+            ender = heap[-1]
             if not closed:
                 result.append('    ' * (len(heap) - 1) + '  </li>\n')
-            result.append('    ' * (len(heap) - 1) + f'</{starter}>\n')
+            result.append('    ' * (len(heap) - 1) + f'</{ender}>\n')
             closed = False
             heap.pop()
+
+
+COMMENT_STARTER = '§§'
+
+def super_strip(line):
+    """Remove any blanks at the start or the end of the string AND the comments §§"""
+    line = line.strip()
+    if len(line) == 0:
+        return line
+    index = find_unescaped(line, COMMENT_STARTER)
+    if index != -1:
+        return line[:index].strip()
+    else:
+        return line
 
 
 def process_lines(lines, default_lang=None, includes=None):
@@ -552,6 +618,7 @@ def process_lines(lines, default_lang=None, includes=None):
     VAR_DEFAULT_PAR_CLASS=None
     VAR_DEFAULT_TAB_CLASS=None
     VAR_NEXT_PAR_CLASS=None
+    VAR_NEXT_PAR_ID=None
     VAR_NEXT_TAB_CLASS=None
     VAR_DEFAULT_FIND_IMAGE=None
     # The 6 HTML constants are defined in Result class
@@ -586,12 +653,12 @@ def process_lines(lines, default_lang=None, includes=None):
                 result["BODY_ID"] = value
             else:
                 raise Exception('Unknown constant: ' + command + 'with value= ' + value)
-        elif line.startswith('!require ') and line.strip().endswith('.css'):
-            required = line.replace('!require ', '', 1).strip()
+        elif line.startswith('!require ') and super_strip(line).endswith('.css'):
+            required = super_strip(line.replace('!require ', '', 1))
             result.header_links.append(f'  <link href="{required}" rel="stylesheet">\n')
         # Inline CSS
         elif line.startswith('!css '):
-            result.header_css.append(line.replace('!css ', '', 1).strip())
+            result.header_css.append(super_strip(line.replace('!css ', '', 1)))
         else:
             # Block of code
             if len(line) > 2 and line[0:3] == '@@@':
@@ -605,7 +672,7 @@ def process_lines(lines, default_lang=None, includes=None):
                 in_code_block = False
             # Strip
             if not in_code_free_block and not in_code_block:
-                line = line.strip()
+                line = super_strip(line)
             # Special chars
             line = safe(line)
             # Link library
@@ -669,6 +736,8 @@ def process_lines(lines, default_lang=None, includes=None):
                     VAR_DEFAULT_CODE = value
                 else:
                     warn('Not recognized language in var VAR_DEFAULT_CODE:', value)
+            elif command == 'NEXT_PAR_ID':
+                VAR_NEXT_PAR_ID = value if value != 'reset' else None
             elif command == 'NEXT_PAR_CLASS':
                 VAR_NEXT_PAR_CLASS = value if value != 'reset' else None
             elif command == 'DEFAULT_PAR_CLASS':
@@ -683,12 +752,10 @@ def process_lines(lines, default_lang=None, includes=None):
                 raise Exception('Var unknown: ' + command + ' with value = ' + value)
             continue
         # Comment
-        if line.startswith('--') and line.count('-') != len(line):
+        if line.startswith(COMMENT_STARTER):
             if VAR_EXPORT_COMMENT:
-                line = line.replace('--', '<!--', 1) + ' -->'
-                result.append(line + '\n')    
-            else:
-                continue
+                line = line.replace(COMMENT_STARTER, '<!--', 1) + ' -->'
+                result.append(line + '\n')
             continue
         # Require CSS or JS file
         if line.startswith('!require '):
@@ -752,11 +819,11 @@ def process_lines(lines, default_lang=None, includes=None):
                 in_code_free_block = False
             continue 
         # Block of code 2
-        if line.startswith('@@') and (len(line.strip()) == 2 or line[2] != '@'):
+        if line.startswith('@@') and (len(super_strip(line)) == 2 or line[2] != '@'):
             if not in_code_block:
                 result.append('<pre class="code">\n')
                 in_code_block = True
-                code_lang = line.replace('@@', '', 1).strip()
+                code_lang = super_strip(line.replace('@@', '', 1))
                 if len(code_lang) == 0:
                     code_lang = VAR_DEFAULT_CODE
                 continue
@@ -768,20 +835,44 @@ def process_lines(lines, default_lang=None, includes=None):
                 line = line[2:] # remove starting @@
             result.append(write_code(line, code_lang))
             continue
-        # Div
+        # Div {{#ids .cls}}
         if line.startswith('{{') and line.endswith('}}'):
-            cls = line[2:-2]
-            if cls == 'end':
+            inside = line[2:-2]
+            if inside == 'end':
                 result.append('</div>\n')
-            elif cls[0] == '.':
-                result.append(f'<div class="{cls[1:]}">\n')
             else:
-                result.append(f'<div id="{cls}">\n')
+                cls = ''
+                ids = ''
+                state = 'start'
+                for c in inside:
+                    # state
+                    if c == '.':
+                        state = 'cls'
+                    elif c == ' ':
+                        state = 'start'
+                    elif c == '#':
+                        state = 'ids'
+                    # save
+                    if state == 'cls':
+                        cls += c
+                    elif state == 'ids':
+                        ids += c
+                if len(cls) > 0 and len(ids) > 0:
+                    result.append(f'<div id="{ids[1:]}" class="{cls[1:]}">\n')
+                elif len(cls) > 0:
+                    result.append(f'<div class="{cls[1:]}">\n')
+                elif len(ids) > 0:
+                    result.append(f'<div id="{ids[1:]}">\n')
+                else:
+                    result.append(f'<div id="{cls}">\n')
             continue
         # Bold & Italic & Strikethrough & Underline & Power
         if multi_find(line, ('**', '--', '__', '^^', "''", "[", '@@', '{{')) and \
            not line.startswith('|-'):
-            line = process_string(line, links, inner_links, VAR_DEFAULT_CODE, VAR_DEFAULT_FIND_IMAGE)
+            res = process_string(line, links, inner_links, VAR_DEFAULT_CODE, VAR_DEFAULT_FIND_IMAGE)
+            line = res.first()
+            VAR_NEXT_PAR_CLASS = res['PARAGRAPH_CLASS']
+            VAR_NEXT_PAR_ID = res['PARAGRAPH_ID']
         # Title
         nb, title, id_title = find_title(line)
         if nb > 0:
@@ -834,7 +925,8 @@ def process_lines(lines, default_lang=None, includes=None):
                             col = col[1:]
                         else:
                             align = ''
-                        val = process_string(escape(col), links, inner_links, VAR_DEFAULT_CODE, VAR_DEFAULT_FIND_IMAGE)
+                        res = process_string(escape(col), links, inner_links, VAR_DEFAULT_CODE, VAR_DEFAULT_FIND_IMAGE)
+                        val = res.first()
                         result.append(f'<{element}{align}>{val}</{element}>')
                 result.append('</tr>\n')
             continue
@@ -865,13 +957,13 @@ def process_lines(lines, default_lang=None, includes=None):
         line = escape(line)
         # Paragraph
         if len(line) > 0:
-            if VAR_DEFAULT_PAR_CLASS is not None:
-                result.append(f'<p class="{VAR_DEFAULT_PAR_CLASS}">' + line.strip() + '</p>\n')
-            elif VAR_NEXT_PAR_CLASS is not None:
-                result.append(f'<p class="{VAR_NEXT_PAR_CLASS}">' + line.strip() + '</p>\n')
-                VAR_NEXT_PAR_CLASS = None
-            else:
-                result.append('<p>' + line.strip() + '</p>\n')
+            cls = f'class="{VAR_DEFAULT_PAR_CLASS}"' if VAR_DEFAULT_PAR_CLASS is not None else ''
+            cls = f'class="{VAR_NEXT_PAR_CLASS}"' if VAR_NEXT_PAR_CLASS is not None else cls
+            ids = f'id="{VAR_NEXT_PAR_ID}"' if VAR_NEXT_PAR_ID is not None else ''
+            space1 = ' ' if len(cls) > 0 or len(ids) > 0 else ''
+            space2 = ' ' if len(cls) > 0 and len(ids) > 0 else ''
+            VAR_NEXT_PAR_CLASS = None
+            result.append(f'<p{space1}{ids}{space2}{cls}>' + super_strip(line) + '</p>\n')
     # Are a definition list still open?
     if in_definition_list:
         result.append('</dl>\n')

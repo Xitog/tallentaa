@@ -3,6 +3,8 @@
 !require https://xitog.github.io/dgx/css/palatino.css
 !var EXPORT_COMMENT=true
 
+{{#main .container}}
+
 # Tests
 
 ## Title 2
@@ -11,7 +13,7 @@
 
 ## Comments
 
--- Tests
+§§ Tests
 
 ## Paragraphs
 
@@ -32,13 +34,13 @@ This is another one.
 * List 1, Item 1
 * List 1, Item 2
 
-% Un premier item
-% Un deuxième item
+% Un premier item numéroté
+% Un deuxième item numéroté
 
-- Un item sans chiffre
-- Un autre item sans chiffre
-- - Un sous item de l'autre item
-- - Un autre sous item !
+* Un item sans chiffre
+* Un autre item sans chiffre
+* * Un sous item de l'autre item
+* * Un autre sous item !
 
 - - Mad list
 - - - - Truly
@@ -57,3 +59,5 @@ This is another one.
 
 \ Un antislah
 \* ceci n'est pas une liste mais un paragraphe avec une étoile
+
+{{end}}
