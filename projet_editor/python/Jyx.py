@@ -10,8 +10,8 @@ import os.path
 
 # Tokenize from rey
 import sys
-sys.path.append('../../projet_language/rey')
-from rey import Tokenizer, Token
+sys.path.append('../../projet_language/ash')
+from ash import Tokenizer, Token
 
 class Fonts:
     COURRIER_NEW_10_BOLD = None
