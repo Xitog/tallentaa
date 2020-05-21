@@ -24,9 +24,15 @@
 # For more information about the Hamill lightweight markup language see:
 # https://xitog.github.io/dgx/informatique/hamill.html
 
+#-------------------------------------------------------------------------------
+# Imports
+#-------------------------------------------------------------------------------
+
 from hamill.log import warn
 
-RECOGNIZED_LANGUAGES = ['text', 'python', 'json', 'game']
+#-------------------------------------------------------------------------------
+# Globals and constants
+#-------------------------------------------------------------------------------
 
 languages = {
     'text': {
@@ -75,8 +81,24 @@ languages = {
         'accept_unknown': True,
         'line_comment': None,
         'string_markers': []
-    }
+    },
+    'hamill' : {
+        'keywords': ['var', 'const', 'include', 'require'],
+        'booleans' : ['true', 'false'],
+        'operators': [':'],
+        'separators' : [],
+        'ante_identifier': ['var', 'const'],
+        'accept_unknown': True,
+        'line_comment': None,
+        'string_markers': []
+    },
 }
+
+RECOGNIZED_LANGUAGES = list(languages.keys())
+
+#-------------------------------------------------------------------------------
+# Data model
+#-------------------------------------------------------------------------------
 
 class Token:
 
@@ -94,6 +116,10 @@ class Token:
 
     def __repr__(self):
         return str(self)
+
+#-------------------------------------------------------------------------------
+# Functions
+#-------------------------------------------------------------------------------
 
 # tokenize("123 456 abc! 'defg' True (")
 def tokenize(text, lang='text'):

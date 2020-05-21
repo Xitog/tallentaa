@@ -28,7 +28,7 @@
 """
 
 # Version of the hamill package
-__version__ = "0.2.1"
+__version__ = "0.2.2"
 
 # Imports
 from hamill.log import *

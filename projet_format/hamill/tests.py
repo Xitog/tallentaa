@@ -186,18 +186,72 @@ res = hamill.process_lines([par])
 check = """<p id="signid" class="signclass">ceci est une signature</p>\n"""
 verify(res, check, "process_lines => Paragraph creation with ID and class error")
 
-# Test 16
-par = """* [https://pipo.html]"""
+# Test 16 Direct link to URL
+par = """[>https://pipo.html]"""
+res = hamill.process_lines([par])
+check = """<p><a href="https://pipo.html">https://pipo.html</a></p>
+"""
+verify(res, check, "Direct link to URL => Error")
+
+# Test 17 Direct link to REF
+par = """[>REF]
+[REF]: https://zembla.org"""
+res = hamill.process_lines(par.split('\n'))
+check = """<p><a href="https://zembla.org">REF</a></p>
+"""
+verify(res, check, "Direct link to REF => Error")
+
+# Test 18 Named link to URL
+par = """[pipo->https://pipo.html]"""
+res = hamill.process_lines([par])
+check = """<p><a href="https://pipo.html">pipo</a></p>
+"""
+verify(res, check, "Named link to URL => Error")
+
+# Test 19 Named link to REF
+par = """[this is a REF->REF]
+[REF]: https://zembla.org"""
+res = hamill.process_lines(par.split('\n'))
+check = """<p><a href="https://zembla.org">this is a REF</a></p>
+"""
+verify(res, check, "Named link to REF => Error")
+
+# Test 20 Named link to TITLE through #
+par = """[this goes to a title->#]
+# This goes to a title"""
+res = hamill.process_lines(par.split('\n'))
+check = """<p><a href="#this-goes-to-a-title">this goes to a title</a></p>
+<h1 id="this-goes-to-a-title">This goes to a title</h1>
+"""
+verify(res, check, "Named link to TITLE through # => Error")
+
+# Test 21 Not a link 1
+par = """https://pipo.html"""
+res = hamill.process_lines([par])
+check = """<p>https://pipo.html</p>
+"""
+verify(res, check, "Not a link 1 => Error")
+
+# Test 22 Not a link 2
+par = """>https://pipo.html"""
+res = hamill.process_lines([par])
+check = """<p>&gt;https://pipo.html</p>
+"""
+verify(res, check, "Not a link 2 => Error")
+
+# Test 23 List and direct link
+par = """* [>https://pipo.html]"""
 res = hamill.process_lines([par])
 check = """<ul>
   <li><a href="https://pipo.html">https://pipo.html</a></li>
 </ul>
 """
-verify(res, check, "List and anchor => Error")
+verify(res, check, "List and direct link => Error")
 
-# Test 17 link
-par = """[pipo->https://pipo.html]"""
+# Test 24 Title transformation
+par = """## Les jeux"""
 res = hamill.process_lines([par])
-check = """<p><a href="https://pipo.html">pipo</a></p>
+check = """<h2 id="les-jeux">Les jeux</h2>
 """
-verify(res, check, "Named link => Error")
+verify(res, check, "Title transformation => Error")
+

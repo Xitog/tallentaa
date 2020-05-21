@@ -1,9 +1,12 @@
 !const TITLE=Hamill
+!const LANG=fr
 !const ICON=https://xitog.github.io/dgx/img/favicon.ico
 !require https://xitog.github.io/dgx/css/simplex.bootstrap.css
 !require https://xitog.github.io/dgx/css/palatino.css
 !require https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
 !require https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js
+
+!var DEFAULT_CODE=hamill
 
 {{#main .container}}
 
@@ -14,7 +17,7 @@
 # Hamill
 ---
 
-Ce document décrit le langage **Hamill**. Comme [Markdown], [Textile], [AsciiDoc] ou [reStructuredText], c'est un [langage de balisage léger] pour écrire de la documentation dans un fichier texte, directement lisible sans transformation, mais pouvant également être transformé en HTML.
+Ce document décrit le langage **Hamill**. Comme [>Markdown], [>Textile], [>AsciiDoc] ou [>reStructuredText], c'est un [>langage de balisage léger] pour écrire de la documentation dans un fichier texte, directement lisible sans transformation, mais pouvant également être transformé en HTML.
 
 ## Sommaire
 
@@ -141,11 +144,13 @@ On peut mettre bien sûr des modificateurs de textes, des liens ou une image dan
 
 ## Liens
 
-* On utilise les crochets @@[ nom affiché -> lien ]@@
-* Le lien peut être directement @@[ http:// ... ]@@ ou @@[ https:// ... ]@@
-* Ou le lien peut être une redirection @@[ nom affiché -> code ]@@ puis une défintion de la forme : @@[code]: http://...@@@
-* Ou le lien peut être seulement @@[ nom affiché -> # ]@@. Dans ce cas, il essaye de faire pointer sur le nom affiché ou, si c'est un titre, le nom affiché transformé ''(voir ci-dessous)''
-* Les titres sont automatiquement transformés en ancre en remplaçant les espaces par - et en les mettant en minuscules : ainsi **Les jeux** devient **les-jeux**
+* On utilise les crochets
+* La première forme dite ''directe'' est @@[> URL]@@ ou @@[> REF]@@. L'URL ou la REF sera affichée
+* La seconde forme dite ''nommée'' s'écrit @@[ nom affiché -> URL ]@@ ou @@[ nom affiché -> REF ]@@
+* Une URL commence par @@http://@@ ou @@https://@@
+* Une REF est définie par une ligne de la forme @@[code]: http://...@@@
+* Une forme spéciale de la nommée est si REF est seulement @@#@@ comme @@[ nom affiché -> # ]@@ : il essaye de faire sur le nom affiché transformé ou, si l'ancre n'existe pas, le nom affiché directement
+* Les titres sont automatiquement transformés en ancre en remplaçant les espaces par - et en les mettant en minuscules : ainsi **Les jeux** devient **les_jeux**
 
 ## Images
 

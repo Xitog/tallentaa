@@ -1,4 +1,5 @@
 !const TITLE=La France au 19ème siècle
+!const LANG=fr
 !const ICON=https://xitog.github.io/dgx/img/favicon.ico
 !require https://xitog.github.io/dgx/css/simplex.bootstrap.css
 !require https://xitog.github.io/dgx/css/palatino.css
@@ -103,7 +104,7 @@ Arbre généalogique des derniers Bourbons :
 
 ### Autres
 
-**François Guizot**, libéral, créateur de la société "Aide-toi, le ciel d'aidera" en 1827 qui publie brochure, et "travaille" l'électorat. Avec Villemain et Cousin, ils forment ''"la trilogie pensante du quartier latin"'' \[[1->#]].
+**François Guizot**, libéral, créateur de la société "Aide-toi, le ciel d'aidera" en 1827 qui publie brochure, et "travaille" l'électorat. Avec Villemain et Cousin, ils forment ''"la trilogie pensante du quartier latin"'' [[1->#]].
 
 **Joseph de Maistre**, royaliste ardent, théoricien.
 
@@ -253,11 +254,11 @@ Mœurs copiées par les bourgeois.
 
 ### Bibliographie
 
-\[[#1]] Caron, Jean-Claude. La France de 1815 à 1848. A. Colin, 1993.
+[[#1]] Caron, Jean-Claude. La France de 1815 à 1848. A. Colin, 1993.
 
 ### Sites web
 
-[http://www.19e.org]
+[>http://www.19e.org]
 
 {{end}}
 {{end}}

@@ -24,28 +24,7 @@
 # For more information about the Hamill lightweight markup language see:
 # https://xitog.github.io/dgx/informatique/hamill.html
 
-"""
-Hamill: a simple lightweight markup language derived from markdown
-
-**bold**
---strikethrough-- (insted of ~~, too hard to type)
-__underline__ (instead of using __ for bold)
-''italic'' (instead of * or _, too difficult to parse)
-
-[link_ref] or [link_name->link_ref]
-
-|Table|
-|-----|
-|data |
-
-* liste
-
-[link_ref]: http://youradress
-
-Created 2020-04-03 as a buggy Markdown processor
-Evolved 2020-04-07 as yet another language
-
-"""
+"""Hamill: a simple lightweight markup language"""
 
 #-------------------------------------------------------------------------------
 # Imports
@@ -59,24 +38,155 @@ from hamill.tokenizer import RECOGNIZED_LANGUAGES, tokenize
 from hamill.log import success, fail, info, warn, error
 
 #-------------------------------------------------------------------------------
+# Constants and globals
+#-------------------------------------------------------------------------------
+
+LIST_STARTERS = {'* ': 'ul', '% ': 'ol', '+ ' : 'ol', '- ': 'ol reversed'}
+COMMENT_STARTER = '§§'
+
+#-------------------------------------------------------------------------------
+# Data model
+#-------------------------------------------------------------------------------
+# Result class : result of a process_string or a process_lines
+#-------------------------------------------------------------------------------
+
+class Result:
+
+    def __init__(self, default_lang='en', default_encoding='utf-8'):
+        self.constants = {}
+        self.variables = {}
+        self.lines = []
+        self.header_links = []
+        self.header_css = []
+        # 6 HTML constants
+        self.constants['TITLE'] = None
+        self.constants['ENCODING'] = default_encoding
+        self.constants['LANG'] = default_lang
+        self.constants['ICON'] = None
+        self.constants['BODY_CLASS'] = None
+        self.constants['BODY_ID'] = None
+        # 2 var from markup {{.cls}} or {{#id}}
+        self.variables['PARAGRAPH_ID'] = None
+        self.variables['PARAGRAPH_CLASS'] = None
+
+    def first(self):
+        return self.lines[0]
+
+    def __getitem__(self, key):
+        if isinstance(key, str):
+            if key in self.constants:
+                return self.constants[key]
+            elif key in self.variables:
+                return self.variables[key]
+            else:
+                raise Exception('Key not known: ' + str(key))
+
+    def __setitem__(self, key, value):
+        if isinstance(key, str):
+            if key in self.constants:
+                self.constants[key] = value
+            elif key in self.variables:
+                self.variables[key] = value
+            else:
+                raise Exception('Key not known: ' + str(key))
+
+    def append(self, line):
+        self.lines.append(line)
+
+    def __iter__(self):
+        for line in self.lines:
+            yield line
+
+    def __str__(self):
+        return ''.join(self.lines)
+
+#-------------------------------------------------------------------------------
 # Tool functions
 #-------------------------------------------------------------------------------
+# count_list_level: count the list level starting a line
+# super_strip     : strip and remove comments
+# prev_next       : get prev, next, prev_prev from a string
+# multi_start     : if a string starts with one of the starters defined
+# multi_find      : if a string contains one of the motif
+# find_unsescaped : if a string contains a motif unescaped
+# escape          : handles escaped characters
+# safe            : transform some characters
+# find_title      : find a title
+# make_id         : make an id from a string (replace ' ' by '-' and lower)
+# write_code      : write code by creating a list of tokens
+#-------------------------------------------------------------------------------
+
+def count_list_level(line):
+    """Return the level of the list, the kind of starter and if it is
+       a continuity of a previous level."""
+    starter = line[0]
+    if starter + ' ' not in LIST_STARTERS:
+        raise Exception('Unknown list starter: ' + line[0] + ' in ' + line)
+    level = 0
+    continuity = False
+    while line.startswith(starter + ' '):
+        level += 1
+        line = line[2:]
+    if line.startswith('| '):
+        level += 1
+        continuity = True
+    return level, starter, continuity
+
+
+def super_strip(line):
+    """Remove any blanks at the start or the end of the string AND the comments §§"""
+    line = line.strip()
+    if len(line) == 0:
+        return line
+    index = find_unescaped(line, COMMENT_STARTER)
+    if index != -1:
+        return line[:index].strip()
+    else:
+        return line
+
+
+def prev_next(line, index):
+    if index > 0:
+        _prev = line[index - 1]
+    else:
+        _prev = None
+    if index > 1:
+        _prev_prev = line[index - 2]
+    else:
+        _prev_prev = None
+    if index < len(line) - 1:
+        _next = line[index + 1]
+    else:
+        _next = None
+    return _prev, _next, _prev_prev
+
 
 def multi_start(string, starts):
     for key in starts:
         if string.startswith(key):
             return key
 
+
 def multi_find(string, finds):
     for key in finds:
-        if string.find(key) != -1:
+        if find_unescaped(string, key) != -1:
             return key
+    return None
 
-def contains_only(string, things):
-    for t in things:
-        if string.startswith(t) and len(string.strip()) == len(t):
-            return True
-    return False
+
+def find_unescaped(line, motif, start=0):
+    "Used by super_strip and code handling and multi_find"
+    index = start
+    while index < len(line):
+        found = line.find(motif, index)
+        if found == -1:
+            break
+        elif found == 0 or line[found - 1] != '\\':
+            return found
+        else:
+            index = found + len(motif)
+    return -1
+
 
 def escape(line):
     # Escaping
@@ -86,10 +196,7 @@ def escape(line):
     index_char = 0
     while index_char < len(line):
         char = line[index_char]
-        if index_char < len(line) - 1:
-            next_char = line[index_char + 1]
-        else:
-            next_char = None
+        _, next_char, _ = prev_next(line, index_char)
         if char == '\\' and next_char in ['*', "'", '^', '-', '_', '[', '@', '%', '+', '$', '!', '|', '{']:
             new_line += next_char
             index_char += 2    
@@ -97,6 +204,7 @@ def escape(line):
             new_line += char
             index_char += 1
     return new_line
+
 
 def safe(line):
     # Do not escape !html line
@@ -109,16 +217,8 @@ def safe(line):
     new_line = ''
     index_char = 0
     while index_char < len(line):
-        # current, next, prev
         char = line[index_char]
-        if index_char < len(line) - 1:
-            next_char = line[index_char + 1]
-        else:
-            next_char = None
-        if index_char > 0:
-            prev_char = line[index_char -1 ]
-        else:
-            prev_char = None
+        prev_char, next_char, _ = prev_next(line, index_char)
         # replace
         if char == '&':
             new_line += '&amp;'
@@ -127,12 +227,13 @@ def safe(line):
         elif char == '>' and next_char == '>' and index_char == 0: # must not replace >>
             new_line += '>>'
             index_char += 1
-        elif char == '>' and prev_char != '-': # must not replace ->
+        elif char == '>' and prev_char not in ['-', '[']: # must not replace -> and [>
             new_line += '&gt;'
         else:
             new_line += char
         index_char += 1
     return new_line
+
 
 def find_title(line):
     c = 0
@@ -149,9 +250,11 @@ def find_title(line):
         return nb, title, id_title
     return 0, None, None
 
+
 def make_id(string):
     """Translate : A simple Title -> a_simple_title"""
     return string.replace(' ', '-').lower()
+
 
 def write_code(line, code_lang):
     tokens = tokenize(line, code_lang)
@@ -171,39 +274,24 @@ def write_code(line, code_lang):
             string += safe(char)
     return string
 
+
+def check_link(link, links, inner_links):
+    if multi_start(link, ('https://', 'http://')):
+        pass
+    elif make_id(link) in inner_links:
+        link = '#' + make_id(link)
+    elif link in inner_links:
+        link = '#' + link
+    elif link in links:
+        link = links[link]
+    else:
+        warn('Undefined link:', link)
+    return link
+
+
 #-------------------------------------------------------------------------------
 # Processors
 #-------------------------------------------------------------------------------
-
-def prev_next(line, index):
-    if index > 0:
-        _prev = line[index - 1]
-    else:
-        _prev = None
-    if index > 1:
-        _prev_prev = line[index - 2]
-    else:
-        _prev_prev = None
-    if index < len(line) - 1:
-        _next = line[index + 1]
-    else:
-        _next = None
-    return _prev, _next, _prev_prev
-
-
-def find_unescaped(line, motif, start=0):
-    "Used by super_strip and code handling"
-    index = start
-    while index < len(line):
-        found = line.find(motif, index)
-        if found == -1:
-            break
-        elif found == 0 or line[found - 1] != '\\':
-            return found
-        else:
-            index = found + len(motif)
-    return -1
-
 
 def process_string(line, links=None, inner_links=None, DEFAULT_CODE='text', DEFAULT_FIND_IMAGE=None):
     links = {} if links is None else links
@@ -266,54 +354,40 @@ def process_string(line, links=None, inner_links=None, DEFAULT_CODE='text', DEFA
             char_index = ending + 1
             continue
         # Links and images
-        if char == '[' and next_char == '#' and prev_char != '\\': # [# ... ] creating inner link
+        if char == '[' and prev_char != '\\' and next_char != '[': # [[ the first is not a link!
             ending = line.find(']', char_index)
             if ending != -1:
-                link_name = line[char_index + 2:ending]
-                id_link = make_id(link_name)
-                new_line += f'<span id="{id_link}">{link_name}</span>'
-                char_index = ending
-                continue
-        elif char == '[' and next_char == '!' and prev_char != '\\': # [! ... ] image
-            ending = line.find(']', char_index)
-            if ending != -1:
-                link = line[char_index + 2:ending]
-                if DEFAULT_FIND_IMAGE is None:
-                    new_line += f'<img src="{link}"></img>'
-                else:
-                    new_line += f'<img src="{DEFAULT_FIND_IMAGE}{link}"></img>'
-                char_index = ending
-                continue
-        elif char == '[' and char_index < len(line) - 1 and prev_char != '\\':
-            ending = line.find(']', char_index)
-            if ending != -1:
-                link = line[char_index + 1:ending]
-                # Set the link_name and the link
-                if link.find('->') != -1:
+                is_link = True
+                if next_char == '#': # [# ... ] creating inner link
+                    link_name = line[char_index + 2:ending]
+                    id_link = make_id(link_name)
+                    new_line += f'<span id="{id_link}">{link_name}</span>'
+                elif next_char == '!': # [! ... ] image
+                    link = line[char_index + 2:ending]
+                    if DEFAULT_FIND_IMAGE is None:
+                        new_line += f'<img src="{link}"></img>'
+                    else:
+                        new_line += f'<img src="{DEFAULT_FIND_IMAGE}{link}"></img>'
+                elif next_char == '>': # [> ... ] direct URL or REF
+                    link_or_name = line[char_index + 2:ending]
+                    link = check_link(link_or_name, links, inner_links)
+                    new_line += f'<a href="{link}">{link_or_name}</a>'
+                elif line[char_index + 1:ending].find('->') != -1: # [ name -> direct URL | REF | # ]
+                    link = line[char_index + 1:ending]
                     link_name, link = link.split('->', 1)
-                else:
-                    link_name = link
-                if link == '#':
-                    link = link_name
-                # Check the link
-                if multi_start(link, ('https://', 'http://')):
-                    pass
-                elif make_id(link) in inner_links:
-                    link = '#' + make_id(link)
-                elif link in inner_links:
-                    link = '#' + link
-                elif link in links:
-                    link = links[link]
-                else:
-                    #print(link)
-                    #print(make_id(link))
-                    #print(inner_links)
-                    warn('Undefined link:', link, 'in', line)
-                link_name = process_string(link_name, links, inner_links,
+                    if link == '#':
+                        link = link_name
+                    # Check link
+                    link = check_link(link, links, inner_links)
+                    # Make link
+                    link_name = process_string(link_name, links, inner_links,
                                            DEFAULT_CODE, DEFAULT_FIND_IMAGE).first()
-                new_line += f'<a href="{link}">{link_name}</a>'
-                char_index = ending
-                continue
+                    new_line += f'<a href="{link}">{link_name}</a>'
+                else:
+                    is_link = False
+                if is_link:
+                    char_index = ending
+                    continue
         # Italic
         if char == "'" and next_char == "'" and prev_char != '\\':
             continue
@@ -389,7 +463,7 @@ def process_string(line, links=None, inner_links=None, DEFAULT_CODE='text', DEFA
     return res
 
 
-def get(line):
+def process_constvar(line):
     if line.startswith('!const'):
         command, value = line.replace('!const ', '').split('=')
     elif line.startswith('!var'):
@@ -399,75 +473,6 @@ def get(line):
     command = command.strip()
     value = value.strip()
     return command, value
-
-LIST_STARTERS = {'* ': 'ul', '% ': 'ol', '+ ' : 'ol', '- ': 'ol reversed'}
-
-def count_list_level(line):
-    """Return the level of the list, the kind of starter and if it is
-       a continuity of a previous level."""
-    starter = line[0]
-    if starter + ' ' not in LIST_STARTERS:
-        raise Exception('Unknown list starter: ' + line[0] + ' in ' + line)
-    level = 0
-    continuity = False
-    while line.startswith(starter + ' '):
-        level += 1
-        line = line[2:]
-    if line.startswith('| '):
-        level += 1
-        continuity = True
-    return level, starter, continuity
-
-
-class Result:
-
-    def __init__(self, default_lang='en', default_encoding='utf-8'):
-        self.constants = {}
-        self.variables = {}
-        self.lines = []
-        self.header_links = []
-        self.header_css = []
-        # 6 HTML constants
-        self.constants['TITLE'] = None
-        self.constants['ENCODING'] = default_encoding
-        self.constants['LANG'] = default_lang
-        self.constants['ICON'] = None
-        self.constants['BODY_CLASS'] = None
-        self.constants['BODY_ID'] = None
-        # 2 var from markup {{.cls}} or {{#id}}
-        self.variables['PARAGRAPH_ID'] = None
-        self.variables['PARAGRAPH_CLASS'] = None
-
-    def first(self):
-        return self.lines[0]
-
-    def __getitem__(self, key):
-        if isinstance(key, str):
-            if key in self.constants:
-                return self.constants[key]
-            elif key in self.variables:
-                return self.variables[key]
-            else:
-                raise Exception('Key not known: ' + str(key))
-
-    def __setitem__(self, key, value):
-        if isinstance(key, str):
-            if key in self.constants:
-                self.constants[key] = value
-            elif key in self.variables:
-                self.variables[key] = value
-            else:
-                raise Exception('Key not known: ' + str(key))
-
-    def append(self, line):
-        self.lines.append(line)
-
-    def __iter__(self):
-        for line in self.lines:
-            yield line
-
-    def __str__(self):
-        return ''.join(self.lines)
 
 
 def process_file(input_name, output_name=None, default_lang=None, includes=None):
@@ -597,20 +602,6 @@ def output_list(result, list_array):
             heap.pop()
 
 
-COMMENT_STARTER = '§§'
-
-def super_strip(line):
-    """Remove any blanks at the start or the end of the string AND the comments §§"""
-    line = line.strip()
-    if len(line) == 0:
-        return line
-    index = find_unescaped(line, COMMENT_STARTER)
-    if index != -1:
-        return line[:index].strip()
-    else:
-        return line
-
-
 def process_lines(lines, default_lang=None, includes=None):
     VAR_EXPORT_COMMENT=False
     VAR_DEFINITION_AS_PARAGRAPH=False
@@ -638,7 +629,7 @@ def process_lines(lines, default_lang=None, includes=None):
     for line in lines:
         # Constant must be read first, are defined once, anywhere in the doc
         if line.startswith('!const '):
-            command, value = get(line)
+            command, value = process_constvar(line)
             if command == 'TITLE':
                 result["TITLE"] = value
             elif command == 'ENCODING':
@@ -676,7 +667,7 @@ def process_lines(lines, default_lang=None, includes=None):
             # Special chars
             line = safe(line)
             # Link library
-            if len(line) > 0 and line[0] == '[' and (line.find(']: https://') != -1 or line.find(']: http://') != -1):
+            if len(line) > 0 and line[0] == '[' and multi_find(line, [']: https://', ']: http://']):
                 name = line[1:line.find(']: ')]
                 link = line[line.find(']: ') + len(']: '):]
                 links[name] = link
@@ -720,7 +711,7 @@ def process_lines(lines, default_lang=None, includes=None):
             next_line = None
         # Variables
         if line.startswith('!var '):
-            command, value = get(line)
+            command, value = process_constvar(line)
             if command == 'EXPORT_COMMENT':
                 if value == 'true':
                     VAR_EXPORT_COMMENT = True
@@ -982,11 +973,9 @@ def process_lines(lines, default_lang=None, includes=None):
         result.append('</pre>')
     return result
 
-
 #-------------------------------------------------------------------------------
 # Main functions
 #-------------------------------------------------------------------------------
-
 
 def process_dir(source, dest, default_lang=None, includes=None):
     """Process a directory:
