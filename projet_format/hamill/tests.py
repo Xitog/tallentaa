@@ -1,4 +1,6 @@
 import hamill
+import locale
+import datetime
 
 print(hamill.__version__)
 
@@ -21,7 +23,7 @@ def verify(answer, check, msg=None):
         print(check)
         for i in range(min(len(s), len(check))):
             if s[i] != check[i]:
-                print(i, s[i], check[i])
+                print('>>>', i, s[i], check[i])
         if msg is not None:
             raise AssertionError("Pb on : " + str(answer))
         else:
@@ -255,3 +257,18 @@ check = """<h2 id="les-jeux">Les jeux</h2>
 """
 verify(res, check, "Title transformation => Error")
 
+# Test 25 display a constant in process_string
+par = "Ce texte a été généré le [=GENDATE]"
+res = hamill.process_string(par, hamill.Generation(default_lang='fr'))
+locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
+dt = datetime.datetime.now().strftime('%d %B %Y')
+check = f"Ce texte a été généré le {dt}"
+verify(res, check, "Output gendate from process_string => Error")
+
+# Test 26 display a constant in process_lines
+par = "Ce texte a été généré le [=GENDATE]"
+res = hamill.process_lines([par], hamill.Generation(default_lang='fr'))
+locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
+dt = datetime.datetime.now().strftime('%d %B %Y')
+check = f"<p>Ce texte a été généré le {dt}</p>\n"
+verify(res, check, "Output gendate from process_lines => Error")

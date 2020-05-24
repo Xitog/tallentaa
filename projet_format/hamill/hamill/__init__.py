@@ -33,4 +33,4 @@ __version__ = "0.2.2"
 # Imports
 from hamill.log import *
 from hamill.tokenizer import *
-from hamill.hamill import process, process_dir, process_file, process_lines, process_string
+from hamill.hamill import process, process_dir, process_file, process_lines, process_string, Generation
