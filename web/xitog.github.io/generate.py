@@ -2,6 +2,11 @@
 #import sys
 #sys.path.append(r"C:\Users\damie_000\Documents\GitHub\tallentaa\projet_format\hamill\hamill")
 
+import os
+
+# Get the last version of Hamill
+os.system('get_last.bat')
+
 # COPY FIRST THE LATEST VERSION OF THE HAMILL PACKAGE IN THIS DIRECTORY
 import hamill
 

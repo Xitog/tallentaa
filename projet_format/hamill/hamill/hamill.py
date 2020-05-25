@@ -33,7 +33,7 @@
 import os # for walk
 import os.path # test if it is a directory or a file
 import shutil
-import locale # for generating the date
+import locale
 import datetime
 
 from hamill.tokenizer import RECOGNIZED_LANGUAGES, tokenize
@@ -75,10 +75,37 @@ class Generation:
         self.constants['BODY_CLASS'] = None
         self.constants['BODY_ID'] = None
         # 1 generation constant
-        if default_lang == 'fr':
-            locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
-        dt = datetime.datetime.now()
-        self.constants['GENDATE'] = dt.strftime('%d %B %Y')
+        try:
+            dt = datetime.datetime.now()
+            found = False
+            # first try, our lang, our encoding
+            for lang, encoding in locale.locale_alias.items():
+                if lang.startswith(default_lang) and default_encoding in encoding.lower():
+                    locale.setlocale(locale.LC_TIME, (lang, encoding))
+                    info(f'Locale set to {lang} and encoding {encoding}')
+                    found = True
+                    break
+            # second try, our lang, any encoding
+            if not found:
+                for lang, encoding in locale.locale_alias.items():
+                    if lang.startswith(default_lang):
+                        try:
+                            locale.setlocale(locale.LC_TIME, (lang, encoding))
+                            found = True
+                            warn(f'Locale not found for {default_lang} and encoding {default_encoding}, defaulting to: {encoding}')
+                            break
+                        except locale.Error:
+                            #warn(f'Error while setting locale for {lang} and encoding {encoding}.')
+                            pass
+            # last try, ugly fix for Windows 7
+            if not found:
+                res = locale.setlocale(locale.LC_TIME, '')
+                warn(f'Locale not found for {default_lang} in any encoding. Setting to default: {res}')
+            self.constants['GENDATE'] = dt.strftime("%d %B %Y")
+            #self.constants['GENDATE'] = f'{dt.year}/{dt.month}/{dt.day}'
+                
+        except KeyError:
+            self.constants['GENDATE'] = f'{dt.day}/{dt.month}/{dt.year}'
         # 2 var from markup {{.cls}} or {{#id}}
         self.variables['EXPORT_COMMENT'] = False
         self.variables['DEFINITION_AS_PARAGRAPH'] = False

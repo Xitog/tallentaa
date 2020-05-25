@@ -23,13 +23,27 @@
 
 # Introduction
 
-**Le [raycasting->https://en.wikipedia.org/wiki/Ray_casting] (lancer de rayons) est une technique de rendu dans les jeux vidéo pour, à partir d'une carte en 2D, afficher en temps réel un environnement qui à l'apparence d'une 3D rudimentaire** [1]. Le principal avantage de cette technique est d'être rapide et abordable en termes de calcul temps réel pour les ordinateurs du début des années 90. Cette technique est également appelée parfois « [2.5D->https://en.wikipedia.org/wiki/2.5D] » pour la différencier des premiers moteurs de rendu en vraie 3D comme le moteur de @@Quake 1@@, appelé aussi Id Tech 1, mais cette appellation recouvre également d'autres techniques de représentation d'un environnement 3D en 2D comme les [projections axonométriques->https://en.wikipedia.org/wiki/Axonometric_projection] dont la [perspective isométrique->https://en.wikipedia.org/wiki/Isometric_video_game_graphics].
+**Le [raycasting->https://en.wikipedia.org/wiki/Ray_casting], le lancer de rayons en bon français, est une technique de rendu dans les jeux vidéo pour, à partir d'une carte en 2D, afficher en temps réel un environnement qui à l'apparence d'une 3D rudimentaire** [1]. Le principal avantage de cette technique est d'être rapide et abordable en termes de calcul temps réel pour les ordinateurs du début des années 90. Cette technique est également appelée parfois « [2.5D->https://en.wikipedia.org/wiki/2.5D] » pour la différencier des premiers moteurs de rendu en vraie 3D comme le moteur de @@Quake 1@@, appelé aussi Id Tech 1, mais cette appellation recouvre également d'autres techniques de représentation d'un environnement 3D en 2D comme les [projections axonométriques->https://en.wikipedia.org/wiki/Axonometric_projection] dont la [perspective isométrique->https://en.wikipedia.org/wiki/Isometric_video_game_graphics].
 
 Il ne faut pas confondre ''raycasting'' et ''raytracing''. Le raytracing est une autre technique de rendu qui est beaucoup plus coûteuse en temps de calcul et simule le parcours des rayons de lumière de différentes sources pour éclairer la scène en essayant d'atteindre une qualité photoréaliste. Depuis la fin 2019, la puissance des cartes graphiques est telle que certains proposent du raytracing en temps réel.
 
 Notons enfin que si le raycasting est rapide sur les résolutions de l'écran de l'époque, 320x200, 640x400 ou 640x480, ses performances sont très mauvaises sur nos grandes résolutions modernes et il vaut mieux passer par des techniques plus modernes comme les API 3D OpenGL, Vulkan ou DirectX.
 
 # Historique
+
+Le jeu qui a popularisé cette technique est @@Wolfenstein 3D@@, d'id Software, sorti le 5 mai 1992. Le raycasting était une technique bien adaptée à la puissance des machines de l'époque, codée avec brio par John Carmack, et mis au service d'un jeu avec un gameplay simple et rapide, dans une direction artistique faisant la part belle à la violence (pour l'époque) et aux décorations nazies, les ennemis du jeu.
+
+Le moteur qui implémente le raycasting dans Wolfenstein 3D propose néanmoins des fonctionnalités très rudimentaires : le niveau est stocké dans un tableau, une grille. La valeur d'une case indique s'il la case est pleine ou creuse. Tous les murs ont la même hauteur, ont une longueur qui est toujours un multiple d'une valeur de base, ils se croisent toujours perpendiculairement, le sol et le plafond ne sont pas texturés, la lumière est statique. Le moteur offre néanmoins des murs texturés, des portes, des sprites pour les ennemis, les objets et les lumières statiques.
+
+Avant Wolfenstein 3D, John Carmack avait développé en 1991 le moteur de @@Hovertank 3D@@ pour son précédent employeur, Softdisk. Celui-ci fut amélioré pour @@Catacomb 3-D@@, sorti en 1991. Un autre développeur, Blue Sky Productions était lui en train de programmer Ultima Underworld: The Stygian Abyss, un autre jeu utilisant le raycasting comme principe mais doté d'un moteur beaucoup plus avancé.
+
+id Software a vendu le moteur de Wolfenstein 3D à différentes équipes de développement, qui en retour l'ont utilisé dans différents jeux, parfois en le changeant profondemment pour lui rajouter des capacités.
+
+Avec la sortie du jeu suivant d'id Software, @@Doom@@, en 1993, le moteur de Wolfenstein 3D prend un sérieux coup de vieux. Le moteur de @@Doom@@, connu sous le nom de @@id Tech 1@@ permet d'afficher des murs non perpendiculaires, de longueurs et de hauteurs variées, avec des sols et des plafonds texturés avec des hauteurs différentes et des effets de lumière dynamique.
+
+Mais c'est encore le jeu suivant d'id Software, @@Quake@@, sorti en 1996, qui rangera le raycasting au rang des technologies obsolètes. Le moteur de @@Quake@@, nommé plus tard @@id Tech 2@@, ne part plus d'une plan 2D pour en construire une vision 3D mais bel et bien d'un environnement 3D. Les derniers feux du raycasting brilleront avec les jeux @@Dark Forces@@, @@Duke Nukem 3D@@, @@Shadow Warrior@@ et @@Blood@@, ces trois derniers utilisant le @@Build engine@@ comme moteur, développé par [Ken Silverman->http://advsys.net/ken/].
+
+A la fin des années dix, on constate un retour d'engouement pour les jeux de cette période avec le développement du ''retrogaming''. De nouveaux jeux sortent également qui utilisent de vieux moteurs ou en construisent de nouveaux émulant le rendu d'époque pour offrir aux joueurs d'aujour'hui un retour vers le passé du FPS avec des titres comme @@GUN GODZ@@, @@Project Warlock@@ ou @@Ion Fury@@.
 
 # Technique
 
