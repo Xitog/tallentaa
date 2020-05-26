@@ -2,10 +2,13 @@
 #import sys
 #sys.path.append(r"C:\Users\damie_000\Documents\GitHub\tallentaa\projet_format\hamill\hamill")
 
+refresh_hamill = False
+
 import os
 
 # Get the last version of Hamill
-os.system('get_last.bat')
+if refresh_hamill:
+    os.system('get_last.bat')
 
 # COPY FIRST THE LATEST VERSION OF THE HAMILL PACKAGE IN THIS DIRECTORY
 import hamill
@@ -16,6 +19,8 @@ includes = ['menu.html']
 
 # Full
 hamill.process('input', 'output', 'fr', includes)
+#hamill.process_file(r'input\passetemps\tech_raycasting_fr.hml', r'output\passetemps\tech_raycasting_fr.html', 'fr', includes)
+#hamill.process_file(r'input\informatique\tools_langs.hml', r'output\informatique\tools_langs.html', 'fr', includes)
 
 # Mono
 #hamill.process_file(r'input\passetemps\pres_jeux.hml', r'output\passetemps\pres_jeux.html', 'fr', includes)

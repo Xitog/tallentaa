@@ -246,6 +246,25 @@ $ Compile
 
 ### Game programming
 
+In order to develop a game you need 1) a language 2) a media library, sometimes several for handling sound, graphic, video, net... I put here some combination I used:
+
+* [C->https://en.cppreference.com/w/c]
+* * [Allegro->http://liballeg.org/]
+* * [SDL 1->https://www.libsdl.org/release/SDL-1.2.15/docs/] and [SDL 2->https://www.libsdl.org/]
+* * [SFML->https://www.sfml-dev.org/]
+* [Lua->https://www.lua.org/]
+* * [Löve->https://love2d.org/]
+* [Python->https://www.python.org/]
+* * [Pygame->http://www.pygame.org/]
+* * [SFML->https://www.sfml-dev.org/]
+* [Ruby->https://www.ruby-lang.org/en/]
+* * [Gosu->https://www.libgosu.org/]
+* * [SFML->https://www.sfml-dev.org/]
+* [Java->https://www.java.com/fr/]
+* * [libGDX->https://libgdx.badlogicgames.com/]
+
+Here are some tech, tools or spec linked to games:
+
 * [War2Tools->https://github.com/war2/war2tools] : set of tools for the PUD map format and resources of Warcraft II
 * [War2Edit->https://war2.github.io/war2edit/] : a free tool for producing PUD map
 * [PUD unofficial format spec->http://cade.datamax.bg/war2x/pudspec.html] : the unofficial specification of the PUD map format

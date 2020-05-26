@@ -35,6 +35,15 @@ The game which put this techique at the center stage was id Software smash hit @
 
 # Technical information
 
+Build:
+Sloped ceilings and floors
+High-res SVGA and VESA support
+True rooms above rooms
+Moving vehicles
+Transparent sprites
+Underwater swimming
+Map sectors can move during game play
+
 # References
 
 [1] : Lode's Computer Graphics Tutorial
