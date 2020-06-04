@@ -1,7 +1,7 @@
 # -----------------------------------------------------------
 # MIT Licence (Expat License Wording)
 # -----------------------------------------------------------
-# Copyright © 2020, Damien Gouteux
+# Copyright © <YEAR>, Damien Gouteux
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,19 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-# For more information about the Hamill lightweight markup language see:
-# https://xitog.github.io/dgx/informatique/hamill.html
+# For more information about the <PROJECT> see:
+# <URL>
 
-"""Hamill: a simple lightweight markup language
-"""
-
-# Version of the hamill package
-__version__ = "0.2.2"
-
-# Imports
-import logging
-from hamill.tokenizer import *
-from hamill.hamill import process, process_dir, process_file, process_lines, process_string, Generation
-
-logging.basicConfig(format='%(levelname)s %(asctime)s %(message)s')
-logging.getLogger().setLevel(logging.DEBUG)
+# REPLACE <YEAR> <PROJECT> <URL>

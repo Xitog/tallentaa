@@ -35,7 +35,7 @@ verify(res, "<b>bold</b> <i>italic</i> <u>underline</u> <s>strike</s> <sup>super
 
 # Test 2
 res = hamill.process_string("@@code@@")
-verify(res, '<code><span class="normal">code</span></code>', "process_string => Code error")
+verify(res, '<code><span class="TokenType.NORMAL">code</span></code>', "process_string => Code error")
 
 # Test 3
 par = """* item 1
@@ -257,18 +257,33 @@ check = """<h2 id="les-jeux">Les jeux</h2>
 """
 verify(res, check, "Title transformation => Error")
 
-# Test 25 display a constant in process_string
+# Test 25 display a constant (English date) in process_string
+par = "This text has been generated on [=GENDATE]"
+res = hamill.process_string(par, hamill.Generation(default_lang='en'))
+dt = datetime.datetime.now().strftime('%d %B %Y')
+check = f"This text has been generated on {dt}"
+verify(res, check, "Output English gendate from process_string => Error")
+
+# Test 26 display a constant (French date) in process_string
 par = "Ce texte a été généré le [=GENDATE]"
 res = hamill.process_string(par, hamill.Generation(default_lang='fr'))
-locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
+try:
+    locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
+except locale.Error:
+    locale.setlocale(locale.LC_TIME, '')
 dt = datetime.datetime.now().strftime('%d %B %Y')
 check = f"Ce texte a été généré le {dt}"
-verify(res, check, "Output gendate from process_string => Error")
+verify(res, check, "Output French gendate from process_string => Error")
 
-# Test 26 display a constant in process_lines
+# Test 27 display a constant (French date) in process_lines
 par = "Ce texte a été généré le [=GENDATE]"
 res = hamill.process_lines([par], hamill.Generation(default_lang='fr'))
-locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
+try:
+    locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
+except locale.Error:
+    locale.setlocale(locale.LC_TIME, '')
 dt = datetime.datetime.now().strftime('%d %B %Y')
 check = f"<p>Ce texte a été généré le {dt}</p>\n"
-verify(res, check, "Output gendate from process_lines => Error")
+verify(res, check, "Output French gendate from process_lines => Error")
+
+

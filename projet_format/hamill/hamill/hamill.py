@@ -37,7 +37,7 @@ import locale
 import datetime
 
 from hamill.tokenizer import RECOGNIZED_LANGUAGES, tokenize
-from hamill.log import success, fail, info, warn, error
+from logging import info, warning, error
 
 #-------------------------------------------------------------------------------
 # Constants and globals
@@ -58,7 +58,8 @@ class Generation:
 
     def __init__(self, default_lang='en', default_encoding='utf-8',
                  default_code='text', default_find_image=None,
-                 includes = None, links = None, inner_links = None):
+                 includes = None, links = None, inner_links = None,
+                 error_locale=False):
         self.constants = {}
         self.variables = {}
         self.lines = []
@@ -81,10 +82,15 @@ class Generation:
             # first try, our lang, our encoding
             for lang, encoding in locale.locale_alias.items():
                 if lang.startswith(default_lang) and default_encoding in encoding.lower():
-                    locale.setlocale(locale.LC_TIME, (lang, encoding))
-                    info(f'Locale set to {lang} and encoding {encoding}')
-                    found = True
-                    break
+                    try:
+                        locale.setlocale(locale.LC_TIME, (lang, encoding))
+                        info(f'Locale set to {lang} and encoding {encoding}')
+                        found = True
+                        break
+                    except locale.Error:
+                        if (error_locale):
+                            warning(f'Impossible to set locale to ({lang}, {encoding}).')
+                        pass
             # second try, our lang, any encoding
             if not found:
                 for lang, encoding in locale.locale_alias.items():
@@ -92,18 +98,18 @@ class Generation:
                         try:
                             locale.setlocale(locale.LC_TIME, (lang, encoding))
                             found = True
-                            warn(f'Locale not found for {default_lang} and encoding {default_encoding}, defaulting to: {encoding}')
+                            warning(f'Locale not found for ({default_lang}, {default_encoding}), defaulting to ({lang}, {encoding})')
                             break
                         except locale.Error:
-                            #warn(f'Error while setting locale for {lang} and encoding {encoding}.')
+                            if (error_locale):
+                                warning(f'Impossible to set locale to ({lang}, {encoding}).')
                             pass
             # last try, ugly fix for Windows 7
             if not found:
                 res = locale.setlocale(locale.LC_TIME, '')
-                warn(f'Locale not found for {default_lang} in any encoding. Setting to default: {res}')
+                warning(f'Locale not found for {default_lang} in any encoding. Setting to default: {res}')
             self.constants['GENDATE'] = dt.strftime("%d %B %Y")
             #self.constants['GENDATE'] = f'{dt.year}/{dt.month}/{dt.day}'
-                
         except KeyError:
             self.constants['GENDATE'] = f'{dt.day}/{dt.month}/{dt.year}'
         # 2 var from markup {{.cls}} or {{#id}}
@@ -264,19 +270,25 @@ def safe(line):
     # Replace HTML special char
     new_line = ''
     index_char = 0
+    escape = False
     while index_char < len(line):
         char = line[index_char]
         prev_char, next_char, _ = prev_next(line, index_char)
         # replace
-        if char == '&':
-            new_line += '&amp;'
-        elif char == '<':
-            new_line += '&lt;'
-        elif char == '>' and next_char == '>' and index_char == 0: # must not replace >>
-            new_line += '>>'
-            index_char += 1
-        elif char == '>' and prev_char not in ['-', '[']: # must not replace -> and [>
-            new_line += '&gt;'
+        if char == '@' and next_char == '@':
+            escape = not escape
+        if not escape:
+            if char == '&':
+                new_line += '&amp;'
+            elif char == '<':
+                new_line += '&lt;'
+            elif char == '>' and next_char == '>' and index_char == 0: # must not replace >>
+                new_line += '>>'
+                index_char += 1
+            elif char == '>' and prev_char not in ['-', '[', '|']: # must not replace -> and [> and |>
+                new_line += '&gt;'
+            else:
+                new_line += char
         else:
             new_line += char
         index_char += 1
@@ -314,7 +326,7 @@ def write_code(line, code_lang):
     for index_char, char in enumerate(line):
         if index_char in tokens_by_index:
             tok = tokens_by_index[index_char]
-            string += f'<span class="{tok.typ}">{char}'
+            string += f'<span class="{tok.typ.value}">{char}'
             next_stop = tok.stop
         elif next_stop is not None and index_char == next_stop:
             string += f'{char}</span>'
@@ -333,7 +345,7 @@ def check_link(link, links, inner_links):
     elif link in links:
         link = links[link]
     else:
-        warn('Undefined link:', link)
+        warning(f'Undefined link: {link}')
     return link
 
 
@@ -425,7 +437,7 @@ def process_string(line, gen=None):
                     elif ids in gen.variables:
                         new_line += str(gen.variables[ids])
                     else:
-                        warn('Undefined identifier:', ids)
+                        warning(f'Undefined identifier: {ids}')
                         new_line += '<undefined>'
                 elif line[char_index + 1:ending].find('->') != -1: # [ name -> direct URL | REF | # ]
                     link = line[char_index + 1:ending]
@@ -529,7 +541,7 @@ def process_constvar(line):
 
 
 def process_file(input_name, output_name=None, default_lang=None, includes=None):
-    info('Processing file:', input_name)
+    info(f'Processing file: {input_name}')
     if not os.path.isfile(input_name):
         raise Exception('Process_file: Invalid source file: ' + str(input_name))
     source = open(input_name, mode='r', encoding='utf8')
@@ -727,7 +739,7 @@ def process_lines(lines, gen=None):
                             link_name = line[char_index + 2:ending]
                             id_link = make_id(link_name)
                             if id_link in gen.inner_links:
-                                log.warn("Multiple definitions of anchor: " + id_link)
+                                warning(f"Multiple definitions of anchor: {id_link}")
                             gen.inner_links.append(id_link)
                             char_index = ending
                             continue
@@ -769,7 +781,7 @@ def process_lines(lines, gen=None):
                 if value in RECOGNIZED_LANGUAGES:
                     gen['DEFAULT_CODE'] = value
                 else:
-                    warn('Not recognized language in var VAR_DEFAULT_CODE:', value)
+                    warning(f'Not recognized language in var VAR_DEFAULT_CODE: {value}')
             elif command == 'NEXT_PAR_ID':
                 gen['NEXT_PAR_ID'] = value if value != 'reset' else None
             elif command == 'NEXT_PAR_CLASS':
@@ -813,9 +825,9 @@ def process_lines(lines, gen=None):
                     file.close()
                     gen.append(file_content + '\n')
                 else:
-                    warn('Included file', included, 'not found in includes.')
+                    warning(f'Included file {included} not found in includes.')
             else:
-                warn('No included files for generation.')
+                warning('No included files for generation.')
             continue
         # Inline HTML
         if line.startswith('!html '):
@@ -1022,12 +1034,12 @@ def process_dir(source, dest, default_lang=None, includes=None):
             - Else the file is copied into the new directory
        The destination directory is systematically DELETED at each run.
     """
-    info('Processing directory:', source)
+    info(f'Processing directory: {source}')
     if not os.path.isdir(source):
         raise Exception('Process_dir: Invalid source directory: ' + str(source))
     if os.path.isdir(dest):
         shutil.rmtree(dest)
-    info('Making dir:', dest)
+    info(f'Making dir: {dest}')
     os.mkdir(dest)
     for name_ext in os.listdir(source):
         path = os.path.join(source, name_ext)
@@ -1036,7 +1048,7 @@ def process_dir(source, dest, default_lang=None, includes=None):
             if ext == '.hml':
                 process_file(path, os.path.join(dest, name + '.html'), default_lang, includes)
             else:
-                info('Copying file:', path)
+                info(f'Copying file: {path}')
                 shutil.copy2(path, os.path.join(dest, name_ext))
         elif os.path.isdir(path):
             process_dir(path, os.path.join(dest, name_ext), default_lang, includes)
@@ -1049,4 +1061,4 @@ def process(source, dest, default_lang=None, includes=None):
     elif os.path.isdir(source):
         process_dir(source, dest, default_lang, includes)
     else:
-        warn('Process:', source, 'not found.')
+        warning(f'Process: {source} not found.')

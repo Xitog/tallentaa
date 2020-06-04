@@ -140,6 +140,12 @@ On peut mettre bien sûr des modificateurs de textes, des liens ou une image dan
 |--------------------------------------------------------------------------------------------------|
 |Il [!background-green.png] |est    |--beau-- différent|ce [tableau->https://xitog.github.io/dgx/].|
 
+On peut également centré une case en faisant suivre la colonne ouvrante par @@=@@ et d'aligner à droite avec @@>@@ :
+
+|A gauche  |= Centré  |> A droite|
+|--------------------------------|
+|> A droite|= Centré  |A gauche  |
+
 **LIMITATION : pas de listes dans un tableau pour l'instant** :
 
 ## Liens

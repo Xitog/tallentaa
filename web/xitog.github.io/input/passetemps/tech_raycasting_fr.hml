@@ -25,7 +25,7 @@
 + [Historique->2.-historique]
 + [Technique->3.-technique]
 + + [Principe->3.1-principe]
-+ [Index des moteurs de raycasting et des jeux->4.-index-des-moteurs-de-raycasting-et-des-jeux]
++ [Index des moteurs de raycasting et des jeux->4.-index-des-moteurs-de-raycasting,-des-jeux-et-des-tutoriels]
 + [Références->5.-références]
 
 A version in English of this page is [available here->https://xitog.github.io/dgx/passetemps/tech_raycasting_en.html].
@@ -78,21 +78,27 @@ Une technique simple pour simuler l'effet de la lumière est de dessiner les tex
 
 # 4. Index des moteurs de raycasting, des jeux et des tutoriels
 
-* Avant Wolfenstein par John Carmack ''(2 jeux publiés)''
-* * 1991 : [Hovertank 3-D->Hovertank], [Catacomb 3-D->Catacomb]
+Ceci est un aperçu rapide des principaux moteurs et jeux. Pour une liste plus complète, vous pouvez consulter mon index.
+
+|Année|= Autres moteurs                                                                           |= Wolfenstein Engine (Carmack)                                                                                                                                                                     |= Doom Engine (Carmack)                                                              |= Build Engine (Silverman)                                                                                |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|1991| [Hovertank 3-D->Hovertank] !! [Catacomb 3-D->Catacomb]                                     |                                                                                                                                                                                                   |                                                                                     |                                                                                                          |
+|1992| [Ultima Underworld: The Stygian Abyss->Ultima]                                             | **[Wolfenstein 3D->Wolfenstein3D]** !! [Spear of Destiny->Spear]                                                                                                                                  |                                                                                     |                                                                                                          |
+|1993| [Ultima Underworld II: Labyrinth of Worlds->Ultima2] !! [The Terminator: Rampage->Rampage] | [Blake Stone: Aliens of Gold->BlakeStone]                                                                                                                                                         | **[>Doom]**                                                                         |                                                                                                          |
+|1994| [The Elder Scrolls: Arena->Arena]                                                          | [Rise of the Triad: Dark War->ROTT] !! [Blake Stone: Planet Strike!->BlakeStone2] !! [Operation Body Count->BodyCount] !! [Corridor 7: Alien Invasion->Corridor7] !! [Super Noah's Ark 3-D->Noah] | [Doom II: Hell on Earth->Doom2] !! [>Heretic]                                       | [Legend of the Seven Paladins 3D->Legend] !! (Euijeok: Im Kkeokjeong)                                    |
+|1995| [Dark Forces->DarkForces] ''(Jedi)''                                                       |                                                                                                                                                                                                   | [The Ultimate DOOM->UltimateDoom] !! [Hexen: Beyond Heretic->Hexen]                 | [William Shatner's TekWar->TekWar] !! [>Witchaven]                                                       |
+|1996|                                                                                            |                                                                                                                                                                                                   | [Final DOOM->FinalDoom] !! [Chex Quest->Chex] !! [Chex Quest 2->Chex2] !! [>Strife] | [Duke Nukem 3D->Duke3D] !! [Witchaven II: Blood Vengeance->Witchhaven2] !! [Powerslave/Exhumed->Exhumed] |
+|1997| [>Outlaws] ''(Jedi)''                                                                      |                                                                                                                                                                                                   |                                                                                     | [>Blood] !! [Redneck Rampagne->Redneck] !! [Shadow Warrior->Shadow]                                      |
+|1998|                                                                                            |                                                                                                                                                                                                   |                                                                                     | [>NAM] !! [Extreme Paintbrawl->Extreme]                                                                  |
+|1999|                                                                                            |                                                                                                                                                                                                   |                                                                                     | [>WW2]                                                                                                   |
+|2018|                                                                                            |                                                                                                                                                                                                   |                                                                                     | [Ion Maiden->Ion]                                                                                        |
+|2019|                                                                                            |                                                                                                                                                                                                   | [>Hedon]                                                                            |                                                                                                          |
+
+* Avant Wolfenstein par John Carmack
 * [Wolfenstein Engine->IdTech0] par John Carmack
-* * Jeux commerciaux publiés ''(3)''
-* * * 1992 : [Wolfenstein 3D->Wolfenstein3D], [Spear of Destiny->Spear]
-* * * 1993 : [Blake Stone: Aliens of Gold->BlakeStone]
-* * * 1994 : [Rise of the Triad: Dark War->ROTT], [Blake Stone: Planet Strike!->BlakeStone2], [Operation Body Count->BodyCount], [Corridor 7: Alien Invasion->Corridor7], [Super Noah's Ark 3-D->Noah]
 * * Liens
 * * * Le jeu est [jouable en ligne->http://3d.wolfenstein.com/game_EU.php] dans une version codée en JavaScript.
 * [Doom Engine/id Tech 1->IdTech1] par John Carmack ''(10 jeux publiés)''
-* * 1993 : [>Doom]
-* * 1994 : [Doom II: Hell on Earth->Doom2], [>Heretic]
-* * 1995 : [The Ultimate DOOM->UltimateDoom], [Hexen: Beyond Heretic->Hexen]
-* * 1996 : [Final DOOM->FinalDoom], [Chex Quest->Chex], [Chex Quest 2->Chex2], [>Strife]
-* * 2019 : [>Hedon]
 * [Build Engine->Build] par Ken Silverman
 * * Technologiquement, le Build Engine apporta :
 * * * Plafonds et pentes inclinés Sloped ceilings and floors
@@ -106,26 +112,8 @@ Une technique simple pour simuler l'effet de la lumière est de dessiner les tex
 * * * [Le Build 2, un moteur jamais utilisé->http://advsys.net/ken/buildsrc/build2.htm]
 * * * [Histoire du Build->https://www.youtube.com/watch?v=VSVzn0F3pyQ] par CuteFloor
 * * * [Description du Build 2->https://www.youtube.com/watch?v=3qtmkkdND6M] par CuteFloor
-* * Jeux commerciaux publiés ''(13)''
-* * * 1994 : [Legend of the Seven Paladins 3D/Euijeok: Im Kkeokjeong->Legend]
-* * * 1995 : [William Shatner's TekWar->TekWar], [>Witchaven]
-* * * 1996 : [Duke Nukem 3D->Duke3D], [Witchaven II: Blood Vengeance->Witchhaven2], [Powerslave/Exhumed->Exhumed]
-* * * 1997 : [>Blood], [Redneck Rampagne->Redneck], [Shadow Warrior->Shadow]
-* * * 1998 : [>NAM], [Extreme Paintbrawl->Extreme]
-* * * 1999 : [>WW2]
-* * * 2018 : [Ion Maiden->Ion]
 * * Jeux non publiés
 * * * Fate (~1996), Corridor 8: Galactic Wars (~1996)
-* [Jedi Engine->JediEngine] par Ray Gresko ''(2 jeux publiés)''
-* * 1995 : [Dark Forces->DarkForces]
-* * 1997 : [>Outlaws]
-* La série des Ultima Underworld ''(2 jeux publiés)''
-* * 1992 : [Ultima Underworld: The Stygian Abyss->Ultima]
-* * 1993 : [Ultima Underworld II: Labyrinth of Worlds->Ultima2]
-* La série de jeux Bethesda ''(2 jeux publiés)''
-* * 1993 : [The Terminator: Rampage->Rampage]
-* * 1994 : [The Elder Scrolls: Arena->Arena]
-
 * Tutoriels
 * * Tutoriel de [Lode Vandevenne->https://lodev.org/cgtutor/]
 * * * [Vidéo d'un moteur avancé->https://www.youtube.com/watch?v=-5nhdEDGaws] basé sur le tutoriel de Lode Vandevenne qui rajoute des plusieurs niveaux, des murs fins, un ciel panoramique et du brouillard.
