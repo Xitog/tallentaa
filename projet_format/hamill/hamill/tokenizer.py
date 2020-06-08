@@ -44,7 +44,8 @@ languages = {
         'ante_identifier': [],
         'accept_unknown' : True,
         'line_comment' : None,
-        'string_markers' : []
+        'string_markers' : [],
+        'number' : False
     },
     'json': {
         'keywords': ['null'],
@@ -54,7 +55,8 @@ languages = {
         'ante_identifier': [],
         'accept_unknown' : True,
         'line_comment' : None,
-        'string_markers' : ['"', "'"]
+        'string_markers' : ['"', "'"],
+        'number' : True
     },
     'python': {
         'keywords': ['await', 'else', 'import', 'pass', 'break', 'except', 'in',
@@ -66,12 +68,13 @@ languages = {
         'operators': ['+', '/', '//', '&', '^', '~', '|', '**', '<<', '%', '*',
                       '-', '>>', ':', '<', '<=', '==', '!=', '>=', '>', '+=',
                       '&=', '//=', '<<=', '%=', '*=', '|=', '**=', '>>=', '-=',
-                      '/=', '^=', '.'],
+                      '/=', '^=', '.', '='],
         'separators': ['{', '}', '(', ')', '[', ']', ',', ';'],
         'ante_identifier': ['def', 'class'],
         'accept_unknown' : False,
         'line_comment' : '#',
-        'string_markers' : ['"', "'"]
+        'string_markers' : ['"', "'"],
+        'number' : True
     },
     'game' : {
         'keywords': [],
@@ -81,7 +84,8 @@ languages = {
         'ante_identifier': [],
         'accept_unknown': True,
         'line_comment': None,
-        'string_markers': []
+        'string_markers': [],
+        'number' : False
     },
     'hamill' : {
         'keywords': ['var', 'const', 'include', 'require'],
@@ -91,7 +95,8 @@ languages = {
         'ante_identifier': ['var', 'const'],
         'accept_unknown': True,
         'line_comment': None,
-        'string_markers': []
+        'string_markers': [],
+        'number' : True
     },
 }
 
@@ -177,7 +182,7 @@ def tokenize(text, lang='text'):
                     break
                 else:
                     break
-            if not wrong:
+            if not wrong and languages[lang]['number']:
                 tokens.append(Token(start, stop, length, TokenType.NUMBER, int(num)))
             else:
                 tokens.append(Token(start, stop, length, TokenType.NORMAL, num))

@@ -328,8 +328,12 @@ def write_code(line, code_lang):
             tok = tokens_by_index[index_char]
             string += f'<span class="{tok.typ.value}">{char}'
             next_stop = tok.stop
+            if next_stop == index_char:
+                string += f'</span>'
+                next_stop = None
         elif next_stop is not None and index_char == next_stop:
             string += f'{char}</span>'
+            next_stop = None
         else:
             string += safe(char)
     return string
