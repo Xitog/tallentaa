@@ -11,6 +11,17 @@
 !css code span.number { color: inherit; background-color: transparent; }
 !css p { text-align: justify; }
 
+!css table#main                   { border-collapse: collapse; font-family: "Arial"; font-size: 0.8em; }
+!css table#main td                { border: 1px black solid; }
+!css table#main tr:first-child    { font-weight: bold; }
+!css table#main tr td:first-child { font-weight: bold; }
+!css table#main td.y              { font-weight: bold; background-color: rgb(146, 208, 80);  color: white; text-align: center; }
+!css table#main td.n              { font-weight: bold; background-color: rgb(247, 150, 70);  color: white; text-align: center; }
+!css table#main td.i              { font-weight: bold; background-color: rgb(0, 176, 240);   color: white; text-align: center; }
+!css table#main td.h1             { font-weight: bold; background-color: rgb(0, 0, 0);       color: white; text-align: center; }
+!css table#main td.h2             { font-weight: bold; background-color: rgb(238, 236, 225); color: black; text-align: center; }
+!css table#main td.u              { vertical-align: top; }
+
 §§ !css code {color: #006FDD; border: 1px solid rgb(225, 228, 229); padding-left: 3px; padding-right: 5px;}
 
 {{#main .container}}
@@ -24,8 +35,8 @@
 + [Introduction->1.-introduction]
 + [Historique->2.-historique]
 + [Technique->3.-technique]
-+ + [Principe->3.1-principe]
-+ [Index des moteurs de raycasting et des jeux->4.-index-des-moteurs-de-raycasting,-des-jeux-et-des-tutoriels]
++ + [Principe->3.1-principe-et-initialisation]
++ [Index des moteurs de raycasting et des jeux->4.-index-des-moteurs-de-raycasting-et-des-jeux]
 + [Références->5.-références]
 
 A version in English of this page is [available here->https://xitog.github.io/dgx/passetemps/tech_raycasting_en.html].
@@ -42,31 +53,67 @@ Notons enfin que si le raycasting est rapide sur les résolutions de l'écran de
 
 # 2. Historique
 
-Le jeu qui a popularisé cette technique est @@Wolfenstein 3D@@, d'id Software, sorti le 5 mai 1992. Le raycasting était une technique bien adaptée à la puissance des machines de l'époque, codée avec brio par John Carmack, et mis au service d'un jeu avec un gameplay simple et rapide, dans une direction artistique faisant la part belle à la violence (pour l'époque) et aux décorations nazies, les ennemis du jeu.
+Le jeu qui a popularisé cette technique est @@Wolfenstein 3D@@, d'id Software, sorti le 5 mai 1992. Le raycasting était une technique bien adaptée à la puissance des machines de l'époque, codée avec brio par [John Carmack->https://twitter.com/id_aa_carmack], et mis au service d'un jeu avec un gameplay simple et rapide, dans une direction artistique faisant la part belle à la violence (pour l'époque) et aux décorations nazies, les ennemis du jeu.
 
 Le moteur qui implémente le raycasting dans Wolfenstein 3D propose néanmoins des fonctionnalités très rudimentaires : le niveau est stocké dans un tableau, une grille. La valeur d'une case indique s'il la case est pleine ou creuse. Tous les murs ont la même hauteur, ont une longueur qui est toujours un multiple d'une valeur de base, ils se croisent toujours perpendiculairement, le sol et le plafond ne sont pas texturés, la lumière est statique. Le moteur offre néanmoins des murs texturés, des portes, des sprites pour les ennemis, les objets et les lumières statiques.
 
 Avant Wolfenstein 3D, John Carmack avait développé en 1991 le moteur de @@Hovertank 3D@@ pour son précédent employeur, Softdisk. Celui-ci fut amélioré pour @@Catacomb 3-D@@, sorti en 1991. Un autre développeur, Blue Sky Productions était lui en train de programmer @@Ultima Underworld: The Stygian Abyss@@, un autre jeu utilisant le raycasting comme principe mais doté d'un moteur beaucoup plus avancé.
 
-id Software a vendu le moteur de Wolfenstein 3D à différentes équipes de développement, qui en retour l'ont utilisé dans différents jeux, parfois en le changeant profondemment pour lui rajouter des capacités.
+id Software a vendu le moteur de Wolfenstein 3D à différentes équipes de développement, qui en retour l'ont utilisé dans différents jeux, parfois en le changeant profondément pour lui rajouter des capacités.
 
 Avec la sortie du jeu suivant d'id Software, @@Doom@@, en 1993, le moteur de Wolfenstein 3D prend un sérieux coup de vieux. Le moteur de Doom, connu sous le nom de @@id Tech 1@@ permet d'afficher des murs non perpendiculaires, de longueurs et de hauteurs variées, avec des sols et des plafonds texturés avec des hauteurs différentes et des effets de lumière dynamique.
 
-Mais c'est encore le jeu suivant d'id Software, @@Quake@@, sorti en 1996, qui rangera le raycasting au rang des technologies obsolètes. Le moteur de Quake, nommé plus tard @@id Tech 2@@, ne part plus d'une plan 2D pour en construire une vision 3D mais bel et bien d'un environnement 3D. Les derniers feux du raycasting brilleront avec les jeux @@Dark Forces@@, @@Duke Nukem 3D@@, @@Shadow Warrior@@ et @@Blood@@, ces trois derniers utilisant le @@Build engine@@ comme moteur, développé par [Ken Silverman->http://advsys.net/ken/].
+Mais c'est encore le jeu suivant d'id Software, @@Quake@@, sorti en 1996, qui rangera le raycasting au rang des technologies obsolètes. Le moteur de Quake, nommé plus tard @@id Tech 2@@, ne part plus d'un plan 2D pour en construire une vision 3D mais bel et bien d'un environnement 3D. Les derniers feux du raycasting brilleront avec les jeux @@Dark Forces@@, @@Duke Nukem 3D@@, @@Shadow Warrior@@ et @@Blood@@, ces trois derniers utilisant le @@Build engine@@ comme moteur, développé par [Ken Silverman->http://advsys.net/ken/].
 
-A la fin des années dix, on constate un retour d'engouement pour les jeux de cette période avec le développement du ''retrogaming''. De nouveaux jeux sortent également qui utilisent de vieux moteurs ou en construisent de nouveaux émulant le rendu d'époque pour offrir aux joueurs d'aujour'hui un retour vers le passé du FPS avec des titres comme @@GUN GODZ@@, @@Project Warlock@@ ou @@Ion Fury@@.
+A la fin des années dix, on constate un retour d'engouement pour les jeux de cette période avec le développement du ''rétrogaming''. De nouveaux jeux sortent également qui utilisent de vieux moteurs ou en construisent de nouveaux émulant le rendu d'époque pour offrir aux joueurs d'aujourd'hui un retour vers le passé du FPS avec des titres comme @@GUN GODZ@@, @@Project Warlock@@ ou @@Ion Fury@@.
 
 # 3. Technique
 
-## 3.1 Principe
+## 3.1 Principe et initialisation
 
-La plupart des jeux en raycasting sont divisés en ''épisodes'' qui sont eux-mêmes divisés en ''niveaux (level)'' ou ''cartes (map)''. Un niveau est représenté par une ''grille'' dans Wolfenstein ou par un ensemble de ''secteurs'', eux-mêmes consitutés de murs dans Doom ou Build. Nous traiterons ici du cas de la grille. Chaque case de la grille peut avoir pour valeur 0, signifiant qu'il n'y a rien et que le joueur peut se déplacer dans cette-ci ou une valeur supérieure à 0. Dans ce dernier cas, la case est pleine, et 4 murs, un sur chaque face, empêche la visibilité et les déplacements. La texture du mur est donnée par la valeur de la case.
+La plupart des jeux en raycasting sont divisés en épisodes qui sont eux-mêmes divisés en niveaux ''(level)'' ou cartes ''(map)'' dans lesquels le joueur évolue. Un niveau est représenté par une ''grille'' dans Wolfenstein ou par un ensemble de ''secteurs'', eux-mêmes constitués de murs dans Doom ou Build. Nous traiterons ici du cas le plus ancien, celui de la grille.
 
-La position du joueur est représenté par un point sur cette grille, **pos**. Il regarde dans une direction donnée, uniquement sur deux axes, qui est matérialisée à la fois par un angle **AP** et par un vecteur, le vecteur **dir** qui a pour norme 1, c'est-à-dire que **cos AP = dir.x** et **sin AP = dir.y**. Le joueur a également un plan caméra : il s'agit d'un vecteur nommé **cam** perpendiculaire au vecteur dir. Il représente l'écran à dessiner. Le champ de vision du joueur est représenté par un angle, le **FOV** pour ''field of view'' en anglais. Le FOV est une valeur absolue, pour savoir les limites sur la grille de son champ de vision, il faut faire **AP - FOV/2** et **AP + FOV/2** : son champ de vision est réparti égalitairement de part et d'autre de son vecteur dir.
+Tout d’abord, on part d’un environnement 2D. En termes mathématiques, on a un plan affine euclidien avec une base orthonormée : les deux axes de coordonnées sont orthogonaux et possèdent une norme égale à un. Chaque point dans ce plan est défini par deux coordonnées cartésiennes : son abscisse, notée x, et son ordonnée, notée y, les deux sont notées (x, y). Dans ce plan, on a deux éléments centraux :
 
-Nous allons lancer des rayons à partir de la position du joueur. Nous allons lancer autant de rayons que la largeur de l'écran que nous voulons dessiner.
+* La grille représente le monde, le niveau, la carte dans laquelle évolue le joueur. Elle a une longueur et une largeur. La grille est constituée de cases qui sont des carrés avec des côtés d’une longueur égale à un. La case notée (0, 0) s’étend donc jusqu’au point (1, 1).
+* Le joueur qui évolue dans cette grille, représenté d’abord par un point (x, y), sa position. On notera les coordonnées du joueur joueur.x et joueur.y dans le texte et les calculs. Le joueur peut avoir une position entre deux entiers : (1.5, 2.4).
 
-## 3.2 Texturation
+Chaque case de la grille peut avoir comme valeur 0, elle est alors vide, ou 1, elle est alors pleine. Une case pleine a quatre murs, un sur chaque face, qui bloquent la visibilité et les déplacements du joueur.
+
+On veut obtenir une image qui représente en pseudo-3D, ou 2.5D, le monde décrit en 2D. C’est cette image que verra le joueur. Pour cela, on attribue à notre joueur :
+
+* Une direction vers laquelle il regarde. Elle s’exprime par un angle qui peut se représenter par un vecteur dont les coordonnées sont (cos angle, sin angle). Sa norme est égale à un.
+* Un « segment caméra » : il s’agit d’un segment représentant la position de l’image 2.5D qui va être affichée au joueur dans le monde en 2D. On construit un vecteur caméra qui doit être perpendiculaire au vecteur de direction, ses coordonnées sont donc (-sin angle * n, cos angle * n) où n est la norme de ce vecteur. Ce vecteur va décrire la moitié du segment caméra. En le multipliant par -1 on obtiendra son opposé qui décrire l’autre moitié du segment caméra.
+* Un angle de vision, ou ''field of view'' en anglais (FOV). Cela détermine l’angle autour du vecteur de direction dans lequel le joueur voit quelque chose. Il est directement relié à la norme du vecteur caméra, la valeur n. Arbitrairement, le FOV est fixé à un angle de 66°, ce qui signifie que le joueur voit 33° à gauche du vecteur de direction et 33° à sa droite. On obtient n par tan(FOV / 2).
+
+Nous pouvons conclure en reprenant nos deux éléments avec toutes leurs propriétés :
+
+* La grille : longueur, largeur, et longueur x largeur cases qui chacune ont une valeur 0 ou 1.
+* Le joueur : position (x, y), direction (cos angle, sin angle), caméra (-sin angle * n, cos angle * n) 
+
+## 3.2 Émission des rayons
+
+Nous allons donc créer une image qui représente en 2.5D le monde en 2D. Cet affichage sera affiché à l’écran, qui possède une largeur et une hauteur : les vieilles résolutions de l’époque étaient par exemple 320x200, 640x400 ou 640x480. Nous prenons 640x480.
+
+Nous allons donc émettre 640 rayons, un par colonne. Pour calculer les coordonnées de chaque rayon, nous additionnons au vecteur direction une fraction du vecteur caméra. La valeur de la fraction va de -1 à +1 et augmente linéairement avec l’indice de la colonne que nous dessinons. La formule est la suivante : ( indice de la colonne / largeur de l’écran ) * 2 - 1. La division  va de 0 à 1, nous multiplions par 2 pour aller de 0 à 2 et faisons -1 pour décrire de -1 à +1.
+
+Nous avons donc 640 rayons avec leurs coordonnées à lancer. Nous devons maintenant savoir quand et où ils rencontrent un obstacle, une case avec une valeur différente de 0.
+
+## 3.3 Intersections des rayons avec la grille
+
+Nous allons nous concentrer sur un seul rayon, sachant que ce que nous allons expliquer vaut pour tous. Un rayon est émis à partir de la position du joueur et va croiser la route de plusieurs cases, c’est-à-dire franchir plusieurs fois des axes qui correspondent à une valeur entière : par exemple pour les abscisses, x = 1, x = 2, x = 3, et pour les ordonnées y = 1, y =2 ,y =3, etc., nous parlerons pour les désigner d’axes X et Y.
+
+La question centrale est comment testée chaque case traversée par le rayon, qui est une demi-droite, dont l’origine est le joueur et la direction et le sens sont donnés par le vecteur rayon. Le premier croisement avec chaque axe se fait à une distance initiale diX et diY qu’il faut calculer. Mais ensuite, la distance entre chaque intersection pour un axe donnée est constante. C’est la clé de cet algorithme qui s’apparente à un « analyseur différentiel numérique » (ADN) ou « digital differential analyzer » (DDA) en anglais.
+
+On ne fait que des additions en avançant sur la demi-droite décrite par le rayon en testant à chaque fois la prochaine case que nous rencontrons : soit elle est égale à 0 et on avance, soit elle est différente de 0 et on s’arrête car on a touché un mur. Pour chaque intersection, suivant le dernier axe traversé on est en mesure de savoir si c’est un mur horizontal ou vertical (par rapport au plan 2D) que l’on a touché et on est en mesure de savoir si c’est le mur du haut ou du bas pour les horizontaux et si c’est le mur de gauche ou de droite pour les verticaux en regardant le sens du rayon. Par exemple, si ray.x est négatif et que l’on touche un mur vertical, cela ne peut être que le mur de droite de la case.
+
+Il faut ensuite calculer la distance orthogonale entre ce point et le segment caméra. Notre algorithme le donne directement. Nous avons donc les coordonnées de la case touchée, lequel de ces quatre murs nous avons touché, et la distance orthogonale. On peut à présent construire notre représentation en pseudo-3D.
+
+## 3.4 Construction du rendu
+
+XXX
+
+## 3.5 Texturation
         
 Une texture est une image qui va être appliqué à un objet de l'environnement, on dit dans ce cas que l'objet est texturé. Un calcul est effectué pour savoir quel pixel de la texture dessiner sur un pixel représentant l'objet à l'écran. En anglais on parle de ''texture mapping''.
 
@@ -74,9 +121,9 @@ Les premiers jeux utilisant le raycasting n'avait pas d'objets texturés (Hovert
 
 Un raycaster dessine les textures colonnes par colonnes, il est donc plus efficace de les stocker ainsi en mémoire, c'est-à-dire faire un tableau de tableaux, ces derniers représentent les colonnes.
 
-Une technique simple pour simuler l'effet de la lumière est de dessiner les textures de façon plus claire, pour simuler une forte luminosité, ou plus sombre, pour l'obscurité. Deux techniques existent : avoir en mémoire plusieurs versions de la texture, le calcul est donc déjà fait, ou calculer à la volée la couleur définitive à partir d'une seule texture de départ. Pour obscurir, il suffit de diminuer les valeurs RGB de chaque pixel et pour illuminer, il faut augmenter ces mêmes valeurs.
+Une technique simple pour simuler l'effet de la lumière est de dessiner les textures de façon plus claire, pour simuler une forte luminosité, ou plus sombre, pour l'obscurité. Deux techniques existent : avoir en mémoire plusieurs versions de la texture, le calcul est donc déjà fait, ou calculer à la volée la couleur définitive à partir d'une seule texture de départ. Pour obscurcir, il suffit de diminuer les valeurs RGB de chaque pixel et pour illuminer, il faut augmenter ces mêmes valeurs.
 
-# 4. Index des moteurs de raycasting, des jeux et des tutoriels
+# 4. Index des moteurs de raycasting et des jeux
 
 Ceci est un aperçu rapide des principaux moteurs et jeux. Pour une liste plus complète, vous pouvez consulter mon index.
 
@@ -175,6 +222,62 @@ Ceci est un aperçu rapide des principaux moteurs et jeux. Pour une liste plus c
 [Ultima2]: https://www.mobygames.com/game/ultima-underworld-ii-labyrinth-of-worlds
 [Rampage]: https://www.mobygames.com/game/terminator-rampage
 [Arena]: https://www.mobygames.com/game/dos/elder-scrolls-arena
+[ShadowCaster]: https://www.mobygames.com/game/dos/shadowcaster
+
+# 5. Comparaison des moteurs d'id Software
+
+|Game name         |Hovertank 3D       |Catacomb 3D       |Wolfenstein 3D     |ShadowCaster !! ''(Raven Engine)''|Doom !! ''(id Tech 1)'' |
+|-----------------------------------------------------------------------------------------------------------------------------------------|
+|Genre             |Science Fiction    |Fantasy           |War                |Fantasy                           |Science Fiction         |
+|Mobygames         |[Hovertank]        |[Catacomb]        |[Wolfenstein3D]    |[ShadowCaster]                    |[Doom]                  |
+|Wikipedia         |[WikiHovertank]    |[WikiCatacomb]    |[WikiWolfenstein]  |[WikiShadowCaster]                |[WikiDoom]              |
+|Source Code       |                   |                  |                   |                                  |                        |
+|Release Date      |April, **1991**    |November, **1991**|May 5, **1992**    |**1993**                          |December 10, **1993**   |
+|Release Source    |June, **2014**     |June, **2014**    |July 21, **1995**  |                                  |December 23, **1997**   |
+|Programmer        |John Carmack       |John Carmack      |John Carmack       |John Carmack                      |John Carmack            |
+|Editing tool      |TEd?               |TEd               |TEd                |TEd                               |DoomEd                  |
+|Display           |                   |                  |                   |                                  |                        |
+|Resolution        |320x200            |320x200           |320x200            |320x200                           |320x200                 |
+|Colors            |16-color EGA       |16-color EGA      |256-color VGA      |256-color VGA                     |256-color VGA           |
+|Levels            |                   |                  |                   |                                  |                        |
+|Level form        |grid?              |grid              |grid               |grid                              |sectors                 |
+|Rendering         |wall span?         |wall span?        |raycasting         |raycasting                        |raycasting              |
+|Automap           |no                 |no                |no                 |yes                               |yes                     |
+|Hub               |no                 |yes               |no                 |yes                               |no                      |
+|Things            |                   |                  |                   |                                  |                        |
+|Scalable sprites  |yes                |yes               |yes                |yes                               |yes                     |
+|Multiangle sprites|no                 |yes               |yes                |yes                               |yes                     |
+|Polygonal things  |no                 |no                |no                 |no                                |no                      |
+|Walls             |                   |                  |                   |                                  |                        |
+|Orthogonal walls  |yes                |yes               |yes                |yes                               |yes                     |
+|Non-ortho. walls  |no                 |no                |no                 |no                                |yes                     |
+|Free length       |no                 |no                |no                 |no                                |yes                     |
+|Doors             |no                 |Disappearing walls|yes                |yes                               |yes                     |
+|Transparent walls |no                 |no                |no                 |no                                |yes                     |
+|Breaking glass    |no                 |no                |no                 |no                                |no                      |
+|3rd Dimension     |                   |                  |                   |                                  |                        |
+|!= heights/levels |no                 |no                |no                 |yes                               |yes                     |
+|!= heights/walls  |no                 |no                |no                 |no                                |yes                     |
+|Sloped floors/ceil|no                 |no                |no                 |yes                               |no                      |
+|Elevators         |no                 |no                |no                 |no                                |yes                     |
+|Texture-mapping   |                   |                  |                   |                                  |                        |
+|Textured walls    |no                 |yes               |yes                |yes                               |yes                     |
+|Textured floors/ce|no                 |no                |no                 |yes                               |yes                     |
+|Animated textures |no                 |no                |no                 |yes                               |yes                     |
+|Skybox            |no                 |no                |no                 |yes                               |yes                     |
+|Lighting          |                   |                  |                   |                                  |                        |
+
+[WikiHovertank]: https://en.wikipedia.org/wiki/Hovertank_3D
+[WikiCatacomb]: https://en.wikipedia.org/wiki/Catacomb_3-D
+[WikiWolfenstein]: https://en.wikipedia.org/wiki/Wolfenstein_3D
+[WikiShadowCaster]: https://en.wikipedia.org/wiki/ShadowCaster 
+[WikiDoom]: https://en.wikipedia.org/wiki/Doom_(1993_video_game)
+
+[SourceHovertank]: https://github.com/FlatRockSoft/Hovertank3D
+[SourceCatacomb]: https://github.com/CatacombGames/Catacomb3DGithub
+[SourceWolfenstein]: https://github.com/id-Software/wolf3d
+[SourceShadowCaster]: https://drive.google.com/open?id=0B3gIcilDnsOPakdzNWNMZ1hNWUE&amp;authuser=0
+[SourceDoom]: https://github.com/id-Software/DOOM
 
 # 5. Références
 

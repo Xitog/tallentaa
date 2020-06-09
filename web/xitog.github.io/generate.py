@@ -21,9 +21,9 @@ includes = ['menu.html']
 logging.getLogger().setLevel(logging.DEBUG)
 
 # Full
-hamill.process_file(r'input\informatique\bnf.hml', r'output\informatique\bnf.html', 'fr', includes)
+#hamill.process_file(r'input\informatique\bnf.hml', r'output\informatique\bnf.html', 'fr', includes)
 #hamill.process('input', 'output', 'fr', includes)
-#hamill.process_file(r'input\passetemps\tech_raycasting_fr.hml', r'output\passetemps\tech_raycasting_fr.html', 'fr', includes)
+hamill.process_file(r'input\passetemps\tech_raycasting_fr.hml', r'output\passetemps\tech_raycasting_fr.html', 'fr', includes)
 #hamill.process_file(r'input\informatique\hamill.hml', r'output\informatique\hamill.html', 'fr', includes)
 #hamill.process_file(r'input\informatique\tools_langs.hml', r'output\informatique\tools_langs.html', 'fr', includes)
 
