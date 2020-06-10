@@ -43,7 +43,7 @@ from logging import info, warning, error
 # Constants and globals
 #-------------------------------------------------------------------------------
 
-LIST_STARTERS = {'* ': 'ul', '% ': 'ol', '+ ' : 'ol', '- ': 'ol reversed'}
+LIST_STARTERS = {'* ': 'ul', '• ': 'ul', '% ': 'ol', '+ ' : 'ol', '- ': 'ol reversed'}
 COMMENT_STARTER = '§§'
 
 #-------------------------------------------------------------------------------
@@ -117,10 +117,11 @@ class Generation:
         self.variables['DEFINITION_AS_PARAGRAPH'] = False
         self.variables['DEFAULT_CODE'] = default_code
         self.variables['DEFAULT_PAR_CLASS'] = None
-        self.variables['DEFAULT_TAB_CLASS'] = None
         self.variables['NEXT_PAR_CLASS'] = None
         self.variables['NEXT_PAR_ID'] = None
+        self.variables['DEFAULT_TAB_CLASS'] = None
         self.variables['NEXT_TAB_CLASS'] = None
+        self.variables['NEXT_TAB_ID'] = None
         self.variables['DEFAULT_FIND_IMAGE'] = default_find_image
 
     def first(self):
@@ -251,7 +252,7 @@ def escape(line):
     while index_char < len(line):
         char = line[index_char]
         _, next_char, _ = prev_next(line, index_char)
-        if char == '\\' and next_char in ['*', "'", '^', '-', '_', '[', '@', '%', '+', '$', '!', '|', '{']:
+        if char == '\\' and next_char in ['*', "'", '^', '-', '_', '[', '@', '%', '+', '$', '!', '|', '{', '•']:
             new_line += next_char
             index_char += 2    
         else:
@@ -794,6 +795,8 @@ def process_lines(lines, gen=None):
                 gen['DEFAULT_PAR_CLASS'] = value if value != 'reset' else None
             elif command == 'NEXT_TAB_CLASS':
                 gen['NEXT_TAB_CLASS'] = value if value != 'reset' else None
+            elif command == 'NEXT_TAB_ID':
+                gen['NEXT_TAB_ID'] = value if value != 'reset' else None
             elif command == 'DEFAULT_TAB_CLASS':
                 gen['DEFAULT_TAB_CLASS'] = value if value != 'reset' else None
             elif command == 'DEFAULT_FIND_IMAGE':
@@ -943,13 +946,19 @@ def process_lines(lines, gen=None):
         # Table
         if len(line) > 0 and line[0] == '|':
             if not in_table:
-                if gen['DEFAULT_TAB_CLASS'] is not None:
-                    gen.append(f'<table class="{gen["DEFAULT_TAB_CLASS"]}">\n')
-                elif gen['NEXT_TAB_CLASS'] is not None:
-                    gen.append(f'<table class="{gen["NEXT_TAB_CLASS"]}">\n')
+                if gen['NEXT_TAB_CLASS'] is not None:
+                    cls = f' class="{gen["NEXT_TAB_CLASS"]}"'
                     gen['NEXT_TAB_CLASS'] = None
+                elif gen['DEFAULT_TAB_CLASS'] is not None:
+                    cls = f' class="{gen["DEFAULT_TAB_CLASS"]}"'
                 else:
-                    gen.append('<table>\n')
+                    cls = ''
+                if gen['NEXT_TAB_ID'] is not None:
+                    ids = f' id="{gen["NEXT_TAB_ID"]}"'
+                    gen['NEXT_TAB_ID'] = None
+                else:
+                    ids = ''
+                gen.append(f'<table{ids}{cls}>\n')
                 in_table = True
             if next_line is not None and next_line.startswith('|-'):
                 element = 'th'
@@ -963,17 +972,29 @@ def process_lines(lines, gen=None):
             if not skip:
                 gen.append('<tr>')
                 for col in columns:
-                    if col != '': # center or right-align
-                        if col[0] == '>':
+                    if col != '':
+                        # center or right-align
+                        if len(col) > 0 and col[0] == '>':
                             align = ' align="right"'
                             col = col[1:]
-                        elif col[0] == '=':
+                        elif len(col) > 0 and col[0] == '=':
                             align = ' align="center"'
                             col = col[1:]
                         else:
                             align = ''
-                        val = process_string(escape(col), gen)
-                        gen.append(f'<{element}{align}>{val}</{element}>')
+                        # row and col span
+                        span = ''
+                        if len(col) > 0 and col[0] == '#':
+                            if len(col) > 1 and col[1] in ['c', 'r']:
+                                ending = col.find('#', 1)
+                                if ending != -1:
+                                    if col[1] == 'c':
+                                        span = f' colspan={int(col[2:ending])}'
+                                    else:
+                                        span = f' rowspan={int(col[2:ending])}'
+                                    col = col[ending+1:]
+                        val = process_string(escape(col), gen)         
+                        gen.append(f'<{element}{align}{span}>{val}</{element}>')
                 gen.append('</tr>\n')
             continue
         elif in_table:

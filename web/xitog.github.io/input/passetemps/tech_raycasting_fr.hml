@@ -11,16 +11,13 @@
 !css code span.number { color: inherit; background-color: transparent; }
 !css p { text-align: justify; }
 
-!css table#main                   { border-collapse: collapse; font-family: "Arial"; font-size: 0.8em; }
-!css table#main td                { border: 1px black solid; }
-!css table#main tr:first-child    { font-weight: bold; }
-!css table#main tr td:first-child { font-weight: bold; }
-!css table#main td.y              { font-weight: bold; background-color: rgb(146, 208, 80);  color: white; text-align: center; }
-!css table#main td.n              { font-weight: bold; background-color: rgb(247, 150, 70);  color: white; text-align: center; }
-!css table#main td.i              { font-weight: bold; background-color: rgb(0, 176, 240);   color: white; text-align: center; }
-!css table#main td.h1             { font-weight: bold; background-color: rgb(0, 0, 0);       color: white; text-align: center; }
-!css table#main td.h2             { font-weight: bold; background-color: rgb(238, 236, 225); color: black; text-align: center; }
-!css table#main td.u              { vertical-align: top; }
+!css table#main tr:nth-child(10)  { font-weight: bold; background-color: rgb(0, 0, 0);       color: white; text-align: center; }
+!css table#main tr:nth-child(13)  { font-weight: bold; background-color: rgb(0, 0, 0);       color: white; text-align: center; }
+!css table#main tr:nth-child(18)  { font-weight: bold; background-color: rgb(0, 0, 0);       color: white; text-align: center; }
+!css table#main tr:nth-child(22)  { font-weight: bold; background-color: rgb(0, 0, 0);       color: white; text-align: center; }
+!css table#main tr:nth-child(29)  { font-weight: bold; background-color: rgb(0, 0, 0);       color: white; text-align: center; }
+!css table#main tr:nth-child(34)  { font-weight: bold; background-color: rgb(0, 0, 0);       color: white; text-align: center; }
+!css table#main tr:nth-child(39)  { font-weight: bold; background-color: rgb(0, 0, 0);       color: white; text-align: center; }
 
 §§ !css code {color: #006FDD; border: 1px solid rgb(225, 228, 229); padding-left: 3px; padding-right: 5px;}
 
@@ -226,46 +223,48 @@ Ceci est un aperçu rapide des principaux moteurs et jeux. Pour une liste plus c
 
 # 5. Comparaison des moteurs d'id Software
 
+!var NEXT_TAB_ID=main
+
 |Game name         |Hovertank 3D       |Catacomb 3D       |Wolfenstein 3D     |ShadowCaster !! ''(Raven Engine)''|Doom !! ''(id Tech 1)'' |
 |-----------------------------------------------------------------------------------------------------------------------------------------|
 |Genre             |Science Fiction    |Fantasy           |War                |Fantasy                           |Science Fiction         |
-|Mobygames         |[Hovertank]        |[Catacomb]        |[Wolfenstein3D]    |[ShadowCaster]                    |[Doom]                  |
-|Wikipedia         |[WikiHovertank]    |[WikiCatacomb]    |[WikiWolfenstein]  |[WikiShadowCaster]                |[WikiDoom]              |
-|Source Code       |                   |                  |                   |                                  |                        |
+|Mobygames         |[>Hovertank]       |[>Catacomb]       |[>Wolfenstein3D]   |[>ShadowCaster]                   |[>Doom]                 |
+|Wikipedia         |[>WikiHovertank]   |[>WikiCatacomb]   |[>WikiWolfenstein] |[>WikiShadowCaster]               |[>WikiDoom]             |
+|=#c6#Source Code                                                                                                                         |
 |Release Date      |April, **1991**    |November, **1991**|May 5, **1992**    |**1993**                          |December 10, **1993**   |
 |Release Source    |June, **2014**     |June, **2014**    |July 21, **1995**  |                                  |December 23, **1997**   |
 |Programmer        |John Carmack       |John Carmack      |John Carmack       |John Carmack                      |John Carmack            |
 |Editing tool      |TEd?               |TEd               |TEd                |TEd                               |DoomEd                  |
-|Display           |                   |                  |                   |                                  |                        |
+|=#c6#Display                                                                                                                             |
 |Resolution        |320x200            |320x200           |320x200            |320x200                           |320x200                 |
 |Colors            |16-color EGA       |16-color EGA      |256-color VGA      |256-color VGA                     |256-color VGA           |
-|Levels            |                   |                  |                   |                                  |                        |
+|=#c6#Levels                                                                                                                              |
 |Level form        |grid?              |grid              |grid               |grid                              |sectors                 |
 |Rendering         |wall span?         |wall span?        |raycasting         |raycasting                        |raycasting              |
 |Automap           |no                 |no                |no                 |yes                               |yes                     |
 |Hub               |no                 |yes               |no                 |yes                               |no                      |
-|Things            |                   |                  |                   |                                  |                        |
+|=#c6#Things                                                                                                                              |
 |Scalable sprites  |yes                |yes               |yes                |yes                               |yes                     |
 |Multiangle sprites|no                 |yes               |yes                |yes                               |yes                     |
 |Polygonal things  |no                 |no                |no                 |no                                |no                      |
-|Walls             |                   |                  |                   |                                  |                        |
+|=#c6#Walls                                                                                                                               |
 |Orthogonal walls  |yes                |yes               |yes                |yes                               |yes                     |
 |Non-ortho. walls  |no                 |no                |no                 |no                                |yes                     |
 |Free length       |no                 |no                |no                 |no                                |yes                     |
 |Doors             |no                 |Disappearing walls|yes                |yes                               |yes                     |
 |Transparent walls |no                 |no                |no                 |no                                |yes                     |
 |Breaking glass    |no                 |no                |no                 |no                                |no                      |
-|3rd Dimension     |                   |                  |                   |                                  |                        |
+|=#c6#3rd Dimension                                                                                                                       |
 |!= heights/levels |no                 |no                |no                 |yes                               |yes                     |
 |!= heights/walls  |no                 |no                |no                 |no                                |yes                     |
 |Sloped floors/ceil|no                 |no                |no                 |yes                               |no                      |
 |Elevators         |no                 |no                |no                 |no                                |yes                     |
-|Texture-mapping   |                   |                  |                   |                                  |                        |
+|=#c6#Texture-mapping                                                                                                                     |
 |Textured walls    |no                 |yes               |yes                |yes                               |yes                     |
 |Textured floors/ce|no                 |no                |no                 |yes                               |yes                     |
 |Animated textures |no                 |no                |no                 |yes                               |yes                     |
 |Skybox            |no                 |no                |no                 |yes                               |yes                     |
-|Lighting          |                   |                  |                   |                                  |                        |
+|=#c6#Lighting                                                                                                                            |
 
 [WikiHovertank]: https://en.wikipedia.org/wiki/Hovertank_3D
 [WikiCatacomb]: https://en.wikipedia.org/wiki/Catacomb_3-D

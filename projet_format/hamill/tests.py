@@ -35,7 +35,7 @@ verify(res, "<b>bold</b> <i>italic</i> <u>underline</u> <s>strike</s> <sup>super
 
 # Test 2
 res = hamill.process_string("@@code@@")
-verify(res, '<code><span class="TokenType.NORMAL">code</span></code>', "process_string => Code error")
+verify(res, '<code><span class="normal">code</span></code>', "process_string => Code error")
 
 # Test 3
 par = """* item 1
@@ -48,7 +48,20 @@ check = """<ul>
   <li>item 3</li>
 </ul>
 """
-verify(res, check, "process_lines => List error on simple list unordered")
+verify(res, check, "process_lines => List error on simple list unordered with *")
+
+# Test 3B
+par = """• item 1
+• item 2
+• item 3"""
+res = hamill.process_lines(par.split('\n'))
+check = """<ul>
+  <li>item 1</li>
+  <li>item 2</li>
+  <li>item 3</li>
+</ul>
+"""
+verify(res, check, "process_lines => List error on simple list unordered with •")
 
 # Test 4
 par = """+ item 1
