@@ -185,6 +185,11 @@
         window.setInterval(run, INTERVAL);
         document.mouseout = out;
         document.mouseleave = out;
+        // When you reload the page it must be set again
+        setBool("bb", opt_biback_val);
+        setBool("gamemode", opt_game_mode_val);
+        setBool('raycolor', opt_monochromic_ray_val);
+        setBool('wallcolor', opt_monochromic_wall_val);
     }
     
     function run() {
@@ -359,7 +364,6 @@
                 tex_column = (point[0] - Math.trunc(point[0])) * TEXTURE_WIDTH;
             }
             
-            let color = (opt_monochromic_wall_val ? 'lightblue' : colors[map[map_y][map_x]]);
             let raycolor = (opt_monochromic_ray_val ? 'lightblue' : colors[map[map_y][map_x]]);
             
             intersections.push({
@@ -367,7 +371,7 @@
                 point: {x: point[0], y: point[1]},
                 cas: {x: map_x, y: map_y},
                 raycolor: raycolor,
-                color: color,
+                tex: map[map_y][map_x],
                 tex_column: tex_column
             });
         }
@@ -446,8 +450,7 @@
         for (let row=0; row < 15; row++) {
             for (let col=0; col < 20; col++) {
                 if (map[row][col] != 0) {
-                    //rect(ctx, colors[map[row][col]], col * 32, row * 32, 32, 32, true);
-                    ctx.drawImage(TEXTURES[0], 0, 0, 64, 64, col * 32, row * 32, 32, 32);
+                    ctx.drawImage(TEXTURES[map[row][col]], 0, 0, 64, 64, col * 32, row * 32, 32, 32);
                 }
             }
         }
@@ -466,7 +469,7 @@
         for (let col=0; col < SCREEN_WIDTH; col++) {
             let size =  Math.trunc((SCREEN_HEIGHT / intersections[col].dist));
             let start = Math.trunc(mid_screen - size / 2);
-            ctx.drawImage(TEXTURES[0], intersections[col].tex_column, 0, 1, TEXTURE_HEIGHT, col, start, 1.5, size);
+            ctx.drawImage(TEXTURES[intersections[col].tex], intersections[col].tex_column, 0, 1, TEXTURE_HEIGHT, col, start, 1.5, size);
         }
         
         let v_x = player_x.toFixed(2).padStart(5);
@@ -480,6 +483,8 @@
         setFloat("a", (v_a / 0.01745).toFixed(2).padStart(5));
         setFloat("x", v_x);
         setFloat("y", v_y);
+        
+        ctx.drawImage(ITEMS[0], SCREEN_WIDTH / 2 - 25, SCREEN_HEIGHT - 64);
     }
         
     </script>

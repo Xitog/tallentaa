@@ -182,6 +182,11 @@
         window.setInterval(run, INTERVAL);
         document.mouseout = out;
         document.mouseleave = out;
+        // When you reload the page it must be set again
+        setBool("bb", opt_biback_val);
+        setBool("gamemode", opt_game_mode_val);
+        setBool('raycolor', opt_monochromic_ray_val);
+        setBool('wallcolor', opt_monochromic_wall_val);
     }
     
     function run() {
