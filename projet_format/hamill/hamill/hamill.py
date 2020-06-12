@@ -463,71 +463,84 @@ def process_string(line, gen=None):
         if char == "'" and next_char == "'" and prev_char != '\\':
             continue
         if char == "'" and prev_char == "'" and prev_prev_char != '\\':
-            if not in_italic:
+            if not in_italic and next_char is not None and line.find("''", char_index + 1) != -1:
                 new_line += '<i>'
                 in_italic = True
-            else:
+            elif in_italic:
                 new_line += '</i>'
                 in_italic = False
+            else:
+                new_line += "''"
             continue
         # Strong
         if char == '*' and next_char == '*' and prev_char != '\\':
             continue
         if char == '*' and prev_char == '*' and prev_prev_char != '\\':
-            if not in_bold:
+            if not in_bold and next_char is not None and line.find("**", char_index + 1) != -1:
                 new_line += '<b>'
                 in_bold = True
-            else:
+            elif in_bold:
                 new_line += '</b>'
                 in_bold = False
+            else:
+                new_line += '**'
             continue
         # Strikethrough
         if char == '-' and next_char == '-' and prev_char != '\\':
             continue
         if char == '-' and prev_char == '-' and prev_prev_char != '\\':
-            if not in_strikethrough:
+            if not in_strikethrough and next_char is not None and line.find("--", char_index + 1) != -1:
                 new_line += '<s>'
                 in_strikethrough = True
-            else:
+            elif in_strikethrough:
                 new_line += '</s>'
                 in_strikethrough = False
+            else:
+                new_line += '--'
             continue
         # Underline
         if char == '_' and next_char == '_' and prev_char != '\\':
             continue
         if char == '_' and prev_char == '_' and prev_prev_char != '\\':
-            if not in_underline:
+            if not in_underline and next_char is not None and line.find("__", char_index + 1) != -1:
                 new_line += '<u>'
                 in_underline = True
-            else:
+            elif in_underline:
                 new_line += '</u>'
                 in_underline = False
+            else:
+                new_line += '__'
             continue
         # Power
         if char == '^' and next_char == '^' and prev_char != '\\':
             continue
         if char == '^' and prev_char == '^' and prev_prev_char != '\\':
-            if not in_power:
+            if not in_power and next_char is not None and line.find("^^", char_index + 1) != -1:
                 new_line += '<sup>'
                 in_power = True
-            else:
+            elif in_power:
                 new_line += '</sup>'
                 in_power = False
+            else:
+                new_line += '^^'
             continue
         # Code
         if char == '@' and next_char == '@' and prev_char != '\\':
             continue
         if char == '@' and prev_char == '@' and prev_prev_char != '\\':
-            ending = find_unescaped(line, '@@', char_index)
-            code = line[char_index + 1:ending]
-            length = len(code) + 2
-            s = multi_start(code, RECOGNIZED_LANGUAGES)
-            if s is not None:
-                code = code.replace(s, '', 1) # delete
+            if next_char is not None and line.index("@@", char_index + 1) != -1:
+                ending = find_unescaped(line, '@@', char_index)
+                code = line[char_index + 1:ending]
+                length = len(code) + 2
+                s = multi_start(code, RECOGNIZED_LANGUAGES)
+                if s is not None:
+                    code = code.replace(s, '', 1) # delete
+                else:
+                    s = gen['DEFAULT_CODE']
+                new_line += '<code>' + write_code(code, s) + '</code>'
+                char_index += length
             else:
-                s = gen['DEFAULT_CODE']
-            new_line += '<code>' + write_code(code, s) + '</code>'
-            char_index += length
+                new_line += '@@'
             continue
         new_line += char
     return new_line

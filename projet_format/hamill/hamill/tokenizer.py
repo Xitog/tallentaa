@@ -88,7 +88,7 @@ languages = {
         'number' : False
     },
     'hamill' : {
-        'keywords': ['var', 'const', 'include', 'require'],
+        'keywords': ['var', 'const', 'include', 'require', 'css', 'html'],
         'booleans' : ['true', 'false'],
         'operators': [':'],
         'separators' : [],

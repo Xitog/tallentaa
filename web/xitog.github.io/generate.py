@@ -21,14 +21,19 @@ includes = ['menu.html']
 logging.getLogger().setLevel(logging.DEBUG)
 
 # Full
-#hamill.process_file(r'input\informatique\bnf.hml', r'output\informatique\bnf.html', 'fr', includes)
 #hamill.process('input', 'output', 'fr', includes)
-hamill.process_file(r'input\passetemps\tech_raycasting_fr.hml', r'output\passetemps\tech_raycasting_fr.html', 'fr', includes)
+
+# Mono
+
+hamill.process_file(r'input\informatique\ash_guide.hml', r'output\informatique\ash_guide.html', 'fr', includes)
+
+#hamill.process_file(r'input\index.hml', r'output\index.html', 'fr', includes)
+
+#hamill.process_file(r'input\informatique\bnf.hml', r'output\informatique\bnf.html', 'fr', includes)
 hamill.process_file(r'input\informatique\hamill.hml', r'output\informatique\hamill.html', 'fr', includes)
 #hamill.process_file(r'input\informatique\tools_langs.hml', r'output\informatique\tools_langs.html', 'fr', includes)
 
-# Mono
 #hamill.process_file(r'input\passetemps\pres_jeux.hml', r'output\passetemps\pres_jeux.html', 'fr', includes)
-#hamill.process_file(r'input\histoire\bibliographie.hml', r'output\histoire\bibliographie.html', 'fr', includes)
-#hamill.process_file(r'input\tests.hml', r'output\tests.html', 'fr', includes)
+#hamill.process_file(r'input\passetemps\tech_raycasting_fr.hml', r'output\passetemps\tech_raycasting_fr.html', 'fr', includes)
 
+#hamill.process_file(r'input\histoire\bibliographie.hml', r'output\histoire\bibliographie.html', 'fr', includes)#hamill.process_file(r'input\tests.hml', r'output\tests.html', 'fr', includes)
