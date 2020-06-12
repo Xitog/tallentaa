@@ -2,8 +2,9 @@
 <html lang="fr" onmouseleave="out();" onmouseenter="inside();">
   <head>
     <meta charset="utf-8">
-    <title>FPS 2.5D Untextured</title>
+    <title>FPS 2.5D textured</title>
     <script type="text/javascript" src="common.js"></script>
+    <script type="text/javascript" src="textures.js"></script>
     <style>
         html, body, table {
             width: 100%;
@@ -19,7 +20,7 @@
   </head>
   <body onload="start();">
     <table style="text-align:center;"><tr><td>
-      <h1>Raycasting 1: Grid - Untextured - One wall/case</h1>
+      <h1>Raycasting 1: Grid - textured - One wall/case</h1>
       <canvas id="screen2D" width="640" height="480">
       </canvas>
       &nbsp;
@@ -91,6 +92,8 @@
     
     const SCREEN_WIDTH = 640;
     const SCREEN_HEIGHT = 480;
+    const TEXTURE_WIDTH = 64;
+    const TEXTURE_HEIGHT = 64;
     
     var colors = ['black', 'red', 'purple', 'yellow', 'green'];
     
@@ -337,6 +340,7 @@
             // Distance
             let dist;
             let point;
+            let tex_column;
             if (on_x) {
                 dist = cumul_x;
                 if (ray_x < 0) {
@@ -344,6 +348,7 @@
                 } else {
                     point = [map_x, player_y + ray_y * cumul_x];
                 }
+                tex_column = (point[1] - Math.trunc(point[1])) * TEXTURE_WIDTH;
             } else {
                 dist = cumul_y;
                 if (ray_y < 0) {
@@ -351,6 +356,7 @@
                 } else {
                     point = [player_x + ray_x * cumul_y, map_y];
                 }
+                tex_column = (point[0] - Math.trunc(point[0])) * TEXTURE_WIDTH;
             }
             
             let color = (opt_monochromic_wall_val ? 'lightblue' : colors[map[map_y][map_x]]);
@@ -361,7 +367,8 @@
                 point: {x: point[0], y: point[1]},
                 cas: {x: map_x, y: map_y},
                 raycolor: raycolor,
-                color: color
+                color: color,
+                tex_column: tex_column
             });
         }
     }
@@ -439,7 +446,8 @@
         for (let row=0; row < 15; row++) {
             for (let col=0; col < 20; col++) {
                 if (map[row][col] != 0) {
-                    rect(ctx, colors[map[row][col]], col * 32, row * 32, 32, 32, true);
+                    //rect(ctx, colors[map[row][col]], col * 32, row * 32, 32, 32, true);
+                    ctx.drawImage(TEXTURES[0], 0, 0, 64, 64, col * 32, row * 32, 32, 32);
                 }
             }
         }
@@ -453,9 +461,12 @@
             rect(ctx, 'dimgrey', 0, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT / 2, true);
         }
 
+        let mid_screen = SCREEN_HEIGHT / 2;
+        
         for (let col=0; col < SCREEN_WIDTH; col++) {
-            let halfsize = Math.trunc((SCREEN_HEIGHT / intersections[col].dist) / 2);
-            line(ctx, intersections[col].color, col, SCREEN_HEIGHT / 2 - halfsize, col, SCREEN_HEIGHT / 2 + halfsize);
+            let size =  Math.trunc((SCREEN_HEIGHT / intersections[col].dist));
+            let start = Math.trunc(mid_screen - size / 2);
+            ctx.drawImage(TEXTURES[0], intersections[col].tex_column, 0, 1, TEXTURE_HEIGHT, col, start, 1.5, size);
         }
         
         let v_x = player_x.toFixed(2).padStart(5);
