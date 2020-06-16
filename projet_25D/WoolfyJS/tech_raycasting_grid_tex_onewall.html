@@ -353,7 +353,7 @@
                 } else {
                     point = [map_x, player_y + ray_y * cumul_x];
                 }
-                tex_column = (point[1] - Math.trunc(point[1])) * TEXTURE_WIDTH;
+                tex_column = Math.trunc((point[1] - Math.trunc(point[1])) * TEXTURE_WIDTH);
             } else {
                 dist = cumul_y;
                 if (ray_y < 0) {
@@ -361,7 +361,7 @@
                 } else {
                     point = [player_x + ray_x * cumul_y, map_y];
                 }
-                tex_column = (point[0] - Math.trunc(point[0])) * TEXTURE_WIDTH;
+                tex_column = Math.trunc((point[0] - Math.trunc(point[0])) * TEXTURE_WIDTH);
             }
             
             let raycolor = (opt_monochromic_ray_val ? 'lightblue' : colors[map[map_y][map_x]]);
@@ -467,9 +467,9 @@
         let mid_screen = SCREEN_HEIGHT / 2;
         
         for (let col=0; col < SCREEN_WIDTH; col++) {
-            let size =  Math.trunc((SCREEN_HEIGHT / intersections[col].dist));
-            let start = Math.trunc(mid_screen - size / 2);
-            ctx.drawImage(TEXTURES[intersections[col].tex], intersections[col].tex_column, 0, 1, TEXTURE_HEIGHT, col, start, 1.5, size);
+            let height =  Math.trunc((SCREEN_HEIGHT / intersections[col].dist));
+            let start = Math.trunc(mid_screen - height / 2);
+            ctx.drawImage(TEXTURES[intersections[col].tex], intersections[col].tex_column, 0, 1, TEXTURE_HEIGHT, col, start, 1, height);
         }
         
         let v_x = player_x.toFixed(2).padStart(5);
