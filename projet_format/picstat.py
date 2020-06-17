@@ -3,7 +3,7 @@ import PIL.Image
 class ImageStat:
 
     def __init__(self, path, most_used=90):
-        self.img = PIL.Image.open('map.png')
+        self.img = PIL.Image.open(path)
         self.pixels = {}
         for col in range(self.img.width):
             for row in range(self.img.height):
@@ -36,5 +36,7 @@ class ImageStat:
         print(f'Number of pixels = {self.total} ({self.img.width}x{self.img.height})')
 
 if __name__ == '__main__':
-    ims = ImageStat('map.png', 95)
+    filename = 'map_small.PNG' # map.png
+    percent = 95 # 100
+    ims = ImageStat(filename, percent)
     ims.info()
