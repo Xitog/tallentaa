@@ -1,4 +1,0 @@
-Historique du projet de RTS
-
-4 Juin 2009 Mise en ligne sur Google code sous le nom de vihanti (d'après un village en Finlande) "a simple rts engine in Ruby". Supprimé pour rationalisation et incorporé à Tallentaa le 28 Octobre 2012.
-
