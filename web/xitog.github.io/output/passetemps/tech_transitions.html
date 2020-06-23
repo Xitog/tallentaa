@@ -18,10 +18,16 @@ table.schema { display: inline-block; margin-right: 20px; }
 table.schema tr:nth-child(2n) { background-color: transparent; }
 </style>
 <style type="text/css">
-table.extract { border-collapse: collapse; display: inline-block; }
+table.extract { border-collapse: collapse; display: inline-block; margin-left: 2em; }
 </style>
 <style type="text/css">
-table.extract td { border: None; padding: 0px; text-align: center; }
+table.extract td { border: 1px solid black; padding: 0px; text-align: center; }
+</style>
+<style type="text/css">
+#interdit {color: red; font-weight: bold; }
+</style>
+<style type="text/css">
+#accept {color: rgb(0, 255, 128); font-weight: bold; }
 </style>
 </head>
 <body>
@@ -175,9 +181,9 @@ table.extract td { border: None; padding: 0px; text-align: center; }
   <li><a href="#vi.-crédits">VI. Crédits</a></li>
 </ul>
 <h2 id="i.-un-tableau-comme-carte">I. Un tableau comme carte</h2>
-<p>Le jeu <code><span class="normal">WarCraft</span> <span class="normal">II</span></code> (1995) propose une vue de dessus d'une carte où se déroule la partie. Cette carte est stocké à l'aide d'un tableau. Chaque case du tableau contient une indication de textures à utiliser. Par exemple, une case peut contenir la valeur <code><span class="number">0</code>, qui désigne de l'eau, ou <code><span class="number">1</code> de la terre. Prenons une carte de 5 cases en largeur et en hauteur, une taille que nous notons 5x5, et affichons la dans un premier temps avec des bordures délimitant chaque case (A) puis sans (B) :</p>
+<p>Le jeu <code><span class="normal">WarCraft</span> <span class="normal">II</span></code> (1995) propose une vue de dessus d'une carte où se déroule la partie. Cette carte est stocké à l'aide d'un tableau. Chaque case du tableau contient une indication de textures à utiliser. Par exemple, une case peut contenir la valeur <code><span class="normal">0</span></code>, qui désigne de l'eau, ou <code><span class="normal">1</span></code> de la terre. Prenons une carte de 5 cases en largeur et en hauteur, une taille que nous notons 5x5, et affichons la dans un premier temps avec des bordures délimitant chaque case (A) puis sans (B) :</p>
 <p>A. <img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/img_1_no_trans_border.png"></img> B. <img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/img_2_no_trans_no_border.png"></img> C. <img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/img_3_spreadsheet_map.png"></img></p>
-<p>On voit que l'ensemble de la carte, qui comporte <code><span class="number">25</span></code> cases, ne fait que répéter deux textures. On peut ainsi décrire facilement de vastes étendues à partir de peu d'éléments. On appelle ses éléments d'après l'anglais <i><b>tiles</b></i>, que l'on pourrait traduire par carreau ou tuile, et cette technique le <i><b>tiling</b></i>, traduisible par carrelage. Une case du tableau correspond donc à un carreau. Pour construire et éditer une telle carte, on peut construire un éditeur de carte ou utiliser un simple tableur comme Microsoft Excel ou LibreOffice Calc. La même carte sous Excel se présenterait comme (C).</p>
+<p>On voit que l'ensemble de la carte, qui comporte <code><span class="normal">25</span></code> cases, ne fait que répéter deux textures. On peut ainsi décrire facilement de vastes étendues à partir de peu d'éléments. On appelle ses éléments d'après l'anglais <i><b>tiles</b></i>, que l'on pourrait traduire par carreau ou tuile, et cette technique le <i><b>tiling</b></i>, traduisible par carrelage. Une case du tableau correspond donc à un carreau. Pour construire et éditer une telle carte, on peut construire un éditeur de carte ou utiliser un simple tableur comme Microsoft Excel ou LibreOffice Calc. La même carte sous Excel se présenterait comme (C).</p>
 <p>Si on enlève les bordures de notre exemple (B), le résultat est déjà plus convaincant. Néanmoins, la transition de l'eau vers la terre est un peu abrupte, elle ne fait pas naturelle. Pour améliorer le résultat, on va créer un jeu de textures spéciales qui assureront des <b>transitions plus douces et naturelles</b>.</p>
 <h2 id="ii.-un-système-de-transition">II. Un système de transition</h2>
 <p>Nous allons établir un système de transition composé de :</p>
@@ -197,18 +203,52 @@ table.extract td { border: None; padding: 0px; text-align: center; }
   <li>Cinquième règle, qui est une exception à la quatrième, est celle des <u><b><span id="coins-en-opposition">coins en opposition</span></b></u> : la configuration où deux coins en opposition sont des influenceurs et ceux sont les seuls influenceurs est autorisée. Cela concerne les deux configurations ci-dessous :
   <br><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/img_6_opposing_corners.png"></img></li>
 </ol>
+<p>Unicité <span id="interdit">casrefusés</span></p>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/grass-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td></tr>
+</table>
+<p>Étau <span id="interdit">casrefusés</span></p>
+<table class="extract">
+<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td></tr>
+</table>
+<table class="extract">
+<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td></tr>
+</table>
+<p>Discontinuité <span id="interdit">casrefusés</span></p>
+<table class="extract">
+<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
+</table>
+<table class="extract">
+<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td></tr>
+</table>
+<p>Coins opposés <span id="accept">casacceptés</span></p>
+<table class="extract">
+<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
+</table>
+<table class="extract">
+<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
 </table>
 <h3 id="ii.b-système-de-numérotation">II.B Système de numérotation</h3>
-<p>Un carreau est entouré de <code><span class="number">8</code> autres carreaux. Nous les notons et les numérotons comme ci-dessous, en partant du carreau en haut à gauche et en les parcourant dans le sens horaire :</p>
+<p>Un carreau est entouré de <code><span class="normal">8</span></code> autres carreaux. Nous les notons et les numérotons comme ci-dessous, en partant du carreau en haut à gauche et en les parcourant dans le sens horaire :</p>
 <table>
 <tr><th>Carreau    </th><th>Nord-Ouest    </th><th>Nord     </th><th>Nord-Est    </th><th>Est     </th><th>Sud-Est  </th><th>Sud      </th><th>Sud-Ouest </th><th>Ouest     </th></tr>
 <tr><td>Code       </td><td align="center">   NO        </td><td align="center"> N      </td><td align="center">  NE       </td><td align="center"> E     </td><td align="center">   SE   </td><td align="center"> S      </td><td align="center">   SO    </td><td align="center">    O    </td></tr>
-<tr><td>Numéro     </td><td align="center">   <code><span class="number">0</code>     </td><td align="center"> <code><span class="number">1</code>  </td><td align="center">  <code><span class="number">2</code>    </td><td align="center"> <code><span class="number">3</code> </td><td align="center">  <code><span class="number">4</code> </td><td align="center"> <code><span class="number">5</code>  </td><td align="center">  <code><span class="number">6</code>  </td><td align="center">  <code><span class="number">7</code>  </td></tr>
-<tr><td>2<sup>Numéro</sup></td><td align="center">   <code><span class="number">1</code>     </td><td align="center"> <code><span class="number">2</code>  </td><td align="center">  <code><span class="number">4</code>    </td><td align="center"> <code><span class="number">8</code> </td><td align="center"> <code><span class="number">16</span></code> </td><td align="center"> <code><span class="number">32</span></code> </td><td align="center"> <code><span class="number">64</span></code>  </td><td align="center"> <code><span class="number">128</span></code> </td></tr>
+<tr><td>Numéro     </td><td align="center">   <code><span class="normal">0</span></code>     </td><td align="center"> <code><span class="normal">1</span></code>  </td><td align="center">  <code><span class="normal">2</span></code>    </td><td align="center"> <code><span class="normal">3</span></code> </td><td align="center">  <code><span class="normal">4</span></code> </td><td align="center"> <code><span class="normal">5</span></code>  </td><td align="center">  <code><span class="normal">6</span></code>  </td><td align="center">  <code><span class="normal">7</span></code>  </td></tr>
+<tr><td>2<sup>Numéro</sup></td><td align="center">   <code><span class="normal">1</span></code>     </td><td align="center"> <code><span class="normal">2</span></code>  </td><td align="center">  <code><span class="normal">4</span></code>    </td><td align="center"> <code><span class="normal">8</span></code> </td><td align="center"> <code><span class="normal">16</span></code> </td><td align="center"> <code><span class="normal">32</span></code> </td><td align="center"> <code><span class="normal">64</span></code>  </td><td align="center"> <code><span class="normal">128</span></code> </td></tr>
 </table>
 <p>Autrement représenté ainsi :</p>
 <table class="schema">
@@ -217,16 +257,16 @@ table.extract td { border: None; padding: 0px; text-align: center; }
 <tr><td align="center"> SO </td><td align="center"> S </td><td align="center"> SE </td></tr>
 </table>
 <table class="schema">
-<tr><td align="center"> <code><span class="number">0</code> </td><td align="center"> <code><span class="number">1</code> </td><td align="center"> <code><span class="number">2</code> </td></tr>
-<tr><td align="center"> <code><span class="number">7</code> </td><td align="center">       </td><td align="center"> <code><span class="number">3</code> </td></tr>
-<tr><td align="center"> <code><span class="number">4</code> </td><td align="center"> <code><span class="number">5</code> </td><td align="center"> <code><span class="number">6</code> </td></tr>
+<tr><td align="center"> <code><span class="normal">0</span></code> </td><td align="center"> <code><span class="normal">1</span></code> </td><td align="center"> <code><span class="normal">2</span></code> </td></tr>
+<tr><td align="center"> <code><span class="normal">7</span></code> </td><td align="center">       </td><td align="center"> <code><span class="normal">3</span></code> </td></tr>
+<tr><td align="center"> <code><span class="normal">4</span></code> </td><td align="center"> <code><span class="normal">5</span></code> </td><td align="center"> <code><span class="normal">6</span></code> </td></tr>
 </table>
 <table class="schema">
-<tr><td align="center"> <code><span class="number">1</code>  </td><td align="center"> <code><span class="number">2</code> </td><td align="center"> <code><span class="number">4</code> </td></tr>
-<tr><td align="center"> <code><span class="number">128</span></code></td><td align="center">       </td><td align="center"> <code><span class="number">8</code> </td></tr>
-<tr><td align="center"> <code><span class="number">16</span></code> </td><td align="center"> <code><span class="number">32</span></code></td><td align="center"> <code><span class="number">64</span></code></td></tr>
+<tr><td align="center"> <code><span class="normal">1</span></code>  </td><td align="center"> <code><span class="normal">2</span></code> </td><td align="center"> <code><span class="normal">4</span></code> </td></tr>
+<tr><td align="center"> <code><span class="normal">128</span></code></td><td align="center">       </td><td align="center"> <code><span class="normal">8</span></code> </td></tr>
+<tr><td align="center"> <code><span class="normal">16</span></code> </td><td align="center"> <code><span class="normal">32</span></code></td><td align="center"> <code><span class="normal">64</span></code></td></tr>
 </table>
-<p>La règle 2 dit que s'il y a un ou plusieurs carreaux influenceurs, ils seront tous du même type. Cela revient à un choix binaire, savoir si c'est le carreau est un influenceur ou pas. Il y a donc <b>2<sup>8</sup></b>, soit <code><span class="number">256</span></code>, possibilités. Pour un carreau, chaque possibilité de configuration des carreaux qui l'entourent est identifiée par un nombre qui est le résultat de l'addition de <b>2<sup>position</sup></b> pour chaque carreau influenceur. Les règles 3 et 4 suppriment de nombreuses combinaisons et réduisent à <code><span class="number">14</span></code> le nombre de textures nécessaires pour faire la transition entre eau et terre.</p>
+<p>La règle 2 dit que s'il y a un ou plusieurs carreaux influenceurs, ils seront tous du même type. Cela revient à un choix binaire, savoir si c'est le carreau est un influenceur ou pas. Il y a donc <b>2<sup>8</sup></b>, soit <code><span class="normal">256</span></code>, possibilités. Pour un carreau, chaque possibilité de configuration des carreaux qui l'entourent est identifiée par un nombre qui est le résultat de l'addition de <b>2<sup>position</sup></b> pour chaque carreau influenceur. Les règles 3 et 4 suppriment de nombreuses combinaisons et réduisent à <code><span class="normal">14</span></code> le nombre de textures nécessaires pour faire la transition entre eau et terre.</p>
 <h3 id="ii.c-exemples-de-configurations">II.C Exemples de configurations</h3>
 <p>À présent, passons aux exemples. Voici sept exemples de configurations de carreaux entourant le carreau central dont une interdite :</p>
 <h3 id="ii.d-correspondances-configuration-transition">II.D Correspondances configuration-transition</h3>

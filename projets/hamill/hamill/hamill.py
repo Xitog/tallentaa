@@ -22,7 +22,7 @@
 # SOFTWARE.
 #
 # For more information about the Hamill lightweight markup language see:
-# https://xitog.github.io/dgx/informatique/hamill.html
+# https://xitog.github.io/dgx/informatique/hamill.html (in French)
 
 """Hamill: a simple lightweight markup language"""
 
@@ -355,7 +355,7 @@ def check_link(link, links, inner_links):
 
 
 #-------------------------------------------------------------------------------
-# Processors
+# Processors functions
 #-------------------------------------------------------------------------------
 
 def process_string(line, gen=None):

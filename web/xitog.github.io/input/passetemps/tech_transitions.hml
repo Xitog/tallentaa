@@ -10,8 +10,11 @@
 !css table.schema { display: inline-block; margin-right: 20px; }
 !css table.schema tr:nth-child(2n) { background-color: transparent; }
 
-!css table.extract { border-collapse: collapse; display: inline-block; }
-!css table.extract td { border: None; padding: 0px; text-align: center; }
+!css table.extract { border-collapse: collapse; display: inline-block; margin-left: 2em; }
+!css table.extract td { border: 1px solid black; padding: 0px; text-align: center; }
+
+!css #interdit {color: red; font-weight: bold; }
+!css #accept {color: rgb(0, 255, 128); font-weight: bold; }
 
 {{#main .container}}
 
@@ -71,15 +74,52 @@ Nous allons établir un ensemble de règles pour les transitions :
 % Cinquième règle, qui est une exception à la quatrième, est celle des __**[#coins en opposition]**__ : la configuration où deux coins en opposition sont des influenceurs et ceux sont les seuls influenceurs est autorisée. Cela concerne les deux configurations ci-dessous :
 | [!https://xitog.github.io/dgx/passetemps/graphics/transitions/img_6_opposing_corners.png]
 
-!var NEXT_TAB_CLASS = extract
+!var DEFAULT_TAB_CLASS = extract
 
 !var DEFAULT_FIND_IMAGE = https://xitog.github.io/dgx/passetemps/graphics/transitions/base/
 
-|[!mud-1.png]|
-|[!water-1.png]|
-|[!water-1.png]|
+§§ Unicity
+
+Unicité {{#interdit cas refusés}}
+|[!blank-1.png]|[!mud-1.png]|[!grass-1.png]|
+|[!blank-1.png]|[!water-1.png]|[!blank-1.png]|
+|[!blank-1.png]|[!blank-1.png]|[!blank-1.png]|
+
+§§ Vice
+
+Étau {{#interdit cas refusés}}
+|[!blank-1.png]|[!mud-1.png]|[!blank-1.png]|
+|[!blank-1.png]|[!water-1.png]|[!blank-1.png]|
+|[!blank-1.png]|[!mud-1.png]|[!blank-1.png]|
+
+|[!blank-1.png]|[!blank-1.png]|[!blank-1.png]|
+|[!mud-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!blank-1.png]|[!blank-1.png]|[!blank-1.png]|
+
+§§ Discontinuity
+
+Discontinuité {{#interdit cas refusés}}
+|[!mud-1.png]|[!mud-1.png]|[!water-1.png]|
+|[!blank-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!blank-1.png]|[!blank-1.png]|[!mud-1.png]|
+
+|[!mud-1.png]|[!mud-1.png]|[!blank-1.png]|
+|[!water-1.png]|[!water-1.png]|[!blank-1.png]|
+|[!mud-1.png]|[!blank-1.png]|[!blank-1.png]|
+
+§§ Opposite corners
+
+Coins opposés {{#accept cas acceptés}}
+|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+
+|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
 
 !var DEFAULT_FIND_IMAGE = reset
+!var DEFAULT_TAB_CLASS = reset
 
 ### II.B Système de numérotation
 
