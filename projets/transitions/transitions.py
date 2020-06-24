@@ -30,7 +30,7 @@
 # Encoding
 #-------------------------------------------------------------------------------
 
-# On 12 bits
+# Calc from Env return a result on 12 bits
 
 # The 3 first bits indicated from which tilesets we are transiting
 # [D]eep < [W]ater < [M]ud < [G]rass < dark g[R]ass
@@ -41,6 +41,8 @@
 # M < Y    3 011
 # M < G    4 100
 # G < R    5 101
+# unused   6 110
+# error    7 111
 
 # The 4 next bits indicated the borders on which we are transiting
 # Only 1 or 2 borders can be transiting:
@@ -120,11 +122,28 @@ ALLOWED_TRANSITIONS = {
 }
 
 TRANSITIONS = {}
+ERROR = None
 
 DEBUG = 0 #0, 1 or 2
 
-RANDOM=[0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1]
+RANDOM=[0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0]
 COUNT=0
+
+RANDOM_BASE = {
+    DEEP:  [0, 0, 1],
+    WATER: [0, 0, 1, 1, 0, 2, 3, 4, 5, 0, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 0, 0, 4, 3, 3, 2, 2, 1, 7,
+            0, 0, 1, 1, 0, 2, 3, 4, 5, 0, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 0, 0, 4, 3, 3, 2, 2, 1, 8],
+    MUD:   [0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    DRY:   [0, 0, 1],
+    GRASS: [0, 0, 1],
+    DARK:  [0, 0, 1]
+}
+COUNT_BASE = {DEEP: 0, WATER: 0, MUD: 0, DRY: 0, GRASS: 0, DARK: 0}
 
 NORTHWEST = 0
 NORTH     = 1
@@ -139,14 +158,18 @@ WEST      = 7
 # Types
 #-------------------------------------------------------------------------------
 
-# Classes Map, Named tuples Transition and Diff
+# Classes TransitionException, Map, Named tuples Transition and Diff
 
 Transition = namedtuple('Transition', ['transition', 'borders', 'corners', 'merged', 'alternate'])
 Diff = namedtuple('Diff', ['first', 'last', 'length'])
 
+class TransitionException(Exception):
+    pass
+
 class Map:
 
-    def __init__(self, width, height, default):
+    def __init__(self, title, width, height, default):
+        self.title = title
         self.width = width
         self.height = height
         self.content = []
@@ -172,6 +195,7 @@ class Map:
         return inverted
 
     def info(self):
+        print(f'= {self.title} =')
         display = self.invert()
         for row in range(self.height):
             print(f'{row=}', display[row])
@@ -186,7 +210,7 @@ class Map:
 # randint (supervized randomness), load (texture), calc_num_from_env (map => code environment),
 # calc_trans_from_num (code environment => trans), produce_one_image, map_to_image
 
-def randint():
+def seq_rand_int():
     global COUNT
     res = RANDOM[COUNT]
     COUNT += 1
@@ -195,40 +219,99 @@ def randint():
     return res
 
 
-def load(TRANSITIONS):
+def seq_rand_base(base):
+    global RANDOM_BASE, COUNT_BASE
+    res = RANDOM_BASE[base][COUNT_BASE[base]]
+    COUNT_BASE[base] += 1
+    if COUNT_BASE[base] >= len(RANDOM_BASE[base]):
+        COUNT_BASE[base] = 0
+    return res
+
+def load():
+    global TRANSITIONS, ERROR
     origin = r'..\..\assets\sets\rts\tiles'
+    # ERROR
+    ERROR = Image.open('error.png')
     # No transition
     TRANSITIONS[0] = {DEEP: {}, WATER: {}, MUD: {}, DRY: {}, GRASS: {}, DARK: {}}
     # Water tiles
+    TRANSITIONS[0][DEEP][0]  = Image.open(join(origin, 'base', 'deep-1.png'))
+    TRANSITIONS[0][DEEP][1]  = Image.open(join(origin, 'base', 'deep-2.png'))
     TRANSITIONS[0][WATER][0] = Image.open(join(origin, 'base', 'water-1.png'))
     TRANSITIONS[0][WATER][1] = Image.open(join(origin, 'base', 'water-2.png'))
-    TRANSITIONS[0][MUD][0] = Image.open(join(origin, 'base', 'mud-1.png'))
-    TRANSITIONS[0][MUD][1] = Image.open(join(origin, 'base', 'mud-2.png'))
+    TRANSITIONS[0][WATER][2] = Image.open(join(origin, 'base', 'water-2.png'))
+    TRANSITIONS[0][WATER][3] = Image.open(join(origin, 'base', 'water-2.png'))
+    TRANSITIONS[0][WATER][4] = Image.open(join(origin, 'base', 'water-2.png'))
+    TRANSITIONS[0][WATER][5] = Image.open(join(origin, 'base', 'water-6.png'))
+    TRANSITIONS[0][WATER][6] = Image.open(join(origin, 'base', 'water-7.png'))
+    TRANSITIONS[0][WATER][7] = Image.open(join(origin, 'base', 'water-8.png'))
+    TRANSITIONS[0][WATER][8] = Image.open(join(origin, 'base', 'water-9.png'))
+    TRANSITIONS[0][MUD][0]   = Image.open(join(origin, 'base', 'mud-1.png'))
+    TRANSITIONS[0][MUD][1]   = Image.open(join(origin, 'base', 'mud-2.png'))
+    TRANSITIONS[0][MUD][2]   = Image.open(join(origin, 'base', 'mud-3.png'))
+    TRANSITIONS[0][MUD][3]   = Image.open(join(origin, 'base', 'mud-4.png'))
+    TRANSITIONS[0][MUD][4]   = Image.open(join(origin, 'base', 'mud-5.png'))
+    TRANSITIONS[0][MUD][5]   = Image.open(join(origin, 'base', 'mud-6.png'))
+    TRANSITIONS[0][DRY][0]   = Image.open(join(origin, 'base', 'dry-1.png'))
+    TRANSITIONS[0][DRY][1]   = Image.open(join(origin, 'base', 'dry-2.png'))
     TRANSITIONS[0][GRASS][0] = Image.open(join(origin, 'base', 'grass-1.png'))
+    TRANSITIONS[0][GRASS][1] = Image.open(join(origin, 'base', 'grass-2.png'))
+    TRANSITIONS[0][DARK][0]  = Image.open(join(origin, 'base', 'dark-1.png'))
+    TRANSITIONS[0][DARK][1]  = Image.open(join(origin, 'base', 'dark-2.png'))
     # Water > Deep
-    #
+    TRANSITIONS[1] = {0: {}, 1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}, 7: {}, 8: {}, 9: {}, 10: {}, 11: {}, 12: {}, 13: {}, 14: {}}
+    TRANSITIONS[1][0][0]  = Image.open(join(origin, 'base', 'blank-1.png'))
+    TRANSITIONS[1][0][1]  = Image.open(join(origin, 'base', 'blank-1.png'))
+    TRANSITIONS[1][1][0]  = Image.open(join(origin, '01_water_deep', 'water-w-deep-1.png'))
+    TRANSITIONS[1][1][1]  = Image.open(join(origin, '01_water_deep', 'water-w-deep-2.png'))
+    TRANSITIONS[1][2][0]  = Image.open(join(origin, '01_water_deep', 'water-s-deep-1.png'))
+    TRANSITIONS[1][2][1]  = Image.open(join(origin, '01_water_deep', 'water-s-deep-2.png'))
+    TRANSITIONS[1][3][0]  = Image.open(join(origin, '01_water_deep', 'water-sw-deep-1.png'))
+    TRANSITIONS[1][3][1]  = Image.open(join(origin, '01_water_deep', 'water-sw-deep-2.png'))
+    TRANSITIONS[1][4][0]  = Image.open(join(origin, '01_water_deep', 'water-e-deep-1.png'))
+    TRANSITIONS[1][4][1]  = Image.open(join(origin, '01_water_deep', 'water-e-deep-2.png'))
+    TRANSITIONS[1][5][0]  = Image.open(join(origin, '01_water_deep', 'water-cnw-deep-1.png'))
+    TRANSITIONS[1][5][1]  = Image.open(join(origin, '01_water_deep', 'water-cnw-deep-2.png'))
+    TRANSITIONS[1][6][0]  = Image.open(join(origin, '01_water_deep', 'water-es-deep-1.png'))
+    TRANSITIONS[1][6][1]  = Image.open(join(origin, '01_water_deep', 'water-es-deep-2.png'))
+    TRANSITIONS[1][7][0]  = Image.open(join(origin, '01_water_deep', 'water-cne-deep-1.png'))
+    TRANSITIONS[1][7][1]  = Image.open(join(origin, '01_water_deep', 'water-cne-deep-2.png'))
+    TRANSITIONS[1][8][0]  = Image.open(join(origin, '01_water_deep', 'water-n-deep-1.png'))
+    TRANSITIONS[1][8][1]  = Image.open(join(origin, '01_water_deep', 'water-n-deep-2.png'))
+    TRANSITIONS[1][9][0]  = Image.open(join(origin, '01_water_deep', 'water-nw-deep-1.png'))
+    TRANSITIONS[1][9][1]  = Image.open(join(origin, '01_water_deep', 'water-nw-deep-2.png'))
+    TRANSITIONS[1][10][0] = Image.open(join(origin, '01_water_deep', 'water-ces-deep-1.png'))
+    TRANSITIONS[1][10][1] = Image.open(join(origin, '01_water_deep', 'water-ces-deep-2.png'))
+    TRANSITIONS[1][11][0] = Image.open(join(origin, '01_water_deep', 'water-csw-deep-1.png'))
+    TRANSITIONS[1][11][1] = Image.open(join(origin, '01_water_deep', 'water-csw-deep-2.png'))
+    TRANSITIONS[1][12][0] = Image.open(join(origin, '01_water_deep', 'water-ne-deep-1.png'))
+    TRANSITIONS[1][12][1] = Image.open(join(origin, '01_water_deep', 'water-ne-deep-2.png'))
+    TRANSITIONS[1][13][0] = Image.open(join(origin, '01_water_deep', 'water-cnwces-deep-1.png'))
+    TRANSITIONS[1][13][1] = Image.open(join(origin, '01_water_deep', 'water-cnwces-deep-2.png'))
+    TRANSITIONS[1][14][0] = Image.open(join(origin, '01_water_deep', 'water-cnecsw-deep-1.png'))
+    TRANSITIONS[1][14][1] = Image.open(join(origin, '01_water_deep', 'water-cnecsw-deep-2.png'))
     # Mud > Water
     TRANSITIONS[2] = {0: {}, 1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}, 7: {}, 8: {}, 9: {}, 10: {}, 11: {}, 12: {}, 13: {}, 14: {}}
-    TRANSITIONS[2][0][0] = Image.open(join(origin, 'base', 'blank-1.png'))
-    TRANSITIONS[2][0][1] = Image.open(join(origin, 'base', 'blank-1.png'))
-    TRANSITIONS[2][1][0] = Image.open(join(origin, '02_mud_water', 'mud-w-water-1.png'))
-    TRANSITIONS[2][1][1] = Image.open(join(origin, '02_mud_water', 'mud-w-water-2.png'))
-    TRANSITIONS[2][2][0] = Image.open(join(origin, '02_mud_water', 'mud-s-water-1.png'))
-    TRANSITIONS[2][2][1] = Image.open(join(origin, '02_mud_water', 'mud-s-water-2.png'))
-    TRANSITIONS[2][3][0] = Image.open(join(origin, '02_mud_water', 'mud-sw-water-1.png'))
-    TRANSITIONS[2][3][1] = Image.open(join(origin, '02_mud_water', 'mud-sw-water-2.png'))
-    TRANSITIONS[2][4][0] = Image.open(join(origin, '02_mud_water', 'mud-e-water-1.png'))
-    TRANSITIONS[2][4][1] = Image.open(join(origin, '02_mud_water', 'mud-e-water-2.png'))
-    TRANSITIONS[2][5][0] = Image.open(join(origin, '02_mud_water', 'mud-cnw-water-1.png'))
-    TRANSITIONS[2][5][1] = Image.open(join(origin, '02_mud_water', 'mud-cnw-water-2.png'))
-    TRANSITIONS[2][6][0] = Image.open(join(origin, '02_mud_water', 'mud-es-water-1.png'))
-    TRANSITIONS[2][6][1] = Image.open(join(origin, '02_mud_water', 'mud-es-water-2.png'))
-    TRANSITIONS[2][7][0] = Image.open(join(origin, '02_mud_water', 'mud-cne-water-1.png'))
-    TRANSITIONS[2][7][1] = Image.open(join(origin, '02_mud_water', 'mud-cne-water-2.png'))
-    TRANSITIONS[2][8][0] = Image.open(join(origin, '02_mud_water', 'mud-n-water-1.png'))
-    TRANSITIONS[2][8][1] = Image.open(join(origin, '02_mud_water', 'mud-n-water-2.png'))
-    TRANSITIONS[2][9][0] = Image.open(join(origin, '02_mud_water', 'mud-nw-water-1.png'))
-    TRANSITIONS[2][9][1] = Image.open(join(origin, '02_mud_water', 'mud-nw-water-2.png'))
+    TRANSITIONS[2][0][0]  = Image.open(join(origin, 'base', 'blank-1.png'))
+    TRANSITIONS[2][0][1]  = Image.open(join(origin, 'base', 'blank-1.png'))
+    TRANSITIONS[2][1][0]  = Image.open(join(origin, '02_mud_water', 'mud-w-water-1.png'))
+    TRANSITIONS[2][1][1]  = Image.open(join(origin, '02_mud_water', 'mud-w-water-2.png'))
+    TRANSITIONS[2][2][0]  = Image.open(join(origin, '02_mud_water', 'mud-s-water-1.png'))
+    TRANSITIONS[2][2][1]  = Image.open(join(origin, '02_mud_water', 'mud-s-water-2.png'))
+    TRANSITIONS[2][3][0]  = Image.open(join(origin, '02_mud_water', 'mud-sw-water-1.png'))
+    TRANSITIONS[2][3][1]  = Image.open(join(origin, '02_mud_water', 'mud-sw-water-2.png'))
+    TRANSITIONS[2][4][0]  = Image.open(join(origin, '02_mud_water', 'mud-e-water-1.png'))
+    TRANSITIONS[2][4][1]  = Image.open(join(origin, '02_mud_water', 'mud-e-water-2.png'))
+    TRANSITIONS[2][5][0]  = Image.open(join(origin, '02_mud_water', 'mud-cnw-water-1.png'))
+    TRANSITIONS[2][5][1]  = Image.open(join(origin, '02_mud_water', 'mud-cnw-water-2.png'))
+    TRANSITIONS[2][6][0]  = Image.open(join(origin, '02_mud_water', 'mud-es-water-1.png'))
+    TRANSITIONS[2][6][1]  = Image.open(join(origin, '02_mud_water', 'mud-es-water-2.png'))
+    TRANSITIONS[2][7][0]  = Image.open(join(origin, '02_mud_water', 'mud-cne-water-1.png'))
+    TRANSITIONS[2][7][1]  = Image.open(join(origin, '02_mud_water', 'mud-cne-water-2.png'))
+    TRANSITIONS[2][8][0]  = Image.open(join(origin, '02_mud_water', 'mud-n-water-1.png'))
+    TRANSITIONS[2][8][1]  = Image.open(join(origin, '02_mud_water', 'mud-n-water-2.png'))
+    TRANSITIONS[2][9][0]  = Image.open(join(origin, '02_mud_water', 'mud-nw-water-1.png'))
+    TRANSITIONS[2][9][1]  = Image.open(join(origin, '02_mud_water', 'mud-nw-water-2.png'))
     TRANSITIONS[2][10][0] = Image.open(join(origin, '02_mud_water', 'mud-ces-water-1.png'))
     TRANSITIONS[2][10][1] = Image.open(join(origin, '02_mud_water', 'mud-ces-water-2.png'))
     TRANSITIONS[2][11][0] = Image.open(join(origin, '02_mud_water', 'mud-csw-water-1.png'))
@@ -240,29 +323,59 @@ def load(TRANSITIONS):
     TRANSITIONS[2][14][0] = Image.open(join(origin, '02_mud_water', 'mud-cnecsw-water-1.png'))
     TRANSITIONS[2][14][1] = Image.open(join(origin, '02_mud_water', 'mud-cnecsw-water-2.png'))
     # Dry > Mud
-    #
+    TRANSITIONS[3] = {0: {}, 1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}, 7: {}, 8: {}, 9: {}, 10: {}, 11: {}, 12: {}, 13: {}, 14: {}}
+    TRANSITIONS[3][0][0]  = Image.open(join(origin, 'base', 'blank-1.png'))
+    TRANSITIONS[3][0][1]  = Image.open(join(origin, 'base', 'blank-1.png'))
+    TRANSITIONS[3][1][0]  = Image.open(join(origin, '03_dry_mud', 'dry-w-mud-1.png'))
+    TRANSITIONS[3][1][1]  = Image.open(join(origin, '03_dry_mud', 'dry-w-mud-2.png'))
+    TRANSITIONS[3][2][0]  = Image.open(join(origin, '03_dry_mud', 'dry-s-mud-1.png'))
+    TRANSITIONS[3][2][1]  = Image.open(join(origin, '03_dry_mud', 'dry-s-mud-2.png'))
+    TRANSITIONS[3][3][0]  = Image.open(join(origin, '03_dry_mud', 'dry-sw-mud-1.png'))
+    TRANSITIONS[3][3][1]  = Image.open(join(origin, '03_dry_mud', 'dry-sw-mud-2.png'))
+    TRANSITIONS[3][4][0]  = Image.open(join(origin, '03_dry_mud', 'dry-e-mud-1.png'))
+    TRANSITIONS[3][4][1]  = Image.open(join(origin, '03_dry_mud', 'dry-e-mud-2.png'))
+    TRANSITIONS[3][5][0]  = Image.open(join(origin, '03_dry_mud', 'dry-cnw-mud-1.png'))
+    TRANSITIONS[3][5][1]  = Image.open(join(origin, '03_dry_mud', 'dry-cnw-mud-2.png'))
+    TRANSITIONS[3][6][0]  = Image.open(join(origin, '03_dry_mud', 'dry-es-mud-1.png'))
+    TRANSITIONS[3][6][1]  = Image.open(join(origin, '03_dry_mud', 'dry-es-mud-2.png'))
+    TRANSITIONS[3][7][0]  = Image.open(join(origin, '03_dry_mud', 'dry-cne-mud-1.png'))
+    TRANSITIONS[3][7][1]  = Image.open(join(origin, '03_dry_mud', 'dry-cne-mud-2.png'))
+    TRANSITIONS[3][8][0]  = Image.open(join(origin, '03_dry_mud', 'dry-n-mud-1.png'))
+    TRANSITIONS[3][8][1]  = Image.open(join(origin, '03_dry_mud', 'dry-n-mud-2.png'))
+    TRANSITIONS[3][9][0]  = Image.open(join(origin, '03_dry_mud', 'dry-nw-mud-1.png'))
+    TRANSITIONS[3][9][1]  = Image.open(join(origin, '03_dry_mud', 'dry-nw-mud-2.png'))
+    TRANSITIONS[3][10][0] = Image.open(join(origin, '03_dry_mud', 'dry-ces-mud-1.png'))
+    TRANSITIONS[3][10][1] = Image.open(join(origin, '03_dry_mud', 'dry-ces-mud-2.png'))
+    TRANSITIONS[3][11][0] = Image.open(join(origin, '03_dry_mud', 'dry-csw-mud-1.png'))
+    TRANSITIONS[3][11][1] = Image.open(join(origin, '03_dry_mud', 'dry-csw-mud-2.png'))
+    TRANSITIONS[3][12][0] = Image.open(join(origin, '03_dry_mud', 'dry-ne-mud-1.png'))
+    TRANSITIONS[3][12][1] = Image.open(join(origin, '03_dry_mud', 'dry-ne-mud-2.png'))
+    TRANSITIONS[3][13][0] = Image.open(join(origin, '03_dry_mud', 'dry-cnwces-mud-1.png'))
+    TRANSITIONS[3][13][1] = Image.open(join(origin, '03_dry_mud', 'dry-cnwces-mud-2.png'))
+    TRANSITIONS[3][14][0] = Image.open(join(origin, '03_dry_mud', 'dry-cnecsw-mud-1.png'))
+    TRANSITIONS[3][14][1] = Image.open(join(origin, '03_dry_mud', 'dry-cnecsw-mud-2.png'))
     # Grass > Mud
     TRANSITIONS[4] = {0: {}, 1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}, 7: {}, 8: {}, 9: {}, 10: {}, 11: {}, 12: {}, 13: {}, 14: {}}
-    TRANSITIONS[4][0][0] = Image.open(join(origin, 'base', 'blank-1.png'))
-    TRANSITIONS[4][0][1] = Image.open(join(origin, 'base', 'blank-1.png'))
-    TRANSITIONS[4][1][0] = Image.open(join(origin, '04_grass_mud', 'grass-w-mud-1.png'))
-    TRANSITIONS[4][1][1] = Image.open(join(origin, '04_grass_mud', 'grass-w-mud-2.png'))
-    TRANSITIONS[4][2][0] = Image.open(join(origin, '04_grass_mud', 'grass-s-mud-1.png'))
-    TRANSITIONS[4][2][1] = Image.open(join(origin, '04_grass_mud', 'grass-s-mud-2.png'))
-    TRANSITIONS[4][3][0] = Image.open(join(origin, '04_grass_mud', 'grass-sw-mud-1.png'))
-    TRANSITIONS[4][3][1] = Image.open(join(origin, '04_grass_mud', 'grass-sw-mud-2.png'))
-    TRANSITIONS[4][4][0] = Image.open(join(origin, '04_grass_mud', 'grass-e-mud-1.png'))
-    TRANSITIONS[4][4][1] = Image.open(join(origin, '04_grass_mud', 'grass-e-mud-2.png'))
-    TRANSITIONS[4][5][0] = Image.open(join(origin, '04_grass_mud', 'grass-cnw-mud-1.png'))
-    TRANSITIONS[4][5][1] = Image.open(join(origin, '04_grass_mud', 'grass-cnw-mud-2.png'))
-    TRANSITIONS[4][6][0] = Image.open(join(origin, '04_grass_mud', 'grass-es-mud-1.png'))
-    TRANSITIONS[4][6][1] = Image.open(join(origin, '04_grass_mud', 'grass-es-mud-2.png'))
-    TRANSITIONS[4][7][0] = Image.open(join(origin, '04_grass_mud', 'grass-cne-mud-1.png'))
-    TRANSITIONS[4][7][1] = Image.open(join(origin, '04_grass_mud', 'grass-cne-mud-2.png'))
-    TRANSITIONS[4][8][0] = Image.open(join(origin, '04_grass_mud', 'grass-n-mud-1.png'))
-    TRANSITIONS[4][8][1] = Image.open(join(origin, '04_grass_mud', 'grass-n-mud-2.png'))
-    TRANSITIONS[4][9][0] = Image.open(join(origin, '04_grass_mud', 'grass-nw-mud-1.png'))
-    TRANSITIONS[4][9][1] = Image.open(join(origin, '04_grass_mud', 'grass-nw-mud-2.png'))
+    TRANSITIONS[4][0][0]  = Image.open(join(origin, 'base', 'blank-1.png'))
+    TRANSITIONS[4][0][1]  = Image.open(join(origin, 'base', 'blank-1.png'))
+    TRANSITIONS[4][1][0]  = Image.open(join(origin, '04_grass_mud', 'grass-w-mud-1.png'))
+    TRANSITIONS[4][1][1]  = Image.open(join(origin, '04_grass_mud', 'grass-w-mud-2.png'))
+    TRANSITIONS[4][2][0]  = Image.open(join(origin, '04_grass_mud', 'grass-s-mud-1.png'))
+    TRANSITIONS[4][2][1]  = Image.open(join(origin, '04_grass_mud', 'grass-s-mud-2.png'))
+    TRANSITIONS[4][3][0]  = Image.open(join(origin, '04_grass_mud', 'grass-sw-mud-1.png'))
+    TRANSITIONS[4][3][1]  = Image.open(join(origin, '04_grass_mud', 'grass-sw-mud-2.png'))
+    TRANSITIONS[4][4][0]  = Image.open(join(origin, '04_grass_mud', 'grass-e-mud-1.png'))
+    TRANSITIONS[4][4][1]  = Image.open(join(origin, '04_grass_mud', 'grass-e-mud-2.png'))
+    TRANSITIONS[4][5][0]  = Image.open(join(origin, '04_grass_mud', 'grass-cnw-mud-1.png'))
+    TRANSITIONS[4][5][1]  = Image.open(join(origin, '04_grass_mud', 'grass-cnw-mud-2.png'))
+    TRANSITIONS[4][6][0]  = Image.open(join(origin, '04_grass_mud', 'grass-es-mud-1.png'))
+    TRANSITIONS[4][6][1]  = Image.open(join(origin, '04_grass_mud', 'grass-es-mud-2.png'))
+    TRANSITIONS[4][7][0]  = Image.open(join(origin, '04_grass_mud', 'grass-cne-mud-1.png'))
+    TRANSITIONS[4][7][1]  = Image.open(join(origin, '04_grass_mud', 'grass-cne-mud-2.png'))
+    TRANSITIONS[4][8][0]  = Image.open(join(origin, '04_grass_mud', 'grass-n-mud-1.png'))
+    TRANSITIONS[4][8][1]  = Image.open(join(origin, '04_grass_mud', 'grass-n-mud-2.png'))
+    TRANSITIONS[4][9][0]  = Image.open(join(origin, '04_grass_mud', 'grass-nw-mud-1.png'))
+    TRANSITIONS[4][9][1]  = Image.open(join(origin, '04_grass_mud', 'grass-nw-mud-2.png'))
     TRANSITIONS[4][10][0] = Image.open(join(origin, '04_grass_mud', 'grass-ces-mud-1.png'))
     TRANSITIONS[4][10][1] = Image.open(join(origin, '04_grass_mud', 'grass-ces-mud-2.png'))
     TRANSITIONS[4][11][0] = Image.open(join(origin, '04_grass_mud', 'grass-csw-mud-1.png'))
@@ -274,122 +387,173 @@ def load(TRANSITIONS):
     TRANSITIONS[4][14][0] = Image.open(join(origin, '04_grass_mud', 'grass-cnecsw-mud-1.png'))
     TRANSITIONS[4][14][1] = Image.open(join(origin, '04_grass_mud', 'grass-cnecsw-mud-2.png'))
     # Dark > Grass
-    #
+    TRANSITIONS[5] = {0: {}, 1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}, 7: {}, 8: {}, 9: {}, 10: {}, 11: {}, 12: {}, 13: {}, 14: {}}
+    TRANSITIONS[5][0][0]  = Image.open(join(origin, 'base', 'blank-1.png'))
+    TRANSITIONS[5][0][1]  = Image.open(join(origin, 'base', 'blank-1.png'))
+    TRANSITIONS[5][1][0]  = Image.open(join(origin, '05_dark_grass', 'dark-w-grass-1.png'))
+    TRANSITIONS[5][1][1]  = Image.open(join(origin, '05_dark_grass', 'dark-w-grass-2.png'))
+    TRANSITIONS[5][2][0]  = Image.open(join(origin, '05_dark_grass', 'dark-s-grass-1.png'))
+    TRANSITIONS[5][2][1]  = Image.open(join(origin, '05_dark_grass', 'dark-s-grass-2.png'))
+    TRANSITIONS[5][3][0]  = Image.open(join(origin, '05_dark_grass', 'dark-sw-grass-1.png'))
+    TRANSITIONS[5][3][1]  = Image.open(join(origin, '05_dark_grass', 'dark-sw-grass-2.png'))
+    TRANSITIONS[5][4][0]  = Image.open(join(origin, '05_dark_grass', 'dark-e-grass-1.png'))
+    TRANSITIONS[5][4][1]  = Image.open(join(origin, '05_dark_grass', 'dark-e-grass-2.png'))
+    TRANSITIONS[5][5][0]  = Image.open(join(origin, '05_dark_grass', 'dark-cnw-grass-1.png'))
+    TRANSITIONS[5][5][1]  = Image.open(join(origin, '05_dark_grass', 'dark-cnw-grass-2.png'))
+    TRANSITIONS[5][6][0]  = Image.open(join(origin, '05_dark_grass', 'dark-es-grass-1.png'))
+    TRANSITIONS[5][6][1]  = Image.open(join(origin, '05_dark_grass', 'dark-es-grass-2.png'))
+    TRANSITIONS[5][7][0]  = Image.open(join(origin, '05_dark_grass', 'dark-cne-grass-1.png'))
+    TRANSITIONS[5][7][1]  = Image.open(join(origin, '05_dark_grass', 'dark-cne-grass-2.png'))
+    TRANSITIONS[5][8][0]  = Image.open(join(origin, '05_dark_grass', 'dark-n-grass-1.png'))
+    TRANSITIONS[5][8][1]  = Image.open(join(origin, '05_dark_grass', 'dark-n-grass-2.png'))
+    TRANSITIONS[5][9][0]  = Image.open(join(origin, '05_dark_grass', 'dark-nw-grass-1.png'))
+    TRANSITIONS[5][9][1]  = Image.open(join(origin, '05_dark_grass', 'dark-nw-grass-2.png'))
+    TRANSITIONS[5][10][0] = Image.open(join(origin, '05_dark_grass', 'dark-ces-grass-1.png'))
+    TRANSITIONS[5][10][1] = Image.open(join(origin, '05_dark_grass', 'dark-ces-grass-2.png'))
+    TRANSITIONS[5][11][0] = Image.open(join(origin, '05_dark_grass', 'dark-csw-grass-1.png'))
+    TRANSITIONS[5][11][1] = Image.open(join(origin, '05_dark_grass', 'dark-csw-grass-2.png'))
+    TRANSITIONS[5][12][0] = Image.open(join(origin, '05_dark_grass', 'dark-ne-grass-1.png'))
+    TRANSITIONS[5][12][1] = Image.open(join(origin, '05_dark_grass', 'dark-ne-grass-2.png'))
+    TRANSITIONS[5][13][0] = Image.open(join(origin, '05_dark_grass', 'dark-cnwces-grass-1.png'))
+    TRANSITIONS[5][13][1] = Image.open(join(origin, '05_dark_grass', 'dark-cnwces-grass-2.png'))
+    TRANSITIONS[5][14][0] = Image.open(join(origin, '05_dark_grass', 'dark-cnecsw-grass-1.png'))
+    TRANSITIONS[5][14][1] = Image.open(join(origin, '05_dark_grass', 'dark-cnecsw-grass-2.png'))
 
 
-def calc_num_from_env(x, y, matrix):
-    # Get the tilesets
-    center = matrix[x][y] & 0b11110000
-    north_west = matrix[x-1][y-1] & 0b11110000 if y-1 >= 0 and x-1 >= 0 else center
-    north = matrix[x][y-1] & 0b11110000 if y-1 >= 0 else center
-    north_east = matrix[x+1][y-1] & 0b11110000 if y-1 >= 0 and x+1 < matrix.width else center
-    east = matrix[x+1][y] & 0b11110000 if x+1 < matrix.width else center
-    south_east = matrix[x+1][y+1] & 0b11110000 if y+1 < matrix.height and x+1 < matrix.width else center
-    south = matrix[x][y+1] & 0b11110000 if y+1 < matrix.height else center
-    south_west = matrix[x-1][y+1] & 0b11110000 if y+1 < matrix.height and x-1 >= 0 else center
-    west = matrix[x-1][y] & 0b11110000 if x-1 >= 0 else center
-    values = [north_west, north, north_east, east, south_east, south, south_west, west]
-    modifying_by_val = [] # unique modifying values
-    modifying_by_pos = [] # masked surrounding values (if not modifying => center)
-    for val in values:
-        if val != center:
-            if val in ALLOWED_TRANSITIONS and center in ALLOWED_TRANSITIONS[val]:
-                modifying_by_pos.append(val)
-                if val not in modifying_by_val:
-                    modifying_by_val.append(val)
-            elif center in ALLOWED_TRANSITIONS and val in ALLOWED_TRANSITIONS[center]:
-                # Allowed pair
-                modifying_by_pos.append(center)
+def code_from_env(x, y, matrix):
+    msg = []
+    try:
+        # Get the tilesets
+        center = matrix[x][y] & 0b11110000
+        north_west = matrix[x-1][y-1] & 0b11110000 if y-1 >= 0 and x-1 >= 0 else center
+        north = matrix[x][y-1] & 0b11110000 if y-1 >= 0 else center
+        north_east = matrix[x+1][y-1] & 0b11110000 if y-1 >= 0 and x+1 < matrix.width else center
+        east = matrix[x+1][y] & 0b11110000 if x+1 < matrix.width else center
+        south_east = matrix[x+1][y+1] & 0b11110000 if y+1 < matrix.height and x+1 < matrix.width else center
+        south = matrix[x][y+1] & 0b11110000 if y+1 < matrix.height else center
+        south_west = matrix[x-1][y+1] & 0b11110000 if y+1 < matrix.height and x-1 >= 0 else center
+        west = matrix[x-1][y] & 0b11110000 if x-1 >= 0 else center
+        values = [north_west, north, north_east, east, south_east, south, south_west, west]
+        modifying_by_val = [] # unique modifying values
+        modifying_by_pos = [] # masked surrounding values (if not modifying => center)
+        for val in values:
+            if val != center:
+                if val in ALLOWED_TRANSITIONS and center in ALLOWED_TRANSITIONS[val]:
+                    modifying_by_pos.append(val)
+                    if val not in modifying_by_val:
+                        modifying_by_val.append(val)
+                elif center in ALLOWED_TRANSITIONS and val in ALLOWED_TRANSITIONS[center]:
+                    # Allowed pair
+                    modifying_by_pos.append(center)
+                else:
+                    # Not an allowed pair
+                    msg.append(f'This tileset: {center} has no allowed transitions towards {val}.')
+                    raise Exception(msg[-1])
             else:
-                # Not an allowed pair
-                raise Exception(f'This tileset: {center} has no allowed transitions towards {val}.')
+                modifying_by_pos.append(center)
+        if DEBUG > 1:
+            print()
+            print(f'col|{x=}, row|{y=}')
+            print(f'{center=}')
+            print(f'{values=}')
+            print(f'{modifying_by_val=}')
+            print(f'{modifying_by_pos=}')
+        # Check only one impacting different tile around me
+        if len(modifying_by_val) > 1:
+            msg.append(f'Too many modifying tilesets around center at {x} {y}: {modifying_by_val}')
+            raise Exception(msg[-1])
+        elif len(modifying_by_val) == 0:
+            # variant
+            variant = seq_rand_base(center)
+            return center | variant
+        elif len(modifying_by_val) == 1:
+            diff = modifying_by_val[0]
+        # if ok
+        trans = ALLOWED_TRANSITIONS[diff][center]
+        # Check no sandwiches
+        if modifying_by_pos[NORTH] != center and modifying_by_pos[SOUTH] != center:
+            msg.append(f'No sandwich North-South at {x},{y}')
+            raise Exception(msg[-1])
+        elif modifying_by_pos[EAST] != center and modifying_by_pos[WEST] != center:
+            msg.append(f'No sandwich East-Weast at {x},{y}')
+            raise Exception(msg[-1])
+        # Check no discontinuities
+        diff_list = []
+        start = None
+        for index in range(len(modifying_by_pos)):
+            val = modifying_by_pos[index]
+            if val != center and start is None:
+                start = index
+            elif val != center and start is not None:
+                pass
+            elif val == center and start is None:
+                pass
+            elif val == center and start is not None:
+                diff_list.append(Diff(start, index - 1, index - start)) # first, last, length
+                start = None
+        #print(f'{diff_list=}')
+        if len(diff_list) > 1:
+            # Exception: opposite corners
+            if len(diff_list) == 2 and diff_list[0].length == 1 and diff_list[1].length == 1 and \
+               ((north_west != center and south_east != center) or (north_east != center and south_west != center)):
+                pass
+            else:
+                msg.append('No discontinuities allowed except opposite corners')
+                raise Exception(msg)
+        # Make a binary repr
+        code = trans << 9
+        if modifying_by_pos[NORTH] != center:
+            code |= 0b000100000000
+        if modifying_by_pos[EAST] != center:
+            code |= 0b000010000000
+        if modifying_by_pos[SOUTH] != center:
+            code |= 0b000001000000
+        if modifying_by_pos[WEST] != center:
+            code |= 0b000000100000
+        if modifying_by_pos[NORTHWEST] != center:
+            code |= 0b000000010000
+        if modifying_by_pos[NORTHEAST] != center:
+            code |= 0b000000001000
+        if modifying_by_pos[SOUTHEAST] != center:
+            code |= 0b000000000100
+        if modifying_by_pos[SOUTHWEST] != center:
+            code |= 0b000000000010
+        if DEBUG > 1:
+            print(f'{diff_list=} {len(diff_list)=}')
+            print(f'{code=:012b}')
+    except TransitionException as e:
+        if hasattr(e, 'message'):
+            print('Exception:', e.message)
         else:
-            modifying_by_pos.append(center)
-    if DEBUG > 1:
-        print()
-        print(f'col|{x=}, row|{y=}')
-        print(f'{center=}')
-        print(f'{values=}')
-        print(f'{modifying_by_val=}')
-        print(f'{modifying_by_pos=}')
-    # Check only one impacting different tile around me
-    if len(modifying_by_val) > 1:
-        raise Exception(f'Too many modifying tilesets around center at {x} {y}: {modifying_by_val}')
-    elif len(modifying_by_val) == 0:
-        return center
-    elif len(modifying_by_val) == 1:
-        diff = modifying_by_val[0]
-    # if ok
-    trans = ALLOWED_TRANSITIONS[diff][center]
-    # Check no sandwiches
-    if modifying_by_pos[NORTH] != center and modifying_by_pos[SOUTH] != center:
-        raise Exception(f'No sandwich North-South at {x},{y}')
-    elif modifying_by_pos[EAST] != center and modifying_by_pos[WEST] != center:
-        raise Exception(f'No sandwich East-Weast at {x},{y}')
-    # Check no discontinuities
-    diff_list = []
-    start = None
-    for index in range(len(modifying_by_pos)):
-        val = modifying_by_pos[index]
-        if val != center and start is None:
-            start = index
-        elif val != center and start is not None:
-            pass
-        elif val == center and start is None:
-            pass
-        elif val == center and start is not None:
-            diff_list.append(Diff(start, index - 1, index - start)) # first, last, length
-            start = None
-    #print(f'{diff_list=}')
-    if len(diff_list) > 1:
-        # Exception: opposite corners
-        if len(diff_list) == 2 and diff_list[0].length == 1 and diff_list[1].length == 1 and \
-           ((north_west != center and south_east != center) or (north_east != center and south_west != center)):
-            pass
-        else:
-            raise Exception('No discontinuities allowed except opposite corners')
-    # Make a binary repr
-    final = trans << 9
-    if modifying_by_pos[NORTH] != center:
-        final |= 0b000100000000
-    if modifying_by_pos[EAST] != center:
-        final |= 0b000010000000
-    if modifying_by_pos[SOUTH] != center:
-        final |= 0b000001000000
-    if modifying_by_pos[WEST] != center:
-        final |= 0b000000100000
-    if modifying_by_pos[NORTHWEST] != center:
-        final |= 0b000000010000
-    if modifying_by_pos[NORTHEAST] != center:
-        final |= 0b000000001000
-    if modifying_by_pos[SOUTHEAST] != center:
-        final |= 0b000000000100
-    if modifying_by_pos[SOUTHWEST] != center:
-        final |= 0b000000000010
-    if DEBUG > 0:
-        print(f'{diff_list=} {len(diff_list)=}')
-        print(f'{final=:012b}')
-    return final
+            print('Exception:', e)
+        if DEBUG > 0:
+            for i, m in enumerate(msg):
+                print(f'>>> {x}, {y} | {i}.', m)
+        code = 0b111111111111
+    return code
 
 
-def calc_trans_from_num(case):
+def trans_from_code(code):
     global RANDOM
+    # Error: rules are broken
+    if code == 0b111111111111:
+        return Transition(0b111, 0, 0, 0, 0)
     # Which tilesets in this transition?
-    transition = (case & 0b111000000000) >> 9
+    transition = (code & 0b111000000000) >> 9
     if transition != 0:
         # Which transition?
-        borders = (case & 0b000111100000) >> 5
-        corners = (case & 0b000000011110) >> 1
+        borders = (code & 0b000111100000) >> 5
+        corners = (code & 0b000000011110) >> 1
         #alternate = (case & 0b000000000001)
         #alternate = 0 if randint(1, 100) < 50 else 1
-        alternate = randint()
+        alternate = seq_rand_int()
         # Merge borders & corners, we are storing the corners into unused border slot
         match = {8:0b0101, 4: 0b0111, 2: 0b1010, 1: 0b1011, 10: 0b1101, 5: 0b1110}
         merged = match[corners] if borders == 0 else borders
         return Transition(transition, borders, corners, merged, alternate)
     else:
         # We are storing the tileset into merged and the variant into alternate
-        return Transition(transition, 0, 0, (case & 0b11110000), (case & 0b00001111))
+        return Transition(transition, 0, 0, (code & 0b11110000), (code & 0b00001111))
 
 
 def produce_one_image(trans):
@@ -402,33 +566,32 @@ def map_to_image(amap, output):
     img = Image.new('RGBA', (amap.width * 32, amap.height * 32))
     for col in range(amap.width):
         for row in range(amap.height):
-            case = calc_num_from_env(col, row, amap)
-            trans = calc_trans_from_num(case)
-            try:
+            case = code_from_env(col, row, amap)
+            trans = trans_from_code(case)
+            #try:
+            if trans.transition == 0b111:
+                img.paste(ERROR, (col * 32, row * 32))
+            else:
                 img.paste(TRANSITIONS[trans.transition][trans.merged][trans.alternate], (col * 32, row * 32))
-                if DEBUG > 0:
-                    print(col, row, "outline")
-                    draw = ImageDraw.Draw(img)
-                    draw.rectangle((col * 32, row * 32, (col + 1) * 32, (row + 1) * 32), fill=None, outline=(0, 0, 0, 255))
-            except:
-                print(f'KeyError: {trans=}')
+            if DEBUG > 0:
+                draw = ImageDraw.Draw(img)
+                draw.rectangle((col * 32, row * 32, (col + 1) * 32, (row + 1) * 32), fill=None, outline=(0, 0, 0, 255))
+            #except:
+            #    print(f'KeyError: {trans=}')
     if DEBUG > 0:
         output = output.replace('.png', '_debug.png')
     img.save(output)
 
 if __name__ == '__main__':
-    load(TRANSITIONS)
+    load()
 
-    print('Map 1')
     print()
-    mymap = Map(3, 3, [ [WATER, MUD, WATER], [WATER, WATER, WATER], [WATER, WATER, WATER] ])
+    mymap = Map('Map 1', 3, 3, [ [WATER, MUD, WATER], [WATER, WATER, WATER], [WATER, WATER, WATER] ])
     mymap.info()
-    map_to_image(mymap, 'out1.png')
-    print()
+    #map_to_image(mymap, 'out1.png')
     
-    print('Map 2')
     print()
-    mymap = Map(5, 5, [
+    mymap = Map('Map 2', 5, 5, [
         [WATER, WATER, WATER, WATER, WATER],
         [WATER, MUD,   MUD,   MUD,   WATER],
         [WATER, MUD,   GRASS, MUD,   WATER],
@@ -436,12 +599,10 @@ if __name__ == '__main__':
         [WATER, WATER, WATER, WATER, WATER]
     ])
     mymap.info()
-    map_to_image(mymap, 'out2.png')
-    print()
+    #map_to_image(mymap, 'out2.png')
     
-    print('Map 3')
     print()
-    mymap = Map(7, 7, [
+    mymap = Map('Map 3', 7, 7, [
         [GRASS, MUD,   MUD,   WATER, WATER, MUD,   GRASS],
         [GRASS, MUD,   MUD,   WATER, WATER, MUD,   GRASS],
         [GRASS, MUD,   MUD,   WATER, WATER, MUD,   GRASS],
@@ -451,12 +612,65 @@ if __name__ == '__main__':
         [GRASS, GRASS, MUD,   MUD,   WATER, WATER, MUD  ]
     ])
     mymap.info()
-    map_to_image(mymap, 'out3.png')
+    #map_to_image(mymap, 'out3.png')
+
     print()
+    mymap = Map('Error Map 1', 3, 3, [
+            [MUD,   MUD,   MUD  ],
+            [GRASS, MUD,   GRASS],
+            [GRASS, GRASS, GRASS]
+    ])
+    mymap.info()
+    #map_to_image(mymap, 'error_map_1.png')
+
+    print()
+    mymap = Map('Dry on mud 1 (out 4)', 3, 3, [
+            [MUD, MUD, DRY],
+            [MUD, DRY, DRY],
+            [MUD, MUD, MUD]
+    ])
+    mymap.info()
+    #map_to_image(mymap, 'out_4.png')
+
+    print()
+    mymap = Map('All (out 5)', 12, 8, [
+            [DEEP, DEEP, WATER, WATER, WATER, MUD,   DRY,   MUD,   MUD, GRASS, DARK,  DARK ],
+            [DEEP, DEEP, WATER, WATER, WATER, MUD,   DRY,   MUD,   MUD, GRASS, GRASS, DARK ],
+            [DEEP, DEEP, WATER, WATER, WATER, MUD,   MUD,   MUD,   MUD, GRASS, GRASS, DARK ],
+            [DEEP, DEEP, WATER, WATER, WATER, MUD,   MUD,   MUD,   MUD, GRASS, GRASS, DARK ],
+            [DEEP, DEEP, DEEP,  DEEP,  WATER, WATER, WATER, MUD,   MUD, MUD,   GRASS, GRASS],
+            [DEEP, DEEP, DEEP,  DEEP,  DEEP,  WATER, WATER, WATER, MUD, MUD,   GRASS, GRASS],
+            [DEEP, DEEP, DEEP,  DEEP,  DEEP,  WATER, WATER, WATER, MUD, MUD,   GRASS, GRASS],
+            [DEEP, DEEP, DEEP,  DEEP,  DEEP,  WATER, WATER, WATER, MUD, MUD,   GRASS, GRASS]
+    ])
+    mymap.info()
+    #map_to_image(mymap, 'out_5_variant.png')
+
+    print()
+    mymap = Map('Variants (out 6)', 10, 10, [
+        [WATER, WATER, WATER, WATER, WATER, WATER, WATER, WATER, WATER, WATER],
+        [WATER, WATER, WATER, WATER, WATER, WATER, WATER, WATER, WATER, WATER],
+        [WATER, WATER, WATER, WATER, WATER, WATER, WATER, WATER, WATER, WATER],
+        [WATER, WATER, WATER, WATER, WATER, WATER, WATER, WATER, WATER, WATER],
+        [WATER, WATER, WATER, WATER, WATER, WATER, WATER, WATER, WATER, WATER],
+        [WATER, WATER, WATER, WATER, WATER, WATER, WATER, WATER, WATER, WATER],
+        [WATER, WATER, WATER, WATER, WATER, WATER, WATER, WATER, WATER, WATER],
+        [WATER, WATER, WATER, WATER, WATER, WATER, WATER, WATER, WATER, WATER],
+        [WATER, WATER, WATER, WATER, WATER, WATER, WATER, WATER, WATER, WATER],
+        [WATER, WATER, WATER, WATER, WATER, WATER, WATER, WATER, WATER, WATER],
+    ])
+    mymap.info()
+    #map_to_image(mymap, 'out_6.png')
+
+    print()
+    mymap = Map('Variant mud big (out 7)', 20, 20, MUD)
+    mymap.info()
+    map_to_image(mymap, 'out_7.png')
     
-    final = calc_num_from_env(1, 1, mymap)
-    case = 0b010100000000 # 12 bits : mud on water at N - BORDERS : NESW CORNERS : NW NE SE SW - alternate or not
-    trans = calc_trans_from_num(case)
+    print()
+    #code = code_from_env(1, 1, mymap)
+    code = 0b010100000000 # 12 bits : mud on water at N - BORDERS : NESW CORNERS : NW NE SE SW - alternate or not
+    trans = trans_from_code(code)
     print(f'{trans.transition=:b}')
     if trans.transition == 2:
         print('2: mud on water (m > w)')

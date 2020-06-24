@@ -14,6 +14,7 @@ copy /Y /B .\output\passetemps\pres_jeuxvideo.html         ..\..\..\dgx\passetem
 copy /Y /B .\output\passetemps\tech_dialogues.html         ..\..\..\dgx\passetemps\tech_dialogues.html
 copy /Y /B .\output\passetemps\tech_raycasting_fr.html     ..\..\..\dgx\passetemps\tech_raycasting_fr.html
 copy /Y /B .\output\passetemps\tech_raycasting_en.html     ..\..\..\dgx\passetemps\tech_raycasting_en.html
+copy /Y /B .\output\passetemps\tech_transitions.html       ..\..\..\dgx\passetemps\tech_transitions.html
 
 copy /Y /B .\output\index.html                             ..\..\..\dgx\index.html
 copy /Y /B .\output\plan.html                              ..\..\..\dgx\plan.html

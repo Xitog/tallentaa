@@ -192,24 +192,28 @@ table.extract td { border: 1px solid black; padding: 0px; text-align: center; }
   <li>un système de numérotation.</li>
 </ul>
 <h3 id="ii.a-cinq-règles-de-transitions">II.A Cinq règles de transitions</h3>
+<h4 id="les-règles">Les règles</h4>
 <p>Nous allons établir un ensemble de règles pour les transitions :</p>
 <ol>
   <li>Première règle, on établit une <u><b><span id="hiérarchie-d'influence">hiérarchie d'influence</span></b></u> : un carreau d'eau est <b>influencé</b> par un carreau de terre. C'est-à-dire que si un carreau jouxte un carreau de terre, c'est le carreau d'eau qui changera pour refléter une transition : sa texture d'eau simple sera remplacée par une texture de transition entre l'eau et la terre : on notera <code><span class="normal">eau</span> ⇐ <span class="normal">terre</span></code></li>
   <li>Deuxième règle, celle d'<u><b><span id="unicité">unicité</span></b></u> : <b>un carreau ne peut avoir autour de lui qu'un seul type d'influenceur</b>. On a vu que les carreaux d'eau sont influencés par les carreaux de terre. Imaginons un autre type de carreau, le sable, qui influence également l'eau. Un carreau d'eau ne pourra être entouré que d'un seul type d'influenceur dans sa proximité immédiate.</li>
-  <li>Troisième règle : celle de l'<u><b><span id="étau">étau</span></b></u> : un carreau ne peut avoir à sa gauche et à sa droite un carreau l'influençant en même temps. De même, un carreau ne peut avoir en haut et en bas un carreau l'influençant en même temps. Les configurations représentées ci-dessous sont donc interdites :
-  <br><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/img_4_vice.png"></img></li>
-  <li>Quatrième règle, celle de la <u><b><span id="continuité">continuité</span></b></u> : <b>Les carreaux influenceurs doivent être consécutifs. Toutes les configurations discontinues sont interdites</b> comme :
-  <br><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/img_5_continuity.png"></img></li>
-  <li>Cinquième règle, qui est une exception à la quatrième, est celle des <u><b><span id="coins-en-opposition">coins en opposition</span></b></u> : la configuration où deux coins en opposition sont des influenceurs et ceux sont les seuls influenceurs est autorisée. Cela concerne les deux configurations ci-dessous :
-  <br><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/img_6_opposing_corners.png"></img></li>
+  <li>Troisième règle : celle de l'<u><b><span id="étau">étau</span></b></u> : un carreau ne peut avoir à sa gauche et à sa droite un carreau l'influençant en même temps. De même, un carreau ne peut avoir en haut et en bas un carreau l'influençant en même temps. Les configurations représentées ci-dessous sont donc interdites :</li>
+  <li>Quatrième règle, celle de la <u><b><span id="continuité">continuité</span></b></u> : <b>Les carreaux influenceurs doivent être consécutifs. Toutes les configurations discontinues sont interdites</b> comme :</li>
+  <li>Cinquième règle, qui est une exception à la quatrième, est celle des <u><b><span id="coins-en-opposition">coins en opposition</span></b></u> : la configuration où deux coins en opposition sont des influenceurs et ceux sont les seuls influenceurs est autorisée. Cela concerne les deux configurations ci-dessous :</li>
 </ol>
-<p>Unicité <span id="interdit">casrefusés</span></p>
+<h4 id="illustrations">Illustrations</h4>
+<p>Règle n°1 - Hiérarchie d'influence</p>
+<table>
+<tr><td rowspan=2> Eau profonde</td><td rowspan=2> ⇐ Eau</td><td rowspan=2>  ⇐ Boue</td><td>  ⇐ Boue séchée</td><td>            </td></tr>
+<tr><td> ⇐ Herbe      </td><td> ⇐ Herbe sombre</td></tr>
+</table>
+<p>Règle n°2 - Unicité des modifieurs, <span id="interdit">cas refusés</span></p>
 <table class="extract">
 <tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/grass-1.png"></img></td></tr>
 <tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td></tr>
 <tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td></tr>
 </table>
-<p>Étau <span id="interdit">casrefusés</span></p>
+<p>Règle n°3 - Étaux <span id="interdit">refusés</span></p>
 <table class="extract">
 <tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td></tr>
 <tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td></tr>
@@ -220,7 +224,7 @@ table.extract td { border: 1px solid black; padding: 0px; text-align: center; }
 <tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
 <tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td></tr>
 </table>
-<p>Discontinuité <span id="interdit">casrefusés</span></p>
+<p>Règle n°4 - Discontinuité <span id="interdit">refusée</span></p>
 <table class="extract">
 <tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
 <tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
@@ -231,7 +235,7 @@ table.extract td { border: 1px solid black; padding: 0px; text-align: center; }
 <tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td></tr>
 <tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td></tr>
 </table>
-<p>Coins opposés <span id="accept">casacceptés</span></p>
+<p>Règle n°5 - Coins opposés <span id="accept">acceptés</span></p>
 <table class="extract">
 <tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
 <tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>

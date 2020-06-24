@@ -384,21 +384,27 @@ def process_string(line, gen=None):
             txt = ''
             state = 'start'
             for c in inside:
-                # state
-                if c == '.':
-                    state = 'cls'
-                elif c == ' ':
-                    state = 'start'
-                elif c == '#':
-                    state = 'ids'
-                elif state == 'start':
-                    state = 'txt'
-                # save
-                if state == 'cls':
-                    cls += c
+                if state == 'start':
+                    if c == '.':
+                        state = 'cls'
+                        cls += c
+                    elif c == '#':
+                        state = 'ids'
+                        ids += c
+                    else:
+                        state = 'txt'
+                        txt += c
+                elif state == 'cls':
+                    if c != ' ':
+                        cls += c
+                    else:
+                        state = 'start'
                 elif state == 'ids':
-                    ids += c
-                elif state == 'txt':
+                    if c != ' ':
+                        ids += c
+                    else:
+                        state = 'start'
+                elif state == 'txt': # you can't escape txt mode
                     txt += c
             if len(txt) > 0:
                 if len(ids) > 0 and len(cls) > 0:

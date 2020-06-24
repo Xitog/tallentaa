@@ -63,31 +63,36 @@ Nous allons établir un système de transition composé de :
 
 ### II.A Cinq règles de transitions
 
+#### Les règles
+
 Nous allons établir un ensemble de règles pour les transitions :
 
 % Première règle, on établit une __**[#hiérarchie d'influence]**__ : un carreau d'eau est **influencé** par un carreau de terre. C'est-à-dire que si un carreau jouxte un carreau de terre, c'est le carreau d'eau qui changera pour refléter une transition : sa texture d'eau simple sera remplacée par une texture de transition entre l'eau et la terre : on notera @@eau <== terre@@
 % Deuxième règle, celle d'__**[#unicité]**__ : **un carreau ne peut avoir autour de lui qu'un seul type d'influenceur**. On a vu que les carreaux d'eau sont influencés par les carreaux de terre. Imaginons un autre type de carreau, le sable, qui influence également l'eau. Un carreau d'eau ne pourra être entouré que d'un seul type d'influenceur dans sa proximité immédiate.
 % Troisième règle : celle de l'__**[#étau]**__ : un carreau ne peut avoir à sa gauche et à sa droite un carreau l'influençant en même temps. De même, un carreau ne peut avoir en haut et en bas un carreau l'influençant en même temps. Les configurations représentées ci-dessous sont donc interdites :
-| [!https://xitog.github.io/dgx/passetemps/graphics/transitions/img_4_vice.png]
 % Quatrième règle, celle de la __**[#continuité]**__ : **Les carreaux influenceurs doivent être consécutifs. Toutes les configurations discontinues sont interdites** comme :
-| [!https://xitog.github.io/dgx/passetemps/graphics/transitions/img_5_continuity.png]
 % Cinquième règle, qui est une exception à la quatrième, est celle des __**[#coins en opposition]**__ : la configuration où deux coins en opposition sont des influenceurs et ceux sont les seuls influenceurs est autorisée. Cela concerne les deux configurations ci-dessous :
-| [!https://xitog.github.io/dgx/passetemps/graphics/transitions/img_6_opposing_corners.png]
-
-!var DEFAULT_TAB_CLASS = extract
 
 !var DEFAULT_FIND_IMAGE = https://xitog.github.io/dgx/passetemps/graphics/transitions/base/
 
+#### Illustrations
+
+Règle n°1 - Hiérarchie d'influence
+|#r2# Eau profonde|#r2# <== Eau|#r2#  <== Boue|  <== Boue séchée|            |
+| <== Herbe      | <== Herbe sombre|
+
+!var DEFAULT_TAB_CLASS = extract
+
 §§ Unicity
 
-Unicité {{#interdit cas refusés}}
+Règle n°2 - Unicité des modifieurs, {{#interdit cas refusés}}
 |[!blank-1.png]|[!mud-1.png]|[!grass-1.png]|
 |[!blank-1.png]|[!water-1.png]|[!blank-1.png]|
 |[!blank-1.png]|[!blank-1.png]|[!blank-1.png]|
 
 §§ Vice
 
-Étau {{#interdit cas refusés}}
+Règle n°3 - Étaux {{#interdit refusés}}
 |[!blank-1.png]|[!mud-1.png]|[!blank-1.png]|
 |[!blank-1.png]|[!water-1.png]|[!blank-1.png]|
 |[!blank-1.png]|[!mud-1.png]|[!blank-1.png]|
@@ -98,7 +103,7 @@ Unicité {{#interdit cas refusés}}
 
 §§ Discontinuity
 
-Discontinuité {{#interdit cas refusés}}
+Règle n°4 - Discontinuité {{#interdit refusée}}
 |[!mud-1.png]|[!mud-1.png]|[!water-1.png]|
 |[!blank-1.png]|[!water-1.png]|[!mud-1.png]|
 |[!blank-1.png]|[!blank-1.png]|[!mud-1.png]|
@@ -109,7 +114,7 @@ Discontinuité {{#interdit cas refusés}}
 
 §§ Opposite corners
 
-Coins opposés {{#accept cas acceptés}}
+Règle n°5 - Coins opposés {{#accept acceptés}}
 |[!mud-1.png]|[!water-1.png]|[!water-1.png]|
 |[!water-1.png]|[!water-1.png]|[!water-1.png]|
 |[!water-1.png]|[!water-1.png]|[!mud-1.png]|
