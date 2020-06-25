@@ -1048,6 +1048,7 @@ def process_lines(lines, gen=None):
             ids = f'id="{gen["NEXT_PAR_ID"]}"' if gen['NEXT_PAR_ID'] is not None else ''
             space1 = ' ' if len(cls) > 0 or len(ids) > 0 else ''
             space2 = ' ' if len(cls) > 0 and len(ids) > 0 else ''
+            gen['NEXT_PAR_ID'] = None
             gen['NEXT_PAR_CLASS'] = None
             gen.append(f'<p{space1}{ids}{space2}{cls}>' + super_strip(line) + '</p>\n')
     # Are a definition list still open?

@@ -16,6 +16,8 @@
 !css #interdit {color: red; font-weight: bold; }
 !css #accept {color: rgb(0, 255, 128); font-weight: bold; }
 
+!css #bordered {border: 1px solid black; background-color: #FEFEFE; }
+
 {{#main .container}}
 
 !include menu.html
@@ -28,58 +30,49 @@
 ## Sommaire
 
 * [I. Un tableau comme carte->#]
-* [II. Un système de transition->#]
-* * [II.A Cinq règles de transitions->#]
-% % % [Hiérarchie d'influence->#]
-% % % [Unicité->#]
-% % % [Étau->#]
-% % % [Continuité->#]
-% % % [Coins en opposition->#]
-* * [II.B Système de numérotation->#]
-* * [II.C Exemples de configurations->#]
-* * [II.D Correspondances configuration-transition->#]
-* * [II.E Exemples de résultats->#]
-* [III. Variations->#]
-* [IV. Multitransitions->#]
-* [V. Historique->#]
-* [VI. Crédits->#]
+* [II. Les 5 cinq règles de transitions->#]
+* [II.A Les règles->#]
+* [II.B Illustrations->#]
+* [III. Numérotation des cases->#]
+* [III.A Identification des deux tilesets en transition->#]
+* [III.B Énumération des environnements valides->#]
+* [III.C Codage de la numérotation->#]
+* [IV. Exemples de résultats->#]
+* [V. Crédits->#]
 
 ## I. Un tableau comme carte
 
-Le jeu @@WarCraft II@@ (1995) propose une vue de dessus d'une carte où se déroule la partie. Cette carte est stocké à l'aide d'un tableau. Chaque case du tableau contient une indication de textures à utiliser. Par exemple, une case peut contenir la valeur @@0@@, qui désigne de l'eau, ou @@1@@ de la terre. Prenons une carte de 5 cases en largeur et en hauteur, une taille que nous notons 5x5, et affichons la dans un premier temps avec des bordures délimitant chaque case (A) puis sans (B) :
+Le jeu @@WarCraft II@@ (1995) propose une vue de dessus d'une carte où se déroule la partie. Cette carte est stocké à l'aide d'un tableau. Chaque case du tableau contient une indication de textures à utiliser. Par exemple, une case peut contenir la valeur @@16@@, qui désigne de l'eau, ou @@32@@ de la boue. Prenons une carte de 5 cases en largeur et en hauteur, une taille que nous notons 5x5, et affichons la dans un premier temps avec des bordures délimitant chaque case (A) puis sans (B) :
 
 A. [!https://xitog.github.io/dgx/passetemps/graphics/transitions/img_1_no_trans_border.png] B. [!https://xitog.github.io/dgx/passetemps/graphics/transitions/img_2_no_trans_no_border.png] C. [!https://xitog.github.io/dgx/passetemps/graphics/transitions/img_3_spreadsheet_map.png]
 
 On voit que l'ensemble de la carte, qui comporte @@25@@ cases, ne fait que répéter deux textures. On peut ainsi décrire facilement de vastes étendues à partir de peu d'éléments. On appelle ses éléments d'après l'anglais ''**tiles**'', que l'on pourrait traduire par carreau ou tuile, et cette technique le ''**tiling**'', traduisible par carrelage. Une case du tableau correspond donc à un carreau. Pour construire et éditer une telle carte, on peut construire un éditeur de carte ou utiliser un simple tableur comme Microsoft Excel ou LibreOffice Calc. La même carte sous Excel se présenterait comme (C).
 
-Si on enlève les bordures de notre exemple (B), le résultat est déjà plus convaincant. Néanmoins, la transition de l'eau vers la terre est un peu abrupte, elle ne fait pas naturelle. Pour améliorer le résultat, on va créer un jeu de textures spéciales qui assureront des **transitions plus douces et naturelles**.
+Si on enlève les bordures de notre exemple (B), le résultat est déjà plus convaincant. Néanmoins, la transition de l'eau vers la boue est un peu abrupte, elle ne fait pas naturelle. Pour améliorer le résultat, on va créer un jeu de textures spéciales qui assureront des **transitions** plus douces et naturelles, on parlera de ''**tileset**''. Il y a aura un tileset par texture de base, dans nos exemples précédent on en aura donc un pour l'eau et un pour la boue.
 
-## II. Un système de transition
+{{#bordered}} Il faut donc établir un **système de transition** à l'aide de ''règles'' pour définir les transitions valides et pour ''numéroter'' à la fois les cases et les transitions. Ce système comportera plusieurs transitions et des variantes, à la fois pour les textures de base et les textures de transitions.
 
-Nous allons établir un système de transition composé de :
+## II. Les 5 cinq règles de transitions
 
-* cinq règles de transition et
-* un système de numérotation.
-
-### II.A Cinq règles de transitions
-
-#### Les règles
+### II.A Les règles
 
 Nous allons établir un ensemble de règles pour les transitions :
 
-% Première règle, on établit une __**[#hiérarchie d'influence]**__ : un carreau d'eau est **influencé** par un carreau de terre. C'est-à-dire que si un carreau jouxte un carreau de terre, c'est le carreau d'eau qui changera pour refléter une transition : sa texture d'eau simple sera remplacée par une texture de transition entre l'eau et la terre : on notera @@eau <== terre@@
-% Deuxième règle, celle d'__**[#unicité]**__ : **un carreau ne peut avoir autour de lui qu'un seul type d'influenceur**. On a vu que les carreaux d'eau sont influencés par les carreaux de terre. Imaginons un autre type de carreau, le sable, qui influence également l'eau. Un carreau d'eau ne pourra être entouré que d'un seul type d'influenceur dans sa proximité immédiate.
+% Première règle, on établit une __**[#hiérarchie d'influence]**__ : On décide que si un carreau jouxte un carreau de boue, c'est le carreau d'eau qui changera pour refléter une transition : sa texture d'eau simple sera remplacée par une texture de transition entre l'eau et la boue. On notera @@eau <== boue@@ et on dira que le carreau d'eau est **influencé** par un carreau de boue ou que le carreau de boue **influence** le carreau d'eau. 
+% Deuxième règle, celle d'__**[#unicité]**__ : **un carreau ne peut avoir autour de lui qu'un seul type d'influenceur**. On a vu que les carreaux d'eau sont influencés par les carreaux de boue. Imaginons un autre type de carreau, le sable, qui influence également l'eau. Un carreau d'eau ne pourra être entouré que d'un seul type d'influenceur dans sa proximité immédiate.
 % Troisième règle : celle de l'__**[#étau]**__ : un carreau ne peut avoir à sa gauche et à sa droite un carreau l'influençant en même temps. De même, un carreau ne peut avoir en haut et en bas un carreau l'influençant en même temps. Les configurations représentées ci-dessous sont donc interdites :
 % Quatrième règle, celle de la __**[#continuité]**__ : **Les carreaux influenceurs doivent être consécutifs. Toutes les configurations discontinues sont interdites** comme :
 % Cinquième règle, qui est une exception à la quatrième, est celle des __**[#coins en opposition]**__ : la configuration où deux coins en opposition sont des influenceurs et ceux sont les seuls influenceurs est autorisée. Cela concerne les deux configurations ci-dessous :
 
 !var DEFAULT_FIND_IMAGE = https://xitog.github.io/dgx/passetemps/graphics/transitions/base/
 
-#### Illustrations
+### II.B Illustrations
 
-Règle n°1 - Hiérarchie d'influence
+Règle n°1 - Hiérarchie d'influence avec 6 tilesets
 |#r2# Eau profonde|#r2# <== Eau|#r2#  <== Boue|  <== Boue séchée|            |
 | <== Herbe      | <== Herbe sombre|
+
+Il faut lire ce tableau comme : l'eau profonde est influencée par l'eau qui elle-même est influencée par la boue qui elle même est influencée par la boue séchée. On note qu'il existe une deuxième branche dans la hiérarchie à partir de la boue, qui est également influencée par l'herbe qui elle-même est influencée par l'herbe sombre.
 
 !var DEFAULT_TAB_CLASS = extract
 
@@ -126,15 +119,13 @@ Règle n°5 - Coins opposés {{#accept acceptés}}
 !var DEFAULT_FIND_IMAGE = reset
 !var DEFAULT_TAB_CLASS = reset
 
-### II.B Système de numérotation
+## III. Numérotation des cases
 
-Un carreau est entouré de @@8@@ autres carreaux. Nous les notons et les numérotons comme ci-dessous, en partant du carreau en haut à gauche et en les parcourant dans le sens horaire :
+Un carreau est entouré de @@8@@ autres carreaux, on parle de son **environnement**. Nous les notons et les numérotons comme ci-dessous, en partant arbitrairement du carreau en haut à gauche et en les parcourant dans le sens des aiguilles d'une montre :
 
 |Carreau    |Nord-Ouest    |Nord     |Nord-Est    |Est     |Sud-Est  |Sud      |Sud-Ouest |Ouest     |
 |----------------------------------------------------------------------------------------------------|
 |Code       |=   NO        |= N      |=  NE       |= E     |=   SE   |= S      |=   SO    |=    O    |
-|Numéro     |=   @@0@@     |= @@1@@  |=  @@2@@    |= @@3@@ |=  @@4@@ |= @@5@@  |=  @@6@@  |=  @@7@@  |
-|2^^Numéro^^|=   @@1@@     |= @@2@@  |=  @@4@@    |= @@8@@ |= @@16@@ |= @@32@@ |= @@64@@  |= @@128@@ |
 
 Autrement représenté ainsi :
 
@@ -144,33 +135,256 @@ Autrement représenté ainsi :
 |= O  |=   |= E  |
 |= SO |= S |= SE |
 
-|= @@0@@ |= @@1@@ |= @@2@@ |
-|= @@7@@ |=       |= @@3@@ |
-|= @@4@@ |= @@5@@ |= @@6@@ |
-
-|= @@1@@  |= @@2@@ |= @@4@@ |
-|= @@128@@|=       |= @@8@@ |
-|= @@16@@ |= @@32@@|= @@64@@|
-
 !var DEFAULT_TAB_CLASS = reset
 
-La règle 2 dit que s'il y a un ou plusieurs carreaux influenceurs, ils seront tous du même type. Cela revient à un choix binaire, savoir si c'est le carreau est un influenceur ou pas. Il y a donc **2^^8^^**, soit @@256@@, possibilités. Pour un carreau, chaque possibilité de configuration des carreaux qui l'entourent est identifiée par un nombre qui est le résultat de l'addition de **2^^position^^** pour chaque carreau influenceur. Les règles 3 et 4 suppriment de nombreuses combinaisons et réduisent à @@14@@ le nombre de textures nécessaires pour faire la transition entre eau et terre.
+Chaque case a une texture de base, nous en prendrons ici 6 en les associant à une valeur :
 
-### II.C Exemples de configurations
+|Texture de base|Numéro (base 10)|Numéro (base 2)|
+|------------------------------------------------|
+| Eau profonde  |> 0             |> 0b00000000   |
+| Eau           |> 16            |> 0b00010000   |
+| Boue          |> 32            |> 0b00100000   |
+| Boue sèche    |> 48            |> 0b00110000   |
+| Herbe         |> 64            |> 0b01000000   |
+| Herbe sombre  |> 80            |> 0b01010000   |
 
-À présent, passons aux exemples. Voici sept exemples de configurations de carreaux entourant le carreau central dont une interdite :
+On remarquera qu'on utililse les 4 bits forts, situés à gauche. Les 4 bits faiblent seront utilisés pour avoir des **variantes** des textures de base. On peut avoir une texture d'herbe simple, une autre avec une fleur, etc.
 
-### II.D Correspondances configuration-transition
+Ces valeurs seront la **numérotation attribuée à une case**. On peut donc avoir 16 tilesets et pour chaque tilesets 16 variantes au maximum.
 
-### II.E Exemples de résultats
+## III. Numérotation des transitions
 
-## III. Variations
+### III.A Identification des deux tilesets en transition
 
-## IV. Multitransitions
+Si on reprend la hiérarchie d'influence, on remarque qu'il y a 5 transitions possibles :
 
-## V. Historique
+|Transition                                |Numéro|Binaire|
+|---------------------------------------------------------|
+|Pas de transition                         |> 0   |> 000  |
+|L'eau profonde est influencée par l'eau   |> 1   |> 001  |
+|L'eau est influencée par la boue          |> 2   |> 010  |
+|La boue est influencée par la boue sèche  |> 3   |> 011  |
+|La boue est influencée par l'herbe        |> 4   |> 100  |
+|L'herbe est influencée par l'herbe sombre |> 5   |> 101  |
 
-## VI. Crédits
+On utilisera ces trois bits en tant que bits forts de nombre **numérotation des transitions**. Cette numérotation est __indépendante__ de la numérotation des cases.
+
+### III.B Énumération des environnements valides
+
+Suivant les 5 règles définies précédemment :
+
+* La règle 2 sur l'unicité indique que s'il y a un ou plusieurs carreaux influenceurs, ils seront tous du même type. Une case est donc entouré soit d'une même texture de base ou d'une case ne l'influençant pas, soit d'une ou plusieurs cases l'influençant mais toutes du même type. Cela revient à un choix binaire, savoir si le carreau est un influenceur (1) ou pas (0) sur les 8 cases entourant une case. Il y a donc **2^^8^^**, soit @@256@@, possibilités.
+* La règle n°4 sur la continuité des influenceurs, l'interdiction de toute discontinuité entre les cases influençantes, et la règle n°3, pas d'étaux nord-sud et est-ouest suppriment de nombreuses combinaisons : il ne reste que 36 combinaisons valides.
+* Pour les énumérer, on prend un ensemble de 9 cases, 3x3, à la valeur 0, et on commence à mettre un 1 au coin supérieur gauche, nord-ouest, pour signifier qu'il s'agit d'un influenceur. C'est une première possibilité valide. Puis on ajoute une case influençante en suivant les aiguilles d'une montre, c'est-à-dire sur nord. C'est un second cas possible. On répète trois fois, en ajoutant à chaque fois une case en suivant les aiguilles d'une montre, jusqu'à avoir nord-ouest, nord, nord-est, est, sud-est en cases influençantes. Si on ajoutait encore une case influençante, on aurait alors un étau entre nord et sud. On s'arrête donc là pour cette itération.
+* On repart ensuite d'un ensemble de 9 cases, mais cette fois-ci on place la première case influençante en deuxième position, c'est-à-dire la nord et on répète jusqu'à avoir un étau. Les séries qui commencent par un coin, nord-ouest, nord-est, sud-est, sud-ouest, comportent 5 cas valides. Les séries qui commencent par une bordure, nord, est, ouest, sud, comportent 4 cas valides. On a donc 5*4 + 4*4 = 36 cas valides.
+* On rajoute à ceux-là les deux cas valides par la règle n°5, celle des coins opposés qui est une exception à la régle d'interdiction des discontinuités, et on obtient bien nos 38 cas valides représentées ci-dessous avec 0 = eau et 1 = boue.
+
+**Il existe donc seulement 38 combinaisons environnementales, ou environnements valides**.
+
+!var DEFAULT_TAB_CLASS = extract
+!var DEFAULT_FIND_IMAGE = https://xitog.github.io/dgx/passetemps/graphics/transitions/base/
+
+Itération n°1, 5 cas
+|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+
+|[!mud-1.png]|[!mud-1.png]|[!water-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+
+|[!mud-1.png]|[!mud-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+
+|[!mud-1.png]|[!mud-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+
+|[!mud-1.png]|[!mud-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+
+Itération n°2, 4 cas
+|[!water-1.png]|[!mud-1.png]|[!water-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+
+|[!water-1.png]|[!mud-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+
+|[!water-1.png]|[!mud-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+
+|[!water-1.png]|[!mud-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+
+Itération n°3, 5 cas
+|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+
+|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+
+|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+
+|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!mud-1.png]|[!mud-1.png]|
+
+|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!mud-1.png]|[!mud-1.png]|[!mud-1.png]|
+
+Itération n°4, 4 cas
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!mud-1.png]|[!mud-1.png]|
+
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!mud-1.png]|[!mud-1.png]|[!mud-1.png]|
+
+Itération n°5, 5 cas
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!mud-1.png]|[!mud-1.png]|
+
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!mud-1.png]|[!mud-1.png]|
+
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!mud-1.png]|[!mud-1.png]|
+
+|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!mud-1.png]|[!mud-1.png]|
+
+Itération n°6, 4 cas
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!mud-1.png]|[!water-1.png]|
+
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!mud-1.png]|[!water-1.png]|
+
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!mud-1.png]|[!water-1.png]|
+
+|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!mud-1.png]|[!water-1.png]|
+
+Itération n°7, 5 cas
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+
+|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+
+|[!mud-1.png]|[!mud-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+
+|[!mud-1.png]|[!mud-1.png]|[!mud-1.png]|
+|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+
+Itération n°8, 4 cas
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+
+|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+
+|[!mud-1.png]|[!mud-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+
+|[!mud-1.png]|[!mud-1.png]|[!mud-1.png]|
+|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+
+Coins opposés, 2 cas
+|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+
+|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+
+!var DEFAULT_FIND_IMAGE = reset
+!var DEFAULT_TAB_CLASS = reset
+
+### III.C Codage de la numérotation
+
+Pour coder les environnements, on peut simplement coder les 38 valeurs sur 6 bits (64 possibilités).
+
+Nous avons choisi une version moins économe en bits mais à notre sens plus lisible. On code les bordures sur 4 bits :
+
+|Bordure | Numéro | Binaire |
+|---------------------------|
+|Aucune  |> 0     |>       0|
+|Nord    |> 8     |>    1000|
+|Est     |> 4     |>    0100|
+|Sud     |> 2     |>    0010|
+|Ouest   |> 1     |>    0001|
+
+Un 1 signifie il y a un tile influenceuse, un 0 non. En ajoutant les trois premiers bits définis auparavant, on saura qui est l'influenceur et l'influenceuse.
+
+Si il n'y a aucune bordure, on regarde les coins. Pour les encoder, on utilise le fait que la règle n°3 qui interdit les étaux nord-sud et est-ouest. Il y a donc des combinaisons de bordures impossibles dans lesquels on codera les coins :
+
+|Coins                | Numéro | Binaire |
+|----------------------------------------|
+|Nord-ouest           |> 5     |> 0101   |
+|Nord-est             |> 7     |> 0111   |
+|Sud-est              |> 10    |> 1010   |
+|Sud-ouest            |> 11    |> 1011   |
+|Nord-ouest + Sud-est |> 13    |> 1101   |
+|Nord-est + Sud-ouest |> 14    |> 1110   |
+
+Notre numérotation des transitions complète utilise 8 bits car on ajoute 1 but pour la variabilité, il n'y a donc que deux variantes pour chaque tile de transition. La représentation de notre numérotation des transitions est la suivante :
+
+|Identification transition| Codage bordures et coins | Variante |
+| 3 bits                  | 4 bits                   | 1 bit    |
+
+## IV. Exemples de résultats
+
+Dans cette partie nous présentons à droite une carte avec des textures de base et à gauche la carte transitionnée.
+
+## V. Crédits
 
 {{end}}
 {{end}}
