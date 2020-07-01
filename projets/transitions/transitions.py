@@ -168,10 +168,12 @@ class TransitionException(Exception):
 
 class Map:
 
-    def __init__(self, title, width, height, default):
+    def __init__(self, title, width=None, height=None, default=0):
         self.title = title
-        self.width = width
-        self.height = height
+        if (width is None or height is None) and not isinstance(default, list) and len(default) == 0:
+            raise Exception(f'You must provide a valid default if width or height are None')
+        self.width = width if width is not None else len(default[0])
+        self.height = height if height is not None else len(default)
         self.content = []
         if isinstance(default, int):
             for col in range(self.width):
@@ -562,22 +564,26 @@ def produce_one_image(trans):
     img.save('out.png')
 
 
-def map_to_image(amap, output):
+def map_to_image(amap, output, force=False):
     img = Image.new('RGBA', (amap.width * 32, amap.height * 32))
     for col in range(amap.width):
         for row in range(amap.height):
-            case = code_from_env(col, row, amap)
-            trans = trans_from_code(case)
-            #try:
-            if trans.transition == 0b111:
-                img.paste(ERROR, (col * 32, row * 32))
-            else:
-                img.paste(TRANSITIONS[trans.transition][trans.merged][trans.alternate], (col * 32, row * 32))
-            if DEBUG > 0:
-                draw = ImageDraw.Draw(img)
-                draw.rectangle((col * 32, row * 32, (col + 1) * 32, (row + 1) * 32), fill=None, outline=(0, 0, 0, 255))
-            #except:
-            #    print(f'KeyError: {trans=}')
+            try:
+                case = code_from_env(col, row, amap)
+                trans = trans_from_code(case)
+                if trans.transition == 0b111:
+                    img.paste(ERROR, (col * 32, row * 32))
+                else:
+                    img.paste(TRANSITIONS[trans.transition][trans.merged][trans.alternate], (col * 32, row * 32))
+                if DEBUG > 0:
+                    draw = ImageDraw.Draw(img)
+                    draw.rectangle((col * 32, row * 32, (col + 1) * 32, (row + 1) * 32), fill=None, outline=(0, 0, 0, 255))
+            except Exception as e:
+                #print(f'KeyError: {trans=}')
+                if not force:
+                    raise e
+                else:
+                    img.paste(ERROR, (col * 32, row * 32))
     if DEBUG > 0:
         output = output.replace('.png', '_debug.png')
     img.save(output)
@@ -665,7 +671,12 @@ if __name__ == '__main__':
     print()
     mymap = Map('Variant mud big (out 7)', 20, 20, MUD)
     mymap.info()
-    map_to_image(mymap, 'out_7.png')
+    #map_to_image(mymap, 'out_7.png')
+    
+    print()
+    import example
+    mymap = Map('Very big map (out 8)', default=example.mymap)
+    map_to_image(mymap, 'out_8.png', force=True)
     
     print()
     #code = code_from_env(1, 1, mymap)
@@ -676,6 +687,5 @@ if __name__ == '__main__':
         print('2: mud on water (m > w)')
     print(f'{trans.borders=:b}')
     print(f'{trans.corners=:b}')
-    print(f'{trans.alternate=:b}')
-    
+    print(f'{trans.alternate=:b}')    
     #produce_one_image(trans)
