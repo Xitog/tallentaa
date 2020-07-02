@@ -47,7 +47,7 @@
 
 from enum import Enum
 from collections import namedtuple
-import sys
+from weyland.console import Console
 
 #-------------------------------------------------------------------------------
 # Types
@@ -58,21 +58,6 @@ Test = namedtuple('Test', ['regex', 'length', 'candidate', 'expected'])
 #-------------------------------------------------------------------------------
 # Classes
 #-------------------------------------------------------------------------------
-
-class Console:
-
-    def __init__(self):
-        try:
-            self.puts = sys.stdout.shell.write
-        except AttributeError:
-            self.puts = None
-    
-    def write(self, msg, color, end='\n'):
-        if self.puts is not None:
-            self.puts(msg + end, color)
-        else:
-            print(msg)
-
 
 class Element:
     """This class represents a element of a regex."""
@@ -118,6 +103,8 @@ class Element:
                 return other.core == '@' or other.core.isalpha()
             elif self.core == '$':
                 return other.core in ['$', '_'] or other.core.isalnum()
+            elif self.core == '.':
+                return other.core != ' '
         else:
             return self.core == other.core
 
@@ -134,7 +121,9 @@ class Element:
             elif self.core == '@': # \a
                 res = candidate.isalpha()
             elif self.core == '$': # \w
-                res = (candidate.isalnum() or candidate == '_') 
+                res = (candidate.isalnum() or candidate == '_')
+            elif self.core == '.':
+                res = (candidate != ' ')
             else:
                 raise Exception(f'Unknown special char {self.elements[index].elem}')
         else:
@@ -148,7 +137,8 @@ class Rex:
     """
 
     MODIFIERS = ['?', '+', '*']
-    CLASSES = ['#', '@', '$'] # \d \a \w
+    CLASSES = ['#', '@', '$', '.'] # \d \a \w
+    ESCAPABLES = MODIFIERS + CLASSES + ['\\', '[', '.']
     
     def __init__(self, pattern, debug=False):
         self.pattern = pattern
@@ -170,6 +160,8 @@ class Rex:
             c = self.pattern[index]
             if c == '[': # choice
                 sub_index = index + 1
+                if sub_index >= len(self.pattern):
+                    raise Exception(f"No [ at the end of a regex: |{self.pattern}|")
                 c = self.pattern[sub_index]
                 while c != ']' and sub_index < limit:
                     if c == '[': # no choice allowed in choice
@@ -194,7 +186,7 @@ class Rex:
                 index = sub_index + 1
             elif c in Rex.MODIFIERS:
                 if index == 0:
-                    raise Exception(c + " without something to repeat. Did you miss to escape?")
+                    raise Exception(f'{c} without something to repeat in {self.pattern}. Did you miss to escape?')
                 if c == '?':
                     self.elements[-1].repeat = False
                     self.elements[-1].option = True
@@ -209,7 +201,7 @@ class Rex:
                 if index + 1 >= len(self.pattern):
                     raise Exception("A regex cannot finish with an escaped char")
                 cnext = self.pattern[index + 1]
-                if cnext not in Rex.MODIFIERS + Rex.CLASSES + ['\\']:
+                if cnext not in Rex.ESCAPABLES:
                     raise Exception("Unable to escape char: " + cnext)
                 self.elements.append(Element(cnext))
                 index += 2
@@ -222,7 +214,7 @@ class Rex:
         # Check
         for index, elem in enumerate(self.elements):
             if index < len(self) - 1:
-                print(index, elem, self.elements[index + 1], elem.is_included(self.elements[index+1]))
+                #print(index, elem, self.elements[index + 1], elem.is_included(self.elements[index+1]))
                 if elem.is_included(self.elements[index+1]) and elem.is_optionnal():
                     raise Exception("An optionnal element can't be followed by the same non optionnal element.") # x?x forbidden, how to match this?
 
@@ -241,6 +233,9 @@ class Rex:
         for i, e in enumerate(self.elements):
             print(f'{starter}{i} {e}')
 
+    def is_specific(self):
+        return all(map(lambda elem: not elem.special, self.elements))
+
     class Result(Enum):
         NO = 'no'                                 # the regex doesn't match content
         PARTIAL = 'partial'                       # the regex is only matched partially
@@ -248,12 +243,10 @@ class Rex:
         COMPLETE_OVERLOAD = 'complete & overload' # the regex is matched and there is more
         PARTIAL_OVERLOAD = 'partial & overload'   # the regex is only matched partially and there is more
     
-    class ResultX:
-        
-        def __init__(self, matched):
-            self.matched = matched
     
     def match(self, candidate):
+        if self.debug:
+            print(f'{self} vs |{candidate}|')
         matched = [0] * len(self.elements)
         index_candidate = 0
         index_regex = 0
@@ -263,7 +256,7 @@ class Rex:
             elem = self.elements[index_regex]
             res = self.check_at(candidate[index_candidate], index_regex)
             if self.debug:
-                print(f'    iter {index_candidate=} {index_regex=} {candidate[index_candidate]} vs {elem} => {res}')
+                pass #print(f'    iter {index_candidate=} {index_regex=} {candidate[index_candidate]} vs {elem} => {res}')
             if res:
                 matched[index_regex] += 1
                 if not elem.is_repeatable():
@@ -378,6 +371,11 @@ test_library = {
 
     9000: Test("#?#", None, None, None),
     9001: Test("#?1", None, None, None),
+
+    10000: Test(".", 1, " ", NO),
+    10001: Test(".", 1, "a", COMPLETE),
+    10002: Test(".", 1, "5", COMPLETE),
+    10003: Test(".", 1, ">", COMPLETE),
     
     #100: Test(r"[@_]\w*", 2, 1, "_a15", COMPLETE),
     #327: Test(r"\d\d?\d", 3, 2, "123", COMPLETE), # pb
@@ -385,13 +383,11 @@ test_library = {
 
 tests = test_library.keys() # [327]
 
-DEBUG = False #True
-
 #-------------------------------------------------
 # Running the tests if we are main
 #-------------------------------------------------
 
-if __name__ == '__main__':
+def main(debug=False):
     console = Console()
     previous = None
     for test_index in tests:
@@ -401,10 +397,10 @@ if __name__ == '__main__':
             regex = None
             msg = None
             try:
-                regex = Rex(t.regex, DEBUG)
+                regex = Rex(t.regex, debug)
             except Exception as e:
                 msg = e
-            end = '\n' if DEBUG else ''
+            end = '\n' if debug else ''
             if t.length is None:
                 if regex is None:
                     console.write(f'= Building of {t.regex} failed as expected: {msg}', color='STRING')
@@ -415,7 +411,7 @@ if __name__ == '__main__':
                 console.write(f'= Building {regex} expected ({t.length}) -> KO{end}', color='COMMENT', end=end)
                 continue
             console.write(f'= Building {regex} expected ({t.length}) -> OK{end}', color='KEYWORD', end=end)
-            if DEBUG:
+            if debug:
                 regex.info(starter='    ')
         console.write(f'{end}= Matching {t.candidate} vs {regex}{end}', color='KEYWORD')
         res = regex.match(t.candidate)
@@ -423,3 +419,6 @@ if __name__ == '__main__':
         color = 'COMMENT' if res != t.expected else 'STRING'
         console.write(f'    {res_str} comparing |{t.candidate}| to regex, expected {t.expected.value} and found {res.value}', color)
         previous = t.regex
+
+if __name__ == '__main__':
+    main(debug=False)

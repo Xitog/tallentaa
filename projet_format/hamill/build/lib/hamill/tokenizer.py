@@ -24,16 +24,9 @@
 # For more information about the Hamill lightweight markup language see:
 # https://xitog.github.io/dgx/informatique/hamill.html
 
-#-------------------------------------------------------------------------------
-# Imports
-#-------------------------------------------------------------------------------
+from hamill.log import warn
 
-import logging
-import enum
-
-#-------------------------------------------------------------------------------
-# Globals and constants
-#-------------------------------------------------------------------------------
+RECOGNIZED_LANGUAGES = ['text', 'python', 'json', 'game']
 
 languages = {
     'text': {
@@ -44,8 +37,7 @@ languages = {
         'ante_identifier': [],
         'accept_unknown' : True,
         'line_comment' : None,
-        'string_markers' : [],
-        'number' : False
+        'string_markers' : []
     },
     'json': {
         'keywords': ['null'],
@@ -55,8 +47,7 @@ languages = {
         'ante_identifier': [],
         'accept_unknown' : True,
         'line_comment' : None,
-        'string_markers' : ['"', "'"],
-        'number' : True
+        'string_markers' : ['"', "'"]
     },
     'python': {
         'keywords': ['await', 'else', 'import', 'pass', 'break', 'except', 'in',
@@ -68,13 +59,12 @@ languages = {
         'operators': ['+', '/', '//', '&', '^', '~', '|', '**', '<<', '%', '*',
                       '-', '>>', ':', '<', '<=', '==', '!=', '>=', '>', '+=',
                       '&=', '//=', '<<=', '%=', '*=', '|=', '**=', '>>=', '-=',
-                      '/=', '^=', '.', '='],
+                      '/=', '^=', '.'],
         'separators': ['{', '}', '(', ')', '[', ']', ',', ';'],
         'ante_identifier': ['def', 'class'],
         'accept_unknown' : False,
         'line_comment' : '#',
-        'string_markers' : ['"', "'"],
-        'number' : True
+        'string_markers' : ['"', "'"]
     },
     'game' : {
         'keywords': [],
@@ -84,41 +74,9 @@ languages = {
         'ante_identifier': [],
         'accept_unknown': True,
         'line_comment': None,
-        'string_markers': [],
-        'number' : False
-    },
-    'hamill' : {
-        'keywords': ['var', 'const', 'include', 'require', 'css', 'html'],
-        'booleans' : ['true', 'false'],
-        'operators': [':'],
-        'separators' : [],
-        'ante_identifier': ['var', 'const'],
-        'accept_unknown': True,
-        'line_comment': None,
-        'string_markers': [],
-        'number' : True
-    },
+        'string_markers': []
+    }
 }
-
-RECOGNIZED_LANGUAGES = list(languages.keys())
-
-#-------------------------------------------------------------------------------
-# Data model
-#-------------------------------------------------------------------------------
-
-class TokenType(enum.Enum):
-    NORMAL = 'normal'
-    KEYWORD = 'keyword'
-    STRING = 'string'
-    NUMBER = 'number'
-    IDENTIFIER = 'identifier'
-    OPERATOR = 'operator'
-    BOOLEAN = 'boolean'
-    NEWLINE = 'newline'
-    SEPARATOR = 'separator'
-    SPECIAL = 'special'
-    COMMENT = 'comment'
-
 
 class Token:
 
@@ -132,22 +90,29 @@ class Token:
             raise Exception(f"Length is not correct: {self.length} start={self.start} stop={self.stop}")
 
     def __str__(self):
-        return f'({self.start}, {self.stop}) #{self.length} <{self.typ}> = {self.val}'
+        return f'({self.start}-{self.stop} #{self.length} <{self.typ}> = {self.val})'
 
     def __repr__(self):
         return str(self)
 
-#-------------------------------------------------------------------------------
-# Functions
-#-------------------------------------------------------------------------------
-
 # tokenize("123 456 abc! 'defg' True (")
 def tokenize(text, lang='text'):
     if lang not in RECOGNIZED_LANGUAGES:
-        logging.warning(f"Not recognized language: {lang} defaulting to 'text' for {text}") 
+        warn("Not recognized language:", str(lang), "defaulting to text in", text) 
         lang = 'text'
     index = 0
     tokens = [] # (start, stop, len, type, val)
+    NORMAL = 'normal'
+    KEYWORD = 'keyword'
+    STRING = 'string'
+    NUMBER = 'number'
+    IDENTIFIER = 'identifier'
+    OPERATOR = 'operator'
+    BOOLEAN = 'boolean'
+    NEWLINE = 'newline'
+    SEPARATOR = 'separator'
+    SPECIAL = 'special'
+    COMMENT = 'comment'
     operator_elements = []
     for op in languages[lang]['operators']:
         for ope in op:
@@ -182,10 +147,10 @@ def tokenize(text, lang='text'):
                     break
                 else:
                     break
-            if not wrong and languages[lang]['number']:
-                tokens.append(Token(start, stop, length, TokenType.NUMBER, int(num)))
+            if not wrong:
+                tokens.append(Token(start, stop, length, NUMBER, int(num)))
             else:
-                tokens.append(Token(start, stop, length, TokenType.NORMAL, num))
+                tokens.append(Token(start, stop, length, NORMAL, num))
         elif char in languages[lang]['string_markers']:
             start = index
             ender = char
@@ -202,7 +167,7 @@ def tokenize(text, lang='text'):
                         continue
                     else:
                         break
-            tokens.append(Token(start, stop, length, TokenType.STRING, string[1:-1]))
+            tokens.append(Token(start, stop, length, STRING, string[1:-1]))
         elif char.isalpha():
             start = index
             symbol = ''
@@ -220,16 +185,16 @@ def tokenize(text, lang='text'):
                     index += 1
                 else:
                     break
-            typ = TokenType.NORMAL
+            typ = NORMAL
             if symbol in languages[lang]['keywords']:
-                typ = TokenType.KEYWORD
+                typ = KEYWORD
             if symbol in languages[lang]['booleans']:
-                typ = TokenType.BOOLEAN
+                typ = BOOLEAN
             if len(tokens) > 0 and tokens[-1].val in languages[lang]['ante_identifier']:
-                typ = TokenType.IDENTIFIER
+                typ = IDENTIFIER
             tokens.append(Token(start, stop, length, typ, symbol))
         elif char in languages[lang]['separators']:
-            tokens.append(Token(index, index, 1, TokenType.SEPARATOR, char))
+            tokens.append(Token(index, index, 1, SEPARATOR, char))
             index += 1
         elif char in operator_elements:
             start = index
@@ -245,21 +210,21 @@ def tokenize(text, lang='text'):
                 after_after = None
             if after is not None and after_after is not None and \
                char + after + after_after in languages[lang]['operators']:
-                tokens.append(Token(start, start + 2, 3, TokenType.OPERATOR,
+                tokens.append(Token(start, start + 2, 3, OPERATOR,
                                     char + after + after_after))
                 index += 3
             elif after is not None and \
                  char + after in languages[lang]['operators']:
-                tokens.append(Token(start, start + 1, 2, TokenType.OPERATOR,
+                tokens.append(Token(start, start + 1, 2, OPERATOR,
                                     char + after))
                 index += 2
             elif char in languages[lang]['operators']:
-                tokens.append(Token(start, start, 1, TokenType.OPERATOR, char))
+                tokens.append(Token(start, start, 1, OPERATOR, char))
                 index += 1
         elif char in [' ', '\r', '\t']:
             index += 1
         elif char == '\n':
-            tokens.append(Token(index, index, 1, TokenType.NEWLINE, char))
+            tokens.append(Token(index, index, 1, NEWLINE, char))
             index += 1
         elif languages[lang]['line_comment'] is not None and \
              (len(languages[lang]['line_comment']) == 1 and char == languages[lang]['line_comment']):
@@ -270,7 +235,7 @@ def tokenize(text, lang='text'):
                 comment += text[index]
                 index += 1
                 length += 1
-            tokens.append(Token(start, index - 1, length, TokenType.COMMENT, comment))
+            tokens.append(Token(start, index - 1, length, COMMENT, comment))
         else:
             if not languages[lang]['accept_unknown']:
                 raise Exception('Char unknown: |' + char + '|')
@@ -279,24 +244,3 @@ def tokenize(text, lang='text'):
     #for tok in tokens:
     #    print(tok)
     return tokens
-
-if __name__ == '__main__':
-    cmd = ''
-    lang = 'python'
-    print('Type [exit] to quit, [set <lang>] to set the language (ex: set python).')
-    print(f'Lang is set to {lang}.')
-    logging.basicConfig(format='%(levelname)s %(asctime)s %(message)s')
-    logging.getLogger().setLevel(logging.DEBUG)
-    while cmd != 'exit':
-        cmd = input('text=')
-        if cmd.startswith('set '):
-            lg = cmd.replace('set ', '')
-            if lg in languages:
-                lang = lg
-                loggin.info(f'Lang set to {lang}')
-            else:
-                logging.warning(f'"{lg}" is not a recognized language. Choose one from {", ".join(languages.keys())}')
-        elif cmd != 'exit':
-            res = tokenize(cmd, lang)
-            for i, r in enumerate(res):
-                print(f'{i:05d} {r}')

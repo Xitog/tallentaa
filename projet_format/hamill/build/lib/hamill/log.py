@@ -24,15 +24,54 @@
 # For more information about the Hamill lightweight markup language see:
 # https://xitog.github.io/dgx/informatique/hamill.html
 
-"""Hamill: a simple lightweight markup language
-"""
+#-------------------------------------------------------------------------------
+# Import
+#-------------------------------------------------------------------------------
 
-# Version of the hamill package
-__version__ = "0.2.2"
+import sys
 
-# Imports
-import logging
-from hamill.hamill import process, process_dir, process_file, process_lines, process_string, Generation
+#-------------------------------------------------------------------------------
+# Logging
+#-------------------------------------------------------------------------------
 
-logging.basicConfig(format='%(levelname)s %(asctime)s %(message)s')
-logging.getLogger().setLevel(logging.DEBUG)
+try:
+    out = sys.stdout.shell
+    IDLE = True
+except AttributeError:
+    out = sys.stdout
+    IDLE = False
+
+def success(*msg, sep=' '):
+    msg = sep.join(msg)
+    if IDLE:
+        out.write('[SUCCESS] ' + msg + '\n', 'STRING')
+    else:
+        out.write(msg + '\n')
+
+def fail(*msg, sep=' '):
+    msg = sep.join(msg)
+    if IDLE:
+        out.write('[FAIL] ' + msg + '\n', 'COMMENT')
+    else:
+        out.write(msg + '\n')
+
+def info(*msg, sep=' '):
+    msg = sep.join(msg)
+    if IDLE:
+        out.write('[INFO] ' + msg + '\n', 'DEFINITION')
+    else:
+        out.write(msg + '\n')
+
+def warn(*msg, sep=' '):
+    msg = sep.join(msg)
+    if IDLE:
+        out.write('[WARN] ' + msg + '\n', 'KEYWORD')
+    else:
+        out.write(msg + '\n')
+
+def error(*msg, sep=' '):
+    msg = sep.join(msg)
+    if IDLE:
+        out.write('[ERROR] ' + msg + '\n', 'COMMENT')
+    else:
+        out.write(msg + '\n')

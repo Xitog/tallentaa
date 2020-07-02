@@ -21,18 +21,30 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-# For more information about the Hamill lightweight markup language see:
-# https://xitog.github.io/dgx/informatique/hamill.html
+# For more information about my projects see:
+# https://xitog.github.io/dgx (in French)
 
-"""Hamill: a simple lightweight markup language
-"""
-
-# Version of the hamill package
-__version__ = "0.2.2"
-
+#-------------------------------------------------------------------------------
 # Imports
-import logging
-from hamill.hamill import process, process_dir, process_file, process_lines, process_string, Generation
+#-------------------------------------------------------------------------------
 
-logging.basicConfig(format='%(levelname)s %(asctime)s %(message)s')
-logging.getLogger().setLevel(logging.DEBUG)
+import sys
+
+#-------------------------------------------------------------------------------
+# Classes
+#-------------------------------------------------------------------------------
+
+class Console:
+    """A simple colored console working in IDLE"""
+
+    def __init__(self):
+        try:
+            self.puts = sys.stdout.shell.write
+        except AttributeError:
+            self.puts = None
+    
+    def write(self, msg, color, end='\n'):
+        if self.puts is not None:
+            self.puts(msg + end, color)
+        else:
+            print(msg)

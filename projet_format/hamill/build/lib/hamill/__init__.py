@@ -28,11 +28,9 @@
 """
 
 # Version of the hamill package
-__version__ = "0.2.2"
+__version__ = "0.2.1"
 
 # Imports
-import logging
-from hamill.hamill import process, process_dir, process_file, process_lines, process_string, Generation
-
-logging.basicConfig(format='%(levelname)s %(asctime)s %(message)s')
-logging.getLogger().setLevel(logging.DEBUG)
+from hamill.log import *
+from hamill.tokenizer import *
+from hamill.hamill import process, process_dir, process_file, process_lines, process_string

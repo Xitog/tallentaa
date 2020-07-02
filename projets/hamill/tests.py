@@ -306,4 +306,8 @@ dt = datetime.datetime.now().strftime('%d %B %Y')
 check = f"<p>Ce texte a été généré le {dt}</p>\n"
 verify(par, res, check, "Output French gendate from process_lines => Error")
 
-
+# Test 29 python
+par = "@@python if a == 5: break@@"
+res = hamill.process_string(par)
+check = f'<code><span class="keyword">if</span><span class="blank"> </span><span class="identifier">a</span><span class="blank"> </span><span class="operator">==</span><span class="blank"> </span><span class="integer">5</span><span class="operator">:</span><span class="blank"> </span><span class="keyword">break</span></code>'
+verify(par, res, check, "Python code with weyland")

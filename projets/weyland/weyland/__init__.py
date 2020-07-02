@@ -21,18 +21,19 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-# For more information about the Hamill lightweight markup language see:
-# https://xitog.github.io/dgx/informatique/hamill.html
+# For more information about my projects see:
+# https://xitog.github.io/dgx (in French)
 
-"""Hamill: a simple lightweight markup language
-"""
+"""Weyland: provides an alternative way to write regular expression (regex) and a lexer using them."""
 
-# Version of the hamill package
-__version__ = "0.2.2"
+# Version of the weyland package
+__version__ = "0.0.4"
 
 # Imports
 import logging
-from hamill.hamill import process, process_dir, process_file, process_lines, process_string, Generation
+from weyland.regex import *
+from weyland.lexer import *
+from weyland.languages import RECOGNIZED_LANGUAGES, LANGUAGES
 
 logging.basicConfig(format='%(levelname)s %(asctime)s %(message)s')
 logging.getLogger().setLevel(logging.DEBUG)

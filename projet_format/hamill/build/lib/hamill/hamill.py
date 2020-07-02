@@ -22,9 +22,30 @@
 # SOFTWARE.
 #
 # For more information about the Hamill lightweight markup language see:
-# https://xitog.github.io/dgx/informatique/hamill.html (in French)
+# https://xitog.github.io/dgx/informatique/hamill.html
 
-"""Hamill: a simple lightweight markup language"""
+"""
+Hamill: a simple lightweight markup language derived from markdown
+
+**bold**
+--strikethrough-- (insted of ~~, too hard to type)
+__underline__ (instead of using __ for bold)
+''italic'' (instead of * or _, too difficult to parse)
+
+[link_ref] or [link_name->link_ref]
+
+|Table|
+|-----|
+|data |
+
+* liste
+
+[link_ref]: http://youradress
+
+Created 2020-04-03 as a buggy Markdown processor
+Evolved 2020-04-07 as yet another language
+
+"""
 
 #-------------------------------------------------------------------------------
 # Imports
@@ -33,41 +54,379 @@
 import os # for walk
 import os.path # test if it is a directory or a file
 import shutil
-import locale
-import datetime
 
-from weyland import Lexer, RECOGNIZED_LANGUAGES, LANGUAGES
-from logging import info, warning, error
+from hamill.tokenizer import RECOGNIZED_LANGUAGES, tokenize
+from hamill.log import success, fail, info, warn, error
 
 #-------------------------------------------------------------------------------
-# Constants and globals
+# Tool functions
 #-------------------------------------------------------------------------------
 
-LIST_STARTERS = {'* ': 'ul', '• ': 'ul', '% ': 'ol', '+ ' : 'ol', '- ': 'ol reversed'}
-COMMENT_STARTER = '§§'
+def multi_start(string, starts):
+    for key in starts:
+        if string.startswith(key):
+            return key
+
+def multi_find(string, finds):
+    for key in finds:
+        if string.find(key) != -1:
+            return key
+
+def contains_only(string, things):
+    for t in things:
+        if string.startswith(t) and len(string.strip()) == len(t):
+            return True
+    return False
+
+def escape(line):
+    # Escaping
+    if line.find('\\') == -1:
+        return line
+    new_line = ''
+    index_char = 0
+    while index_char < len(line):
+        char = line[index_char]
+        if index_char < len(line) - 1:
+            next_char = line[index_char + 1]
+        else:
+            next_char = None
+        if char == '\\' and next_char in ['*', "'", '^', '-', '_', '[', '@', '%', '+', '$', '!', '|', '{']:
+            new_line += next_char
+            index_char += 2    
+        else:
+            new_line += char
+            index_char += 1
+    return new_line
+
+def safe(line):
+    # Do not escape !html line
+    if line.startswith('!html'):
+        return line
+    # Replace special glyph
+    line = line.replace('<==', '⇐')
+    line = line.replace('==>', '⇒')
+    # Replace HTML special char
+    new_line = ''
+    index_char = 0
+    while index_char < len(line):
+        # current, next, prev
+        char = line[index_char]
+        if index_char < len(line) - 1:
+            next_char = line[index_char + 1]
+        else:
+            next_char = None
+        if index_char > 0:
+            prev_char = line[index_char -1 ]
+        else:
+            prev_char = None
+        # replace
+        if char == '&':
+            new_line += '&amp;'
+        elif char == '<':
+            new_line += '&lt;'
+        elif char == '>' and next_char == '>' and index_char == 0: # must not replace >>
+            new_line += '>>'
+            index_char += 1
+        elif char == '>' and prev_char != '-': # must not replace ->
+            new_line += '&gt;'
+        else:
+            new_line += char
+        index_char += 1
+    return new_line
+
+def find_title(line):
+    c = 0
+    nb = 0
+    while c < len(line):
+        if line[c] == '#':
+            nb += 1
+        else:
+            break
+        c += 1
+    if nb > 0:
+        title = line.replace('#' * nb, '', 1).strip()
+        id_title = make_id(title)
+        return nb, title, id_title
+    return 0, None, None
+
+def make_id(string):
+    """Translate : A simple Title -> a_simple_title"""
+    return string.replace(' ', '-').lower()
+
+def write_code(line, code_lang):
+    tokens = tokenize(line, code_lang)
+    tokens_by_index = {}
+    next_stop = None
+    string = ''
+    for tok in tokens:
+        tokens_by_index[tok.start] = tok
+    for index_char, char in enumerate(line):
+        if index_char in tokens_by_index:
+            tok = tokens_by_index[index_char]
+            string += f'<span class="{tok.typ}">{char}'
+            next_stop = tok.stop
+        elif next_stop is not None and index_char == next_stop:
+            string += f'{char}</span>'
+        else:
+            string += safe(char)
+    return string
 
 #-------------------------------------------------------------------------------
-# Data model
-#-------------------------------------------------------------------------------
-# Generation class : contains the config of a generation
-# - process_lines puts the result of the generation in lines
-# - process_string returns directly the generated string
+# Processors
 #-------------------------------------------------------------------------------
 
-class Generation:
+def prev_next(line, index):
+    if index > 0:
+        _prev = line[index - 1]
+    else:
+        _prev = None
+    if index > 1:
+        _prev_prev = line[index - 2]
+    else:
+        _prev_prev = None
+    if index < len(line) - 1:
+        _next = line[index + 1]
+    else:
+        _next = None
+    return _prev, _next, _prev_prev
 
-    def __init__(self, default_lang='en', default_encoding='utf-8',
-                 default_code='text', default_find_image=None,
-                 includes = None, links = None, inner_links = None,
-                 error_locale=False):
+
+def find_unescaped(line, motif, start=0):
+    "Used by super_strip and code handling"
+    index = start
+    while index < len(line):
+        found = line.find(motif, index)
+        if found == -1:
+            break
+        elif found == 0 or line[found - 1] != '\\':
+            return found
+        else:
+            index = found + len(motif)
+    return -1
+
+
+def process_string(line, links=None, inner_links=None, DEFAULT_CODE='text', DEFAULT_FIND_IMAGE=None):
+    links = {} if links is None else links
+    inner_links = [] if inner_links is None else inner_links
+    new_line = ''
+    in_bold = False
+    in_italic = False
+    in_strikethrough = False
+    in_underline = False
+    in_power = False
+    in_code = False
+    code = ''
+    char_index = -1
+    res = Result()
+    while char_index < len(line) - 1:
+        char_index += 1
+        char = line[char_index]
+        prev_char, next_char, prev_prev_char = prev_next(line, char_index)
+        # Paragraph et span class (div class are handled elsewhere)
+        if char == '{' and next_char == '{' and prev_char != '\\':
+            continue
+        if char == '{' and prev_char == '{' and prev_prev_char != '\\':
+            ending = line.find('}}', char_index)
+            inside = line[char_index + 1:ending]
+            cls = ''
+            ids = ''
+            txt = ''
+            state = 'start'
+            for c in inside:
+                # state
+                if c == '.':
+                    state = 'cls'
+                elif c == ' ':
+                    state = 'start'
+                elif c == '#':
+                    state = 'ids'
+                elif state == 'start':
+                    state = 'txt'
+                # save
+                if state == 'cls':
+                    cls += c
+                elif state == 'ids':
+                    ids += c
+                elif state == 'txt':
+                    txt += c
+            if len(txt) > 0:
+                if len(ids) > 0 and len(cls) > 0:
+                    new_line += f'<span id="{ids[1:]}" class="{cls[1:]}">{txt}</span>'
+                elif len(ids) > 0:
+                    new_line += f'<span id="{ids[1:]}">{txt}</span>'
+                elif len(cls) > 0:
+                    new_line += f'<span class="{cls[1:]}">{txt}</span>'
+                else:
+                    new_line += f'<span>{txt}</span>'
+            else:
+                if len(ids) > 0:
+                    res['PARAGRAPH_ID'] = ids[1:]
+                if len(cls) > 0:
+                    res['PARAGRAPH_CLASS'] = cls[1:]
+            char_index = ending + 1
+            continue
+        # Links and images
+        if char == '[' and next_char == '#' and prev_char != '\\': # [# ... ] creating inner link
+            ending = line.find(']', char_index)
+            if ending != -1:
+                link_name = line[char_index + 2:ending]
+                id_link = make_id(link_name)
+                new_line += f'<span id="{id_link}">{link_name}</span>'
+                char_index = ending
+                continue
+        elif char == '[' and next_char == '!' and prev_char != '\\': # [! ... ] image
+            ending = line.find(']', char_index)
+            if ending != -1:
+                link = line[char_index + 2:ending]
+                if DEFAULT_FIND_IMAGE is None:
+                    new_line += f'<img src="{link}"></img>'
+                else:
+                    new_line += f'<img src="{DEFAULT_FIND_IMAGE}{link}"></img>'
+                char_index = ending
+                continue
+        elif char == '[' and char_index < len(line) - 1 and prev_char != '\\':
+            ending = line.find(']', char_index)
+            if ending != -1:
+                link = line[char_index + 1:ending]
+                # Set the link_name and the link
+                if link.find('->') != -1:
+                    link_name, link = link.split('->', 1)
+                else:
+                    link_name = link
+                if link == '#':
+                    link = link_name
+                # Check the link
+                if multi_start(link, ('https://', 'http://')):
+                    pass
+                elif make_id(link) in inner_links:
+                    link = '#' + make_id(link)
+                elif link in inner_links:
+                    link = '#' + link
+                elif link in links:
+                    link = links[link]
+                else:
+                    #print(link)
+                    #print(make_id(link))
+                    #print(inner_links)
+                    warn('Undefined link:', link, 'in', line)
+                link_name = process_string(link_name, links, inner_links,
+                                           DEFAULT_CODE, DEFAULT_FIND_IMAGE).first()
+                new_line += f'<a href="{link}">{link_name}</a>'
+                char_index = ending
+                continue
+        # Italic
+        if char == "'" and next_char == "'" and prev_char != '\\':
+            continue
+        if char == "'" and prev_char == "'" and prev_prev_char != '\\':
+            if not in_italic:
+                new_line += '<i>'
+                in_italic = True
+            else:
+                new_line += '</i>'
+                in_italic = False
+            continue
+        # Strong
+        if char == '*' and next_char == '*' and prev_char != '\\':
+            continue
+        if char == '*' and prev_char == '*' and prev_prev_char != '\\':
+            if not in_bold:
+                new_line += '<b>'
+                in_bold = True
+            else:
+                new_line += '</b>'
+                in_bold = False
+            continue
+        # Strikethrough
+        if char == '-' and next_char == '-' and prev_char != '\\':
+            continue
+        if char == '-' and prev_char == '-' and prev_prev_char != '\\':
+            if not in_strikethrough:
+                new_line += '<s>'
+                in_strikethrough = True
+            else:
+                new_line += '</s>'
+                in_strikethrough = False
+            continue
+        # Underline
+        if char == '_' and next_char == '_' and prev_char != '\\':
+            continue
+        if char == '_' and prev_char == '_' and prev_prev_char != '\\':
+            if not in_underline:
+                new_line += '<u>'
+                in_underline = True
+            else:
+                new_line += '</u>'
+                in_underline = False
+            continue
+        # Power
+        if char == '^' and next_char == '^' and prev_char != '\\':
+            continue
+        if char == '^' and prev_char == '^' and prev_prev_char != '\\':
+            if not in_power:
+                new_line += '<sup>'
+                in_power = True
+            else:
+                new_line += '</sup>'
+                in_power = False
+            continue
+        # Code
+        if char == '@' and next_char == '@' and prev_char != '\\':
+            continue
+        if char == '@' and prev_char == '@' and prev_prev_char != '\\':
+            ending = find_unescaped(line, '@@', char_index)
+            code = line[char_index + 1:ending]
+            length = len(code) + 2
+            s = multi_start(code, RECOGNIZED_LANGUAGES)
+            if s is not None:
+                code = code.replace(s, '', 1) # delete
+            else:
+                s = DEFAULT_CODE
+            new_line += '<code>' + write_code(code, s) + '</code>'
+            char_index += length
+            continue
+        new_line += char
+    res.append(new_line)
+    return res
+
+
+def get(line):
+    if line.startswith('!const'):
+        command, value = line.replace('!const ', '').split('=')
+    elif line.startswith('!var'):
+        command, value = line.replace('!var ', '').split('=')
+    else:
+        raise Exception('No variable or constant defined here: ' + line)
+    command = command.strip()
+    value = value.strip()
+    return command, value
+
+LIST_STARTERS = {'* ': 'ul', '% ': 'ol', '+ ' : 'ol', '- ': 'ol reversed'}
+
+def count_list_level(line):
+    """Return the level of the list, the kind of starter and if it is
+       a continuity of a previous level."""
+    starter = line[0]
+    if starter + ' ' not in LIST_STARTERS:
+        raise Exception('Unknown list starter: ' + line[0] + ' in ' + line)
+    level = 0
+    continuity = False
+    while line.startswith(starter + ' '):
+        level += 1
+        line = line[2:]
+    if line.startswith('| '):
+        level += 1
+        continuity = True
+    return level, starter, continuity
+
+
+class Result:
+
+    def __init__(self, default_lang='en', default_encoding='utf-8'):
         self.constants = {}
         self.variables = {}
         self.lines = []
         self.header_links = []
         self.header_css = []
-        self.includes = [] if includes is None else includes
-        self.links = {} if links is None else links
-        self.inner_links = [] if inner_links is None else inner_links
         # 6 HTML constants
         self.constants['TITLE'] = None
         self.constants['ENCODING'] = default_encoding
@@ -75,54 +434,9 @@ class Generation:
         self.constants['ICON'] = None
         self.constants['BODY_CLASS'] = None
         self.constants['BODY_ID'] = None
-        # 1 generation constant
-        try:
-            dt = datetime.datetime.now()
-            found = False
-            # first try, our lang, our encoding
-            for lang, encoding in locale.locale_alias.items():
-                if lang.startswith(default_lang) and default_encoding in encoding.lower():
-                    try:
-                        locale.setlocale(locale.LC_TIME, (lang, encoding))
-                        info(f'Locale set to {lang} and encoding {encoding}')
-                        found = True
-                        break
-                    except locale.Error:
-                        if (error_locale):
-                            warning(f'Impossible to set locale to ({lang}, {encoding}).')
-                        pass
-            # second try, our lang, any encoding
-            if not found:
-                for lang, encoding in locale.locale_alias.items():
-                    if lang.startswith(default_lang):
-                        try:
-                            locale.setlocale(locale.LC_TIME, (lang, encoding))
-                            found = True
-                            warning(f'Locale not found for ({default_lang}, {default_encoding}), defaulting to ({lang}, {encoding})')
-                            break
-                        except locale.Error:
-                            if (error_locale):
-                                warning(f'Impossible to set locale to ({lang}, {encoding}).')
-                            pass
-            # last try, ugly fix for Windows 7
-            if not found:
-                res = locale.setlocale(locale.LC_TIME, '')
-                warning(f'Locale not found for {default_lang} in any encoding. Setting to default: {res}')
-            self.constants['GENDATE'] = dt.strftime("%d %B %Y")
-            #self.constants['GENDATE'] = f'{dt.year}/{dt.month}/{dt.day}'
-        except KeyError:
-            self.constants['GENDATE'] = f'{dt.day}/{dt.month}/{dt.year}'
         # 2 var from markup {{.cls}} or {{#id}}
-        self.variables['EXPORT_COMMENT'] = False
-        self.variables['DEFINITION_AS_PARAGRAPH'] = False
-        self.variables['DEFAULT_CODE'] = default_code
-        self.variables['DEFAULT_PAR_CLASS'] = None
-        self.variables['NEXT_PAR_CLASS'] = None
-        self.variables['NEXT_PAR_ID'] = None
-        self.variables['DEFAULT_TAB_CLASS'] = None
-        self.variables['NEXT_TAB_CLASS'] = None
-        self.variables['NEXT_TAB_ID'] = None
-        self.variables['DEFAULT_FIND_IMAGE'] = default_find_image
+        self.variables['PARAGRAPH_ID'] = None
+        self.variables['PARAGRAPH_CLASS'] = None
 
     def first(self):
         return self.lines[0]
@@ -155,425 +469,16 @@ class Generation:
     def __str__(self):
         return ''.join(self.lines)
 
-#-------------------------------------------------------------------------------
-# Tool functions
-#-------------------------------------------------------------------------------
-# count_list_level: count the list level starting a line
-# super_strip     : strip and remove comments
-# prev_next       : get prev, next, prev_prev from a string
-# multi_start     : if a string starts with one of the starters defined
-# multi_find      : if a string contains one of the motif
-# find_unsescaped : if a string contains a motif unescaped
-# escape          : handles escaped characters
-# safe            : transform some characters
-# find_title      : find a title
-# make_id         : make an id from a string (replace ' ' by '-' and lower)
-# write_code      : write code by creating a list of tokens
-#-------------------------------------------------------------------------------
-
-def count_list_level(line):
-    """Return the level of the list, the kind of starter and if it is
-       a continuity of a previous level."""
-    starter = line[0]
-    if starter + ' ' not in LIST_STARTERS:
-        raise Exception('Unknown list starter: ' + line[0] + ' in ' + line)
-    level = 0
-    continuity = False
-    while line.startswith(starter + ' '):
-        level += 1
-        line = line[2:]
-    if line.startswith('| '):
-        level += 1
-        continuity = True
-    return level, starter, continuity
-
-
-def super_strip(line):
-    """Remove any blanks at the start or the end of the string AND the comments §§"""
-    line = line.strip()
-    if len(line) == 0:
-        return line
-    index = find_unescaped(line, COMMENT_STARTER)
-    if index != -1:
-        return line[:index].strip()
-    else:
-        return line
-
-
-def prev_next(line, index):
-    if index > 0:
-        _prev = line[index - 1]
-    else:
-        _prev = None
-    if index > 1:
-        _prev_prev = line[index - 2]
-    else:
-        _prev_prev = None
-    if index < len(line) - 1:
-        _next = line[index + 1]
-    else:
-        _next = None
-    return _prev, _next, _prev_prev
-
-
-def multi_start(string, starts):
-    for key in starts:
-        if string.startswith(key):
-            return key
-
-
-def multi_find(string, finds):
-    for key in finds:
-        if find_unescaped(string, key) != -1:
-            return key
-    return None
-
-
-def find_unescaped(line, motif, start=0):
-    "Used by super_strip and code handling and multi_find"
-    index = start
-    while index < len(line):
-        found = line.find(motif, index)
-        if found == -1:
-            break
-        elif found == 0 or line[found - 1] != '\\':
-            return found
-        else:
-            index = found + len(motif)
-    return -1
-
-
-def escape(line):
-    # Escaping
-    if line.find('\\') == -1:
-        return line
-    new_line = ''
-    index_char = 0
-    while index_char < len(line):
-        char = line[index_char]
-        _, next_char, _ = prev_next(line, index_char)
-        if char == '\\' and next_char in ['*', "'", '^', '-', '_', '[', '@', '%', '+', '$', '!', '|', '{', '•']:
-            new_line += next_char
-            index_char += 2    
-        else:
-            new_line += char
-            index_char += 1
-    return new_line
-
-
-def safe(line):
-    # Do not escape !html line
-    if line.startswith('!html'):
-        return line
-    # Replace special glyph
-    line = line.replace('<==', '⇐')
-    line = line.replace('==>', '⇒')
-    # Replace HTML special char
-    new_line = ''
-    index_char = 0
-    escape = False
-    while index_char < len(line):
-        char = line[index_char]
-        prev_char, next_char, _ = prev_next(line, index_char)
-        # replace
-        if char == '@' and next_char == '@':
-            escape = not escape
-        if not escape:
-            if char == '&':
-                new_line += '&amp;'
-            elif char == '<':
-                new_line += '&lt;'
-            elif char == '>' and next_char == '>' and index_char == 0: # must not replace >>
-                new_line += '>>'
-                index_char += 1
-            elif char == '>' and prev_char not in ['-', '[', '|']: # must not replace -> and [> and |>
-                new_line += '&gt;'
-            else:
-                new_line += char
-        else:
-            new_line += char
-        index_char += 1
-    return new_line
-
-
-def find_title(line):
-    c = 0
-    nb = 0
-    while c < len(line):
-        if line[c] == '#':
-            nb += 1
-        else:
-            break
-        c += 1
-    if nb > 0:
-        title = line.replace('#' * nb, '', 1).strip()
-        id_title = make_id(title)
-        return nb, title, id_title
-    return 0, None, None
-
-
-def make_id(string):
-    """Translate : A simple Title -> a_simple_title"""
-    return string.replace(' ', '-').lower()
-
-
-def write_code(line, code_lang):
-    tokens = Lexer(LANGUAGES[code_lang]['tokens']).lex(line)
-    tokens_by_index = {}
-    next_stop = None
-    string = ''
-    for tok in tokens:
-        tokens_by_index[tok.first] = tok
-    for index_char, char in enumerate(line):
-        if index_char in tokens_by_index:
-            tok = tokens_by_index[index_char]
-            string += f'<span class="{tok.typ}">{char}'
-            next_stop = tok.last
-            if next_stop == index_char:
-                string += f'</span>'
-                next_stop = None
-        elif next_stop is not None and index_char == next_stop:
-            string += f'{char}</span>'
-            next_stop = None
-        else:
-            string += safe(char)
-    return string
-
-
-def check_link(link, links, inner_links):
-    if multi_start(link, ('https://', 'http://')):
-        pass
-    elif make_id(link) in inner_links:
-        link = '#' + make_id(link)
-    elif link in inner_links:
-        link = '#' + link
-    elif link in links:
-        link = links[link]
-    else:
-        warning(f'Undefined link: {link}')
-    return link
-
-
-#-------------------------------------------------------------------------------
-# Processors functions
-#-------------------------------------------------------------------------------
-
-def process_string(line, gen=None):
-    gen = Generation() if gen is None else gen
-    new_line = ''
-    in_bold = False
-    in_italic = False
-    in_strikethrough = False
-    in_underline = False
-    in_power = False
-    in_code = False
-    code = ''
-    char_index = -1
-    while char_index < len(line) - 1:
-        char_index += 1
-        char = line[char_index]
-        prev_char, next_char, prev_prev_char = prev_next(line, char_index)
-        # Paragraph et span class (div class are handled elsewhere)
-        if char == '{' and next_char == '{' and prev_char != '\\':
-            continue
-        if char == '{' and prev_char == '{' and prev_prev_char != '\\':
-            ending = line.find('}}', char_index)
-            inside = line[char_index + 1:ending]
-            cls = ''
-            ids = ''
-            txt = ''
-            state = 'start'
-            for c in inside:
-                if state == 'start':
-                    if c == '.':
-                        state = 'cls'
-                        cls += c
-                    elif c == '#':
-                        state = 'ids'
-                        ids += c
-                    else:
-                        state = 'txt'
-                        txt += c
-                elif state == 'cls':
-                    if c != ' ':
-                        cls += c
-                    else:
-                        state = 'start'
-                elif state == 'ids':
-                    if c != ' ':
-                        ids += c
-                    else:
-                        state = 'start'
-                elif state == 'txt': # you can't escape txt mode
-                    txt += c
-            if len(txt) > 0:
-                if len(ids) > 0 and len(cls) > 0:
-                    new_line += f'<span id="{ids[1:]}" class="{cls[1:]}">{txt}</span>'
-                elif len(ids) > 0:
-                    new_line += f'<span id="{ids[1:]}">{txt}</span>'
-                elif len(cls) > 0:
-                    new_line += f'<span class="{cls[1:]}">{txt}</span>'
-                else:
-                    new_line += f'<span>{txt}</span>'
-            else:
-                if len(ids) > 0:
-                    gen['NEXT_PAR_ID'] = ids[1:]
-                if len(cls) > 0:
-                    gen['NEXT_PAR_CLASS'] = cls[1:]
-            char_index = ending + 1
-            continue
-        # Links and images
-        if char == '[' and prev_char != '\\' and next_char != '[': # [[ the first is not a link!
-            ending = line.find(']', char_index)
-            if ending != -1:
-                is_link = True
-                if next_char == '#': # [# ... ] creating inner link
-                    link_name = line[char_index + 2:ending]
-                    id_link = make_id(link_name)
-                    new_line += f'<span id="{id_link}">{link_name}</span>'
-                elif next_char == '!': # [! ... ] image
-                    link = line[char_index + 2:ending]
-                    if gen['DEFAULT_FIND_IMAGE'] is None:
-                        new_line += f'<img src="{link}"></img>'
-                    else:
-                        new_line += f'<img src="{gen["DEFAULT_FIND_IMAGE"]}{link}"></img>'
-                elif next_char == '>': # [> ... ] direct URL or REF
-                    link_or_name = line[char_index + 2:ending]
-                    link = check_link(link_or_name, gen.links, gen.inner_links)
-                    new_line += f'<a href="{link}">{link_or_name}</a>'
-                elif next_char == '=': # [= ... ] display a value
-                    ids = line[char_index + 2:ending]
-                    if ids in gen.constants:
-                        new_line += str(gen.constants[ids])
-                    elif ids in gen.variables:
-                        new_line += str(gen.variables[ids])
-                    else:
-                        warning(f'Undefined identifier: {ids}')
-                        new_line += '<undefined>'
-                elif line[char_index + 1:ending].find('->') != -1: # [ name -> direct URL | REF | # ]
-                    link = line[char_index + 1:ending]
-                    link_name, link = link.split('->', 1)
-                    if link == '#':
-                        link = link_name
-                    # Check link
-                    link = check_link(link, gen.links, gen.inner_links)
-                    # Make link
-                    link_name = process_string(link_name, gen)
-                    new_line += f'<a href="{link}">{link_name}</a>'
-                else:
-                    is_link = False
-                if is_link:
-                    char_index = ending
-                    continue
-        # Italic
-        if char == "'" and next_char == "'" and prev_char != '\\':
-            continue
-        if char == "'" and prev_char == "'" and prev_prev_char != '\\':
-            if not in_italic and next_char is not None and line.find("''", char_index + 1) != -1:
-                new_line += '<i>'
-                in_italic = True
-            elif in_italic:
-                new_line += '</i>'
-                in_italic = False
-            else:
-                new_line += "''"
-            continue
-        # Strong
-        if char == '*' and next_char == '*' and prev_char != '\\':
-            continue
-        if char == '*' and prev_char == '*' and prev_prev_char != '\\':
-            if not in_bold and next_char is not None and line.find("**", char_index + 1) != -1:
-                new_line += '<b>'
-                in_bold = True
-            elif in_bold:
-                new_line += '</b>'
-                in_bold = False
-            else:
-                new_line += '**'
-            continue
-        # Strikethrough
-        if char == '-' and next_char == '-' and prev_char != '\\':
-            continue
-        if char == '-' and prev_char == '-' and prev_prev_char != '\\':
-            if not in_strikethrough and next_char is not None and line.find("--", char_index + 1) != -1:
-                new_line += '<s>'
-                in_strikethrough = True
-            elif in_strikethrough:
-                new_line += '</s>'
-                in_strikethrough = False
-            else:
-                new_line += '--'
-            continue
-        # Underline
-        if char == '_' and next_char == '_' and prev_char != '\\':
-            continue
-        if char == '_' and prev_char == '_' and prev_prev_char != '\\':
-            if not in_underline and next_char is not None and line.find("__", char_index + 1) != -1:
-                new_line += '<u>'
-                in_underline = True
-            elif in_underline:
-                new_line += '</u>'
-                in_underline = False
-            else:
-                new_line += '__'
-            continue
-        # Power
-        if char == '^' and next_char == '^' and prev_char != '\\':
-            continue
-        if char == '^' and prev_char == '^' and prev_prev_char != '\\':
-            if not in_power and next_char is not None and line.find("^^", char_index + 1) != -1:
-                new_line += '<sup>'
-                in_power = True
-            elif in_power:
-                new_line += '</sup>'
-                in_power = False
-            else:
-                new_line += '^^'
-            continue
-        # Code
-        if char == '@' and next_char == '@' and prev_char != '\\':
-            continue
-        if char == '@' and prev_char == '@' and prev_prev_char != '\\':
-            if next_char is not None and line.index("@@", char_index + 1) != -1:
-                ending = find_unescaped(line, '@@', char_index)
-                code = line[char_index + 1:ending]
-                length = len(code) + 2
-                s = multi_start(code, RECOGNIZED_LANGUAGES)
-                if s is not None:
-                    code = code.replace(s + ' ', '', 1) # delete also the space between the language and the actual code
-                else:
-                    s = gen['DEFAULT_CODE']
-                new_line += '<code>' + write_code(code, s) + '</code>'
-                char_index += length
-            else:
-                new_line += '@@'
-            continue
-        new_line += char
-    return new_line
-
-
-def process_constvar(line):
-    if line.startswith('!const'):
-        command, value = line.replace('!const ', '').split('=')
-    elif line.startswith('!var'):
-        command, value = line.replace('!var ', '').split('=')
-    else:
-        raise Exception('No variable or constant defined here: ' + line)
-    command = command.strip()
-    value = value.strip()
-    return command, value
-
 
 def process_file(input_name, output_name=None, default_lang=None, includes=None):
-    info(f'Processing file: {input_name}')
+    info('Processing file:', input_name)
     if not os.path.isfile(input_name):
         raise Exception('Process_file: Invalid source file: ' + str(input_name))
     source = open(input_name, mode='r', encoding='utf8')
     content = source.readlines()
     source.close()
 
-    result = process_lines(content,
-                           Generation(default_lang=default_lang, includes=includes))
+    result = process_lines(content, default_lang, includes)
 
     if output_name is None:
         if input_name.endswith('.hml'):
@@ -624,7 +529,7 @@ def process_file(input_name, output_name=None, default_lang=None, includes=None)
     output.close()
 
 
-def output_list(gen, list_array):
+def output_list(result, list_array):
     heap = []
     closed = False
     for index in range(len(list_array)):
@@ -649,24 +554,24 @@ def output_list(gen, list_array):
         if prev_level is None or level > prev_level:
             start = 0 if prev_level is None else prev_level
             for current in range(start, level):
-                gen.append('    ' * current + f'<{starter}>\n')
+                result.append('    ' * current + f'<{starter}>\n')
                 heap.append(ender)
                 if current < level - 1:
-                    gen.append('    ' * current + f'  <li>\n')
+                    result.append('    ' * current + f'  <li>\n')
         elif prev_level == level:
             current = level - 1
             if not closed and not cont:
-                    gen.append('    ' * current + '  </li>\n')
+                    result.append('    ' * current + '  </li>\n')
         elif level < prev_level:
             start = prev_level
             for current in range(start, level, -1):
                 ender = heap[-1]
                 if current != start:
-                    gen.append('    ' * (current - 1) + '  </li>\n')
-                gen.append('    ' * (current - 1) + f'</{ender}>\n')
+                    result.append('    ' * (current - 1) + '  </li>\n')
+                result.append('    ' * (current - 1) + f'</{ender}>\n')
                 heap.pop()
             current -= 2
-            gen.append('    ' * current + '  </li>\n')
+            result.append('    ' * current + '  </li>\n')
         # Line
         s = '    ' * current + '  '
         if cont:
@@ -681,21 +586,46 @@ def output_list(gen, list_array):
         else:
             s += '\n'
             closed = False
-        gen.append(s)
+        result.append(s)
     if len(heap) > 0:
         while len(heap) > 0:
             ender = heap[-1]
             if not closed:
-                gen.append('    ' * (len(heap) - 1) + '  </li>\n')
-            gen.append('    ' * (len(heap) - 1) + f'</{ender}>\n')
+                result.append('    ' * (len(heap) - 1) + '  </li>\n')
+            result.append('    ' * (len(heap) - 1) + f'</{ender}>\n')
             closed = False
             heap.pop()
 
 
-def process_lines(lines, gen=None):
-    gen = Generation() if gen is None else gen
+COMMENT_STARTER = '§§'
+
+def super_strip(line):
+    """Remove any blanks at the start or the end of the string AND the comments §§"""
+    line = line.strip()
+    if len(line) == 0:
+        return line
+    index = find_unescaped(line, COMMENT_STARTER)
+    if index != -1:
+        return line[:index].strip()
+    else:
+        return line
+
+
+def process_lines(lines, default_lang=None, includes=None):
+    VAR_EXPORT_COMMENT=False
+    VAR_DEFINITION_AS_PARAGRAPH=False
+    VAR_DEFAULT_CODE='text'
+    VAR_DEFAULT_PAR_CLASS=None
+    VAR_DEFAULT_TAB_CLASS=None
+    VAR_NEXT_PAR_CLASS=None
+    VAR_NEXT_PAR_ID=None
+    VAR_NEXT_TAB_CLASS=None
+    VAR_DEFAULT_FIND_IMAGE=None
     # The 6 HTML constants are defined in Result class
+    result = Result(default_lang)
     in_table = False
+    links = {}
+    inner_links = []
     in_definition_list = False
     in_code_free_block = False
     in_code_block = False
@@ -708,27 +638,27 @@ def process_lines(lines, gen=None):
     for line in lines:
         # Constant must be read first, are defined once, anywhere in the doc
         if line.startswith('!const '):
-            command, value = process_constvar(line)
+            command, value = get(line)
             if command == 'TITLE':
-                gen["TITLE"] = value
+                result["TITLE"] = value
             elif command == 'ENCODING':
-                gen["ENCODING"] = value
+                result["ENCODING"] = value
             elif command == 'ICON':
-                gen["ICON"] = value
+                result["ICON"] = value
             elif command == 'LANG':
-                gen["LANG"] = value
+                result["LANG"] = value
             elif command == 'BODY_CLASS':
-                gen["BODY_CLASS"] = value
+                results["BODY_CLASS"] = value
             elif command == 'BODY_ID':
-                gen["BODY_ID"] = value
+                result["BODY_ID"] = value
             else:
                 raise Exception('Unknown constant: ' + command + 'with value= ' + value)
         elif line.startswith('!require ') and super_strip(line).endswith('.css'):
             required = super_strip(line.replace('!require ', '', 1))
-            gen.header_links.append(f'  <link href="{required}" rel="stylesheet">\n')
+            result.header_links.append(f'  <link href="{required}" rel="stylesheet">\n')
         # Inline CSS
         elif line.startswith('!css '):
-            gen.header_css.append(super_strip(line.replace('!css ', '', 1)))
+            result.header_css.append(super_strip(line.replace('!css ', '', 1)))
         else:
             # Block of code
             if len(line) > 2 and line[0:3] == '@@@':
@@ -746,10 +676,10 @@ def process_lines(lines, gen=None):
             # Special chars
             line = safe(line)
             # Link library
-            if len(line) > 0 and line[0] == '[' and multi_find(line, [']: https://', ']: http://']):
+            if len(line) > 0 and line[0] == '[' and (line.find(']: https://') != -1 or line.find(']: http://') != -1):
                 name = line[1:line.find(']: ')]
                 link = line[line.find(']: ') + len(']: '):]
-                gen.links[name] = link
+                links[name] = link
                 continue
             # Inner links
             if line.find('[#') != -1:
@@ -762,16 +692,16 @@ def process_lines(lines, gen=None):
                         if ending != -1:
                             link_name = line[char_index + 2:ending]
                             id_link = make_id(link_name)
-                            if id_link in gen.inner_links:
-                                warning(f"Multiple definitions of anchor: {id_link}")
-                            gen.inner_links.append(id_link)
+                            if id_link in inner_links:
+                                log.warn("Multiple definitions of anchor: " + id_link)
+                            inner_links.append(id_link)
                             char_index = ending
                             continue
                     char_index += 1
             # Inner links from Title
             nb, title, id_title = find_title(line)
             if nb > 0:
-                gen.inner_links.append(id_title)
+                inner_links.append(id_title)
             after.append(line)
     content = after
     
@@ -790,79 +720,77 @@ def process_lines(lines, gen=None):
             next_line = None
         # Variables
         if line.startswith('!var '):
-            command, value = process_constvar(line)
+            command, value = get(line)
             if command == 'EXPORT_COMMENT':
                 if value == 'true':
-                    gen['EXPORT_COMMENT'] = True
+                    VAR_EXPORT_COMMENT = True
                 elif value == 'false':
-                    gen['EXPORT_COMMENT'] = False
+                    VAR_EXPORT_COMMENT = False
             elif command == 'PARAGRAPH_DEFINITION':
                 if value == 'true':
-                    gen['DEFINITION_AS_PARAGRAPH'] = True
+                    VAR_DEFINITION_AS_PARAGRAPH = True
                 else:
-                    gen['DEFINITION_AS_PARAGRAPH'] = False
+                    VAR_DEFINITION_AS_PARAGRAPH = False
             elif command == 'DEFAULT_CODE':
                 if value in RECOGNIZED_LANGUAGES:
-                    gen['DEFAULT_CODE'] = value
+                    VAR_DEFAULT_CODE = value
                 else:
-                    warning(f'Not recognized language in var VAR_DEFAULT_CODE: {value}')
+                    warn('Not recognized language in var VAR_DEFAULT_CODE:', value)
             elif command == 'NEXT_PAR_ID':
-                gen['NEXT_PAR_ID'] = value if value != 'reset' else None
+                VAR_NEXT_PAR_ID = value if value != 'reset' else None
             elif command == 'NEXT_PAR_CLASS':
-                gen['NEXT_PAR_CLASS'] = value if value != 'reset' else None
+                VAR_NEXT_PAR_CLASS = value if value != 'reset' else None
             elif command == 'DEFAULT_PAR_CLASS':
-                gen['DEFAULT_PAR_CLASS'] = value if value != 'reset' else None
+                VAR_DEFAULT_PAR_CLASS = value if value != 'reset' else None
             elif command == 'NEXT_TAB_CLASS':
-                gen['NEXT_TAB_CLASS'] = value if value != 'reset' else None
-            elif command == 'NEXT_TAB_ID':
-                gen['NEXT_TAB_ID'] = value if value != 'reset' else None
+                VAR_NEXT_TAB_CLASS = value if value != 'reset' else None
             elif command == 'DEFAULT_TAB_CLASS':
-                gen['DEFAULT_TAB_CLASS'] = value if value != 'reset' else None
+                VAR_DEFAULT_TAB_CLASS = value if value != 'reset' else None
             elif command == 'DEFAULT_FIND_IMAGE':
-                gen['DEFAULT_FIND_IMAGE'] = value if value != 'reset' else None
+                VAR_DEFAULT_FIND_IMAGE = value if value != 'reset' else None
             else:
                 raise Exception('Var unknown: ' + command + ' with value = ' + value)
             continue
         # Comment
         if line.startswith(COMMENT_STARTER):
-            if gen['EXPORT_COMMENT']:
+            if VAR_EXPORT_COMMENT:
                 line = line.replace(COMMENT_STARTER, '<!--', 1) + ' -->'
-                gen.append(line + '\n')
+                result.append(line + '\n')
             continue
         # Require CSS or JS file
         if line.startswith('!require '):
             required = line.replace('!require ', '', 1)
             if required.endswith('.js'):
-                gen.append(f'  <script src="{required}"></script>\n')
+                result.append(f'  <script src="{required}"></script>\n')
             else:
                 raise Exception("I don't known how to handle this file: " + required)
             continue
         # Include HTML file
         if line.startswith('!include '):
             included = line.replace('!include ', '', 1).strip()
-            if gen.includes is not None:
+            if includes is not None:
                 filepath = None
-                for file in gen.includes:
+                for file in includes:
                     if os.path.basename(file) == included:
                         filepath = file
                 if filepath is not None:
                     file = open(filepath, mode='r', encoding='utf8')
                     file_content = file.read()
                     file.close()
-                    gen.append(file_content + '\n')
+                    result.append(file_content + '\n')
                 else:
-                    warning(f'Included file {included} not found in includes.')
+                    warn('Included file', included, 'not found in includes.')
             else:
-                warning('No included files for generation.')
+                warn('No included files for generation.')
             continue
         # Inline HTML
         if line.startswith('!html '):
-            gen.append(line.replace('!html ', '', 1) + '\n')
+            result.append(line.replace('!html ', '', 1) + '\n')
             continue
         # HR
         if line.startswith('---'):
             if line.count('-') == len(line):
-                gen.append('<hr>\n')
+                result.append('<hr>\n')
                 continue
         # BR
         if line.find(' !! ') != -1:
@@ -870,48 +798,48 @@ def process_lines(lines, gen=None):
         # Block of pre
         if line.startswith('>>'):
             if not in_pre_block:
-                gen.append('<pre>\n')
+                result.append('<pre>\n')
                 in_pre_block = True
             line = escape(line[2:])
-            gen.append(line + '\n')
+            result.append(line + '\n')
             continue
         elif in_pre_block:
-            gen.append('</pre>\n')
+            result.append('</pre>\n')
             in_pre_block = False
         # Block of code 1
         if len(line) > 2 and line[0:3] == '@@@':
             if not in_code_free_block:
-                gen.append('<pre class="code">\n')
+                result.append('<pre class="code">\n')
                 in_code_free_block = True
                 code_lang = line.replace('@@@', '', 1).strip()
                 if len(code_lang) == 0:
                     code_lang = VAR_DEFAULT_CODE
             else:
-                gen.append('</pre>\n')
+                result.append('</pre>\n')
                 in_code_free_block = False
             continue 
         # Block of code 2
         if line.startswith('@@') and (len(super_strip(line)) == 2 or line[2] != '@'):
             if not in_code_block:
-                gen.append('<pre class="code">\n')
+                result.append('<pre class="code">\n')
                 in_code_block = True
                 code_lang = super_strip(line.replace('@@', '', 1))
                 if len(code_lang) == 0:
-                    code_lang = gen['DEFAULT_CODE']
+                    code_lang = VAR_DEFAULT_CODE
                 continue
         elif in_code_block:
-            gen.append('</pre>\n')
+            result.append('</pre>\n')
             in_code_block = False
         if in_code_free_block or in_code_block:
             if in_code_block:
                 line = line[2:] # remove starting @@
-            gen.append(write_code(line, code_lang))
+            result.append(write_code(line, code_lang))
             continue
         # Div {{#ids .cls}}
         if line.startswith('{{') and line.endswith('}}'):
             inside = line[2:-2]
             if inside == 'end':
-                gen.append('</div>\n')
+                result.append('</div>\n')
             else:
                 cls = ''
                 ids = ''
@@ -930,23 +858,26 @@ def process_lines(lines, gen=None):
                     elif state == 'ids':
                         ids += c
                 if len(cls) > 0 and len(ids) > 0:
-                    gen.append(f'<div id="{ids[1:]}" class="{cls[1:]}">\n')
+                    result.append(f'<div id="{ids[1:]}" class="{cls[1:]}">\n')
                 elif len(cls) > 0:
-                    gen.append(f'<div class="{cls[1:]}">\n')
+                    result.append(f'<div class="{cls[1:]}">\n')
                 elif len(ids) > 0:
-                    gen.append(f'<div id="{ids[1:]}">\n')
+                    result.append(f'<div id="{ids[1:]}">\n')
                 else:
-                    gen.append(f'<div id="{cls}">\n')
+                    result.append(f'<div id="{cls}">\n')
             continue
         # Bold & Italic & Strikethrough & Underline & Power
         if multi_find(line, ('**', '--', '__', '^^', "''", "[", '@@', '{{')) and \
            not line.startswith('|-'):
-            line = process_string(line, gen)
+            res = process_string(line, links, inner_links, VAR_DEFAULT_CODE, VAR_DEFAULT_FIND_IMAGE)
+            line = res.first()
+            VAR_NEXT_PAR_CLASS = res['PARAGRAPH_CLASS']
+            VAR_NEXT_PAR_ID = res['PARAGRAPH_ID']
         # Title
         nb, title, id_title = find_title(line)
         if nb > 0:
             line = f'<h{nb} id="{id_title}">{title}</h{nb}>\n'
-            gen.append(line)
+            result.append(line)
             continue
         # Liste
         found = multi_start(line, LIST_STARTERS)
@@ -960,24 +891,18 @@ def process_lines(lines, gen=None):
             list_array.append({'level': level, 'starter': starter, 'line': escape(line[2:]), 'cont': True})
             continue
         elif len(list_array) > 0:
-            output_list(gen, list_array)
+            output_list(result, list_array)
             list_array = []
         # Table
         if len(line) > 0 and line[0] == '|':
             if not in_table:
-                if gen['NEXT_TAB_CLASS'] is not None:
-                    cls = f' class="{gen["NEXT_TAB_CLASS"]}"'
-                    gen['NEXT_TAB_CLASS'] = None
-                elif gen['DEFAULT_TAB_CLASS'] is not None:
-                    cls = f' class="{gen["DEFAULT_TAB_CLASS"]}"'
+                if VAR_DEFAULT_TAB_CLASS is not None:
+                    result.append(f'<table class="{VAR_DEFAULT_TAB_CLASS}">\n')
+                elif VAR_NEXT_TAB_CLASS is not None:
+                    result.append(f'<table class="{VAR_NEXT_TAB_CLASS}">\n')
+                    VAR_NEXT_TAB_CLASS = None
                 else:
-                    cls = ''
-                if gen['NEXT_TAB_ID'] is not None:
-                    ids = f' id="{gen["NEXT_TAB_ID"]}"'
-                    gen['NEXT_TAB_ID'] = None
-                else:
-                    ids = ''
-                gen.append(f'<table{ids}{cls}>\n')
+                    result.append('<table>\n')
                 in_table = True
             if next_line is not None and next_line.startswith('|-'):
                 element = 'th'
@@ -989,89 +914,79 @@ def process_lines(lines, gen=None):
                 if len(col.replace('-', '').strip()) != 0:
                     skip = False
             if not skip:
-                gen.append('<tr>')
+                result.append('<tr>')
                 for col in columns:
-                    if col != '':
-                        # center or right-align
-                        if len(col) > 0 and col[0] == '>':
+                    if col != '': # center or right-align
+                        if col[0] == '>':
                             align = ' align="right"'
                             col = col[1:]
-                        elif len(col) > 0 and col[0] == '=':
+                        elif col[0] == '=':
                             align = ' align="center"'
                             col = col[1:]
                         else:
                             align = ''
-                        # row and col span
-                        span = ''
-                        if len(col) > 0 and col[0] == '#':
-                            if len(col) > 1 and col[1] in ['c', 'r']:
-                                ending = col.find('#', 1)
-                                if ending != -1:
-                                    if col[1] == 'c':
-                                        span = f' colspan={int(col[2:ending])}'
-                                    else:
-                                        span = f' rowspan={int(col[2:ending])}'
-                                    col = col[ending+1:]
-                        val = process_string(escape(col), gen)         
-                        gen.append(f'<{element}{align}{span}>{val}</{element}>')
-                gen.append('</tr>\n')
+                        res = process_string(escape(col), links, inner_links, VAR_DEFAULT_CODE, VAR_DEFAULT_FIND_IMAGE)
+                        val = res.first()
+                        result.append(f'<{element}{align}>{val}</{element}>')
+                result.append('</tr>\n')
             continue
         elif in_table:
-            gen.append('</table>\n')
+            result.append('</table>\n')
             in_table = False
         # Definition list
         if line.startswith('$ '):
             if not in_definition_list:
                 in_definition_list = True
-                gen.append('<dl>\n')
+                result.append('<dl>\n')
             else:
-                gen.append('</dd>\n')
-            gen.append(f'<dt>{line.replace("$ ", "", 1)}</dt>\n<dd>\n')
+                result.append('</dd>\n')
+            result.append(f'<dt>{line.replace("$ ", "", 1)}</dt>\n<dd>\n')
             continue
         elif len(line) != 0 and in_definition_list:
-            if not gen['DEFINITION_AS_PARAGRAPH']:
-                gen.append(escape(line) +'\n')
+            if not VAR_DEFINITION_AS_PARAGRAPH:
+                result.append(escape(line) +'\n')
             else:
-                gen.append('<p>' + escape(line) +'</p>\n')
+                result.append('<p>' + escape(line) +'</p>\n')
             continue
         # empty line
         elif len(line) == 0 and in_definition_list:
             in_definition_list = False
-            gen.append('</dl>\n')
+            result.append('</dl>\n')
             continue
         # Replace escaped char
         line = escape(line)
         # Paragraph
         if len(line) > 0:
-            cls = f'class="{gen["DEFAULT_PAR_CLASS"]}"' if gen['DEFAULT_PAR_CLASS'] is not None else ''
-            cls = f'class="{gen["NEXT_PAR_CLASS"]}"' if gen['NEXT_PAR_CLASS'] is not None else cls
-            ids = f'id="{gen["NEXT_PAR_ID"]}"' if gen['NEXT_PAR_ID'] is not None else ''
+            cls = f'class="{VAR_DEFAULT_PAR_CLASS}"' if VAR_DEFAULT_PAR_CLASS is not None else ''
+            cls = f'class="{VAR_NEXT_PAR_CLASS}"' if VAR_NEXT_PAR_CLASS is not None else cls
+            ids = f'id="{VAR_NEXT_PAR_ID}"' if VAR_NEXT_PAR_ID is not None else ''
             space1 = ' ' if len(cls) > 0 or len(ids) > 0 else ''
             space2 = ' ' if len(cls) > 0 and len(ids) > 0 else ''
-            gen['NEXT_PAR_ID'] = None
-            gen['NEXT_PAR_CLASS'] = None
-            gen.append(f'<p{space1}{ids}{space2}{cls}>' + super_strip(line) + '</p>\n')
+            VAR_NEXT_PAR_CLASS = None
+            result.append(f'<p{space1}{ids}{space2}{cls}>' + super_strip(line) + '</p>\n')
     # Are a definition list still open?
     if in_definition_list:
-        gen.append('</dl>\n')
+        result.append('</dl>\n')
     # Are some lists still open?
     if len(list_array) > 0:
-        output_list(gen, list_array)
+        output_list(result, list_array)
     # Are a table still open?
     if in_table:
-        gen.append('</table>\n')
+        result.append('</table>\n')
         in_table = False
     # Are we stil in in_pre_block?
     if in_pre_block:
-        gen.append('</pre>')
+        result.append('</pre>')
     # Are we still in in_code_block?
     if in_code_block:
-        gen.append('</pre>')
-    return gen
+        result.append('</pre>')
+    return result
+
 
 #-------------------------------------------------------------------------------
 # Main functions
 #-------------------------------------------------------------------------------
+
 
 def process_dir(source, dest, default_lang=None, includes=None):
     """Process a directory:
@@ -1079,12 +994,12 @@ def process_dir(source, dest, default_lang=None, includes=None):
             - Else the file is copied into the new directory
        The destination directory is systematically DELETED at each run.
     """
-    info(f'Processing directory: {source}')
+    info('Processing directory:', source)
     if not os.path.isdir(source):
         raise Exception('Process_dir: Invalid source directory: ' + str(source))
     if os.path.isdir(dest):
         shutil.rmtree(dest)
-    info(f'Making dir: {dest}')
+    info('Making dir:', dest)
     os.mkdir(dest)
     for name_ext in os.listdir(source):
         path = os.path.join(source, name_ext)
@@ -1093,7 +1008,7 @@ def process_dir(source, dest, default_lang=None, includes=None):
             if ext == '.hml':
                 process_file(path, os.path.join(dest, name + '.html'), default_lang, includes)
             else:
-                info(f'Copying file: {path}')
+                info('Copying file:', path)
                 shutil.copy2(path, os.path.join(dest, name_ext))
         elif os.path.isdir(path):
             process_dir(path, os.path.join(dest, name_ext), default_lang, includes)
@@ -1106,4 +1021,4 @@ def process(source, dest, default_lang=None, includes=None):
     elif os.path.isdir(source):
         process_dir(source, dest, default_lang, includes)
     else:
-        warning(f'Process: {source} not found.')
+        warn('Process:', source, 'not found.')

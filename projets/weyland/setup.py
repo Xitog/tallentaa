@@ -1,5 +1,5 @@
 from setuptools import setup
-import hamill
+import weyland
 
 f = open('README.txt', mode='r', encoding='utf8')
 long_desc = f.read()
@@ -7,18 +7,18 @@ f.close()
 
 setup(
     # Metadata
-    name='hamill',
-    version=hamill.__version__,
+    name='weyland',
+    version=weyland.__version__,
 
     license="MIT",
 
     author='Damien Gouteux',
     author_email='damien.gouteux@gmail.com',
-    url="https://xitog.github.io/dgx/informatique/hamill.html",
+    url="https://xitog.github.io/dgx",
     maintainer='Damien Gouteux',
     maintainer_email='damien.gouteux@gmail.com',
     
-    description='A lightweight markup language',
+    description='An alternative way to write regular expression and a lexer using them.',
     long_description=long_desc,
     long_description_content_type="text/markdown",
     # https://pypi.org/classifiers/
@@ -29,18 +29,16 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: 3 :: Only',
         'Programming Language :: Python :: Implementation :: CPython',
-        'Topic :: Text Processing :: Markup',
-        'Topic :: Text Processing :: Markup :: HTML',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Software Development :: Documentation',
-        'Topic :: Internet :: WWW/HTTP :: Site Management',
-        'Topic :: Internet :: WWW/HTTP :: Dynamic Content :: CGI Tools/Libraries'
+        'Topic :: Text Processing',
+        'Programming Language :: Other'
     ],
-    keywords=['hamill', 'lml', 'lightweight markup language', 'markup', 'text', 'html'],
+    keywords=['weyland', 'lexer', 'regular expression', 'regex', 'text', 'languages'],
     
-    packages=['hamill'],  #same as name
-    python_requires='>=3.5',
-    install_requires = ['weyland'], #external packages as dependencies
+    packages=['weyland'],  #same as name
+    python_requires='>=3.5', # 3.5 for f'', 3.8 for f'{a=}'
     #zip_safe=True,
+    #install_requires=[], #external packages as dependencies
     #extras_require={}
 )
