@@ -9,6 +9,9 @@
   <link href="https://xitog.github.io/dgx/css/simplex.bootstrap.css" rel="stylesheet">
   <link href="https://xitog.github.io/dgx/css/palatino.css" rel="stylesheet">
 <style type="text/css">
+p {text-align: justify;}
+</style>
+<style type="text/css">
 code {color: #006FDD; border: 1px solid rgb(225, 228, 229); padding-left: 3px; padding-right: 5px;}
 </style>
 <style type="text/css">
@@ -27,10 +30,10 @@ table.extract td { border: 1px solid black; padding: 0px; text-align: center; }
 #interdit {color: red; font-weight: bold; }
 </style>
 <style type="text/css">
-#accept {color: rgb(0, 255, 128); font-weight: bold; }
+#accept {color: darkgreen; font-weight: bold; }
 </style>
 <style type="text/css">
-#bordered {border: 1px solid black; background-color: #FEFEFE; }
+#bordered {border: 1px solid black; background-color: #FEFEFE; padding: 1em;}
 </style>
 </head>
 <body>
@@ -161,18 +164,32 @@ table.extract td { border: 1px solid black; padding: 0px; text-align: center; }
 <h2 id="sommaire">Sommaire</h2>
 <ul>
   <li><a href="#i.-un-tableau-comme-carte">I. Un tableau comme carte</a></li>
-  <li><a href="#ii.-les-5-cinq-règles-de-transitions">II. Les 5 cinq règles de transitions</a></li>
-  <li><a href="#ii.a-les-règles">II.A Les règles</a></li>
-  <li><a href="#ii.b-illustrations">II.B Illustrations</a></li>
-  <li><a href="#iii.-numérotation-des-cases">III. Numérotation des cases</a></li>
-  <li><a href="#iii.a-identification-des-deux-tilesets-en-transition">III.A Identification des deux tilesets en transition</a></li>
-  <li><a href="#iii.b-énumération-des-environnements-valides">III.B Énumération des environnements valides</a></li>
-  <li><a href="#iii.c-codage-de-la-numérotation">III.C Codage de la numérotation</a></li>
+  <li><a href="#ii.-les-5-cinq-règles-de-transitions">II. Les 5 cinq règles de transitions</a>
+    <ul>
+      <li><a href="#ii.a-les-règles">II.A Les règles</a>
+        <ol>
+          <li><a href="#hiérarchie-d'influence">Hiérarchie d'influence</a></li>
+          <li><a href="#unicité">Unicité</a></li>
+          <li><a href="#étau">Étau</a></li>
+          <li><a href="#continuité">Continuité</a></li>
+          <li><a href="#coins-en-opposition">Coins en opposition</a></li>
+        </ol>
+      </li>
+      <li><a href="#ii.b-illustrations">II.B Illustrations</a></li>
+    </ul>
+  </li>
+  <li><a href="#iii.-numérotation-des-cases">III. Numérotation des cases</a>
+    <ul>
+      <li><a href="#iii.a-identification-des-deux-tilesets-en-transition">III.A Identification des deux tilesets en transition</a></li>
+      <li><a href="#iii.b-énumération-des-environnements-valides">III.B Énumération des environnements valides</a></li>
+      <li><a href="#iii.c-codage-de-la-transition">III.C Codage de la transition</a></li>
+    </ul>
+  </li>
   <li><a href="#iv.-exemples-de-résultats">IV. Exemples de résultats</a></li>
   <li><a href="#v.-crédits">V. Crédits</a></li>
 </ul>
 <h2 id="i.-un-tableau-comme-carte">I. Un tableau comme carte</h2>
-<p>Le jeu <code><span class="normal">WarCraft</span> <span class="normal">II</span></code> (1995) propose une vue de dessus d'une carte où se déroule la partie. Cette carte est stocké à l'aide d'un tableau. Chaque case du tableau contient une indication de textures à utiliser. Par exemple, une case peut contenir la valeur <code><span class="normal">16</span></code>, qui désigne de l'eau, ou <code><span class="normal">32</span></code> de la boue. Prenons une carte de 5 cases en largeur et en hauteur, une taille que nous notons 5x5, et affichons la dans un premier temps avec des bordures délimitant chaque case (A) puis sans (B) :</p>
+<p>Le jeu <code><span class="normal">WarCraft</span><span class="blank"> </span><span class="normal">II</span></code> (1995) propose une vue de dessus d'une carte où se déroule la partie. Cette carte est stocké à l'aide d'un tableau. Chaque case du tableau contient une indication de textures à utiliser. Par exemple, une case peut contenir la valeur <code><span class="normal">16</span></code>, qui désigne de l'eau, ou <code><span class="normal">32</span></code> de la boue. Prenons une carte de 5 cases en largeur et en hauteur, une taille que nous notons 5x5, et affichons la dans un premier temps avec des bordures délimitant chaque case (A) puis sans (B) :</p>
 <p>A. <img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/img_1_no_trans_border.png"></img> B. <img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/img_2_no_trans_no_border.png"></img> C. <img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/img_3_spreadsheet_map.png"></img></p>
 <p>On voit que l'ensemble de la carte, qui comporte <code><span class="normal">25</span></code> cases, ne fait que répéter deux textures. On peut ainsi décrire facilement de vastes étendues à partir de peu d'éléments. On appelle ses éléments d'après l'anglais <i><b>tiles</b></i>, que l'on pourrait traduire par carreau ou tuile, et cette technique le <i><b>tiling</b></i>, traduisible par carrelage. Une case du tableau correspond donc à un carreau. Pour construire et éditer une telle carte, on peut construire un éditeur de carte ou utiliser un simple tableur comme Microsoft Excel ou LibreOffice Calc. La même carte sous Excel se présenterait comme (C).</p>
 <p>Si on enlève les bordures de notre exemple (B), le résultat est déjà plus convaincant. Néanmoins, la transition de l'eau vers la boue est un peu abrupte, elle ne fait pas naturelle. Pour améliorer le résultat, on va créer un jeu de textures spéciales qui assureront des <b>transitions</b> plus douces et naturelles, on parlera de <i><b>tileset</b></i>. Il y a aura un tileset par texture de base, dans nos exemples précédent on en aura donc un pour l'eau et un pour la boue.</p>
@@ -181,7 +198,7 @@ table.extract td { border: 1px solid black; padding: 0px; text-align: center; }
 <h3 id="ii.a-les-règles">II.A Les règles</h3>
 <p>Nous allons établir un ensemble de règles pour les transitions :</p>
 <ol>
-  <li>Première règle, on établit une <u><b><span id="hiérarchie-d'influence">hiérarchie d'influence</span></b></u> : On décide que si un carreau jouxte un carreau de boue, c'est le carreau d'eau qui changera pour refléter une transition : sa texture d'eau simple sera remplacée par une texture de transition entre l'eau et la boue. On notera <code><span class="normal">eau</span> ⇐ <span class="normal">boue</span></code> et on dira que le carreau d'eau est <b>influencé</b> par un carreau de boue ou que le carreau de boue <b>influence</b> le carreau d'eau.</li>
+  <li>Première règle, on établit une <u><b><span id="hiérarchie-d'influence">hiérarchie d'influence</span></b></u> : On décide que si un carreau jouxte un carreau de boue, c'est le carreau d'eau qui changera pour refléter une transition : sa texture d'eau simple sera remplacée par une texture de transition entre l'eau et la boue. On notera <code><span class="normal">eau</span><span class="blank"> </span><span class="normal">⇐</span><span class="blank"> </span><span class="normal">boue</span></code> et on dira que le carreau d'eau est <b>influencé</b> par un carreau de boue ou que le carreau de boue <b>influence</b> le carreau d'eau.</li>
   <li>Deuxième règle, celle d'<u><b><span id="unicité">unicité</span></b></u> : <b>un carreau ne peut avoir autour de lui qu'un seul type d'influenceur</b>. On a vu que les carreaux d'eau sont influencés par les carreaux de boue. Imaginons un autre type de carreau, le sable, qui influence également l'eau. Un carreau d'eau ne pourra être entouré que d'un seul type d'influenceur dans sa proximité immédiate.</li>
   <li>Troisième règle : celle de l'<u><b><span id="étau">étau</span></b></u> : un carreau ne peut avoir à sa gauche et à sa droite un carreau l'influençant en même temps. De même, un carreau ne peut avoir en haut et en bas un carreau l'influençant en même temps. Les configurations représentées ci-dessous sont donc interdites :</li>
   <li>Quatrième règle, celle de la <u><b><span id="continuité">continuité</span></b></u> : <b>Les carreaux influenceurs doivent être consécutifs. Toutes les configurations discontinues sont interdites</b> comme :</li>
@@ -194,44 +211,44 @@ table.extract td { border: 1px solid black; padding: 0px; text-align: center; }
 <tr><td> ⇐ Herbe      </td><td> ⇐ Herbe sombre</td></tr>
 </table>
 <p>Il faut lire ce tableau comme : l'eau profonde est influencée par l'eau qui elle-même est influencée par la boue qui elle même est influencée par la boue séchée. On note qu'il existe une deuxième branche dans la hiérarchie à partir de la boue, qui est également influencée par l'herbe qui elle-même est influencée par l'herbe sombre.</p>
-<p>Règle n°2 - Unicité des modifieurs, <span id="interdit">cas refusés</span></p>
+<p>Règle n°2 - Unicité des modifieurs, <span id="interdit">cas refusé</span></p>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/grass-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/grass-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/blank-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/blank-1.png"></img></td></tr>
 </table>
 <p>Règle n°3 - Étaux <span id="interdit">refusés</span></p>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/blank-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/blank-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/blank-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/blank-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/blank-1.png"></img></td></tr>
 </table>
 <p>Règle n°4 - Discontinuité <span id="interdit">refusée</span></p>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/blank-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/blank-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/blank-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/blank-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/blank-1.png"></img></td></tr>
 </table>
 <p>Règle n°5 - Coins opposés <span id="accept">acceptés</span></p>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
 </table>
 <h2 id="iii.-numérotation-des-cases">III. Numérotation des cases</h2>
 <p>Un carreau est entouré de <code><span class="normal">8</span></code> autres carreaux, on parle de son <b>environnement</b>. Nous les notons et les numérotons comme ci-dessous, en partant arbitrairement du carreau en haut à gauche et en les parcourant dans le sens des aiguilles d'une montre :</p>
@@ -279,207 +296,207 @@ table.extract td { border: 1px solid black; padding: 0px; text-align: center; }
   <li>On repart ensuite d'un ensemble de 9 cases, mais cette fois-ci on place la première case influençante en deuxième position, c'est-à-dire la nord et on répète jusqu'à avoir un étau. Les séries qui commencent par un coin, nord-ouest, nord-est, sud-est, sud-ouest, comportent 5 cas valides. Les séries qui commencent par une bordure, nord, est, ouest, sud, comportent 4 cas valides. On a donc 5*4 + 4*4 = 36 cas valides.</li>
   <li>On rajoute à ceux-là les deux cas valides par la règle n°5, celle des coins opposés qui est une exception à la régle d'interdiction des discontinuités, et on obtient bien nos 38 cas valides représentées ci-dessous avec 0 = eau et 1 = boue.</li>
 </ul>
-<p><b>Il existe donc seulement 38 combinaisons environnementales, ou environnements valides</b>.</p>
+<p><b>Il existe donc seulement 38 combinaisons environnementales, ou environnements valides</b>. Nous représentons ci-dessous ces 38 combinaisons en ne prenant une texture de transition que pour la case centrale.</p>
 <p>Itération n°1, 5 cas</p>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-cnw-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-n-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-n-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-ne-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-ne-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
 </table>
 <p>Itération n°2, 4 cas</p>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-n-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-n-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-ne-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-ne-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
 </table>
 <p>Itération n°3, 5 cas</p>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-cne-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-e-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-e-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-es-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-es-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
 </table>
 <p>Itération n°4, 4 cas</p>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-e-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-e-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-es-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-es-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
 </table>
 <p>Itération n°5, 5 cas</p>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-ces-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-s-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-s-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-sw-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-sw-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
 </table>
 <p>Itération n°6, 4 cas</p>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-s-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-s-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-sw-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-sw-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
 </table>
 <p>Itération n°7, 5 cas</p>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-csw-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-w-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-w-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-nw-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-nw-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
 </table>
 <p>Itération n°8, 4 cas</p>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-w-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-w-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-nw-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-nw-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
 </table>
 <p>Coins opposés, 2 cas</p>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-cnwces-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
 </table>
 <table class="extract">
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
-<tr><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/base/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-cnecsw-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
 </table>
-<h3 id="iii.c-codage-de-la-numérotation">III.C Codage de la numérotation</h3>
+<h3 id="iii.c-codage-de-la-transition">III.C Codage de la transition</h3>
 <p>Pour coder les environnements, on peut simplement coder les 38 valeurs sur 6 bits (64 possibilités).</p>
 <p>Nous avons choisi une version moins économe en bits mais à notre sens plus lisible. On code les bordures sur 4 bits :</p>
 <table>

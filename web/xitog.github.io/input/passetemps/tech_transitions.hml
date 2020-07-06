@@ -6,6 +6,8 @@
 !require https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
 !require https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js
 
+!css p {text-align: justify;}
+
 !css code {color: #006FDD; border: 1px solid rgb(225, 228, 229); padding-left: 3px; padding-right: 5px;}
 !css table.schema { display: inline-block; margin-right: 20px; }
 !css table.schema tr:nth-child(2n) { background-color: transparent; }
@@ -14,9 +16,9 @@
 !css table.extract td { border: 1px solid black; padding: 0px; text-align: center; }
 
 !css #interdit {color: red; font-weight: bold; }
-!css #accept {color: rgb(0, 255, 128); font-weight: bold; }
+!css #accept {color: darkgreen; font-weight: bold; }
 
-!css #bordered {border: 1px solid black; background-color: #FEFEFE; }
+!css #bordered {border: 1px solid black; background-color: #FEFEFE; padding: 1em;}
 
 {{#main .container}}
 
@@ -31,12 +33,17 @@
 
 * [I. Un tableau comme carte->#]
 * [II. Les 5 cinq règles de transitions->#]
-* [II.A Les règles->#]
-* [II.B Illustrations->#]
+* * [II.A Les règles->#]
++ + + [Hiérarchie d'influence->#]
++ + + [Unicité->#]
++ + + [Étau->#]
++ + + [Continuité->#]
++ + + [Coins en opposition->#]
+* * [II.B Illustrations->#]
 * [III. Numérotation des cases->#]
-* [III.A Identification des deux tilesets en transition->#]
-* [III.B Énumération des environnements valides->#]
-* [III.C Codage de la numérotation->#]
+* * [III.A Identification des deux tilesets en transition->#]
+* * [III.B Énumération des environnements valides->#]
+* * [III.C Codage de la transition->#]
 * [IV. Exemples de résultats->#]
 * [V. Crédits->#]
 
@@ -64,7 +71,7 @@ Nous allons établir un ensemble de règles pour les transitions :
 % Quatrième règle, celle de la __**[#continuité]**__ : **Les carreaux influenceurs doivent être consécutifs. Toutes les configurations discontinues sont interdites** comme :
 % Cinquième règle, qui est une exception à la quatrième, est celle des __**[#coins en opposition]**__ : la configuration où deux coins en opposition sont des influenceurs et ceux sont les seuls influenceurs est autorisée. Cela concerne les deux configurations ci-dessous :
 
-!var DEFAULT_FIND_IMAGE = https://xitog.github.io/dgx/passetemps/graphics/transitions/base/
+!var DEFAULT_FIND_IMAGE = https://xitog.github.io/dgx/img/rts/tiles/
 
 ### II.B Illustrations
 
@@ -78,7 +85,7 @@ Il faut lire ce tableau comme : l'eau profonde est influencée par l'eau qui ell
 
 §§ Unicity
 
-Règle n°2 - Unicité des modifieurs, {{#interdit cas refusés}}
+Règle n°2 - Unicité des modifieurs, {{#interdit cas refusé}}
 |[!blank-1.png]|[!mud-1.png]|[!grass-1.png]|
 |[!blank-1.png]|[!water-1.png]|[!blank-1.png]|
 |[!blank-1.png]|[!blank-1.png]|[!blank-1.png]|
@@ -179,176 +186,176 @@ Suivant les 5 règles définies précédemment :
 * On repart ensuite d'un ensemble de 9 cases, mais cette fois-ci on place la première case influençante en deuxième position, c'est-à-dire la nord et on répète jusqu'à avoir un étau. Les séries qui commencent par un coin, nord-ouest, nord-est, sud-est, sud-ouest, comportent 5 cas valides. Les séries qui commencent par une bordure, nord, est, ouest, sud, comportent 4 cas valides. On a donc 5*4 + 4*4 = 36 cas valides.
 * On rajoute à ceux-là les deux cas valides par la règle n°5, celle des coins opposés qui est une exception à la régle d'interdiction des discontinuités, et on obtient bien nos 38 cas valides représentées ci-dessous avec 0 = eau et 1 = boue.
 
-**Il existe donc seulement 38 combinaisons environnementales, ou environnements valides**.
+**Il existe donc seulement 38 combinaisons environnementales, ou environnements valides**. Nous représentons ci-dessous ces 38 combinaisons en ne prenant une texture de transition que pour la case centrale.
 
 !var DEFAULT_TAB_CLASS = extract
-!var DEFAULT_FIND_IMAGE = https://xitog.github.io/dgx/passetemps/graphics/transitions/base/
+!var DEFAULT_FIND_IMAGE = https://xitog.github.io/dgx/img/rts/tiles/
 
 Itération n°1, 5 cas
 |[!mud-1.png]|[!water-1.png]|[!water-1.png]|
-|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!mud-cnw-water-1.png]|[!water-1.png]|
 |[!water-1.png]|[!water-1.png]|[!water-1.png]|
 
 |[!mud-1.png]|[!mud-1.png]|[!water-1.png]|
-|[!water-1.png]|[!water-1.png]|[!water-1.png]|
-|[!water-1.png]|[!water-1.png]|[!water-1.png]|
-
-|[!mud-1.png]|[!mud-1.png]|[!mud-1.png]|
-|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!mud-n-water-2.png]|[!water-1.png]|
 |[!water-1.png]|[!water-1.png]|[!water-1.png]|
 
 |[!mud-1.png]|[!mud-1.png]|[!mud-1.png]|
-|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!mud-n-water-2.png]|[!water-1.png]|
 |[!water-1.png]|[!water-1.png]|[!water-1.png]|
 
 |[!mud-1.png]|[!mud-1.png]|[!mud-1.png]|
-|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!mud-ne-water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+
+|[!mud-1.png]|[!mud-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!mud-ne-water-1.png]|[!mud-1.png]|
 |[!water-1.png]|[!water-1.png]|[!mud-1.png]|
 
 Itération n°2, 4 cas
 |[!water-1.png]|[!mud-1.png]|[!water-1.png]|
-|[!water-1.png]|[!water-1.png]|[!water-1.png]|
-|[!water-1.png]|[!water-1.png]|[!water-1.png]|
-
-|[!water-1.png]|[!mud-1.png]|[!mud-1.png]|
-|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!mud-n-water-2.png]|[!water-1.png]|
 |[!water-1.png]|[!water-1.png]|[!water-1.png]|
 
 |[!water-1.png]|[!mud-1.png]|[!mud-1.png]|
-|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!mud-n-water-2.png]|[!water-1.png]|
 |[!water-1.png]|[!water-1.png]|[!water-1.png]|
 
 |[!water-1.png]|[!mud-1.png]|[!mud-1.png]|
-|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!mud-ne-water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+
+|[!water-1.png]|[!mud-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!mud-ne-water-1.png]|[!mud-1.png]|
 |[!water-1.png]|[!water-1.png]|[!mud-1.png]|
 
 Itération n°3, 5 cas
 |[!water-1.png]|[!water-1.png]|[!mud-1.png]|
-|[!water-1.png]|[!water-1.png]|[!water-1.png]|
-|[!water-1.png]|[!water-1.png]|[!water-1.png]|
-
-|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
-|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!mud-cne-water-1.png]|[!water-1.png]|
 |[!water-1.png]|[!water-1.png]|[!water-1.png]|
 
 |[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!mud-e-water-2.png]|[!mud-1.png]|
+|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+
 |[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!mud-e-water-2.png]|[!mud-1.png]|
 |[!water-1.png]|[!water-1.png]|[!mud-1.png]|
 
 |[!water-1.png]|[!water-1.png]|[!mud-1.png]|
-|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!mud-es-water-2.png]|[!mud-1.png]|
 |[!water-1.png]|[!mud-1.png]|[!mud-1.png]|
 
 |[!water-1.png]|[!water-1.png]|[!mud-1.png]|
-|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!mud-es-water-2.png]|[!mud-1.png]|
 |[!mud-1.png]|[!mud-1.png]|[!mud-1.png]|
 
 Itération n°4, 4 cas
 |[!water-1.png]|[!water-1.png]|[!water-1.png]|
-|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!mud-e-water-2.png]|[!mud-1.png]|
 |[!water-1.png]|[!water-1.png]|[!water-1.png]|
 
 |[!water-1.png]|[!water-1.png]|[!water-1.png]|
-|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!mud-e-water-2.png]|[!mud-1.png]|
 |[!water-1.png]|[!water-1.png]|[!mud-1.png]|
 
 |[!water-1.png]|[!water-1.png]|[!water-1.png]|
-|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!mud-es-water-2.png]|[!mud-1.png]|
 |[!water-1.png]|[!mud-1.png]|[!mud-1.png]|
 
 |[!water-1.png]|[!water-1.png]|[!water-1.png]|
-|[!water-1.png]|[!water-1.png]|[!mud-1.png]|
+|[!water-1.png]|[!mud-es-water-2.png]|[!mud-1.png]|
 |[!mud-1.png]|[!mud-1.png]|[!mud-1.png]|
 
 Itération n°5, 5 cas
 |[!water-1.png]|[!water-1.png]|[!water-1.png]|
-|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!mud-ces-water-1.png]|[!water-1.png]|
 |[!water-1.png]|[!water-1.png]|[!mud-1.png]|
 
 |[!water-1.png]|[!water-1.png]|[!water-1.png]|
-|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!mud-s-water-2.png]|[!water-1.png]|
 |[!water-1.png]|[!mud-1.png]|[!mud-1.png]|
 
 |[!water-1.png]|[!water-1.png]|[!water-1.png]|
-|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!mud-s-water-2.png]|[!water-1.png]|
 |[!mud-1.png]|[!mud-1.png]|[!mud-1.png]|
 
 |[!water-1.png]|[!water-1.png]|[!water-1.png]|
-|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!mud-sw-water-1.png]|[!water-1.png]|
 |[!mud-1.png]|[!mud-1.png]|[!mud-1.png]|
 
 |[!mud-1.png]|[!water-1.png]|[!water-1.png]|
-|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!mud-sw-water-1.png]|[!water-1.png]|
 |[!mud-1.png]|[!mud-1.png]|[!mud-1.png]|
 
 Itération n°6, 4 cas
 |[!water-1.png]|[!water-1.png]|[!water-1.png]|
-|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!mud-s-water-2.png]|[!water-1.png]|
 |[!water-1.png]|[!mud-1.png]|[!water-1.png]|
 
 |[!water-1.png]|[!water-1.png]|[!water-1.png]|
-|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!mud-s-water-2.png]|[!water-1.png]|
 |[!mud-1.png]|[!mud-1.png]|[!water-1.png]|
 
 |[!water-1.png]|[!water-1.png]|[!water-1.png]|
-|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!mud-sw-water-1.png]|[!water-1.png]|
 |[!mud-1.png]|[!mud-1.png]|[!water-1.png]|
 
 |[!mud-1.png]|[!water-1.png]|[!water-1.png]|
-|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!mud-sw-water-1.png]|[!water-1.png]|
 |[!mud-1.png]|[!mud-1.png]|[!water-1.png]|
 
 Itération n°7, 5 cas
 |[!water-1.png]|[!water-1.png]|[!water-1.png]|
-|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!mud-csw-water-1.png]|[!water-1.png]|
 |[!mud-1.png]|[!water-1.png]|[!water-1.png]|
 
 |[!water-1.png]|[!water-1.png]|[!water-1.png]|
-|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!mud-w-water-2.png]|[!water-1.png]|
 |[!mud-1.png]|[!water-1.png]|[!water-1.png]|
 
 |[!mud-1.png]|[!water-1.png]|[!water-1.png]|
-|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!mud-w-water-2.png]|[!water-1.png]|
 |[!mud-1.png]|[!water-1.png]|[!water-1.png]|
 
 |[!mud-1.png]|[!mud-1.png]|[!water-1.png]|
-|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!mud-nw-water-1.png]|[!water-1.png]|
 |[!mud-1.png]|[!water-1.png]|[!water-1.png]|
 
 |[!mud-1.png]|[!mud-1.png]|[!mud-1.png]|
-|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!mud-nw-water-1.png]|[!water-1.png]|
 |[!mud-1.png]|[!water-1.png]|[!water-1.png]|
 
 Itération n°8, 4 cas
 |[!water-1.png]|[!water-1.png]|[!water-1.png]|
-|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!mud-w-water-2.png]|[!water-1.png]|
 |[!water-1.png]|[!water-1.png]|[!water-1.png]|
 
 |[!mud-1.png]|[!water-1.png]|[!water-1.png]|
-|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!mud-w-water-2.png]|[!water-1.png]|
 |[!water-1.png]|[!water-1.png]|[!water-1.png]|
 
 |[!mud-1.png]|[!mud-1.png]|[!water-1.png]|
-|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!mud-nw-water-1.png]|[!water-1.png]|
 |[!water-1.png]|[!water-1.png]|[!water-1.png]|
 
 |[!mud-1.png]|[!mud-1.png]|[!mud-1.png]|
-|[!mud-1.png]|[!water-1.png]|[!water-1.png]|
+|[!mud-1.png]|[!mud-nw-water-1.png]|[!water-1.png]|
 |[!water-1.png]|[!water-1.png]|[!water-1.png]|
 
 Coins opposés, 2 cas
 |[!mud-1.png]|[!water-1.png]|[!water-1.png]|
-|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!mud-cnwces-water-1.png]|[!water-1.png]|
 |[!water-1.png]|[!water-1.png]|[!mud-1.png]|
 
 |[!water-1.png]|[!water-1.png]|[!mud-1.png]|
-|[!water-1.png]|[!water-1.png]|[!water-1.png]|
+|[!water-1.png]|[!mud-cnecsw-water-1.png]|[!water-1.png]|
 |[!mud-1.png]|[!water-1.png]|[!water-1.png]|
 
 !var DEFAULT_FIND_IMAGE = reset
 !var DEFAULT_TAB_CLASS = reset
 
-### III.C Codage de la numérotation
+### III.C Codage de la transition
 
 Pour coder les environnements, on peut simplement coder les 38 valeurs sur 6 bits (64 possibilités).
 
