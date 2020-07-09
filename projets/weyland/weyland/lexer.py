@@ -33,7 +33,7 @@
 from weyland.regex import Rex
 from copy import copy
 from collections import namedtuple
-from weyland.languages import LANGUAGES
+from weyland.languages import LANGUAGES, Language
 
 #-------------------------------------------------------------------------------
 # Types
@@ -83,18 +83,19 @@ class LexingException(Exception):
 
 class Lexer:
 
-    def __init__(self, definitions, debug=False):
+    def __init__(self, lang, debug=False):
         self.debug = debug
+        self.lang = lang
         self.defs = []
-        for typ, values in definitions.items():
+        for typ, values in lang.tokens.items():
             for val in values:
                 self.defs.append(TokenDef(typ, val, self.debug))
         if self.debug:
             print('----------------------------------------')
             print('Language')
             print('----------------------------------------')
-            print('Types :', len(definitions))
-            for d in definitions:
+            print('Types :', len(self.lang.tokens))
+            for d in self.lang.tokens:
                 print('   ', d)
             print('----------------------------------------')
             print('Token definitions :', len(self.defs))
@@ -132,13 +133,13 @@ class Lexer:
             if len(partial) == 0 and len(complete) == 0:
                 specifics = list(filter(lambda elem: self.defs[elem].regex.is_specific(), prev_complete))
                 if len(prev_complete) == 0:
-                    raise LexingException(f'No matching token for |{word}| in {self.defs}')
+                    raise LexingException(f'\nLang:[{self.lang.name}]\nSource:\n{text}\nError:\nNo matching token for |{word}| in:\n{self.defs}')
                 elif len(prev_complete) > 1 and len(specifics) != 1:
                     msg = ''
                     for p in prev_complete:
                         msg += ' ' + str(self.defs[p])
                     msg += ' specifics = ' + str(specifics)
-                    raise LexingException('Multiple matching tokens:' + msg)
+                    raise LexingException(f'[{self.lang.name}] Multiple matching tokens:' + msg)
                 else:
                     if len(prev_complete) > 1:
                         chosen = specifics[0]
@@ -199,11 +200,11 @@ def main(debug=False):
         'SPACE': [' '],
     }
     tests = [
-        Test(text = 'aaa bbb', language = simple_one, nb = 3),
-        Test(text = '08789 bonjour', language = test_one, nb = 3),
-        Test(text = '2 22 abc 2a2 a+b', language = test_one, nb = 11),
-        Test(text = 'bonjour 08789 b2974 0b01111 breaka break', language = LANGUAGES['ash']['tokens'], nb = 11),
-        Test(text = 'bonjour bon bonjour 08789 22 abc + += a+b \n c _d 2a2 #a', language = LANGUAGES['ash']['tokens'], nb = 30)
+        Test(text = 'aaa bbb', language = Language('simple_one', simple_one, {}), nb = 3),
+        Test(text = '08789 bonjour', language = Language('test_one', test_one, {}), nb = 3),
+        Test(text = '2 22 abc 2a2 a+b', language = Language('test_one', test_one, {}), nb = 11),
+        Test(text = 'bonjour 08789 b2974 0b01111 breaka break', language = LANGUAGES['ash'], nb = 11),
+        Test(text = 'bonjour bon bonjour 08789 22 abc + += a+b \n c _d 2a2 #a', language = LANGUAGES['ash'], nb = 30)
     ]
     for tst in tests:
         lexer = Lexer(tst.language, debug=debug)

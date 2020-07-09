@@ -71,7 +71,7 @@
 @@  # Une syntaxe correcte contient au moins une règle
 @@  <syntaxe>               ::=     <règle> | <règle syntaxe>
 @@  # Définition d'une règle par ligne
-@@  <règle>                 ::=     "<"<nom>">" "::=" <expansion> "\n"
+@@  <règle>                 ::=     "<"<nom>">" "::=" <expansion> "NEW_LINE"
 @@  # Définition d'un nom de non-terminal
 @@  <nom>                   ::=     <lettre> | <nom> <lettreplus>
 @@  <lettre>                ::=     "a" | "b" ...
@@ -121,7 +121,7 @@ Les langages de patrons sont utilisés pour décrire un patron. Un patron décri
 
 Mon premier langage de patron, pour mon mémoire de master 1 en traitement automatique des langues, ne gérait pas la répétition mais l'optionnalité (à l'aide de @@?@@), le choix (à l'aide de @@[ A B ]@@) et la sous-séquence (à l'aide de @@( A B )@@. Ainsi on pouvait faire un choix entre un élément ou une sous-séquence : @@[ (A B) C ] D@@ décrit les séquences @@A B D@@ et @@C D@@. Techniquement, ma façon de les gérer était très bourrine : je dépliais le patron, stockant toutes les séquences qu'il générait dans une liste. Je comparais ensuite une nouvelle séquence avec les séquences générées et si une correspondait, c'est que le patron la capturait. Si plusieurs séquences correspondaient, la plus longue était choisie.
 
-Mon second langage de patrons a été développé le 27 octobre 2018 pour un lexer de langage. Il reprend ceux de regex. Il propose, comme le premier, le choix et l'optionnalité avec les mêmes symboles, mais perd les sous-séquences et rajoute la répétition (à l'aide de @@+@@ pour répéter de 1 à n fois et @@*@@ pour répéter de 0 à n fois). Il propose des caractères spéciaux de classes de caractères, @@\d@@ pour les chiffres, @@\a@@ pour les lettres et @@\w@@ pour les lettres, les chiffres et @@_@@. De plus les caractères spéciaux peuvent être échappés à l'aide également de l'antislash.
+Mon second langage de patrons a été développé le 27 octobre 2018 pour un lexer de langage. Il reprend ceux de regex. Il propose, comme le premier, le choix et l'optionnalité avec les mêmes symboles, mais perd les sous-séquences et rajoute la répétition (à l'aide de @@+@@ pour répéter de 1 à n fois et @@*@@ pour répéter de 0 à n fois). Il propose des caractères spéciaux de classes de caractères, @@#@@ pour les chiffres, @@\@@@ pour les lettres et @@$@@ pour les lettres, les chiffres et @@_@@. De plus les caractères spéciaux peuvent être échappés à l'aide également de l'antislash.
 
 {{end}}
 {{end}}

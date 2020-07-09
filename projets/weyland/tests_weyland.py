@@ -7,7 +7,7 @@ print(res)
 print('\nTest lexer')
 text = 'if A then 5 end'
 print(f'Lex : |{text}| ({len(text)})')
-lex = weyland.Lexer(weyland.LANGUAGES['ash']['tokens'])
+lex = weyland.Lexer(weyland.LANGUAGES['ash'])
 tokens = lex.lex(text)
 for i, t in enumerate(tokens):
     print(i, t)

@@ -534,7 +534,7 @@ def process_string(line, gen=None):
         if char == '@' and next_char == '@' and prev_char != '\\':
             continue
         if char == '@' and prev_char == '@' and prev_prev_char != '\\':
-            if next_char is not None and line.index("@@", char_index + 1) != -1:
+            if next_char is not None and line.find("@@", char_index + 1) != -1:
                 ending = find_unescaped(line, '@@', char_index)
                 code = line[char_index + 1:ending]
                 length = len(code) + 2

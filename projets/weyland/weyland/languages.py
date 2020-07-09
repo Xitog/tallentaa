@@ -30,9 +30,15 @@
 # Globals and constants
 #-------------------------------------------------------------------------------
 
+class Language:
+
+    def __init__(self, name, tokens, specials):
+        self.name = name
+        self.tokens = tokens
+        self.specials = specials
+
 LANGUAGES = {
-    'text': {
-        'tokens': {
+    'text': Language('text', {
             'normal': ['.*'],
             'identifier': [],
             'integer': [],
@@ -42,38 +48,40 @@ LANGUAGES = {
             'operator': [],
             'separator': [],
             'wrong_int': [],
-            'blank': [' '],
+            'blank': [' +'],
             'newline' : ['\n'],
             'line_comment' : [],
         },
         # Special
-        'ante_identifier': [],
-        'accept_unknown' : True,
-        'string_markers' : [],
-        'number' : False
-    },
-    'json': {
-        'tokens': {
-            'identifier' : [],
+        {
+            'ante_identifier': [],
+            'accept_unknown' : True,
+            'string_markers' : [],
+            'number' : False
+        }
+    ),
+    'json': Language('json', {
+            'identifier' : ['[@_]$*'],
             'integer' : ['#+'],
             'boolean': ['true', 'false'],
             'nil': [],
             'keyword': ['null'],
             'operator': [],
-            'separator': ['{', '}', '(', ')', r'\[', ']', ',', ':'],
+            'separator': ['{', '}', '(', ')', r'\[', ']', ',', ':', '"', "'", "\."],
             'wrong_int' : ['#+$+'],
-            'blank': [' '],
+            'blank': [' +'],
             'newline' : ['\n'],
             'line_comment' : [],
         },
         # Special
-        'ante_identifier': [],
-        'accept_unknown' : True,
-        'string_markers' : ['"', "'"],
-        'number' : True
-    },
-    'ash': {
-        'tokens': {
+        {
+            'ante_identifier': [],
+            'accept_unknown' : True,
+            'string_markers' : ['"', "'"],
+            'number' : True
+        }
+    ),
+    'ash': Language('ash', {
             # Old
             'AFFECTATION' : ['='],
             'COMBINED_AFFECTATION' : [r'\+=', '-=', r'\*=', '/=', '//=', r'\*\*=', '%='],
@@ -97,20 +105,21 @@ LANGUAGES = {
                   '&', '|', '~', '>>', '<<', # bitwise
                   '<', '<=', '>', '>=', '==', '!=', # comparison
                   '\.'], # call
-            'separator': ['{', '}', '(', ')', r'\[', ']', ',', ';'],
+            'separator': ['{', '}', '(', ')', r'\[', ']', ',', ';', '"', "'"],
             'wrong_int' : ['#+$+'],
-            'blanks': [' '],
+            'blanks': [' +'],
             'newline' : ['\n'],
             'line_comment': ['--'],
         },
         # Special
-        'ante_identifier': ['def', 'class'],
-        'accept_unknown' : False,
-        'string_markers' : ['"', "'"],
-        'number' : True
-    },
-    'python': {
-        'tokens': {
+        {
+            'ante_identifier': ['def', 'class'],
+            'accept_unknown' : False,
+            'string_markers' : ['"', "'"],
+            'number' : True
+        }
+    ),
+    'python': Language('python', {
             'identifier' : ['[@_]$*'],
             'integer' : ['#+'],
             'boolean' : ['True', 'False'],
@@ -126,36 +135,40 @@ LANGUAGES = {
                       '/=', '^=', '\.', '='],
             'separator': ['{', '}', '(', ')', r'\[', ']', ',', ';'],
             'wrong_int' : ['#+$+'],
-            'blank': [' '],
+            'blank': [' +'],
             'newline' : ['\n'],
-            'line_comment': ['\#'],
+            'line_comment': ['\#[. ]+\n'],
+            'string': ['"."', "'.'"],
         },
         # Special
-        'ante_identifier': ['def', 'class'],
-        'accept_unknown' : False,
-        'string_markers' : ['"', "'"],
-        'number' : True
-    },
-    'hamill' : {
-        'tokens': {
-            'identifier' : [],
+        {
+            'ante_identifier': ['def', 'class'],
+            'accept_unknown' : False,
+            'string_markers' : ['"', "'"],
+            'number' : True
+        }
+    ),
+    'hamill' : Language('hamill', {
+            'identifier' : ['[@_]$*'],
             'integer' : ['#+'],
             'boolean' : ['true', 'false'],
             'nil': [],
             'keyword': ['var', 'const', 'include', 'require', 'css', 'html'],
             'operator': [':'],
-            'separator' : [],
+            'separator' : ['{', '}', '\#', '.'],
             'wrong_int' : ['#+$+'],
-            'blank': [' '],
+            'blank': [' +'],
             'newline' : ['\n'],
             'line_comment': ['§§'],
         },
         # Special
-        'ante_identifier': ['var', 'const'],
-        'accept_unknown': True,
-        'string_markers': [],
-        'number' : True
-    },
+        {
+            'ante_identifier': ['var', 'const'],
+            'accept_unknown': True,
+            'string_markers': [],
+            'number' : True
+        }
+    ),
 }
 
 RECOGNIZED_LANGUAGES = list(LANGUAGES.keys())

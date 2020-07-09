@@ -62,7 +62,7 @@ On peut diviser les 6 types de données en 2 :
 * * et la valeur @@null@@.
 * Les types ''composés''^^1^^ de données :
 * * Object @@{ clé : value, ... }@@,
-* * Array @@\[ val1, ...]@@.
+* * Array @@[ val1, ...]@@.
 
 ^^1^^: atomiques et composés sont des termes personnels.
 
