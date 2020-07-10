@@ -29,7 +29,7 @@
 #       @ = alpha
 #       # = digit
 #       $ = alpha + digit + _
-#       . = any but space
+#       . = any but newline
 #   Special chars for repeatability/optionality:
 #       * repeat (0, n)
 #       + repeat (1, n)
@@ -114,7 +114,7 @@ class Element:
             elif self.core == '$':
                 return other.core in ['$', '_'] or other.core.isalnum()
             elif self.core == '.':
-                return other.core != ' '
+                return other.core != '\n'
         else:
             return self.core == other.core
 
@@ -133,7 +133,7 @@ class Element:
             elif self.core == '$': # \w
                 res = (candidate.isalnum() or candidate == '_')
             elif self.core == '.':
-                res = (candidate != ' ')
+                res = (candidate != '\n')
             else:
                 raise Exception(f'Unknown special char {self.elements[index].elem}')
         else:
@@ -268,12 +268,19 @@ class Rex:
             if self.debug:
                 pass #print(f'    iter {index_candidate=} {index_regex=} {candidate[index_candidate]} vs {elem} => {res}')
             if res:
-                matched[index_regex] += 1
-                if not elem.is_repeatable():
+                # pb of |."| We should quit the '.' as soon as possible
+                if elem.is_repeatable():
+                    if (elem.is_optionnal() or matched[index_regex] > 0) and index_regex + 1 < len(self.elements):
+                        next_res = self.check_at(candidate[index_candidate], index_regex + 1)
+                        if next_res: # We prefer the next one
+                            index_regex += 1
+                    matched[index_regex] += 1    
+                else: # next element
+                    matched[index_regex] += 1
                     index_regex += 1
                 index_candidate += 1
             else:
-                if elem.is_optionnal() or (elem.is_repeatable() and matched[index_regex] > 0): # ?/* or (+ and nb > 0)
+                if elem.is_optionnal() or matched[index_regex] > 0: # ?/* or (+ and nb > 0)
                     index_regex += 1 # test next
                 else:
                     break

@@ -1,8 +1,9 @@
 import weyland
 
 def display(tokens):
+   print(f'Tokens: {len(tokens)}')
    for i, t in enumerate(tokens):
-        print(i, t)
+        print(f'    {i:5d}. {t.typ:10s} ({t.first:3d},{t.last:3d}) |{t.val:s}|')
  
 rex = weyland.Rex('aaa')
 res = rex.match('aaa')
@@ -10,7 +11,7 @@ print(res)
 
 print('\nTest lexer')
 text = 'if A then 5 end'
-print(f'Lex : |{text}| ({len(text)})')
+print(f'Lexing: |{text}| ({len(text)})')
 lex = weyland.Lexer(weyland.LANGUAGES['ash'])
 tokens = lex.lex(text)
 display(tokens)
