@@ -230,7 +230,7 @@ def multi_find(string, finds):
 
 
 def find_unescaped(line, motif, start=0):
-    "Used by super_strip and code handling and multi_find"
+    "Used by super_strip, code handling and multi_find"
     index = start
     while index < len(line):
         found = line.find(motif, index)
@@ -239,7 +239,7 @@ def find_unescaped(line, motif, start=0):
         elif found == 0 or line[found - 1] != '\\':
             return found
         else:
-            index = found + len(motif)
+            index = found + 1 #len(motif)
     return -1
 
 
@@ -318,13 +318,15 @@ def make_id(string):
 
 
 def write_code(line, code_lang):
-    tokens = Lexer(LANGUAGES[code_lang]['tokens']).lex(line)
+    line = line.replace('\\@', '@') # warning bug if \\@
+    tokens = Lexer(LANGUAGES[code_lang]).lex(line)
     tokens_by_index = {}
     next_stop = None
     string = ''
     for tok in tokens:
         tokens_by_index[tok.first] = tok
     for index_char, char in enumerate(line):
+        char = safe(char)
         if index_char in tokens_by_index:
             tok = tokens_by_index[index_char]
             string += f'<span class="{tok.typ}">{char}'
@@ -336,7 +338,8 @@ def write_code(line, code_lang):
             string += f'{char}</span>'
             next_stop = None
         else:
-            string += safe(char)
+            string += char #safe(char)
+    #print('write_code', code_lang, line, string)
     return string
 
 

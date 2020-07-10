@@ -29,6 +29,7 @@
 #       @ = alpha
 #       # = digit
 #       $ = alpha + digit + _
+#       . = any but space
 #   Special chars for repeatability/optionality:
 #       * repeat (0, n)
 #       + repeat (1, n)
@@ -73,6 +74,15 @@ class Element:
 
     def __repr__(self):
         return f'|{self.core}|'
+
+    def is_special(self):
+        if self.is_choice():
+            for elem in self.core:
+                if elem.special:
+                    return True
+            return False
+        else:
+            return self.special
 
     def is_optionnal(self):
         return self.option
@@ -234,7 +244,7 @@ class Rex:
             print(f'{starter}{i} {e}')
 
     def is_specific(self):
-        return all(map(lambda elem: not elem.special, self.elements))
+        return all(map(lambda elem: not elem.is_special(), self.elements))
 
     class Result(Enum):
         NO = 'no'                                 # the regex doesn't match content

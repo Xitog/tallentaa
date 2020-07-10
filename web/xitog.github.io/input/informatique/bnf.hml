@@ -12,7 +12,7 @@
 !css b {color: #777777;}
 !css i b {color: #FF0000;}
 
-!var DEFAULT_CODE=text
+!var DEFAULT_CODE=bnf
 
 {{#main .container}}
 
@@ -47,11 +47,11 @@
 ## 2. La notation Backus-Naur Form (BNF)
 
 * La notation **Backus-Naur Form (BNF)** est un métalangage utilisé pour les décrire les langages de programmation.
-* * Elle utilise deux types de symboles : les @@terminaux@@ et les @@non-terminaux@@.
-* * Les terminaux sont un ou plusieurs caractères entre guillemets doubles @@"@@ ou simples @@'@@.
+* * Elle utilise deux types de symboles : les @@"terminaux"@@ et les @@<non-terminaux>@@.
+* * Les terminaux sont un ou plusieurs caractères entre guillemets doubles ou simples.
 * * La chaîne vide est symbolisée par @@""@@ ou @@''@@.
-* * Les non-terminaux sont un ou plusieurs caractères entre @@<@@ et @@>@@.
-* * Elle est constituée de règles notées : @@non-terminal ::= expansion@@
+* * Les non-terminaux sont un ou plusieurs caractères entre les signes inférieur et supérieur.
+* * Elle est constituée de règles notées : @@<non-terminal> ::= expansion@@
 * * Il doit y avoir **une règle par ligne**.
 * * Une expansion est consituée de terminaux et non-terminaux arrangée en :
 * * * **Suite** par simple juxtaposition : @@"abc" "def"@@
@@ -67,7 +67,7 @@
 * L'expression d'une possible **répétition** se fait en combinant la suite, le choix et une définition **récursive** dans : @@<suite> ::= <item> | <item> <suite>@@
 * On peut décrire BNF en BNF, le métalangage est **réflexif**. Ci-dessous, le modèle de la BNF en BNF, avec des commentaires (lignes qui commencent par #) :
 
-@@python
+@@bnf
 @@  # Une syntaxe correcte contient au moins une règle
 @@  <syntaxe>               ::=     <règle> | <règle syntaxe>
 @@  # Définition d'une règle par ligne

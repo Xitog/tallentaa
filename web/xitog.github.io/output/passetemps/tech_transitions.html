@@ -27,13 +27,19 @@ table.extract { border-collapse: collapse; display: inline-block; margin-left: 2
 table.extract td { border: 1px solid black; padding: 0px; text-align: center; }
 </style>
 <style type="text/css">
+table.extract_noborder { border-collapse: collapse; display: inline-block; margin-left: 2em; }
+</style>
+<style type="text/css">
+table.extract_noborder td { border: none; padding: 0px; text-align: center; }
+</style>
+<style type="text/css">
 #interdit {color: red; font-weight: bold; }
 </style>
 <style type="text/css">
 #accept {color: darkgreen; font-weight: bold; }
 </style>
 <style type="text/css">
-#bordered {border: 1px solid black; background-color: #FEFEFE; padding: 1em;}
+#bordered {border: 1px solid rgb(200, 200, 200); background-color: #FAFAFA; padding: 1em;}
 </style>
 </head>
 <body>
@@ -178,21 +184,41 @@ table.extract td { border: 1px solid black; padding: 0px; text-align: center; }
       <li><a href="#ii.b-illustrations">II.B Illustrations</a></li>
     </ul>
   </li>
-  <li><a href="#iii.-numérotation-des-cases">III. Numérotation des cases</a>
+  <li><a href="#iii.-codages">III. Codages</a>
     <ul>
-      <li><a href="#iii.a-identification-des-deux-tilesets-en-transition">III.A Identification des deux tilesets en transition</a></li>
-      <li><a href="#iii.b-énumération-des-environnements-valides">III.B Énumération des environnements valides</a></li>
-      <li><a href="#iii.c-codage-de-la-transition">III.C Codage de la transition</a></li>
+      <li><a href="#iii.a-codage-des-cases">III.A Codage des cases</a></li>
+      <li><a href="#iii.b-codage-de-l'environnement">III.B Codage de l'environnement</a></li>
+      <li><a href="#iii.c-codage-des-transitions">III.C Codage des transitions</a>
+        <ul>
+          <li><a href="#iii.c.1-identification-des-deux-tilesets-en-transition">III.C.1 Identification des deux tilesets en transition</a></li>
+          <li><a href="#iii.c.2-énumération-des-environnements-valides">III.C.2 Énumération des environnements valides</a></li>
+          <li><a href="#iii.c.3-codage-de-la-transition">III.C.3 Codage de la transition</a></li>
+        </ul>
+      </li>
     </ul>
   </li>
   <li><a href="#iv.-exemples-de-résultats">IV. Exemples de résultats</a></li>
   <li><a href="#v.-crédits">V. Crédits</a></li>
 </ul>
 <h2 id="i.-un-tableau-comme-carte">I. Un tableau comme carte</h2>
-<p>Le jeu <code><span class="normal">WarCraft</span><span class="blank"> </span><span class="normal">II</span></code> (1995) propose une vue de dessus d'une carte où se déroule la partie. Cette carte est stocké à l'aide d'un tableau. Chaque case du tableau contient une indication de textures à utiliser. Par exemple, une case peut contenir la valeur <code><span class="normal">16</span></code>, qui désigne de l'eau, ou <code><span class="normal">32</span></code> de la boue. Prenons une carte de 5 cases en largeur et en hauteur, une taille que nous notons 5x5, et affichons la dans un premier temps avec des bordures délimitant chaque case (A) puis sans (B) :</p>
-<p>A. <img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/img_1_no_trans_border.png"></img> B. <img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/img_2_no_trans_no_border.png"></img> C. <img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/img_3_spreadsheet_map.png"></img></p>
-<p>On voit que l'ensemble de la carte, qui comporte <code><span class="normal">25</span></code> cases, ne fait que répéter deux textures. On peut ainsi décrire facilement de vastes étendues à partir de peu d'éléments. On appelle ses éléments d'après l'anglais <i><b>tiles</b></i>, que l'on pourrait traduire par carreau ou tuile, et cette technique le <i><b>tiling</b></i>, traduisible par carrelage. Une case du tableau correspond donc à un carreau. Pour construire et éditer une telle carte, on peut construire un éditeur de carte ou utiliser un simple tableur comme Microsoft Excel ou LibreOffice Calc. La même carte sous Excel se présenterait comme (C).</p>
-<p>Si on enlève les bordures de notre exemple (B), le résultat est déjà plus convaincant. Néanmoins, la transition de l'eau vers la boue est un peu abrupte, elle ne fait pas naturelle. Pour améliorer le résultat, on va créer un jeu de textures spéciales qui assureront des <b>transitions</b> plus douces et naturelles, on parlera de <i><b>tileset</b></i>. Il y a aura un tileset par texture de base, dans nos exemples précédent on en aura donc un pour l'eau et un pour la boue.</p>
+<p>Le jeu <code><span class="normal">WarCraft</span><span class="blank"> </span><span class="normal">II</span></code> (1995) propose une vue de dessus d'une carte où se déroule la partie. Cette carte est stocké à l'aide d'un tableau. Chaque case du tableau contient une indication de textures à utiliser. Par exemple, une case peut contenir la valeur <code><span class="normal">16</span></code>, qui désigne de l'eau, ou <code><span class="normal">32</span></code> de la boue. Prenons une carte de 5 cases en largeur et en hauteur, une taille que nous notons 5x5, et affichons la dans un premier temps avec des bordures délimitant chaque case puis sans :</p>
+<table class="extract">
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+</table>
+<table class="extract_noborder">
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+</table>
+<p>On voit que l'ensemble de la carte, qui comporte <code><span class="normal">25</span></code> cases, ne fait que répéter deux textures. On peut ainsi décrire facilement de vastes étendues à partir de peu d'éléments. On appelle ses éléments d'après l'anglais <i><b>tiles</b></i>, que l'on pourrait traduire par carreau ou tuile, et cette technique le <i><b>tiling</b></i>, traduisible par carrelage. Une case du tableau correspond donc à un carreau. Pour construire et éditer une telle carte, on peut construire un éditeur de carte ou utiliser un simple tableur comme Microsoft Excel ou LibreOffice Calc. La même carte sous Excel se présenterait comme cela :</p>
+<p><img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/img_3_spreadsheet_map.png"></img></p>
+<p>Si on enlève les bordures de notre exemple, le résultat est déjà plus convaincant. Néanmoins, la transition de l'eau vers la boue est un peu abrupte, elle ne fait pas naturelle. Pour améliorer le résultat, on va créer un jeu de textures spéciales qui assureront des <b>transitions</b> plus douces et naturelles, on parlera de <i><b>tileset</b></i>. Il y a aura un tileset par texture de base, dans nos exemples précédent on en aura donc un pour l'eau et un pour la boue.</p>
 <p id="bordered">Il faut donc établir un <b>système de transition</b> à l'aide de <i>règles</i> pour définir les transitions valides et pour <i>numéroter</i> à la fois les cases et les transitions. Ce système comportera plusieurs transitions et des variantes, à la fois pour les textures de base et les textures de transitions.</p>
 <h2 id="ii.-les-5-cinq-règles-de-transitions">II. Les 5 cinq règles de transitions</h2>
 <h3 id="ii.a-les-règles">II.A Les règles</h3>
@@ -250,11 +276,36 @@ table.extract td { border: 1px solid black; padding: 0px; text-align: center; }
 <tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
 <tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
 </table>
-<h2 id="iii.-numérotation-des-cases">III. Numérotation des cases</h2>
+<h2 id="iii.-codages">III. Codages</h2>
+<h3 id="iii.a-codage-des-cases">III.A Codage des cases</h3>
+<p>Chaque case a une texture de base, nous en prendrons ici 6 en les associant à une valeur :</p>
+<table>
+<tr><th>Texture de base</th><th>Numéro (base 10)</th><th>Numéro (base 2)</th></tr>
+<tr><td> Eau profonde  </td><td align="right"> 0             </td><td align="right"> 0b<b>0000</b>0000   </td></tr>
+<tr><td> Eau           </td><td align="right"> 16            </td><td align="right"> 0b<b>0001</b>0000   </td></tr>
+<tr><td> Boue          </td><td align="right"> 32            </td><td align="right"> 0b<b>0010</b>0000   </td></tr>
+<tr><td> Boue sèche    </td><td align="right"> 48            </td><td align="right"> 0b<b>0011</b>0000   </td></tr>
+<tr><td> Herbe         </td><td align="right"> 64            </td><td align="right"> 0b<b>0100</b>0000   </td></tr>
+<tr><td> Herbe sombre  </td><td align="right"> 80            </td><td align="right"> 0b<b>0101</b>0000   </td></tr>
+</table>
+<p>On remarquera qu'on utililse les 4 bits forts, situés à gauche. Les 4 bits faiblent seront utilisés pour avoir des <b>variantes</b> des textures de base. On peut avoir une texture d'herbe simple codée 0b0100000, une autre avec une fleur codée 0b0100001, etc.</p>
+<p>Ces valeurs seront le <b>code attribué à une case</b>. On peut donc avoir 16 tilesets (2<sup>4</sup>) et, pour chaque tilesets, 16 variantes (2<sup>4</sup>) au maximum.</p>
+<p>Voici les 9 variantes de l'eau et les 6 variantes de la boue :</p>
+<table class="extract">
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-3.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-4.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-5.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-6.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-7.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-8.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-9.png"></img></td></tr>
+<tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td></tr>
+</table>
+<table class="extract">
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-3.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-4.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-5.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-6.png"></img></td></tr>
+<tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td></tr>
+</table>
+<h3 id="iii.b-codage-de-l'environnement">III.B Codage de l'environnement</h3>
 <p>Un carreau est entouré de <code><span class="normal">8</span></code> autres carreaux, on parle de son <b>environnement</b>. Nous les notons et les numérotons comme ci-dessous, en partant arbitrairement du carreau en haut à gauche et en les parcourant dans le sens des aiguilles d'une montre :</p>
 <table>
-<tr><th>Carreau    </th><th>Nord-Ouest    </th><th>Nord     </th><th>Nord-Est    </th><th>Est     </th><th>Sud-Est  </th><th>Sud      </th><th>Sud-Ouest </th><th>Ouest     </th></tr>
-<tr><td>Code       </td><td align="center">   NO        </td><td align="center"> N      </td><td align="center">  NE       </td><td align="center"> E     </td><td align="center">   SE   </td><td align="center"> S      </td><td align="center">   SO    </td><td align="center">    O    </td></tr>
+<tr><th>Carreau       </th><th>Nord-Ouest    </th><th>Nord     </th><th>Nord-Est    </th><th>Est     </th><th>Sud-Est  </th><th>Sud      </th><th>Sud-Ouest </th><th>Ouest     </th></tr>
+<tr><td>Étiquette     </td><td align="center">   NO        </td><td align="center"> N      </td><td align="center"> NE        </td><td align="center"> E     </td><td align="center"> SE     </td><td align="center"> S      </td><td align="center"> SO      </td><td align="center"> O       </td></tr>
+<tr><td>Position      </td><td align="center">   0         </td><td align="center"> 1      </td><td align="center"> 2         </td><td align="center"> 3     </td><td align="center"> 4      </td><td align="center"> 5      </td><td align="center"> 6       </td><td align="center"> 7       </td></tr>
+<tr><td>2<sup>Position</sup> </td><td align="center">   1         </td><td align="center"> 2      </td><td align="center"> 4         </td><td align="center"> 8     </td><td align="center"> 16     </td><td align="center"> 32     </td><td align="center"> 64      </td><td align="center"> 128     </td></tr>
 </table>
 <p>Autrement représenté ainsi :</p>
 <table class="schema">
@@ -262,20 +313,19 @@ table.extract td { border: 1px solid black; padding: 0px; text-align: center; }
 <tr><td align="center"> O  </td><td align="center">   </td><td align="center"> E  </td></tr>
 <tr><td align="center"> SO </td><td align="center"> S </td><td align="center"> SE </td></tr>
 </table>
-<p>Chaque case a une texture de base, nous en prendrons ici 6 en les associant à une valeur :</p>
-<table>
-<tr><th>Texture de base</th><th>Numéro (base 10)</th><th>Numéro (base 2)</th></tr>
-<tr><td> Eau profonde  </td><td align="right"> 0             </td><td align="right"> 0b00000000   </td></tr>
-<tr><td> Eau           </td><td align="right"> 16            </td><td align="right"> 0b00010000   </td></tr>
-<tr><td> Boue          </td><td align="right"> 32            </td><td align="right"> 0b00100000   </td></tr>
-<tr><td> Boue sèche    </td><td align="right"> 48            </td><td align="right"> 0b00110000   </td></tr>
-<tr><td> Herbe         </td><td align="right"> 64            </td><td align="right"> 0b01000000   </td></tr>
-<tr><td> Herbe sombre  </td><td align="right"> 80            </td><td align="right"> 0b01010000   </td></tr>
+<table class="schema">
+<tr><td align="center"> 0 </td><td align="center"> 1 </td><td align="center"> 2 </td></tr>
+<tr><td align="center"> 7 </td><td align="center">   </td><td align="center"> 3 </td></tr>
+<tr><td align="center"> 6 </td><td align="center"> 5 </td><td align="center"> 4 </td></tr>
 </table>
-<p>On remarquera qu'on utililse les 4 bits forts, situés à gauche. Les 4 bits faiblent seront utilisés pour avoir des <b>variantes</b> des textures de base. On peut avoir une texture d'herbe simple, une autre avec une fleur, etc.</p>
-<p>Ces valeurs seront la <b>numérotation attribuée à une case</b>. On peut donc avoir 16 tilesets et pour chaque tilesets 16 variantes au maximum.</p>
-<h2 id="iii.-numérotation-des-transitions">III. Numérotation des transitions</h2>
-<h3 id="iii.a-identification-des-deux-tilesets-en-transition">III.A Identification des deux tilesets en transition</h3>
+<table class="schema">
+<tr><td align="center">   1 </td><td align="center">  2 </td><td align="center">  4 </td></tr>
+<tr><td align="center"> 128 </td><td align="center">    </td><td align="center">  8 </td></tr>
+<tr><td align="center">  64 </td><td align="center"> 32 </td><td align="center"> 16 </td></tr>
+</table>
+<p>Nous pourrions coder chaque environnement, c'est-à-dire attribuer une valeur à chaque configuration, et ensuite la faire correspondre à la transition appropriée. Nous avons choisi une autre méthode expliquée ci-dessous.</p>
+<h3 id="iii.c-codage-des-transitions">III.C Codage des transitions</h3>
+<h4 id="iii.c.1-identification-des-deux-tilesets-en-transition">III.C.1 Identification des deux tilesets en transition</h4>
 <p>Si on reprend la hiérarchie d'influence, on remarque qu'il y a 5 transitions possibles :</p>
 <table>
 <tr><th>Transition                                </th><th>Numéro</th><th>Binaire</th></tr>
@@ -287,7 +337,17 @@ table.extract td { border: 1px solid black; padding: 0px; text-align: center; }
 <tr><td>L'herbe est influencée par l'herbe sombre </td><td align="right"> 5   </td><td align="right"> 101  </td></tr>
 </table>
 <p>On utilisera ces trois bits en tant que bits forts de nombre <b>numérotation des transitions</b>. Cette numérotation est <u>indépendante</u> de la numérotation des cases.</p>
-<h3 id="iii.b-énumération-des-environnements-valides">III.B Énumération des environnements valides</h3>
+<p>On peut faire un tableau qui indique <i>qui influence qui</i> : une case avec <b>vvvvvvv</b> marquant que la texture sur la ligne est influencée par la texture sur la colonne, une case avec <b>+++++++</b> marquant que la texture sur la ligne influence la texture sur la colonne, une case avec <b>=</b> indique une identité :</p>
+<table>
+<tr><th>Textures    </th><th>Eau profonde  </th><th>Eau           </th><th>Boue          </th><th>Boue sèche    </th><th>Herbe         </th><th>Herbe sombre  </th></tr>
+<tr><td>Eau profonde</td><td align="center"> <b>=</b>       </td><td align="center"> <b>vvvvvvv</b> </td><td>              </td><td>              </td><td>              </td><td>              </td></tr>
+<tr><td>Eau         </td><td align="center"> <b>+++++++</b> </td><td align="center"> <b>=</b>       </td><td align="center"> <b>vvvvvvv</b> </td><td>              </td><td>              </td><td>              </td></tr>
+<tr><td>Boue        </td><td>              </td><td align="center"> <b>+++++++</b> </td><td align="center"> <b>=</b>       </td><td align="center"> <b>vvvvvvv</b> </td><td align="center"> <b>vvvvvvv</b> </td><td>              </td></tr>
+<tr><td>Boue sèche  </td><td>              </td><td>              </td><td align="center"> <b>+++++++</b> </td><td align="center"> <b>=</b>       </td><td>              </td><td>              </td></tr>
+<tr><td>Herbe       </td><td>              </td><td>              </td><td align="center"> <b>+++++++</b> </td><td>              </td><td align="center"> <b>=</b>       </td><td align="center"> <b>vvvvvvv</b> </td></tr>
+<tr><td>Herbe sombre</td><td>              </td><td>              </td><td>              </td><td>              </td><td align="center"> <b>+++++++</b> </td><td align="center"> <b>=</b>       </td></tr>
+</table>
+<h4 id="iii.c.2-énumération-des-environnements-valides">III.C.2 Énumération des environnements valides</h4>
 <p>Suivant les 5 règles définies précédemment :</p>
 <ul>
   <li>La règle 2 sur l'unicité indique que s'il y a un ou plusieurs carreaux influenceurs, ils seront tous du même type. Une case est donc entouré soit d'une même texture de base ou d'une case ne l'influençant pas, soit d'une ou plusieurs cases l'influençant mais toutes du même type. Cela revient à un choix binaire, savoir si le carreau est un influenceur (1) ou pas (0) sur les 8 cases entourant une case. Il y a donc <b>2<sup>8</sup></b>, soit <code><span class="normal">256</span></code>, possibilités.</li>
@@ -496,36 +556,119 @@ table.extract td { border: 1px solid black; padding: 0px; text-align: center; }
 <tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-cnecsw-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
 <tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td></tr>
 </table>
-<h3 id="iii.c-codage-de-la-transition">III.C Codage de la transition</h3>
+<h4 id="iii.c.3-codage-de-la-transition">III.C.3 Codage de la transition</h4>
 <p>Pour coder les environnements, on peut simplement coder les 38 valeurs sur 6 bits (64 possibilités).</p>
-<p>Nous avons choisi une version moins économe en bits mais à notre sens plus lisible. On code les bordures sur 4 bits :</p>
+<p>Nous avons choisi une version moins économe en bits mais à notre sens plus lisible humainement. On code les bordures sur 4 bits :</p>
 <table>
-<tr><th>Bordure </th><th> Numéro </th><th> Binaire </th></tr>
-<tr><td>Aucune  </td><td align="right"> 0     </td><td align="right">       0</td></tr>
-<tr><td>Nord    </td><td align="right"> 8     </td><td align="right">    1000</td></tr>
-<tr><td>Est     </td><td align="right"> 4     </td><td align="right">    0100</td></tr>
-<tr><td>Sud     </td><td align="right"> 2     </td><td align="right">    0010</td></tr>
-<tr><td>Ouest   </td><td align="right"> 1     </td><td align="right">    0001</td></tr>
+<tr><th>Bordure      </th><th> Base 10 </th><th> Binaire </th></tr>
+<tr><td>Aucune       </td><td align="right"> 0      </td><td align="right">       0</td></tr>
+<tr><td>Nord         </td><td align="right"> 8      </td><td align="right">    1000</td></tr>
+<tr><td>Est          </td><td align="right"> 4      </td><td align="right">    0100</td></tr>
+<tr><td>Sud          </td><td align="right"> 2      </td><td align="right">    0010</td></tr>
+<tr><td>Ouest        </td><td align="right"> 1      </td><td align="right">    0001</td></tr>
 </table>
-<p>Un 1 signifie il y a un tile influenceuse, un 0 non. En ajoutant les trois premiers bits définis auparavant, on saura qui est l'influenceur et l'influenceuse.</p>
+<p>Un 1 signifie il y a un tile influenceuse, un 0 non. En ajoutant les trois premiers bits définis auparavant, on saura qui est l'influenceuse et l'influencée.</p>
 <p>Si il n'y a aucune bordure, on regarde les coins. Pour les encoder, on utilise le fait que la règle n°3 qui interdit les étaux nord-sud et est-ouest. Il y a donc des combinaisons de bordures impossibles dans lesquels on codera les coins :</p>
 <table>
-<tr><th>Coins                </th><th> Numéro </th><th> Binaire </th></tr>
-<tr><td>Nord-ouest           </td><td align="right"> 5     </td><td align="right"> 0101   </td></tr>
-<tr><td>Nord-est             </td><td align="right"> 7     </td><td align="right"> 0111   </td></tr>
-<tr><td>Sud-est              </td><td align="right"> 10    </td><td align="right"> 1010   </td></tr>
-<tr><td>Sud-ouest            </td><td align="right"> 11    </td><td align="right"> 1011   </td></tr>
-<tr><td>Nord-ouest + Sud-est </td><td align="right"> 13    </td><td align="right"> 1101   </td></tr>
-<tr><td>Nord-est + Sud-ouest </td><td align="right"> 14    </td><td align="right"> 1110   </td></tr>
+<tr><th>Coins                </th><th> Base 10 </th><th> Binaire </th></tr>
+<tr><td>Nord-ouest           </td><td align="right"> 5      </td><td align="right"> 0101   </td></tr>
+<tr><td>Nord-est             </td><td align="right"> 7      </td><td align="right"> 0111   </td></tr>
+<tr><td>Sud-est              </td><td align="right"> 10     </td><td align="right"> 1010   </td></tr>
+<tr><td>Sud-ouest            </td><td align="right"> 11     </td><td align="right"> 1011   </td></tr>
+<tr><td>Nord-ouest + Sud-est </td><td align="right"> 13     </td><td align="right"> 1101   </td></tr>
+<tr><td>Nord-est + Sud-ouest </td><td align="right"> 14     </td><td align="right"> 1110   </td></tr>
 </table>
 <p>Notre numérotation des transitions complète utilise 8 bits car on ajoute 1 but pour la variabilité, il n'y a donc que deux variantes pour chaque tile de transition. La représentation de notre numérotation des transitions est la suivante :</p>
 <table>
-<tr><td>Identification transition</td><td> Codage bordures et coins </td><td> Variante </td></tr>
-<tr><td> 3 bits                  </td><td> 4 bits                   </td><td> 1 bit    </td></tr>
+<tr><th>Identification transition</th><th> Codage bordures et coins </th><th> Variante </th></tr>
+<tr><td align="center"> 3 bits                 </td><td align="center"> 4 bits                  </td><td align="center"> 1 bit   </td></tr>
 </table>
+<p>Et nous pouvons avoir les valeurs suivantes pour la partie centrale, codage des bordures et coins :</p>
+<table>
+<tr><th>Signification              </th><th>Base 10 </th><th> Binaire </th><th> Eau influencée par boue </th><th> Boue influencée par herbe </th></tr>
+<tr><td>Aucune transition          </td><td align="right"> 0     </td><td align="right">       0</td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img>           </td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img>               </td></tr>
+<tr><td>Bordure Ouest              </td><td align="right"> 1     </td><td align="right">    0001</td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-w-water-1.png"></img>     </td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/grass-w-mud-1.png"></img>       </td></tr>
+<tr><td>Bordure Sud                </td><td align="right"> 2     </td><td align="right">    0010</td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-s-water-1.png"></img>     </td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/grass-s-mud-1.png"></img>       </td></tr>
+<tr><td>Bordures Sud et Ouest      </td><td align="right"> 3     </td><td align="right">    0011</td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-sw-water-1.png"></img>    </td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/grass-sw-mud-1.png"></img>      </td></tr>
+<tr><td>Bordure Est                </td><td align="right"> 4     </td><td align="right">    0100</td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-e-water-1.png"></img>     </td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/grass-e-mud-1.png"></img>       </td></tr>
+<tr><td>Coin Nord-ouest            </td><td align="right"> 5     </td><td align="right">    0101</td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-cnw-water-1.png"></img>   </td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/grass-cnw-mud-1.png"></img>     </td></tr>
+<tr><td>Bordures Est et Sud        </td><td align="right"> 6     </td><td align="right">    0110</td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-es-water-1.png"></img>    </td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/grass-es-mud-1.png"></img>      </td></tr>
+<tr><td>Coin Nord-est              </td><td align="right"> 7     </td><td align="right">    0111</td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-cne-water-1.png"></img>   </td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/grass-cne-mud-1.png"></img>     </td></tr>
+<tr><td>Bordure Nord               </td><td align="right"> 8     </td><td align="right">    1000</td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-n-water-1.png"></img>     </td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/grass-n-mud-1.png"></img>       </td></tr>
+<tr><td>Bordures Ouest et Nord     </td><td align="right"> 9     </td><td align="right">    1001</td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-nw-water-1.png"></img>    </td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/grass-nw-mud-1.png"></img>      </td></tr>
+<tr><td>Coin Sud-est               </td><td align="right"> 10    </td><td align="right">    1010</td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-ces-water-1.png"></img>   </td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/grass-ces-mud-1.png"></img>     </td></tr>
+<tr><td>Coin Sud-ouest             </td><td align="right"> 11    </td><td align="right">    1011</td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-csw-water-1.png"></img>   </td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/grass-csw-mud-1.png"></img>     </td></tr>
+<tr><td>Bordures Nord et Est       </td><td align="right"> 12    </td><td align="right">    1100</td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-ne-water-1.png"></img>    </td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/grass-ne-mud-1.png"></img>      </td></tr>
+<tr><td>Coins Nord-ouest + Sud-est </td><td align="right"> 13    </td><td align="right">    1101</td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-cnwces-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/grass-cnwces-mud-1.png"></img>  </td></tr>
+<tr><td>Coins Nord-est + Sud-ouest </td><td align="right"> 14    </td><td align="right">    1110</td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-cnecsw-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/grass-cnecsw-mud-1.png"></img>  </td></tr>
+<tr><td>Code d'erreur              </td><td align="right"> 15    </td><td align="right">    1111</td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/error.png"></img>             </td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/error.png"></img>               </td></tr>
+</table>
+<p>Le code d'erreur traduit que l'environnement de la case est invalide : il ne respecte pas les 5 règles énoncées plus tôt.</p>
+<p>Au 38 environnements valides correspondent <b>14 transitions possibles</b>. On a une seule variante possible pour chaque transition dans notre codage :</p>
+<table class="extract">
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-w-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-s-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-sw-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-e-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-cnw-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-es-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-cne-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-n-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-nw-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-ces-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-csw-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-ne-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-cnwces-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-cnecsw-water-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-w-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-s-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-sw-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-e-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-cnw-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-es-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-cne-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-n-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-nw-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-ces-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-csw-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-ne-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-cnwces-water-2.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-cnecsw-water-2.png"></img></td></tr>
+<tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td><td>14</td></tr>
+</table>
+<p>Pour les coins en opposition, les deux variantes sont exactement la même texture de transition.</p>
 <h2 id="iv.-exemples-de-résultats">IV. Exemples de résultats</h2>
-<p>Dans cette partie nous présentons à droite une carte avec des textures de base et à gauche la carte transitionnée.</p>
+<p>Dans cette partie nous présentons à gauche une carte avec des textures de base et à droite la carte transitionnée :</p>
+<p>Avec bordures :</p>
+<table class="extract">
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+</table>
+<table class="extract">
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-nw-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-n-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-ne-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-w-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-e-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-sw-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-s-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-es-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+</table>
+<p>Sans bordures :</p>
+<table class="extract_noborder">
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+</table>
+<table class="extract_noborder">
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-nw-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-n-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-ne-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-w-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-e-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-sw-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-s-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-es-water-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+<tr><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td><td><img src="https://xitog.github.io/dgx/img/rts/tiles/mud-1.png"></img></td></tr>
+</table>
+<p>Quelques exemples supplémentaires :</p>
+<p>A. <img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/TestWaterMudDry1.png"></img> B. <img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/TestWaterMudDryGrass1.png"></img> C. <img src="https://xitog.github.io/dgx/passetemps/graphics/transitions/TestWaterMudGrass1.png"></img></p>
 <h2 id="v.-crédits">V. Crédits</h2>
+<ul>
+  <li>Damien Gouteux 2019-2020 pour le texte</li>
+  <li>Les graphismes sont tirés du jeu libre <code><span class="normal">Wyrmsun</span><span class="blank"> </span><span class="normal">(2014)</span></code> par Andrettin :
+    <ul>
+      <li><a href="https://andrettin.github.io/">Présentation du jeu</a></li>
+      <li><a href="https://github.com/andrettin/wyrmsun">Dépôt des données du jeu</a></li>
+      <li><a href="http://store.steampowered.com/app/370070">Page Steam du jeu</a></li>
+      <li><a href="https://twitter.com/wyrmsun">Page Twitter du jeu</a></li>
+      <li><a href="https://framalibre.org/content/wyrmsun">Page Framasoft du jeu</a></li>
+    </ul>
+  </li>
+  <li>Plus précisément, les graphismes utilisés sont tirés de :
+    <ul>
+      <li><a href="https://github.com/Andrettin/Wyrmsun/blob/master/graphics/terrain/shallow_water.png">/graphics/terrain/shallow_water.png</a> par Jinn sous licence CC0.</li>
+      <li><a href="https://github.com/Andrettin/Wyrmsun/blob/master/graphics/terrain/deep_water-1.png">/graphics/terrain/deep_water-1.png</a> par Exidelo sous licence CC0.</li>
+      <li><a href="https://github.com/Andrettin/Wyrmsun/blob/master/graphics/terrain/dry_mud.png">/graphics/terrain/dry_mud.png</a> par Jinn sous licence CC0.</li>
+      <li><a href="https://github.com/Andrettin/Wyrmsun/blob/master/graphics/terrain/grass.png">/graphics/terrain/grass.png</a> par Exidelo sous licence CC0.</li>
+      <li><a href="https://github.com/Andrettin/Wyrmsun/blob/master/graphics/neutral/decorations/flowers_swamp_1.png">/graphics/neutral/decorations/flowers_swamp_1.png</a> par b_o sous licence GPL 2.0 et CC-BY-SA 3.0.</li>
+      <li><a href="https://github.com/Andrettin/Wyrmsun/blob/master/graphics/neutral/decorations/large_flower_swamp_1.png">/graphics/neutral/decorations/large_flower_swamp_1.png</a> par b_o sous licence GPL 2.0 et CC-BY-SA 3.0.</li>
+      <li><a href="https://github.com/Andrettin/Wyrmsun/blob/master/graphics/neutral/decorations/small_rocks.png">/graphics/neutral/decorations/small_rocks.png</a> par b_o sous licence GPL 2.0 et CC-BY-SA 3.0.</li>
+    </ul>
+  </li>
+</ul>
 </div>
 </div>
 </body>

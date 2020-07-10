@@ -213,7 +213,7 @@
 </span><span class="normal">fun</span><span class="blank"> </span><span class="normal">fact(nb</span><span class="blank"> </span><span class="normal">:</span><span class="blank"> </span><span class="normal">int)
 </span><span class="blank">    </span><span class="normal">if</span><span class="blank"> </span><span class="normal">nb</span><span class="blank"> </span><span class="normal">==</span><span class="blank"> </span><span class="normal">0</span><span class="blank"> </span><span class="normal">then
 </span><span class="blank">        </span><span class="normal">return</span><span class="blank"> </span><span class="normal">1
-</span><span class="blank">    </span><span class="normal">elif</span><span class="blank"> </span><span class="normal">nb</span><span class="blank"> </span><span class="normal">&gt;</span><span class="blank"> </span><span class="normal">0</span><span class="blank"> </span><span class="normal">then
+</span><span class="blank">    </span><span class="normal">elif</span><span class="blank"> </span><span class="normal">nb</span><span class="blank"> </span><span class="normal">&amp;gt;</span><span class="blank"> </span><span class="normal">0</span><span class="blank"> </span><span class="normal">then
 </span><span class="blank">        </span><span class="normal">return</span><span class="blank"> </span><span class="normal">nb</span><span class="blank"> </span><span class="normal">*</span><span class="blank"> </span><span class="normal">fact(nb</span><span class="blank"> </span><span class="normal">-</span><span class="blank"> </span><span class="normal">1)
 </span><span class="blank">    </span><span class="normal">else
 </span><span class="blank">        </span><span class="normal">raise</span><span class="blank"> </span><span class="normal">Exception("Invalid</span><span class="blank"> </span><span class="normal">number")
@@ -234,13 +234,13 @@
 <p>following word are reserved because they are keyword.</p>
 <p>Ash is case sensitive.</p>
 <pre class="code">
-<span class="normal">defined?(tst)</span><span class="blank"> </span><span class="normal">--></span><span class="blank"> </span><span class="normal">nil
-</span><span class="normal">tst</span><span class="blank"> </span><span class="normal">=</span><span class="blank"> </span><span class="normal">nil</span><span class="blank"> </span><span class="normal">--></span><span class="blank"> </span><span class="normal">variable</span><span class="blank"> </span><span class="normal">defined</span><span class="blank"> </span><span class="normal">with</span><span class="blank"> </span><span class="normal">value
+<span class="normal">defined?(tst)</span><span class="blank"> </span><span class="normal">--&gt;</span><span class="blank"> </span><span class="normal">nil
+</span><span class="normal">tst</span><span class="blank"> </span><span class="normal">=</span><span class="blank"> </span><span class="normal">nil</span><span class="blank"> </span><span class="normal">--&gt;</span><span class="blank"> </span><span class="normal">variable</span><span class="blank"> </span><span class="normal">defined</span><span class="blank"> </span><span class="normal">with</span><span class="blank"> </span><span class="normal">value
 </span><span class="normal">if</span><span class="blank"> </span><span class="normal">tst</span><span class="blank"> </span><span class="normal">is</span><span class="blank"> </span><span class="normal">nil</span><span class="blank"> </span><span class="normal">then
 </span><span class="blank">    </span><span class="normal">writeln('tst</span><span class="blank"> </span><span class="normal">is</span><span class="blank"> </span><span class="normal">nil')
 </span><span class="normal">end
 </span><span class="normal">tst</span><span class="blank"> </span><span class="normal">=</span><span class="blank"> </span><span class="normal">22
-</span><span class="normal">writeln(tst)</span><span class="blank">  </span><span class="normal">--></span><span class="blank"> </span><span class="normal">2
+</span><span class="normal">writeln(tst)</span><span class="blank">  </span><span class="normal">--&gt;</span><span class="blank"> </span><span class="normal">2
 </span></pre>
 <p>A variable is automatically cleaned after its containing scope is destroy (function or prog body).</p>
 <h3 id="1.5-expressions-et-instructions">1.5 Expressions et instructions</h3>

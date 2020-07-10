@@ -131,19 +131,26 @@ class Lexer:
             if self.debug:
                 print(f'This turn: {len(partial)} partials and {len(complete)} complete')
             if len(partial) == 0 and len(complete) == 0:
-                specifics = list(filter(lambda elem: self.defs[elem].regex.is_specific(), prev_complete))
                 if len(prev_complete) == 0:
-                    raise LexingException(f'\nLang:[{self.lang.name}]\nSource:\n{text}\nError:\nNo matching token for |{word}| in:\n{self.defs}')
-                elif len(prev_complete) > 1 and len(specifics) != 1:
-                    msg = ''
-                    for p in prev_complete:
-                        msg += ' ' + str(self.defs[p])
-                    msg += ' specifics = ' + str(specifics)
-                    raise LexingException(f'[{self.lang.name}] Multiple matching tokens:' + msg)
+                    raise LexingException(f'\nLang:[{self.lang.name}]\nSource:\n|{text}|\nError:\nNo matching token for |{word}| in:\n{self.defs}')
+                #elif len(prev_complete) > 1 and len(specifics) != 1:
+                #   msg = ''
+                #   for p in prev_complete:
+                #       msg += ' ' + str(self.defs[p])
+                #   msg += ' specifics = ' + str(specifics)
+                #   raise LexingException(f'[{self.lang.name}] Multiple matching tokens:' + msg)
                 else:
                     if len(prev_complete) > 1:
-                        chosen = specifics[0]
-                    else:
+                        #specifics = list(filter(lambda elem: self.defs[elem].regex.is_specific(), prev_complete))
+                        #if len(specifics) > 1:
+                        min_length = None
+                        for s in prev_complete:
+                            if min_length is None or len(self.defs[s].regex) < min_length:
+                                min_length = s
+                        chosen = min_length
+                        #else:
+                        #    chosen = specifics[0]
+                    else: # len=1
                         chosen = prev_complete[0]
                     tokens.append(Token(self.defs[chosen].typ, word[:-1], index - len(word) + 1, index - 1))
                     if self.debug:
@@ -154,21 +161,27 @@ class Lexer:
             prev_complete = copy(complete)
             index += 1
         # Last token
-        specifics = list(filter(lambda elem: self.defs[elem].regex.is_specific(), prev_complete))
-        if len(prev_complete) > 1 and len(specifics) != 1:
-            msg = ''
-            for p in prev_complete:
-                msg += ' ' + str(self.defs[p])
-            raise LexingException('Multiple matching tokens:' + msg)
-        elif len(prev_complete) >= 1 and len(specifics) <= 1:
-            if len(prev_complete) > 1:
-                chosen = specifics[0]
-            else:
-                chosen = prev_complete[0]
-            tokens.append(Token(self.defs[chosen].typ, word[:-1], index - len(word), index - 1))
-            if self.debug:
-                print(f'Token {tokens[-1]}')
+        #if len(prev_complete) > 1 and len(specifics) != 1:
+        #    msg = ''
+        #    for p in prev_complete:
+        #        msg += ' ' + str(self.defs[p])
+        #    raise LexingException('Multiple matching tokens:' + msg)
+        if len(prev_complete) > 1:
+            #specifics = list(filter(lambda elem: self.defs[elem].regex.is_specific(), prev_complete))
+            #if len(specifics) > 1:
+            min_length = None
+            for s in prev_complete:
+                if min_length is None or len(self.defs[s].regex) < min_length:
+                    min_length = s
+            chosen = min_length
+            tokens.append(Token(self.defs[chosen].typ, word, index - len(word), index - 1))
+        elif len(prev_complete) == 1:
+            chosen = prev_complete[0]
+            tokens.append(Token(self.defs[chosen].typ, word, index - len(word), index - 1))
+        elif len(prev_complete) == 0:
+            pass
         if self.debug:
+            print(f'Token {tokens[-1]}')
             print('----------------------------------------')
             print('Tokens :', len(tokens))
             print('----------------------------------------')

@@ -62,16 +62,17 @@ LANGUAGES = {
     ),
     'json': Language('json', {
             'identifier' : ['[@_]$*'],
-            'integer' : ['#+'],
+            'number' : ['#+', '#+\.#+'],
             'boolean': ['true', 'false'],
             'nil': [],
             'keyword': ['null'],
             'operator': [],
-            'separator': ['{', '}', '(', ')', r'\[', ']', ',', ':', '"', "'", "\."],
+            'separator': ['{', '}', '(', ')', r'\[', ']', ',', ':', "\."],
             'wrong_int' : ['#+$+'],
             'blank': [' +'],
             'newline' : ['\n'],
             'line_comment' : [],
+            'string' : ['"[@#_- <>:=,;|\']*"', "'[@#_- <>:=,;|\"]*'"],
         },
         # Special
         {
@@ -79,6 +80,19 @@ LANGUAGES = {
             'accept_unknown' : True,
             'string_markers' : ['"', "'"],
             'number' : True
+        }
+    ),
+    'bnf': Language('bnf', {
+            'keyword': ['<[@#_- ]+>'],  # non-terminal
+            'identifier': ['expansion', 'A', 'B', 'C', 'D', 'nom'], # expansion
+            'operator': ['::=', '|', '\.\.\.', '=', '-', '\?', '\*', '\+', '\@', '\$', '_'],
+            'separator': ['(', ')', '\[', ']', '{', '}', ',', ';'],
+            'string' : ['"[@#_- <>:=,;|\']*"', "'[@#_- <>:=,;|\"]*'"], # terminal
+            'blank': [' +'],
+            'comment': ['\#[@#_- "\'\\\#\@\$,;:=\.-\+\*\?]*\n'],
+            'newline' : ['\n'],
+        },
+        {
         }
     ),
     'ash': Language('ash', {
@@ -105,11 +119,12 @@ LANGUAGES = {
                   '&', '|', '~', '>>', '<<', # bitwise
                   '<', '<=', '>', '>=', '==', '!=', # comparison
                   '\.'], # call
-            'separator': ['{', '}', '(', ')', r'\[', ']', ',', ';', '"', "'"],
+            'separator': ['{', '}', '(', ')', r'\[', ']', ',', ';'],
             'wrong_int' : ['#+$+'],
             'blanks': [' +'],
             'newline' : ['\n'],
             'line_comment': ['--'],
+            'string' : ['"[@#_- <>:=,;|\']*"', "'[@#_- <>:=,;|\"]*'"],
         },
         # Special
         {
@@ -138,7 +153,7 @@ LANGUAGES = {
             'blank': [' +'],
             'newline' : ['\n'],
             'line_comment': ['\#[. ]+\n'],
-            'string': ['"."', "'.'"],
+            'string' : ['"[@#_- <>:=,;|\']*"', "'[@#_- <>:=,;|\"]*'"],
         },
         # Special
         {
@@ -169,6 +184,15 @@ LANGUAGES = {
             'number' : True
         }
     ),
+    'game': Language('game', {
+            'number': ['#+'],
+            'normal': ['[@#_-<>:=,;|\']+'],
+            'blank': [' +'],
+            'newline' : ['\n'],
+        },
+        {
+        }
+    )
 }
 
 RECOGNIZED_LANGUAGES = list(LANGUAGES.keys())
