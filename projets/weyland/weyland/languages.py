@@ -186,9 +186,10 @@ LANGUAGES = {
     ),
     'game': Language('game', {
             'number': ['#+'],
-            'normal': ['[@#_-<>:=,;|\']+'],
+            'normal': ['[@#\']+'], # Total Annihilation => 2 tokens, Baldur's => 1
             'blank': [' +'],
             'newline' : ['\n'],
+            'operator': [':'] # FarCry: 
         },
         {
         }

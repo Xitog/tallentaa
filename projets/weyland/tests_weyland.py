@@ -28,9 +28,21 @@ display(tokens)
 
 print('\nTest 1999 with game language')
 lex = weyland.Lexer(weyland.LANGUAGES['game'], True)
-tokens = lex.lex("1999")
-display(tokens)
-
+lex.info()
+#display(tokens)
+lex.check("Test 1999",
+          ['normal', 'blank', 'number'],
+          ['Test'  , ' '    , '1999'])
+lex.check("3D 3 D3",
+          ['normal', 'blank', 'number', 'blank', 'normal'],
+          ['3D'    , ' '    , '3'     , ' '    , 'D3'])
+lex.check("Baldur's Gate",
+          ['normal'  , 'blank', 'normal'],
+          ["Baldur's", ' '    , 'Gate'])
+lex.check("FarCry: Blood Dragon",
+          ['normal', 'operator', 'blank', 'normal', 'blank', 'normal'],
+          ['FarCry', ':'       , ' '    , 'Blood' , ' '    , 'Dragon'])
+          
 exit()
 
 print('\nRunning regex main()')
