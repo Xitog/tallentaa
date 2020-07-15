@@ -47,6 +47,7 @@ void load_textures() {
 
 int main(int argc, char * argv[]) {
     
+    /*
     FILE * fp = fopen("D:\\Tools\\Perso\\Projets\\map_editor\\New map.bin", "rb");
     short s1;
     fread(&s1, 2, 1, fp);
@@ -55,6 +56,7 @@ int main(int argc, char * argv[]) {
     float f1;
     fread(&f1, 4, 1, fp);
     printf("%hd %d %f\n", s1, l1, f1);
+    */
 
     int err = init("Woolfy 2.5 FLAT", SCREEN_WIDTH, SCREEN_HEIGHT, 32, false);
     if (err == EXIT_FAILURE) {

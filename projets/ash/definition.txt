@@ -1,0 +1,135 @@
+Ce document décrit le langage Ash, une syntaxe alternative pour Python.
+
+1. Base du langage
+
+-- pour les commentaires
+--[[ ... ]] pour les commentaires multilignes
+
+tokens sont case sensitives
+attr et method avec a_b
+
+2. Instructions
+
+assignement =
+assignement, constance de type [var] a := ou : typ =
+assignement, constance de valeur const a := b
+
+begin
+end
+
+suppression des ":", on fait => pour avoir des oneliners
+
+if COND then
+    ACT
+elif COND then
+    ACT
+else
+    ACT
+end
+
+while COND do
+    ACT
+end
+
+for ID in ID2 do
+    ACT
+end
+
+repeat
+    ACT
+until COND
+
+next, break
+
+repeat pour do/while
+
+try
+    ACT
+catch ID: typ
+    ACT
+finally
+    ACT
+end
+raise expr
+
+No redo nor retry
+
+3. Types
+
+" " ' ' => string
+1 => integer
+1.2 => float
+true/false => boolean
+[a, b] => list/array
+    l.flatten
+    l.pop/shift
+    l.push_front/back
+    l.insert
+    l.add / append
+    l.first
+    l.last a[-1]
+    l.find
+    l.find_all
+    l.include?
+    l.min
+    l.max
+    l.length/count
+    l.sort
+    l.reverse
+    l.uniq
+{a = v} => dict/hash/table
+    d.delete
+    d.find
+    d.keys
+    d.values
+    
+4. Expressions
+
+== != < <= >= > ~= (match) is <=> . not in .. ..<
+| & ^
++ - * / ** %
+
+4.1 Nouveaux opérateurs
+
+Opérateur de conversion en string
+$a => convertit a en string, équivalent à str(a)
+
+Opérateur de conversion en entier
+#a => convertit a en integer, équivalent à len(a) mais aussi trunc(a)
+
+Opérateur de concaténation de chaînes optionnel
+2 strings d'affilées doivent se concaténer automatiquement comme en Ruby : "abc" $5 => abc5
+
+Définition et appel universels
+universal function call : f(a, b) est équivalent à a.f(b)
+
+5. Déclaration
+
+fun[ction] [id] (a : typ, b : typ -> typ)
+pro[cedure] [id] (a : typ, b : typ)
+call without parameter id
+return [expr]
+
+o.clone
+o.methods
+o.respond_to?
+o.dump
+o.load
+
+self
+super
+
+class A < B
+    ID : typ
+end
+
+module ID
+end
+
+require or import ID
+include or use ID
+
+writeln
+write
+print
+println
