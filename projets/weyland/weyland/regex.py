@@ -157,10 +157,16 @@ class Rex:
         self.compile()
 
     def __str__(self):
-        return f"Regex |{self.pattern}| ({len(self)})"
+        if self.pattern != '\n':
+            return f"Regex |{self.pattern}| ({len(self)})"
+        else:
+            return f"Regex |NEWLINE| ({len(self)})"
 
     def __repr__(self):
-        return f"Regex |{self.pattern}|"
+        if self.pattern != '\n':
+            return f"Regex |NEWLINE|"
+        else:
+            return f"Regex |{self.pattern}|"
     
     def compile(self, start=0, limit=None):
         index = start

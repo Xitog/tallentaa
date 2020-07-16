@@ -83,16 +83,29 @@ class LexingException(Exception):
 
 class Lexer:
 
-    def __init__(self, lang, debug=False):
+    def __init__(self, lang, discards=None, debug=False):
         self.debug = debug
         self.lang = lang
         self.defs = []
+        self.discards = [] if discards is None else discards
         for typ, values in lang.tokens.items():
             for val in values:
                 self.defs.append(TokenDef(typ, val, self.debug))
         if self.debug:
             self.info()
 
+    def ignore(self, typ):
+        if isinstance(typ, str):
+            self.discards.append(typ)
+        elif isinstance(typ, list):
+            for t in typ:
+                self.ignore(t)
+        else:
+            raise Exception(f"Unknown type to ignore: {typ} of {type(typ)}")
+
+    def clear_ignored(self):
+        self.discards = []
+    
     def info(self):
         print('----------------------------------------')
         print('Language')
@@ -107,6 +120,7 @@ class Lexer:
         print('----------------------------------------')
 
     def check(self, string, typs, vals):
+        print(f'Text: {string}')
         tokens = self.lex(string)
         if len(tokens) != len(vals):
             print(f'ERROR        Wrong length of tokens expected: len(typs)')
@@ -120,82 +134,82 @@ class Lexer:
                 print(f'EXPECTED {typs[i]:10s} |{vals[i]:s}|')
                 return False
 
+    def to_html(self, text=None, tokens=None, raws=None):
+        if text is None and tokens is None:
+            raise LexingException("Nothing send to html")
+        elif text is not None and tokens is not None:
+            raise LexingException("Send to html text OR tokens, not both!")
+        if text is not None:
+            tokens = self.lex(text)
+        raws = [] if raws is None else raws
+        output = ''
+        for tok in tokens:
+            if tok.typ in raws:
+                output += tok.val
+            else:
+                output += f'<span class="{self.lang}.{tok.typ}">{tok.val}</span>'
+        return output
+
     def lex(self, text):
         if self.debug:
             print(f'Texte = |{text}|')
         index = 0
         res = [ None ] * len(self.defs)
-        word = ''
+        start = 0
         complete = []
         prev_complete = []
         tokens = []
         while index <= len(text):
-            print(index)
+            # Get Regex matching the current word
             if self.debug:
-                print(f'- {index} -------------------------')
+                print(f'-- {index:5d} ----------------------------')
             if index < len(text):
-                char = text[index]
-                after = text[index + 1] if index + 1 < len(text) else None
-                word += char
                 for idf in range(len(self.defs)):
-                    if res[idf] is not None and res[idf] == Rex.Result.NO:
+                    if res[idf] is None or res[idf] != Rex.Result.NO:
+                        res[idf] = self.defs[idf].regex.match(text[start:index + 1])
                         if self.debug:
-                            print(f'{idf:5d} {self.defs[idf].typ:10s} {str(self.defs[idf].regex):20s} SKIPPED              {word}')
-                        continue
-                    res[idf] = self.defs[idf].regex.match(word)
-                    if self.debug:
-                        print(f'{idf:5d} {self.defs[idf].typ:10s} {str(self.defs[idf].regex):20s} {res[idf].value:20s} {word}')
+                            print(f'{idf:5d} {self.defs[idf].typ:10s} {str(self.defs[idf].regex):20s} {res[idf].value:20s} |{text[start:index + 1]}|')
                 partial = list(filter(lambda elem: res[elem] == Rex.Result.PARTIAL, range(len(res))))
                 complete = list(filter(lambda elem: res[elem] == Rex.Result.COMPLETE, range(len(res))))
-                if self.debug:
-                    print(f'This turn: {len(partial)} partials and {len(complete)} complete')
-            else: # index == len(text)
-                char = None
-                index += 1 # needed for quitting the loop and the token creation
-                if self.debug:
-                    print(f'Last turn', len(partial), len(prev_complete), 'word=', word)
-            if (len(partial) == 0 and len(complete) == 0) or char is None:
-                if len(prev_complete) == 0:
-                    raise LexingException(f'\nLang:[{self.lang.name}]\nSource:\n|{text}|\nError:\nNo matching token for |{word}| in:\n{self.defs}')
-                #elif len(prev_complete) > 1 and len(specifics) != 1:
-                #   msg = ''
-                #   for p in prev_complete:
-                #       msg += ' ' + str(self.defs[p])
-                #   msg += ' specifics = ' + str(specifics)
-                #   raise LexingException(f'[{self.lang.name}] Multiple matching tokens:' + msg)
-                else:
-                    if len(prev_complete) > 1:
-                        #specifics = list(filter(lambda elem: self.defs[elem].regex.is_specific(), prev_complete))
-                        #if len(specifics) > 1:
+            else:
+                partial = []
+                complete = []
+            # We got too far: deciding the correct matching regex
+            if (len(partial) == 0 and len(complete) == 0):
+                count = len(prev_complete)
+                end = index - 1 if index <= len(text) else index
+                if count == 0:
+                    raise LexingException(f'\nLang:[{self.lang.name}]\nSource:\n|{text}|\nError:\nNo matching token for |{text[start:index + 1]}| in:\n{self.defs}')
+                elif count == 1:
+                    tokens.append(Token(self.defs[prev_complete[0]].typ, text[start:end + 1], start, end))
+                    if self.debug:
+                        print(f'Token {tokens[-1]}')
+                elif count > 1:
+                    specific = list(filter(lambda elem: self.defs[elem].regex.is_specific(), prev_complete))
+                    if len(specific) == 1:
+                        chosen = specific[0]
+                    else:
                         min_length = None
                         for s in prev_complete:
                             if min_length is None or len(self.defs[s].regex) < min_length:
                                 min_length = s
-                        chosen = min_length
-                        #else:
-                        #    chosen = specifics[0]
-                    else: # len=1
-                        chosen = prev_complete[0]
-                    word = word[:-1] if char is not None else word
-                    tokens.append(Token(self.defs[chosen].typ, word, index - len(word) + 1, index - 1))
+                        corresponding = list(filter(lambda elem: len(self.defs[elem].regex) == min_length, prev_complete))
+                        if len(corresponding) > 1:
+                            raise LexingEception(f'Multiple matching regex of same length: {corresponding}')
+                        else:
+                            chosen = min_length
+                    tokens.append(Token(self.defs[chosen].typ, text[start:end + 1], start, end))
                     if self.debug:
                         print(f'Token {tokens[-1]}')
-                    word = ''
-                    index -= 1
+                if index == len(text):
+                    break
+                else:
+                    start = index
                     res = [ None ] * len(self.defs)
-            prev_complete = copy(complete)
-            index += 1
-        if self.debug:
-            print(f'Token {tokens[-1]}')
-            print('----------------------------------------')
-            print('Tokens :', len(tokens))
-            print('----------------------------------------')
-            for i, tok in enumerate(tokens):
-                print('   ', i, tok)
-            if len(tokens) > 0:
-                print('----------------------------------------')
+            else:
+                index += 1
+            prev_complete = copy(complete) # must be enhanced
         return tokens
-
 
 #-------------------------------------------------------------------------------
 # Main

@@ -36,8 +36,21 @@ import shutil
 import locale
 import datetime
 
-from weyland import Lexer, RECOGNIZED_LANGUAGES, LANGUAGES
 from logging import info, warning, error
+
+try:
+    from weyland import Lexer, RECOGNIZED_LANGUAGES, LANGUAGES
+except ModuleNotFoundError:
+    import sys
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("weyland", r"C:\Users\DGX\Desktop\Git\tallentaa\projets\weyland\weyland\__init__.py")
+    weyland = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = weyland
+    spec.loader.exec_module(weyland)
+    Lexer = weyland.Lexer
+    RECOGNIZED_LANGUAGES = weyland.RECOGNIZED_LANGUAGES
+    LANGUAGES = weyland.LANGUAGES
+    print('Using Weyland version:', weyland.__version__)
 
 #-------------------------------------------------------------------------------
 # Constants and globals
@@ -319,28 +332,7 @@ def make_id(string):
 
 def write_code(line, code_lang):
     line = line.replace('\\@', '@') # warning bug if \\@
-    tokens = Lexer(LANGUAGES[code_lang]).lex(line)
-    tokens_by_index = {}
-    next_stop = None
-    string = ''
-    for tok in tokens:
-        tokens_by_index[tok.first] = tok
-    for index_char, char in enumerate(line):
-        char = safe(char)
-        if index_char in tokens_by_index:
-            tok = tokens_by_index[index_char]
-            string += f'<span class="{tok.typ}">{char}'
-            next_stop = tok.last
-            if next_stop == index_char:
-                string += f'</span>'
-                next_stop = None
-        elif next_stop is not None and index_char == next_stop:
-            string += f'{char}</span>'
-            next_stop = None
-        else:
-            string += char #safe(char)
-    #print('write_code', code_lang, line, string)
-    return string
+    return Lexer(LANGUAGES[code_lang], debug=True).to_html(text=line)
 
 
 def check_link(link, links, inner_links):

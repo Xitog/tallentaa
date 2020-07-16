@@ -32,10 +32,13 @@
 
 class Language:
 
-    def __init__(self, name, tokens, specials):
+    def __init__(self, name, tokens, specials = None):
         self.name = name
         self.tokens = tokens
-        self.specials = specials
+        self.specials = specials if specials is not None else {}
+
+    def __str__(self):
+        return self.name
 
 LANGUAGES = {
     'text': Language('text', {
@@ -121,7 +124,7 @@ LANGUAGES = {
                   '\.'], # call
             'separator': ['{', '}', '(', ')', r'\[', ']', ',', ';'],
             'wrong_int' : ['#+$+'],
-            'blanks': [' +'],
+            'blank': [' +'],
             'newline' : ['\n'],
             'line_comment': ['--'],
             'string' : ['"[@#_- <>:=,;|\']*"', "'[@#_- <>:=,;|\"]*'"],
