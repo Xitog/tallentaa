@@ -123,7 +123,9 @@ class Lexer:
         print(f'Text: {string}')
         tokens = self.lex(string)
         if len(tokens) != len(vals):
-            print(f'ERROR        Wrong length of tokens expected: len(typs)')
+            print(f'ERROR        Wrong length of tokens expected: {len(typs)}, got {len(tokens)}:')
+            for i, t in enumerate(tokens):
+                print(f'    {t.typ:10s} |{t.val:s}|')
             return False
         print(f'Tokens: {len(tokens)}')
         for i, t in enumerate(tokens):
@@ -150,65 +152,70 @@ class Lexer:
                 output += f'<span class="{self.lang}.{tok.typ}">{tok.val}</span>'
         return output
 
+    def make_token(self, start, text, index, res):
+        matches = list(filter(lambda elem: res[elem].match if res[elem] is not None else False, range(len(res))))
+        count = len(matches)
+        if count == 0:
+            raise LexingException(f'\nLang:[{self.lang.name}]\nSource:\n|{text}|\nError:\nNo matching token for |{text[start:index + 1]}| in:\n{self.defs}')
+        elif count == 1:
+            i = matches[0]
+            token = Token(self.defs[i].typ, res[i].get_match(), start, start + len(res[i]))
+        elif count > 1:
+            specific = list(filter(lambda elem: self.defs[elem].regex.is_specific(), matches))
+            if len(specific) == 1:
+                chosen = specific[0]
+            else:
+                min_length = None
+                for s in prev_complete:
+                    if min_length is None or len(self.defs[s].regex) < min_length:
+                        min_length = s
+                corresponding = list(filter(lambda elem: len(self.defs[elem].regex) == min_length, prev_complete))
+                if len(corresponding) > 1:
+                    raise LexingEception(f'Multiple matching regex of same length: {corresponding}')
+                else:
+                    chosen = min_length
+            token = Token(self.defs[chosen].typ, res[chosen].get_match(), start, start + len(res[chosen]))
+        if self.debug:
+            print(f'Token {token}')
+        return token
+
     def lex(self, text):
         if self.debug:
             print(f'Texte = |{text}|')
         index = 0
         res = [ None ] * len(self.defs)
         start = 0
-        complete = []
-        prev_complete = []
         tokens = []
-        while index <= len(text):
+        while index < len(text):
             # Get Regex matching the current word
             if self.debug:
                 print(f'-- {index:5d} ----------------------------')
-            if index < len(text):
-                for idf in range(len(self.defs)):
-                    if res[idf] is None or res[idf] != Rex.Result.NO:
-                        res[idf] = self.defs[idf].regex.match(text[start:index + 1])
-                        if self.debug:
-                            print(f'{idf:5d} {self.defs[idf].typ:10s} {str(self.defs[idf].regex):20s} {res[idf].value:20s} |{text[start:index + 1]}|')
-                partial = list(filter(lambda elem: res[elem] == Rex.Result.PARTIAL, range(len(res))))
-                complete = list(filter(lambda elem: res[elem] == Rex.Result.COMPLETE, range(len(res))))
-            else:
-                partial = []
-                complete = []
+            nb_partial = 0
+            nb_match = 0
+            for idf in range(len(self.defs)):
+                r = self.defs[idf].regex.match(text[start:index + 1])
+                if r.partial: nb_partial += 1
+                if r.match and not r.is_overload(): nb_match += 1 
+                if res[idf] is None or res[idf].partial:
+                    res[idf] = r
+                elif res[idf] is not None and res[idf].match and r.match:
+                    res[idf] = r
+                if self.debug and (res[idf].partial or res[idf].match):
+                    print(f'{idf:5d} {self.defs[idf].typ:10s} {str(self.defs[idf].regex):20s} {str(res[idf]):20s}')
+            if self.debug:
+                print('index', index, 'start', start, 'nb_tok', len(tokens), 'nb_part', nb_partial, 'nb_match', nb_match, 'char', text[index], f'word |{text[start:index+1]}|')
             # We got too far: deciding the correct matching regex
-            if (len(partial) == 0 and len(complete) == 0):
-                count = len(prev_complete)
-                end = index - 1 if index <= len(text) else index
-                if count == 0:
-                    raise LexingException(f'\nLang:[{self.lang.name}]\nSource:\n|{text}|\nError:\nNo matching token for |{text[start:index + 1]}| in:\n{self.defs}')
-                elif count == 1:
-                    tokens.append(Token(self.defs[prev_complete[0]].typ, text[start:end + 1], start, end))
-                    if self.debug:
-                        print(f'Token {tokens[-1]}')
-                elif count > 1:
-                    specific = list(filter(lambda elem: self.defs[elem].regex.is_specific(), prev_complete))
-                    if len(specific) == 1:
-                        chosen = specific[0]
-                    else:
-                        min_length = None
-                        for s in prev_complete:
-                            if min_length is None or len(self.defs[s].regex) < min_length:
-                                min_length = s
-                        corresponding = list(filter(lambda elem: len(self.defs[elem].regex) == min_length, prev_complete))
-                        if len(corresponding) > 1:
-                            raise LexingEception(f'Multiple matching regex of same length: {corresponding}')
-                        else:
-                            chosen = min_length
-                    tokens.append(Token(self.defs[chosen].typ, text[start:end + 1], start, end))
-                    if self.debug:
-                        print(f'Token {tokens[-1]}')
-                if index == len(text):
-                    break
-                else:
-                    start = index
-                    res = [ None ] * len(self.defs)
-            else:
-                index += 1
-            prev_complete = copy(complete) # must be enhanced
+            if nb_partial == 0 and nb_match == 0:
+                tok = self.make_token(start, text, index, res)
+                if tok.typ not in self.discards:
+                    tokens.append(tok)
+                start = index
+                index -= 1
+                res = [ None ] * len(self.defs)
+            index += 1
+        tok = self.make_token(start, text, index, res)
+        if tok.typ not in self.discards:
+            tokens.append(tok)
         return tokens
 
 #-------------------------------------------------------------------------------

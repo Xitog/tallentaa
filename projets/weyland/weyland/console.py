@@ -45,6 +45,7 @@ class Console:
     
     def write(self, msg, color, end='\n'):
         if self.puts is not None:
+            msg = str(msg) if not isinstance(msg, str) else msg
             self.puts(msg + end, color)
         else:
             print(msg)

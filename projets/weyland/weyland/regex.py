@@ -54,7 +54,7 @@ from weyland.console import Console
 # Types
 #-------------------------------------------------------------------------------
 
-Test = namedtuple('Test', ['regex', 'length', 'candidate', 'expected'])
+RexTest = namedtuple('Test', ['regex', 'length', 'candidate', 'expected'])
 
 #-------------------------------------------------------------------------------
 # Classes
@@ -139,6 +139,82 @@ class Element:
         else:
             res = (candidate == self.core)
         return res
+
+
+class Match:
+
+    def __init__(self, text):
+        self.text = text
+        self.match = False
+        self.partial = False
+        self.length = None
+
+    def __len__(self):
+        return self.length
+
+    def is_partial(self):
+        """Not a match but the last char matched is the last char of the text"""
+        return not self.match and self.length == len(text)
+
+    def is_match(self):
+        return self.match
+
+    def get_match(self):
+        return '' if self.length is None else self.text[:self.length]
+
+    def is_overload(self):
+        if self.length is not None and self.length < len(self.text):
+            return True
+        else:
+            return False
+
+    def get_overload(self):
+        if self.length is None or self.length == len(self.text):
+            return ''
+        else:
+            return self.text[self.length:]
+        
+    def info(self):
+        print(text)
+        if self.last is not None:
+            print('^' * self.length)
+        else:
+            print('No match')
+
+    def __str__(self):
+        return f'<Match ?{self.match} ...{self.partial} |{self.get_match()}|>'
+
+
+class AwaitedResult:
+
+    def __init__(self, match=False, partial=False, length=None):
+        self.match = match
+        self.partial = partial
+        self.length = length
+
+    def check(self, res):
+        return res.match == self.match and res.partial == self.partial and res.length == self.length
+
+    def __str__(self):
+        return f'AwaitedResult => match={self.match} partial={self.partial} length={self.length}'
+
+
+class Check:
+
+    def __init__(self, good='', over=''):
+        self.good = good
+        self.over = over
+
+    def check(self, res):
+        if self.over == '...': # partial
+            return not res.match and res.partial and res.text[:res.length] == self.good
+        elif res.length is not None:
+            return res.text[:res.length] == self.good and res.get_overload() == self.over
+        else:
+            return self.good == ''
+
+    def __str__(self):
+        return f'+|{self.good}| -|{self.over}|'
 
 
 class Rex:
@@ -251,14 +327,6 @@ class Rex:
 
     def is_specific(self):
         return all(map(lambda elem: not elem.is_special(), self.elements))
-
-    class Result(Enum):
-        NO = 'no'                                 # the regex doesn't match content
-        PARTIAL = 'partial'                       # the regex is only matched partially
-        COMPLETE = 'complete'                     # the regex is matched
-        COMPLETE_OVERLOAD = 'complete & overload' # the regex is matched and there is more
-        PARTIAL_OVERLOAD = 'partial & overload'   # the regex is only matched partially and there is more
-    
     
     def match(self, candidate):
         if self.debug:
@@ -266,7 +334,7 @@ class Rex:
         matched = [0] * len(self.elements)
         index_candidate = 0
         index_regex = 0
-        final = Rex.Result.NO
+        final = Match(candidate)
         previous = False
         while index_candidate < len(candidate) and index_regex < len(self):
             elem = self.elements[index_regex]
@@ -305,143 +373,8 @@ class Rex:
         if self.debug:
             print(f'    Unmatched: {candidate[count:]} ({len(candidate[count:])})')
             print()
-        if res == False:
-            if count == len(candidate):
-                final = Rex.Result.PARTIAL
-            elif count > 0:
-                final = Rex.Result.PARTIAL_OVERLOAD
-            else:
-                final = Rex.Result.NO
-        else:
-            if count == len(candidate):
-                final = Rex.Result.COMPLETE
-            else:
-                final = Rex.Result.COMPLETE_OVERLOAD
+        final.match = res
+        final.partial = True if not final.match and count == len(candidate) else False
+        if final.match or final.partial:
+            final.length = count
         return final
-
-#-------------------------------------------------
-# Tests
-#-------------------------------------------------
-
-NO = Rex.Result.NO
-PARTIAL = Rex.Result.PARTIAL
-COMPLETE = Rex.Result.COMPLETE
-COMPLETE_OVERLOAD = Rex.Result.COMPLETE_OVERLOAD
-PARTIAL_OVERLOAD = Rex.Result.PARTIAL_OVERLOAD
-
-test_library = {
-    100: Test("abc", 3, "zor", NO),
-    101: Test("abc", 3, "ab", PARTIAL),
-    102: Test("abc", 3, "abc", COMPLETE),
-    103: Test("abc", 3, "abcd", COMPLETE_OVERLOAD),
-
-    110: Test("@", 1, "a", COMPLETE),
-    111: Test("@", 1, "5", NO),
-    112: Test("@", 1, "ab", COMPLETE_OVERLOAD),
-
-    150: Test("a@+", 2, "a5", PARTIAL_OVERLOAD),
-    151: Test("a@+", 2, "a", PARTIAL),
-    152: Test("a@+", 2, "ab", COMPLETE),
-    153: Test("a@+", 2, "abc", COMPLETE),
-
-    154: Test("a@*", 2, "a5", COMPLETE_OVERLOAD),
-    155: Test("a@*", 2, "a", COMPLETE),
-    156: Test("a@*", 2, "ab", COMPLETE),
-    157: Test("a@*", 2, "abc", COMPLETE),
-
-    200: Test("#", 1, "a", NO),
-    201: Test("#", 1, "1", COMPLETE),
-    202: Test("#", 1, "15", COMPLETE_OVERLOAD),
-
-    220: Test("##", 2, "aa", NO),
-    221: Test("##", 2, "a5", NO),
-    222: Test("##", 2, "1", PARTIAL),
-    223: Test("##", 2, "1a", PARTIAL_OVERLOAD),
-    224: Test("##", 2, "15", COMPLETE),
-    225: Test("##", 2, "158", COMPLETE_OVERLOAD),
-    
-    230: Test("##?", 2, "a", NO),
-    231: Test("##?", 2, "1", COMPLETE),
-    232: Test("##?", 2, "15", COMPLETE),
-    233: Test("##?", 2, "158", COMPLETE_OVERLOAD),
-
-    240: Test("##+", 2, "a", NO),
-    241: Test("##+", 2, "ab", NO),
-    242: Test("##+", 2, "1", PARTIAL),
-    243: Test("##+", 2, "1a", PARTIAL_OVERLOAD),
-    244: Test("##+", 2, "15", COMPLETE),
-    245: Test("##+", 2, "158", COMPLETE),
-
-    500: Test("a\?", 2, "b", NO),
-    501: Test("a\?", 2, "a", PARTIAL),
-    502: Test("a\?", 2, "a?", COMPLETE),
-    503: Test("a\?", 2, "ab", PARTIAL_OVERLOAD),
-    504: Test("a\?", 2, "a?b", COMPLETE_OVERLOAD),
-
-    510: Test("a\\\\", 2, "b", NO),
-    511: Test("a\\\\", 2, "a", PARTIAL),
-    512: Test("a\\\\", 2, "a\\", COMPLETE),
-    513: Test("a\\\\", 2, "ab", PARTIAL_OVERLOAD),
-    514: Test("a\\\\", 2, "a\\b", COMPLETE_OVERLOAD),
-
-    1000: Test("[ab]", 1, "c", NO),
-    1001: Test("[ab]", 1, "a", COMPLETE),
-    1002: Test("[ab]", 1, "b", COMPLETE),
-
-    5000: Test(r"[@_]$*[\?!]?", 3, "_a15", COMPLETE),
-    5001: Test(r"[@_]$*[\?!]?", 3, "4a", NO),
-    5002: Test(r"[@_]$*[\?!]?", 3, "_isalpha?", COMPLETE),
-
-    9000: Test("#?#", None, None, None),
-    9001: Test("#?1", None, None, None),
-
-    10000: Test(".", 1, " ", NO),
-    10001: Test(".", 1, "a", COMPLETE),
-    10002: Test(".", 1, "5", COMPLETE),
-    10003: Test(".", 1, ">", COMPLETE),
-    
-    #100: Test(r"[@_]\w*", 2, 1, "_a15", COMPLETE),
-    #327: Test(r"\d\d?\d", 3, 2, "123", COMPLETE), # pb
-}
-
-tests = test_library.keys() # [327]
-
-#-------------------------------------------------
-# Running the tests if we are main
-#-------------------------------------------------
-
-def main(debug=False):
-    console = Console()
-    previous = None
-    for test_index in tests:
-        t = test_library[test_index]
-        if previous != t.regex:
-            print('-----------------------')
-            regex = None
-            msg = None
-            try:
-                regex = Rex(t.regex, debug)
-            except Exception as e:
-                msg = e
-            end = '\n' if debug else ''
-            if t.length is None:
-                if regex is None:
-                    console.write(f'= Building of {t.regex} failed as expected: {msg}', color='STRING')
-                else:
-                    console.write(f"= Building of {t.regex} didn't fail as expected", color='COMMENT')
-                continue
-            elif len(regex) != t.length:
-                console.write(f'= Building {regex} expected ({t.length}) -> KO{end}', color='COMMENT', end=end)
-                continue
-            console.write(f'= Building {regex} expected ({t.length}) -> OK{end}', color='KEYWORD', end=end)
-            if debug:
-                regex.info(starter='    ')
-        console.write(f'{end}= Matching {t.candidate} vs {regex}{end}', color='KEYWORD')
-        res = regex.match(t.candidate)
-        res_str = 'ERROR' if res != t.expected else 'OK   '
-        color = 'COMMENT' if res != t.expected else 'STRING'
-        console.write(f'    {res_str} comparing |{t.candidate}| to regex, expected {t.expected.value} and found {res.value}', color)
-        previous = t.regex
-
-if __name__ == '__main__':
-    main(debug=False)

@@ -23,16 +23,69 @@
 #
 # For more information about my projects see:
 # https://xitog.github.io/dgx (in French)
+#
+# Summary
+#     Import
+#     Function
+#        test_regex
+#        display
+#     Tests of Regex
+#     Tests of Lexer
 
 #-------------------------------------------------------------------------------
 # Import
 #-------------------------------------------------------------------------------
 
-import weyland
+from weyland import Rex, RexTest, AwaitedResult, Console, Check
+from weyland import Lexer, LANGUAGES
+
+#-------------------------------------------------------------------------------
+# Constants
+#-------------------------------------------------------------------------------
+
+TEST_REGEX = False
+TEST_LEXER = True
 
 #-------------------------------------------------------------------------------
 # Function
 #-------------------------------------------------------------------------------
+
+def test_regex(debug=False):
+    console = Console()
+    previous = None
+    for test_index in tests:
+        t = test_library[test_index]
+        if previous != t.regex:
+            print('-----------------------')
+            regex = None
+            msg = None
+            try:
+                regex = Rex(t.regex, debug)
+            except Exception as e:
+                msg = e
+            end = '\n' if debug else ''
+            if t.length is None:
+                if regex is None:
+                    console.write(f'= Building of {t.regex} failed as expected: {msg}', color='STRING')
+                else:
+                    console.write(f"= Building of {t.regex} didn't fail as expected", color='COMMENT')
+                continue
+            elif len(regex) != t.length:
+                console.write(f'= Building {regex} expected ({t.length}) -> KO{end}', color='COMMENT')
+                continue
+            console.write(f'= Building {regex} expected ({t.length}) -> OK{end}', color='KEYWORD')
+            if debug:
+                regex.info(starter='    ')
+        console.write(f'{end}= {test_index:5d} Matching |{t.candidate}| vs {regex}{end}', color='KEYWORD')
+        res = regex.match(t.candidate)
+        if t.expected.check(res):
+           res_str = 'OK   '
+           color = 'STRING'
+        else:
+            res_str = 'ERROR'
+            color = 'COMMENT'
+        console.write(f'   {res_str} expected {t.expected} and found {res}', color)
+        previous = t.regex
 
 def display(tokens):
    print(f'Tokens: {len(tokens)}')
@@ -42,35 +95,124 @@ def display(tokens):
 #-------------------------------------------------------------------------------
 # Tests of Regex
 #-------------------------------------------------------------------------------
- 
-rex = weyland.Rex('aaa')
-res = rex.match('aaa')
-print(res)
+
+test_library = {
+    100: RexTest("abc", 3, "zor", Check('', 'zor')),
+    101: RexTest("abc", 3, "ab", Check('ab')),
+    102: RexTest("abc", 3, "abc", Check('abc')),
+    103: RexTest("abc", 3, "abcd", Check('abc', 'd')),
+
+    110: RexTest("@", 1, "5", Check()),
+    111: RexTest("@", 1, "a", Check('a')),
+    112: RexTest("@", 1, "ab", Check('a', 'b')),
+
+    150: RexTest("a@+", 2, "a5", Check()),
+    151: RexTest("a@+", 2, "a", Check('a', '...')), # partial match
+    152: RexTest("a@+", 2, "ab", Check('ab')),
+    153: RexTest("a@+", 2, "abc", Check('abc')),
+
+    154: RexTest("a@*", 2, "a5", Check('a', '5')),
+    155: RexTest("a@*", 2, "a", Check('a')),
+    156: RexTest("a@*", 2, "ab", Check('ab')),
+    157: RexTest("a@*", 2, "abc", Check('abc')),
+
+    200: RexTest("#", 1, "a", Check()),
+    201: RexTest("#", 1, "1", Check('1')),
+    202: RexTest("#", 1, "15", Check('1', '5')),
+
+    220: RexTest("##", 2, "aa", Check()),
+    221: RexTest("##", 2, "a5", Check()),
+    222: RexTest("##", 2, "1", Check('1', '...')),
+    223: RexTest("##", 2, "1a", Check('', '1a')),
+    224: RexTest("##", 2, "15", Check('15')),
+    225: RexTest("##", 2, "158", Check('15', '8')),
+    
+    230: RexTest("##?", 2, "a", Check()),
+    231: RexTest("##?", 2, "1", Check('1')),
+    232: RexTest("##?", 2, "15", Check('15')),
+    233: RexTest("##?", 2, "158", Check('15', '8')),
+
+    240: RexTest("##+", 2, "a", Check()),
+    241: RexTest("##+", 2, "ab", Check()),
+    242: RexTest("##+", 2, "1", Check('1', '...')),
+    243: RexTest("##+", 2, "1a", Check('', '1a')), # ce n'est pas bon, ni partial !
+    244: RexTest("##+", 2, "15", Check('15')),
+    245: RexTest("##+", 2, "158", Check('158')),
+
+    500: RexTest("a\?", 2, "b", Check()),
+    501: RexTest("a\?", 2, "a", Check('a', '...')),
+    502: RexTest("a\?", 2, "a?", Check('a?')),
+    503: RexTest("a\?", 2, "ab", Check('', 'ab')),
+    504: RexTest("a\?", 2, "a?b", Check('a?', 'b')),
+
+    510: RexTest("a\\\\", 2, "b", Check()),
+    511: RexTest("a\\\\", 2, "a", Check('a', '...')),
+    512: RexTest("a\\\\", 2, "a\\", Check('a\\')),
+    513: RexTest("a\\\\", 2, "ab", Check('', 'ab')),
+    514: RexTest("a\\\\", 2, "a\\b", Check('a\\', 'b')),
+
+    1000: RexTest("[ab]", 1, "c", Check()),
+    1001: RexTest("[ab]", 1, "a", Check('a')),
+    1002: RexTest("[ab]", 1, "b", Check('b')),
+    1003: RexTest("[ab]", 1, "ac", Check('a', 'c')),
+    1004: RexTest("[ab]c", 2, "ab", Check('', 'ab')),
+    1005: RexTest("[ab]c", 2, "ac", Check('ac')),
+    
+    5000: RexTest(r"[@_]$*[\?!]?", 3, "_a15", Check('_a15')),
+    5001: RexTest(r"[@_]$*[\?!]?", 3, "4a", Check()),
+    5002: RexTest(r"[@_]$*[\?!]?", 3, "_isalpha?", Check('_isalpha?')),
+
+    9000: RexTest("#?#", None, None, None),
+    9001: RexTest("#?1", None, None, None),
+
+    10000: RexTest(".", 1, " ", Check(' ')),
+    10001: RexTest(".", 1, "a", Check('a')),
+    10002: RexTest(".", 1, "5", Check('5')),
+    10003: RexTest(".", 1, ">", Check('>')),
+    
+    #100: Test(r"[@_]\w*", 2, 1, "_a15", COMPLETE),
+    #327: Test(r"\d\d?\d", 3, 2, "123", COMPLETE), # pb
+
+} # [327]
+
+if TEST_REGEX:
+   tests = test_library.keys() # [223]
+   test_regex(False)
+   rex = Rex('aaa')
+   res = rex.match('aaa')
+   Console().write(res, 'STRING')
+
+#-------------------------------------------------------------------------------
+# Tests of Lexer
+#-------------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------------
 # Tests for the Ash language
 #-------------------------------------------------------------------------------
 
 print('\nTest lexer')
-text = 'if A then 5 end'
-print(f'Lexing: |{text}| ({len(text)})')
-lex = weyland.Lexer(weyland.LANGUAGES['ash'])
-tokens = lex.lex(text)
-display(tokens)
+lex = Lexer(LANGUAGES['ash'], discards=['blank'], debug=True)
+lex.check('if A then 5 end',
+          ['keyword', 'identifier', 'keyword', 'integer', 'keyword'],
+          ['if'     , 'A'         , 'then'   , '5'      , 'end'])
 
 #-------------------------------------------------------------------------------
 # Tests for the BNF language
 #-------------------------------------------------------------------------------
 
 print('\nTest "abc" "def" with bnf language')
-lex = weyland.Lexer(weyland.LANGUAGES['bnf'])
-tokens = lex.lex('"abc" "def"')
-display(tokens)
+lex = Lexer(LANGUAGES['bnf'])
+lex.check('"abc" "def"',
+          ['string', 'blank', 'string'],
+          ['"abc"' , ' '    , '"def"'])
 
 print('\nTest [ (A B) C ] D with bnf language')
-lex = weyland.Lexer(weyland.LANGUAGES['bnf'])
-tokens = lex.lex("[ (A B) C ] D")
-display(tokens)
+lex = Lexer(LANGUAGES['bnf'], discards=['blank'], debug=True)
+lex.check('[ (A B) C ] D',
+          ['separator', 'separator', 'identifier', 'identifier', 'separator', 'identifier', 'separator', 'identifier'],
+          ['['        , '('        , 'A'         , 'B'         , ')'        , 'C'         , ']'        , 'D'])
+
+exit()
 
 #-------------------------------------------------------------------------------
 # Tests for the python language
@@ -143,9 +285,6 @@ exit()
 #-------------------------------------------------------------------------------
 # Main functions of Regex and Lexer
 #-------------------------------------------------------------------------------
-
-print('\nRunning regex main()')
-weyland.regex.main()
 
 print('\nRunning lexer main()')
 weyland.lexer.main()
