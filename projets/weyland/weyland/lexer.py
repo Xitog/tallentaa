@@ -60,12 +60,12 @@ class TokenDef:
 
 class Token:
 
-    def __init__(self, typ, val, first, last):
+    def __init__(self, typ, val, first):
         self.typ = typ
         self.val = val
         self.first = first
-        self.last = last
-        self.length = self.last - self.first + 1
+        self.length = len(val)
+        self.last = self.first + self.length - 1
     
     def __str__(self):
         return f"{self.typ} |{self.val}| ({self.first}, {self.last}) #{self.length}"
@@ -159,24 +159,43 @@ class Lexer:
             raise LexingException(f'\nLang:[{self.lang.name}]\nSource:\n|{text}|\nError:\nNo matching token for |{text[start:index + 1]}| in:\n{self.defs}')
         elif count == 1:
             i = matches[0]
-            token = Token(self.defs[i].typ, res[i].get_match(), start, start + len(res[i]))
+            token = Token(self.defs[i].typ, res[i].get_match(), start)
         elif count > 1:
             specific = list(filter(lambda elem: self.defs[elem].regex.is_specific(), matches))
             if len(specific) == 1:
                 chosen = specific[0]
             else:
-                min_length = None
-                for s in prev_complete:
-                    if min_length is None or len(self.defs[s].regex) < min_length:
-                        min_length = s
-                corresponding = list(filter(lambda elem: len(self.defs[elem].regex) == min_length, prev_complete))
-                if len(corresponding) > 1:
-                    raise LexingEception(f'Multiple matching regex of same length: {corresponding}')
+                max_length = None
+                good = {}
+                for i, r in enumerate(res):
+                    if r is None or not r.match:
+                        continue
+                    length = len(r.get_match())
+                    if length in good:
+                        good[length].append(i)
+                    else:
+                        good[length] = [i]
+                    if max_length is None or length > max_length:
+                        max_length = length
+                if len(good[max_length]) > 1:
+                    print('ERROR: Multiple matching tokens')
+                    for i in good[max_length]:
+                        print('   ', self.defs[i], res[i], len(res[i].get_match()))
+                    raise LexingException(f'Multiple matching regex of same length: {good}')
                 else:
-                    chosen = min_length
-            token = Token(self.defs[chosen].typ, res[chosen].get_match(), start, start + len(res[chosen]))
+                    chosen = good[max_length][0]
+                #min_length = None
+                #for s in matches:
+                #    if min_length is None or len(self.defs[s].regex) < min_length:
+                #        min_length = s
+                #corresponding = list(filter(lambda elem: len(self.defs[elem].regex) == min_length, matches))
+                #if len(corresponding) > 1:
+                #    raise LexingEception(f'Multiple matching regex of same length: {corresponding}')
+                #else:
+                #    chosen = min_length
+            token = Token(self.defs[chosen].typ, res[chosen].get_match(), start)
         if self.debug:
-            print(f'Token {token}')
+            print(f'=>= Token {token}')
         return token
 
     def lex(self, text):
@@ -209,8 +228,8 @@ class Lexer:
                 tok = self.make_token(start, text, index, res)
                 if tok.typ not in self.discards:
                     tokens.append(tok)
-                start = index
-                index -= 1
+                start = tok.last + 1
+                index = tok.last
                 res = [ None ] * len(self.defs)
             index += 1
         tok = self.make_token(start, text, index, res)

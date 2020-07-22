@@ -37,7 +37,7 @@
 #-------------------------------------------------------------------------------
 
 from weyland import Rex, RexTest, AwaitedResult, Console, Check
-from weyland import Lexer, LANGUAGES
+from weyland import Lexer, LANGUAGES, Language
 
 #-------------------------------------------------------------------------------
 # Constants
@@ -187,6 +187,21 @@ if TEST_REGEX:
 #-------------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------------
+# Breaking it: we must trace ALL the completes before (complete + overload)
+#-------------------------------------------------------------------------------
+
+funk = Language('funk', {
+            'aaab': ['aaab'],
+            'aa': ['aa'],
+            'ac': ['ac'],
+      })
+lex = Lexer(funk, debug=True)
+lex.info()
+lex.check("aaac",
+          ['aa', 'ac'],
+          ['aa', 'ac'])
+
+#-------------------------------------------------------------------------------
 # Tests for the Ash language
 #-------------------------------------------------------------------------------
 
@@ -212,16 +227,14 @@ lex.check('[ (A B) C ] D',
           ['separator', 'separator', 'identifier', 'identifier', 'separator', 'identifier', 'separator', 'identifier'],
           ['['        , '('        , 'A'         , 'B'         , ')'        , 'C'         , ']'        , 'D'])
 
-exit()
-
 #-------------------------------------------------------------------------------
 # Tests for the python language
 #-------------------------------------------------------------------------------
 
 print('\nTests of python language')
-lex = weyland.Lexer(weyland.LANGUAGES['python'], debug=False)
+lex = Lexer(LANGUAGES['python'], debug=False)
 lex.check("Test 1999",
-          ['identifier', 'blank', 'number'],
+          ['identifier', 'blank', 'integer'],
           ['Test'  , ' '    , '1999'])
 
 #-------------------------------------------------------------------------------
@@ -229,7 +242,7 @@ lex.check("Test 1999",
 #-------------------------------------------------------------------------------
 
 print('\nTests of game language')
-lex = weyland.Lexer(weyland.LANGUAGES['game'], debug=False)
+lex = Lexer(LANGUAGES['game'], debug=False)
 lex.info()
 
 lex.check("Test 1999",
@@ -237,7 +250,7 @@ lex.check("Test 1999",
           ['Test'  , ' '    , '1999'])
 
 lex.check("3D 3 D3",
-          ['normal', 'blank', 'number', 'blank', 'normal'],
+          ['wrong_int', 'blank', 'number', 'blank', 'normal'],
           ['3D'    , ' '    , '3'     , ' '    , 'D3'])
 
 lex.check("Baldur's Gate",
@@ -265,26 +278,5 @@ assert(output == '<span class="game.normal">Test</span> <span class="game.number
 
 #lex.ignore([1, 'a'])
 
-#-------------------------------------------------------------------------------
-# Breaking it: we must trace ALL the completes before (complete + overload)
-#-------------------------------------------------------------------------------
-
-funk = weyland.Language('funk', {
-            'aaab': ['aaab'],
-            'aa': ['aa'],
-            'ac': ['ac'],
-      })
-lex = weyland.Lexer(funk, debug=True)
-lex.info()
-lex.check("aaac",
-          ['aa', 'ac'],
-          ['aa', 'ac'])
-
-exit()
-
-#-------------------------------------------------------------------------------
-# Main functions of Regex and Lexer
-#-------------------------------------------------------------------------------
-
-print('\nRunning lexer main()')
-weyland.lexer.main()
+#print('\nRunning lexer main()')
+#weyland.lexer.main()

@@ -152,7 +152,7 @@ LANGUAGES = {
                       '&=', '//=', '<<=', '%=', '\*=', '|=', r'\*\*=', '>>=', '-=',
                       '/=', '^=', '\.', '='],
             'separator': ['{', '}', '(', ')', r'\[', ']', ',', ';'],
-            'wrong_int' : ['#+$+'],
+            'wrong_int' : ['#+@+'],
             'blank': [' +'],
             'newline' : ['\n'],
             'line_comment': ['\#[. ]+\n'],
@@ -189,8 +189,9 @@ LANGUAGES = {
     ),
     'game': Language('game', {
             'number': ['#+'],
-            'normal': ['[@#\']+'], # Total Annihilation => 2 tokens, Baldur's => 1
+            'normal': ['[@_][@#\']*'], # Total Annihilation => 2 tokens, Baldur's => 1
             'blank': [' +'],
+            'wrong_int' : ['#+@+'],
             'newline' : ['\n'],
             'operator': [':'] # FarCry: 
         },
