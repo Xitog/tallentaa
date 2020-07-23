@@ -31,15 +31,7 @@
 #-------------------------------------------------------------------------------
 
 from weyland.regex import Rex
-from copy import copy
-from collections import namedtuple
-from weyland.languages import LANGUAGES, Language
-
-#-------------------------------------------------------------------------------
-# Types
-#-------------------------------------------------------------------------------
-
-Test = namedtuple('Test', ['text', 'language', 'nb'])
+from weyland.languages import Language # only for check
 
 #-------------------------------------------------------------------------------
 # Classes
@@ -84,6 +76,9 @@ class LexingException(Exception):
 class Lexer:
 
     def __init__(self, lang, discards=None, debug=False):
+        assert(isinstance(lang, Language))
+        assert(discards is None or isinstance(discards, list))
+        assert(isinstance(debug, bool))
         self.debug = debug
         self.lang = lang
         self.defs = []
@@ -135,6 +130,7 @@ class Lexer:
                 print(f'ERROR   {i:5d}. {t.typ:10s} |{t.val:s}|')
                 print(f'EXPECTED {typs[i]:10s} |{vals[i]:s}|')
                 return False
+        return True
 
     def to_html(self, text=None, tokens=None, raws=None):
         if text is None and tokens is None:
@@ -149,50 +145,42 @@ class Lexer:
             if tok.typ in raws:
                 output += tok.val
             else:
-                output += f'<span class="{self.lang}.{tok.typ}">{tok.val}</span>'
+                output += f'<span class="{self.lang}-{tok.typ}">{tok.val}</span>'
         return output
 
     def make_token(self, start, text, index, res):
         matches = list(filter(lambda elem: res[elem].match if res[elem] is not None else False, range(len(res))))
         count = len(matches)
         if count == 0:
-            raise LexingException(f'\nLang:[{self.lang.name}]\nSource:\n|{text}|\nError:\nNo matching token for |{text[start:index + 1]}| in:\n{self.defs}')
+            raise LexingException(f'\nLang:[{self.lang.name}]\nSource:\n|{text}|\nError:\nNo matching token for |{text[start:index + 1]}| from |{text}| in:\n{self.defs}')
         elif count == 1:
             i = matches[0]
             token = Token(self.defs[i].typ, res[i].get_match(), start)
-        elif count > 1:
-            specific = list(filter(lambda elem: self.defs[elem].regex.is_specific(), matches))
-            if len(specific) == 1:
-                chosen = specific[0]
-            else:
-                max_length = None
-                good = {}
-                for i, r in enumerate(res):
-                    if r is None or not r.match:
-                        continue
-                    length = len(r.get_match())
-                    if length in good:
-                        good[length].append(i)
-                    else:
-                        good[length] = [i]
-                    if max_length is None or length > max_length:
-                        max_length = length
-                if len(good[max_length]) > 1:
+        elif count > 1: # We try to get the longest match (greedy regex)
+            max_length = None
+            good = {}
+            for i, r in enumerate(res):
+                if r is None or not r.match:
+                    continue
+                length = len(r.get_match())
+                if length in good:
+                    good[length].append(i)
+                else:
+                    good[length] = [i]
+                if max_length is None or length > max_length:
+                    max_length = length
+            if len(good[max_length]) > 1:
+                # Last try: do we have a only one specific among them?
+                specific = list(filter(lambda elem: self.defs[elem].regex.is_specific(), good[max_length]))
+                if len(specific) == 1:
+                    chosen = specific[0]
+                else:
                     print('ERROR: Multiple matching tokens')
                     for i in good[max_length]:
                         print('   ', self.defs[i], res[i], len(res[i].get_match()))
                     raise LexingException(f'Multiple matching regex of same length: {good}')
-                else:
-                    chosen = good[max_length][0]
-                #min_length = None
-                #for s in matches:
-                #    if min_length is None or len(self.defs[s].regex) < min_length:
-                #        min_length = s
-                #corresponding = list(filter(lambda elem: len(self.defs[elem].regex) == min_length, matches))
-                #if len(corresponding) > 1:
-                #    raise LexingEception(f'Multiple matching regex of same length: {corresponding}')
-                #else:
-                #    chosen = min_length
+            else:
+                chosen = good[max_length][0]
             token = Token(self.defs[chosen].typ, res[chosen].get_match(), start)
         if self.debug:
             print(f'=>= Token {token}')
@@ -236,46 +224,3 @@ class Lexer:
         if tok.typ not in self.discards:
             tokens.append(tok)
         return tokens
-
-#-------------------------------------------------------------------------------
-# Main
-#-------------------------------------------------------------------------------
-
-def main(debug=False):
-    simple_one = {
-        'A': ['aaa'],
-        'B': ['bbb'],
-        'SPACE': [' '],
-    }
-    test_one = {
-        'KEYWORD' : ['bonjour', 'bon'],
-        'IDENTIFIER' : ['[@_]$*'],
-        'SPECIFIC_INTEGER' : ['08789'],
-        'ALL_INTEGER' : ['#+'],
-        'OPERATOR' : ['\+', '\+='],
-        'NEWLINE' : ['\n'],
-        'WRONGINT' : [r'#+$+'], #
-        'SPACE': [' '],
-    }
-    tests = [
-        Test(text = 'aaa bbb', language = Language('simple_one', simple_one, {}), nb = 3),
-        Test(text = '08789 bonjour', language = Language('test_one', test_one, {}), nb = 3),
-        Test(text = '2 22 abc 2a2 a+b', language = Language('test_one', test_one, {}), nb = 11),
-        Test(text = 'bonjour 08789 b2974 0b01111 breaka break', language = LANGUAGES['ash'], nb = 11),
-        Test(text = 'bonjour bon bonjour 08789 22 abc + += a+b \n c _d 2a2 #a', language = LANGUAGES['ash'], nb = 30)
-    ]
-    for tst in tests:
-        lexer = Lexer(tst.language, debug=debug)
-        tokens = lexer.lex(tst.text)
-        print()
-        print(f'{tst.text} => {tokens} ({len(tokens)})')
-        for i, t in enumerate(tokens):
-            print(i, t.typ, t.val)
-        if len(tokens) != tst.nb:
-            print(f'ERROR: Wrong number of tokens, expected: {tst.nb}')
-        else:
-            print(f'OK')
-
-if __name__ == '__main__':
-    main(debug=False)
-

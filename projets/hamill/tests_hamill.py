@@ -2,7 +2,7 @@ import hamill
 import locale
 import datetime
 
-print(hamill.__version__)
+print('Hamill version:', hamill.__version__)
 
 nb = 0
 def display(answer):

@@ -1,20 +1,19 @@
-#import hamill
-#import sys
-#sys.path.append(r"C:\Users\damie_000\Documents\GitHub\tallentaa\projet_format\hamill\hamill")
+#-------------------------------------------------------------------------------
+# Imports
+#-------------------------------------------------------------------------------
 
-refresh_hamill = False
-
-import os
 import logging
-
-# Get the last version of Hamill
-if refresh_hamill:
-    os.system('get_last.bat')
-
-# COPY FIRST THE LATEST VERSION OF THE HAMILL PACKAGE IN THIS DIRECTORY
+import os.path
 import hamill
 
-print(hamill.__version__)
+#-------------------------------------------------------------------------------
+
+print('Using Hamill:', hamill.__version__)
+
+# Get the last version of Hamill
+#import os
+#if refresh_hamill:
+#    os.system('get_last.bat')
 
 includes = ['menu.html']
 

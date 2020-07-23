@@ -6,8 +6,6 @@
 !require https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
 !require https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js
 
-!css p {text-align: justify;}
-
 !css code {color: #006FDD; border: 1px solid rgb(225, 228, 229); padding-left: 3px; padding-right: 5px;}
 !css table.schema { display: inline-block; margin-right: 20px; }
 !css table.schema tr:nth-child(2n) { background-color: transparent; }

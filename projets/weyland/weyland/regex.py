@@ -307,8 +307,9 @@ class Rex:
         for index, elem in enumerate(self.elements):
             if index < len(self) - 1:
                 #print(index, elem, self.elements[index + 1], elem.is_included(self.elements[index+1]))
-                if elem.is_included(self.elements[index+1]) and elem.is_optionnal():
-                    raise Exception("An optionnal element can't be followed by the same non optionnal element.") # x?x forbidden, how to match this?
+                # '.*' ok because ' (after .*) is not special
+                if elem.is_optionnal() and (self.elements[index+1].core == elem.core or (elem.is_included(self.elements[index+1]) and self.elements[index+1].special)):
+                    raise Exception(f"An optionnal element can't be followed by the same non optionnal element in {self.pattern}.") # x?x forbidden, how to match this?
 
     def check_at(self, candidate, index):
         if index >= len(self.elements):

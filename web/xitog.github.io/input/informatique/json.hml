@@ -71,7 +71,7 @@ Remarques :
 * **La clé ne peut être que de type** @@String@@, pas de nombres, pas d'identifiant.
 * JSON est un sous-ensemble du langage [YAML->http://yaml.org/], plus particulièrement de sa syntaxe compacte.
 * JSON est un sous-ensemble de [JavaScript->https://developer.mozilla.org/fr/docs/Web/JavaScript].
-* Pas de guillemet simple @@'@@ pour encadrer les chaînes de caractères seulement le double @@"@@.
+* Pas de guillemet simple @@text '@@ pour encadrer les chaînes de caractères seulement le double @@text "@@.
 * Les chaînes de caractères doivent être en [Unicode->http://unicode.org/fr/], plus précisément, encodées en [UTF-8->https://tools.ietf.org/html/rfc8259#section-8.1].
 * **Pas de virgule @@,@@ après l'élément final d'un Object ou d'une Array**.
 * **On ne peut pas faire de commentaires en JSON**.

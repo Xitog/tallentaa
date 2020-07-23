@@ -38,19 +38,39 @@
 
 from weyland import Rex, RexTest, AwaitedResult, Console, Check
 from weyland import Lexer, LANGUAGES, Language
+from collections import namedtuple
 
 #-------------------------------------------------------------------------------
-# Constants
+# Constants and globals
 #-------------------------------------------------------------------------------
 
-TEST_REGEX = False
+TEST_REGEX = True
 TEST_LEXER = True
+
+Total = 0
+Good = 0
+Bad = 0
+
+#-------------------------------------------------------------------------------
+# Types
+#-------------------------------------------------------------------------------
+
+TestLexer = namedtuple('Test', ['text', 'language', 'nb'])
 
 #-------------------------------------------------------------------------------
 # Function
 #-------------------------------------------------------------------------------
 
+def reg(r):
+    global Total, Good, Bad
+    Total += 1
+    if r:
+        Good += 1
+    else:
+        Bad += 1
+
 def test_regex(debug=False):
+    global Total, Good, Bad
     console = Console()
     previous = None
     for test_index in tests:
@@ -70,6 +90,9 @@ def test_regex(debug=False):
                 else:
                     console.write(f"= Building of {t.regex} didn't fail as expected", color='COMMENT')
                 continue
+            elif regex is None:
+                print(msg)
+                raise Exception("No regex!")
             elif len(regex) != t.length:
                 console.write(f'= Building {regex} expected ({t.length}) -> KO{end}', color='COMMENT')
                 continue
@@ -78,12 +101,15 @@ def test_regex(debug=False):
                 regex.info(starter='    ')
         console.write(f'{end}= {test_index:5d} Matching |{t.candidate}| vs {regex}{end}', color='KEYWORD')
         res = regex.match(t.candidate)
+        Total += 1
         if t.expected.check(res):
            res_str = 'OK   '
            color = 'STRING'
+           Good += 1
         else:
             res_str = 'ERROR'
             color = 'COMMENT'
+            Bad += 1
         console.write(f'   {res_str} expected {t.expected} and found {res}', color)
         previous = t.regex
 
@@ -97,6 +123,9 @@ def display(tokens):
 #-------------------------------------------------------------------------------
 
 test_library = {
+
+      1: RexTest("'.*'", 3, "'Je suis un zorba'", Check("'Je suis un zorba'")),
+    
     100: RexTest("abc", 3, "zor", Check('', 'zor')),
     101: RexTest("abc", 3, "ab", Check('ab')),
     102: RexTest("abc", 3, "abc", Check('abc')),
@@ -176,15 +205,59 @@ test_library = {
 } # [327]
 
 if TEST_REGEX:
-   tests = test_library.keys() # [223]
-   test_regex(False)
-   rex = Rex('aaa')
-   res = rex.match('aaa')
-   Console().write(res, 'STRING')
+    tests = test_library.keys() # [223]
+    test_regex(False)
+
+    # Independant test (uncounted)
+    rex = Rex('aaa')
+    res = rex.match('aaa')
+    Console().write(res, 'STRING')
 
 #-------------------------------------------------------------------------------
 # Tests of Lexer
 #-------------------------------------------------------------------------------
+
+simple_one = Language('simple_one', {
+                'A': ['aaa'],
+                'B': ['bbb'],
+                'SPACE': [' '],
+            })
+
+test_one = Language('test_one', {
+                'KEYWORD' : ['bonjour', 'bon'],
+                'IDENTIFIER' : ['[@_]$*'],
+                'SPECIFIC_INTEGER' : ['08789'],
+                'ALL_INTEGER' : ['#+'],
+                'OPERATOR' : ['\+', '\+='],
+                'NEWLINE' : ['\n'],
+                'WRONGINT' : ['#+@+$+'],
+                'SPACE': [' '],
+            })
+
+tests = [
+    TestLexer(text = '1.2', language = LANGUAGES['json'], nb = 1),
+    TestLexer(text = 'aaa bbb', language = simple_one, nb = 3),
+    TestLexer(text = '08789 bonjour', language = test_one, nb = 3),
+    TestLexer(text = '2 22 abc 2a2 a+b', language = test_one, nb = 11),
+    TestLexer(text = 'bonjour 08789 b2974 0b01111 breaka break', language = LANGUAGES['ash'], nb = 11),
+    TestLexer(text = 'bonjour bon bonjour 08789 22 abc + += a+b \n c _d 2a2 #a', language = LANGUAGES['ash'], nb = 30)
+]
+for tst in tests:
+    print('------------------------------')
+    print(f'{tst.text} with lang={tst.language}')
+    lexer = Lexer(tst.language, debug=False)
+    tokens = lexer.lex(tst.text)
+    print()
+    print(f'{tst.text} => {tokens} ({len(tokens)})')
+    for i, t in enumerate(tokens):
+        print('   ', i, t.typ, t.val)
+    Total += 1
+    if len(tokens) != tst.nb:
+        print(f'ERROR: Wrong number of tokens: {len(tokens)}, expected: {tst.nb}')
+        Bad += 1
+    else:
+        Good += 1
+        print(f'OK')
 
 #-------------------------------------------------------------------------------
 # Breaking it: we must trace ALL the completes before (complete + overload)
@@ -197,9 +270,9 @@ funk = Language('funk', {
       })
 lex = Lexer(funk, debug=True)
 lex.info()
-lex.check("aaac",
+reg(lex.check("aaac",
           ['aa', 'ac'],
-          ['aa', 'ac'])
+          ['aa', 'ac']))
 
 #-------------------------------------------------------------------------------
 # Tests for the Ash language
@@ -207,9 +280,9 @@ lex.check("aaac",
 
 print('\nTest lexer')
 lex = Lexer(LANGUAGES['ash'], discards=['blank'], debug=True)
-lex.check('if A then 5 end',
+reg(lex.check('if A then 5 end',
           ['keyword', 'identifier', 'keyword', 'integer', 'keyword'],
-          ['if'     , 'A'         , 'then'   , '5'      , 'end'])
+          ['if'     , 'A'         , 'then'   , '5'      , 'end']))
 
 #-------------------------------------------------------------------------------
 # Tests for the BNF language
@@ -217,15 +290,15 @@ lex.check('if A then 5 end',
 
 print('\nTest "abc" "def" with bnf language')
 lex = Lexer(LANGUAGES['bnf'])
-lex.check('"abc" "def"',
+reg(lex.check('"abc" "def"',
           ['string', 'blank', 'string'],
-          ['"abc"' , ' '    , '"def"'])
+          ['"abc"' , ' '    , '"def"']))
 
 print('\nTest [ (A B) C ] D with bnf language')
 lex = Lexer(LANGUAGES['bnf'], discards=['blank'], debug=True)
-lex.check('[ (A B) C ] D',
+reg(lex.check('[ (A B) C ] D',
           ['separator', 'separator', 'identifier', 'identifier', 'separator', 'identifier', 'separator', 'identifier'],
-          ['['        , '('        , 'A'         , 'B'         , ')'        , 'C'         , ']'        , 'D'])
+          ['['        , '('        , 'A'         , 'B'         , ')'        , 'C'         , ']'        , 'D']))
 
 #-------------------------------------------------------------------------------
 # Tests for the python language
@@ -233,9 +306,9 @@ lex.check('[ (A B) C ] D',
 
 print('\nTests of python language')
 lex = Lexer(LANGUAGES['python'], debug=False)
-lex.check("Test 1999",
+reg(lex.check("Test 1999",
           ['identifier', 'blank', 'integer'],
-          ['Test'  , ' '    , '1999'])
+          ['Test'  , ' '    , '1999']))
 
 #-------------------------------------------------------------------------------
 # Tests for the game language
@@ -245,38 +318,49 @@ print('\nTests of game language')
 lex = Lexer(LANGUAGES['game'], debug=False)
 lex.info()
 
-lex.check("Test 1999",
+reg(lex.check("Test 1999",
           ['normal', 'blank', 'number'],
-          ['Test'  , ' '    , '1999'])
+          ['Test'  , ' '    , '1999']))
 
-lex.check("3D 3 D3",
+reg(lex.check("3D 3 D3",
           ['wrong_int', 'blank', 'number', 'blank', 'normal'],
-          ['3D'    , ' '    , '3'     , ' '    , 'D3'])
+          ['3D'    , ' '    , '3'     , ' '    , 'D3']))
 
-lex.check("Baldur's Gate",
+reg(lex.check("Baldur's Gate",
           ['normal'  , 'blank', 'normal'],
-          ["Baldur's", ' '    , 'Gate'])
+          ["Baldur's", ' '    , 'Gate']))
 
-lex.check("FarCry: Blood Dragon",
+reg(lex.check("FarCry: Blood Dragon",
           ['normal', 'operator', 'blank', 'normal', 'blank', 'normal'],
-          ['FarCry', ':'       , ' '    , 'Blood' , ' '    , 'Dragon'])
+          ['FarCry', ':'       , ' '    , 'Blood' , ' '    , 'Dragon']))
 
 print('Ignore blank')
 lex.ignore('blank')
-lex.check("Je suis un jeu",
+reg(lex.check("Je suis un jeu",
           ['normal', 'normal', 'normal', 'normal'],
-          ['Je'    , 'suis'  , 'un'    , 'jeu'])
+          ['Je'    , 'suis'  , 'un'    , 'jeu']))
 lex.clear_ignored()
 
 output = lex.to_html(text='Test 1999')
 print(output)
 assert(output == '<span class="game.normal">Test</span><span class="game.blank"> </span><span class="game.number">1999</span>')
+Total += 1
+Good += 1
 
 output = lex.to_html(text='Test 1999', raws=['blank'])
 print(output)
 assert(output == '<span class="game.normal">Test</span> <span class="game.number">1999</span>')
+Total += 1
+Good += 1
 
 #lex.ignore([1, 'a'])
 
-#print('\nRunning lexer main()')
-#weyland.lexer.main()
+#-------------------------------------------------------------------------------
+# Display results
+#-------------------------------------------------------------------------------
+
+Console().write('----------------------------------------', 'KEYWORD')
+if Bad > 0:
+    Console().write(f'{Total} tests, {Good} good, {Bad} bad', 'COMMENT')
+else:
+    Console().write(f'{Total} tests, {Good} good, {Bad} bad', 'STRING')

@@ -38,19 +38,21 @@ import datetime
 
 from logging import info, warning, error
 
-try:
-    from weyland import Lexer, RECOGNIZED_LANGUAGES, LANGUAGES
-except ModuleNotFoundError:
+# Ugly hack to have the dev version of Weyland on my computer instead of the one loaded through pypi
+if os.path.exists(r"C:\Users\damie_000\Documents\GitHub\tallentaa\projets\weyland\weyland\__init__.py"):
     import sys
     import importlib.util
-    spec = importlib.util.spec_from_file_location("weyland", r"C:\Users\DGX\Desktop\Git\tallentaa\projets\weyland\weyland\__init__.py")
+    spec = importlib.util.spec_from_file_location("weyland", r"C:\Users\damie_000\Documents\GitHub\tallentaa\projets\weyland\weyland\__init__.py")
     weyland = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = weyland
     spec.loader.exec_module(weyland)
     Lexer = weyland.Lexer
     RECOGNIZED_LANGUAGES = weyland.RECOGNIZED_LANGUAGES
     LANGUAGES = weyland.LANGUAGES
-    print('Using Weyland version:', weyland.__version__)
+    __version__ = weyland.__version__
+else:
+    from weyland import Lexer, RECOGNIZED_LANGUAGES, LANGUAGES, __version__
+print('Using Weyland version:', __version__)
 
 #-------------------------------------------------------------------------------
 # Constants and globals
@@ -332,7 +334,8 @@ def make_id(string):
 
 def write_code(line, code_lang):
     line = line.replace('\\@', '@') # warning bug if \\@
-    return Lexer(LANGUAGES[code_lang], debug=True).to_html(text=line)
+    #print('write_code', code_lang, line)
+    return Lexer(LANGUAGES[code_lang], debug=False).to_html(text=line)
 
 
 def check_link(link, links, inner_links):
