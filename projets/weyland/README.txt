@@ -25,9 +25,13 @@ In Weyland, we call regular expression **rex** instead of regex to differenciate
 * ``#`` means any digits
 * ``@`` means any letters
 * ``$`` means any digits, letters and the underscore character (_)
-* ``.`` means any characters which not a space ( )
+* ``.`` means any characters which is not a new line
 
 ### Limitations
 
 * In a choice, **you can only choose between one element** not between sequences,
 * In a choice, no repeated element nor optionnal element.
+
+### Languages available
+
+* A set of tokens is available for the languages: bnf, json, lua python and hamill.

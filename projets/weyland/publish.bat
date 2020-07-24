@@ -1,3 +1,4 @@
+REM See the results in https://pypi.org/project/weyland/
 if exist dist (
     rmdir dist /S /Q
 )
