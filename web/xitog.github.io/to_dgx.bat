@@ -2,8 +2,9 @@ copy /Y /B .\output\index.html                             ..\..\..\dgx\index.ht
 copy /Y /B .\output\blog.html                              ..\..\..\dgx\blog.html
 copy /Y /B .\output\plan.html                              ..\..\..\dgx\plan.html
 
-copy /Y /B .\output\informatique\ash_guide.html             ..\..\..\dgx\informatique\ash_guide.html
-copy /Y /B .\output\informatique\bnf.html                   ..\..\..\dgx\informatique\bnf.html
+copy /Y /B .\output\informatique\ash_guide.html            ..\..\..\dgx\informatique\ash_guide.html
+copy /Y /B .\output\informatique\lua.html                  ..\..\..\dgx\informatique\lua.html
+copy /Y /B .\output\informatique\bnf.html                  ..\..\..\dgx\informatique\bnf.html
 copy /Y /B .\output\informatique\json.html                 ..\..\..\dgx\informatique\json.html
 copy /Y /B .\output\informatique\hamill.html               ..\..\..\dgx\informatique\hamill.html
 copy /Y /B .\output\informatique\tools_langs.html          ..\..\..\dgx\informatique\tools_langs.html

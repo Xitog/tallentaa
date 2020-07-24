@@ -40,6 +40,12 @@ class Language:
     def __str__(self):
         return self.name
 
+# text
+# bnf
+# hamill
+# game
+# ash, json, lua, python
+
 LANGUAGES = {
     'text': Language('text', {
             'normal': ['.*'],
@@ -58,31 +64,6 @@ LANGUAGES = {
         # Special
         {
             'ante_identifier': [],
-            'accept_unknown' : True,
-            'string_markers' : [],
-            'number' : False
-        }
-    ),
-    'json': Language('json', {
-            'identifier' : ['[@_]$*'],
-            'number' : ['#+', '#+\.#+'],
-            'boolean': ['true', 'false'],
-            'nil': [],
-            'keyword': ['null'],
-            'operator': [],
-            'separator': ['{', '}', '(', ')', r'\[', ']', ',', ':', "\."],
-            'wrong_int' : ['#+@+$+'],
-            'blank': [' +'],
-            'newline' : ['\n'],
-            'line_comment' : [],
-            'string' : ['".*"', "'.*'"],
-        },
-        # Special
-        {
-            'ante_identifier': [],
-            'accept_unknown' : True,
-            'string_markers' : ['"', "'"],
-            'number' : True
         }
     ),
     'bnf': Language('bnf', {
@@ -98,80 +79,12 @@ LANGUAGES = {
         {
         }
     ),
-    'ash': Language('ash', {
-            # Old
-            'AFFECTATION' : ['='],
-            'COMBINED_AFFECTATION' : [r'\+=', '-=', r'\*=', '/=', '//=', r'\*\*=', '%='],
-            'TYPE' : [':', '->'],
-            'FAST' : ['=>'],
-            'LABEL' : ['::'],
-            'UNARY_OPERATOR' : ['-', 'not', r'\#', '~'],
-            # New
-            'identifier' : [r'[@_]$*'],
-            'integer' : [r'#+'],
-            'boolean' : ['false', 'true'],
-            'nil': ['nil'],
-            'keyword' : ['if', 'then', 'else', 'end', 'while', 'do', 'for',
-                 'break', 'next', 'return',
-                 'var', 'fun', 'sub', 'get', 'set', 'class',
-                 'import', 'from', 'as',
-                 'try', 'catch', 'finally', 'raise'],
-            'binary_operator' : ['and', 'or', # boolean
-                  'in', # belongs to
-                  r'\+', '-', r'\*', '/', '//', r'\*\*', '%', # mathematical
-                  '&', '|', '~', '>>', '<<', # bitwise
-                  '<', '<=', '>', '>=', '==', '!=', # comparison
-                  '\.'], # call
-            'separator': ['{', '}', '(', ')', r'\[', ']', ',', ';'],
-            'wrong_int' : ['#+@+$+'],
-            'blank': [' +'],
-            'newline' : ['\n'],
-            'line_comment': ['--'],
-            'string' : ['"[@#_- <>:=,;|\']*"', "'[@#_- <>:=,;|\"]*'"],
-        },
-        # Special
-        {
-            'ante_identifier': ['def', 'class'],
-            'accept_unknown' : False,
-            'string_markers' : ['"', "'"],
-            'number' : True
-        }
-    ),
-    'python': Language('python', {
-            'identifier' : ['[@_]$*'],
-            'integer' : ['#+'],
-            'boolean' : ['True', 'False'],
-            'nil': ['None'],
-            'keyword' : ['await', 'else', 'import', 'pass', 'break', 'except', 'in',
-                     'raise', 'class', 'finally', 'is', 'return', 'and', 'for',
-                     'continue', 'lambda', 'try', 'as', 'def', 'from', 'while',
-                     'nonlocal', 'assert', 'del', 'global', 'not', 'with', 'if',
-                     'async', 'elif', 'or', 'yield'],
-            'operator': [r'\+', '/', '//', '&', '^', '~', '|', r'\*\*', '<<', '%', r'\*',
-                      '-', '>>', ':', '<', '<=', '==', '!=', '>=', '>', r'\+=',
-                      '&=', '//=', '<<=', '%=', '\*=', '|=', r'\*\*=', '>>=', '-=',
-                      '/=', '^=', '\.', '='],
-            'separator': ['{', '}', '(', ')', r'\[', ']', ',', ';'],
-            'wrong_int' : ['#+@+$+'],
-            'blank': [' +'],
-            'newline' : ['\n'],
-            'line_comment': ['\#[. ]+\n'],
-            'string' : ['"[@#_- <>:=,;|\']*"', "'[@#_- <>:=,;|\"]*'"],
-        },
-        # Special
-        {
-            'ante_identifier': ['def', 'class'],
-            'accept_unknown' : False,
-            'string_markers' : ['"', "'"],
-            'number' : True
-        }
-    ),
     'hamill' : Language('hamill', {
+            'keyword': ['var', 'const', 'include', 'require', 'css', 'html'],
             'identifier' : ['[@_]$*'],
             'integer' : ['#+'],
             'boolean' : ['true', 'false'],
             'nil': [],
-            'keyword': ['var', 'const', 'include', 'require', 'css', 'html'],
             'operator': [':'],
             'separator' : ['{', '}', '\#', '.'],
             'wrong_int' : ['#+$+'],
@@ -197,7 +110,115 @@ LANGUAGES = {
         },
         {
         }
-    )
+    ),
+    'ash': Language('ash', {
+            'keyword' : ['if', 'then', 'else', 'end', 'while', 'do', 'for',
+                 'break', 'next', 'return',
+                 'var', 'fun', 'sub', 'get', 'set', 'class',
+                 'import', 'from', 'as',
+                 'try', 'catch', 'finally', 'raise'],
+            'identifier' : ['[@_]$*'],
+            # Old
+            'AFFECTATION' : ['='],
+            'COMBINED_AFFECTATION' : [r'\+=', '-=', r'\*=', '/=', '//=', r'\*\*=', '%='],
+            'TYPE' : [':', '->'],
+            'FAST' : ['=>'],
+            'LABEL' : ['::'],
+            'UNARY_OPERATOR' : ['-', 'not', r'\#', '~'],
+            # New
+            'integer' : [r'#+'],
+            'boolean' : ['false', 'true'],
+            'nil': ['nil'],
+            'binary_operator' : ['and', 'or', # boolean
+                  'in', # belongs to
+                  r'\+', '-', r'\*', '/', '//', r'\*\*', '%', # mathematical
+                  '&', '|', '~', '>>', '<<', # bitwise
+                  '<', '<=', '>', '>=', '==', '!=', # comparison
+                  '\.'], # call
+            'separator': ['{', '}', '(', ')', r'\[', ']', ',', ';'],
+            'wrong_int' : ['#+@+$+'],
+            'blank': [' +'],
+            'newline' : ['\n'],
+            'line_comment': ['--'],
+            'string' : ['"[@#_- <>:=,;|\']*"', "'[@#_- <>:=,;|\"]*'"],
+        },
+        # Special
+        {
+            'ante_identifier': ['def', 'class'],
+        }
+    ),
+    'json': Language('json', {
+            'identifier' : ['[@_]$*'],
+            'number' : ['#+', '#+\.#+'],
+            'boolean': ['true', 'false'],
+            'string' : ['".*"', "'.*'"],
+            'nil': [],
+            'keyword': ['null'],
+            'operator': [],
+            'separator': ['{', '}', '(', ')', r'\[', ']', ',', ':', "\."],
+            'line_comment' : [],
+            'newline' : ['\n'],
+            'blank': [' +'],
+            'wrong_int' : ['#+@+$+'],
+        },
+        # Special
+        {
+            'ante_identifier': [],
+        }
+    ),
+    'lua': Language('lua', {
+            #'keyword': ['and', 'break', 'do', 'else', 'elseif', 'end', 'false', 'for',
+            #            'function', 'goto', 'if', 'in', 'local', 'nil', 'not', 'or',
+            #            'repeat', 'return', 'then', 'true', 'until', 'while'],
+            'keyword': ['and', 'break', 'do', 'else', 'elseif', 'end', 'for',
+                        'function', 'goto', 'if', 'in', 'local', 'not', 'or',
+                        'repeat', 'return', 'then', 'until', 'while'],
+            'identifier' : ['[@_]$*'],
+            'number' : ['#+', '#+\.#+'],
+            'boolean': ['true', 'false'],
+            'string' : ['".*"', "'.*'"],
+            'nil' : ['nil'],
+            'operator': ['=', '==', '~=', r'\+', r'\*', '-', '/', '%', '^',
+                         '<', '<=', '>', '>=', r'\.\.', r'\#', ':'],
+            'separator': ['{', '}', '(', ')', r'\[', ']', ',', ';'],
+            'line_comment': ['--.+\n', '--.+'], # the second is for @@-- xxx@@ without \n
+            'newline' : ['\n'],
+            'blank': [' +'],
+            'wrong_int' : ['#+@+$+'],
+            'special': ['ipairs', 'pairs', '\?', 'print'], # ? is here for demonstration only
+        },
+        # Special
+        {
+            'ante_identifier': ['function'],
+        }
+    ),
+    'python': Language('python', {
+            'keyword' : ['await', 'else', 'import', 'pass', 'break', 'except', 'in',
+                     'raise', 'class', 'finally', 'is', 'return', 'and', 'for',
+                     'continue', 'lambda', 'try', 'as', 'def', 'from', 'while',
+                     'nonlocal', 'assert', 'del', 'global', 'not', 'with', 'if',
+                     'async', 'elif', 'or', 'yield'],
+            'identifier' : ['[@_]$*'],
+            'integer' : ['#+'],
+            'boolean' : ['True', 'False'],
+            'string' : ['".*"', "'.*'"],
+            'nil': ['None'],
+            'operator': [r'\+', '/', '//', '&', '^', '~', '|', r'\*\*', '<<', '%', r'\*',
+                      '-', '>>', ':', '<', '<=', '==', '!=', '>=', '>', r'\+=',
+                      '&=', '//=', '<<=', '%=', '\*=', '|=', r'\*\*=', '>>=', '-=',
+                      '/=', '^=', '\.', '='],
+            'separator': ['{', '}', '(', ')', r'\[', ']', ',', ';'],
+            'line_comment': ['\#.+\n'],
+            'newline' : ['\n'],
+            'blank': [' +'],
+            'wrong_int' : ['#+@+$+'],
+            'special': ['print'],
+        },
+        # Special
+        {
+            'ante_identifier': ['def', 'class'],
+        }
+    ),
 }
 
 RECOGNIZED_LANGUAGES = list(LANGUAGES.keys())

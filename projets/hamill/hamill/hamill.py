@@ -372,54 +372,55 @@ def process_string(line, gen=None):
         char = line[char_index]
         prev_char, next_char, prev_prev_char = prev_next(line, char_index)
         # Paragraph et span class (div class are handled elsewhere)
-        if char == '{' and next_char == '{' and prev_char != '\\':
+        if char == '{' and next_char == '{' and prev_char != '\\' and line.find('}}', char_index+1) != -1:
             continue
         if char == '{' and prev_char == '{' and prev_prev_char != '\\':
             ending = line.find('}}', char_index)
-            inside = line[char_index + 1:ending]
-            cls = ''
-            ids = ''
-            txt = ''
-            state = 'start'
-            for c in inside:
-                if state == 'start':
-                    if c == '.':
-                        state = 'cls'
-                        cls += c
-                    elif c == '#':
-                        state = 'ids'
-                        ids += c
-                    else:
-                        state = 'txt'
+            if ending != -1:
+                inside = line[char_index + 1:ending]
+                cls = ''
+                ids = ''
+                txt = ''
+                state = 'start'
+                for c in inside:
+                    if state == 'start':
+                        if c == '.':
+                            state = 'cls'
+                            cls += c
+                        elif c == '#':
+                            state = 'ids'
+                            ids += c
+                        else:
+                            state = 'txt'
+                            txt += c
+                    elif state == 'cls':
+                        if c != ' ':
+                            cls += c
+                        else:
+                            state = 'start'
+                    elif state == 'ids':
+                        if c != ' ':
+                            ids += c
+                        else:
+                            state = 'start'
+                    elif state == 'txt': # you can't escape txt mode
                         txt += c
-                elif state == 'cls':
-                    if c != ' ':
-                        cls += c
+                if len(txt) > 0:
+                    if len(ids) > 0 and len(cls) > 0:
+                        new_line += f'<span id="{ids[1:]}" class="{cls[1:]}">{txt}</span>'
+                    elif len(ids) > 0:
+                        new_line += f'<span id="{ids[1:]}">{txt}</span>'
+                    elif len(cls) > 0:
+                        new_line += f'<span class="{cls[1:]}">{txt}</span>'
                     else:
-                        state = 'start'
-                elif state == 'ids':
-                    if c != ' ':
-                        ids += c
-                    else:
-                        state = 'start'
-                elif state == 'txt': # you can't escape txt mode
-                    txt += c
-            if len(txt) > 0:
-                if len(ids) > 0 and len(cls) > 0:
-                    new_line += f'<span id="{ids[1:]}" class="{cls[1:]}">{txt}</span>'
-                elif len(ids) > 0:
-                    new_line += f'<span id="{ids[1:]}">{txt}</span>'
-                elif len(cls) > 0:
-                    new_line += f'<span class="{cls[1:]}">{txt}</span>'
+                        new_line += f'<span>{txt}</span>'
                 else:
-                    new_line += f'<span>{txt}</span>'
-            else:
-                if len(ids) > 0:
-                    gen['NEXT_PAR_ID'] = ids[1:]
-                if len(cls) > 0:
-                    gen['NEXT_PAR_CLASS'] = cls[1:]
-            char_index = ending + 1
-            continue
+                    if len(ids) > 0:
+                        gen['NEXT_PAR_ID'] = ids[1:]
+                    if len(cls) > 0:
+                        gen['NEXT_PAR_CLASS'] = cls[1:]
+                char_index = ending + 1
+                continue
         # Links and images
         if char == '[' and prev_char != '\\' and next_char != '[': # [[ the first is not a link!
             ending = line.find(']', char_index)
