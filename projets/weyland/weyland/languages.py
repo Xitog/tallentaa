@@ -102,7 +102,7 @@ LANGUAGES = {
     ),
     'game': Language('game', {
             'number': ['#+'],
-            'normal': ['[@_][@#\']*'], # Total Annihilation => 2 tokens, Baldur's => 1
+            'normal': ['[@_][@#\'-]*'], # Total Annihilation => 2 tokens, Baldur's => 1, Half-life => 1
             'blank': [' +'],
             'wrong_int' : ['#+@+'],
             'newline' : ['\n'],

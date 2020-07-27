@@ -20,7 +20,7 @@ includes = ['menu.html']
 logging.getLogger().setLevel(logging.DEBUG)
 
 # Full
-hamill.process('input', 'output', 'fr', includes)
+#hamill.process('input', 'output', 'fr', includes)
 
 # Mono
 
@@ -35,7 +35,7 @@ hamill.process('input', 'output', 'fr', includes)
 
 #hamill.process_file(r'input\passetemps\tech_transitions.hml', r'output\passetemps\tech_transitions.html', 'fr', includes)
 #hamill.process_file(r'input\passetemps\pres_jeux.hml', r'output\passetemps\pres_jeux.html', 'fr', includes)
-#hamill.process_file(r'input\passetemps\pres_jeuxvideo.hml', r'output\passetemps\pres_jeuxvideo.html', 'fr', includes)
+hamill.process_file(r'input\passetemps\pres_jeuxvideo.hml', r'output\passetemps\pres_jeuxvideo.html', 'fr', includes)
 #hamill.process_file(r'input\passetemps\tech_raycasting_fr.hml', r'output\passetemps\tech_raycasting_fr.html', 'fr', includes)
 
 #hamill.process_file(r'input\histoire\bibliographie.hml', r'output\histoire\bibliographie.html', 'fr', includes)#hamill.process_file(r'input\tests.hml', r'output\tests.html', 'fr', includes)
