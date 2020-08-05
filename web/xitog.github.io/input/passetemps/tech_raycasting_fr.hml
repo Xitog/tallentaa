@@ -11,6 +11,7 @@
 !css code span.number { color: inherit; background-color: transparent; }
 !css p { text-align: justify; }
 
+!css table { margin-left:auto; margin-right:auto; }
 !css table#main tr:nth-child(10)  { font-weight: bold; background-color: rgb(0, 0, 0);       color: white; text-align: center; }
 !css table#main tr:nth-child(13)  { font-weight: bold; background-color: rgb(0, 0, 0);       color: white; text-align: center; }
 !css table#main tr:nth-child(18)  { font-weight: bold; background-color: rgb(0, 0, 0);       color: white; text-align: center; }
@@ -32,9 +33,14 @@
 + [Introduction->1.-introduction]
 + [Historique->2.-historique]
 + [Technique->3.-technique]
-+ + [Principe->3.1-principe-et-initialisation]
++ + [Principe et initialisation->3.1-principe-et-initialisation]
++ + [Émission des rayons->3.2-émission-des-rayons]
++ + [Intersections des rayons avec la grille->3.3-intersections-des-rayons-avec-la-grille]
++ + [Construction du rendu->3.4-construction-du-rendu]
++ + [Texturation->3.5-texturation]
 + [Index des moteurs de raycasting et des jeux->4.-index-des-moteurs-de-raycasting-et-des-jeux]
-+ [Références->5.-références]
++ [Comparaison des moteurs d'id Software->5.-comparaison-des-moteurs-d'id-software]
++ [Références->6.-références]
 
 A version in English of this page is [available here->https://xitog.github.io/dgx/passetemps/tech_raycasting_en.html].
 
@@ -278,7 +284,7 @@ Ceci est un aperçu rapide des principaux moteurs et jeux. Pour une liste plus c
 [SourceShadowCaster]: https://drive.google.com/open?id=0B3gIcilDnsOPakdzNWNMZ1hNWUE&amp;authuser=0
 [SourceDoom]: https://github.com/id-Software/DOOM
 
-# 5. Références
+# 6. Références
 
 [1] : Lode's Computer Graphics Tutorial
 
