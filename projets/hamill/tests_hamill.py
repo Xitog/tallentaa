@@ -42,7 +42,7 @@ verify(source, res, "<b>bold</b> <i>italic</i> <u>underline</u> <s>strike</s> <s
 # Test 2
 source = "@@code@@"
 res = hamill.process_string(source)
-verify(source, res, '<code><span class="text.normal">code</span></code>', "process_string => Code error")
+verify(source, res, '<code><span class="text-normal">code</span></code>', "process_string => Code error")
 
 # Test 3
 par = """* item 1
@@ -290,6 +290,7 @@ res = hamill.process_string(par, hamill.Generation(default_lang='fr'))
 try:
     locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
 except locale.Error:
+    print('Locale set to default')
     locale.setlocale(locale.LC_TIME, '')
 dt = datetime.datetime.now().strftime('%d %B %Y')
 check = f"Ce texte a été généré le {dt}"
@@ -309,5 +310,5 @@ verify(par, res, check, "Output French gendate from process_lines => Error")
 # Test 29 python
 par = "@@python if a == 5: break@@"
 res = hamill.process_string(par)
-check = f'<code><span class="python.keyword">if</span><span class="python.blank"> </span><span class="python.identifier">a</span><span class="python.blank"> </span><span class="python.operator">==</span><span class="python.blank"> </span><span class="python.integer">5</span><span class="python.operator">:</span><span class="python.blank"> </span><span class="python.keyword">break</span></code>'
+check = f'<code><span class="python-keyword">if</span><span class="python-blank"> </span><span class="python-identifier">a</span><span class="python-blank"> </span><span class="python-operator">==</span><span class="python-blank"> </span><span class="python-integer">5</span><span class="python-operator">:</span><span class="python-blank"> </span><span class="python-keyword">break</span></code>'
 verify(par, res, check, "Python code with weyland")

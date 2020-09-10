@@ -39,10 +39,17 @@ import datetime
 from logging import info, warning, error
 
 # Ugly hack to have the dev version of Weyland on my computer instead of the one loaded through pypi
-if os.path.exists(r"C:\Users\damie_000\Documents\GitHub\tallentaa\projets\weyland\weyland\__init__.py"):
+could_be = [r"C:\Users\damie_000\Documents\GitHub\tallentaa\projets\weyland\weyland\__init__.py",
+            '/home/damien/Documents/tallentaa/projets/weyland/weyland/__init__.py']
+location = None
+for cb in could_be:
+    if os.path.exists(cb):
+        location = cb
+        break
+if location is not None:
     import sys
     import importlib.util
-    spec = importlib.util.spec_from_file_location("weyland", r"C:\Users\damie_000\Documents\GitHub\tallentaa\projets\weyland\weyland\__init__.py")
+    spec = importlib.util.spec_from_file_location("weyland", location)
     weyland = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = weyland
     spec.loader.exec_module(weyland)
@@ -94,19 +101,38 @@ class Generation:
         try:
             dt = datetime.datetime.now()
             found = False
-            # first try, our lang, our encoding
-            for lang, encoding in locale.locale_alias.items():
-                if lang.startswith(default_lang) and default_encoding in encoding.lower():
-                    try:
-                        locale.setlocale(locale.LC_TIME, (lang, encoding))
-                        info(f'Locale set to {lang} and encoding {encoding}')
-                        found = True
-                        break
-                    except locale.Error:
-                        if (error_locale):
-                            warning(f'Impossible to set locale to ({lang}, {encoding}).')
-                        pass
-            # second try, our lang, any encoding
+            # first try
+            language_alias = {'en': ['en_US'], 'fr': ['fr_FR']}
+            encoding_alias = {'utf-8': ['utf8'], 'utf8': ['utf-8']}
+            all_alias = [(default_lang, default_encoding)]
+            if default_lang in language_alias:
+                for elem in language_alias[default_lang]:
+                    all_alias.append((elem, default_encoding))
+                    if default_encoding in encoding_alias:
+                        for enco in encoding_alias[default_encoding]:
+                            all_alias.append((elem, enco))
+            for lg, en in all_alias:
+                try:
+                    locale.setlocale(locale.LC_TIME, (lg, en))
+                    info(f'Locale set to {lg} and encoding {en}')
+                    found = True
+                    break
+                except locale.Error:
+                    pass
+            # second try, our lang, our encoding
+            if not found:
+                for lang, encoding in locale.locale_alias.items():
+                    if lang.startswith(default_lang) and default_encoding in encoding.lower():
+                        try:
+                            locale.setlocale(locale.LC_TIME, (lang, encoding))
+                            info(f'Locale set to {lang} and encoding {encoding}')
+                            found = True
+                            break
+                        except locale.Error:
+                            if (error_locale):
+                                warning(f'Impossible to set locale to ({lang}, {encoding}).')
+                            pass
+            # third try, our lang, any encoding
             if not found:
                 for lang, encoding in locale.locale_alias.items():
                     if lang.startswith(default_lang):

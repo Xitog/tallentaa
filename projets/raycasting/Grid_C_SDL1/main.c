@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 #include <math.h>
-#include "sdl.h"
+#include "SDL/SDL.h"
 #include "draw.h"
 #include "event.h"
 #include "game.h"
@@ -29,23 +29,25 @@ void infosurf(SDL_Surface * surf) {
 
 void load_textures(void) {
     // Textures
-    TEXTURES[0] = SDL_ConvertSurface(SDL_LoadBMP("..\\..\\..\\assets\\sets\\fps\\western\\walls\\0-placeholder.bmp"), screen->format, SDL_SWSURFACE);
-    TEXTURES[1] = SDL_ConvertSurface(SDL_LoadBMP("..\\..\\..\\assets\\sets\\fps\\western\\walls\\1-grey_stone_wall.bmp"), screen->format, SDL_SWSURFACE);
-    TEXTURES[2] = SDL_ConvertSurface(SDL_LoadBMP("..\\..\\..\\assets\\sets\\fps\\western\\walls\\2-grey_stone_wall_stone.bmp"), screen->format, SDL_SWSURFACE);
-    TEXTURES[3] = SDL_ConvertSurface(SDL_LoadBMP("..\\..\\..\\assets\\sets\\fps\\western\\walls\\3-light_stone_wall.bmp"), screen->format, SDL_SWSURFACE);
-    TEXTURES[4] = SDL_ConvertSurface(SDL_LoadBMP("..\\..\\..\\assets\\sets\\fps\\western\\walls\\4-light_stone_wall_stone.bmp"), screen->format, SDL_SWSURFACE);
-    TEXTURES[5] = SDL_ConvertSurface(SDL_LoadBMP("..\\..\\..\\assets\\sets\\fps\\western\\walls\\5-light_stone_wall_grass.bmp"), screen->format, SDL_SWSURFACE);
-    TEXTURES[6] = SDL_ConvertSurface(SDL_LoadBMP("..\\..\\..\\assets\\sets\\fps\\western\\walls\\6-light_wood_wall.bmp"), screen->format, SDL_SWSURFACE);
-    TEXTURES[7] = SDL_ConvertSurface(SDL_LoadBMP("..\\..\\..\\assets\\sets\\fps\\western\\walls\\7-light_wood_wall_window.bmp"), screen->format, SDL_SWSURFACE);
-    TEXTURES[8] = SDL_ConvertSurface(SDL_LoadBMP("..\\..\\..\\assets\\sets\\fps\\western\\walls\\8-dark_wood_wall.bmp"), screen->format, SDL_SWSURFACE);
-    TEXTURES[9] = SDL_ConvertSurface(SDL_LoadBMP("..\\..\\..\\assets\\sets\\fps\\western\\walls\\9-red_brick_wall.bmp"), screen->format, SDL_SWSURFACE);
-    TEXTURES[10] = SDL_ConvertSurface(SDL_LoadBMP("..\\..\\..\\assets\\sets\\fps\\western\\walls\\10-red_brick_wall_light.bmp"), screen->format, SDL_SWSURFACE);
-    TEXTURES[11] = SDL_ConvertSurface(SDL_LoadBMP("..\\..\\..\\assets\\sets\\fps\\western\\walls\\11-red_brick_wall_pillar.bmp"), screen->format, SDL_SWSURFACE);
-    TEXTURES[12] = SDL_ConvertSurface(SDL_LoadBMP("..\\..\\..\\assets\\sets\\fps\\western\\walls\\12-red_brick_wall_bars.bmp"), screen->format, SDL_SWSURFACE);
-    infosurf(TEXTURES[0]);
+    TEXTURES[0] = SDL_ConvertSurface(SDL_LoadBMP("../../../assets/sets/fps/western/walls/0-placeholder.bmp"), screen->format, SDL_SWSURFACE);
+    TEXTURES[1] = SDL_ConvertSurface(SDL_LoadBMP("../../../assets/sets/fps/western/walls/1-grey_stone_wall.bmp"), screen->format, SDL_SWSURFACE);
+    TEXTURES[2] = SDL_ConvertSurface(SDL_LoadBMP("../../../assets/sets/fps/western/walls/2-grey_stone_wall_stone.bmp"), screen->format, SDL_SWSURFACE);
+    TEXTURES[3] = SDL_ConvertSurface(SDL_LoadBMP("../../../assets/sets/fps/western/walls/3-light_stone_wall.bmp"), screen->format, SDL_SWSURFACE);
+    TEXTURES[4] = SDL_ConvertSurface(SDL_LoadBMP("../../../assets/sets/fps/western/walls/4-light_stone_wall_stone.bmp"), screen->format, SDL_SWSURFACE);
+    TEXTURES[5] = SDL_ConvertSurface(SDL_LoadBMP("../../../assets/sets/fps/western/walls/5-light_stone_wall_grass.bmp"), screen->format, SDL_SWSURFACE);
+    TEXTURES[6] = SDL_ConvertSurface(SDL_LoadBMP("../../../assets/sets/fps/western/walls/6-light_wood_wall.bmp"), screen->format, SDL_SWSURFACE);
+    TEXTURES[7] = SDL_ConvertSurface(SDL_LoadBMP("../../../assets/sets/fps/western/walls/7-light_wood_wall_window.bmp"), screen->format, SDL_SWSURFACE);
+    TEXTURES[8] = SDL_ConvertSurface(SDL_LoadBMP("../../../assets/sets/fps/western/walls/8-dark_wood_wall.bmp"), screen->format, SDL_SWSURFACE);
+    TEXTURES[9] = SDL_ConvertSurface(SDL_LoadBMP("../../../assets/sets/fps/western/walls/9-red_brick_wall.bmp"), screen->format, SDL_SWSURFACE);
+    TEXTURES[10] = SDL_ConvertSurface(SDL_LoadBMP("../../../assets/sets/fps/western/walls/10-red_brick_wall_light.bmp"), screen->format, SDL_SWSURFACE);
+    TEXTURES[11] = SDL_ConvertSurface(SDL_LoadBMP("../../../assets/sets/fps/western/walls/11-red_brick_wall_pillar.bmp"), screen->format, SDL_SWSURFACE);
+    TEXTURES[12] = SDL_ConvertSurface(SDL_LoadBMP("../../../assets/sets/fps/western/walls/12-red_brick_wall_bars.bmp"), screen->format, SDL_SWSURFACE);
+    //infosurf(TEXTURES[0]);
 }
 
 int main(int argc, char * argv[]) {
+    
+    printf("Start of program\n");
     
     /*
     FILE * fp = fopen("D:\\Tools\\Perso\\Projets\\map_editor\\New map.bin", "rb");
@@ -61,6 +63,8 @@ int main(int argc, char * argv[]) {
     int err = init("Woolfy 2.5 FLAT", SCREEN_WIDTH, SCREEN_HEIGHT, 32, false);
     if (err == EXIT_FAILURE) {
         return err;
+    } else {
+        printf("Textures loaded.");
     }
     
     load_textures();

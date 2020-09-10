@@ -341,17 +341,19 @@ reg(lex.check("Je suis un jeu",
           ['Je'    , 'suis'  , 'un'    , 'jeu']))
 lex.clear_ignored()
 
-output = lex.to_html(text='Test 1999')
-print(output)
-assert(output == '<span class="game.normal">Test</span><span class="game.blank"> </span><span class="game.number">1999</span>')
-Total += 1
-Good += 1
+def check_html(text, expected, raws=None):
+    global Total, Good
+    print('Text:', text)
+    output = lex.to_html(text=text, raws=raws)
+    print('Result:', output)
+    print('Length:', len(output), '( expected =', len(expected), ')')
+    assert(output == expected)
+    Total += 1
+    Good += 1
 
-output = lex.to_html(text='Test 1999', raws=['blank'])
-print(output)
-assert(output == '<span class="game.normal">Test</span> <span class="game.number">1999</span>')
-Total += 1
-Good += 1
+check_html('Test 1999', '<span class="game-normal">Test</span><span class="game-blank"> </span><span class="game-number">1999</span>')
+
+check_html('Test 1999', '<span class="game-normal">Test</span> <span class="game-number">1999</span>', raws=['blank'])
 
 #lex.ignore([1, 'a'])
 

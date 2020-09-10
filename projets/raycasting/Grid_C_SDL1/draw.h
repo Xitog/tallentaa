@@ -6,7 +6,7 @@
 //-----------------------------------------------------------------------------
 
 #include <stdbool.h>
-#include "sdl.h"
+#include "SDL/SDL.h"
 
 //-----------------------------------------------------------------------------
 // Type
@@ -53,5 +53,7 @@ void render(void);
 Uint32 get_pixel(SDL_Surface * surf, int x, int y);
 
 void set_pixel(int x, int y, Uint32 color);
+
+void display(SDL_Surface * surf, int x, int y);
 
 #endif

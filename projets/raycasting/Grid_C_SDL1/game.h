@@ -7,7 +7,7 @@
 
 #include <stdio.h>
 #include <math.h>
-#include "sdl.h"
+#include "SDL/SDL.h"
 #include "draw.h"
 #include "event.h"
 

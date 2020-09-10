@@ -282,17 +282,19 @@ void game_raycast(void) {
         
         //line(x, START_SCREEN + FPS_SCREEN_HEIGHT / 2 - (int) (d / 2), x, START_SCREEN + FPS_SCREEN_HEIGHT / 2 + (int) (d / 2), color);
 
+        /*
         for(int yy = 0; yy < TEXTURE_HEIGHT; yy++) {
             for (int xx = 0; xx < TEXTURE_WIDTH; xx++) {
                 Uint32 c = get_pixel(TEXTURES[0], xx, yy);
                 set_pixel(xx, yy, c);
             }
         }
+        */
     }
 }
 
 void game_draw(void) {
-    
+
     fill(BLACK);
 
     rect(0, START_SCREEN, screen->w, FPS_SCREEN_HEIGHT / 2, CEILGREY, true);
