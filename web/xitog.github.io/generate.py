@@ -5,6 +5,7 @@
 import logging
 import os.path
 import hamill
+jp = os.path.join
 
 #-------------------------------------------------------------------------------
 
@@ -24,10 +25,10 @@ logging.getLogger().setLevel(logging.DEBUG)
 
 # Mono
 
-#hamill.process_file(r'input\index.hml', r'output\index.html', 'fr', includes)
+#hamill.process_file(jp('input', 'index.hml'), jp('output', 'index.html'), 'fr', includes)
 
 #hamill.process_file(r'input\informatique\json.hml', r'output\informatique\json.html', 'fr', includes)
-#hamill.process_file(r'input\informatique\bnf.hml', r'output\informatique\bnf.html', 'fr', includes)
+hamill.process_file(jp('input', 'informatique', 'bnf.hml'), jp('output', 'informatique', 'bnf.html'), 'fr', includes)
 #hamill.process_file(r'input\informatique\hamill.hml', r'output\informatique\hamill.html', 'fr', includes)
 #hamill.process_file(r'input\informatique\tools_langs.hml', r'output\informatique\tools_langs.html', 'fr', includes)
 #hamill.process_file(r'input\informatique\ash_guide.hml', r'output\informatique\ash_guide.html', 'fr', includes)
@@ -38,6 +39,9 @@ logging.getLogger().setLevel(logging.DEBUG)
 #hamill.process_file(r'input\passetemps\pres_jeux.hml', r'output\passetemps\pres_jeux.html', 'fr', includes)
 #hamill.process_file(r'input\passetemps\pres_jeuxvideo.hml', r'output\passetemps\pres_jeuxvideo.html', 'fr', includes)
 #hamill.process_file(r'input\passetemps\tech_raycasting_fr.hml', r'output\passetemps\tech_raycasting_fr.html', 'fr', includes)
-hamill.process_file(r'input\passetemps\history_fps_tables_en.hml', r'output\passetemps\history_fps_tables_en.html', 'fr', includes)
 
-#hamill.process_file(r'input\histoire\bibliographie.hml', r'output\histoire\bibliographie.html', 'fr', includes)#hamill.process_file(r'input\tests.hml', r'output\tests.html', 'fr', includes)
+hamill.process_file(jp('input', 'passetemps', 'history_fps_tables_en.hml'), jp('output', 'passetemps', 'history_fps_tables_en.html'), 'fr', includes)
+hamill.process_file(jp('input', 'passetemps', 'history_fps_references_en.hml'), jp('output', 'passetemps', 'history_fps_references_en.html'), 'fr', includes)
+
+#hamill.process_file(jp('input', 'histoire', 'bibliographie.hml'), jp('output', 'histoire', 'bibliographie.html'), 'fr', includes)
+#hamill.process_file(jp('input', 'tests.hml'), jp('output', 'tests.html'), 'fr', includes)

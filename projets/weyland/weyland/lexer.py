@@ -32,6 +32,7 @@
 
 from weyland.regex import Rex
 from weyland.languages import Language # only for check
+import html
 
 #-------------------------------------------------------------------------------
 # Classes
@@ -145,7 +146,7 @@ class Lexer:
             if tok.typ in raws:
                 output += tok.val
             else:
-                output += f'<span class="{self.lang}-{tok.typ}">{tok.val}</span>'
+                output += f'<span class="{self.lang}-{tok.typ}">{html.escape(tok.val)}</span>'
         return output
 
     def make_token(self, start, text, index, res):
