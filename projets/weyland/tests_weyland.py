@@ -37,8 +37,9 @@
 #-------------------------------------------------------------------------------
 
 from weyland import Rex, RexTest, AwaitedResult, Console, Check
-from weyland import Lexer, LANGUAGES, Language
+from weyland import Lexer, LANGUAGES, Language, __version__
 from collections import namedtuple
+from datetime import datetime
 
 #-------------------------------------------------------------------------------
 # Constants and globals
@@ -204,6 +205,8 @@ test_library = {
 
 } # [327]
 
+start = datetime.now()
+
 if TEST_REGEX:
     tests = test_library.keys() # [223]
     test_regex(False)
@@ -341,8 +344,9 @@ reg(lex.check("Je suis un jeu",
           ['Je'    , 'suis'  , 'un'    , 'jeu']))
 lex.clear_ignored()
 
-def check_html(text, expected, raws=None):
+def check_html(lang, text, expected, raws=None):
     global Total, Good
+    lex = Lexer(LANGUAGES[lang], debug=False)
     print('Text:', text)
     output = lex.to_html(text=text, raws=raws)
     print('Result:', output)
@@ -351,9 +355,11 @@ def check_html(text, expected, raws=None):
     Total += 1
     Good += 1
 
-check_html('Test 1999', '<span class="game-normal">Test</span><span class="game-blank"> </span><span class="game-number">1999</span>')
+check_html('game', 'Test 1999', '<span class="game-normal">Test</span><span class="game-blank"> </span><span class="game-number">1999</span>')
 
-check_html('Test 1999', '<span class="game-normal">Test</span> <span class="game-number">1999</span>', raws=['blank'])
+check_html('game', 'Test 1999', '<span class="game-normal">Test</span> <span class="game-number">1999</span>', raws=['blank'])
+
+check_html('bnf', '<bonjour>', '<span class="bnf-keyword">&lt;bonjour&gt;</span>')
 
 #lex.ignore([1, 'a'])
 
@@ -366,3 +372,8 @@ if Bad > 0:
     Console().write(f'{Total} tests, {Good} good, {Bad} bad', 'COMMENT')
 else:
     Console().write(f'{Total} tests, {Good} good, {Bad} bad', 'STRING')
+
+stop = datetime.now()
+print("Duration:", stop - start)
+print("Version of Weyland tested: ", __version__)
+
