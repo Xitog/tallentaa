@@ -1,6 +1,9 @@
 import hamill
+import weyland
 import locale
-import datetime
+from datetime import datetime
+
+start = datetime.now()
 
 print('Hamill version:', hamill.__version__)
 
@@ -280,7 +283,7 @@ verify(par, res, check, "Title transformation => Error")
 # Test 26 display a constant (English date) in process_string
 par = "This text has been generated on [=GENDATE]"
 res = hamill.process_string(par, hamill.Generation(default_lang='en'))
-dt = datetime.datetime.now().strftime('%d %B %Y')
+dt = datetime.now().strftime('%d %B %Y')
 check = f"This text has been generated on {dt}"
 verify(par, res, check, "Output English gendate from process_string => Error")
 
@@ -292,7 +295,7 @@ try:
 except locale.Error:
     print('Locale set to default')
     locale.setlocale(locale.LC_TIME, '')
-dt = datetime.datetime.now().strftime('%d %B %Y')
+dt = datetime.now().strftime('%d %B %Y')
 check = f"Ce texte a été généré le {dt}"
 verify(par, res, check, "Output French gendate from process_string => Error")
 
@@ -303,7 +306,7 @@ try:
     locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
 except locale.Error:
     locale.setlocale(locale.LC_TIME, '')
-dt = datetime.datetime.now().strftime('%d %B %Y')
+dt = datetime.now().strftime('%d %B %Y')
 check = f"<p>Ce texte a été généré le {dt}</p>\n"
 verify(par, res, check, "Output French gendate from process_lines => Error")
 
@@ -312,3 +315,10 @@ par = "@@python if a == 5: break@@"
 res = hamill.process_string(par)
 check = f'<code><span class="python-keyword">if</span><span class="python-blank"> </span><span class="python-identifier">a</span><span class="python-blank"> </span><span class="python-operator">==</span><span class="python-blank"> </span><span class="python-integer">5</span><span class="python-operator">:</span><span class="python-blank"> </span><span class="python-keyword">break</span></code>'
 verify(par, res, check, "Python code with weyland")
+
+stop = datetime.now()
+print("Duration:", stop - start)
+print("Version of Hamill tested: ", hamill.__version__)
+print("Version of Weyland tested: ", weyland.__version__)
+
+
