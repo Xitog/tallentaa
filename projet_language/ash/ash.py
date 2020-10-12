@@ -40,6 +40,9 @@ import copy # only once for read_expr
 import sys # for writing debug info in red for the tests
 import traceback
 
+__version__ = '0.0.1'
+__py_version__ = f'{sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]}'
+
 #-------------------------------------------------------------------------------
 # Console
 #-------------------------------------------------------------------------------
@@ -184,7 +187,8 @@ class Tokenizer:
                 Tokenizer.START_OF_OPERATOR.append(op[0])
         self.debug = debug
         
-    def read_number(self, line, index):
+    def read_number(self, line, start):
+        index = start
         if self.debug:
             print("    " + f'Reading number at {index}, line {self.line_count}, starting with [{line[index]}]')
         word = line[index]
@@ -211,15 +215,16 @@ class Tokenizer:
                 word += line[index]
             index += 1
         if not is_float:
-            t = Token(Token.Integer, word, self.counter)
+            t = Token(Token.Integer, word, start)
         else:
-            t = Token(Token.Float, word, self.counter)
+            t = Token(Token.Float, word, start)
         if self.debug:
             print("    " + f'Creating token {t} n°{len(self.tokens)}')
         self.tokens.append(t)
         return index
 
-    def read_id(self, line, index):
+    def read_id(self, line, start):
+        index = start
         if self.debug:
             print("    " + f'Reading id at {index}, line {self.line_count}, starting with [{line[index]}]')
         word = line[index]
@@ -233,19 +238,20 @@ class Tokenizer:
             word += line[index]
             index += 1
         if word in Tokenizer.OPERATORS:
-            t = Token(Token.Operator, word, self.counter)
+            t = Token(Token.Operator, word, start)
         elif word in Tokenizer.KEYWORDS:
-            t = Token(Token.Keyword, word, self.counter)
+            t = Token(Token.Keyword, word, start)
         elif word in Tokenizer.BOOLEANS:
-            t = Token(Token.Boolean, word, self.counter)
+            t = Token(Token.Boolean, word, start)
         else:
-            t = Token(Token.Identifier, word, self.counter)
+            t = Token(Token.Identifier, word, start)
         if self.debug:
             print("    " + f'Creating token {t} n°{len(self.tokens)}, returning index {index}')
         self.tokens.append(t)
         return index
 
-    def read_operator(self, line, index):
+    def read_operator(self, line, start):
+        index = start
         if self.debug:
             print("    " + f'Reading operator at {index}, line {self.line_count}, starting with [{line[index]}]')
         operator = line[index]
@@ -255,25 +261,27 @@ class Tokenizer:
             index += 1
         if operator not in Tokenizer.OPERATORS:
             raise Exception("Operator unknown: " + operator + " at line " + str(self.line_count))
-        t = Token(Token.Operator, operator, self.counter)
+        t = Token(Token.Operator, operator, start)
         if self.debug:
             print("    " + f'Creating token {t} n°{len(self.tokens)}')
         self.tokens.append(t)
         return index
     
-    def read_separator(self, line, index):
+    def read_separator(self, line, start):
+        index = start
         if self.debug:
             print("    " + f'Reading separator at {index}, line {self.line_count}, starting with [{line[index]}]')
         if line[index] == '\n':
-            t = Token(Token.NewLine, 'NEWLINE', self.counter) #line[index], self.counter)
+            t = Token(Token.NewLine, 'NEWLINE', start) #line[index], self.counter)
         else:
-            t = Token(Token.Separator, line[index], self.counter)
+            t = Token(Token.Separator, line[index], start)
         if self.debug:
             print("    " + f'Creating token {t} n°{len(self.tokens)}')
         self.tokens.append(t)
         return index+1
     
-    def read_string(self, line, index):
+    def read_string(self, line, start):
+        index = start
         if self.debug:
             print("    " + f'Reading string at {index}, line {self.line_count}, starting with [{line[index]}]')
         terminator = line[index]
@@ -291,7 +299,7 @@ class Tokenizer:
             raise Exception("Terminator char not found for string!")
         if word == '\\n':
             word = '\n'
-        t = Token(Token.String, word, self.counter)
+        t = Token(Token.String, word, start)
         if self.debug:
             print("    " + f'Creating token {t} n°{len(self.tokens)}')
         self.tokens.append(t)
@@ -301,38 +309,37 @@ class Tokenizer:
         if debug: print('[INFO] Start lexing')
         self.debug = debug
         self.tokens.clear()
-        self.counter = 0
         if os.path.isfile(source):
             source = open(source, 'r', encoding='utf8').read()
-        index = 0
+        self.index = 0
         word = None
         self.line_position = 0
         self.line_count = 1
         skip_line = False
-        while index < len(source):
-            char = source[index]
+        while self.index < len(source):
+            char = source[self.index]
             self.line_position += 1
-            if char == '-' and index + 1 < len(source) and source[index + 1] == '-':
+            if char == '-' and self.index + 1 < len(source) and source[self.index + 1] == '-':
                 skip_line = True
             if skip_line and char == '\n':
                 skip_line = False
                 self.line_count += 1
                 self.line_position = 0
             elif skip_line:
-                index += 1
+                self.index += 1
             else:
                 if char.isdigit(): # 0 1 2 3 4 5 6 7 8 9
-                    index = self.read_number(source, index)
+                    self.index = self.read_number(source, self.index)
                 elif char.isalpha() or char in Tokenizer.START_OF_ID: # a-z A-Z @ _
-                    index = self.read_id(source, index)
+                    self.index = self.read_id(source, self.index)
                 elif char.isspace() and char != '\n': # ' ' \t
-                    index += 1
+                    self.index += 1
                 elif char in Tokenizer.START_OF_STRING:
-                    index = self.read_string(source, index)
+                    self.index = self.read_string(source, self.index)
                 elif char in Tokenizer.START_OF_OPERATOR:
-                    index = self.read_operator(source, index)
+                    self.index = self.read_operator(source, self.index)
                 elif char in Tokenizer.SEPARATORS:
-                    index = self.read_separator(source, index)
+                    self.index = self.read_separator(source, self.index)
                 else:
                     raise Exception("[TOKENS] What to do with: " + char + " at line " + str(self.line_count) + " pos " + str(self.line_position))
         if self.debug:
@@ -1570,7 +1577,7 @@ def read(filepath):
     f.close()
     return c
 
-def run(command, interpreter, output=None):
+def run(command, interpreter, only_tokenize=False, debug=False, output=None):
     global console
     tokenizer = Tokenizer()
     parser = Parser()
@@ -1581,6 +1588,7 @@ def run(command, interpreter, output=None):
     res = None
     try:
         tokens = tokenizer.tokenize(command)
+        if only_tokenize: return tokens
         ast = parser.parse(tokens)
         res = interpreter.do_ast(ast)
         console.puts('= ' + str(res))
@@ -1614,6 +1622,8 @@ def run(command, interpreter, output=None):
         f.close()
                 
 if __name__ == '__main__':
+    debug = False
+    only_tokenize = False
     if len(sys.argv) > 1:
         filepath = sys.argv[1]
         f = open(filepath, mode='r')
@@ -1621,14 +1631,14 @@ if __name__ == '__main__':
         f.close()
         interpreter = Interpreter().do(data)
     else:
-        debug = True
         interpreter = Interpreter()
+        print(f'Ash {__version__} on Python {__py_version__}.\nType "help" for more information.')
         while True:
             command = input('ash> ')
             if command == 'exit':
                 break
             elif command == 'help':
-                print('Ash language v0.1 2017-2019')
+                print(f'Ash {__version__} on Python {__py_version__}. 2017-2020')
                 print('help      : this help')
                 print('tests     : run multiple tests')
                 print('reset     : reset interpreter')
@@ -1636,14 +1646,15 @@ if __name__ == '__main__':
                 print('locals    : get local variable')
                 print('exec <f>  : execute a file')
                 print('trans <f> : transpile a file')
+                print('tokenize  : get only the tokens')
                 print('exit      : exit this shell')
             elif command.startswith('debug'):
                 args = command.split(' ')
                 if len(args) < 2:
                     debug = not debug
-                    console.info('Debug set to ' + str(debug))
                 else:
                     debug = True if args[1] == 'true' else False
+                console.info(f'Debug set to {debug}.')
             elif command == 'locals':
                 for k in sorted(interpreter.vars):
                     print(f"{k:10}", interpreter.vars[k])
@@ -1688,7 +1699,7 @@ if __name__ == '__main__':
                                 filename = os.path.join(arg, f)
                                 html_output = os.path.join(arg, 'html', f)
                                 c = read(filename)
-                                run(c, interpreter, html_output[:-4] + '.html')
+                                run(c, interpreter, only_tokenize, debug, html_output[:-4] + '.html')
                     else:
                         if not arg.endswith('.ash'):
                             arg += '.ash'
@@ -1696,14 +1707,31 @@ if __name__ == '__main__':
                             console.error('File ' + arg + ' does not exist')
                         else:
                             c = read(arg)
-                            run(c, interpreter)
+                            run(c, interpreter, only_tokenize, debug)
             elif command == 'reset':
                 interpreter = Interpreter()
             elif command == 'tests':
-                read_tests('./tests/tests.txt')      
+                read_tests('./tests/tests.txt')
+            elif command == 'tokenize':
+                only_tokenize = not only_tokenize
+                if only_tokenize:
+                    print('Ash is now only producing tokens.')
+                else:
+                    print('Ash is now producing tokens, an ast and interpreting it.')
             else:
                 try:
-                    run(command, interpreter)
+                    res = run(command, interpreter, only_tokenize, debug)
+                    if only_tokenize:
+                        print(command)
+                        start_line = ''
+                        for i, r in enumerate(res):
+                            while len(start_line) < r.start:
+                                start_line += ' '
+                            si = str(i)
+                            start_line += si + '_' * (r.length - len(si))
+                        print(start_line)
+                        for i, r in enumerate(res):
+                            print(i, r)
                 except Exception as e:
                     console.error(f'Exception: {e}')
                     traceback.print_exception(*sys.exc_info())

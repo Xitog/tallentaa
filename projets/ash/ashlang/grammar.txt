@@ -1,7 +1,7 @@
-Ce document décrit le langage Ash, une syntaxe alternative pour Python.
+ï»¿Ce document dÃ©crit le langage Ash, une syntaxe alternative pour Python.
 
-Ce document décrit un langage minimaliste de script.
-On décrit des EXTENSION (EXT) et des ALTERNATIVES (ALT) possibles.
+Ce document dÃ©crit un langage minimaliste de script.
+On dÃ©crit des EXTENSION (EXT) et des ALTERNATIVES (ALT) possibles.
 
 1. Bases
 ========
@@ -9,9 +9,9 @@ On décrit des EXTENSION (EXT) et des ALTERNATIVES (ALT) possibles.
 1.A Commentaires
 ----------------
 
-Les commentaires commençent par "--".
-Cela permet de conserver "//" et "#" comme opérateurs de intdiv et longueur.
-Pas de commentaires multilignes. On fera un "return" pour éviter du code.
+Les commentaires commenÃ§ent par "--".
+Cela permet de conserver "//" et "#" comme opÃ©rateurs de intdiv et longueur.
+Pas de commentaires multilignes. On fera un "return" pour Ã©viter du code.
 
 EXT : "--[[ ]]" pour les multilignes.
 ALT : "/*" et "*/" mais ce n'est plus raccord avec "--".
@@ -21,11 +21,11 @@ ALT : "/*" et "*/" mais ce n'est plus raccord avec "--".
 
 Tout est case-sensitive. Ab != Ba
 Le style est :
-    - a_b pour les méthodes, les attributs et les variables.
+    - a_b pour les mÃ©thodes, les attributs et les variables.
     - Ab pour les classes et les constantes
-Les fichiers sont encodés en ASCII.
+Les fichiers sont encodÃ©s en ASCII.
 
-1.C Mots clés
+1.C Mots clÃ©s
 -------------
 
 const, var, if, then, elif, else, end, while, do, for, in, break, next, and, or, not, fun, pro, function, procedure, return, self, super, nil
@@ -35,14 +35,14 @@ const, var, if, then, elif, else, end, while, do, for, in, break, next, and, or,
 
 - 1 => int pour les entiers
 - 1.2 => float/flt pour les flottants
-- true/false => bool pour les booléens
-- " ", ' ' => string/str pour les chaînes
-- [1, 2] => list pour les listes/array/tableaux
+- true/false => bool pour les boolÃ©ens
+- " ", ' ' => string/str pour les chaÃ®nes
+- [1, 2]Â => list pour les listes/array/tableaux
 - {k = v} => hash pour les dictionnaires/tables de hashage
 
 On garde : pour le typage et => pour autre chose.
 
-Les noms des types doivent être courts car on les écrira souvent.
+Les noms des types doivent Ãªtre courts car on les Ã©crira souvent.
 
 ALT : => pour les dico
 
@@ -55,18 +55,18 @@ a : int = 5
 
 : TYPE disent que c'est une constance de type.
 const dit que c'est une constance de valeur.
-nil permet de mettre une variable à "non initialisée".
-Tous les types s'entendent comme int ou nil (non initialisée).
-Une variable à nil ne peut être testée que pour is nil/is not nil
+nil permet de mettre une variable Ã  "non initialisÃ©e".
+Tous les types s'entendent comme int ou nil (non initialisÃ©e).
+Une variable Ã  nil ne peut Ãªtre testÃ©e que pour is nil/is not nil
 
-EXT : := pour une constance de type avec type inféré : a := 5
-    Finalement, je ne mets pas cette façon car :
-    1) cela créé un pb avec const : const A = 5 n'a pas de sens, il faudrait toujours écrire const A := 5
-    2) si EXPR n'est pas évident (= f()) il faut chercher le type de retour de f
+EXT : := pour une constance de type avec type infÃ©rÃ© : a := 5
+    Finalement, je ne mets pas cette faÃ§on car :
+    1) cela crÃ©Ã© un pb avec const : const A = 5 n'a pas de sens, il faudrait toujours Ã©crire const A := 5
+    2) si EXPR n'est pas Ã©vident (= f()) il faut chercher le type de retour de f
 ALT : on ne type pas les variables
 EXT : le type "any"
 
-4. Contrôle du flux
+4. ContrÃ´le du flux
 ===================
 
 4.A Structures de base
@@ -93,7 +93,7 @@ for ID[, ID2] in ID3 do
     ACT
 end
 
-On n'oblige pas dans le for à mettre var.
+On n'oblige pas dans le for Ã  mettre var.
 
 EXT :   repeat
             ACT
@@ -110,28 +110,28 @@ EXT : one liner : ... if COND
 break
 next
 
-5. Opérateurs
+5. OpÃ©rateurs
 =============
 
-Mathématiques   + - * / ** // %
-Booléens        and or xor not
+MathÃ©matiques   + - * / ** // %
+BoolÃ©ens        and or xor not
 Comparaison     == != < <= >= >
 Objet           is in $ (conv en string/str) # (conv en int length/len/trunc)
 Range           ..
 
-Les chaînes d'affilées se concatènent automatiquement, comme en Ruby.
+Les chaÃ®nes d'affilÃ©es se concatÃ¨nent automatiquement, comme en Ruby.
 
 EXT : ~= pour les matchs et <=> pour comparer en -1, 0, 1
-EXT : ..< pour les ranges où le dernier élément n'est pas inclus
+EXT : ..< pour les ranges oÃ¹ le dernier Ã©lÃ©ment n'est pas inclus
 ALT : [deb..fin] ou [deb..fin[
-EXT : &a permet de faire des alias a = &b a et b poitent sur la même valeur
+EXT : &a permet de faire des alias a = &b a et b poitent sur la mÃªme valeur
 ALT : tester nil avec ==
-ALT : Définir l'interrogation de définition : defined? (en méthode) non car on veut savoir si une var existe, il faut un keyword ??? ou ?
+ALT : DÃ©finir l'interrogation de dÃ©finition : defined? (en mÃ©thode) non car on veut savoir si une var existe, il faut un keyword ??? ou ?
 
 6. Fonctions
 ============
 
-6.A Déclaration
+6.A DÃ©claration
 ---------------
 
 fun[ction] [id] (a : typ, b : typ -> typ)
@@ -148,19 +148,19 @@ ALT : fun id (...) : typ
 6.B Appel
 ---------
 
-Définition et appel universels
-universal function call : f(a, b) est équivalent à a.f(b)
+DÃ©finition et appel universels
+universal function call : f(a, b) est Ã©quivalent Ã  a.f(b)
 
-Un appel de fonction peut se passer de paramètre et de parenthèses, mais dans ce cas-là, au niveau du parser, c'est juste un appel à un id. C'est au niveau de l'analyzer qu'il réinterprétera cette id en fonction du contexte déclaré.
+Un appel de fonction peut se passer de paramÃ¨tre et de parenthÃ¨ses, mais dans ce cas-lÃ , au niveau du parser, c'est juste un appel Ã  un id. C'est au niveau de l'analyzer qu'il rÃ©interprÃ©tera cette id en fonction du contexte dÃ©clarÃ©.
 
-Mouais, le non parenthésage obligatoire est élégant (pour les DSL) mais compliqué.
+Mouais, le non parenthÃ©sage obligatoire est Ã©lÃ©gant (pour les DSL) mais compliquÃ©.
 
 Il y a aussi les *id (liste de param) **id (hash de param)
-Ce qu'on peut faire avec les id n'est pas spécifié dans cette grammaire : $id (globale, les const le sont auto), , .
+Ce qu'on peut faire avec les id n'est pas spÃ©cifiÃ© dans cette grammaire : $id (globale, les const le sont auto), , .
 
 ALT : forcer le ()
 ALT : doit on avoir des fonctions first class object ? Sans () obligatoire, il faut passer par &f
-ALT : is après ) si on a pas de paramètres et qu'on autorise de ne pas mettre ()
+ALT : is aprÃ¨s ) si on a pas de paramÃ¨tres et qu'on autorise de ne pas mettre ()
 
 7. Classes
 ==========
@@ -169,14 +169,14 @@ class ID [< SUPER]
 end
 
 init : fonction de constructeur (au lieu de constructor, initialize, __init__)
-@attr doivent être déclaré uniquement dans init
+@attr doivent Ãªtre dÃ©clarÃ© uniquement dans init
 
 self
 super
 
 ALT : this
 EXT : enum
-ALT : +id -id #id respectivement une clé publique, privée, et protégée mais-@a c'est laid.
+ALT : +id -id #id respectivement une clÃ© publique, privÃ©e, et protÃ©gÃ©e mais-@a c'est laid.
 
 8. Exceptions
 =============
@@ -192,7 +192,7 @@ raise expr
 
 No redo nor retry
 
-ALT : pas de gestion d'exceptions, on fait "à la C".
+ALT : pas de gestion d'exceptions, on fait "Ã  la C".
 Chaque type s'entend comme pouvant accueillir les valeurs nil et error.
 
 a = f()
@@ -201,7 +201,7 @@ elif a is nil
 elif a is error
 end
 
-ALT : when au lieu de catch (pratique car on réutilise le when du switch)
+ALT : when au lieu de catch (pratique car on rÃ©utilise le when du switch)
 
 9. Modules
 ==========
@@ -216,7 +216,7 @@ ALT : module ID/end
 ALT : require or import ID
 ALT : include or use ID
 
-10. Bibliothèque standard
+10. BibliothÃ¨que standard
 =========================
 
 I/O
@@ -255,22 +255,22 @@ Hash
 11. Syntaxe BNF
 ===============
 
-11.A Légende
+11.A LÃ©gende
 ------------
 
-    EXPRESSION : règle
+    EXPRESSION : rÃ¨gle
     fun : token
-    --> : transcription de règle
-    { ... } : 0 à n
+    --> : transcription de rÃ¨gle
+    { ... } : 0 Ã  n
     [ ... ] : 0 ou 1
     | : ou
     # : commentaire
-    'x' : littéral (symbole directement)
+    'x' : littÃ©ral (symbole directement)
     
 11.B Syntaxe
 ------------
 
-ATTENTION : pas mis à jour avec les dernières modifications
+ATTENTION : pas mis Ã  jour avec les derniÃ¨res modifications
 
     PROGRAM --> STATEMENT { ';' STATEMENT }
     
@@ -388,7 +388,7 @@ ATTENTION : pas mis à jour avec les dernières modifications
     
     FUNC_SUB_CALL --> id ( LIST_EXPRESSION )
  
-11.C Définition des tokens
+11.C DÃ©finition des tokens
 --------------------------
 
     fun --> 'fun' 'function'
@@ -441,7 +441,7 @@ Not used :
 12. Exemples / Ash en Action
 ----------------------------
 
-ATTENTION : pas mis à jour avec les dernières modifications
+ATTENTION : pas mis Ã  jour avec les derniÃ¨res modifications
 
 const Personne = {
     age = 5,
