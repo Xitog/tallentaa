@@ -1,7 +1,40 @@
-﻿Ce document décrit le langage Ash, une syntaxe alternative pour Python.
+Ce document décrit le langage Ash, une syntaxe alternative pour Python.
 
 Ce document décrit un langage minimaliste de script.
 On décrit des EXTENSION (EXT) et des ALTERNATIVES (ALT) possibles.
+
+Ce langage est très inspiré de :
+    1) Lua
+    2) Ruby
+    3) Pascal
+
+Il se veut simple et pérenne (pas de multiples versions tous les ans).
+
+Lua est une bonne base, par son petit périmète, mais souffre de plusieurs défauts selon moi :
+    o l'opérateur de différence est ~= au lieu du standard !=
+    o la fusion des listes et des dictionnaires dans les tables est imbitables
+    o par exemple, impossible d'avoir un compte fiable d'une table avec l'opérateur # si on mixe index numérique et non numérique
+    o impossible de savoir si une clé est définie ou contient nil
+    o présence de goto, my goodness!
+    o pas de continue ou de next dans les boucles
+    o pas de vérification du nombre de paramètres (la valence) des fonctions
+    o bien sûr, aucune vérification possible du type des paramètres (mais Teal, un langage dérivé, le peut)
+    o pas d'opérateurs combinés comme +=
+    o la bibliothèque standard est ultralimité, il faudrait penlib directement dedans
+    o pas d'orienté objet de base (encapsulation et héritage)
+    o break et return ne peuvent apparaître que comme dernier statement d'un bloc
+      https://www.lua.org/pil/4.4.html
+    o pas d'exceptions, seulement pcall, error, xpcall, pas de try/catch/raise/throw/finally
+    o il faut mettre entre crochets la clé si ce n'est pas un symbole : { ["a"] = 5 }    
+    o un test de if/while ne devrait se faire que sur des booléens
+Il y a des points positifs néanmoins :
+    o les listes vides, le nombre 0 et une liste vide sont vrais seuls false et nil sont faux
+      http://t-a-w.blogspot.com/2007/07/truth-falsehood-and-voidness-in-dynamic.html
+    o 8 types de base only : nil, boolean, number, string, function, thread, table, and userdata
+    o possible de retourner plusieurs valeurs http://www.lua.org/pil/5.1.html
+      mais attention (f()) fait ne retourner qu'une valeur
+    o possibilité de faire des labels bon ça marche avec des goto par contre :(
+      http://lua-users.org/wiki/GotoStatement
 
 1. Bases
 ========
@@ -28,12 +61,15 @@ Les fichiers sont encodés en ASCII.
 1.C Mots clés
 -------------
 
-const, var, if, then, elif, else, end, while, do, for, in, break, next, and, or, not, fun, pro, function, procedure, return, self, super, nil
+27 en tout.
+const, var, if, then, elif, else, end, while, do, for, in, break, next, and, or, not, fun, pro, function, procedure, return, self, super, nil, false, true, require
+
+ALT : remove const, var => 25
 
 2. Types de base
 ================
 
-- 1 => int pour les entiers
+- 1, 0b0101, 0xAF00, 0c10 => int pour les entiers
 - 1.2 => float/flt pour les flottants
 - true/false => bool pour les booléens
 - " ", ' ' => string/str pour les chaînes
@@ -45,6 +81,7 @@ On garde : pour le typage et => pour autre chose.
 Les noms des types doivent être courts car on les écrira souvent.
 
 ALT : => pour les dico
+ALT : number pour les float (num)
 
 3. Variables et constantes
 ==========================
@@ -65,6 +102,7 @@ EXT : := pour une constance de type avec type inféré : a := 5
     2) si EXPR n'est pas évident (= f()) il faut chercher le type de retour de f
 ALT : on ne type pas les variables
 EXT : le type "any"
+ALT : ni var, ni const, on ne fait qu'à la majuscule en début d'identifiant
 
 4. Contrôle du flux
 ===================
@@ -85,15 +123,19 @@ else
     ACT
 end
 
-while COND do
+[label] while COND do
     ACT
 end
 
-for ID[, ID2] in ID3 do
+[label] for ID[: typ1][, ID2[: typ2]] in ID3 do
     ACT
 end
 
 On n'oblige pas dans le for à mettre var.
+
+On peut "étiquetter" une boucle pour ensuite breaké ou nexté celle-ci.
+Un label est défini ainsi :label:
+:innerloop: for x in l do (comme Lua, JavaScript et C utilisent innerloop:)
 
 EXT :   repeat
             ACT
@@ -102,13 +144,14 @@ ALT : begin/end
 ALT : else if, elseif, elsif
 EXT : switch : switch / case / default / break ou case / when / others / break
 EXT : redo, retry dans les boucles
-EXT : one liner : ... if COND
+EXT : one liner : ... if COND ou if COND => ... avec else possible et while COND =>
+EXT :case expr when expr [then] ... else ... end
 
 4.B Modificateurs
 -----------------
 
-break
-next
+break [label]
+next [label]
 
 5. Opérateurs
 =============
@@ -134,7 +177,7 @@ ALT : Définir l'interrogation de définition : defined? (en méthode) non car o
 6.A Déclaration
 ---------------
 
-fun[ction] [id] (a : typ, b : typ -> typ)
+fun[ction] [id] (a : typ, b : typ -> typ[, typ]*)
 pro[cedure] [id] (a : typ, b : typ)
 call without parameter id
 return [expr]
@@ -144,6 +187,7 @@ Autoriser ? (pour -> bool) et ! (pour modif internes) dans les id de fun/pro.
 PB : fun id ( -> str) c'est laid non ?
 
 ALT : fun id (...) : typ
+ALT : func et proc et pas sub, def
 
 6.B Appel
 ---------
@@ -175,11 +219,14 @@ self
 super
 
 ALT : this
-EXT : enum
+EXT : enum < type is ... end
 ALT : +id -id #id respectivement une clé publique, privée, et protégée mais-@a c'est laid.
+EXT : type/data ID is ... end
 
 8. Exceptions
 =============
+
+raise EXPR
 
 try
     ACT
@@ -202,6 +249,8 @@ elif a is error
 end
 
 ALT : when au lieu de catch (pratique car on réutilise le when du switch)
+ALT : throw au lieu de raise
+ALT : else s'il n'y a pas eu d'exception
 
 9. Modules
 ==========
@@ -215,6 +264,8 @@ Pour l'importer : require str ex :
 ALT : module ID/end
 ALT : require or import ID
 ALT : include or use ID
+ALT : import au lieu de require. import STRING ou import :label:
+      pb : import a où a est une variable...
 
 10. Bibliothèque standard
 =========================
