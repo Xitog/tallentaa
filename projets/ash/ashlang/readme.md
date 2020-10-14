@@ -179,14 +179,8 @@ Le commentaire continue ici.
 Mots clés
 
 Les 26 mots suivant, appelés mots clés, sont réservés et ne peuvent être utilisés comme noms de variable :
-<table>
-<tr><td>and</td><td>break</td><td>catch</td><td>do</td><td>else</td></tr>
-<tr><td>elif</td><td>end</td><td>false</td><td>finally</td><td>for</td></tr>
-<tr><td>fun</td><td>if</td><td>in</td><td>next</td><td>nil</td></tr>
-<tr><td>not</td><td>or</td><td>raise</td><td>repeat</td><td>return</td></tr>
-<tr><td>sub</td><td>then</td><td>true</td><td>while</td><td>try</td></tr>
-<tr><td>class</td></tr>
-</table>
+
+repeat
 
 # 2. Variables et constantes
 

@@ -1,10 +1,32 @@
+
 # Ash
 
 A simple language transpiling to Python. Its default implementation is written in Python 3.
 
-## Comments
+## Summary
+
+1. First step with Ash
+  1.A Comments
+  1.B Keywords
+
+## First steps with Ash
+
+### Comments
 
 ``-- This is a comment``
+
+### Keywords
+
+Ash uses 26 keywords which mustn't be used as variable names:
+* Nil literal: ``nil``
+* Boolean literals: ``true``, ``false``
+* Operators: ``and``, ``or``, ``not``, ``xor``
+* Choice: ``if``, ``then``, ``elif``, ``else``, ``end``
+* Loop: ``while``, ``do``, ``end``, ``break``, ``next``
+* Subprogram: ``fun``, ``pro``, ``return``
+* Class: ``class``
+* Module: ``import``
+* Exceptions: ``try``, ``when``, ``finally``, ``raise``
 
 ## Variables
 
