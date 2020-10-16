@@ -1,5 +1,5 @@
 
-from ashlexer import TokenType, Token, Tokenizer
+from ashlang.ashlexer import TokenType, Token, Tokenizer
 import copy # only once for read_expr
 
 # Model

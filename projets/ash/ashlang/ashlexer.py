@@ -54,6 +54,9 @@ class Token:
     def __repr__(self):
         return str(self)
 
+    def format(self):
+        return f'({self.typ}, "{self.val}")'
+
     def to_s(self, level=1):
         """String representation of the token type"""
         return "    " * level + "{Token} " + str(self)
@@ -110,6 +113,15 @@ class Tokenizer:
                 Tokenizer.START_OF_OPERATOR.append(operator[0])
         self.debug = debug
 
+    def format(self, token_list):
+        s = '(TokenList, ['
+        for i, tok in enumerate(token_list):
+            s += tok.format()
+            if i != len(token_list) - 1:
+                s += ', '
+        s += '])'
+        return s
+
     def read_number(self, line: str, start: int):
         """Read a number from a string"""
         index = start
@@ -127,11 +139,11 @@ class Tokenizer:
             if line[index] == '_':
                 suspended = True
             elif line[index] == '.':
-                if is_float:
-                    raise Exception("Twice . in a number")
                 # 1..2 => range op
                 if index + 1 < len(line) and line[index + 1] == '.':
                     break
+                if is_float:
+                    raise Exception("Twice . in a number")
                 is_float = True
                 word += '.'
             else:
@@ -234,7 +246,7 @@ class Tokenizer:
         self.tokens.append(token)
         return index+1
 
-    def tokenize(self, source: str, debug: bool = False):
+    def tokenize(self, source: str, debug: bool = False, to_s: bool = False):
         """Transform a string into a list of tokens"""
         if debug:
             print('[INFO] Start lexing')
@@ -275,4 +287,7 @@ class Tokenizer:
             print(f'[INFO] {len(self.tokens)} tokens created:')
             for i in range(0, len(self.tokens)):
                 print(f'{i}. {self.tokens[i]}')
-        return self.tokens
+        if not to_s:
+            return self.tokens
+        else:
+            return self.format(self.tokens)

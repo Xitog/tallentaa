@@ -12,10 +12,10 @@ import os.path
 import sys # for writing debug info
 import traceback
 
-from ashlexer import Tokenizer
-from ashparser import Parser
-from ashtranspiler import TranspilerDirectPython
-from ashinterpreter import Interpreter
+from ashlang.ashlexer import Tokenizer
+from ashlang.ashparser import Parser
+from ashlang.ashtranspiler import TranspilerDirectPython
+from ashlang.ashinterpreter import Interpreter
 
 #
 # Globals
@@ -117,7 +117,7 @@ def run(command, interpreter, mode='full', debug=False, output=None):
         f.write('  </body>\n</html>')
         f.close()
                 
-if __name__ == '__main__':
+def main():
     debug = False
     mode = 'full'
     if len(sys.argv) > 1:
@@ -232,3 +232,6 @@ if __name__ == '__main__':
                 except Exception as e:
                     console.error(f'Exception: {e}')
                     traceback.print_exception(*sys.exc_info())
+
+if __name__ == '__main__':
+    main()

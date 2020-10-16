@@ -32,7 +32,11 @@ __version__ = "0.0.1"
 
 # Imports
 import logging
-from ashlang.ash import ash
+from ashlang.ash import main
+from ashlang.ashlexer import *
+from ashlang.ashparser import *
+from ashlang.ashinterpreter import *
+from ashlang.ashtranspiler import *
 
 logging.basicConfig(format='%(levelname)s %(asctime)s %(message)s')
 logging.getLogger().setLevel(logging.DEBUG)

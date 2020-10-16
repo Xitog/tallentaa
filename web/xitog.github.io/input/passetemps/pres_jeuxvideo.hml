@@ -33,6 +33,7 @@
 * * [Hexen: Beyond Heretic->#]
 * * [Soldier of Fortune->#]
 * * [Ion Fury->#]
+* * [Strife->#]
 * [La musique de jeux vidéo->#]
 * [Index des jeux cités->#]
 
@@ -138,12 +139,12 @@ Heureusement, les hubs suivants sont meilleurs et nous permettent de découvrir 
 
 Après l'avoir fini, je peux dire qu'Hexen est un bon, sinon grand, jeu. Sorti fin 1995, c'est la queue de la comète des jeux utilisant le moteur de Doom, que Strife viendra clore. L'ambiance héroïc fantasy est bien sympa, les trois classes de personnage apportent une rejouabilité non négligeable, chacune ayant son propre ensemble d'armes.
 
-* Hexen sur [Wikipedia->hexen1], [Mobygames->hexen2], [doom.fandom->hexen3], [doomwiki->hexen4]
+* Hexen sur [Wikipedia->hexen1], [Mobygames->hexen2], [Doom Wiki->hexen3], [Doom Fandom->hexen4]
 
 [hexen1]: https://fr.wikipedia.org/wiki/Hexen
 [hexen2]: https://www.mobygames.com/game/hexen-beyond-heretic
-[hexen3]: https://doom.fandom.com/wiki/Hexen
-[hexen4]: https://doomwiki.org/wiki/Hexen
+[hexen3]: https://doomwiki.org/wiki/Hexen
+[hexen4]: https://doom.fandom.com/wiki/Hexen
 
 ## Soldier of Fortune
 
@@ -184,6 +185,34 @@ Bref, Ion Fury est un moment sympa, bourré de nostalgie pour les anciens, et un
 
 [ion1]: https://fr.wikipedia.org/wiki/Ion_Fury
 [ion2]: https://www.mobygames.com/game/windows/ion-fury
+
+## Strife
+
+**Rogue**, 1996 ''(joué en octobre 2020, fini en rookie 2/4)'' **Doom engine**
+
+Strife est le dernier jeu commercialé utilisant le moteur de @@Doom@@ (1993). S’il y a des textures transparentes brisables pour représenter des vitraux, il s’agit globalement de la même technologie, l’id Tech 1. Strife est sorti en 1996 après un développement troublé : démarré chez Cygnus, abandonné par le directeur du studio, ses développeurs se révoltent et fondent Rogue pour finir son développement, aidé par id Software qui leur trouve un éditeur, Velocity. Malheureusement, Velocity est en difficulté financière et fermera peu de temps après la sortie du jeu.
+
+Cette genèse troublée retarde la sortie du jeu d’un an et l’année 1996 est marquée par les sorties de @@Duke Nukem 3D@@ et @@Dark Forces@@, des jeux qui exploitent de façon très avancée les possibilités des moteurs 2.5D, ainsi que par la sortie du révolutionnaire @@Quake@@, avec son moteur en vraie 3D. Qu’à Strife pour lui face à tous ces hits ?
+
+En premier, un univers original : sur une terre parallèle où on s’habille aussi bien en toge qu’en débardeur, une comète s’écrase. Peu après un virus apparaît, contaminant et tuant la majorité de la population. Certains commencent à entendre une voix, qu’ils prennent pour celle d’un dieu, et fondent l’Ordre. Une organisation totalitaire qui prend le contrôle du monde. Le Front essaye néanmoins de leur résister dans un combat qui n’est pas sans rappeler les Rebelles contre l’Empire de Star Wars. L'histoire est racontée par des dessins dans le plus pur style des comics américains.
+
+On se balade donc dans un monde qui oscille entre médiéval-fantastique et science-fiction, où un château est commandé par le Programmeur, où l’Evêque commande des hordes robotiques, et l’Oracle est autant cyber que mythologique. Parfois on trouve également des éléments rappelant les anciennes civilisations mésoaméricains (Aztec et Maya), ou une civilisation extraterrestre qui rappelle celle de @@Duke Nukem 3D@@. Comme **niveaux**, on aura droit aux grands classiques des deux genres : le château, les égoûts, les mines mais aussi la base, l’entrepôt, la centrale énergétique, le vaisseau spatial. Certains sont un peu labyrinthique (les égouts, les proving grounds), mais rien à voir avec les délires d’@@Hexen@@ avec ses boutons ouvrant une porte dans un autre niveau sans aucune indication.
+
+En second, même si ses bases technologiques sont anciennes, Strife propose dans son **gameplay** des éléments de RPG : on peut discuter avec de nombreux personnages, certains avec un portrait dessiné, qui nous donnent des quêtes à remplir, le héros possède deux caractéristiques, l’accuracy et la stamina, qu’il peut augmenter peu à peu, il y a des boutiques où on peut acheter des munitions ou des packs de santé. Si @@Heretic@@ et @@Hexen@@ possédaient déjà un inventaire, ils n’étaient pas allés aussi loin dans l’aspect RPG. Strife propose également des éléments de gameplay originaux : on peut parfois parcourir la base ennemie en se déguisant avec un uniforme de l’Ordre, les ennemis ne sont pas hostiles tant que l’alarme n’est pas déclenchée, sauf certains robots qui attaquent à vue. Strife reprend également le système de hub, des niveaux interconnectés, déjà vu dans les jeux de Raven.
+
+Les **armes** sont pour la plupart intéressantes : outre la dague, nous avons à notre diposition une arbalète, un fusil d’assaut, un lance-roquette, un lance-grenade, un lance-flamme, le mauler et le Sigil, une arme surpuissante dont il faut retrouver les différents morceaux au cours de notre aventure, gardés par de puissants boss. Les **enemis** oscillent entre l’humanoïde et le robotique, sont plutôt bien animés et variés : tourelles, sentinelles volantes, araignées, space marines, mécha à la Robocop ou énorme mécha. L’Ordre étant une organisation religieuse, plusieurs monstres portent des noms liés : templier, croisé et inquisiteur.
+
+Pour la **difficulté**, il faut faire attention à ne pas déclencher l’alarme dans les hubs neutres, dans la ville de départ notamment, économiser ses munitions, mais sinon le jeu ne pose pas de véritables difficultés au niveau Rookie (2/4). La **musique** est un peu trop répétitive et n'atteint pas les sommets de celles de @@Doom@@, @@Duke Nukem 3D@@ et @@Rise of the Triad@@. Côté **technique**, j'ai joué à la ''Veteran Edition'' disponible sur Steam et GOG, aucun bug, c'est très propre.
+
+En bref, un jeu intéressant et qui procure son lot de fun dans un univers original, même si je ne suis pas particulièrement fan du mix sf/fantasy.
+
+* Strife sur [Wikipedia->strife1], [Mobygames->strife2], [Doom Wiki->strife3], [Doom Fandom->strife4], [Code source->strife5]
+
+[strife1]: https://en.wikipedia.org/wiki/Strife_(1996_video_game)
+[strife2]: https://www.mobygames.com/game/strife
+[strife3]: https://doomwiki.org/wiki/Strife
+[strife4]: https://doom.fandom.com/wiki/Strife
+[strife5]: https://github.com/svkaiser/strife-ve
 
 # La musique de jeux vidéo
 

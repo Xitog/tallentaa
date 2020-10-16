@@ -1,5 +1,5 @@
-from ashlexer import Token
-from ashparser import Block, Operation, Terminal
+from ashlang.ashlexer import Token
+from ashlang.ashparser import Block, Operation, Terminal
 
 class TranspilerDirectPython:
     def __init__(self):

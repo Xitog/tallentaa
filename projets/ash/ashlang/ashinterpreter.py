@@ -1,4 +1,4 @@
-from ashparser import *
+from ashlang.ashparser import *
 
 # Basic Library
 
