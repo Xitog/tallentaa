@@ -1,18 +1,3 @@
-# Sommaire
-
-1. Premiers pas avec Ash
-    1. Commentaires
-    2. Mots clés
-2. Variables et constantes
-3. Types et opérateurs
-4. Instructions
-5. Fonctions et procédures
-6. Classes
-7. Modules
-8. Exceptions
-9. Bibliothèque standard
-10. Interactions avec Python et transpilation
-
 # Introduction
 
 Ash est né des limitations frustrantes de Lua :
@@ -95,30 +80,13 @@ Ash 1.0 2011-2019
 
 Pour commencer, nous allons suivre la tradition en affichant le message "Hello World" dans la console. Pour donner cette instruction à l'ordinateur, il suffit d'écrire dans l'interpréteur :
 
-Exemple 1 :
-
-```lua
-> writeln("Hello World")
-```
-
 writeln est une fonction qui affiche ce qu'on lui donne en paramètre et finit par un saut de ligne et un retour à la première position.
 
 Nous voulons ensuite personnaliser notre message en demandant son nom à l'utilisateur :
 
-Exemple 2 :
-
-```lua
-> name = io.read(str)
-> writeln("Hello", name)
-```
-
 read est une fonction du module io qui va lire sur la console ce que tape l'utilisateur. Ici, on précise qu'on veut lire une chaîne de caractère (str pour String). On stocke cette valeur dans la variable name, puis on affiche à l'aide de writeln un message de bienvenue.
 
 L'exemple 1 est constitué d'une seule instruction. L'exemple 2 est constituée de deux instructions. Un programme Ash est constitué d'une suite d'instructions et globalement, une instruction correspond à une ligne. Les sauts de ligne jouent un rôle important dans la syntaxe d'Ash. Si on veut mettre deux instructions sur la même ligne, il faut les séparer par un point-virgule. Ainsi l'exemple 2 est équivalent à l'exemple 3 :
-
-```lua
-> name = io.read(str) ; writeln("Hello", name)
-```
 
 L'interpréteur exécute les instructions Ash une par une immédiatement dans ce qu'on appelle une boucle REPL : read/lire - eval/interpréter - print/afficher - loop/boucler. Pour quitter cette boucle, il suffit de taper exit. Parfois, une instruction ne peut être exécutée seule et doit être complétée par une autre. Dans ce cas-là, l'interpréteur change son invite de commande en >>.
 
@@ -231,13 +199,3 @@ NilError : variable 'a' is of type int, not int?
 Une variable déclarée dans un script a une portée globale. 
 
 Un nom de variable ne doit pas commencer par un chiffre et peut contenir les 26 lettres de l'alphabet latin standard et des soulignés. Une variable ne peut avoir pour nom un mot clé. Ash fait la différence entre les minuscules et les majuscules, ainsi abc et ABC ne sont pas la même variable. De plus, nous l’avons vu, toute variable commençant par une majuscule est en fait une constante : elle référence une valeur et cette référence ne peut être changée.
-
-# 3. Types et opérateurs
-
-# 4. Instructions
-# 5. Fonctions et procédures
-# 6. Classes
-# 7. Modules
-# 8. Exceptions
-# 9. Bibliothèque standard
-# 10. Interactions avec Python et transpilation
