@@ -68,21 +68,23 @@ def python_tokenize(string):
 class Test:
 
     nb = 0
+    nb_good = 0
 
-    def __init__(self, s, res=None):
+    def __init__(self, s, expected=None):
         Test.nb += 1
         process = t.tokenize(s, to_s = True)
         vs_python = False
-        if res is None:
-            res = t.format(python_tokenize(s))
+        if expected is None:
+            expected = t.format(python_tokenize(s))
             vs_python = True
-        if process == res:
-            info = '' if not vs_python else '(vs python)'
-            print(f'Test {Test.nb} ok     {s} {info}')
+        if process == expected:
+            info = ' ' * 11 if not vs_python else '(vs python)'
+            print(f'Test {Test.nb} ok     {s:20} {info} {process}')
+            Test.nb_good += 1
         else:
-            print(f'Test {Test.nb} failed {s}:')
+            print(f'Test {Test.nb} failed {s:}:')
             print(f'1. Processed: {process}')
-            print(f'2. Expected:  {res}')
+            print(f'2. Expected:  {expected}')
             if vs_python:
                 print('Expected obtained from Python tokenizer.')
 
@@ -90,3 +92,9 @@ Test('2+3', '(TokenList, [(Integer, "2"), (Operator, "+"), (Integer, "3")])')
 Test('2+3') # 14h26 plus besoin de spécifier le résultat, on utilise le tokenizer de base de Python :-) !
 Test('2..3', '(TokenList, [(Integer, "2"), (Operator, ".."), (Integer, "3")])')
 Test('2.3..4', '(TokenList, [(Float, "2.3"), (Operator, ".."), (Integer, "4")])')
+Test('2 + 3 * 2')
+Test('(2 + 3) * 2')
+Test('a = 5')
+Test('if a == 5 then writeln("a equals 5") end', '(TokenList, [(Keyword, "if"), (Identifier, "a"), (Operator, "=="), (Integer, "5"), (Keyword, "then"), (Identifier, "writeln"), (Separator, "("), (String, "a equals 5"), (Separator, ")"), (Keyword, "end")])')
+print(f"Test passed: {Test.nb_good} / {Test.nb}")
+

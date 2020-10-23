@@ -1,0 +1,10 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Version=0.0.1
+Type=Application
+Terminal=false
+Name=Jyx
+Comment=A simple text editor
+Exec=/home/damien/Documents/tallentaa/projet_editor/python/jyx.py
+Icon=/home/damien/Documents/tallentaa/projet_editor/python/icons/pole-star.png
+StartupWMClass=Jyx
