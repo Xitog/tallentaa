@@ -1,8 +1,0 @@
-Main-Class: jyx.Jyx
-Name: Jyx
-Specification-Title: Jyx, a simple text editor
-Specification-Version: 1.0
-Specification-Vendor: Damien Gouteux
-Implementation-Title: jyx.Jyx
-Implementation-Version: 1.0
-Implementation-Vendor: Damien Gouteux

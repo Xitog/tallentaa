@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 # Created the ‎lundi ‎6 ‎juin ‎2016 (début des tests tkinter)
 
+#
+# Imports
+#
+
 import configparser
 import os.path
 
@@ -13,10 +17,139 @@ from tkinter import font
 from enum import Enum
 from typing import Dict
 
+# Getting now
+from datetime import datetime
+
+import subprocess
+import stat
+
 # Tokenize from rey
 import sys
-sys.path.append('../../projets/ash')
-from ashlang import Tokenizer, Token
+try:
+    sys.path.append('../../projets/ash')
+    from ashlang import Tokenizer, Token
+except ModuleNotFoundError:
+    ASH_TOKENIZER = False
+else:
+    ASH_TOKENIZER = True
+
+#
+# Globals and constants
+#
+
+# support is a list and can have 'tokenize' and/or 'execute' to enable them
+default_language = 'text'
+languages = {
+    'text' : {
+        'label': 'Plain text',
+        'extension': ['.txt'],
+        'family': None,
+        'support': None,
+    },
+    'dglog' : {
+        'label': 'DG log',
+        'extension': ['.dlg'],
+        'family': 'Lightweight markup',
+        'support': None,
+    },
+    'textile' : {
+        'label': 'Textile',
+        'extension': ['.txl'],
+        'family': 'Lightweight markup',
+        'support': None,
+    },
+    'hamill': {
+        'label': 'Hamill',
+        'extension': ['.hml'],
+        'family': 'Lightweight markup',
+        'support': None,
+    },
+    'javascript' : {
+        'label': 'JavaScript',
+        'extension': ['.js'],
+        'family': 'Scripting',
+        'support': None,
+    },
+    'lua' : {
+        'label': 'Lua',
+        'extension': ['.lua'],
+        'family': 'Scripting',
+        'support': None,
+    },
+    'python' : {
+        'label': 'Python',
+        'extension': ['.py'],
+        'family': 'Scripting',
+        'support': ['execute'],
+    },
+    'ruby' : {
+        'label': 'Ruby',
+        'extension': ['.rb'],
+        'family': 'Scripting',
+        'support': None,
+    },
+    'ash' : {
+        'label': 'Ash',
+        'extension': ['.ash'],
+        'family': 'Scripting',
+        'support': None,
+    },
+    'c' : {
+        'label': 'C',
+        'extension': ['.c', '.h'],
+        'family': 'Compiled',
+        'support': None,
+    },
+    'java' : {
+        'label': 'Java',
+        'extension': ['.java'],
+        'family': 'Compiled',
+        'support': None,
+    },
+    'ini' : {
+        'label': 'INI config',
+        'extension': ['.ini'],
+        'family': 'Data',
+        'support': None,
+    },
+    'json' : {
+        'label': 'JSON data',
+        'extension': ['.json'],
+        'family': 'Data',
+        'support': None,
+    },
+    'xml' : {
+        'label': 'XML data',
+        'extension': ['.xml', '.xsd', '.xslt'],
+        'family': 'Data',
+        'support': None,
+    },
+    'html': {
+        'label': 'HTML',
+        'extension': ['.html', '.htm'],
+        'family': 'Web',
+        'support': None,
+    },
+    'css': {
+        'label': 'CSS',
+        'extension': ['.css'],
+        'family': 'Web',
+        'support': None,
+    },
+}
+
+def lang_has(lang, prop):
+    if lang not in languages:
+        return False
+    if 'support' not in languages[lang]:
+        return False
+    support = languages[lang]['support']
+    if support is None:
+        return False
+    if prop not in support:
+        return False
+    return True
+
 
 class Fonts:
     COURRIER_NEW_10_BOLD = None
@@ -140,23 +273,26 @@ class RessourceManager:
 
 class Application:
 
+    RUN_COMMAND = 5
+    CONFIG_FILE_NAME = 'jyx.ini'
+    VERSION = '0.0.1'
+
     def __init__(self):
         self.log = Logger(False)
         self.rc = RessourceManager(self.log)
         #self.rc.from_file(r'icons\iconyellowcube16x19_F5i_icon.ico')
         self.rc.from_file(os.path.join(".", "icons", "polar-star.png"))
         self.title = 'Jyx'
-        self.version = '0.0.1'
         # config
         self.options = {}
         # base options
         self.options['display_tree'] = True
         self.options['confirm_exit'] = True
-        self.options['lang'] = 'txt'
+        self.options['lang'] = default_language
         # try to load options
-        if os.path.isfile(self.title + '.ini'):
+        if os.path.isfile(Application.CONFIG_FILE_NAME):
             config = configparser.ConfigParser()
-            config.read(self.title + '.ini')
+            config.read(Application.CONFIG_FILE_NAME)
             if 'MAIN' in config:
                 if 'display_tree' in config['MAIN']:
                     self.options['display_tree'] = (config['MAIN']['display_tree'] == 'True')
@@ -175,7 +311,7 @@ class Application:
             'display_tree' : str(self.options['display_tree']),
             'confirm_exit' : str(self.options['confirm_exit']),
         }
-        with open(self.title + '.ini', 'w') as configfile:
+        with open(Application.CONFIG_FILE_NAME, 'w') as configfile:
             config.write(configfile)
 
     def update(self):
@@ -195,7 +331,7 @@ class Application:
             if self.frame.get_dirty(i):
                 dirty = " *"
             if i == current:
-                self.root.wm_title(self.title + " " + self.version + " - " + file + dirty)
+                self.root.wm_title(self.title + " " + Application.VERSION + " - " + file + dirty)
             self.frame.notebook.tab(i, text=os.path.basename(file) + dirty)
 
     def make_menu(self):
@@ -220,7 +356,7 @@ class Application:
         self.editmenu.add_separator()
         self.editmenu.add_command(label="Cut", command=self.menu_cut, accelerator="Ctrl+X")
         self.editmenu.add_command(label="Copy", command=self.menu_copy, accelerator="Ctrl+C")
-        self.editmenu.add_command(label="Paste", command=self.menu_paste) #, accelerator="Ctrl+V")
+        self.editmenu.add_command(label="Paste", command=self.menu_paste, accelerator="Ctrl+V")
         self.editmenu.add_command(label="Select All", command=self.menu_select_all, accelerator="Ctrl+A")
 
         self.display_tree = tkinter.BooleanVar()
@@ -231,36 +367,42 @@ class Application:
         self.options_menu = tkinter.Menu(self.menu, tearoff=0)
         self.menu.add_cascade(label="Options", menu=self.options_menu)
         self.options_menu.add_checkbutton(label="Display Tree", onvalue=True, offvalue=False, variable=self.display_tree, command=self.restart)
-        self.options_menu.add_checkbutton(label="Confirm Exit", onvalue=True, offvalue=False, variable=self.confirm_exit, command=self.restart)
+        self.options_menu.add_checkbutton(label="Confirm Exit", onvalue=True, offvalue=False, variable=self.confirm_exit, command=self.save_opt)
 
+        # Language
+        self.log.info(f"{len(languages)} language definitions loaded.")
         self.lang = tkinter.StringVar()
-        self.lang.set(self.options['lang'])
+        if self.options['lang'] not in languages:
+            self.log.error(f"{self.options['lang']} not in known languages. Reseting to {languages[default_language]['label']}.")
+            self.lang.set(default_language)
+        else:
+            self.lang.set(self.options['lang'])
+        self.log.info("self.lang = " + self.lang.get())
 
         self.langmenu = tkinter.Menu(self.menu, tearoff=0)
         self.menu.add_cascade(label="Language", menu=self.langmenu)
-        # Plain text
-        self.langmenu.add_radiobutton(label="Plain text (.txt)", variable=self.lang, value="txt", command=self.update_lang)#, indicatoron=0
-        self.langmenu.add_separator()
-        # Lightweight markup language
-        self.langmenu.add_radiobutton(label="DG Log (.dgl)", variable=self.lang, value="dgl", command=self.update_lang)
-        self.langmenu.add_radiobutton(label="Textile (.txl)", variable=self.lang, value="txl", command=self.update_lang)
-        self.langmenu.add_separator()
-        # Script language
-        self.langmenu.add_radiobutton(label="JavaScript (.js)", variable=self.lang, value="js", command=self.update_lang)
-        self.langmenu.add_radiobutton(label="Lua (.lua)", variable=self.lang, value="lua", command=self.update_lang)
-        self.langmenu.add_radiobutton(label="Python (.py)", variable=self.lang, value="py", command=self.update_lang)#, indicatoron=0
-        self.langmenu.add_radiobutton(label="Rey (.rey)", variable=self.lang, value="rey", command=self.update_lang)
-        self.langmenu.add_radiobutton(label="Ruby (.rb)", variable=self.lang, value="rb", command=self.update_lang)
-        self.langmenu.add_separator()
-        # Compiled language
-        self.langmenu.add_radiobutton(label="C (.c, .h)", variable=self.lang, value="c", command=self.update_lang)
-        self.langmenu.add_radiobutton(label="Java (.java)", variable=self.lang, value="java", command=self.update_lang)
-        self.langmenu.add_separator()
-        # Data format
-        self.langmenu.add_radiobutton(label="INI (.ini)", variable=self.lang, value="ini", command=self.update_lang)
-        self.langmenu.add_radiobutton(label="JSON (.json)", variable=self.lang, value="json", command=self.update_lang)#, indicatoron=0
-        self.langmenu.add_radiobutton(label="XML (.xml, .xsd)", variable=self.lang, value="xml", command=self.update_lang)#, indicatoron=0
 
+        base = {}
+        families = {}
+        for lang, prop in languages.items():
+            if prop['family'] is None:
+                base[lang] = prop
+                continue
+            elif prop['family'] not in families:
+                families[prop['family']] = {}
+            families[prop['family']][lang] = prop
+        for lang in sorted(base):
+            self.langmenu.add_radiobutton(label=languages[lang]['label'], variable=self.lang, value=lang, command=self.update_lang)
+        self.langmenu.add_separator()
+        for fam in sorted(families):
+            menu = tkinter.Menu(self.langmenu, tearoff=0)
+            self.langmenu.add_cascade(label=fam, menu=menu)
+            for lang in sorted(families[fam]):
+                menu.add_radiobutton(label=languages[lang]['label'], variable=self.lang, value=lang, command=self.update_lang)#, indicatoron=0
+
+        if not lang_has(self.options['lang'], 'execute'):
+            self.filemenu.entryconfig(Application.RUN_COMMAND, state=tkinter.DISABLED)
+        
         self.helpmenu = tkinter.Menu(self.menu, tearoff=0)
         self.menu.add_cascade(label="Help", menu=self.helpmenu)
         self.helpmenu.add_command(label="About...", command=self.menu_about)
@@ -282,9 +424,13 @@ class Application:
         self.status_bar.pack(side=tkinter.BOTTOM, fill=tkinter.X)
 
     def update_lang(self):
-        #self.log.info("self.lang = " + self.lang.get())
+        self.log.info("self.lang = " + self.lang.get())
         self.options['lang'] = self.lang.get()
-
+        if not lang_has(self.options['lang'], 'execute'):
+            self.filemenu.entryconfig(Application.RUN_COMMAND, state=tkinter.DISABLED)
+        else:
+            self.filemenu.entryconfig(Application.RUN_COMMAND, state=tkinter.ACTIVE)
+    
     def start(self):
         # root widget, an ordinary window
         self.root = tkinter.Tk()
@@ -306,8 +452,10 @@ class Application:
         self.make_status_bar()
         self.set_title()
         self.update()
-        # self.log.set_error(Logger.POPUP) # if we do that before initialize Tk, an empty window appear
-        # self.log.set_warn(Logger.POPUP)
+
+    def save_opt(self):
+        self.options['confirm_exit'] = self.confirm_exit.get()
+        self.write_options()
 
     def restart(self):
         # Save
@@ -346,7 +494,7 @@ class Application:
     #-------------------------------------------------------
 
     def menu_about(self):
-        messagebox.showinfo("About", self.title + " - " + self.version + "\nMade with ❤\nDamien Gouteux, 2017\n")
+        messagebox.showinfo("About", f"{self.title} - {Application.VERSION}\nMade with ❤\nDamien Gouteux\n2017 - {datetime.now().year}\n")
 
     def menu_exit(self, event=None):
         self.exit()
@@ -402,21 +550,34 @@ class Application:
         self.frame.get_current_text().event_generate("<<Copy>>")
 
     def menu_paste(self, event=None):
-        self.frame.get_current_text().event_generate("<<Paste>>")
+        self.frame.paste(event)
         self.state_change()
 
     def menu_select_all(self, event=None):
-        self.frame.escape_refresh(2)
-        self.frame.get_current_text().tag_add(tkinter.SEL, "1.0", tkinter.END)
+        tab = self.frame.get_current_text()
+        tab.tag_add(tkinter.SEL, "1.0", tkinter.END) # Select
+        tab.mark_set(tkinter.INSERT, "1.0") # Mark
+        tab.see(tkinter.INSERT) # Scroll to insert mark
+        #print(tab.count("sel.first", "sel.last"))
+        return 'break'
 
     def menu_exec(self, event=None):
-        filepath = self.filepath
+        if not lang_has(self.options['lang'], 'execute'):
+            return
+        filepath = self.frame.get_current_path()
         if filepath is None:
             filepath = os.path.join(os.getcwd(), 'temp.' + self.options['lang'])
-            self.save(filepath)
+            self.save(filepath, raw=True) # will not set any filepath nor dirty state (still dirty)
         self.log.info('Executing: ' + filepath)
-        os.startfile(filepath)
-
+        if hasattr(os, 'startfile'): # Windows only
+            os.startfile(filepath)
+        else:
+            #os.system(filepath)
+            os.chmod(filepath, stat.S_IXUSR | stat.S_IWUSR | stat.S_IRUSR)
+            cmd = subprocess.run(['python3', filepath], capture_output=True)
+            stdout = cmd.stdout.decode() # from bytes to str
+            print(stdout)
+    
     #-------------------------------------------------------
     # Text functions
     #-------------------------------------------------------
@@ -447,12 +608,13 @@ class Application:
         self.frame.get_current_text().insert("1.0", content) # or END
         self.state_restart(filename)
 
-    def save(self, filename : str):
+    def save(self, filename: str, raw: bool=False):
         f = open(filename, mode='w', encoding='utf8')
         content = self.frame.get_current_text().get(1.0, tkinter.END)
         f.write(content)
         f.close()
-        self.state_restart(filename)
+        if not raw:
+            self.state_restart(filename)
 
     def exit(self):
         if self.frame.is_dirty() and self.options['confirm_exit']:
@@ -460,8 +622,6 @@ class Application:
                 self.root.destroy()
         else:
             self.root.destroy()
-        #root.quit()
-        #exit(0)
 
     #-------------------------------------------------------
     # State functions
@@ -485,10 +645,25 @@ class MyFrame(tkinter.Frame):
 
     def __init__(self, app):
         tkinter.Frame.__init__(self, app.root)
+        app.root.bind_class("Text", "<<Paste>>", self.paste)
         self.pack(fill=tkinter.BOTH, expand=tkinter.YES) # make it visible
         self.app = app
         self.build()
-        self._escape_refresh = 0
+
+    def paste(self, event):
+        if event is None:
+            widget = self.get_current_text()
+        else:
+            widget = event.widget
+        # Delete selection if existing
+        try:
+            widget.delete("sel.first", "sel.last")
+        except:
+            pass
+        # Insert new text
+        widget.insert(tkinter.INSERT, widget.clipboard_get())
+        # Don't execute any more binding
+        return "break"
 
     def get_current_text(self):
         return self.text[self.notebook.index("current")]
@@ -594,14 +769,12 @@ class MyFrame(tkinter.Frame):
         self.hi_there.pack(side="bottom")
 
     def tokenizer(self):
+        lang = self.app.options['lang']
+        if not lang_has(lang, 'tokenize'):
+            return
         debug = True
         text = self.get_current_text()
         content = text.get(1.0, tkinter.END)
-        #print('||',content,'||', sep='')
-        if self.app.options['lang'] == 'txt':
-            return
-        else:
-            print(self.app.options['lang'])
         tokens = Tokenizer(lang).tokenize(content, debug)
         # Clear all tags
         for tag in text.tag_names():
@@ -623,12 +796,7 @@ class MyFrame(tkinter.Frame):
                 text.tag_add("keyword", deb, end)
             elif t.typ == Token.Comment:
                 print('TAGGING CMT')
-                text.tag_add("comment", deb, end)
-
-    # There is a bug when doing Ctrl+A : the refresh (call to key function) "let" the first character outside the selected area!
-    # To prevent this, we do this
-    def escape_refresh(self, nb):
-        self._escape_refresh = nb
+                text.tag_add("comment", deb, end) 
 
     def key(self, event):
         text = self.get_current_text()
@@ -637,12 +805,7 @@ class MyFrame(tkinter.Frame):
             return
         #print("pressed", "char", repr(event.char), "keycode", event.keycode, "state", event.state, "type", event.type, "ctrl", event.state & KeyConstants.MASK_CONTROL)
         #print(dir(event))
-        #print('>>>', self._escape_refresh)
-        # and event.type == tkinter.EventType.KeyRelease:
         if event.state & KeyConstants.MASK_CONTROL and event.keycode not in [ KeyConstants.KEY_X, KeyConstants.KEY_V]:
-            return
-        if self._escape_refresh > 0:
-            self._escape_refresh -= 1
             return
         self.app.state_change()
         self.tokenizer()
@@ -734,6 +897,3 @@ class MyFrame(tkinter.Frame):
             #self.notebook.pack(side=tkinter.RIGHT, fill=tkinter.BOTH, expand=tkinter.YES)
             self.notebook.place( relx = 0.0, rely = 0.0, relwidth = 1.0, relheight = 1.0 )
 
-
-if __name__ == "__main__":
-    Application().run()

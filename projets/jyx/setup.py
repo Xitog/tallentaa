@@ -1,43 +1,41 @@
 from setuptools import setup
+import jyx
 from os.path import join
-import ashlang
 
-f = open(join('ashlang', 'readme.md'), mode='r', encoding='utf8')
+f = open(join('jyx', 'readme.md'), mode='r', encoding='utf8')
 long_desc = f.read()
 f.close()
 
 setup(
     # Metadata
-    name='ashlang',
-    version=ashlang.__version__,
+    name='jyx',
+    version=jyx.__version__,
 
     license="MIT",
 
     author='Damien Gouteux',
     author_email='damien.gouteux@gmail.com',
-    url="https://xitog.github.io/dgx/informatique/ash_guide.html",
+    url="https://xitog.github.io/dgx/index.html",
     maintainer='Damien Gouteux',
     maintainer_email='damien.gouteux@gmail.com',
     
-    description='A simple language transpiling to Python',
+    description='A simple text editor',
     long_description=long_desc,
     long_description_content_type="text/markdown",
     # https://pypi.org/classifiers/
     classifiers=[
-        'Development Status :: 1 - Planning',
+        'Development Status :: 2 - Pre-Alpha',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3 :: Only',
         'Programming Language :: Python :: Implementation :: CPython',
         'Topic :: Software Development',
-        'Topic :: Software Development :: Code Generators',
-        'Topic :: Software Development :: Compilers',
-        'Topic :: Software Development :: Interpreters'
+        'Topic :: Text Editors',
     ],
-    keywords=['ash', 'ashlang', 'programming language', 'script', 'scripting', 'transpiler'],
+    keywords=['jyx', 'editor', 'programming language', 'script', 'text'],
     
-    packages=['ashlang'],  #same as name
+    packages=['jyx'],  #same as name
     python_requires='>=3.5',
     #install_requires = ['xxx'],
 )
