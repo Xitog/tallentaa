@@ -570,13 +570,15 @@ class Application:
             self.save(filepath, raw=True) # will not set any filepath nor dirty state (still dirty)
         self.log.info('Executing: ' + filepath)
         if hasattr(os, 'startfile'): # Windows only
-            os.startfile(filepath)
+            #os.startfile(filepath)
+            subp = 'python'
         else:
             #os.system(filepath)
+            subp = 'python3'
             os.chmod(filepath, stat.S_IXUSR | stat.S_IWUSR | stat.S_IRUSR)
-            cmd = subprocess.run(['python3', filepath], capture_output=True)
-            stdout = cmd.stdout.decode() # from bytes to str
-            print(stdout)
+        cmd = subprocess.run([subp, filepath], capture_output=True)
+        stdout = cmd.stdout.decode() # from bytes to str
+        print(stdout)
     
     #-------------------------------------------------------
     # Text functions
