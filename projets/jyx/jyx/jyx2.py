@@ -1,6 +1,14 @@
 import tkinter as tk
 from tkinter import ttk
 
+MENU_FILE = 'File'
+MENU_FILE_NEW = 'New'
+MENU_FILE_NEW_TAB = 'New Tab'
+MENU_FILE_OPEN = 'Open...'
+MENU_FILE_SAVE = 'Save As...'
+MENU_FILE_RUN = 'Run Script'
+MENU_FILE_EXIT = 'Exit'
+
 class Jyx:
 
     def __init__(self):
@@ -22,6 +30,21 @@ class Jyx:
     def exit(self, event=None):
         self.root.destroy()
 
+    def new(self, event=None):
+        pass
+
+    def new_tab(self, event=None):
+        pass
+
+    def open(self, event=None):
+        pass
+
+    def save(self, event=None):
+        pass
+
+    def run(self, event=None):
+        pass
+
 
 class JyxMenu(tk.Menu):
 
@@ -29,8 +52,85 @@ class JyxMenu(tk.Menu):
         tk.Menu.__init__(self, parent.get_root())
         self.parent = parent
         self.filemenu = tk.Menu(self, tearoff=0)
-        self.add_cascade(label="File", menu=self.filemenu)
+        self.add_cascade(label=MENU_FILE, menu=self.filemenu)
+        self.filemenu.add_command(label=MENU_FILE_NEW, command=self.parent.new, accelerator="Ctrl+N")
+        self.filemenu.add_command(label=MENU_FILE_NEW_TAB, command=self.parent.new_tab, accelerator="Ctrl+T")
+        self.filemenu.add_command(label=MENU_FILE_OPEN, command=self.parent.open, accelerator="Ctrl+O")
+        self.filemenu.add_command(label=MENU_FILE_SAVE, command=self.parent.save, accelerator="Ctrl+S")
+        self.filemenu.add_separator()
+        self.filemenu.add_command(label=MENU_FILE_RUN, command=self.parent.run, accelerator="F5")
+        self.filemenu.add_separator()
+        self.filemenu.add_command(label=MENU_FILE_EXIT, command=self.parent.exit, accelerator="Ctrl+Q")
 
+        """
+        self.editmenu = tkinter.Menu(self.menu, tearoff=0)
+        self.menu.add_cascade(label="Edit", menu=self.editmenu)
+        self.editmenu.add_command(label="Undo", command=self.menu_undo, accelerator="Ctrl+Z")
+        self.editmenu.add_command(label="Redo", command=self.menu_redo, accelerator="Ctrl+Y")
+        self.editmenu.add_separator()
+        self.editmenu.add_command(label="Cut", command=self.menu_cut, accelerator="Ctrl+X")
+        self.editmenu.add_command(label="Copy", command=self.menu_copy, accelerator="Ctrl+C")
+        self.editmenu.add_command(label="Paste", command=self.menu_paste, accelerator="Ctrl+V")
+        self.editmenu.add_command(label="Select All", command=self.menu_select_all, accelerator="Ctrl+A")
+
+        self.display_tree = tkinter.BooleanVar()
+        self.display_tree.set(self.options['display_tree'])
+        self.confirm_exit = tkinter.BooleanVar()
+        self.confirm_exit.set(self.options['confirm_exit'])
+
+        self.options_menu = tkinter.Menu(self.menu, tearoff=0)
+        self.menu.add_cascade(label="Options", menu=self.options_menu)
+        self.options_menu.add_checkbutton(label="Display Tree", onvalue=True, offvalue=False, variable=self.display_tree, command=self.restart)
+        self.options_menu.add_checkbutton(label="Confirm Exit", onvalue=True, offvalue=False, variable=self.confirm_exit, command=self.save_opt)
+
+        # Language
+        self.log.info(f"{len(languages)} language definitions loaded.")
+        self.lang = tkinter.StringVar()
+        if self.options['lang'] not in languages:
+            self.log.error(f"{self.options['lang']} not in known languages. Reseting to {languages[default_language]['label']}.")
+            self.lang.set(default_language)
+        else:
+            self.lang.set(self.options['lang'])
+        self.log.info("self.lang = " + self.lang.get())
+
+        self.langmenu = tkinter.Menu(self.menu, tearoff=0)
+        self.menu.add_cascade(label="Language", menu=self.langmenu)
+
+        base = {}
+        families = {}
+        for lang, prop in languages.items():
+            if prop['family'] is None:
+                base[lang] = prop
+                continue
+            elif prop['family'] not in families:
+                families[prop['family']] = {}
+            families[prop['family']][lang] = prop
+        for lang in sorted(base):
+            self.langmenu.add_radiobutton(label=languages[lang]['label'], variable=self.lang, value=lang, command=self.update_lang)
+        self.langmenu.add_separator()
+        for fam in sorted(families):
+            menu = tkinter.Menu(self.langmenu, tearoff=0)
+            self.langmenu.add_cascade(label=fam, menu=menu)
+            for lang in sorted(families[fam]):
+                menu.add_radiobutton(label=languages[lang]['label'], variable=self.lang, value=lang, command=self.update_lang)#, indicatoron=0
+
+        if not lang_has(self.options['lang'], 'execute'):
+            self.filemenu.entryconfig(Application.RUN_COMMAND, state=tkinter.DISABLED)
+        
+        self.helpmenu = tkinter.Menu(self.menu, tearoff=0)
+        self.menu.add_cascade(label="Help", menu=self.helpmenu)
+        self.helpmenu.add_command(label="About...", command=self.menu_about)
+
+        self.root.bind('<Control-n>', self.menu_new)
+        self.root.bind('<Control-t>', self.menu_new_tab)
+        self.root.bind('<Control-o>', self.menu_open)
+        self.root.bind('<Control-s>', self.menu_save)
+        self.root.bind('<Control-q>', self.menu_exit)
+        self.root.bind('<Control-a>', self.menu_select_all)
+        self.root.bind('<Control-z>', self.menu_undo)
+        self.root.bind('<Control-y>', self.menu_redo)
+        self.root.bind('<F5>', self.menu_exec)
+        """
 
 class JyxText(tk.Text):
 
@@ -154,7 +254,7 @@ class JyxText(tk.Text):
             content = '    '
         elif event.keysym == 'space':
             content = ' '
-        elif event.char.isalnum():
+        elif event.char.isprintable(): #isalnum()
             print(event)
             content = event.char
         else:
