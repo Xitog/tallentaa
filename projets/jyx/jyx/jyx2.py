@@ -1,17 +1,13 @@
 import tkinter as tk
 from tkinter import ttk
-
-MENU_FILE = 'File'
-MENU_FILE_NEW = 'New'
-MENU_FILE_NEW_TAB = 'New Tab'
-MENU_FILE_OPEN = 'Open...'
-MENU_FILE_SAVE = 'Save As...'
-MENU_FILE_RUN = 'Run Script'
-MENU_FILE_EXIT = 'Exit'
+import json
 
 class Jyx:
 
     def __init__(self):
+        f = open('jyx.json', 'r', encoding='utf8')
+        self.data = json.load(f)
+        f.close()
         self.root = tk.Tk()
         self.root.protocol('WM_DELETE_WINDOW', self.exit)
         self.text = JyxText(self)
@@ -45,6 +41,12 @@ class Jyx:
     def run(self, event=None):
         pass
 
+    def undo(self, event=None):
+        pass
+
+    def redo(self, event=None):
+        pass
+
 
 class JyxMenu(tk.Menu):
 
@@ -52,27 +54,31 @@ class JyxMenu(tk.Menu):
         tk.Menu.__init__(self, parent.get_root())
         self.parent = parent
         self.filemenu = tk.Menu(self, tearoff=0)
-        self.add_cascade(label=MENU_FILE, menu=self.filemenu)
-        self.filemenu.add_command(label=MENU_FILE_NEW, command=self.parent.new, accelerator="Ctrl+N")
-        self.filemenu.add_command(label=MENU_FILE_NEW_TAB, command=self.parent.new_tab, accelerator="Ctrl+T")
-        self.filemenu.add_command(label=MENU_FILE_OPEN, command=self.parent.open, accelerator="Ctrl+O")
-        self.filemenu.add_command(label=MENU_FILE_SAVE, command=self.parent.save, accelerator="Ctrl+S")
+        data = self.parent.data
+        lang = self.parent.data['lang_gui']
+        self.add_cascade(label=self.parent.data['menu'][lang]['file'], menu=self.filemenu)
+        self.filemenu.add_command(label=data['menu'][lang]['new'], command=self.parent.new, accelerator="Ctrl+N")
+        self.filemenu.add_command(label=data['menu'][lang]['tab'], command=self.parent.new_tab, accelerator="Ctrl+T")
+        self.filemenu.add_command(label=data['menu'][lang]['open'], command=self.parent.open, accelerator="Ctrl+O")
+        self.filemenu.add_command(label=data['menu'][lang]['save'], command=self.parent.save, accelerator="Ctrl+S")
+        self.filemenu.add_command(label=data['menu'][lang]['save as'], command=self.parent.save, accelerator="Ctrl+Shift+S")
+        self.filemenu.add_command(label=data['menu'][lang]['save all'], command=self.parent.save, accelerator="Ctrl+Alt+S")
         self.filemenu.add_separator()
-        self.filemenu.add_command(label=MENU_FILE_RUN, command=self.parent.run, accelerator="F5")
+        self.filemenu.add_command(label=data['menu'][lang]['run'], command=self.parent.run, accelerator="F5")
         self.filemenu.add_separator()
-        self.filemenu.add_command(label=MENU_FILE_EXIT, command=self.parent.exit, accelerator="Ctrl+Q")
+        self.filemenu.add_command(label=data['menu'][lang]['exit'], command=self.parent.exit, accelerator="Ctrl+Q")
+
+        self.editmenu = tk.Menu(self, tearoff=0)
+        self.add_cascade(label=data['menu'][lang]['edit'], menu=self.editmenu)
+        self.editmenu.add_command(label=data['menu'][lang]['undo'], command=self.parent.undo, accelerator="Ctrl+Z")
+        self.editmenu.add_command(label=data['menu'][lang]['redo'], command=self.parent.redo, accelerator="Ctrl+Y")
+        self.editmenu.add_separator()
+        self.editmenu.add_command(label=data['menu'][lang]['cut'], command=self.parent.text.cut, accelerator="Ctrl+X")
+        self.editmenu.add_command(label=data['menu'][lang]['copy'], command=self.parent.text.copy, accelerator="Ctrl+C")
+        self.editmenu.add_command(label=data['menu'][lang]['paste'], command=self.parent.text.paste, accelerator="Ctrl+V")
+        self.editmenu.add_command(label=data['menu'][lang]['select all'], command=self.parent.text.select_all, accelerator="Ctrl+A")
 
         """
-        self.editmenu = tkinter.Menu(self.menu, tearoff=0)
-        self.menu.add_cascade(label="Edit", menu=self.editmenu)
-        self.editmenu.add_command(label="Undo", command=self.menu_undo, accelerator="Ctrl+Z")
-        self.editmenu.add_command(label="Redo", command=self.menu_redo, accelerator="Ctrl+Y")
-        self.editmenu.add_separator()
-        self.editmenu.add_command(label="Cut", command=self.menu_cut, accelerator="Ctrl+X")
-        self.editmenu.add_command(label="Copy", command=self.menu_copy, accelerator="Ctrl+C")
-        self.editmenu.add_command(label="Paste", command=self.menu_paste, accelerator="Ctrl+V")
-        self.editmenu.add_command(label="Select All", command=self.menu_select_all, accelerator="Ctrl+A")
-
         self.display_tree = tkinter.BooleanVar()
         self.display_tree.set(self.options['display_tree'])
         self.confirm_exit = tkinter.BooleanVar()
@@ -132,14 +138,14 @@ class JyxMenu(tk.Menu):
         self.root.bind('<F5>', self.menu_exec)
         """
 
-class JyxText(tk.Text):
+class JyxText: #(tk.Text):
 
     def __init__(self, parent):
-        tk.Text.__init__(self, parent.get_root())
-        self.parent = parent
+        #tk.Text.__init__(self, parent.get_root())
+        self.jyx = parent
         self.dirty = False
         
-        frame = ttk.Frame(self.parent.get_root()) #, bd=2, relief=tk.SUNKEN)
+        frame = ttk.Frame(self.jyx.root) #, bd=2, relief=tk.SUNKEN)
         # To make the element at 0,0 grows with the window
         frame.grid_rowconfigure(0, weight=1)
         frame.grid_columnconfigure(0, weight=1)
@@ -169,12 +175,12 @@ class JyxText(tk.Text):
     def write(self, content, at=tk.INSERT):
         self.text.insert(at, content)
         self.dirty = True
-        self.parent.update_title()
+        self.jyx.update_title()
 
     def delete(self, first, last=None):
         self.text.delete(first, last)
         self.dirty = True
-        self.parent.update_title()
+        self.jyx.update_title()
 
     #
     # Handling of selection: deleting, getting, selecting and unselecting
@@ -196,21 +202,26 @@ class JyxText(tk.Text):
         self.text.tag_remove('sel', '1.0', tk.END)
 
     #
-    # Basic functions
+    # Basic functions (called from menu without event)
     #
-    def paste(self, event):
-        content =  self.root.clipboard_get()
-        event.widget.insert(tk.INSERT, content)
+    def paste(self, event=None):
+        content =  self.jyx.root.clipboard_get()
+        self.text.insert(tk.INSERT, content)
         return 'break'
 
-    def cut(self, event):
+    def cut(self, event=None):
         self.copy(event)
         self.selection_delete()
         return 'break'
 
-    def copy(self, event):
-        self.root.clipboard_clear()
-        self.root.clipboard_append(self.selection_get())
+    def copy(self, event=None):
+        self.jyx.root.clipboard_clear()
+        self.jyx.root.clipboard_append(self.selection_get())
+        return 'break'
+
+    def select_all(self, event=None):
+        self.selection_clear()
+        self.selection_set('1.0', tk.END)
         return 'break'
 
     def update_text_before(self, event):

@@ -1,0 +1,41 @@
+{
+    "lang_gui": "fr",
+    "menu": {
+        "fr": {
+            "file"       : "Fichier",
+            "new"        : "Nouveau",
+            "tab"        : "Nouvel onglet",
+            "open"       : "Ouvrir...",
+            "save"       : "Sauver",
+            "save as"    : "Sauver sous...",
+            "save all"   : "Sauver tous",
+            "run"        : "Exécuter",
+            "exit"       : "Quitter",
+            "edit"       : "Edition",
+            "undo"       : "Annuler",
+            "redo"       : "Rétablir",
+            "cut"        : "Couper",
+            "copy"       : "Copier",
+            "paste"      : "Coller",
+            "select all" : "Sélectionner tout"
+        },
+        "en": {
+            "file"       : "File",
+            "new"        : "New",
+            "tab"        : "New Tab",
+            "open"       : "Open...",
+            "save"       : "Save",
+            "save as"    : "Save As...",
+            "save all"   : "Save All",
+            "run"        : "Run Script",
+            "exit"       : "Exit",
+            "edit"       : "Edit",
+            "undo"       : "Undo",
+            "redo"       : "Redo",
+            "cut"        : "Cut",
+            "copy"       : "Copy",
+            "paste"      : "Paste",
+            "select all" : "Select all"
+        }
+    }
+}
