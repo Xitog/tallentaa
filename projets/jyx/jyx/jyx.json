@@ -17,7 +17,10 @@
             "cut"        : "Couper",
             "copy"       : "Copier",
             "paste"      : "Coller",
-            "select all" : "Sélectionner tout"
+            "select all" : "Sélectionner tout",
+            "languages"  : "Langages",
+            "help"       : "Aide",
+            "about"      : "A propos..."
         },
         "en": {
             "file"       : "File",
@@ -35,7 +38,109 @@
             "cut"        : "Cut",
             "copy"       : "Copy",
             "paste"      : "Paste",
-            "select all" : "Select all"
+            "select all" : "Select all",
+            "languages"  : "Languages",
+            "help"       : "Help",
+            "about"      : "About..."
+        }
+    },
+    "default_language" : "text",
+    "languages" : {
+        "text" : {
+            "label": "Plain text",
+            "extension": [".txt"],
+            "family": "",
+            "support": ""
+        },
+        "dglog" : {
+            "label": "DG log",
+            "extension": [".dlg"],
+            "family": "Lightweight markup",
+            "support": ""
+        },
+        "textile" : {
+            "label": "Textile",
+            "extension": [".txl"],
+            "family": "Lightweight markup",
+            "support": ""
+        },
+        "hamill": {
+            "label": "Hamill",
+            "extension": [".hml"],
+            "family": "Lightweight markup",
+            "support": ""
+        },
+        "javascript" : {
+            "label": "JavaScript",
+            "extension": [".js"],
+            "family": "Scripting",
+            "support": ""
+        },
+        "lua" : {
+            "label": "Lua",
+            "extension": [".lua"],
+            "family": "Scripting",
+            "support": ""
+        },
+        "python" : {
+            "label": "Python",
+            "extension": [".py"],
+            "family": "Scripting",
+            "support": ["execute"]
+        },
+        "ruby" : {
+            "label": "Ruby",
+            "extension": [".rb"],
+            "family": "Scripting",
+            "support": ""
+        },
+        "ash" : {
+            "label": "Ash",
+            "extension": [".ash"],
+            "family": "Scripting",
+            "support": ""
+        },
+        "c" : {
+            "label": "C",
+            "extension": [".c", ".h"],
+            "family": "Compiled",
+            "support": ""
+        },
+        "java" : {
+            "label": "Java",
+            "extension": [".java"],
+            "family": "Compiled",
+            "support": ""
+        },
+        "ini" : {
+            "label": "INI config",
+            "extension": [".ini"],
+            "family": "Data",
+            "support": ""
+        },
+        "json" : {
+            "label": "JSON data",
+            "extension": [".json"],
+            "family": "Data",
+            "support": ""
+        },
+        "xml" : {
+            "label": "XML data",
+            "extension": [".xml", ".xsd", ".xslt"],
+            "family": "Data",
+            "support": ""
+        },
+        "html": {
+            "label": "HTML",
+            "extension": [".html", ".htm"],
+            "family": "Web",
+            "support": ""
+        },
+        "css": {
+            "label": "CSS",
+            "extension": [".css"],
+            "family": "Web",
+            "support": ""
         }
     }
 }
