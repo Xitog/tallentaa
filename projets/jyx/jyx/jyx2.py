@@ -13,14 +13,24 @@ class Jyx:
         self.data = json.load(f)
         f.close()
         self.vars = {}
+        self.prev = {}
         self.root = tk.Tk()
         self.root.protocol('WM_DELETE_WINDOW', self.exit)
+        # Vars
+        self.vars['tongue'] = tk.StringVar()
+        self.vars['tongue'].set(self.data['tongue'])
+        self.prev['tongue'] = self.vars['tongue']
         self.vars['language'] = tk.StringVar()
+        self.vars['language'].set(self.data['default_language'])
+        self.prev['language'] = self.vars['language']
+        # UI components
         self.text = JyxText(self)
         self.menu = JyxMenu(self)
-        self.update_lang() # cannot be called until the menu is completed
         self.root.config(menu=self.menu)
+        # Updall vars, cannot be called until the menu is completed
+        self.update_all_vars() 
         self.update_title()
+        # Starting
         self.root.mainloop()
 
     def get_root(self):
@@ -28,13 +38,26 @@ class Jyx:
 
     def update_title(self):
         dirty = ' *' if self.text.dirty else ''
-        self.root.wm_title('Jyx' + dirty + ' ' + Jyx.VERSION)
+        tongue = self.data['tongue']
+        file = self.data['menu'][tongue]['new'] if self.text.file is None else self.text.file
+        self.root.wm_title('Jyx ' + Jyx.VERSION + ' - ' + file + dirty)
 
-    def update_lang(self):
-        language = self.vars['language'].get()
-        print("var language = " + language)
-        if not self.has(f"languages.{language}.support", "execute"):
-            self.menu.filemenu.entryconfig(Jyx.RUN_COMMAND, state=tk.DISABLED)
+    def update_all_vars(self):
+        for varname in self.vars:
+            self.update(varname, True)
+
+    def update(self, varname, init=False):
+        value = self.vars[varname].get()
+        print(f"var {varname} = {value}")
+        if varname == 'language':
+            if not self.has(f"languages.{value}.support", "execute"):
+                self.menu.file_menu.entryconfig(Jyx.RUN_COMMAND, state=tk.DISABLED)
+        elif varname == 'tongue':
+            if not init:
+                self.menu.relabel(old=self.prev[varname], new=value)
+        else:
+            raise Exception(f'Variable unknown: {varname}')
+        self.prev[varname] = value
 
     def has(self, prop, value, content=None):
         #print('has', prop, value, content)
@@ -86,33 +109,67 @@ class JyxMenu(tk.Menu):
     def __init__(self, jyx):
         tk.Menu.__init__(self, jyx.get_root())
         self.jyx = jyx
-        self.filemenu = tk.Menu(self, tearoff=0)
+        self.build()
+
+    def relabel(self, old, new):
+        #last = self.index(tk.END)
+        #for item in range(last + 1)
         data = self.jyx.data
-        lang = self.jyx.data['lang_gui']
+
+        self.entryconfig(data['menu'][old]['file'], label=data['menu'][new]['file'])
+        self.entryconfig(data['menu'][old]['edit'], label=data['menu'][new]['edit'])
+        self.entryconfig(data['menu'][old]['options'], label=data['menu'][new]['options'])
+        self.entryconfig(data['menu'][old]['languages'], label=data['menu'][new]['languages'])
+        self.entryconfig(data['menu'][old]['help'], label=data['menu'][new]['help'])
+        
+        self.file_menu.entryconfig(data['menu'][old]['new'], label=data['menu'][new]['new'])
+        self.file_menu.entryconfig(data['menu'][old]['tab'], label=data['menu'][new]['tab'])
+        self.file_menu.entryconfig(data['menu'][old]['open'], label=data['menu'][new]['open'])
+        self.file_menu.entryconfig(data['menu'][old]['save'], label=data['menu'][new]['save'])
+        self.file_menu.entryconfig(data['menu'][old]['save as'], label=data['menu'][new]['save as'])
+        self.file_menu.entryconfig(data['menu'][old]['save all'], label=data['menu'][new]['save all'])
+        self.file_menu.entryconfig(data['menu'][old]['run'], label=data['menu'][new]['run'])
+        self.file_menu.entryconfig(data['menu'][old]['exit'], label=data['menu'][new]['exit'])
+
+        self.edit_menu.entryconfig(data['menu'][old]['undo'], label=data['menu'][new]['undo'])
+        self.edit_menu.entryconfig(data['menu'][old]['redo'], label=data['menu'][new]['redo'])
+        self.edit_menu.entryconfig(data['menu'][old]['cut'], label=data['menu'][new]['cut'])
+        self.edit_menu.entryconfig(data['menu'][old]['copy'], label=data['menu'][new]['copy'])
+        self.edit_menu.entryconfig(data['menu'][old]['paste'], label=data['menu'][new]['paste'])
+        self.edit_menu.entryconfig(data['menu'][old]['select all'], label=data['menu'][new]['select all'])
+
+        self.options_menu.entryconfig(data['menu'][old]['tongues'], label=data['menu'][new]['tongues'])
+        
+        self.help_menu.entryconfig(data['menu'][old]['about'], label=data['menu'][new]['about'])
+    
+    def build(self):
+        data = self.jyx.data
+        tongue = self.jyx.data['tongue']
         languages = self.jyx.data['languages']
         default_language = self.jyx.data['default_language']
-        
-        self.add_cascade(label=self.jyx.data['menu'][lang]['file'], menu=self.filemenu)
-        self.filemenu.add_command(label=data['menu'][lang]['new'], command=self.jyx.new, accelerator="Ctrl+N")
-        self.filemenu.add_command(label=data['menu'][lang]['tab'], command=self.jyx.new_tab, accelerator="Ctrl+T")
-        self.filemenu.add_command(label=data['menu'][lang]['open'], command=self.jyx.open, accelerator="Ctrl+O")
-        self.filemenu.add_command(label=data['menu'][lang]['save'], command=self.jyx.save, accelerator="Ctrl+S")
-        self.filemenu.add_command(label=data['menu'][lang]['save as'], command=self.jyx.save, accelerator="Ctrl+Shift+S")
-        self.filemenu.add_command(label=data['menu'][lang]['save all'], command=self.jyx.save, accelerator="Ctrl+Alt+S")
-        self.filemenu.add_separator()
-        self.filemenu.add_command(label=data['menu'][lang]['run'], command=self.jyx.run, accelerator="F5")
-        self.filemenu.add_separator()
-        self.filemenu.add_command(label=data['menu'][lang]['exit'], command=self.jyx.exit, accelerator="Ctrl+Q")
 
-        self.editmenu = tk.Menu(self, tearoff=0)
-        self.add_cascade(label=data['menu'][lang]['edit'], menu=self.editmenu)
-        self.editmenu.add_command(label=data['menu'][lang]['undo'], command=self.jyx.undo, accelerator="Ctrl+Z")
-        self.editmenu.add_command(label=data['menu'][lang]['redo'], command=self.jyx.redo, accelerator="Ctrl+Y")
-        self.editmenu.add_separator()
-        self.editmenu.add_command(label=data['menu'][lang]['cut'], command=self.jyx.text.cut, accelerator="Ctrl+X")
-        self.editmenu.add_command(label=data['menu'][lang]['copy'], command=self.jyx.text.copy, accelerator="Ctrl+C")
-        self.editmenu.add_command(label=data['menu'][lang]['paste'], command=self.jyx.text.paste, accelerator="Ctrl+V")
-        self.editmenu.add_command(label=data['menu'][lang]['select all'], command=self.jyx.text.select_all, accelerator="Ctrl+A")
+        self.file_menu = tk.Menu(self, tearoff=0)
+        self.add_cascade(label=data['menu'][tongue]['file'], menu=self.file_menu)
+        self.file_menu.add_command(label=data['menu'][tongue]['new'], command=self.jyx.new, accelerator="Ctrl+N")
+        self.file_menu.add_command(label=data['menu'][tongue]['tab'], command=self.jyx.new_tab, accelerator="Ctrl+T")
+        self.file_menu.add_command(label=data['menu'][tongue]['open'], command=self.jyx.open, accelerator="Ctrl+O")
+        self.file_menu.add_command(label=data['menu'][tongue]['save'], command=self.jyx.save, accelerator="Ctrl+S")
+        self.file_menu.add_command(label=data['menu'][tongue]['save as'], command=self.jyx.save, accelerator="Ctrl+Shift+S")
+        self.file_menu.add_command(label=data['menu'][tongue]['save all'], command=self.jyx.save, accelerator="Ctrl+Alt+S")
+        self.file_menu.add_separator()
+        self.file_menu.add_command(label=data['menu'][tongue]['run'], command=self.jyx.run, accelerator="F5")
+        self.file_menu.add_separator()
+        self.file_menu.add_command(label=data['menu'][tongue]['exit'], command=self.jyx.exit, accelerator="Ctrl+Q")
+
+        self.edit_menu = tk.Menu(self, tearoff=0)
+        self.add_cascade(label=data['menu'][tongue]['edit'], menu=self.edit_menu)
+        self.edit_menu.add_command(label=data['menu'][tongue]['undo'], command=self.jyx.undo, accelerator="Ctrl+Z")
+        self.edit_menu.add_command(label=data['menu'][tongue]['redo'], command=self.jyx.redo, accelerator="Ctrl+Y")
+        self.edit_menu.add_separator()
+        self.edit_menu.add_command(label=data['menu'][tongue]['cut'], command=self.jyx.text.cut, accelerator="Ctrl+X")
+        self.edit_menu.add_command(label=data['menu'][tongue]['copy'], command=self.jyx.text.copy, accelerator="Ctrl+C")
+        self.edit_menu.add_command(label=data['menu'][tongue]['paste'], command=self.jyx.text.paste, accelerator="Ctrl+V")
+        self.edit_menu.add_command(label=data['menu'][tongue]['select all'], command=self.jyx.text.select_all, accelerator="Ctrl+A")
 
         """
         self.display_tree = tkinter.BooleanVar()
@@ -120,46 +177,60 @@ class JyxMenu(tk.Menu):
         self.confirm_exit = tkinter.BooleanVar()
         self.confirm_exit.set(self.options['confirm_exit'])
 
-        self.options_menu = tkinter.Menu(self.menu, tearoff=0)
-        self.menu.add_cascade(label="Options", menu=self.options_menu)
         self.options_menu.add_checkbutton(label="Display Tree", onvalue=True, offvalue=False, variable=self.display_tree, command=self.restart)
         self.options_menu.add_checkbutton(label="Confirm Exit", onvalue=True, offvalue=False, variable=self.confirm_exit, command=self.save_opt)
         """
+
+        self.options_menu = tk.Menu(self, tearoff=0)
+        self.add_cascade(label=data['menu'][tongue]['options'], menu=self.options_menu)
+        tongues = data['menu'].keys()
+        sub_tongue_menu = tk.Menu(self.options_menu, tearoff=0)
+        self.options_menu.add_cascade(label=data['menu'][tongue]['tongues'], menu=sub_tongue_menu)
+        for tong in sorted(tongues):
+            sub_tongue_menu.add_radiobutton(label=data['menu'][tong]['tongue'],
+                                            variable=self.jyx.vars['tongue'],
+                                            value=tong,
+                                            command=lambda: self.jyx.update('tongue'))
         
         # Language
-        print(f"{len(languages)} language definitions loaded.")
+        #print(f"{len(languages)} language definitions loaded.")
         #if self.options['lang'] not in languages:
         #    print(f"{self.options['lang']} not in known languages. Reseting to {languages[default_language]['label']}.")
         #    self.lang.set(default_language)
         #else:
         #    self.lang.set(self.options['lang'])
-        self.jyx.vars['language'].set(default_language)
         #self.jyx.update_lang() we must wait to finish the menu
 
         self.langmenu = tk.Menu(self, tearoff=0)
-        self.add_cascade(label=data['menu'][lang]['languages'], menu=self.langmenu)
+        self.add_cascade(label=data['menu'][tongue]['languages'], menu=self.langmenu)
 
         base = {}
         families = {}
-        for language, prop in languages.items():
+        for lang, prop in languages.items():
             if prop['family'] == "":
-                base[language] = prop
+                base[lang] = prop
                 continue
             elif prop['family'] not in families:
                 families[prop['family']] = {}
-            families[prop['family']][language] = prop
-        for language in sorted(base):
-            self.langmenu.add_radiobutton(label=languages[language]['label'], variable=self.jyx.vars['language'], value=language, command=self.jyx.update_lang)
+            families[prop['family']][lang] = prop
+        for lang in sorted(base):
+            self.langmenu.add_radiobutton(label=languages[lang]['label'],
+                                          variable=self.jyx.vars['language'],
+                                          value=lang,
+                                          command=lambda: self.jyx.update('language'))
         self.langmenu.add_separator()
         for fam in sorted(families):
             menu = tk.Menu(self.langmenu, tearoff=0)
             self.langmenu.add_cascade(label=fam, menu=menu)
-            for language in sorted(families[fam]):
-                menu.add_radiobutton(label=languages[language]['label'], variable=self.jyx.vars['language'], value=language, command=self.jyx.update_lang)#, indicatoron=0
+            for lang in sorted(families[fam]):
+                menu.add_radiobutton(label=languages[lang]['label'],
+                                     variable=self.jyx.vars['language'],
+                                     value=lang,
+                                     command=lambda: self.jyx.update('language'))#, indicatoron=0
 
-        self.helpmenu = tk.Menu(self, tearoff=0)
-        self.add_cascade(label=data['menu'][lang]['help'], menu=self.helpmenu)
-        self.helpmenu.add_command(label=data['menu'][lang]['about'], command=self.jyx.about)
+        self.help_menu = tk.Menu(self, tearoff=0)
+        self.add_cascade(label=data['menu'][tongue]['help'], menu=self.help_menu)
+        self.help_menu.add_command(label=data['menu'][tongue]['about'], command=self.jyx.about)
 
         """
         self.root.bind('<Control-n>', self.menu_new)
@@ -179,6 +250,7 @@ class JyxText: #(tk.Text):
         #tk.Text.__init__(self, parent.get_root())
         self.jyx = parent
         self.dirty = False
+        self.file = None
         
         frame = ttk.Frame(self.jyx.root) #, bd=2, relief=tk.SUNKEN)
         # To make the element at 0,0 grows with the window

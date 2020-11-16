@@ -1,7 +1,8 @@
 {
-    "lang_gui": "fr",
+    "tongue": "fr",
     "menu": {
         "fr": {
+            "tongue"     : "Français",
             "file"       : "Fichier",
             "new"        : "Nouveau",
             "tab"        : "Nouvel onglet",
@@ -18,11 +19,14 @@
             "copy"       : "Copier",
             "paste"      : "Coller",
             "select all" : "Sélectionner tout",
+            "options"    : "Options",
+            "tongues"    : "Langues",
             "languages"  : "Langages",
             "help"       : "Aide",
             "about"      : "A propos..."
         },
         "en": {
+            "tongue"     : "English",
             "file"       : "File",
             "new"        : "New",
             "tab"        : "New Tab",
@@ -39,6 +43,8 @@
             "copy"       : "Copy",
             "paste"      : "Paste",
             "select all" : "Select all",
+            "options"    : "Options",
+            "tongues"   : "Tongues",
             "languages"  : "Languages",
             "help"       : "Help",
             "about"      : "About..."
