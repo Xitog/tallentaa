@@ -1,28 +1,57 @@
+#!/usr/bin/env python3
+
+#
+# Imports
+#
+
 import tkinter as tk
 from tkinter import ttk
-import json
+from tkinter import messagebox
+from tkinter import filedialog
+
+import json # for loading/saving options
+from datetime import datetime # for now()
+import os # for getcwd()
+import os.path # for basename()
+
+#
+# Globals and constants
+#
+
+# None
+
+#
+# Classes
+#
 
 class Jyx:
 
-    RUN_COMMAND = 7
+    TITLE = 'Jyx'
+    RUN_COMMAND = 6
     CONFIG_FILE_NAME = 'jyx.json'
     VERSION = '0.0.1'
     
     def __init__(self):
+        # Load data
         f = open(Jyx.CONFIG_FILE_NAME, 'r', encoding='utf8')
         self.data = json.load(f)
         f.close()
-        self.vars = {}
-        self.prev = {}
+        # Init
         self.root = tk.Tk()
         self.root.protocol('WM_DELETE_WINDOW', self.exit)
         # Vars
+        self.vars = {}
+        self.prev = {}
         self.vars['tongue'] = tk.StringVar()
-        self.vars['tongue'].set(self.data['tongue'])
-        self.prev['tongue'] = self.vars['tongue']
+        self.vars['tongue'].set(self.data['options']['tongue'])
         self.vars['language'] = tk.StringVar()
-        self.vars['language'].set(self.data['default_language'])
-        self.prev['language'] = self.vars['language']
+        self.vars['language'].set(self.data['options']['default_language'])
+        self.vars['confirm'] = tk.BooleanVar()
+        self.vars['confirm'].set(self.data['options']['confirm'])
+        self.vars['basename'] = tk.BooleanVar()
+        self.vars['basename'].set(self.data['options']['basename'])
+        for k, v in self.vars.items():
+            self.prev[k] = v
         # UI components
         self.text = JyxText(self)
         self.menu = JyxMenu(self)
@@ -39,8 +68,16 @@ class Jyx:
     def update_title(self):
         dirty = ' *' if self.text.dirty else ''
         tongue = self.data['tongue']
-        file = self.data['menu'][tongue]['new'] if self.text.file is None else self.text.file
-        self.root.wm_title('Jyx ' + Jyx.VERSION + ' - ' + file + dirty)
+        if self.text.file is None:
+            file = self.data['menu'][tongue]['new']
+        elif self.vars['basename'].get():
+            file = os.path.basename(self.text.file)
+        else:
+            file = self.text.file
+        self.root.wm_title(f"{Jyx.TITLE} {Jyx.VERSION} - {file}{dirty}")
+
+    def update_status(self, event=None):
+        self.menu.status_bar.configure(text=self.text.text.index(tk.INSERT))
 
     def update_all_vars(self):
         for varname in self.vars:
@@ -49,12 +86,17 @@ class Jyx:
     def update(self, varname, init=False):
         value = self.vars[varname].get()
         print(f"var {varname} = {value}")
-        if varname == 'language':
-            if not self.has(f"languages.{value}.support", "execute"):
-                self.menu.file_menu.entryconfig(Jyx.RUN_COMMAND, state=tk.DISABLED)
-        elif varname == 'tongue':
-            if not init:
+        if varname in self.vars:
+            self.data[varname] = value
+            if varname == 'language':
+                if not self.has(f"languages.{value}.support", "execute"):
+                    self.menu.file_menu.entryconfig(Jyx.RUN_COMMAND, state=tk.DISABLED)
+                else:
+                    self.menu.file_menu.entryconfig(Jyx.RUN_COMMAND, state=tk.ACTIVE)
+            elif varname == 'tongue' and not init:
                 self.menu.relabel(old=self.prev[varname], new=value)
+            elif varname == 'basename' and not init:
+                self.update_title()
         else:
             raise Exception(f'Variable unknown: {varname}')
         self.prev[varname] = value
@@ -77,16 +119,39 @@ class Jyx:
             return self.has('.'.join(exploded[1:]), value, content[exploded[0]])
 
     def exit(self, event=None):
-        self.root.destroy()
+        tongue = self.vars['tongue'].get()
+        if self.text.dirty and self.vars['confirm'].get():
+            title = self.data['messages'][tongue]['unsaved']
+            msg = self.data['messages'][tongue]['unsaved_msg']
+            if messagebox.askyesno("Unsaved changes", msg, default=messagebox.NO):
+                self.root.destroy()
+        else:
+            self.root.destroy()
 
     def new(self, event=None):
         pass
 
-    def new_tab(self, event=None):
-        pass
-
     def open(self, event=None):
-        pass
+        options = {}
+        #options['defaultextension'] = '.txt'
+        options['filetypes'] = [('all files', '.*'), ('lua files', '.lua'), ('python files', '.py'), ('text files', '.txt')]
+        options['initialdir'] = os.getcwd()
+        options['initialfile'] = 'myfile.' + self.vars['language'].get()
+        options['parent'] = self.root
+        options['title'] = 'Open file...'
+        filename = filedialog.askopenfilename(**options)
+        f = open(filename, mode='r', encoding='utf8')
+        content = None
+        try:
+            content = f.read()
+        except UnicodeDecodeError as ude:
+            print("[ERROR] Encoding error: unable to open file: " + filename)
+            print(ude)
+        finally:
+            f.close()
+        if content is not None:
+            if not self.text.dirty and self.text.file is None:
+                self.text.load(filename, content)
 
     def save(self, event=None):
         pass
@@ -101,7 +166,10 @@ class Jyx:
         pass
 
     def about(self, event=None):
-        pass
+        tongue = self.vars['tongue'].get()
+        title = self.data['menu'][tongue]['about']
+        msg = self.data['messages'][tongue]['about_msg']
+        messagebox.showinfo(title, f"{Jyx.TITLE} - {Jyx.VERSION}\n{msg}\nDamien Gouteux\n2017 - {datetime.now().year}\n")
 
 
 class JyxMenu(tk.Menu):
@@ -123,7 +191,6 @@ class JyxMenu(tk.Menu):
         self.entryconfig(data['menu'][old]['help'], label=data['menu'][new]['help'])
         
         self.file_menu.entryconfig(data['menu'][old]['new'], label=data['menu'][new]['new'])
-        self.file_menu.entryconfig(data['menu'][old]['tab'], label=data['menu'][new]['tab'])
         self.file_menu.entryconfig(data['menu'][old]['open'], label=data['menu'][new]['open'])
         self.file_menu.entryconfig(data['menu'][old]['save'], label=data['menu'][new]['save'])
         self.file_menu.entryconfig(data['menu'][old]['save as'], label=data['menu'][new]['save as'])
@@ -137,21 +204,24 @@ class JyxMenu(tk.Menu):
         self.edit_menu.entryconfig(data['menu'][old]['copy'], label=data['menu'][new]['copy'])
         self.edit_menu.entryconfig(data['menu'][old]['paste'], label=data['menu'][new]['paste'])
         self.edit_menu.entryconfig(data['menu'][old]['select all'], label=data['menu'][new]['select all'])
+        self.edit_menu.entryconfig(data['menu'][old]['clear'], label=data['menu'][new]['clear'])
 
         self.options_menu.entryconfig(data['menu'][old]['tongues'], label=data['menu'][new]['tongues'])
+        self.options_menu.entryconfig(data['menu'][old]['confirm'], label=data['menu'][new]['confirm'])
+        self.options_menu.entryconfig(data['menu'][old]['basename'], label=data['menu'][new]['basename'])
         
         self.help_menu.entryconfig(data['menu'][old]['about'], label=data['menu'][new]['about'])
-    
+
+        self.status_bar.config(text=data['messages'][new]['started'])
+
     def build(self):
         data = self.jyx.data
-        tongue = self.jyx.data['tongue']
+        tongue = self.jyx.vars['tongue'].get()
         languages = self.jyx.data['languages']
-        default_language = self.jyx.data['default_language']
-
+        
         self.file_menu = tk.Menu(self, tearoff=0)
         self.add_cascade(label=data['menu'][tongue]['file'], menu=self.file_menu)
         self.file_menu.add_command(label=data['menu'][tongue]['new'], command=self.jyx.new, accelerator="Ctrl+N")
-        self.file_menu.add_command(label=data['menu'][tongue]['tab'], command=self.jyx.new_tab, accelerator="Ctrl+T")
         self.file_menu.add_command(label=data['menu'][tongue]['open'], command=self.jyx.open, accelerator="Ctrl+O")
         self.file_menu.add_command(label=data['menu'][tongue]['save'], command=self.jyx.save, accelerator="Ctrl+S")
         self.file_menu.add_command(label=data['menu'][tongue]['save as'], command=self.jyx.save, accelerator="Ctrl+Shift+S")
@@ -170,15 +240,13 @@ class JyxMenu(tk.Menu):
         self.edit_menu.add_command(label=data['menu'][tongue]['copy'], command=self.jyx.text.copy, accelerator="Ctrl+C")
         self.edit_menu.add_command(label=data['menu'][tongue]['paste'], command=self.jyx.text.paste, accelerator="Ctrl+V")
         self.edit_menu.add_command(label=data['menu'][tongue]['select all'], command=self.jyx.text.select_all, accelerator="Ctrl+A")
-
+        self.edit_menu.add_separator()
+        self.edit_menu.add_command(label=data['menu'][tongue]['clear'], command=self.jyx.text.clear) #, accelerator="Ctrl+A")
+        
         """
         self.display_tree = tkinter.BooleanVar()
         self.display_tree.set(self.options['display_tree'])
-        self.confirm_exit = tkinter.BooleanVar()
-        self.confirm_exit.set(self.options['confirm_exit'])
-
         self.options_menu.add_checkbutton(label="Display Tree", onvalue=True, offvalue=False, variable=self.display_tree, command=self.restart)
-        self.options_menu.add_checkbutton(label="Confirm Exit", onvalue=True, offvalue=False, variable=self.confirm_exit, command=self.save_opt)
         """
 
         self.options_menu = tk.Menu(self, tearoff=0)
@@ -191,15 +259,12 @@ class JyxMenu(tk.Menu):
                                             variable=self.jyx.vars['tongue'],
                                             value=tong,
                                             command=lambda: self.jyx.update('tongue'))
-        
-        # Language
-        #print(f"{len(languages)} language definitions loaded.")
-        #if self.options['lang'] not in languages:
-        #    print(f"{self.options['lang']} not in known languages. Reseting to {languages[default_language]['label']}.")
-        #    self.lang.set(default_language)
-        #else:
-        #    self.lang.set(self.options['lang'])
-        #self.jyx.update_lang() we must wait to finish the menu
+        self.options_menu.add_checkbutton(label=data['menu'][tongue]['confirm'], onvalue=True, offvalue=False,
+                                          variable=self.jyx.vars['confirm'],
+                                          command=lambda: self.jyx.update('confirm'))
+        self.options_menu.add_checkbutton(label=data['menu'][tongue]['basename'], onvalue=True, offvalue=False,
+                                          variable=self.jyx.vars['basename'],
+                                          command=lambda: self.jyx.update('basename'))
 
         self.langmenu = tk.Menu(self, tearoff=0)
         self.add_cascade(label=data['menu'][tongue]['languages'], menu=self.langmenu)
@@ -232,9 +297,13 @@ class JyxMenu(tk.Menu):
         self.add_cascade(label=data['menu'][tongue]['help'], menu=self.help_menu)
         self.help_menu.add_command(label=data['menu'][tongue]['about'], command=self.jyx.about)
 
+        # Status bas
+        self.status_bar = tk.Label(self.jyx.get_root(), bd=1, relief=tk.SUNKEN)
+        self.status_bar.config(text=data['messages'][tongue]['started'], anchor=tk.E, padx=20)
+        self.status_bar.pack(side=tk.BOTTOM, fill=tk.X)
+
         """
         self.root.bind('<Control-n>', self.menu_new)
-        self.root.bind('<Control-t>', self.menu_new_tab)
         self.root.bind('<Control-o>', self.menu_open)
         self.root.bind('<Control-s>', self.menu_save)
         self.root.bind('<Control-q>', self.menu_exit)
@@ -257,10 +326,11 @@ class JyxText: #(tk.Text):
         frame.grid_rowconfigure(0, weight=1)
         frame.grid_columnconfigure(0, weight=1)
 
-        yscrollbar = ttk.Scrollbar(frame)
-        yscrollbar.grid(row=0, column=1, sticky=tk.N+tk.S)
+        horizontal_scrollbar = ttk.Scrollbar(frame)
+        horizontal_scrollbar.grid(row=0, column=1, sticky=tk.N+tk.S)
         self.text = tk.Text(frame, wrap=tk.NONE, bd=0,
-                            yscrollcommand=yscrollbar.set)
+                            yscrollcommand=horizontal_scrollbar.set)
+        horizontal_scrollbar.configure(command=self.text.yview)
         self.text.config(font=('consolas', 12), undo=True, wrap='word')
         self.text.grid(row=0, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
         self.text.bind('<<Paste>>', self.paste)
@@ -268,7 +338,8 @@ class JyxText: #(tk.Text):
         self.text.bind('<<Copy>>', self.copy)
         self.text.bind('<KeyPress>', self.update_text_before)
         self.text.bind('<KeyRelease>', self.update_text_after)
-
+        self.text.bind('<ButtonRelease-1>', self.jyx.update_status)
+        
         self.text.tag_config("a", foreground="blue", underline=1)
 
         self.start = None
@@ -279,6 +350,14 @@ class JyxText: #(tk.Text):
     #
     # Handling of state
     #
+    def load(self, file, content):
+        self.clear()
+        self.text.insert('1.0', content)
+        self.dirty = False
+        self.file = file
+        self.jyx.update_title()
+        self.text.see(tk.INSERT)
+    
     def write(self, content, at=tk.INSERT):
         self.text.insert(at, content)
         self.dirty = True
@@ -331,6 +410,10 @@ class JyxText: #(tk.Text):
         self.selection_set('1.0', tk.END)
         return 'break'
 
+    def clear(self, event=None):
+        self.select_all(event)
+        self.selection_delete()
+        
     def update_text_before(self, event):
         text = event.widget
         Shift = 0x0001
@@ -351,6 +434,7 @@ class JyxText: #(tk.Text):
             if Shift & event.state:
                 self.selection_set(nex, self.start)
             text.mark_set(tk.INSERT, f'{nex}')
+            self.jyx.update_status()
             return 'break'
         elif event.keysym == 'BackSpace':
             if len(text.tag_ranges('sel')) > 0:
@@ -358,13 +442,16 @@ class JyxText: #(tk.Text):
             else:
                 text.mark_set(tk.INSERT, 'insert-1c')
                 self.delete(tk.INSERT)
+            self.jyx.update_status()
             return 'break'
         elif event.keysym == 'Delete':
             if len(text.tag_ranges('sel')) > 0:
                 self.selection_delete()
+            self.jyx.update_status()
             return 'break'
         elif event.keysym == 'Escape':
             self.selection_clear()
+            self.jyx.update_status()
             return 'break'
         elif event.char == '\r':
             content = '\n'
@@ -388,6 +475,7 @@ class JyxText: #(tk.Text):
         else:
             text.tag_remove('a', 'insert linestart', tk.INSERT)
         text.see(tk.INSERT)
+        self.jyx.update_status()
         return 'break'
 
     def update_text_after(self, event):

@@ -1,24 +1,10 @@
-#!/usr/bin/env python3
-# Created the ‎lundi ‎6 ‎juin ‎2016 (début des tests tkinter)
-
-#
-# Imports
-#
-
-import configparser
-import os.path
-
-import tkinter
-from tkinter import ttk # not found in 2.7.11 but found in 3.5.1 :-)
-from tkinter import filedialog
-from tkinter import messagebox
 from tkinter import font
 
 from enum import Enum
 from typing import Dict
 
 # Getting now
-from datetime import datetime
+
 
 import subprocess
 import stat
@@ -32,124 +18,6 @@ except ModuleNotFoundError:
     ASH_TOKENIZER = False
 else:
     ASH_TOKENIZER = True
-
-#
-# Globals and constants
-#
-
-# support is a list and can have 'tokenize' and/or 'execute' to enable them
-default_language = 'text'
-languages = {
-    'text' : {
-        'label': 'Plain text',
-        'extension': ['.txt'],
-        'family': None,
-        'support': None,
-    },
-    'dglog' : {
-        'label': 'DG log',
-        'extension': ['.dlg'],
-        'family': 'Lightweight markup',
-        'support': None,
-    },
-    'textile' : {
-        'label': 'Textile',
-        'extension': ['.txl'],
-        'family': 'Lightweight markup',
-        'support': None,
-    },
-    'hamill': {
-        'label': 'Hamill',
-        'extension': ['.hml'],
-        'family': 'Lightweight markup',
-        'support': None,
-    },
-    'javascript' : {
-        'label': 'JavaScript',
-        'extension': ['.js'],
-        'family': 'Scripting',
-        'support': None,
-    },
-    'lua' : {
-        'label': 'Lua',
-        'extension': ['.lua'],
-        'family': 'Scripting',
-        'support': None,
-    },
-    'python' : {
-        'label': 'Python',
-        'extension': ['.py'],
-        'family': 'Scripting',
-        'support': ['execute'],
-    },
-    'ruby' : {
-        'label': 'Ruby',
-        'extension': ['.rb'],
-        'family': 'Scripting',
-        'support': None,
-    },
-    'ash' : {
-        'label': 'Ash',
-        'extension': ['.ash'],
-        'family': 'Scripting',
-        'support': None,
-    },
-    'c' : {
-        'label': 'C',
-        'extension': ['.c', '.h'],
-        'family': 'Compiled',
-        'support': None,
-    },
-    'java' : {
-        'label': 'Java',
-        'extension': ['.java'],
-        'family': 'Compiled',
-        'support': None,
-    },
-    'ini' : {
-        'label': 'INI config',
-        'extension': ['.ini'],
-        'family': 'Data',
-        'support': None,
-    },
-    'json' : {
-        'label': 'JSON data',
-        'extension': ['.json'],
-        'family': 'Data',
-        'support': None,
-    },
-    'xml' : {
-        'label': 'XML data',
-        'extension': ['.xml', '.xsd', '.xslt'],
-        'family': 'Data',
-        'support': None,
-    },
-    'html': {
-        'label': 'HTML',
-        'extension': ['.html', '.htm'],
-        'family': 'Web',
-        'support': None,
-    },
-    'css': {
-        'label': 'CSS',
-        'extension': ['.css'],
-        'family': 'Web',
-        'support': None,
-    },
-}
-
-def lang_has(lang, prop):
-    if lang not in languages:
-        return False
-    if 'support' not in languages[lang]:
-        return False
-    support = languages[lang]['support']
-    if support is None:
-        return False
-    if prop not in support:
-        return False
-    return True
-
 
 class Fonts:
     COURRIER_NEW_10_BOLD = None
@@ -273,33 +141,14 @@ class RessourceManager:
 
 class Application:
 
-    RUN_COMMAND = 5
-    CONFIG_FILE_NAME = 'jyx.ini'
-    VERSION = '0.0.1'
-
     def __init__(self):
         self.log = Logger(False)
         self.rc = RessourceManager(self.log)
         #self.rc.from_file(r'icons\iconyellowcube16x19_F5i_icon.ico')
         self.rc.from_file(os.path.join(".", "icons", "polar-star.png"))
         self.title = 'Jyx'
-        # config
-        self.options = {}
         # base options
         self.options['display_tree'] = True
-        self.options['confirm_exit'] = True
-        self.options['lang'] = default_language
-        # try to load options
-        if os.path.isfile(Application.CONFIG_FILE_NAME):
-            config = configparser.ConfigParser()
-            config.read(Application.CONFIG_FILE_NAME)
-            if 'MAIN' in config:
-                if 'display_tree' in config['MAIN']:
-                    self.options['display_tree'] = (config['MAIN']['display_tree'] == 'True')
-                    self.log.info('Display tree is : ' + str(self.options['display_tree']))
-                if 'confirm_exit' in config['MAIN']:
-                    self.options['confirm_exit'] = (config['MAIN']['confirm_exit'] == 'True')
-                    self.log.info('Confirm exit is : ' + str(self.options['confirm_exit']))
         # create default option file
         else:
             self.write_options()
@@ -336,76 +185,12 @@ class Application:
 
     def make_menu(self):
         "Build the menu"
-        self.menu = tkinter.Menu(self.root)
-        self.root.config(menu=self.menu)
-        self.filemenu = tkinter.Menu(self.menu, tearoff=0)
-        self.menu.add_cascade(label="File", menu=self.filemenu)
-        self.filemenu.add_command(label="New", command=self.menu_new, accelerator="Ctrl+N")
-        self.filemenu.add_command(label="New Tab", command=self.menu_new_tab, accelerator="Ctrl+T")
-        self.filemenu.add_command(label="Open...", command=self.menu_open, accelerator="Ctrl+O")
-        self.filemenu.add_command(label="Save As...", command=self.menu_save, accelerator="Ctrl+S")
-        self.filemenu.add_separator()
-        self.filemenu.add_command(label="Run Script", command=self.menu_exec, accelerator="F5")
-        self.filemenu.add_separator()
-        self.filemenu.add_command(label="Exit", command=self.menu_exit, accelerator="Ctrl+Q")
-
-        self.editmenu = tkinter.Menu(self.menu, tearoff=0)
-        self.menu.add_cascade(label="Edit", menu=self.editmenu)
-        self.editmenu.add_command(label="Undo", command=self.menu_undo, accelerator="Ctrl+Z")
-        self.editmenu.add_command(label="Redo", command=self.menu_redo, accelerator="Ctrl+Y")
-        self.editmenu.add_separator()
-        self.editmenu.add_command(label="Cut", command=self.menu_cut, accelerator="Ctrl+X")
-        self.editmenu.add_command(label="Copy", command=self.menu_copy, accelerator="Ctrl+C")
-        self.editmenu.add_command(label="Paste", command=self.menu_paste, accelerator="Ctrl+V")
-        self.editmenu.add_command(label="Select All", command=self.menu_select_all, accelerator="Ctrl+A")
-
         self.display_tree = tkinter.BooleanVar()
         self.display_tree.set(self.options['display_tree'])
-        self.confirm_exit = tkinter.BooleanVar()
-        self.confirm_exit.set(self.options['confirm_exit'])
 
         self.options_menu = tkinter.Menu(self.menu, tearoff=0)
         self.menu.add_cascade(label="Options", menu=self.options_menu)
         self.options_menu.add_checkbutton(label="Display Tree", onvalue=True, offvalue=False, variable=self.display_tree, command=self.restart)
-        self.options_menu.add_checkbutton(label="Confirm Exit", onvalue=True, offvalue=False, variable=self.confirm_exit, command=self.save_opt)
-
-        # Language
-        self.log.info(f"{len(languages)} language definitions loaded.")
-        self.lang = tkinter.StringVar()
-        if self.options['lang'] not in languages:
-            self.log.error(f"{self.options['lang']} not in known languages. Reseting to {languages[default_language]['label']}.")
-            self.lang.set(default_language)
-        else:
-            self.lang.set(self.options['lang'])
-        self.log.info("self.lang = " + self.lang.get())
-
-        self.langmenu = tkinter.Menu(self.menu, tearoff=0)
-        self.menu.add_cascade(label="Language", menu=self.langmenu)
-
-        base = {}
-        families = {}
-        for lang, prop in languages.items():
-            if prop['family'] is None:
-                base[lang] = prop
-                continue
-            elif prop['family'] not in families:
-                families[prop['family']] = {}
-            families[prop['family']][lang] = prop
-        for lang in sorted(base):
-            self.langmenu.add_radiobutton(label=languages[lang]['label'], variable=self.lang, value=lang, command=self.update_lang)
-        self.langmenu.add_separator()
-        for fam in sorted(families):
-            menu = tkinter.Menu(self.langmenu, tearoff=0)
-            self.langmenu.add_cascade(label=fam, menu=menu)
-            for lang in sorted(families[fam]):
-                menu.add_radiobutton(label=languages[lang]['label'], variable=self.lang, value=lang, command=self.update_lang)#, indicatoron=0
-
-        if not lang_has(self.options['lang'], 'execute'):
-            self.filemenu.entryconfig(Application.RUN_COMMAND, state=tkinter.DISABLED)
-        
-        self.helpmenu = tkinter.Menu(self.menu, tearoff=0)
-        self.menu.add_cascade(label="Help", menu=self.helpmenu)
-        self.helpmenu.add_command(label="About...", command=self.menu_about)
 
         self.root.bind('<Control-n>', self.menu_new)
         self.root.bind('<Control-t>', self.menu_new_tab)
@@ -417,24 +202,7 @@ class Application:
         self.root.bind('<Control-y>', self.menu_redo)
         self.root.bind('<F5>', self.menu_exec)
 
-    def make_status_bar(self):
-        self.status_bar = tkinter.Label(self.root, bd=1, relief=tkinter.SUNKEN)
-        self.status_bar.config(text="Hello!", anchor=tkinter.E, padx=20)
-        #status_bar.update_idletasks()
-        self.status_bar.pack(side=tkinter.BOTTOM, fill=tkinter.X)
-
-    def update_lang(self):
-        self.log.info("self.lang = " + self.lang.get())
-        self.options['lang'] = self.lang.get()
-        if not lang_has(self.options['lang'], 'execute'):
-            self.filemenu.entryconfig(Application.RUN_COMMAND, state=tkinter.DISABLED)
-        else:
-            self.filemenu.entryconfig(Application.RUN_COMMAND, state=tkinter.ACTIVE)
-    
     def start(self):
-        # root widget, an ordinary window
-        self.root = tkinter.Tk()
-        self.root.protocol("WM_DELETE_WINDOW", self.menu_exit)
         # Fonts
         Fonts.COURRIER_NEW_10 = font.Font(family='Courier New', size=10)
         Fonts.COURRIER_NEW_10_BOLD = font.Font(family='Courier New', size=10, weight='bold')
@@ -493,28 +261,8 @@ class Application:
     # Menu functions
     #-------------------------------------------------------
 
-    def menu_about(self):
-        messagebox.showinfo("About", f"{self.title} - {Application.VERSION}\nMade with ❤\nDamien Gouteux\n2017 - {datetime.now().year}\n")
-
-    def menu_exit(self, event=None):
-        self.exit()
-
-    def menu_new(self, event=None):
-        self.new()
-
     def menu_new_tab(self, event=None):
         self.new_tab()
-
-    def menu_open(self, event=None):
-        """Returns an opened file in read mode."""
-        options = {}
-        #options['defaultextension'] = '.txt'
-        options['filetypes'] = [('all files', '.*'), ('lua files', '.lua'), ('python files', '.py'), ('text files', '.txt')]
-        options['initialdir'] = 'C:\\'
-        options['initialfile'] = 'myfile.' + self.options['lang']
-        options['parent'] = self.root
-        options['title'] = 'Open file...'
-        self.load(filedialog.askopenfilename(**options)) # mode='r',
 
     def menu_save(self, event=None):
         options = {}
@@ -584,31 +332,14 @@ class Application:
     # Text functions
     #-------------------------------------------------------
 
-    def new(self):
-        self.clear()
-        self.state_restart(None)
-
     def new_tab(self):
         self.frame.make_text()
         self.set_title()
         # Select last tab
         self.frame.notebook.select(self.frame.notebook.index('end')-1)
 
-    def clear(self):
-        self.frame.get_current_text().delete("1.0", tkinter.END)
-
     def load(self, filename : str):
-        f = open(filename, mode='r', encoding='utf8')
-        try:
-            content = f.read()
-        except UnicodeDecodeError as ude:
-            self.log.error("Encoding error: unable to open file: " + filename)
-            print(ude)
-            return
-        f.close()
-        self.clear()
-        self.frame.get_current_text().insert("1.0", content) # or END
-        self.state_restart(filename)
+
 
     def save(self, filename: str, raw: bool=False):
         f = open(filename, mode='w', encoding='utf8')
@@ -617,13 +348,6 @@ class Application:
         f.close()
         if not raw:
             self.state_restart(filename)
-
-    def exit(self):
-        if self.frame.is_dirty() and self.options['confirm_exit']:
-            if messagebox.askyesno("Unsaved changes", "There are unsaved changes. Do you really want to quit " + self.title + "?", default=messagebox.NO):
-                self.root.destroy()
-        else:
-            self.root.destroy()
 
     #-------------------------------------------------------
     # State functions
