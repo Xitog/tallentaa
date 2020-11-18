@@ -126,13 +126,150 @@
             "label": "Ash",
             "extension": [".ash"],
             "family": "Scripting",
-            "support": ""
+            "support": ["tokenize"],
+            "categories": {
+                "keywords": [
+                    "if", "then", "elif", "else", "end",
+                    "while", "do", "loop",
+                    "for", "in",
+                    "break", "next",
+                    "return",
+                    "class", "fun", "pro", "get", "set", "sig"
+                ],
+                "predef_types": [
+                    "str", "int", "num", "bool", "list", "dict"
+                ],
+                "booleans": [
+                    "true", "false"
+                ],
+                "predef_functions": [
+                    "sizeof", "alignof"
+                ],
+                "separators": [
+                    "(", ")", "[", "]", "{", "}", ",", ";", ":", "->", "\n", "\t", " "
+                ],
+                "operators": [
+                    "+", "-", "*", "/", "%", "//",
+                    ".", "<<", ">>", "..",
+                    "=", "+=", "-=", "*=", "/=", "%=", "//=",
+                    "==", "!=", ">", ">=", "<=", "<",
+                    "?", "$", "@",
+                    "not", "and", "or", "xor"
+                ],
+                "string": [
+                    "\"", "'"
+                ],
+                "null": [
+                    "nil"
+                ],
+                "comment": [
+                    "--"
+                ]
+            },
+            "styles": {
+                "base": {
+                    "keywords": {
+                        "color": "gold"
+                    },
+                    "predef_types": {
+                        "color": "purple"
+                    },
+                    "booleans": {
+                        "color": "gold"
+                    },
+                    "predef_functions": {
+                        "color": "purple"
+                    },
+                    "separators": {
+                        "color": "black"
+                    },
+                    "string": {
+                        "color": "green"
+                    },
+                    "null": {
+                        "color": "gold"
+                    },
+                    "comment": {
+                        "color": "red"
+                    }
+                }
+            }
         },
         "c" : {
             "label": "C",
             "extension": [".c", ".h"],
             "family": "Compiled",
-            "support": ""
+            "support": ["tokenize"],
+            "categories": {
+                "keywords": [
+                    "auto", "break", "case", "const", "continue",
+                    "default", "do", "else", "enum", "extern",
+                    "for", "goto", "if", "register", "return",
+                    "signed", "static", "struct",
+                    "switch", "typedef", "union", "unsigned",
+                    "volatile", "while"
+                ],
+                "predef_types": [
+                    "char", "double", "float", "int", "long", "short",
+                    "void", "bool"
+                ],
+                "booleans": [
+                    "true", "false"
+                ],
+                "predef_functions": [
+                    "sizeof", "alignof"
+                ],
+                "separators": [
+                    "(", ")", "[", "]", "{", "}", ",", ";", "\n", "\t", " "
+                ],
+                "operators": [
+                    "+", "-", "*", "/", "%", "++", "--",
+                    "&", "|", "^", "~", "<<", ">>",
+                    "=", "+=", "-=", "*=", "/=", "%=", "&=", "|=", "^=", "<<=", ">>=",
+                    "==", "!=", ">", ">=", "<=", "<",
+                    ".", "->", "::",
+                    "?", ":",
+                    "not_eq", "not", "and", "or", "and_eq", "or_eq", "xor_eq",
+                    "!", "&&", "||"
+                ],
+                "string": [
+                    "\"", "'"
+                ],
+                "null": [
+                    "null"
+                ],
+                "comment": [
+                    "//"
+                ]
+            },
+            "styles": {
+                "base": {
+                    "keywords": {
+                        "color": "gold"
+                    },
+                    "predef_types": {
+                        "color": "purple"
+                    },
+                    "booleans": {
+                        "color": "gold"
+                    },
+                    "predef_functions": {
+                        "color": "purple"
+                    },
+                    "separators": {
+                        "color": "black"
+                    },
+                    "string": {
+                        "color": "green"
+                    },
+                    "null": {
+                        "color": "gold"
+                    },
+                    "comment": {
+                        "color": "red"
+                    }
+                }
+            }
         },
         "java" : {
             "label": "Java",

@@ -102,7 +102,7 @@ class Jyx:
         self.prev[varname] = value
 
     def has(self, prop, value, content=None):
-        #print('has', prop, value, content)
+        #print('has', prop, value) #, content)
         if content is None:
             content = self.data
         exploded = prop.split('.')
@@ -134,7 +134,7 @@ class Jyx:
     def open(self, event=None):
         options = {}
         #options['defaultextension'] = '.txt'
-        options['filetypes'] = [('all files', '.*'), ('lua files', '.lua'), ('python files', '.py'), ('text files', '.txt')]
+        options['filetypes'] = [('all files', '.*')]
         options['initialdir'] = os.getcwd()
         options['initialfile'] = 'myfile.' + self.vars['language'].get()
         options['parent'] = self.root
@@ -152,6 +152,11 @@ class Jyx:
         if content is not None:
             if not self.text.dirty and self.text.file is None:
                 self.text.load(filename, content)
+        _, ext = os.path.splitext(filename)
+        for key, lang in self.data['languages'].items():
+            if ext in lang['extension']:
+                self.vars['language'].set(key)
+                self.update('language')
 
     def save(self, event=None):
         pass
@@ -479,6 +484,11 @@ class JyxText: #(tk.Text):
         return 'break'
 
     def update_text_after(self, event):
+        language = self.jyx.vars['language'].get()
+        if self.jyx.has(f"languages.{language}.support", "tokenize"):
+            print("tokens available!")
+        else:
+            print("no tokens")
         #print('h', event)
         res = event.widget.search('--> ', "insert linestart", "insert lineend")
         while res != '':
