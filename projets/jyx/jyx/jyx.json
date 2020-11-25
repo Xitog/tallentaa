@@ -10,13 +10,21 @@
             "started"    : "Démarré",
             "about_msg"  : "Fait avec ❤",
             "unsaved"    : "Modifications non sauvées",
-            "unsaved_msg": "Il y a des modifications non sauvées.\nVoulez-vous vraiment quitter Jyx ?"
+            "unsaved_msg": "Il y a des modifications non sauvées.\nVoulez-vous vraiment quitter Jyx ?",
+            "open file"  : "Ouvrir un fichier...",
+            "save file"  : "Sauvegarder le fichier...",
+            "filter all" : "tous les fichiers",
+            "file name"  : "monfichier"
         },
         "en" : {
             "started"    : "Started",
             "about_msg"  : "Made with ❤",
             "unsaved"    : "Unsaved changes",
-            "unsaved_msg": "There are unsaved changes.\nDo you really want to quit Jyx?"
+            "unsaved_msg": "There are unsaved changes.\nDo you really want to quit Jyx?",
+            "open file"  : "Open file...",
+            "save file"  : "Save file...",
+            "filter all" : "all files",
+            "file name"  : "myfile"
         }
     },
     "menu": {
