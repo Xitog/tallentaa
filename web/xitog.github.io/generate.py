@@ -25,7 +25,7 @@ logging.getLogger().setLevel(logging.DEBUG)
 
 # Mono
 
-#hamill.process_file(jp('input', 'index.hml'), jp('output', 'index.html'), 'fr', includes)
+hamill.process_file(jp('input', 'index.hml'), jp('output', 'index.html'), 'fr', includes)
 
 #hamill.process_file(r'input\informatique\json.hml', r'output\informatique\json.html', 'fr', includes)
 #hamill.process_file(jp('input', 'informatique', 'bnf.hml'), jp('output', 'informatique', 'bnf.html'), 'fr', includes)
@@ -37,7 +37,7 @@ logging.getLogger().setLevel(logging.DEBUG)
 #hamill.process_file(r'input\passetemps\tech_dialogues.hml', r'output\passetemps\tech_dialogues.html', 'fr', includes)
 #hamill.process_file(r'input\passetemps\tech_transitions.hml', r'output\passetemps\tech_transitions.html', 'fr', includes)
 #hamill.process_file(r'input\passetemps\pres_jeux.hml', r'output\passetemps\pres_jeux.html', 'fr', includes)
-hamill.process_file(jp('input', 'passetemps', 'pres_jeuxvideo.hml'), jp('output', 'passetemps', 'pres_jeuxvideo.html'), 'fr', includes)
+#hamill.process_file(jp('input', 'passetemps', 'pres_jeuxvideo.hml'), jp('output', 'passetemps', 'pres_jeuxvideo.html'), 'fr', includes)
 #hamill.process_file(r'input\passetemps\tech_raycasting_fr.hml', r'output\passetemps\tech_raycasting_fr.html', 'fr', includes)
 
 #hamill.process_file(jp('input', 'passetemps', 'history_fps_tables_en.hml'), jp('output', 'passetemps', 'history_fps_tables_en.html'), 'fr', includes)

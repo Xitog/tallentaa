@@ -1,9 +1,21 @@
 {
     "options": {
-        "default_language" : "text",
-        "tongue": "fr",
-        "confirm": false,
-        "basename": false
+        "tongue": {
+            "value": "fr",
+            "msg": "tongue"
+        },
+        "confirm": {
+            "value": false,
+            "msg":"confirm"
+        },
+        "basename": {
+            "value": false,
+            "msg": "basename"
+        },
+        "treeview": {
+            "value": true,
+            "msg": "treeview"
+        }
     },
     "messages": {
         "fr": {
@@ -50,6 +62,7 @@
             "tongues"    : "Langues",
             "confirm"    : "Confirmer avant de quitter",
             "basename"   : "Afficher seulement le nom",
+            "treeview"   : "Afficher l'arbre",
             "languages"  : "Langages",
             "help"       : "Aide",
             "about"      : "A propos..."
@@ -76,11 +89,13 @@
             "tongues"    : "Tongues",
             "confirm"    : "Confirm before exit",
             "basename"   : "Display only the name",
+            "treeview"   : "Display tree",
             "languages"  : "Languages",
             "help"       : "Help",
             "about"      : "About..."
         }
     },
+    "default_language" : "text",
     "languages" : {
         "text" : {
             "label": "Plain text",

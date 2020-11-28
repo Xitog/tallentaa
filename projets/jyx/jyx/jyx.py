@@ -1,8 +1,6 @@
 from typing import Dict
-
 import subprocess
 import stat
-
 # Tokenize from rey
 import sys
 try:
@@ -13,120 +11,10 @@ except ModuleNotFoundError:
 else:
     ASH_TOKENIZER = True
 
-class RessourceManager:
-
-    def __init__(self, logger: Logger):
-        self.ressources: Dict[str, str] = {}
-        self.log: Logger = logger
-
-    def from_file(self, filepath: str) -> None:
-        key = os.path.splitext(os.path.basename(filepath))[0] # suppress .extension
-        if os.path.isfile(filepath):
-            self.ressources[key] = filepath
-            self.log.info('Ressource registered from file: ' + filepath)
-        else:
-            self.ressources[key] = None
-            self.log.error('Ressource could not be found: ' + filepath)
-
-    def get(self, key: str) -> str:
-        return self.ressources[key]
-
-    def get_as_image(self, key: str) -> tkinter.PhotoImage:
-        if self.found(key):
-            return tkinter.PhotoImage(file=self.ressources[key])
-        raise Exception("Ressource could not be found")
-
-    def found(self, key: str) -> bool:
-        return key in self.ressources and self.ressources[key] is not None
-
-class Application:
-
-    def __init__(self):
-        self.rc = RessourceManager(self.log)
-        self.rc.from_file(os.path.join(".", "icons", "polar-star.png"))
-        self.options['display_tree'] = True
-
-    def update(self):
-        self.after_id = self.root.after(1000, self.update)
-
-    def set_title(self):
-        current = self.frame.notebook.index("current")
-        for i in range(0, self.frame.notebook.index('end')):
-            file = self.frame.get_path(i)
-            if file is None:
-                file = "New"
-            dirty = ""
-            if self.frame.get_dirty(i):
-                dirty = " *"
-            if i == current:
-                self.root.wm_title(self.title + " " + Application.VERSION + " - " + file + dirty)
-            self.frame.notebook.tab(i, text=os.path.basename(file) + dirty)
-
     def make_menu(self):
-        "Build the menu"
-        self.display_tree = tkinter.BooleanVar()
-        self.display_tree.set(self.options['display_tree'])
-
         self.options_menu = tkinter.Menu(self.menu, tearoff=0)
         self.menu.add_cascade(label="Options", menu=self.options_menu)
         self.options_menu.add_checkbutton(label="Display Tree", onvalue=True, offvalue=False, variable=self.display_tree, command=self.restart)
-
-    def start(self):
-        # Ressources
-        if self.rc.found("polar-star"):
-            #self.root.iconbitmap("@...")
-            self.root.iconphoto(True, self.rc.get_as_image('polar-star'))
-        self.root.minsize(width=800, height=600)
-        #root.title("Jyx")
-        #root.geometry("600x400")
-        self.update()
-
-    def save_opt(self):
-        self.options['confirm_exit'] = self.confirm_exit.get()
-        self.write_options()
-
-    def restart(self):
-        # Save
-        f = self.frame
-        contents = []
-        paths = []
-        dirtyness = []
-        nb = f.notebook.index('end')
-        current = f.notebook.index("current")
-        for i in range(0, nb):
-            contents.append(f.get_content(i))
-            paths.append(f.get_path(i))
-            dirtyness.append(f.get_dirty(i))
-        del f
-        self.options['display_tree'] = self.display_tree.get()
-        self.options['confirm_exit'] = self.confirm_exit.get()
-        self.root.after_cancel(self.after_id)
-        self.menu_exit()
-        self.write_options()
-        self.start()
-        f = self.frame # new value!
-        for i in range(0, nb):
-            if i > 0:
-                self.new_tab()
-            f.set_content(i, contents[i])
-            f.set_path(i, paths[i])
-            f.set_dirty(i, dirtyness[i])
-        self.set_title()
-        self.frame.notebook.select(current)
-
-    def menu_undo(self, event=None):
-        try:
-            self.frame.get_current_text().edit_undo()
-            self.state_change()
-        except tkinter.TclError:
-            self.log.warn("Nothing to undo")
-
-    def menu_redo(self, event=None):
-        try:
-            self.frame.get_current_text().edit_redo()
-            self.state_change()
-        except tkinter.TclError:
-            self.log.warn("Nothing to redo")
 
     def menu_exec(self, event=None):
         if not lang_has(self.options['lang'], 'execute'):
@@ -159,7 +47,6 @@ class Application:
         #    relief = 'flat',  # flat ridge for separator
         #    borderwidth = 0,  # zero width for the border
         #)
-        self.treeview = ttk.Treeview(self)
         #self.treeview["columns"] = ("text",)
         self.treeview.column("#0", width=120)
         self.treeview.heading("#0", text="Nodes")
@@ -208,21 +95,10 @@ class Application:
         self.hi_there.pack(side="bottom")
 
     def tokenizer(self):
-        lang = self.app.options['lang']
-        if not lang_has(lang, 'tokenize'):
-            return
-        debug = True
-        text = self.get_current_text()
-        content = text.get(1.0, tkinter.END)
-        tokens = Tokenizer(lang).tokenize(content, debug)
         # Clear all tags
         for tag in text.tag_names():
             text.tag_remove(tag, 1.0)
         # Put tags
-        if debug:
-            print('------------')
-            print('Setting tags')
-            print('------------')
         for t in tokens:
             deb = '1.0+%ic' % t.start
             end = '1.0+%ic' % (t.start + t.length)
@@ -238,15 +114,6 @@ class Application:
                 text.tag_add("comment", deb, end) 
 
     def key(self, event):
-        text = self.get_current_text()
-        # no refresh on control keys
-        if event.keycode in KeyConstants.CONTROL_KEYS:
-            return
-        #print("pressed", "char", repr(event.char), "keycode", event.keycode, "state", event.state, "type", event.type, "ctrl", event.state & KeyConstants.MASK_CONTROL)
-        #print(dir(event))
-        if event.state & KeyConstants.MASK_CONTROL and event.keycode not in [ KeyConstants.KEY_X, KeyConstants.KEY_V]:
-            return
-        self.app.state_change()
         self.tokenizer()
         s = text.get(1.0, tkinter.END)
         w = ''
@@ -264,19 +131,4 @@ class Application:
                 start = i
                 print(w, len(w))
 
-        #self.xscrollbar = tkinter.Scrollbar(self.text_frame, orient=tkinter.HORIZONTAL)
-        #self.xscrollbar.grid(row=1, column=0, sticky=tkinter.E+tkinter.W)
         text.grid(row=0, column=0, sticky=tkinter.N+tkinter.S+tkinter.E+tkinter.W)
-        
-    def build(self):
-        if self.app.options['display_tree']:
-            self.make_tree()
-            self.make_notebook()
-            #self.treeview.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=tkinter.YES)
-            #self.notebook.pack(side=tkinter.RIGHT, fill=tkinter.BOTH, expand=tkinter.YES)
-            self.treeview.place( relx = 0.0, rely = 0.0, relwidth = 0.2, relheight = 1.0 )
-            self.notebook.place( relx = 0.2, rely = 0.0, relwidth = 0.8, relheight = 1.0 )
-        else:
-            self.make_notebook()
-            #self.notebook.pack(side=tkinter.RIGHT, fill=tkinter.BOTH, expand=tkinter.YES)
-            self.notebook.place( relx = 0.0, rely = 0.0, relwidth = 1.0, relheight = 1.0 )

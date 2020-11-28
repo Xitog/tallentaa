@@ -4,6 +4,7 @@
 !require https://xitog.github.io/dgx/css/palatino.css
 !require https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
 !require https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js
+!css .jumbotron li { margin-bottom: 0px; }
 
 {{#main .container}}
 
@@ -16,20 +17,40 @@
 
 Bonjour visiteur !
 
-Vous vous trouvez sur mon site web personnel, qui présente mes projets.
+Mon site web personnel présente mes différents projets qui se divisent en trois catégories :
 
-Mes projets se divisent en deux catégories :
++ Des **prototypes et des moteurs de jeux vidéo** :
+* * Un [RTS->https://xitog.github.io/dgx/passetemps/project_rts.html] et son moteur de transitions
+* * Un [FPS 2.5D->https://xitog.github.io/dgx/passetemps/project_rts.html] et son moteur de raycasting
+* * Un RPG et son moteur de dialogues
+* * Un Action-RPG et son moteur de génération procédurale
++ Des **outils informatiques** :
+* * Jyx, un éditeur de texte simple et multiplateforme
+* * Ash, un langage de programmation simple
+* * Hamill, un langage de balisage léger pour produire du HTML
++ Des **livres, manuels, guides, fiches ou jeux** pour apprendre ou réviser :
+* * Sur des technologies informatiques :
+* * * Les langages de programmation comme Python, Ruby, Lua
+* * * Les langages de description comme BNF, JSON
+* * * Une liste de liens vers des outils pratiques
+* * Sur des langues et la linguistique :
+* * * Français : phonèmes, outil d'analyse
+* * * Italien : une gramaire, Beatrice, et un jeu sur la conjugaison
+* * * Anglais : une liste des verbes fréquents et un jeu sur le vocabulaire
+* * * Interlingua : un conjugueur
+* * Sur l'histoire :
+* * * Fiches méthodologiques générale et bibliographie
+* * * Fiche sur la France du XIXe siècle
+* * Sur l'histoire des jeux vidéo :
+* * * Les premiers FPS
+* * * Les premiers RTS
+* * Sur mes passe-temps :
+* * * Jeux de cartes ou de figurines
+* * * Jeux de rôles
+* * * Livres-jeux
+* * * Jeux vidéo
 
-* Les programmes informatiques,
-* Les guides et les fiches pour apprendre ou réviser.
-
-Mes projets concernent trois grands domaines scientifiques :
-
-* la linguistique, l'informatique et l'histoire
-
-Ils concernent également mes passes-temps, surtout les jeux, vidéo ou non.
-
-J'espère que ce site pourra vous être utile et je vous souhaite une bonne journée !
+En espérant que ce site pourra vous être utile, je vous souhaite une bonne journée.
 
 {{.sign}}Damien Gouteux, dernière mise à jour le [=GENDATE].
 

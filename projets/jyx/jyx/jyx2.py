@@ -22,10 +22,22 @@ from enum import Enum
 
 DEFAULT_CONFIG = """{
     "options": {
-        "default_language" : "text",
-        "tongue": "en",
-        "confirm": false,
-        "basename": false
+        "tongue": {
+            "value": "fr",
+            "msg": "tongue"
+        },
+        "confirm": {
+            "value": false,
+            "msg":"confirm"
+        },
+        "basename": {
+            "value": false,
+            "msg": "basename"
+        },
+        "treeview": {
+            "value": true,
+            "msg": "treeview"
+        }
     },
     "messages": {
         "en" : {
@@ -134,6 +146,31 @@ class Logger:
         if self.exit_on_error:
             exit()
 
+
+class Option:
+
+    def __init__(self, name, val, msg):
+        self.name = name
+        self.val = val
+        self.typ = type(val)
+        self.msg = msg
+        if self.typ == str:
+            self.var = tk.StringVar()
+        elif self.typ == bool:
+            self.var = tk.BooleanVar()
+        else:
+            raise Exception(f"Option type not handled for {self.name} of type {self.typ}")
+        self.var.set(self.val)
+        self.prev = self.val
+
+    @staticmethod
+    def load(key, dic):
+        return Option(key, dic['value'], dic['msg'])
+
+    def get(self):
+        return self.var.get()
+
+
 class Jyx:
 
     TITLE = 'Jyx'
@@ -156,29 +193,32 @@ class Jyx:
         # Init
         self.root = tk.Tk()
         self.root.protocol('WM_DELETE_WINDOW', self.exit)
+        self.root.minsize(width=800, height=600)
+        icon = self.load_icon('polar-star.png')
+        if icon is not None:
+            self.root.iconphoto(True, icon)
         # Fonts
         self.fonts = {}
         self.fonts['COURRIER_NEW_10'] = font.Font(family='Courier New', size=10)
         self.fonts['COURRIER_NEW_10_BOLD'] = font.Font(family='Courier New', size=10, weight='bold')
-        # Vars
-        self.vars = {}
-        self.prev = {}
-        self.vars['tongue'] = tk.StringVar()
-        self.vars['tongue'].set(self.data['options']['tongue'])
-        self.vars['language'] = tk.StringVar()
-        self.vars['language'].set(self.data['options']['default_language'])
-        self.vars['confirm'] = tk.BooleanVar()
-        self.vars['confirm'].set(self.data['options']['confirm'])
-        self.vars['basename'] = tk.BooleanVar()
-        self.vars['basename'].set(self.data['options']['basename'])
-        for k, v in self.vars.items():
-            self.prev[k] = v
+        # Options
+        self.options = {}
+        for opt, info in self.data['options'].items():
+            self.options[opt] = Option.load(opt, info)
+        self.langage = tk.StringVar()
+        self.langage.set(self.data['default_language'])
         # UI components
         self.notebook = JyxNotebook(self)
+        self.treeview = JyxTree(self)
+        #self.treeview.treeview.pack(side=tk.LEFT, fill=tk.Y, expand=tk.YES)
+        #self.notebook.notebook.pack(side=tk.RIGHT, fill=tk.BOTH, expand=tk.YES)
+        # Prend tout Y (relheight = 1.0), se positionne à 0.2 pour le notebook
+        self.treeview.treeview.place(relx=0.0, rely =0.0, relwidth =0.2, relheight =1.0)
+        self.notebook.notebook.place(relx=0.2, rely =0.0, relwidth =0.8, relheight =1.0)
         self.menu = JyxMenu(self)
         self.root.config(menu=self.menu)
         # Updall vars, cannot be called until the menu is completed
-        self.update_all_vars() 
+        self.update_all_options() 
         self.update_title()
         # Tags
         #self.tags = {}
@@ -186,17 +226,34 @@ class Jyx:
         #self.tags['comment'] = self.notebook.get_text().tag_config("comment", foreground="grey", font=self.fonts['COURRIER_NEW_10'])
         #self.tags['test'] = self.notebook.note.get_text().tag_config("a", foreground="blue", underline=1)
         # Starting
+        self.auto_update()
         self.root.mainloop()
+
+    def load_icon(self, name: str) -> tk.PhotoImage:
+        res = None
+        try:
+            res = tk.PhotoImage(file=os.path.join('icons', name))
+        except:
+            self.log.info(f'Resource {name} could not be found')
+        return res
 
     def get_root(self):
         return self.root
 
+    def auto_update(self):
+        self.after_id = self.root.after(5000, self.auto_update)
+        #self.root.bell()
+        print('hello')
+
+    def update_langage(self):
+        print('update langage')
+
     def update_title(self):
         dirty = ' *' if self.notebook.is_dirty() else ''
-        tongue = self.data['tongue']
+        tongue = self.options['tongue'].get()
         if self.notebook.get_filepath() is None:
             file = self.data['menu'][tongue]['new']              
-        elif self.vars['basename'].get():
+        elif self.options['basename'].get():
             file = os.path.basename(self.notebook.get_filepath())
         else:
             file = self.notebook.get_filepath()
@@ -207,27 +264,34 @@ class Jyx:
     def update_status(self, event=None):
         self.menu.status_bar.configure(text=self.notebook.get_position())
 
-    def update_all_vars(self):
-        for varname in self.vars:
-            self.update(varname, True)
+    def update_all_options(self):
+        for key in self.options:
+            self.update(key, True)
 
     def update(self, varname, init=False):
-        value = self.vars[varname].get()
-        print(f"var {varname} = {value}")
-        if varname in self.vars:
-            self.data[varname] = value
-            if varname == 'language':
-                if not self.has(f"languages.{value}.support", "execute"):
-                    self.menu.file_menu.entryconfig(Jyx.RUN_COMMAND, state=tk.DISABLED)
-                else:
-                    self.menu.file_menu.entryconfig(Jyx.RUN_COMMAND, state=tk.ACTIVE)
-            elif varname == 'tongue' and not init:
-                self.menu.relabel(old=self.prev[varname], new=value)
-            elif varname == 'basename' and not init:
-                self.update_title()
-        else:
+        if varname not in self.options:
             raise Exception(f'Variable unknown: {varname}')
-        self.prev[varname] = value
+        opt = self.options[varname]
+        val = opt.get()
+        print(f"option {opt.name} = {val}")
+        if varname == 'language':
+            if not self.has(f"languages.{val}.support", "execute"):
+                self.menu.file_menu.entryconfig(Jyx.RUN_COMMAND, state=tk.DISABLED)
+            else:
+                self.menu.file_menu.entryconfig(Jyx.RUN_COMMAND, state=tk.ACTIVE)
+        elif varname == 'tongue' and not init:
+            self.menu.relabel(old=opt.prev, new=val)
+            self.notebook.relabel(val)
+        elif varname == 'basename' and not init:
+            self.update_title()
+        elif varname == 'treeview':
+            if val and not init:
+                self.treeview.treeview.place(relx=0.0, rely =0.0, relwidth =0.2, relheight =1.0)
+                self.notebook.notebook.place(relx=0.2, rely =0.0, relwidth =0.8, relheight =1.0)
+            elif not val:
+                self.treeview.treeview.place_forget()
+                self.notebook.notebook.place(relx=0.0, rely =0.0, relwidth =1.0, relheight =1.0)
+        opt.prev = val
 
     def has(self, prop, value, content=None):
         #print('has', prop, value) #, content)
@@ -247,8 +311,8 @@ class Jyx:
             return self.has('.'.join(exploded[1:]), value, content[exploded[0]])
 
     def exit(self, event=None):
-        tongue = self.vars['tongue'].get()
-        if self.notebook.anyone_dirty() and self.vars['confirm'].get():
+        tongue = self.options['tongue'].get()
+        if self.notebook.is_anyone_dirty() and self.options['confirm'].get():
             title = self.data['messages'][tongue]['unsaved']
             msg = self.data['messages'][tongue]['unsaved_msg']
             if messagebox.askyesno("Unsaved changes", msg, default=messagebox.NO):
@@ -268,8 +332,8 @@ class Jyx:
             self.note.save()
 
     def save_as(self, event=None):
-        tongue = self.vars['tongue'].get()
-        lang = self.vars['language'].get()
+        tongue = self.options['tongue'].get()
+        lang = self.notebook.current().lang
         options = {}
         #options['defaultextension'] = '.txt'
         options['filetypes'] = [
@@ -286,8 +350,8 @@ class Jyx:
             self.notebook.save(filename)
 
     def open(self, event=None):
-        tongue = self.vars['tongue'].get()
-        lang = self.vars['language'].get()
+        tongue = self.options['tongue'].get()
+        lang = self.notebook.current().lang
         options = {}
         #options['defaultextension'] = '.txt'
         options['filetypes'] = [(self.data['messages'][tongue]['filter all'], '.*')]
@@ -313,14 +377,8 @@ class Jyx:
     def run(self, event=None):
         pass
 
-    def undo(self, event=None):
-        pass
-
-    def redo(self, event=None):
-        pass
-
     def about(self, event=None):
-        tongue = self.vars['tongue'].get()
+        tongue = self.options['tongue'].get()
         title = self.data['menu'][tongue]['about']
         msg = self.data['messages'][tongue]['about_msg']
         messagebox.showinfo(title, f"{Jyx.TITLE} - {Jyx.VERSION}\n{msg}\nDamien Gouteux\n2017 - {datetime.now().year}\n")
@@ -370,7 +428,7 @@ class JyxMenu(tk.Menu):
 
     def build(self):
         data = self.jyx.data
-        tongue = self.jyx.vars['tongue'].get()
+        tongue = self.jyx.options['tongue'].get()
         languages = self.jyx.data['languages']
         
         self.file_menu = tk.Menu(self, tearoff=0)
@@ -394,9 +452,9 @@ class JyxMenu(tk.Menu):
 
         self.edit_menu = tk.Menu(self, tearoff=0)
         self.add_cascade(label=data['menu'][tongue]['edit'], menu=self.edit_menu)
-        self.edit_menu.add_command(label=data['menu'][tongue]['undo'], command=self.jyx.undo,
+        self.edit_menu.add_command(label=data['menu'][tongue]['undo'], command=lambda: self.jyx.notebook.send('undo'),
                                    accelerator="Ctrl+Z")
-        self.edit_menu.add_command(label=data['menu'][tongue]['redo'], command=self.jyx.redo,
+        self.edit_menu.add_command(label=data['menu'][tongue]['redo'], command=lambda: self.jyx.notebook.send('redo'),
                                    accelerator="Ctrl+Y")
         self.edit_menu.add_separator()
         self.edit_menu.add_command(label=data['menu'][tongue]['cut'], command=lambda: self.jyx.notebook.send('cut'),
@@ -425,16 +483,19 @@ class JyxMenu(tk.Menu):
         self.options_menu.add_cascade(label=data['menu'][tongue]['tongues'], menu=sub_tongue_menu)
         for tong in sorted(tongues):
             sub_tongue_menu.add_radiobutton(label=data['menu'][tong]['tongue'],
-                                            variable=self.jyx.vars['tongue'],
+                                            variable=self.jyx.options['tongue'].var,
                                             value=tong,
                                             command=lambda: self.jyx.update('tongue'))
         self.options_menu.add_checkbutton(label=data['menu'][tongue]['confirm'], onvalue=True, offvalue=False,
-                                          variable=self.jyx.vars['confirm'],
+                                          variable=self.jyx.options['confirm'].var,
                                           command=lambda: self.jyx.update('confirm'))
         self.options_menu.add_checkbutton(label=data['menu'][tongue]['basename'], onvalue=True, offvalue=False,
-                                          variable=self.jyx.vars['basename'],
+                                          variable=self.jyx.options['basename'].var,
                                           command=lambda: self.jyx.update('basename'))
-
+        self.options_menu.add_checkbutton(label=data['menu'][tongue]['treeview'], onvalue=True, offvalue=False,
+                                          variable=self.jyx.options['treeview'].var,
+                                          command=lambda: self.jyx.update('treeview'))
+        
         self.langmenu = tk.Menu(self, tearoff=0)
         self.add_cascade(label=data['menu'][tongue]['languages'], menu=self.langmenu)
 
@@ -449,9 +510,9 @@ class JyxMenu(tk.Menu):
             families[prop['family']][lang] = prop
         for lang in sorted(base):
             self.langmenu.add_radiobutton(label=languages[lang]['label'],
-                                          variable=self.jyx.vars['language'],
+                                          variable=self.jyx.langage,
                                           value=lang,
-                                          command=lambda: self.jyx.update('language'))
+                                          command=self.jyx.update_langage)
         if len(families) > 0:
             self.langmenu.add_separator()
         for fam in sorted(families):
@@ -459,9 +520,9 @@ class JyxMenu(tk.Menu):
             self.langmenu.add_cascade(label=fam, menu=menu)
             for lang in sorted(families[fam]):
                 menu.add_radiobutton(label=languages[lang]['label'],
-                                     variable=self.jyx.vars['language'],
+                                     variable=self.jyx.langage,
                                      value=lang,
-                                     command=lambda: self.jyx.update('language'))#, indicatoron=0
+                                     command=self.jyx.update_langage)
 
         self.help_menu = tk.Menu(self, tearoff=0)
         self.add_cascade(label=data['menu'][tongue]['help'], menu=self.help_menu)
@@ -484,6 +545,12 @@ class JyxMenu(tk.Menu):
         """
 
 
+class JyxTree:
+
+    def __init__(self, jyx):
+        self.treeview = ttk.Treeview(jyx.get_root())
+
+    
 class JyxNotebook:
 
     def __init__(self, jyx):
@@ -500,10 +567,15 @@ class JyxNotebook:
         self.notebook.bind('<<NotebookTabChanged>>', self.on_tab_change)
         self.current().focus()
 
+    def relabel(self, new):
+        for i in range(self.notebook.index('end')):
+            if self.notes[i].filepath is None:
+                self.notes[i].update_title()
+
     def new_tab(self, lang=None):
-        if lang is None: lang = self.jyx.data['options']['default_language']
+        if lang is None: lang = self.jyx.data['default_language']
         jn = JyxNote(self, lang)
-        self.notebook.add(jn.frame, text=self.jyx.data['menu'][self.jyx.data['options']['tongue']]['new'])
+        self.notebook.add(jn.frame, text=self.jyx.data['menu'][self.jyx.options['tongue'].get()]['new'])
         jn.index = self.notebook.index('end') - 1
         self.notebook.select(jn.index)
         self.notes.append(jn)
@@ -526,7 +598,7 @@ class JyxNotebook:
     def get_position(self):
         return self.current().text.index(tk.INSERT)
 
-    def anyone_dirty(self):
+    def is_anyone_dirty(self):
         for i in range(self.notebook.index("end")):
             if self.notes[i].dirty:
                 return True
@@ -537,9 +609,6 @@ class JyxNotebook:
 
     def get_filepath(self):
         return self.current().filepath
-
-    def set_filepath(self, value):
-        self.filepaths[self.notebook.index("current")] = value
 
     def open(self, filename, content):
         _, ext = os.path.splitext(filename)
@@ -563,8 +632,12 @@ class JyxNotebook:
             self.current().copy()
         elif order == 'select all':
             self.current().select_all()
-        elif ordr == 'clear':
+        elif order == 'clear':
             self.current().clear()
+        elif order == 'undo':
+            self.current().undo()
+        elif order == 'redo':
+            self.current().redo()
 
 
 class JyxNote:
@@ -582,15 +655,15 @@ class JyxNote:
         self.scrollbar = ttk.Scrollbar(self.frame)
         self.scrollbar.grid(row=0, column=1, sticky=tk.N+tk.S)
 
-        self.text = tk.Text(self.frame, wrap=tk.NONE, bd=0,
+        self.text = tk.Text(self.frame, wrap=tk.NONE, bd=0, undo=True,
                             yscrollcommand=self.scrollbar.set)
         self.scrollbar.configure(command=self.text.yview)
         
         self.text.config(font=('consolas', 12), undo=True, wrap='word')
         self.text.grid(row=0, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
-        self.text.bind('<<Paste>>', self.paste)
-        self.text.bind('<<Cut>>', self.cut)
-        self.text.bind('<<Copy>>', self.copy)
+        #self.text.bind('<<Paste>>', self.paste)
+        #self.text.bind('<<Cut>>', self.cut)
+        #self.text.bind('<<Copy>>', self.copy)
         self.text.bind('<KeyPress>', self.update_text_before)
         self.text.bind('<KeyRelease>', self.update_text_after)
         self.text.bind('<ButtonRelease-1>', self.notebook.jyx.update_status)
@@ -604,7 +677,7 @@ class JyxNote:
 
     def update_title(self):
         dirty = ' *' if self.dirty else ''
-        tongue = self.notebook.jyx.data['tongue']
+        tongue = self.notebook.jyx.options['tongue'].get()
         if self.filepath is None:
             file = self.notebook.jyx.data['menu'][tongue]['new']
         else:
@@ -628,6 +701,7 @@ class JyxNote:
     def load(self, filename, content):
         self.clear()
         self.text.insert('1.0', content)
+        self.text.edit_reset()
         self.dirty = False
         self.filepath = filename
         self.text.see(tk.INSERT)
@@ -635,13 +709,31 @@ class JyxNote:
     
     def write(self, content, at=tk.INSERT):
         self.text.insert(at, content)
+        self.text.edit_separator()
         self.dirty = True
         self.update_title()
 
     def delete(self, first, last=None):
         self.text.delete(first, last)
+        self.text.edit_separator()
         self.dirty = True
         self.update_title()
+
+    def undo(self):
+        try:
+            self.text.edit_undo()
+            self.dirty = True
+            self.update_title()
+        except tk.TclError:
+            self.notebook.jyx.log.info("Nothing to undo")
+
+    def redo(self):
+        try:
+            self.text.edit_redo()
+            self.dirty = True
+            self.update_title()
+        except tk.TclError:
+            self.notebook.jyx.log.info("Nothing to redo")
 
     #
     # Handling of selection: deleting, getting, selecting and unselecting
@@ -697,17 +789,28 @@ class JyxNote:
     # React to key events
     #
     def update_text_before(self, event):
+        print('update')
         text = event.widget
         if JyxNote.MOD_CONTROL & event.state:
+            print(event.keysym)
             if event.keysym == 'a':
                 self.select_all()
-                return 'break'
             elif event.keysym in ['n', 't']:
                 self.notebook.new_tab()
-                return 'break'
+            elif event.keysym == 'z':
+                self.undo()
+            elif event.keysym == 'y':
+                self.redo()
+            elif event.keysym == 'c':
+                self.copy()
+            elif event.keysym == 'x':
+                self.cut()
+            elif event.keysym == 'v':
+                self.paste()
             else:
                 self.notebook.jyx.log.warn('Event not handled: ' + event.keysym)
                 return 'break'
+            return 'break'
         elif event.keysym == 'Control_L':
             return 'break'
         elif event.keysym in ['Left', 'Right', 'Up', 'Down', 'End', 'Home']: # 37, 39
@@ -785,6 +888,31 @@ class JyxNote:
             self.write(res, '→ ')
             res = event.widget.search('--> ', res, "insert lineend")
         return 'break'
+
+    #
+    # Tag
+    #
+    def tag(self):
+        if not self.notebook.jyx.has(f"languages.{self.lang}.support", "tokenize"):
+            return
+        content = self.text.get(1.0, tk.END)
+        tokens = Lexer().lex(self.lang, content)
+
+
+class Token:
+
+    def __init__(self, start, length):
+        self.start = start
+        self.length = length
+
+
+class Lexer:
+
+    def __init__(self):
+        pass
+
+    def lex(self, lang, content):
+        return []
 
 
 if __name__ == '__main__':
