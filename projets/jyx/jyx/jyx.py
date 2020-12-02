@@ -11,11 +11,6 @@ except ModuleNotFoundError:
 else:
     ASH_TOKENIZER = True
 
-    def make_menu(self):
-        self.options_menu = tkinter.Menu(self.menu, tearoff=0)
-        self.menu.add_cascade(label="Options", menu=self.options_menu)
-        self.options_menu.add_checkbutton(label="Display Tree", onvalue=True, offvalue=False, variable=self.display_tree, command=self.restart)
-
     def menu_exec(self, event=None):
         if not lang_has(self.options['lang'], 'execute'):
             return
@@ -95,9 +90,6 @@ else:
         self.hi_there.pack(side="bottom")
 
     def tokenizer(self):
-        # Clear all tags
-        for tag in text.tag_names():
-            text.tag_remove(tag, 1.0)
         # Put tags
         for t in tokens:
             deb = '1.0+%ic' % t.start
@@ -114,7 +106,6 @@ else:
                 text.tag_add("comment", deb, end) 
 
     def key(self, event):
-        self.tokenizer()
         s = text.get(1.0, tkinter.END)
         w = ''
         start = 0
@@ -130,5 +121,3 @@ else:
                 w = ''
                 start = i
                 print(w, len(w))
-
-        text.grid(row=0, column=0, sticky=tkinter.N+tkinter.S+tkinter.E+tkinter.W)

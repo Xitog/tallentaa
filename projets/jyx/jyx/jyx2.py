@@ -147,29 +147,7 @@ class Logger:
             exit()
 
 
-class Option:
-
-    def __init__(self, name, val, msg):
-        self.name = name
-        self.val = val
-        self.typ = type(val)
-        self.msg = msg
-        if self.typ == str:
-            self.var = tk.StringVar()
-        elif self.typ == bool:
-            self.var = tk.BooleanVar()
-        else:
-            raise Exception(f"Option type not handled for {self.name} of type {self.typ}")
-        self.var.set(self.val)
-        self.prev = self.val
-
-    @staticmethod
-    def load(key, dic):
-        return Option(key, dic['value'], dic['msg'])
-
-    def get(self):
-        return self.var.get()
-
+#-------------------------------------------------------------------------------
 
 class Jyx:
 
@@ -204,17 +182,15 @@ class Jyx:
         # Options
         self.options = {}
         for opt, info in self.data['options'].items():
-            self.options[opt] = Option.load(opt, info)
+            self.options[opt] = JyxOption.load(opt, info)
         self.langage = tk.StringVar()
         self.langage.set(self.data['default_language'])
         # UI components
         self.notebook = JyxNotebook(self)
         self.treeview = JyxTree(self)
-        #self.treeview.treeview.pack(side=tk.LEFT, fill=tk.Y, expand=tk.YES)
-        #self.notebook.notebook.pack(side=tk.RIGHT, fill=tk.BOTH, expand=tk.YES)
         # Prend tout Y (relheight = 1.0), se positionne à 0.2 pour le notebook
-        self.treeview.treeview.place(relx=0.0, rely =0.0, relwidth =0.2, relheight =1.0)
-        self.notebook.notebook.place(relx=0.2, rely =0.0, relwidth =0.8, relheight =1.0)
+        self.treeview.place(relx=0.0, rely =0.0, relwidth =0.2, relheight =1.0)
+        self.notebook.place(relx=0.2, rely =0.0, relwidth =0.8, relheight =1.0)
         self.menu = JyxMenu(self)
         self.root.config(menu=self.menu)
         # Updall vars, cannot be called until the menu is completed
@@ -257,7 +233,7 @@ class Jyx:
             file = os.path.basename(self.notebook.get_filepath())
         else:
             file = self.notebook.get_filepath()
-        i = self.notebook.index() + 1
+        i = self.notebook.current_index() + 1
         nb = len(self.notebook)
         self.root.wm_title(f"{Jyx.TITLE} {Jyx.VERSION} - {i}/{nb} {file}{dirty}")
 
@@ -286,11 +262,11 @@ class Jyx:
             self.update_title()
         elif varname == 'treeview':
             if val and not init:
-                self.treeview.treeview.place(relx=0.0, rely =0.0, relwidth =0.2, relheight =1.0)
-                self.notebook.notebook.place(relx=0.2, rely =0.0, relwidth =0.8, relheight =1.0)
+                self.treeview.place(relx=0.0, rely =0.0, relwidth =0.2, relheight =1.0)
+                self.notebook.place(relx=0.2, rely =0.0, relwidth =0.8, relheight =1.0)
             elif not val:
-                self.treeview.treeview.place_forget()
-                self.notebook.notebook.place(relx=0.0, rely =0.0, relwidth =1.0, relheight =1.0)
+                self.treeview.place_forget()
+                self.notebook.place(relx=0.0, rely =0.0, relwidth =1.0, relheight =1.0)
         opt.prev = val
 
     def has(self, prop, value, content=None):
@@ -382,6 +358,30 @@ class Jyx:
         title = self.data['menu'][tongue]['about']
         msg = self.data['messages'][tongue]['about_msg']
         messagebox.showinfo(title, f"{Jyx.TITLE} - {Jyx.VERSION}\n{msg}\nDamien Gouteux\n2017 - {datetime.now().year}\n")
+
+
+class JyxOption:
+
+    def __init__(self, name, val, msg):
+        self.name = name
+        self.val = val
+        self.typ = type(val)
+        self.msg = msg
+        if self.typ == str:
+            self.var = tk.StringVar()
+        elif self.typ == bool:
+            self.var = tk.BooleanVar()
+        else:
+            raise Exception(f"Option type not handled for {self.name} of type {self.typ}")
+        self.var.set(self.val)
+        self.prev = self.val
+
+    @staticmethod
+    def load(key, dic):
+        return JyxOption(key, dic['value'], dic['msg'])
+
+    def get(self):
+        return self.var.get()
 
 
 class JyxMenu(tk.Menu):
@@ -545,39 +545,39 @@ class JyxMenu(tk.Menu):
         """
 
 
-class JyxTree:
+class JyxTree(ttk.Treeview):
 
     def __init__(self, jyx):
-        self.treeview = ttk.Treeview(jyx.get_root())
+        ttk.Treeview.__init__(self, jyx.get_root())
 
     
-class JyxNotebook:
+class JyxNotebook(ttk.Notebook):
 
     def __init__(self, jyx):
+        ttk.Notebook.__init__(self, jyx.get_root())
         self.jyx = jyx
-        
-        self.notebook = ttk.Notebook(self.jyx.root)
+
         # To make the element at 0,0 grows with the window
-        self.notebook.grid_rowconfigure(0, weight=1)
-        self.notebook.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
 
         self.notes = []
         self.new_tab(self)
-        self.notebook.pack(fill=tk.BOTH, expand=tk.YES)
-        self.notebook.bind('<<NotebookTabChanged>>', self.on_tab_change)
+        self.pack(fill=tk.BOTH, expand=tk.YES)
+        self.bind('<<NotebookTabChanged>>', self.on_tab_change)
         self.current().focus()
 
     def relabel(self, new):
-        for i in range(self.notebook.index('end')):
+        for i in range(self.index('end')):
             if self.notes[i].filepath is None:
                 self.notes[i].update_title()
 
     def new_tab(self, lang=None):
         if lang is None: lang = self.jyx.data['default_language']
         jn = JyxNote(self, lang)
-        self.notebook.add(jn.frame, text=self.jyx.data['menu'][self.jyx.options['tongue'].get()]['new'])
-        jn.index = self.notebook.index('end') - 1
-        self.notebook.select(jn.index)
+        self.add(jn.frame, text=self.jyx.data['menu'][self.jyx.options['tongue'].get()]['new'])
+        jn.index = self.index('end') - 1
+        self.select(jn.index)
         self.notes.append(jn)
         jn.focus()
         return jn.index
@@ -587,19 +587,19 @@ class JyxNotebook:
         self.jyx.update_status()
         
     def current(self):
-        return self.notes[self.index()]
+        return self.notes[self.index("current")]
 
-    def index(self):
-        return self.notebook.index("current")
+    def current_index(self):
+        return self.index("current")
 
     def __len__(self):
-        return self.notebook.index("end")
+        return self.index("end")
 
     def get_position(self):
         return self.current().text.index(tk.INSERT)
 
     def is_anyone_dirty(self):
-        for i in range(self.notebook.index("end")):
+        for i in range(self.index("end")):
             if self.notes[i].dirty:
                 return True
         return False
@@ -620,7 +620,7 @@ class JyxNotebook:
         if self.current().dirty or self.current().filepath is not None or len(self) > 1:
             self.new_tab(lang)
         else:
-            self.notes[self.notebook.index("current")].lang = lang
+            self.notes[self.index("current")].lang = lang
         self.current().load(filename, content)
 
     def send(self, order):
@@ -648,7 +648,7 @@ class JyxNote:
     def __init__(self, notebook, lang):
         self.notebook = notebook
 
-        self.frame = ttk.Frame(self.notebook.notebook) #, bd=2, relief=tk.SUNKEN)
+        self.frame = ttk.Frame(self.notebook) #, bd=2, relief=tk.SUNKEN)
         self.frame.grid_rowconfigure(0, weight=1)
         self.frame.grid_columnconfigure(0, weight=1)
         
@@ -682,8 +682,9 @@ class JyxNote:
             file = self.notebook.jyx.data['menu'][tongue]['new']
         else:
             file = os.path.basename(self.filepath)
-        self.notebook.notebook.tab(self.index, text=f"{file}{dirty}")
+        self.notebook.tab(self.index, text=f"{file}{dirty}")
         self.notebook.jyx.update_title()
+
     #
     # Handling of state and deleting, writing, loading and saving
     #
@@ -895,25 +896,361 @@ class JyxNote:
     def tag(self):
         if not self.notebook.jyx.has(f"languages.{self.lang}.support", "tokenize"):
             return
+        # Clear all tags
+        for tag in text.tag_names():
+            text.tag_remove(tag, 1.0)
         content = self.text.get(1.0, tk.END)
         tokens = Lexer().lex(self.lang, content)
 
+#-------------------------------------------------------------------------------
 
 class Token:
 
-    def __init__(self, start, length):
-        self.start = start
-        self.length = length
+    def __init__(self, pos, typ, value):
+        self.pos = pos
+        self.typ = typ
+        self.val = value
 
+    def __str__(self):
+        return f"({self.val}:{self.typ}@{self.pos})"
 
-class Lexer:
+class Machine:
 
     def __init__(self):
-        pass
+        self.states = {}
 
-    def lex(self, lang, content):
-        return []
+    def add(self, name):
+        s = State(name)
+        self.states[name] = s
+        return s
 
+    def run(self, iterable, discard=None):
+        tokens = []
+        state = self.states['init']
+        nb = 0
+        length = 0
+        while nb < len(iterable):
+            nex = state.react(iterable, nb)
+            elem = iterable[nb]
+            if nex is None:
+                raise Exception(f'Not suitable next state for {elem} at {nb} in {state.name}')
+            if nex.arrival == state.name:
+                nb += len(nex)
+                length += len(nex)
+                print(f'Staying in {state} at char {elem}')
+            else:
+                if nex.take:
+                    nb += len(nex)
+                    length += len(nex)
+                if nex.verse is True:
+                    print(f'Moving on {nex.arrival} at char {elem} without creating token')
+                elif discard is None or state.name not in discard:
+                    tokens.append(Token(nb - length, state.name, content[nb - length:nb]))
+                    length = 0
+                    print(f'Moving on {nex.arrival} at char {elem} and creating token {state.name}')
+            state = self.states[nex.arrival]
+        if length != 0:
+            #if nex.verse is True:
+            #    raise Exception(f'Finishing on state {state.name} which is versing')
+            if discard is None or state.name not in discard:
+                tokens.append(Token(len(iterable) - length, state.name, content[len(iterable) - length:]))
+        return tokens
+
+    def dot(self, filename):
+        f = open(filename, mode='w', encoding='utf8')
+        f.write('digraph graphname {\n')
+        for _, s in self.states.items():
+            for t in s.trans:
+                f.write(f"    {s.name} -> {t.arrival} [label=\"{t.on_str()}\"];\n")
+        f.write('}\n')
+        f.close()
+
+class State:
+
+    def __init__(self, name):
+        self.name = name
+        self.trans = []
+        self.substates = {}
+
+    def __str__(self):
+        return f"({self.name} {len(self.trans)} tra {len(self.substates)} sub)"
+
+    def add(self, on, arrival, pos=None, nex=None, take=False, verse=False):
+        self.trans.append(Transition(self, on, arrival, pos, nex, take, verse))
+
+    def sub(self, name, iterable):
+        self.substates[name] = iterable
+
+    def react(self, iterable, index):
+        matches = []
+        for trans in self.trans:
+            #print('>', iterable[index:index+len(trans)])
+            if trans.match(iterable[index:index+len(trans)]):
+                matches.append(trans)
+        if len(matches) == 0:
+            return None
+        elif len(matches) > 1:
+            maxlen = 0
+            for m in matches:
+                if len(m) > maxlen:
+                    maxlen = len(m)
+            filtered_maxlen = []
+            for m in matches:
+                if len(m) == maxlen:
+                    filtered_maxlen.append(m)
+            if len(filtered_maxlen) > 1:
+                s = ''
+                for m in filtered_maxlen:
+                    s += str(m) + ' '
+                raise Exception(f'Ambiguous transitions on {elem}: {s}')
+            else:
+                return filtered_maxlen[0]
+        elif len(matches) == 1:
+            return matches[0]
+
+
+class Elem:
+
+    def __init__(self, char=None, all_digit=False, all_alpha=False, all_blank=False, any_char=False, class_chars=None):
+        self.char = char
+        self.all_digit = all_digit
+        self.all_alpha = all_alpha
+        self.all_blank = all_blank
+        self.any_char = any_char
+        self.class_chars = class_chars
+        if (self.all_digit or self.all_alpha or self.all_blank or self.class_chars is not None) and self.char is not None:
+            raise Exception('Cannot define an elem with a literal char and a modifier or a class')
+
+    def __str__(self):
+        if self.char is not None:
+            if self.char == '"':
+                return '\\"'
+            else:
+                return self.char
+        elif self.all_digit and self.all_alpha:
+            return '<alnum>'
+        elif self.all_digit:
+            return '<digit>'
+        elif self.all_alpha:
+            return '<alpha>'
+        elif self.all_blank:
+            return '<blank>'
+        elif self.any_char:
+            return '<any>'
+        elif self.class_chars is not None:
+            return str(self.class_chars)
+
+    def match(self, thing):
+        if self.char is not None:
+            return thing == self.char
+        elif self.any_char is True:
+            return thing != '\n'
+        elif self.all_digit and self.all_alpha:
+            return thing.alnum()
+        elif self.all_digit is True:
+            return thing.isdigit()
+        elif self.all_alpha is True:
+            return thing.isalpha()
+        elif self.all_blank is True:
+            return elem in [' ', '\t']
+        elif self.class_chars is not None:
+            return thing in self.class_chars
+        
+
+class Transition:
+
+    def __init__(self, origin, on, arrival, pos, nex, take, verse=False):
+        self.origin = origin
+        self.on = []
+        cnt = len(on)
+        while cnt := len(on) > 0:
+            if on.startswith('<digit>'):
+                self.on.append(Elem(all_digit=True))
+                on = on[7:]
+            elif on.startswith('<alpha>'):
+                self.on.append(Elem(all_alpha=True))
+                on = on[7:]
+            elif on.startswith('<alnum>'):
+                self.on.append(Elem(all_digit=True, all_alpha=True))
+            elif on.startswith('<all>'):
+                self.on.append(Elem(any_char=True))
+            elif on.startswith('<blank>'):
+                self.on.append(Elem(any_blank=True))
+            elif on[0] == '[':
+                end = on.index(']')
+                lst = []
+                for e in on[1:end]:
+                    lst.append(e)
+                self.on.append(Elem(class_chars=lst))
+                on = on[end+1:]
+            else:
+                self.on.append(Elem(char=on[0]))
+                on = on[1:]
+        self.arrival = arrival
+        self.pos = pos
+        self.nex = nex
+        self.take = take
+        self.verse = verse # le contenu de l'état précédent est "versé" dans le nouveau, no new token et l'état suivant récup tous les élem
+
+    def __len__(self):
+        return len(self.on)
+
+    def on_str(self):
+        s = ''
+        for o in self.on:
+            s += str(o)
+        return s
+
+    def match(self, elem):
+        res = True
+        length = min(len(self.on), len(elem))
+        if len(self.on) != len(elem):
+            print(f'warning on= {self.on} and elem= {elem}')
+        for i in range(length):
+            res = self.on[i].match(elem[i])
+            if not res:
+                break
+        return res
+
+    def __str__(self):
+        return f"{self.origin} -[{self.on})-> {self.arrival}"
+
+#-------------------------------------------------------------------------------
+
+lexerLua = Machine()
+
+sInit = lexerLua.add('init')
+sNum  = lexerLua.add('number')
+sInt  = lexerLua.add('integer')
+sInt2 = lexerLua.add('integer_binary')
+sInt8 = lexerLua.add('integer_octal')
+sInt16= lexerLua.add('integer_hexa')
+sFlt  = lexerLua.add('float')
+sStr  = lexerLua.add('string')
+sId   = lexerLua.add('identifier')
+sOp   = lexerLua.add('operator')
+sSep  = lexerLua.add('separator')
+
+sBoo  = sId.sub('boolean', ['true', 'false'])
+sKey  = sId.sub('keyword',  ['if', 'while', 'do', 'then', 'elif', 'else', 'end'])
+
+#sLst  = lexerLua.add('list')
+#sDic  = lexerLua.add('dict')
+
+sInit.add(' ', 'init')
+sInit.add('<digit>', 'number')
+sInit.add('<alpha>', 'identifier')
+sInit.add('"', 'string')
+sInit.add('+', 'operator')
+sInit.add('-', 'operator')
+sInit.add('*', 'operator')
+sInit.add('/', 'operator')
+sInit.add('%', 'operator')
+sInit.add('>', 'operator')
+sInit.add('<', 'operator')
+sInit.add('.', 'operator')
+sInit.add('=', 'operator')
+sInit.add('0x', 'integer_hexa', take=True, verse=True)
+sInit.add('0X', 'integer_hexa', take=True, verse=True)
+sInit.add('0c', 'integer_octal', take=True, verse=True)
+sInit.add('0C', 'integer_octal', take=True, verse=True)
+sInit.add('0b', 'integer_binary', take=True, verse=True)
+sInit.add('0B', 'integer_binary', take=True, verse=True)
+
+#sInt2.add('0', 'integer_binary')
+#sInt2.add('1', 'integer_binary')
+sInt2.add('[01]', 'integer_binary')
+sInt2.add(' ', 'init')
+
+sInt8.add('0', 'integer_octal')
+sInt8.add('1', 'integer_octal')
+sInt8.add('2', 'integer_octal')
+sInt8.add('3', 'integer_octal')
+sInt8.add('4', 'integer_octal')
+sInt8.add('5', 'integer_octal')
+sInt8.add('6', 'integer_octal')
+sInt8.add('7', 'integer_octal')
+sInt8.add(' ', 'init')
+
+sInt16.add('<digit>', 'integer_hexa')
+sInt16.add('a', 'integer_hexa')
+sInt16.add('A', 'integer_hexa')
+sInt16.add('b', 'integer_hexa')
+sInt16.add('B', 'integer_hexa')
+sInt16.add('c', 'integer_hexa')
+sInt16.add('C', 'integer_hexa')
+sInt16.add('d', 'integer_hexa')
+sInt16.add('D', 'integer_hexa')
+sInt16.add('e', 'integer_hexa')
+sInt16.add('E', 'integer_hexa')
+sInt16.add('f', 'integer_hexa')
+sInt16.add('F', 'integer_hexa')
+sInt16.add(' ', 'init')
+
+sNum.add('<digit>', 'number')
+sNum.add('+', 'operator')
+sNum.add('-', 'operator')
+sNum.add('*', 'operator')
+sNum.add('/', 'operator')
+sNum.add('%', 'operator')
+sNum.add('.<digit>', 'float', take=True, verse=True)
+sNum.add('.<alpha>', 'operator')
+sNum.add(' ', 'init')
+
+sFlt.add('<digit>', 'float')
+sFlt.add('+', 'operator')
+sFlt.add('-', 'operator')
+sFlt.add('*', 'operator')
+sFlt.add('/', 'operator')
+sFlt.add('%', 'operator')
+sFlt.add(' ', 'init')
+
+sId.add('<alpha>', 'identifier')
+sId.add('+', 'operator')
+sId.add('-', 'operator')
+sId.add('*', 'operator')
+sId.add('/', 'operator')
+sId.add('%', 'operator')
+sId.add(' ', 'init')
+
+sOp.add('+', 'init', take=True)
+sOp.add('-', 'init', take=True)
+sOp.add('*', 'init', take=True)
+sOp.add('**', 'init', take=True)
+sOp.add('/', 'init', take=True)
+sOp.add('//', 'init', take=True)
+sOp.add('%', 'init', take=True)
+sOp.add('>>', 'init', take=True)
+sOp.add('<<', 'init', take=True)
+sOp.add('.', 'init', take=True)
+sOp.add('=', 'init', take=True)
+sOp.add('+=', 'init', take=True)
+sOp.add('-=', 'init', take=True)
+sOp.add('*=', 'init', take=True)
+sOp.add('**=', 'init', take=True)
+sOp.add('/=', 'init', take=True)
+sOp.add('//=', 'init', take=True)
+sOp.add('%=', 'init', take=True)
+sOp.add('<', 'init', take=True)
+sOp.add('>', 'init', take=True)
+sOp.add('!=', 'init', take=True)
+sOp.add('<=', 'init', take=True)
+sOp.add('>=', 'init', take=True)
+sOp.add(' ', 'init')
+
+print('------------------------------')
+#content = "0b10"
+content = "123 + 5 ** 2 + 1.abc/8.7 + 0b0101"
+print(f'{content=}')
+print('------------------------------')
+tokens = lexerLua.run(content) #, discard=['init'])
+print('------------------------------')
+for t in tokens:
+    print(t)
+print('------------------------------')
+lexerLua.dot('output.dot')
+
+#-------------------------------------------------------------------------------
 
 if __name__ == '__main__':
     Jyx()
