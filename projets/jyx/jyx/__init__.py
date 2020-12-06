@@ -27,9 +27,9 @@
 """Jyx: a simple text editor
 """
 
-from jyx.jyx import Application
+from jyx.jyx import Jyx
 
-__version__ = Application.VERSION
+__version__ = Jyx.VERSION
 
 #if __name__ == "__main__":
 #    Application().run()

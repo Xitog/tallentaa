@@ -1,2 +1,2 @@
 import jyx
-jyx.Application().run()
+jyx.Jyx()
