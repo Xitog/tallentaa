@@ -76,6 +76,7 @@ DEFAULT_CONFIG = """{
             "save as"    : "Save As...",
             "save all"   : "Save All",
             "run"        : "Run Script",
+            "close tab"  : "Close Tab",
             "exit"       : "Exit",
             "edit"       : "Edit",
             "undo"       : "Undo",
@@ -170,6 +171,7 @@ class Jyx:
 
     TITLE = 'Jyx'
     RUN_COMMAND = 6
+    CLOSE_TAB = 8
     CONFIG_FILE_NAME = 'jyx.json'
     VERSION = '0.0.1'
     
@@ -295,7 +297,7 @@ class Jyx:
                 raise Exception('Type not handled')
         else:
             return self.has('.'.join(exploded[1:]), value, content[exploded[0]])
-
+        
     def exit(self, event=None):
         tongue = self.options['tongue'].get()
         if self.notebook.is_anyone_dirty() and self.options['confirm'].get():
@@ -472,6 +474,8 @@ class JyxMenu(tk.Menu):
         self.file_menu.add_command(label=data['menu'][tongue]['run'], command=self.jyx.run,
                                    accelerator="F5")
         self.file_menu.add_separator()
+        self.file_menu.add_command(label=data['menu'][tongue]['close tab'], command=self.jyx.notebook.close_tab,
+                                   accelerator="Ctrl+X", state=tk.DISABLED)
         self.file_menu.add_command(label=data['menu'][tongue]['exit'], command=self.jyx.exit,
                                    accelerator="Ctrl+Q")
 
@@ -494,12 +498,6 @@ class JyxMenu(tk.Menu):
         self.edit_menu.add_separator()
         self.edit_menu.add_command(label=data['menu'][tongue]['clear'],
                                    command=lambda: self.jyx.notebook.send('clear'))
-        
-        """
-        self.display_tree = tkinter.BooleanVar()
-        self.display_tree.set(self.options['display_tree'])
-        self.options_menu.add_checkbutton(label="Display Tree", onvalue=True, offvalue=False, variable=self.display_tree, command=self.restart)
-        """
 
         self.options_menu = tk.Menu(self, tearoff=0)
         self.add_cascade(label=data['menu'][tongue]['options'], menu=self.options_menu)
@@ -558,17 +556,6 @@ class JyxMenu(tk.Menu):
         self.status_bar.config(text=data['messages'][tongue]['started'], anchor=tk.E, padx=20)
         self.status_bar.pack(side=tk.BOTTOM, fill=tk.X)
 
-        """
-        self.root.bind('<Control-n>', self.menu_new)
-        self.root.bind('<Control-o>', self.menu_open)
-        self.root.bind('<Control-s>', self.menu_save)
-        self.root.bind('<Control-q>', self.menu_exit)
-        self.root.bind('<Control-a>', self.menu_select_all)
-        self.root.bind('<Control-z>', self.menu_undo)
-        self.root.bind('<Control-y>', self.menu_redo)
-        self.root.bind('<F5>', self.menu_exec)
-        """
-
 
 class JyxTree(ttk.Treeview):
 
@@ -605,7 +592,16 @@ class JyxNotebook(ttk.Notebook):
         self.select(jn.index)
         self.notes.append(jn)
         jn.focus()
+        if self.index("end") > 1:
+            self.jyx.menu.file_menu.entryconfig(Jyx.CLOSE_TAB, state=tk.ACTIVE)
         return jn.index
+
+    def close_tab(self):
+        self.forget(self.index("current"))
+        if self.index("end") == 1:
+            self.jyx.menu.file_menu.entryconfig(Jyx.CLOSE_TAB, state=tk.DISABLED)
+        self.jyx.update_title()
+        self.jyx.update_status()
 
     def on_tab_change(self, event):
         self.jyx.options['language'].var.set(self.current().lang)
@@ -693,9 +689,6 @@ class JyxNote:
         
         self.text.config(font=('consolas', 12), undo=True, wrap='word')
         self.text.grid(row=0, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
-        #self.text.bind('<<Paste>>', self.paste)
-        #self.text.bind('<<Cut>>', self.cut)
-        #self.text.bind('<<Copy>>', self.copy)
         self.text.bind('<KeyPress>', self.update_text_before)
         self.text.bind('<KeyRelease>', self.update_text_after)
         self.text.bind('<ButtonRelease-1>', self.notebook.jyx.update_status)
@@ -729,7 +722,7 @@ class JyxNote:
             for tag in self.text.tag_names():
                 if tag == 'sel':
                     continue # sans cela, bug du selection_delete qui ne supprime pas le 1er caractere ! XXX
-                self.text.tag_remove(tag, 1.0)
+                self.text.tag_delete(tag, 1.0, tk.END)
             self.tokens.clear()
             self.tags.clear()
         # Load new lang
@@ -737,6 +730,8 @@ class JyxNote:
         self.tokens = self.notebook.jyx.data['languages'][lang]['token']
         for tag, val in self.notebook.jyx.data['languages'][lang]['style']['default'].items():
             self.tags[tag] = self.text.tag_config(tag, foreground=val['color'])
+        # Retag
+        self.tag()
 
     #
     # Handling of state and deleting, writing, loading and saving
@@ -919,7 +914,7 @@ class JyxNote:
             #info self.notebook.jyx.log.info(event)
             content = event.char
         else:
-            self.notebook.jyx.log.info('Unknown:', event)
+            self.notebook.jyx.log.info(f'Unknown: {event}')
             return 'break'
         if len(text.tag_ranges('sel')) > 0:
             self.selection_delete()
@@ -948,34 +943,79 @@ class JyxNote:
     # Tag
     #
     def tag(self):
-        if not self.notebook.jyx.has(f"languages.{self.lang}.support", "tokenize"):
+        if not self.notebook.jyx.has(f"languages.{self.lang}.support", "tokenize") or self.lang not in LEXERS:
             return
         # Clear all tags
         for tag in self.text.tag_names():
             if tag == 'sel':
                 continue # sans cela, bug du selection_delete qui ne supprime pas le 1er caractere ! XXX
-            self.text.tag_remove(tag, 1.0)
+            self.text.tag_remove(tag, 1.0, tk.END)
         content = self.text.get(1.0, tk.END)
-        megaregex = '|'.join('(?P<%s>%s)' % pair for pair in self.tokens.items())
-        line_num = 1
-        line_start = 0
-        res = []
-        for match in re.finditer(megaregex, content):
-                kind = match.lastgroup
-                value = match.group()
-                column = match.start() - line_start
-                if kind == 'NEWLINE':
-                    line_start = mo.end()
-                    line_num += 1
-                    continue
-                if kind in self.tags: # gather only token with a tag for style
-                    res.append(Token(kind, value, line_num, column))
+        res = LEXERS[self.lang]().lex(content)
         for r in res:
             start = self.text.index("1.0+%d chars" % r.column)
             end = self.text.index("1.0+%d chars" % (r.end))
             self.text.tag_add(r.kind, start, end)
 
 #-------------------------------------------------------------------------------
+
+class LexerJSON:
+
+    def __init__(self):
+        pass
+
+    def lex(self, content):
+        res = []
+        line = 0
+        column = 0
+        while column < len(content):
+            c = content[column]
+            if c in ['{', '}', '[', ']', ',', ':']:
+                res.append(Token('separator', c, line, column))
+            elif c == '"':
+                s = '"'
+                j = column + 1
+                while j < len(content):
+                    s += content[j]
+                    if content[j] == '"':
+                        break
+                    j += 1
+                res.append(Token('string', s, line, column))
+                column += len(s)
+            elif c in ['\\r', '\\n']:
+                if len(content) > i+1 and content[i+1] in ['\\r', '\\n']:
+                    res.append(Token, 'newline', content[column, column+1], line, column)
+                    column += 1
+                else:
+                    res.append(Token, 'newline', s, line, column)
+                line += 1
+            elif c in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+                s = c
+                j = column + 1
+                while j < len(content):
+                    if content[j] not in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+                        break
+                    s += content[j]
+                    j += 1
+                res.append(Token('number', s, line, column))
+                column += len(s)
+            elif c.isalpha():
+                s = c
+                j = column + 1
+                while j < len(content):
+                    if not content[j].isalpha() and c not in ['_']:
+                        break
+                    s += content[j]
+                    j += 1
+                    if s in ['false', 'true']:
+                        res.append(Token('boolean', s, line, column))
+                column += len(s)
+            elif c in [' ', '\t']:
+                pass
+            column += 1
+        return res
+
+LEXERS = {'json': LexerJSON}
 
 class Token:
 
@@ -987,349 +1027,12 @@ class Token:
         self.end = self.column + len(self.value)
 
     def __str__(self):
-        return f"({self.value}:{self.kind}@{self.line,self.column})"
-
-class Machine:
-
-    def __init__(self):
-        self.states = {}
-
-    def add(self, name):
-        s = State(name)
-        self.states[name] = s
-        return s
-
-    def run(self, iterable, discard=None):
-        tokens = []
-        state = self.states['init']
-        nb = 0
-        length = 0
-        while nb < len(iterable):
-            nex = state.react(iterable, nb)
-            elem = iterable[nb]
-            if nex is None:
-                raise Exception(f'Not suitable next state for {elem} at {nb} in {state.name}')
-            if nex.arrival == state.name:
-                nb += len(nex)
-                length += len(nex)
-                print(f'Staying in {state} at char {elem}')
-            else:
-                if nex.take:
-                    nb += len(nex)
-                    length += len(nex)
-                if nex.verse is True:
-                    print(f'Moving on {nex.arrival} at char {elem} without creating token')
-                elif discard is None or state.name not in discard:
-                    tokens.append(Token(state.name, content[len(iterable) - length:], len(iterable) - length, 0))
-                    length = 0
-                    print(f'Moving on {nex.arrival} at char {elem} and creating token {state.name}')
-            state = self.states[nex.arrival]
-        if length != 0:
-            #if nex.verse is True:
-            #    raise Exception(f'Finishing on state {state.name} which is versing')
-            if discard is None or state.name not in discard:
-                tokens.append(Token(state.name, content[len(iterable) - length:], len(iterable) - length, 0))
-        return tokens
-
-    def dot(self, filename):
-        f = open(filename, mode='w', encoding='utf8')
-        f.write('digraph graphname {\n')
-        for _, s in self.states.items():
-            for t in s.trans:
-                f.write(f"    {s.name} -> {t.arrival} [label=\"{t.on_str()}\"];\n")
-        f.write('}\n')
-        f.close()
-
-class State:
-
-    def __init__(self, name):
-        self.name = name
-        self.trans = []
-        self.substates = {}
-
-    def __str__(self):
-        return f"({self.name} {len(self.trans)} tra {len(self.substates)} sub)"
-
-    def add(self, on, arrival, pos=None, nex=None, take=False, verse=False):
-        self.trans.append(Transition(self, on, arrival, pos, nex, take, verse))
-
-    def sub(self, name, iterable):
-        self.substates[name] = iterable
-
-    def react(self, iterable, index):
-        matches = []
-        for trans in self.trans:
-            #print('>', iterable[index:index+len(trans)])
-            if trans.match(iterable[index:index+len(trans)]):
-                matches.append(trans)
-        if len(matches) == 0:
-            return None
-        elif len(matches) > 1:
-            maxlen = 0
-            for m in matches:
-                if len(m) > maxlen:
-                    maxlen = len(m)
-            filtered_maxlen = []
-            for m in matches:
-                if len(m) == maxlen:
-                    filtered_maxlen.append(m)
-            if len(filtered_maxlen) > 1:
-                s = ''
-                for m in filtered_maxlen:
-                    s += str(m) + ' '
-                raise Exception(f'Ambiguous transitions on {elem}: {s}')
-            else:
-                return filtered_maxlen[0]
-        elif len(matches) == 1:
-            return matches[0]
-
-
-class Elem:
-
-    def __init__(self, char=None, all_digit=False, all_alpha=False, all_blank=False, any_char=False, class_chars=None):
-        self.char = char
-        self.all_digit = all_digit
-        self.all_alpha = all_alpha
-        self.all_blank = all_blank
-        self.any_char = any_char
-        self.class_chars = class_chars
-        if (self.all_digit or self.all_alpha or self.all_blank or self.class_chars is not None) and self.char is not None:
-            raise Exception('Cannot define an elem with a literal char and a modifier or a class')
-
-    def __str__(self):
-        if self.char is not None:
-            if self.char == '"':
-                return '\\"'
-            else:
-                return self.char
-        elif self.all_digit and self.all_alpha:
-            return '<alnum>'
-        elif self.all_digit:
-            return '<digit>'
-        elif self.all_alpha:
-            return '<alpha>'
-        elif self.all_blank:
-            return '<blank>'
-        elif self.any_char:
-            return '<any>'
-        elif self.class_chars is not None:
-            return str(self.class_chars)
-
-    def match(self, thing):
-        if self.char is not None:
-            return thing == self.char
-        elif self.any_char is True:
-            return thing != '\n'
-        elif self.all_digit and self.all_alpha:
-            return thing.alnum()
-        elif self.all_digit is True:
-            return thing.isdigit()
-        elif self.all_alpha is True:
-            return thing.isalpha()
-        elif self.all_blank is True:
-            return elem in [' ', '\t']
-        elif self.class_chars is not None:
-            return thing in self.class_chars
-        
-
-class Transition:
-
-    def __init__(self, origin, on, arrival, pos, nex, take, verse=False):
-        self.origin = origin
-        self.on = []
-        cnt = len(on)
-        while cnt := len(on) > 0:
-            if on.startswith('<digit>'):
-                self.on.append(Elem(all_digit=True))
-                on = on[7:]
-            elif on.startswith('<alpha>'):
-                self.on.append(Elem(all_alpha=True))
-                on = on[7:]
-            elif on.startswith('<alnum>'):
-                self.on.append(Elem(all_digit=True, all_alpha=True))
-            elif on.startswith('<all>'):
-                self.on.append(Elem(any_char=True))
-            elif on.startswith('<blank>'):
-                self.on.append(Elem(any_blank=True))
-            elif on[0] == '[':
-                end = on.index(']')
-                lst = []
-                for e in on[1:end]:
-                    lst.append(e)
-                self.on.append(Elem(class_chars=lst))
-                on = on[end+1:]
-            else:
-                self.on.append(Elem(char=on[0]))
-                on = on[1:]
-        self.arrival = arrival
-        self.pos = pos
-        self.nex = nex
-        self.take = take
-        self.verse = verse # le contenu de l'état précédent est "versé" dans le nouveau, no new token et l'état suivant récup tous les élem
-
-    def __len__(self):
-        return len(self.on)
-
-    def on_str(self):
-        s = ''
-        for o in self.on:
-            s += str(o)
-        return s
-
-    def match(self, elem):
-        res = True
-        length = min(len(self.on), len(elem))
-        if len(self.on) != len(elem):
-            print(f'warning on= {self.on} and elem= {elem}')
-        for i in range(length):
-            res = self.on[i].match(elem[i])
-            if not res:
-                break
-        return res
-
-    def __str__(self):
-        return f"{self.origin} -[{self.on})-> {self.arrival}"
-
-#-------------------------------------------------------------------------------
-
-lexerLua = Machine()
-
-sInit = lexerLua.add('init')
-sNum  = lexerLua.add('number')
-sInt  = lexerLua.add('integer')
-sInt2 = lexerLua.add('integer_binary')
-sInt8 = lexerLua.add('integer_octal')
-sInt16= lexerLua.add('integer_hexa')
-sFlt  = lexerLua.add('float')
-sStr  = lexerLua.add('string')
-sId   = lexerLua.add('identifier')
-sOp   = lexerLua.add('operator')
-sSep  = lexerLua.add('separator')
-
-sBoo  = sId.sub('boolean', ['true', 'false'])
-sKey  = sId.sub('keyword',  ['if', 'while', 'do', 'then', 'elif', 'else', 'end'])
-
-#sLst  = lexerLua.add('list')
-#sDic  = lexerLua.add('dict')
-
-sInit.add(' ', 'init')
-sInit.add('<digit>', 'number')
-sInit.add('<alpha>', 'identifier')
-sInit.add('"', 'string')
-sInit.add('+', 'operator')
-sInit.add('-', 'operator')
-sInit.add('*', 'operator')
-sInit.add('/', 'operator')
-sInit.add('%', 'operator')
-sInit.add('>', 'operator')
-sInit.add('<', 'operator')
-sInit.add('.', 'operator')
-sInit.add('=', 'operator')
-sInit.add('0x', 'integer_hexa', take=True, verse=True)
-sInit.add('0X', 'integer_hexa', take=True, verse=True)
-sInit.add('0c', 'integer_octal', take=True, verse=True)
-sInit.add('0C', 'integer_octal', take=True, verse=True)
-sInit.add('0b', 'integer_binary', take=True, verse=True)
-sInit.add('0B', 'integer_binary', take=True, verse=True)
-
-#sInt2.add('0', 'integer_binary')
-#sInt2.add('1', 'integer_binary')
-sInt2.add('[01]', 'integer_binary')
-sInt2.add(' ', 'init')
-
-sInt8.add('0', 'integer_octal')
-sInt8.add('1', 'integer_octal')
-sInt8.add('2', 'integer_octal')
-sInt8.add('3', 'integer_octal')
-sInt8.add('4', 'integer_octal')
-sInt8.add('5', 'integer_octal')
-sInt8.add('6', 'integer_octal')
-sInt8.add('7', 'integer_octal')
-sInt8.add(' ', 'init')
-
-sInt16.add('<digit>', 'integer_hexa')
-sInt16.add('a', 'integer_hexa')
-sInt16.add('A', 'integer_hexa')
-sInt16.add('b', 'integer_hexa')
-sInt16.add('B', 'integer_hexa')
-sInt16.add('c', 'integer_hexa')
-sInt16.add('C', 'integer_hexa')
-sInt16.add('d', 'integer_hexa')
-sInt16.add('D', 'integer_hexa')
-sInt16.add('e', 'integer_hexa')
-sInt16.add('E', 'integer_hexa')
-sInt16.add('f', 'integer_hexa')
-sInt16.add('F', 'integer_hexa')
-sInt16.add(' ', 'init')
-
-sNum.add('<digit>', 'number')
-sNum.add('+', 'operator')
-sNum.add('-', 'operator')
-sNum.add('*', 'operator')
-sNum.add('/', 'operator')
-sNum.add('%', 'operator')
-sNum.add('.<digit>', 'float', take=True, verse=True)
-sNum.add('.<alpha>', 'operator')
-sNum.add(' ', 'init')
-
-sFlt.add('<digit>', 'float')
-sFlt.add('+', 'operator')
-sFlt.add('-', 'operator')
-sFlt.add('*', 'operator')
-sFlt.add('/', 'operator')
-sFlt.add('%', 'operator')
-sFlt.add(' ', 'init')
-
-sId.add('<alpha>', 'identifier')
-sId.add('+', 'operator')
-sId.add('-', 'operator')
-sId.add('*', 'operator')
-sId.add('/', 'operator')
-sId.add('%', 'operator')
-sId.add(' ', 'init')
-
-sOp.add('+', 'init', take=True)
-sOp.add('-', 'init', take=True)
-sOp.add('*', 'init', take=True)
-sOp.add('**', 'init', take=True)
-sOp.add('/', 'init', take=True)
-sOp.add('//', 'init', take=True)
-sOp.add('%', 'init', take=True)
-sOp.add('>>', 'init', take=True)
-sOp.add('<<', 'init', take=True)
-sOp.add('.', 'init', take=True)
-sOp.add('=', 'init', take=True)
-sOp.add('+=', 'init', take=True)
-sOp.add('-=', 'init', take=True)
-sOp.add('*=', 'init', take=True)
-sOp.add('**=', 'init', take=True)
-sOp.add('/=', 'init', take=True)
-sOp.add('//=', 'init', take=True)
-sOp.add('%=', 'init', take=True)
-sOp.add('<', 'init', take=True)
-sOp.add('>', 'init', take=True)
-sOp.add('!=', 'init', take=True)
-sOp.add('<=', 'init', take=True)
-sOp.add('>=', 'init', take=True)
-sOp.add(' ', 'init')
-
-print('------------------------------')
-#content = "0b10"
-content = "123 + 5 ** 2 + 1.abc/8.7 + 0b0101"
-print(f'{content=}')
-print('------------------------------')
-tokens = lexerLua.run(content) #, discard=['init'])
-print('------------------------------')
-for t in tokens:
-    print(t)
-print('------------------------------')
-lexerLua.dot('output.dot')
+        return f"({self.value}:{self.kind}@{self.line,self.column}#{len(self.value)})"
 
 #-------------------------------------------------------------------------------
 
 if __name__ == '__main__':
     Jyx()
-
 
 ##        #self.treeview["columns"] = ("text",)
 ##        self.treeview.column("#0", width=120)
@@ -1359,4 +1062,3 @@ if __name__ == '__main__':
 ##            self.treeview.insert("sub2", 0, text=" 3-1 Entry", image=self.app.rc.get_as_image('IconYellowCube16x19'))
 ##        else:
 ##            self.treeview.insert("sub2", 0, text=" 3-1 Entry")
-

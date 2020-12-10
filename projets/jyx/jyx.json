@@ -49,6 +49,7 @@
             "save as"    : "Sauver sous...",
             "save all"   : "Sauver tous",
             "run"        : "Exécuter",
+            "close tab"  : "Fermer onglet",
             "exit"       : "Quitter",
             "edit"       : "Edition",
             "undo"       : "Annuler",
@@ -76,6 +77,7 @@
             "save as"    : "Save As...",
             "save all"   : "Save All",
             "run"        : "Run Script",
+            "close tab"  : "Close Tab",
             "exit"       : "Exit",
             "edit"       : "Edit",
             "undo"       : "Undo",
@@ -104,10 +106,10 @@
             "support": "",
             "token": {
             },
-			"style": {
-				"default": {
-				}
-			}
+            "style": {
+                "default": {
+                }
+            }
         },
         "dglog" : {
             "label": "DG log",
@@ -125,10 +127,10 @@
                 "identifier": [],
                 "newline": []
             },
-			"style": {
-				"default": {
-				}
-			}
+            "style": {
+                "default": {
+                }
+            }
         },
         "textile" : {
             "label": "Textile",
@@ -146,10 +148,10 @@
                 "identifier": [],
                 "newline": []
             },
-			"style": {
-				"default": {
-				}
-			}
+            "style": {
+                "default": {
+                }
+            }
         },
         "hamill": {
             "label": "Hamill",
@@ -167,10 +169,10 @@
                 "identifier": [],
                 "newline": []
             },
-			"style": {
-				"default": {
-				}
-			}
+            "style": {
+                "default": {
+                }
+            }
         },
         "javascript" : {
             "label": "JavaScript",
@@ -188,10 +190,10 @@
                 "identifier": [],
                 "newline": []
             },
-			"style": {
-				"default": {
-				}
-			}
+            "style": {
+                "default": {
+                }
+            }
         },
         "lua" : {
             "label": "Lua",
@@ -200,9 +202,9 @@
             "support": "",
             "token": {
                 "keyword": ["break", "goto", "do", "end", "while", "repeat",
-				            "until", "if", "then", "elseif", "else", "for",
-							"in", "function", "local", "return", "nil", "and",
-							"or", "not"],
+                            "until", "if", "then", "elseif", "else", "for",
+                            "in", "function", "local", "return", "nil", "and",
+                            "or", "not"],
                 "predefined": [],
                 "boolean": ["false", "true"],
                 "separator": [";"],
@@ -211,12 +213,12 @@
                 "comment": [],
                 "identifier": [],
                 "newline": [],
-				"label": []
+                "label": []
             },
-			"style": {
-				"default": {
-				}
-			}
+            "style": {
+                "default": {
+                }
+            }
         },
         "python" : {
             "label": "Python",
@@ -234,10 +236,10 @@
                 "identifier": [],
                 "newline": []
             },
-			"style": {
-				"default": {
-				}
-			}
+            "style": {
+                "default": {
+                }
+            }
         },
         "ruby" : {
             "label": "Ruby",
@@ -255,10 +257,10 @@
                 "identifier": [],
                 "newline": []
             },
-			"style": {
-				"default": {
-				}
-			}
+            "style": {
+                "default": {
+                }
+            }
         },
         "ash" : {
             "label": "Ash",
@@ -423,10 +425,10 @@
                 "identifier": [],
                 "newline": []
             },
-			"style": {
-				"default": {
-				}
-			}
+            "style": {
+                "default": {
+                }
+            }
         },
         "ini" : {
             "label": "INI config",
@@ -444,37 +446,30 @@
                 "identifier": [],
                 "newline": []
             },
-			"style": {
-				"default": {
-				}
-			}
+            "style": {
+                "default": {
+                }
+            }
         },
         "json" : {
             "label": "JSON",
             "extension": [".json"],
             "family": "Data",
             "support": ["tokenize"],
-            "token": {
-                "boolean": "false|true",
-                "separator": ["[", "]", ",", "{", "}", ":"],
-                "number": "-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?",
-                "string": "\\\"(?:[^\\\\]|\\\\[bfnrt\\\"]|\\\\u[0-9a-fA-F]{4})*\\\"",
-                "newline": "\\r\\n|\\n|\\n\\r",
-				"whitespace": "\\t| "
-            },
-			"style": {
-				"default": {
-					"boolean": {
-						"color": "orange"
-					},
-					"number": {
-						"color": "red"
-					},
-					"string": {
-						"color": "darkgreen"
-					}
-				}
-			}
+            "token": ["boolean", "separator", "number", "string", "newline", "whitespace"],
+            "style": {
+                "default": {
+                    "boolean": {
+                        "color": "orange"
+                    },
+                    "number": {
+                        "color": "red"
+                    },
+                    "string": {
+                        "color": "darkgreen"
+                    }
+                }
+            }
         },
         "xml" : {
             "label": "XML data",
@@ -492,10 +487,10 @@
                 "identifier": [],
                 "newline": []
             },
-			"style": {
-				"default": {
-				}
-			}
+            "style": {
+                "default": {
+                }
+            }
         },
         "html": {
             "label": "HTML",
@@ -513,10 +508,10 @@
                 "identifier": [],
                 "newline": []
             },
-			"style": {
-				"default": {
-				}
-			}
+            "style": {
+                "default": {
+                }
+            }
         },
         "css": {
             "label": "CSS",
@@ -534,10 +529,10 @@
                 "identifier": [],
                 "newline": []
             },
-			"style": {
-				"default": {
-				}
-			}
+            "style": {
+                "default": {
+                }
+            }
         }
     }
 }
