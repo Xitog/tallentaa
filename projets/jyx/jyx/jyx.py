@@ -248,7 +248,7 @@ class Jyx:
         self.root.wm_title(f"{Jyx.TITLE} {Jyx.VERSION} - {i}/{nb} {file}{dirty}")
 
     def update_status(self, event=None):
-        self.menu.status_bar.configure(text=self.notebook.get_position())
+        self.menu.status_bar.configure(text=self.notebook.current().lang + ' - ' + self.notebook.get_position())
 
     def update_all_options(self):
         for key in self.options:
@@ -304,8 +304,10 @@ class Jyx:
             title = self.data['messages'][tongue]['unsaved']
             msg = self.data['messages'][tongue]['unsaved_msg']
             if messagebox.askyesno("Unsaved changes", msg, default=messagebox.NO):
+                self.root.after_cancel(self.after_id)
                 self.root.destroy()
         else:
+            self.root.after_cancel(self.after_id)
             self.root.destroy()
 
     def new(self, event=None):
@@ -349,7 +351,6 @@ class Jyx:
         options['title'] = self.data['messages'][tongue]['open file']
         filename = filedialog.askopenfilename(**options)
         if type(filename) == str and len(filename) > 0:
-            print(filename)
             f = open(filename, mode='r', encoding='utf8')
             content = None
             try:
@@ -668,9 +669,8 @@ class JyxNote:
     MOD_SHIFT = 0x0001
     MOD_CAPS_LOCK = 0x0002
     MOD_CONTROL = 0x0004
-    #MOD_LEFT_ALT = 0x0008 # seems to be the right for me XXX
+    MOD_LEFT_ALT = 0x0080 # inverted par rapport à la doc
     MOD_NUM_LOCK = 0x0010
-    #MOD_RIGHT_ALT = 0x0080
     MOD_RIGHT_ALT = 0x0008
 
     def __init__(self, notebook, lang):
@@ -690,7 +690,7 @@ class JyxNote:
         self.text.config(font=('consolas', 12), undo=True, wrap='word')
         self.text.grid(row=0, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
         self.text.bind('<KeyPress>', self.update_text_before)
-        self.text.bind('<KeyRelease>', self.update_text_after)
+        #self.text.bind('<KeyRelease>', self.update_text_after)
         self.text.bind('<ButtonRelease-1>', self.notebook.jyx.update_status)
 
         self.filepath = None
@@ -700,7 +700,6 @@ class JyxNote:
         # Tags
         self.tokens = {}
         self.tags = {}
-        print('0', lang)
         self.change_lang(lang, True)
 
     def focus(self):
@@ -732,6 +731,9 @@ class JyxNote:
             self.tags[tag] = self.text.tag_config(tag, foreground=val['color'])
         # Retag
         self.tag()
+        # Refresh status
+        if not init:
+            self.notebook.jyx.update_status()
 
     #
     # Handling of state and deleting, writing, loading and saving
@@ -919,43 +921,38 @@ class JyxNote:
         if len(text.tag_ranges('sel')) > 0:
             self.selection_delete()
         self.write(content)
-        #info c = event.widget.get("insert linestart", "insert lineend")
-        #info self.notebook.jyx.log.info(c)
-        #if c.startswith('http://'):
-        #    text.tag_add('a', 'insert linestart', tk.INSERT)
-        #else:
-        #    text.tag_remove('a', 'insert linestart', tk.INSERT)
+        self.tag(self.text.index("insert linestart"), self.text.index("insert lineend"))
         text.see(tk.INSERT)
         self.notebook.jyx.update_status()
         return 'break'
 
-    def update_text_after(self, event):
-        self.tag()
+    #def update_text_after(self, event):
+        #self.tag()
         #res = event.widget.search('--> ', "insert linestart", "insert lineend")
         #while res != '':
         #    self.notebook.jyx.log.info(res)
         #    self.delete(res, res + '+4c')
         #    self.write(res, '→ ')
         #    res = event.widget.search('--> ', res, "insert lineend")
-        return 'break'
+        #return 'break'
 
     #
     # Tag
     #
-    def tag(self):
+    def tag(self, start='1.0', end=tk.END):
         if not self.notebook.jyx.has(f"languages.{self.lang}.support", "tokenize") or self.lang not in LEXERS:
             return
         # Clear all tags
         for tag in self.text.tag_names():
             if tag == 'sel':
                 continue # sans cela, bug du selection_delete qui ne supprime pas le 1er caractere ! XXX
-            self.text.tag_remove(tag, 1.0, tk.END)
-        content = self.text.get(1.0, tk.END)
+            self.text.tag_remove(tag, start, end)
+        content = self.text.get(start, end)
         res = LEXERS[self.lang]().lex(content)
-        for r in res:
-            start = self.text.index("1.0+%d chars" % r.column)
-            end = self.text.index("1.0+%d chars" % (r.end))
-            self.text.tag_add(r.kind, start, end)
+        for t in res:
+            t_start = self.text.index("%s+%d chars" % (start, t.column))
+            t_end = self.text.index("%s+%d chars" % (start, t.end))
+            self.text.tag_add(t.kind, t_start, t_end)
 
 #-------------------------------------------------------------------------------
 
