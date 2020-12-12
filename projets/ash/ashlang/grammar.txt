@@ -25,7 +25,7 @@ Lua est une bonne base, par son petit périmète, mais souffre de plusieurs déf
     o break et return ne peuvent apparaître que comme dernier statement d'un bloc
       https://www.lua.org/pil/4.4.html
     o pas d'exceptions, seulement pcall, error, xpcall, pas de try/catch/raise/throw/finally
-    o il faut mettre entre crochets la clé si ce n'est pas un symbole : { ["a"] = 5 }    
+    o il faut mettre entre crochets la clé si ce n'est pas un symbole : { ["a"] = 5 }
     o un test de if/while ne devrait se faire que sur des booléens
 Il y a des points positifs néanmoins :
     o les listes vides, le nombre 0 et une liste vide sont vrais seuls false et nil sont faux
@@ -74,7 +74,7 @@ ALT : remove const, var => 25
 - true/false => bool pour les booléens
 - " ", ' ' => string/str pour les chaînes
 - [1, 2] => list pour les listes/array/tableaux
-- {k = v} => hash pour les dictionnaires/tables de hashage
+- {k = v} => hash pour les dictionnaires/tables de hashage ( = : veut dire associer)
 
 On garde : pour le typage et => pour autre chose.
 
@@ -82,6 +82,9 @@ Les noms des types doivent être courts car on les écrira souvent.
 
 ALT : => pour les dico
 ALT : number pour les float (num)
+ALT : [ k = v ] pour les dico, on garde { } seulement pour les blocks en rempla de then/do/end
+ALT : on supprime les octaux
+ALT : on autorise \n dans une chaîne et on supprime ' '
 
 3. Variables et constantes
 ==========================
@@ -103,6 +106,10 @@ EXT : := pour une constance de type avec type inféré : a := 5
 ALT : on ne type pas les variables
 EXT : le type "any"
 ALT : ni var, ni const, on ne fait qu'à la majuscule en début d'identifiant
+ALT : type? pour pouvoir dire nullable
+ALT : [X] pour indiquer que c'est un tableau de longueur X ou dyn pour dynamique : int[dyn] ou list(int, dyn)
+ALT : comment gérer le typage des list et des hashs ? int[50] ou [int, 50] ou list(int, 50) ? str=int[50]
+      ou [int=str, 50] raccourci pour Hash(int, str, 50)
 
 4. Contrôle du flux
 ===================
@@ -257,7 +264,7 @@ ALT : else s'il n'y a pas eu d'exception
 
 Un fichier = un module
 
-Pour l'importer : require str ex : 
+Pour l'importer : require str ex :
     - require "flat.ash"
     - require "../flat.ash"
 
@@ -317,45 +324,46 @@ Hash
     | : ou
     # : commentaire
     'x' : littéral (symbole directement)
-    
+
 11.B Syntaxe
 ------------
 
 ATTENTION : pas mis à jour avec les dernières modifications
 
     PROGRAM --> STATEMENT { ';' STATEMENT }
-    
-	STATEMENT --> 
+
+    STATEMENT -->
         | BLOCK_STATEMENT
         # Declaration (first level statement)
         | module id is MOD_BODY end
         | require string
         # Declaration (common to 1st level and module)
         | FUN_CONST_ENUM
-        
+
     FUN_CONST_ENUM -->
-		| fun id [ '(' [ LIST_PARAM ] ')' ] [ : id ] ( is | \n ) FUNC_BODY end
+        | fun id [ '(' [ LIST_PARAM ] ')' ] [ : id ] ( is | \n ) FUNC_BODY end
         | sub id [ '(' [ LIST_PARAM ] ')' ] ( is | \n ) SUB_BODY end
         | const id '=' EXPRESSION # var are defined in BLOCK_STATEMENT
         | enum id [ : id ] ( is | \n ) LIST_VAL_ENUM end
-        
+
     LIST_EXPRESSION --> EXPRESSION { ',' LIST_EXPRESSION }
-    
+
     LIST_ID --> id { ',' LIST_ID }
-    
+
     LIST_ID_TYP --> id [ : id ]  { ',' LIST_ID }
-    
+
     LIST_VAL_ENUM --> id [ = expression ] { ( ',' | \n ) LIST_VAL_ENUM }
-    
+
     LIST_PARAM --> id [ : id ] { ',' LIST_PARAM }
-    
-    EXPRESSION --> 
+
+    EXPRESSION -->
         | nil
+        | byte
         | true
         | false
-        | integer
-        | float
-        | string
+        | integer / int
+        | float   / num
+        | string  / str
         | LIST
         | HASH
         | LAMBDA
@@ -364,81 +372,80 @@ ATTENTION : pas mis à jour avec les dernières modifications
         | UNA_OP EXPRESSION
         | FUNC_SUB_CALL
         | '(' EXPRESSION ')'
-    
+
     BLOCK --> BLOCK_STATEMENT { ';' BLOCK_STATEMENT }
-    
+
     BLOCK_STATEMENT --> ';'
         # Base
-        | LIST_ID = LIST_EXPRESSION
-		| EXPRESSION
-		# Selection
-		| if EXPRESSION ( then | \n ) BLOCK { elseif EXPRESSION then BLOCK } [ else BLOCK ] end
-        # Loop
-        | while EXPRESSION ( do | \n ) BLOCK end
-		| repeat BLOCK until EXPRESSION
-		| for id = EXPRESSION ',' EXPRESSION [ ',' EXPRESSION ] ( do | \n ) BLOCK end
-		| for LIST_ID in LIST_EXPRESSION ( do | \n ) BLOCK end
-        # Loop special
-        | break
-        | next
+        | EXPRESSION
         # Declaration
-        | var LIST_ID_TYP = LIST_EXPRESSION
+        | [ var | final ] LIST_ID_TYP = LIST_EXPRESSION # final pour not override et no subclass plutôt que const
+        # Selection
+        | if EXPRESSION ( then | \n ) BLOCK { elseif EXPRESSION then BLOCK } [ else BLOCK ] end[if]
+        # Loop
+        | [<label>] while EXPRESSION ( do | \n ) BLOCK end
+        | [<label>] loop ( do | \n ) BLOCK until EXPRESSION [ end[loop] | \n ]
+        | [<label>] for id = EXPRESSION ',' EXPRESSION [ ',' EXPRESSION ] ( do | \n ) BLOCK end
+        | [<label>] for LIST_ID in LIST_EXPRESSION ( do | \n ) BLOCK end
+        # Loop special
+        | break [<label>]
+        | next [<label>]
         # Exception
         | try [\n] BLOCK { catch [id : ] id BLOCK } [ finally BLOCK ] end
         | throw expression
-        
+
     FUNC_BODY --> FUNC_STATEMENT { ';' FUNC_STATEMENT }
-    
+
     FUNC_STATEMENT -->
         BLOCK_STATEMENT
         # Function special
         | return [ LIST_EXPRESSION ]
-    
+
     SUB_BODY --> SUB_STATEMENT { ';' SUB_STATEMENT }
-    
+
     SUB_STATEMENT -->
         BLOCK_STATEMENT
         # Subprogram special
         | return
-    
+
     MOD_BODY --> MOD_STATEMENT { ';' MOD_STATEMENT }
-    
+
     MOD_STATEMENT -->
         | BLOCK_STATEMENT
         | FUN_CONST_ENUM
-        
-    LAMBDA --> 
+
+    LAMBDA -->
         | fun [ '(' LIST_PARAM ')' ] [ : id ] ( is | \n ) FUNC_STATEMENT end
         | sub [ '(' LIST_PARAM ')' ] ( is | \n ) SUB_STATEMENT end
-    
+
     LIST --> '[' [ LIST_EXPRESSION ] [ ',' ] ']'
-    
+
     HASH --> '{' [ LIST_KEY_VALUE ] [ ',' ] '}'
-    
+
     LIST_KEY_VALUE --> KEY ':' EXPRESSION { ',' LIST_KEY_VALUE }
-    
-    KEY --> 
+
+    KEY -->
+        | byte
         | true
         | false
         | integer
         | float
         | string
         | id
-        
-	BIN_OP --> 
+
+    BIN_OP -->
         | '+' | '-' | '*' | '/' | '//' | '**' | '%'
-		| '&' | '~' | '|' | '>>' | '<<'
-		| '<' | '<=' | '>' | '>=' | '==' | '!='
-		| and | or
+        | '>>' | '<<'
+        | '<' | '<=' | '>' | '>=' | '==' | '!='
+        | and | or | xor
         | in | not in
-    
-    UNA_OP --> 
+
+    UNA_OP -->
         | '-'
         | not
-        | '~'
-    
+
     FUNC_SUB_CALL --> id ( LIST_EXPRESSION )
- 
+
 11.C Définition des tokens
 --------------------------
 
@@ -464,11 +471,11 @@ Not used :
     else --> 'else'
     while --> 'while'
     do --> 'do'
-    
+
 Not used :
     repeat --> 'repeat'
     until --> 'until'
-    
+
     for --> 'for'
     break --> 'break'
     next --> 'next'
@@ -476,19 +483,19 @@ Not used :
     and --> 'and'
     or --> 'or'
     not --> 'not'
-    
+
 Not used :
     module --> 'module'
-    
+
     require --> 'require'
-    
-Not used :    
+
+Not used :
     sub --> 'sub'
     try --> 'try'
     catch --> 'catch'
     finally --> 'finally'
     throw --> 'throw'
-    
+
 12. Exemples / Ash en Action
 ----------------------------
 

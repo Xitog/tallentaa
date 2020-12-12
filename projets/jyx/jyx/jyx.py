@@ -199,10 +199,18 @@ class Jyx:
         self.fonts['COURRIER_NEW_10'] = font.Font(family='Courier New', size=10)
         self.fonts['COURRIER_NEW_10_BOLD'] = font.Font(family='Courier New', size=10, weight='bold')
         # Options
+        if os.path.exists('last_values.json'):
+            self.log.info('Last values file for options found.')
+            file = open('last_values.json', mode='r')
+            last_values = json.load(file)
+        else:
+            last_values = {}
         self.options = {}
-        for opt, info in self.data['options'].items():
-            self.options[opt] = JyxOption.load(opt, info)
-        self.options['language'] = JyxOption.load('language', {'value': self.data['default_language'], 'msg': ''})
+        for opt, val in self.data['options'].items():
+            if opt in last_values:
+                val = last_values[opt]
+            self.options[opt] = JyxOption(opt, val)
+        self.options['language'] = JyxOption('language', self.data['default_language'])
         # UI components
         self.notebook = JyxNotebook(self)
         self.treeview = JyxTree(self)
@@ -273,7 +281,7 @@ class Jyx:
         elif varname == 'basename' and not init:
             self.update_title()
         elif varname == 'treeview':
-            if val and not init:
+            if val:
                 self.treeview.place(relx=0.0, rely =0.0, relwidth =0.2, relheight =1.0)
                 self.notebook.place(relx=0.2, rely =0.0, relwidth =0.8, relheight =1.0)
             elif not val:
@@ -299,14 +307,22 @@ class Jyx:
             return self.has('.'.join(exploded[1:]), value, content[exploded[0]])
         
     def exit(self, event=None):
+        ending = False
         tongue = self.options['tongue'].get()
         if self.notebook.is_anyone_dirty() and self.options['confirm'].get():
             title = self.data['messages'][tongue]['unsaved']
             msg = self.data['messages'][tongue]['unsaved_msg']
             if messagebox.askyesno("Unsaved changes", msg, default=messagebox.NO):
-                self.root.after_cancel(self.after_id)
-                self.root.destroy()
+                ending = True
         else:
+            ending = True
+        if ending:
+            simple_opt = {}
+            for opt, val in self.options.items():
+                simple_opt[opt] = val.var.get()
+            file = open('last_values.json', mode='w', encoding='utf8')
+            json.dump(simple_opt, file, indent='    ')
+            file.close()
             self.root.after_cancel(self.after_id)
             self.root.destroy()
 
@@ -390,23 +406,17 @@ class Jyx:
 
 class JyxOption:
 
-    def __init__(self, name, val, msg):
+    def __init__(self, name, val):
         self.name = name
-        self.val = val
         self.typ = type(val)
-        self.msg = msg
         if self.typ == str:
             self.var = tk.StringVar()
         elif self.typ == bool:
             self.var = tk.BooleanVar()
         else:
             raise Exception(f"Option type not handled for {self.name} of type {self.typ}")
-        self.var.set(self.val)
-        self.prev = self.val
-
-    @staticmethod
-    def load(key, dic):
-        return JyxOption(key, dic['value'], dic['msg'])
+        self.var.set(val)
+        self.prev = val
 
     def get(self):
         return self.var.get()
@@ -436,6 +446,7 @@ class JyxMenu(tk.Menu):
         self.file_menu.entryconfig(data['menu'][old]['save as'], label=data['menu'][new]['save as'])
         self.file_menu.entryconfig(data['menu'][old]['save all'], label=data['menu'][new]['save all'])
         self.file_menu.entryconfig(data['menu'][old]['run'], label=data['menu'][new]['run'])
+        self.file_menu.entryconfig(data['menu'][old]['close tab'], label=data['menu'][new]['close tab'])
         self.file_menu.entryconfig(data['menu'][old]['exit'], label=data['menu'][new]['exit'])
 
         self.edit_menu.entryconfig(data['menu'][old]['undo'], label=data['menu'][new]['undo'])
@@ -666,11 +677,12 @@ class JyxNotebook(ttk.Notebook):
 
 class JyxNote:
 
-    MOD_SHIFT = 0x0001
+    MOD_CONTROL   = 0x000C # Windows 10
+    MOD_SHIFT     = 0x0001
     MOD_CAPS_LOCK = 0x0002
-    MOD_CONTROL = 0x0004
-    MOD_LEFT_ALT = 0x0080 # inverted par rapport à la doc
-    MOD_NUM_LOCK = 0x0010
+    #MOD_CONTROL   = 0x0004
+    MOD_LEFT_ALT  = 0x0080 # inverted par rapport à la doc
+    MOD_NUM_LOCK  = 0x0010
     MOD_RIGHT_ALT = 0x0008
 
     def __init__(self, notebook, lang):
@@ -807,6 +819,9 @@ class JyxNote:
     def selection_clear(self):
         self.text.tag_remove(tk.SEL, '1.0', tk.END)
 
+    def has_selection(self):
+        return len(self.text.tag_ranges('sel')) > 0
+
     #
     # Basic functions (called from menu without event)
     #
@@ -823,8 +838,9 @@ class JyxNote:
         return 'break'
 
     def copy(self, event=None):
-        self.notebook.jyx.root.clipboard_clear()
-        self.notebook.jyx.root.clipboard_append(self.selection_get())
+        if self.has_selection():
+            self.notebook.jyx.root.clipboard_clear()
+            self.notebook.jyx.root.clipboard_append(self.selection_get())
         return 'break'
 
     def select_all(self, event=None):
@@ -843,11 +859,13 @@ class JyxNote:
     #
     def update_text_before(self, event):
         text = event.widget
-        if JyxNote.MOD_CONTROL & event.state and not JyxNote.MOD_RIGHT_ALT & event.state:
-            if JyxNote.MOD_LEFT_ALT & event.state:
-                print('alt left on:', event.state)
-            if JyxNote.MOD_RIGHT_ALT & event.state:
-                print('alt right on:', event.state)
+        if JyxNote.MOD_CONTROL & event.state:
+            print(f'ctrl {event.state:06X}')
+        if JyxNote.MOD_RIGHT_ALT & event.state:
+            print(f'alt right {event.state:06X}')
+        if JyxNote.MOD_LEFT_ALT & event.state:
+            print(f'alt left {event.state:06X}')
+        if JyxNote.MOD_CONTROL & event.state: #or JyxNote.MOD_RIGHT_ALT & event.state:
             print('update_text_before:', event.keysym)
             if event.keysym == 'a':
                 self.select_all()
@@ -879,10 +897,10 @@ class JyxNote:
                 'Home': 'insert linestart'
             }
             nex = codes[event.keysym]
-            if len(text.tag_ranges('sel')) == 0:
-                self.start = text.index(tk.INSERT)
-            else:
+            if self.has_selection():
                 self.selection_clear()
+            else:
+                self.start = text.index(tk.INSERT)
             if JyxNote.MOD_SHIFT & event.state:
                 self.selection_set(nex, self.start)
             text.mark_set(tk.INSERT, f'{nex}')

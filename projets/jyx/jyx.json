@@ -1,21 +1,9 @@
 {
     "options": {
-        "tongue": {
-            "value": "fr",
-            "msg": "tongue"
-        },
-        "confirm": {
-            "value": false,
-            "msg":"confirm"
-        },
-        "basename": {
-            "value": false,
-            "msg": "basename"
-        },
-        "treeview": {
-            "value": true,
-            "msg": "treeview"
-        }
+        "tongue": "fr",
+        "confirm": false,
+        "basename": false,
+        "treeview": true
     },
     "messages": {
         "fr": {
@@ -76,8 +64,8 @@
             "save"       : "Save",
             "save as"    : "Save As...",
             "save all"   : "Save All",
-            "run"        : "Run Script",
             "close tab"  : "Close Tab",
+            "run"        : "Run Script",
             "exit"       : "Exit",
             "edit"       : "Edit",
             "undo"       : "Undo",
@@ -225,17 +213,8 @@
             "extension": [".py"],
             "family": "Scripting",
             "support": ["execute"],
-            "token": {
-                "keyword": [],
-                "predefined": [],
-                "boolean": [],
-                "separator": [],
-                "operator": [],
-                "string": [],
-                "comment": [],
-                "identifier": [],
-                "newline": []
-            },
+            "token": ["keyword", "predefined", "boolean", "separator",
+                      "operator","string", "comment", "identifier", "newline"],
             "style": {
                 "default": {
                 }
