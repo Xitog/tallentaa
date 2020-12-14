@@ -574,6 +574,16 @@ class JyxTree(ttk.Treeview):
 
     def __init__(self, jyx):
         ttk.Treeview.__init__(self, jyx.get_root())
+        self.jyx = jyx
+
+    def rebuild(self):
+        if self.jyx.notebook.current().lang == 'json':
+            try:
+                text = self.jyx.notebook.current().text.get('1.0', tk.END)
+                obj = json.loads(text)
+                print(obj)
+            except ValueError as e:
+                print(e)
 
     
 class JyxNotebook(ttk.Notebook):
@@ -678,15 +688,16 @@ class JyxNotebook(ttk.Notebook):
 
 class JyxNote:
 
-    #MOD_CONTROL   = 0x000C # Windows 10
     #MOD_NUM_LOCK  = 0x0010
-
     MOD_CAPS_LOCK = 0b00000010
     MOD_SHIFT     = 0b00000001
     # Linux
-    MOD_CONTROL   = 0b00010100
-    MOD_LEFT_ALT  = 0b00011000
-    MOD_RIGHT_ALT = 0b10010000
+    MOD_CONTROL_WIN   = 0b00001100
+    MOD_CONTROL_LIN   = 0b00010100
+    MOD_ALT_LEFT_LIN  = 0b00011000
+    MOD_ALT_LEFT_WIN  = 0b100000000000001000
+    MOD_ALT_RIGHT_LIN = 0b10010000
+    MOD_ALT_RIGHT_WIN = 0b100000000000001100
     
     def __init__(self, notebook, lang):
         self.notebook = notebook
@@ -857,21 +868,30 @@ class JyxNote:
         self.select_all(event)
         self.selection_delete()
 
+    def control_pressed(self, state):
+        return state in [JyxNote.MOD_CONTROL_LIN, JyxNote.MOD_CONTROL_WIN]
+
+    def alt_left_pressed(self, state):
+        return state in [JyxNote.MOD_ALT_LEFT_LIN, JyxNote.MOD_ALT_LEFT_WIN]
+
+    def alt_right_pressed(self, state):
+        return state in [JyxNote.MOD_ALT_RIGHT_LIN, JyxNote.MOD_ALT_RIGHT_WIN]
+
     #
     # React to key events
     #
     def update_text_before(self, event):
         text = event.widget
         print(f'{event.state:08b} {platform.system()}')
-        if JyxNote.MOD_CONTROL == event.state:
-            print(f'ctrl {JyxNote.MOD_CONTROL:08b} {event.state:08b} {platform.system()}')
-        if JyxNote.MOD_RIGHT_ALT == event.state:
-            print(f'alt right {JyxNote.MOD_RIGHT_ALT:08b} {event.state:08b} {platform.system()}')
-        if JyxNote.MOD_LEFT_ALT == event.state:
-            print(f'alt left {JyxNote.MOD_LEFT_ALT:08b} {event.state:08b} {platform.system()}')
+        if self.control_pressed(event.state):
+            print(f'ctrl {event.state:08b} {platform.system()}')
+        if self.alt_right_pressed(event.state):
+            print(f'alt right {event.state:08b} {platform.system()}')
+        if self.alt_left_pressed(event.state):
+            print(f'alt left {event.state:08b} {platform.system()}')
         if JyxNote.MOD_CAPS_LOCK & event.state:
             print(f'caps lock')
-        if JyxNote.MOD_CONTROL == event.state: #or JyxNote.MOD_RIGHT_ALT & event.state:
+        if self.control_pressed(event.state):
             print('update_text_before:', event.keysym)
             if event.keysym == 'a':
                 self.select_all()
@@ -887,6 +907,8 @@ class JyxNote:
                 self.cut()
             elif event.keysym == 'v':
                 self.paste()
+            elif event.keysym == 'p':
+                self.notebook.jyx.treeview.rebuild()
             else:
                 self.notebook.jyx.log.info(f'Event not handled: {event.keysym} with state={event.state}')
                 return 'break'

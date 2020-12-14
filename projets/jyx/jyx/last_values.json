@@ -2,6 +2,6 @@
     "tongue": "fr",
     "confirm": true,
     "basename": true,
-    "treeview": false,
-    "language": "text"
+    "treeview": true,
+    "language": "json"
 }
