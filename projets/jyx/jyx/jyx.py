@@ -19,6 +19,7 @@ import subprocess # for run
 import stat # for run
 import re
 from typing import Dict # not used
+import platform # just for knowing where we are in handling of ctrl
 
 # Tokenizer
 import sys
@@ -677,14 +678,16 @@ class JyxNotebook(ttk.Notebook):
 
 class JyxNote:
 
-    MOD_CONTROL   = 0x000C # Windows 10
-    MOD_SHIFT     = 0x0001
-    MOD_CAPS_LOCK = 0x0002
-    #MOD_CONTROL   = 0x0004
-    MOD_LEFT_ALT  = 0x0080 # inverted par rapport à la doc
-    MOD_NUM_LOCK  = 0x0010
-    MOD_RIGHT_ALT = 0x0008
+    #MOD_CONTROL   = 0x000C # Windows 10
+    #MOD_NUM_LOCK  = 0x0010
 
+    MOD_CAPS_LOCK = 0b00000010
+    MOD_SHIFT     = 0b00000001
+    # Linux
+    MOD_CONTROL   = 0b00010100
+    MOD_LEFT_ALT  = 0b00011000
+    MOD_RIGHT_ALT = 0b10010000
+    
     def __init__(self, notebook, lang):
         self.notebook = notebook
 
@@ -859,13 +862,16 @@ class JyxNote:
     #
     def update_text_before(self, event):
         text = event.widget
-        if JyxNote.MOD_CONTROL & event.state:
-            print(f'ctrl {event.state:06X}')
-        if JyxNote.MOD_RIGHT_ALT & event.state:
-            print(f'alt right {event.state:06X}')
-        if JyxNote.MOD_LEFT_ALT & event.state:
-            print(f'alt left {event.state:06X}')
-        if JyxNote.MOD_CONTROL & event.state: #or JyxNote.MOD_RIGHT_ALT & event.state:
+        print(f'{event.state:08b} {platform.system()}')
+        if JyxNote.MOD_CONTROL == event.state:
+            print(f'ctrl {JyxNote.MOD_CONTROL:08b} {event.state:08b} {platform.system()}')
+        if JyxNote.MOD_RIGHT_ALT == event.state:
+            print(f'alt right {JyxNote.MOD_RIGHT_ALT:08b} {event.state:08b} {platform.system()}')
+        if JyxNote.MOD_LEFT_ALT == event.state:
+            print(f'alt left {JyxNote.MOD_LEFT_ALT:08b} {event.state:08b} {platform.system()}')
+        if JyxNote.MOD_CAPS_LOCK & event.state:
+            print(f'caps lock')
+        if JyxNote.MOD_CONTROL == event.state: #or JyxNote.MOD_RIGHT_ALT & event.state:
             print('update_text_before:', event.keysym)
             if event.keysym == 'a':
                 self.select_all()
