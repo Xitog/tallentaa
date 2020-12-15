@@ -38,22 +38,10 @@ else:
 
 DEFAULT_CONFIG = """{
     "options": {
-        "tongue": {
-            "value": "en",
-            "msg": "tongue"
-        },
-        "confirm": {
-            "value": false,
-            "msg":"confirm"
-        },
-        "basename": {
-            "value": false,
-            "msg": "basename"
-        },
-        "treeview": {
-            "value": true,
-            "msg": "treeview"
-        }
+        "tongue": "en",
+        "confirm": false,
+        "basename": false,
+        "treeview": true
     },
     "messages": {
         "en" : {
@@ -102,7 +90,12 @@ DEFAULT_CONFIG = """{
             "label": "Plain text",
             "extension": [".txt"],
             "family": "",
-            "support": ""
+            "support": "",
+            "token": [],
+            "style": {
+                "default": {
+                }
+            }
         }
     },
     "default_language" : "text"
@@ -230,7 +223,7 @@ class Jyx:
     def load_icon(self, name: str) -> tk.PhotoImage:
         res = None
         try:
-            res = tk.PhotoImage(file=os.path.join('icons', name))
+            res = tk.PhotoImage(file=os.path.join(os.path.dirname(__file__), 'icons', name))
         except:
             self.log.info(f'Resource {name} could not be found')
         return res
