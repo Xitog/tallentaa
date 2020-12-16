@@ -571,10 +571,15 @@ class JyxTree(ttk.Treeview):
 
     def rebuild(self):
         if self.jyx.notebook.current().lang == 'json':
+            self.delete(*self.get_children())
             try:
                 text = self.jyx.notebook.current().text.get('1.0', tk.END)
                 obj = json.loads(text)
                 print(obj)
+                self.column("#0", stretch=True)
+                self.heading("#0", text="Element", anchor="w")
+                typ = type(obj)
+                self.insert("", 1, "N1", text=typ)
             except ValueError as e:
                 print(e)
 
@@ -995,6 +1000,14 @@ class JyxNote:
 
 #-------------------------------------------------------------------------------
 
+class ParserJSON:
+
+    def __init__(self):
+        pass
+
+    def parse(self, tokens):
+        pass
+
 class LexerJSON:
 
     def __init__(self):
@@ -1004,20 +1017,27 @@ class LexerJSON:
         res = []
         line = 0
         column = 0
+        #print('|' + content + '|')
         while column < len(content):
             c = content[column]
+            #print(column, c)
             if c in ['{', '}', '[', ']', ',', ':']:
                 res.append(Token('separator', c, line, column))
+                if c == ':' and len(res) > 1 and res[-2].kind == 'string':
+                    res[-2].kind = 'key'
             elif c == '"':
                 s = '"'
                 j = column + 1
                 while j < len(content):
                     s += content[j]
                     if content[j] == '"':
-                        break
+                        if j > 1 and content[j-1] == '\\' and content[j-2] == '\\':
+                            break
+                        elif j > 0 and content[j-1] != '\\':
+                            break
                     j += 1
                 res.append(Token('string', s, line, column))
-                column += len(s)
+                column += len(s) - 1
             elif c in ['\\r', '\\n']:
                 if len(content) > i+1 and content[i+1] in ['\\r', '\\n']:
                     res.append(Token, 'newline', content[column, column+1], line, column)
@@ -1034,7 +1054,7 @@ class LexerJSON:
                     s += content[j]
                     j += 1
                 res.append(Token('number', s, line, column))
-                column += len(s)
+                column += len(s) - 1
             elif c.isalpha():
                 s = c
                 j = column + 1
@@ -1045,10 +1065,11 @@ class LexerJSON:
                     j += 1
                     if s in ['false', 'true']:
                         res.append(Token('boolean', s, line, column))
-                column += len(s)
+                column += len(s) - 1
             elif c in [' ', '\t']:
                 pass
             column += 1
+        #print(res)
         return res
 
 LEXERS = {'json': LexerJSON}
@@ -1061,6 +1082,9 @@ class Token:
         self.line = line
         self.column = column
         self.end = self.column + len(self.value)
+
+    def __repr__(self):
+        return f"{self.value}:{self.kind}"
 
     def __str__(self):
         return f"({self.value}:{self.kind}@{self.line,self.column}#{len(self.value)})"

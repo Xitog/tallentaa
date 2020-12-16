@@ -439,13 +439,16 @@
             "style": {
                 "default": {
                     "boolean": {
-                        "color": "orange"
+                        "color": "goldenrod"
                     },
                     "number": {
-                        "color": "red"
+                        "color": "tomato2"
                     },
                     "string": {
-                        "color": "darkgreen"
+                        "color": "sea green"
+                    },
+                    "key": {
+                        "color": "DeepSkyBlue2"
                     }
                 }
             }

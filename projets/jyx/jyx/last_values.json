@@ -1,6 +1,6 @@
 {
     "tongue": "fr",
-    "confirm": true,
+    "confirm": false,
     "basename": true,
     "treeview": true,
     "language": "json"
