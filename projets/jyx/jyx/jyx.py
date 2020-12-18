@@ -256,7 +256,15 @@ class Jyx:
         for key in self.options:
             self.update(key, True)
 
-    def update(self, varname, init=False):
+    def update(self, varname=None, init=False):
+        if varname is None and not init:
+            self.update_title()
+            self.update_status()
+            if self.options['treeview'].get():
+                self.treeview.rebuild()
+            return
+        elif varname is None and init:
+            return
         if varname not in self.options:
             raise Exception(f'Variable unknown: {varname}')
         opt = self.options[varname]
@@ -278,6 +286,7 @@ class Jyx:
             if val:
                 self.treeview.place(relx=0.0, rely =0.0, relwidth =0.2, relheight =1.0)
                 self.notebook.place(relx=0.2, rely =0.0, relwidth =0.8, relheight =1.0)
+                self.treeview.rebuild()
             elif not val:
                 self.treeview.place_forget()
                 self.notebook.place(relx=0.0, rely =0.0, relwidth =1.0, relheight =1.0)
@@ -322,8 +331,6 @@ class Jyx:
 
     def new(self, event=None):
         self.notebook.new_tab()
-        self.update_title()
-        self.update_status()
   
     def save(self, event=None):
         if self.notebook.get_filepath() is None:
@@ -372,6 +379,7 @@ class Jyx:
                 f.close()
             if content is not None:
                 self.notebook.open(filename, content)
+                self.treeview.rebuild()
 
     def run(self, event=None):
         lang = self.notebook.current().lang
@@ -570,16 +578,42 @@ class JyxTree(ttk.Treeview):
         self.jyx = jyx
 
     def rebuild(self):
+        self.delete(*self.get_children())
         if self.jyx.notebook.current().lang == 'json':
-            self.delete(*self.get_children())
             try:
                 text = self.jyx.notebook.current().text.get('1.0', tk.END)
                 obj = json.loads(text)
-                print(obj)
+                #print(obj)
                 self.column("#0", stretch=True)
                 self.heading("#0", text="Element", anchor="w")
-                typ = type(obj)
-                self.insert("", 1, "N1", text=typ)
+                def explore(parent, counter, obj, k=None):
+                    counter += 1
+                    typ = type(obj)
+                    if typ == bool:
+                        msg = 'true' if obj else 'false'
+                    elif typ in [int, float]:
+                        msg = str(obj)
+                    elif typ == str:
+                        msg = obj
+                    elif typ == list:
+                        msg = "[]"
+                    elif typ == dict:
+                        msg = "{}"
+                    else:
+                        raise Exception(f"Type not known: {typ}")
+                    identifier = f"Item_{counter}"
+                    if k is not None:
+                        msg = f"{k} : {msg}"
+                    #print('Inserting:', identifier, msg)
+                    self.insert(parent, counter, identifier, text=msg)
+                    if typ == list:
+                        for k, v in enumerate(obj):
+                            counter = explore(identifier, counter, v, k)
+                    elif typ == dict:
+                        for k, v in obj.items():
+                            counter = explore(identifier, counter, v, k)
+                    return counter
+                explore("", 0, obj)
             except ValueError as e:
                 print(e)
 
@@ -595,7 +629,7 @@ class JyxNotebook(ttk.Notebook):
         self.grid_columnconfigure(0, weight=1)
 
         self.notes = []
-        self.new_tab()
+        self.new_tab(init=True)
         self.pack(fill=tk.BOTH, expand=tk.YES)
         self.bind('<<NotebookTabChanged>>', self.on_tab_change)
         self.current().focus()
@@ -605,7 +639,7 @@ class JyxNotebook(ttk.Notebook):
             if self.notes[i].filepath is None:
                 self.notes[i].update_title()
 
-    def new_tab(self, lang=None):
+    def new_tab(self, lang=None, init=False):
         if lang is None: lang = self.jyx.data['default_language']
         jn = JyxNote(self, lang)
         self.add(jn.frame, text=self.jyx.data['menu'][self.jyx.options['tongue'].get()]['new'])
@@ -615,19 +649,18 @@ class JyxNotebook(ttk.Notebook):
         jn.focus()
         if self.index("end") > 1:
             self.jyx.menu.file_menu.entryconfig(Jyx.CLOSE_TAB, state=tk.ACTIVE)
+        self.jyx.update(init=init)
         return jn.index
 
     def close_tab(self):
         self.forget(self.index("current"))
         if self.index("end") == 1:
             self.jyx.menu.file_menu.entryconfig(Jyx.CLOSE_TAB, state=tk.DISABLED)
-        self.jyx.update_title()
-        self.jyx.update_status()
+        self.jyx.update()
 
     def on_tab_change(self, event):
         self.jyx.options['language'].var.set(self.current().lang)
-        self.jyx.update_title()
-        self.jyx.update_status()
+        self.jyx.update()
         
     def current(self):
         return self.notes[self.index("current")]
@@ -737,7 +770,7 @@ class JyxNote:
         else:
             file = os.path.basename(self.filepath)
         self.notebook.tab(self.index, text=f"{file}{dirty}")
-        self.notebook.jyx.update_title()
+        self.notebook.jyx.update()
 
     def change_lang(self, lang, init=False):
         if not init:
