@@ -64,6 +64,8 @@ Les fichiers sont encodés en ASCII.
 27 en tout.
 const, var, if, then, elif, else, end, while, do, for, in, break, next, and, or, not, fun, pro, function, procedure, return, self, super, nil, false, true, require
 
+Délimiteurs : ( ) [ ] { } ; ,
+
 ALT : remove const, var => 25
 
 2. Types de base
@@ -143,6 +145,7 @@ On n'oblige pas dans le for à mettre var.
 On peut "étiquetter" une boucle pour ensuite breaké ou nexté celle-ci.
 Un label est défini ainsi :label:
 :innerloop: for x in l do (comme Lua, JavaScript et C utilisent innerloop:)
+ou ainsi <label>
 
 EXT :   repeat
             ACT
@@ -152,7 +155,8 @@ ALT : else if, elseif, elsif
 EXT : switch : switch / case / default / break ou case / when / others / break
 EXT : redo, retry dans les boucles
 EXT : one liner : ... if COND ou if COND => ... avec else possible et while COND =>
-EXT :case expr when expr [then] ... else ... end
+EXT : case expr when expr [then] ... else ... end
+EXT : do ... next cond
 
 4.B Modificateurs
 -----------------
@@ -163,11 +167,13 @@ next [label]
 5. Opérateurs
 =============
 
-Mathématiques   + - * / ** // %
-Booléens        and or xor not
-Comparaison     == != < <= >= >
-Objet           is in $ (conv en string/str) # (conv en int length/len/trunc)
-Range           ..
+Mathématiques           + - * / ** // %
+Booléens et binaires    and or xor not
+Binaires                << >>
+Comparaison             == != < <= >= >
+Objet                   is in $ (conv en string/str) # (conv en int length/len/trunc) .
+Range                   ..
+Assignation             = += -= *= /= **= //= %= and= or= xor= not= <<= >>=
 
 Les chaînes d'affilées se concatènent automatiquement, comme en Ruby.
 
@@ -186,6 +192,7 @@ ALT : Définir l'interrogation de définition : defined? (en méthode) non car o
 
 fun[ction] [id] (a : typ, b : typ -> typ[, typ]*)
 pro[cedure] [id] (a : typ, b : typ)
+sig[nature] [id] (a : typ, b : typ -> (typ[, typ]*) | nil)
 call without parameter id
 return [expr]
 
@@ -509,3 +516,24 @@ var p = Personne.new() # alias sur clone
 p.birthday
 writeln(p.age) # 6
 
+13. Nodes
+---------
+
+8 octobre 2020 :
+
+binop (Operand, Operator, Operand)
+unaop (Node, Operand)
+list (Node*)
+if (Condition, Action, Else)
+while (Condition, Action)
+for (VarList, ExprList, Action)
+break (label)
+next (label)
+return (ExprList)
+fun (ParList, OutList, Action)
+pro (ParList, Action)
+assign (IdList, Operator, ExprList)
+parameter (identifier, type, litt)
+raise (Expr)
+try (Action, whenList, finalAction)
+whenList (identifier, type, action)
