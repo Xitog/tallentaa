@@ -167,18 +167,27 @@ class Jyx:
     RUN_COMMAND = 6
     CLOSE_TAB = 8
     CONFIG_FILE_NAME = 'jyx.json'
+    LAST_VALUES = 'last_values.json'
     VERSION = '0.0.1'
     
     def __init__(self):
         self.log = Logger(exit_on_error=False, info=Output.CONSOLE, warn=Output.POPUP, error=Output.POPUP)
-        # Load data
+        # Path
+        home = os.path.expanduser("~")
+        self.jyx_dir = os.path.join(home, '.jyx')
+        if not os.path.isdir(self.jyx_dir):
+            os.mkdir(self.jyx_dir)
+        # Load base data (in same dir than jyx.py or we create one in jyx_dir)
         try:
             f = open(Jyx.CONFIG_FILE_NAME, 'r', encoding='utf8')
         except FileNotFoundError:
-            f = open(Jyx.CONFIG_FILE_NAME, 'w', encoding='utf8')
-            f.write(DEFAULT_CONFIG)
-            f.close()
-            f = open(Jyx.CONFIG_FILE_NAME, 'r', encoding='utf8')
+            try:
+                f = open(os.path.join(self.jyx_dir, Jyx.CONFIG_FILE_NAME), 'r', encoding='utf8')
+            except FileNotFoundError:
+                f = open(os.path.join(self.jyx_dir, Jyx.CONFIG_FILE_NAME), 'w', encoding='utf8')
+                f.write(DEFAULT_CONFIG)
+                f.close()
+                f = open(os.path.join(self.jyx_dir, Jyx.CONFIG_FILE_NAME), 'r', encoding='utf8')
         self.data = json.load(f)
         f.close()
         # Init
@@ -193,11 +202,12 @@ class Jyx:
         self.fonts['COURRIER_NEW_10'] = font.Font(family='Courier New', size=10)
         self.fonts['COURRIER_NEW_10_BOLD'] = font.Font(family='Courier New', size=10, weight='bold')
         # Options
-        if os.path.exists('last_values.json'):
+        try:
+            file = open(os.path.join(self.jyx_dir, Jyx.LAST_VALUES), mode='r')
             self.log.info('Last values file for options found.')
-            file = open('last_values.json', mode='r')
-            last_values = json.load(file)
-        else:
+            last_values = json.load(file)         
+            file.close()
+        except:
             last_values = {}
         self.options = {}
         for opt, val in self.data['options'].items():
@@ -205,6 +215,10 @@ class Jyx:
                 val = last_values[opt]
             self.options[opt] = JyxOption(opt, val)
         self.options['language'] = JyxOption('language', self.data['default_language'])
+        # Option if we recreate a jyx.json, there is only 'en' inside
+        if self.options['tongue'].get() not in self.data['menu']:
+            self.options['tongue'].var.set('en')
+            self.update('tongue', init=True)
         # UI components
         self.notebook = JyxNotebook(self)
         self.treeview = JyxTree(self)
@@ -323,8 +337,8 @@ class Jyx:
             simple_opt = {}
             for opt, val in self.options.items():
                 simple_opt[opt] = val.var.get()
-            file = open('last_values.json', mode='w', encoding='utf8')
-            json.dump(simple_opt, file, indent='    ')
+            file = open(os.path.join(self.jyx_dir, Jyx.LAST_VALUES), mode='w', encoding='utf8')
+            json.dump(simple_opt, file, indent=' ' * 4)
             file.close()
             self.root.after_cancel(self.after_id)
             self.root.destroy()
