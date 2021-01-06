@@ -103,7 +103,11 @@ def int_flt(op, res, v1, v2):
         return AshInteger
     else:
         raise Exception(f'[ERROR] Interpreter: Operator {op} not known')
-    
+
+#-------------------------------------------------------------------------------
+# Integer
+#-------------------------------------------------------------------------------
+
 AshInteger = AshClass('Integer')
 
 def ari_add(a1, a2):
@@ -166,6 +170,12 @@ AshInteger.instance_methods['>'] = ari_cmp_gt
 AshInteger.instance_methods['!='] = ari_cmp_dif
 AshInteger.instance_methods['unary-'] = ari_unary_minus
 
+#-------------------------------------------------------------------------------
+# Boolean
+#-------------------------------------------------------------------------------
+
+AshBoolean = AshClass('Boolean')
+
 def boo_and(b1, b2):
     return AshObject(AshBoolean, val=b1.val and b2.val)
 def boo_or(b1, b2):
@@ -173,11 +183,13 @@ def boo_or(b1, b2):
 def boo_not(b):
     return AshObject(AshBoolean, val=not b.val)
 
-AshBoolean = AshClass('Boolean')
-
 AshBoolean.instance_methods['and'] = boo_and
 AshBoolean.instance_methods['or'] = boo_or
 AshBoolean.instance_methods['not'] = boo_not
+
+#-------------------------------------------------------------------------------
+# Float
+#-------------------------------------------------------------------------------
 
 AshFloat = AshClass('Float')
 
@@ -197,9 +209,28 @@ AshFloat.instance_methods['>='] = ari_cmp_ge
 AshFloat.instance_methods['>'] = ari_cmp_gt
 AshFloat.instance_methods['!='] = ari_cmp_dif
 
+#-------------------------------------------------------------------------------
+# String
+#-------------------------------------------------------------------------------
+
 AshString = AshClass('String')
 
+def str_add(s1, s2):
+    return AshObject(AshString, val=s1.val + s2.val)
+def str_mul(s1, a1):
+    return AshObject(AshString, val=s1.val * a1.val)
+def str_sub(s1, s2):
+    return AshObject(AshString, val=s1.val.replace(s2.val, ""))
+
+AshString.instance_methods['+'] = str_add
+AshString.instance_methods['*'] = str_mul
+AshString.instance_methods['-'] = str_sub
+
+#-------------------------------------------------------------------------------
+
 AshModule = AshClass('Module')
+
+#-------------------------------------------------------------------------------
 
 AshModuleSDL = AshObject(cls=AshModule)
 
@@ -356,7 +387,7 @@ class Interpreter:
             elif elem.content.typ == Token.Boolean:
                 return AshObject(AshBoolean, val=elem.content.val == "true")
             elif elem.content.typ == Token.String:
-                return elem.content.val
+                return AshObject(AshString, val=elem.content.val)
             elif elem.content.typ == Token.Identifier:
                 if affectation == True:
                     return elem.content.val
