@@ -577,47 +577,29 @@ class JyxTree(ttk.Treeview):
         ttk.Treeview.__init__(self, jyx.get_root())
         self.jyx = jyx
 
+    def explore(self, parent, counter, node):
+        counter += 1
+        identifier = f"Item_{counter}"
+        self.insert(parent, counter, identifier, text=str(node))
+        if len(node.children) > 0:
+            for n in node:
+                counter = self.explore(identifier, counter, n)
+        return counter
+
     def rebuild(self):
         self.delete(*self.get_children())
-        if self.jyx.notebook.current().lang == 'json':
-            try:
-                text = self.jyx.notebook.current().text.get('1.0', tk.END)
-                obj = json.loads(text)
-                #print(obj)
+        try:
+            lang = self.jyx.notebook.current().lang
+            text = self.jyx.notebook.current().text.get('1.0', tk.END)
+            if lang in PARSERS:
+                ast = PARSERS[lang]().parse(text)
                 self.column("#0", stretch=True)
                 self.heading("#0", text="Element", anchor="w")
-                def explore(parent, counter, obj, k=None):
-                    counter += 1
-                    typ = type(obj)
-                    if typ == bool:
-                        msg = 'true' if obj else 'false'
-                    elif typ in [int, float]:
-                        msg = str(obj)
-                    elif typ == str:
-                        msg = obj
-                    elif typ == list:
-                        msg = "[]"
-                    elif typ == dict:
-                        msg = "{}"
-                    else:
-                        raise Exception(f"Type not known: {typ}")
-                    identifier = f"Item_{counter}"
-                    if k is not None:
-                        msg = f"{k} : {msg}"
-                    #print('Inserting:', identifier, msg)
-                    self.insert(parent, counter, identifier, text=msg)
-                    if typ == list:
-                        for k, v in enumerate(obj):
-                            counter = explore(identifier, counter, v, k)
-                    elif typ == dict:
-                        for k, v in obj.items():
-                            counter = explore(identifier, counter, v, k)
-                    return counter
-                explore("", 0, obj)
-            except ValueError as e:
-                print(e)
+                self.explore("", 0, ast)
+        except ValueError as e:
+            print(e)
 
-    
+
 class JyxNotebook(ttk.Notebook):
 
     def __init__(self, jyx):
@@ -1038,8 +1020,69 @@ class ParserJSON:
     def __init__(self):
         pass
 
-    def parse(self, tokens):
-        pass
+    def parse(self, content):
+        data = json.loads(content)
+        root = self._parse(data)
+        return root
+
+    def _parse(self, obj, key=None):
+        kind = type(obj)
+        if kind == bool:
+            typ = 'boolean'
+            msg = 'true' if obj else 'false'
+        elif kind in [int, float]:
+            typ = 'number'
+            msg = str(obj)
+        elif kind == str:
+            typ = 'string'
+            msg = obj
+        elif kind == list:
+            typ = 'array'
+            msg = "[]"
+        elif kind == dict:
+            typ = 'object'
+            msg = "{}"
+        else:
+            raise Exception(f"Type not known: {typ}")
+        if key is not None:
+            msg = f"{key} : {msg}"
+        n = Node(typ, obj, msg)
+        if kind == list:
+            for k, v in enumerate(obj):
+                n.children.append(self._parse(v, k))
+        elif kind == dict:
+            for k, v in obj.items():
+                n.children.append(self._parse(v, k))
+        return n
+
+
+class NodeIterator:
+
+    def __init__(self, obj):
+        self.obj = obj
+        self.count = -1
+
+    def __next__(self):
+        self.count += 1
+        if self.count >= len(self.obj.children):
+            raise StopIteration
+        return self.obj.children[self.count]
+
+
+class Node:
+
+    def __init__(self, typ, value, msg):
+        self.typ = typ
+        self.value = value
+        self.msg = msg
+        self.children = []
+
+    def __str__(self):
+        return self.msg
+
+    def __iter__(self):
+        return NodeIterator(self)
+
 
 class LexerJSON:
 
@@ -1105,8 +1148,6 @@ class LexerJSON:
         #print(res)
         return res
 
-LEXERS = {'json': LexerJSON}
-
 class Token:
 
     def __init__(self, kind, value, line, column):
@@ -1121,6 +1162,9 @@ class Token:
 
     def __str__(self):
         return f"({self.value}:{self.kind}@{self.line,self.column}#{len(self.value)})"
+
+LEXERS = {'json': LexerJSON}
+PARSERS = {'json': ParserJSON}
 
 #-------------------------------------------------------------------------------
 
