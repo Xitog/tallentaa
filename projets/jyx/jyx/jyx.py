@@ -576,11 +576,19 @@ class JyxTree(ttk.Treeview):
     def __init__(self, jyx):
         ttk.Treeview.__init__(self, jyx.get_root())
         self.jyx = jyx
+        self.links = {}
+        self.bind('<Button-1>', self.selection)
+
+    def selection(self, event):
+        current = self.identify('item', event.x, event.y)
+        print('Node:', self.links[current])
+        print(self.item(current))
 
     def explore(self, parent, counter, node):
         counter += 1
         identifier = f"Item_{counter}"
         self.insert(parent, counter, identifier, text=str(node))
+        self.links[identifier] = node
         if len(node.children) > 0:
             for n in node:
                 counter = self.explore(identifier, counter, n)
@@ -588,6 +596,7 @@ class JyxTree(ttk.Treeview):
 
     def rebuild(self):
         self.delete(*self.get_children())
+        self.links = {}
         try:
             lang = self.jyx.notebook.current().lang
             text = self.jyx.notebook.current().text.get('1.0', tk.END)
@@ -597,7 +606,7 @@ class JyxTree(ttk.Treeview):
                 self.heading("#0", text="Element", anchor="w")
                 self.explore("", 0, ast)
         except ValueError as e:
-            print(e)
+            print('Error on parsing:', e)
 
 
 class JyxNotebook(ttk.Notebook):
@@ -781,7 +790,7 @@ class JyxNote:
         if filename is None:
             filename = self.get_filepath()
         f = open(filename, mode='w', encoding='utf8')
-        content = self.text.get(1.0, tk.END)
+        content = self.text.get('1.0', tk.END)
         f.write(content)
         f.close()
         if not raw: # skip updating the state if it is a "raw" save for executing file without to have to save it first
@@ -790,7 +799,7 @@ class JyxNote:
             self.update_title()
     
     def load(self, filename, content):
-        self.clear()
+        self.text.delete('1.0', tk.END)
         self.text.insert('1.0', content)
         self.text.edit_reset()
         self.dirty = False
