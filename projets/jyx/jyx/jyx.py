@@ -10,27 +10,15 @@ from tkinter import messagebox
 from tkinter import filedialog
 from tkinter import font
 
-import json # for loading/saving options
+import json                   # for loading/saving options
 from datetime import datetime # for now()
-import os # for getcwd()
-import os.path # for basename()
-from enum import Enum
-import subprocess # for run
-import stat # for run
-import re
-from typing import Dict # not used
-import platform # just for knowing where we are in handling of ctrl
-
-# Tokenizer
-import sys
-sys.coinit_flags = 2 
-try:
-    sys.path.append('../../projets/ash')
-    from ashlang import Tokenizer, Token
-except ModuleNotFoundError:
-    ASH_TOKENIZER = False
-else:
-    ASH_TOKENIZER = True
+import os                     # for getcwd()
+import os.path                # for basename()
+from enum import Enum         # for our Logger
+import subprocess             # for run
+import stat                   # for run
+import platform               # for knowing where we are in handling of ctrl
+from collections import deque # for parsing
 
 #
 # Globals and constants
@@ -488,37 +476,50 @@ class JyxMenu(tk.Menu):
         
         self.file_menu = tk.Menu(self, tearoff=0)
         self.add_cascade(label=data['menu'][tongue]['file'], menu=self.file_menu)
-        self.file_menu.add_command(label=data['menu'][tongue]['new'], command=self.jyx.new,
+        self.file_menu.add_command(label=data['menu'][tongue]['new'],
+                                   command=self.jyx.new,
                                    accelerator="Ctrl+N")
-        self.file_menu.add_command(label=data['menu'][tongue]['open'], command=self.jyx.open,
+        self.file_menu.add_command(label=data['menu'][tongue]['open'],
+                                   command=self.jyx.open,
                                    accelerator="Ctrl+O")
-        self.file_menu.add_command(label=data['menu'][tongue]['save'], command=self.jyx.save,
+        self.file_menu.add_command(label=data['menu'][tongue]['save'],
+                                   command=self.jyx.save,
                                    accelerator="Ctrl+S")
-        self.file_menu.add_command(label=data['menu'][tongue]['save as'], command=self.jyx.save_as,
+        self.file_menu.add_command(label=data['menu'][tongue]['save as'],
+                                   command=self.jyx.save_as,
                                    accelerator="Ctrl+Shift+S")
-        self.file_menu.add_command(label=data['menu'][tongue]['save all'], command=self.jyx.save,
+        self.file_menu.add_command(label=data['menu'][tongue]['save all'],
+                                   command=self.jyx.save,
                                    accelerator="Ctrl+Alt+S")
         self.file_menu.add_separator()
-        self.file_menu.add_command(label=data['menu'][tongue]['run'], command=self.jyx.run,
+        self.file_menu.add_command(label=data['menu'][tongue]['run'],
+                                   command=self.jyx.run,
                                    accelerator="F5")
         self.file_menu.add_separator()
-        self.file_menu.add_command(label=data['menu'][tongue]['close tab'], command=self.jyx.notebook.close_tab,
+        self.file_menu.add_command(label=data['menu'][tongue]['close tab'],
+                                   command=self.jyx.notebook.close_tab,
                                    accelerator="Ctrl+X", state=tk.DISABLED)
-        self.file_menu.add_command(label=data['menu'][tongue]['exit'], command=self.jyx.exit,
+        self.file_menu.add_command(label=data['menu'][tongue]['exit'],
+                                   command=self.jyx.exit,
                                    accelerator="Ctrl+Q")
 
         self.edit_menu = tk.Menu(self, tearoff=0)
         self.add_cascade(label=data['menu'][tongue]['edit'], menu=self.edit_menu)
-        self.edit_menu.add_command(label=data['menu'][tongue]['undo'], command=lambda: self.jyx.notebook.send('undo'),
+        self.edit_menu.add_command(label=data['menu'][tongue]['undo'],
+                                   command=lambda: self.jyx.notebook.send('undo'),
                                    accelerator="Ctrl+Z")
-        self.edit_menu.add_command(label=data['menu'][tongue]['redo'], command=lambda: self.jyx.notebook.send('redo'),
+        self.edit_menu.add_command(label=data['menu'][tongue]['redo'],
+                                   command=lambda: self.jyx.notebook.send('redo'),
                                    accelerator="Ctrl+Y")
         self.edit_menu.add_separator()
-        self.edit_menu.add_command(label=data['menu'][tongue]['cut'], command=lambda: self.jyx.notebook.send('cut'),
+        self.edit_menu.add_command(label=data['menu'][tongue]['cut'],
+                                   command=lambda: self.jyx.notebook.send('cut'),
                                    accelerator="Ctrl+X")
-        self.edit_menu.add_command(label=data['menu'][tongue]['copy'], command=lambda: self.jyx.notebook.send('copy'),
+        self.edit_menu.add_command(label=data['menu'][tongue]['copy'],
+                                   command=lambda: self.jyx.notebook.send('copy'),
                                    accelerator="Ctrl+C")
-        self.edit_menu.add_command(label=data['menu'][tongue]['paste'], command=lambda: self.jyx.notebook.send('paste'),
+        self.edit_menu.add_command(label=data['menu'][tongue]['paste'],
+                                   command=lambda: self.jyx.notebook.send('paste'),
                                    accelerator="Ctrl+V")
         self.edit_menu.add_command(label=data['menu'][tongue]['select all'],
                                    command=lambda: self.jyx.notebook.send('select all'),
@@ -537,13 +538,16 @@ class JyxMenu(tk.Menu):
                                             variable=self.jyx.options['tongue'].var,
                                             value=tong,
                                             command=lambda: self.jyx.update('tongue'))
-        self.options_menu.add_checkbutton(label=data['menu'][tongue]['confirm'], onvalue=True, offvalue=False,
+        self.options_menu.add_checkbutton(label=data['menu'][tongue]['confirm'],
+                                          onvalue=True, offvalue=False,
                                           variable=self.jyx.options['confirm'].var,
                                           command=lambda: self.jyx.update('confirm'))
-        self.options_menu.add_checkbutton(label=data['menu'][tongue]['basename'], onvalue=True, offvalue=False,
+        self.options_menu.add_checkbutton(label=data['menu'][tongue]['basename'],
+                                          onvalue=True, offvalue=False,
                                           variable=self.jyx.options['basename'].var,
                                           command=lambda: self.jyx.update('basename'))
-        self.options_menu.add_checkbutton(label=data['menu'][tongue]['treeview'], onvalue=True, offvalue=False,
+        self.options_menu.add_checkbutton(label=data['menu'][tongue]['treeview'],
+                                          onvalue=True, offvalue=False,
                                           variable=self.jyx.options['treeview'].var,
                                           command=lambda: self.jyx.update('treeview'))
         
@@ -595,17 +599,19 @@ class JyxTree(ttk.Treeview):
 
     def selection(self, event):
         current = self.identify('item', event.x, event.y)
-        print('Node:', self.links[current])
-        print(self.item(current))
+        at = self.links[current].at
+        #print('Node :', self.links[current], '@', at)
+        self.jyx.notebook.current().text.see("1.0+%d chars" % (at,))
+        #print('Node:', self.links[current])
+        #print(self.item(current))
 
     def explore(self, parent, counter, node):
         counter += 1
         identifier = f"Item_{counter}"
         self.insert(parent, counter, identifier, text=str(node))
         self.links[identifier] = node
-        if len(node.children) > 0:
-            for n in node:
-                counter = self.explore(identifier, counter, n)
+        for n in node.get_children():
+            counter = self.explore(identifier, counter, n)
         return counter
 
     def rebuild(self):
@@ -1032,7 +1038,7 @@ class JyxNote:
         content = self.text.get(start, end)
         res = LEXERS[self.lang]().lex(content)
         for t in res:
-            t_start = self.text.index("%s+%d chars" % (start, t.column))
+            t_start = self.text.index("%s+%d chars" % (start, t.index))
             t_end = self.text.index("%s+%d chars" % (start, t.end))
             self.text.tag_add(t.kind, t_start, t_end)
 
@@ -1044,39 +1050,80 @@ class ParserJSON:
         pass
 
     def parse(self, content):
-        data = json.loads(content)
-        root = self._parse(data)
-        return root
+        tokens = LexerJSON().lex(content, ['newline'])
+        return self.read(deque(tokens))
 
-    def _parse(self, obj, key=None):
-        kind = type(obj)
-        if kind == bool:
-            typ = 'boolean'
-            msg = 'true' if obj else 'false'
-        elif kind in [int, float]:
-            typ = 'number'
-            msg = str(obj)
-        elif kind == str:
-            typ = 'string'
-            msg = obj
-        elif kind == list:
-            typ = 'array'
-            msg = "[]"
-        elif kind == dict:
-            typ = 'object'
-            msg = "{}"
+    def read(self, tokens):
+        #print('read', tokens[0], len(tokens))
+        token = tokens[0]
+        if token.kind == 'separator' and token.value == '{':
+            return self.read_object(tokens)
+        elif token.kind == 'separator' and token.value == '[':
+            return self.read_array(tokens)
         else:
-            raise Exception(f"Type not known: {typ}")
-        if key is not None:
-            msg = f"{key} : {msg}"
-        n = Node(typ, obj, msg)
-        if kind == list:
-            for k, v in enumerate(obj):
-                n.children.append(self._parse(v, k))
-        elif kind == dict:
-            for k, v in obj.items():
-                n.children.append(self._parse(v, k))
-        return n
+            return self.read_terminal(tokens)
+
+    def read_object(self, tokens):
+        #print('read_object', tokens[0], len(tokens))
+        at = tokens[0].index
+        tokens.popleft()
+        elements = self.read_keyvalue(tokens)
+        return ListNode(at, elements, '{}')
+
+    def read_keyvalue(self, tokens):
+        #print('read_keyvalue', tokens[0], len(tokens))
+        if len(tokens) == 0:
+            raise Exception('Malformed object literal: unfinished')
+        token = tokens[0]
+        if token.kind == 'separator' and token.value == '}':
+            tokens.popleft()
+            return []
+        elif token.kind == 'separator' and token.value == ',':
+            tokens.popleft()
+            token = tokens[0]
+        if token.kind != 'key':
+            raise Exception('Malformed object literal on token: ' + str(token) + ' -> not a key')
+        if len(tokens) < 2:
+                raise Exception('Malformed object literal on token: ' + str(token) + ' -> key without :')
+        if len(tokens) < 3:
+                raise Exception('Malformed object literal on token: ' + str(token) + ' -> key without value')
+        tokens.popleft()
+        tokens.popleft()
+        n = KeyValueElementNode(token.index, token.value, self.read(tokens))
+        return [n] + self.read_keyvalue(tokens)
+
+    def read_array(self, tokens):
+        #print('read_array', tokens[0], len(tokens))
+        at = tokens[0].index
+        tokens.popleft()
+        elements = self.read_item(tokens)
+        return ListNode(at, elements, '[]')
+
+    def read_item(self, tokens):
+        #print('read_item', tokens[0], len(tokens))
+        if len(tokens) == 0:
+            raise Exception('Malformed array literal: unfinished')
+        token = tokens[0]
+        if token.kind == 'separator' and token.value == ']':
+            tokens.popleft()
+            return []
+        elif token.kind == 'separator' and token.value == ',':
+            tokens.popleft()
+        n = self.read(tokens)
+        return [n] + self.read_item(tokens)
+
+    def read_terminal(self, tokens):
+        #print('read_terminal', tokens[0], len(tokens))
+        token = tokens[0]
+        tokens.popleft()
+        if token.kind == 'string':
+            return LiteralNode(token.index, token.kind, token.value)
+        elif token.kind == 'number':
+            return LiteralNode(token.index, token.kind, token.value)
+        elif token.kind == 'boolean':
+            return LiteralNode(token.index, token.kind, token.value)
+        else:
+            raise Exception("Kind not known: " + str(token.kind))   
 
 
 class NodeIterator:
@@ -1094,11 +1141,12 @@ class NodeIterator:
 
 class Node:
 
-    def __init__(self, typ, value, msg):
-        self.typ = typ
-        self.value = value
+    def __init__(self, msg, at):
         self.msg = msg
-        self.children = []
+        self.at = at
+
+    def __repr__(self):
+        return self.msg
 
     def __str__(self):
         return self.msg
@@ -1106,27 +1154,108 @@ class Node:
     def __iter__(self):
         return NodeIterator(self)
 
+    def explore(self, lvl=0):
+        print(f"{'    ' * lvl}{self.msg}")
+
+    def get_children(self):
+        return []
+
+
+class IfNode(Node):
+
+    def __init__(self, at, condition, if_true, if_false):
+        Node.__init__(self, 'if', at)
+        self.condition = condition
+        self.if_true = if_true
+        self.if_false = if_false
+        self.at = at
+
+
+class WhileNode(Node):
+
+    def __init__(self, at, condition, action):
+        Node.__init__(self, 'while', at)
+        self.condition = condition
+        self.action = action
+        self.at = at
+
+
+class LiteralNode(Node):
+
+    def __init__(self, at, kind, value):
+        Node.__init__(self, f'{value} : {kind}', at)
+        self.kind = kind
+        self.value = value
+        self.at = at
+
+
+class ListNode(Node):
+
+    def __init__(self, at, elements, kind=None):
+        if kind is not None:
+            msg = kind
+        elif len(elements) > 0 and type(elements[0]) == KeyValueElementNode:
+            msg = 'dict'
+        else:
+            msg = 'list'
+        Node.__init__(self, msg, at)
+        self.children = elements
+
+    def explore(self, lvl=0):
+        Node.explore(self, lvl)
+        for c in self.children:
+            c.explore(lvl + 1)
+
+    def get_children(self):
+        return self.children
+
+
+class KeyValueElementNode(Node):
+
+    def __init__(self, at, key, value):
+        Node.__init__(self, 'key-value', at)
+        self.key = key
+        self.value = value
+
+    def __str__(self):
+        return f"{self.key} : {self.value.msg}"
+
+    def explore(self, lvl=0):
+        Node.explore(self, lvl)
+        print(f"{'    ' * (lvl + 1)}{self.key}")
+        self.value.explore(lvl + 1)
+
+    def get_children(self):
+        # We skip the {} step in order to present directly the elements of {}
+        if type(self.value) == ListNode:
+            return self.value.get_children()
+        elif type(self.value) == LiteralNode:
+            return [] # no more dispay
+        else:
+            return [self.value]
+
+#-------------------------------------------------------------------------------
 
 class LexerJSON:
 
     def __init__(self):
         pass
 
-    def lex(self, content):
+    def lex(self, content, discard=None):
         res = []
         line = 0
-        column = 0
+        index = 0
+        discard = discard if discard is not None else []
         #print('|' + content + '|')
-        while column < len(content):
-            c = content[column]
-            #print(column, c)
+        while index < len(content):
+            c = content[index]
             if c in ['{', '}', '[', ']', ',', ':']:
-                res.append(Token('separator', c, line, column))
+                res.append(Token('separator', c, line, index))
                 if c == ':' and len(res) > 1 and res[-2].kind == 'string':
                     res[-2].kind = 'key'
             elif c == '"':
                 s = '"'
-                j = column + 1
+                j = index + 1
                 while j < len(content):
                     s += content[j]
                     if content[j] == '"':
@@ -1135,90 +1264,64 @@ class LexerJSON:
                         elif j > 0 and content[j-1] != '\\':
                             break
                     j += 1
-                res.append(Token('string', s, line, column))
-                column += len(s) - 1
+                res.append(Token('string', s, line, index))
+                index += len(s) - 1
             elif c in ['\\r', '\\n']:
                 if len(content) > i+1 and content[i+1] in ['\\r', '\\n']:
-                    res.append(Token, 'newline', content[column, column+1], line, column)
-                    column += 1
+                    if 'newline' not in discard:
+                        res.append(Token, 'newline', content[index, index+1], line, index)
+                    index += 1
                 else:
-                    res.append(Token, 'newline', s, line, column)
+                    if 'newline' not in discard:
+                        res.append(Token, 'newline', s, line, index)
                 line += 1
             elif c in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
                 s = c
-                j = column + 1
+                j = index + 1
                 while j < len(content):
                     if content[j] not in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
                         break
                     s += content[j]
                     j += 1
-                res.append(Token('number', s, line, column))
-                column += len(s) - 1
+                res.append(Token('number', s, line, index))
+                index += len(s) - 1
             elif c.isalpha():
                 s = c
-                j = column + 1
+                j = index + 1
                 while j < len(content):
                     if not content[j].isalpha() and c not in ['_']:
                         break
                     s += content[j]
                     j += 1
                     if s in ['false', 'true']:
-                        res.append(Token('boolean', s, line, column))
-                column += len(s) - 1
+                        res.append(Token('boolean', s, line, index))
+                index += len(s) - 1
             elif c in [' ', '\t']:
                 pass
-            column += 1
-        #print(res)
+            index += 1
         return res
 
 class Token:
 
-    def __init__(self, kind, value, line, column):
+    def __init__(self, kind, value, line, index):
         self.kind = kind
         self.value = value
         self.line = line
-        self.column = column
-        self.end = self.column + len(self.value)
+        self.index = index
+        self.end = self.index + len(self.value)
 
     def __repr__(self):
         return f"{self.value}:{self.kind}"
 
     def __str__(self):
-        return f"({self.value}:{self.kind}@{self.line,self.column}#{len(self.value)})"
+        return f"({self.value}:{self.kind}@{self.line,self.index}#{len(self.value)})"
 
 LEXERS = {'json': LexerJSON}
 PARSERS = {'json': ParserJSON}
 
-#-------------------------------------------------------------------------------
+#
+# Main
+#
 
 if __name__ == '__main__':
     Jyx()
-
-##        #self.treeview["columns"] = ("text",)
-##        self.treeview.column("#0", width=120)
-##        self.treeview.heading("#0", text="Nodes")
-##        #self.treeview.column("text", width=80)
-##        #self.treeview.heading("text", text="Tag")
-##        self.treeview.insert("", 0, text="First entry")
-##        if self.app.rc.found('Crystal_Clear_device_blockdevice16'):
-##            self.treeview.insert("", 1, text=" Second entry", image=self.app.rc.get_as_image('Crystal_Clear_device_blockdevice16'))
-##        else:
-##            self.treeview.insert("", 1, text=" Second entry")
-##        if self.app.rc.found('IconYellowCube16x19'):
-##            sub1 = self.treeview.insert("", 2, text=" Third entry", image=self.app.rc.get_as_image('IconYellowCube16x19'))
-##        else:
-##            sub1 = self.treeview.insert("", 2, text=" Third entry")
-##        if self.app.rc.found('IconBlueCube16x19'):
-##            self.treeview.insert(sub1, 0, text=" 2-1 Entry", image=self.app.rc.get_as_image('IconBlueCube16x19'))
-##        else:
-##            self.treeview.insert(sub1, 0, text=" 2-1 Entry")
-##        if self.app.rc.found('IconMagentaCube16x19'):
-##            self.treeview.insert(sub1, 1, text=" 2-2 Entry", image=self.app.rc.get_as_image('IconMagentaCube16x19'))
-##        else:
-##            self.treeview.insert(sub1, 1, text=" 2-2 Entry")
-##        # or
-##        self.treeview.insert("", 3, "sub2", text="Fourth entry")
-##        if self.app.rc.found('IconYellowCube16x19'):
-##            self.treeview.insert("sub2", 0, text=" 3-1 Entry", image=self.app.rc.get_as_image('IconYellowCube16x19'))
-##        else:
-##            self.treeview.insert("sub2", 0, text=" 3-1 Entry")
