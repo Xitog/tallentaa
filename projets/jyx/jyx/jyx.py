@@ -154,12 +154,13 @@ class Jyx:
     TITLE = 'Jyx'
     RUN_COMMAND = 6
     CLOSE_TAB = 8
-    CONFIG_FILE_NAME = 'jyx.json'
+    DATA_FILE_NAME = 'jyx.json'
     LAST_VALUES = 'last_values.json'
     VERSION = '0.0.1'
     
     def __init__(self):
-        self.log = Logger(exit_on_error=False, info=Output.CONSOLE, warn=Output.POPUP, error=Output.POPUP)
+        self.log = Logger(exit_on_error=False, info=Output.CONSOLE, 
+                          warn=Output.POPUP, error=Output.POPUP)
         # Path
         home = os.path.expanduser("~")
         self.jyx_dir = os.path.join(home, '.jyx')
@@ -167,15 +168,21 @@ class Jyx:
             os.mkdir(self.jyx_dir)
         # Load base data (in same dir than jyx.py or we create one in jyx_dir)
         try:
-            f = open(Jyx.CONFIG_FILE_NAME, 'r', encoding='utf8')
+            f = open(os.path.join(os.path.dirname(os.path.realpath(__file__)), Jyx.DATA_FILE_NAME), 'r', encoding='utf8')
+            self.log.info('Data file for options found in:')
+            self.log.info(os.path.join(os.path.dirname(os.path.realpath(__file__)), Jyx.DATA_FILE_NAME))
         except FileNotFoundError:
             try:
-                f = open(os.path.join(self.jyx_dir, Jyx.CONFIG_FILE_NAME), 'r', encoding='utf8')
+                f = open(os.path.join(self.jyx_dir, Jyx.DATA_FILE_NAME), 'r', encoding='utf8')
+                self.log.info('Data file for options found in:')
+                self.log.info(os.path.join(self.jyx_dir, Jyx.DATA_FILE_NAME))
             except FileNotFoundError:
-                f = open(os.path.join(self.jyx_dir, Jyx.CONFIG_FILE_NAME), 'w', encoding='utf8')
+                f = open(os.path.join(self.jyx_dir, Jyx.DATA_FILE_NAME), 'w', encoding='utf8')
                 f.write(DEFAULT_CONFIG)
                 f.close()
-                f = open(os.path.join(self.jyx_dir, Jyx.CONFIG_FILE_NAME), 'r', encoding='utf8')
+                self.log.info('No data file found. Writing default in:')
+                self.log.info(os.path.join(self.jyx_dir, Jyx.DATA_FILE_NAME))
+                f = open(os.path.join(self.jyx_dir, Jyx.DATA_FILE_NAME), 'r', encoding='utf8')
         self.data = json.load(f)
         f.close()
         # Init
@@ -192,7 +199,8 @@ class Jyx:
         # Options
         try:
             file = open(os.path.join(self.jyx_dir, Jyx.LAST_VALUES), mode='r')
-            self.log.info('Last values file for options found.')
+            self.log.info('Last values file for options found in:')
+            self.log.info(os.path.join(self.jyx_dir, Jyx.LAST_VALUES))
             last_values = json.load(file)         
             file.close()
         except:
