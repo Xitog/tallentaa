@@ -346,7 +346,7 @@ class Jyx:
         if self.notebook.get_filepath() is None:
             self.save_as(event)
         else:
-            self.note.save()
+            self.notebook.current().save()
 
     def save_as(self, event=None):
         tongue = self.options['tongue'].get()
@@ -815,8 +815,10 @@ class JyxNote:
     # Handling of state and deleting, writing, loading and saving
     #
     def save(self, filename=None, raw=False):
-        if filename is None:
-            filename = self.get_filepath()
+        if filename is None and self.filepath is not None:
+            filename = self.filepath
+        else:
+            raise Exception("Impossible to save, no file name specified.")
         f = open(filename, mode='w', encoding='utf8')
         content = self.text.get('1.0', tk.END)
         f.write(content)
@@ -932,15 +934,19 @@ class JyxNote:
     #
     def update_text_before(self, event):
         text = event.widget
-        print(f'{event.state:08b} {platform.system()}')
+        #print(f'{event.state:08b} {platform.system()}')
         if self.control_pressed(event.state):
-            print(f'ctrl {event.state:08b} {platform.system()}')
+            pass
+            #print(f'ctrl {event.state:08b} {platform.system()}')
         if self.alt_right_pressed(event.state):
-            print(f'alt right {event.state:08b} {platform.system()}')
+            pass
+            #print(f'alt right {event.state:08b} {platform.system()}')
         if self.alt_left_pressed(event.state):
-            print(f'alt left {event.state:08b} {platform.system()}')
+            pass
+            #print(f'alt left {event.state:08b} {platform.system()}')
         if JyxNote.MOD_CAPS_LOCK & event.state:
-            print(f'caps lock')
+            pass
+            #print(f'caps lock')
         if self.control_pressed(event.state):
             print('update_text_before:', event.keysym)
             if event.keysym == 'a':
@@ -959,9 +965,10 @@ class JyxNote:
                 self.paste()
             elif event.keysym == 'p':
                 self.notebook.jyx.treeview.rebuild()
+            elif event.keysym == 's':
+                self.notebook.jyx.save()
             else:
                 self.notebook.jyx.log.info(f'Event not handled: {event.keysym} with state={event.state}')
-                return 'break'
             return 'break'
         elif event.keysym == 'Control_L':
             return 'break'

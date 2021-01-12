@@ -11,22 +11,28 @@ Ce langage est très inspiré de :
 Il se veut simple et pérenne (pas de multiples versions tous les ans).
 
 Lua est une bonne base, par son petit périmète, mais souffre de plusieurs défauts selon moi :
-    o l'opérateur de différence est ~= au lieu du standard !=
+1. Types de données
     o la fusion des listes et des dictionnaires dans les tables est imbitables
-    o par exemple, impossible d'avoir un compte fiable d'une table avec l'opérateur # si on mixe index numérique et non numérique
-    o impossible de savoir si une clé est définie ou contient nil
-    o présence de goto, my goodness!
-    o pas de continue ou de next dans les boucles
-    o pas de vérification du nombre de paramètres (la valence) des fonctions
-    o bien sûr, aucune vérification possible du type des paramètres (mais Teal, un langage dérivé, le peut)
+       o impossible d'avoir un compte fiable d'une table avec l'opérateur # si on mixe index numérique et non numérique
+       o impossible de savoir si une clé est définie ou contient nil
+    o il faut mettre entre crochets la clé si ce n'est pas un symbole : { ["a"] = 5 }
+2. Opérateurs
+    o l'opérateur de différence est ~= au lieu du standard !=
     o pas d'opérateurs combinés comme +=
-    o la bibliothèque standard est ultralimité, il faudrait penlib directement dedans
-    o pas d'orienté objet de base (encapsulation et héritage)
+3. Syntaxe
+    o présence de goto, my goodness!
+    o pas de continue/next dans les boucles
     o break et return ne peuvent apparaître que comme dernier statement d'un bloc
       https://www.lua.org/pil/4.4.html
-    o pas d'exceptions, seulement pcall, error, xpcall, pas de try/catch/raise/throw/finally
-    o il faut mettre entre crochets la clé si ce n'est pas un symbole : { ["a"] = 5 }
+    o pas d'orienté objet de base (encapsulation et héritage)
     o un test de if/while ne devrait se faire que sur des booléens
+4. Fonctions
+    o pas de vérification du nombre de paramètres (la valence) des fonctions
+    o bien sûr, aucune vérification possible du type des paramètres (mais Teal, un langage dérivé, le peut)
+5. Exceptions
+    o pas d'exceptions, seulement pcall, error, xpcall, pas de try/catch/raise/throw/finally
+6. Bibliothèque
+    o la bibliothèque standard est ultralimité, il faudrait penlib directement dedans
 Il y a des points positifs néanmoins :
     o les listes vides, le nombre 0 et une liste vide sont vrais seuls false et nil sont faux
       http://t-a-w.blogspot.com/2007/07/truth-falsehood-and-voidness-in-dynamic.html
@@ -48,6 +54,7 @@ Pas de commentaires multilignes. On fera un "return" pour éviter du code.
 
 EXT : "--[[ ]]" pour les multilignes.
 ALT : "/*" et "*/" mais ce n'est plus raccord avec "--".
+ALT : "-*" et "*-" mixe entre le C et --
 
 1.B Encodage et case-sensitive
 ------------------------------
@@ -537,3 +544,4 @@ parameter (identifier, type, litt)
 raise (Expr)
 try (Action, whenList, finalAction)
 whenList (identifier, type, action)
+
