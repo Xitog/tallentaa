@@ -186,7 +186,8 @@ class Jyx:
         self.data = json.load(f)
         f.close()
         # Init
-        self.root = tk.Tk()
+        self.root = tk.Tk(className=Jyx.TITLE)
+        self.root.title(Jyx.TITLE)
         self.root.protocol('WM_DELETE_WINDOW', self.exit)
         self.root.minsize(width=800, height=600)
         icon = self.load_icon('polar-star.png')
