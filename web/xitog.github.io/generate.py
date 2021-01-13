@@ -9,14 +9,20 @@ jp = os.path.join
 
 #-------------------------------------------------------------------------------
 
+includes = ['menu.html']
+
+def do(filepath, lang='fr'):
+    hamill.process_file(jp('input', *filepath.split('/')), 
+                        jp('output', *filepath.split('/'))[:-4] + '.html',
+                        lang,
+                        includes)
+
 print('Using Hamill:', hamill.__version__)
 
 # Get the last version of Hamill
 #import os
 #if refresh_hamill:
 #    os.system('get_last.bat')
-
-includes = ['menu.html']
 
 logging.getLogger().setLevel(logging.DEBUG)
 
@@ -25,7 +31,7 @@ logging.getLogger().setLevel(logging.DEBUG)
 
 # Mono
 
-hamill.process_file(jp('input', 'index.hml'), jp('output', 'index.html'), 'fr', includes)
+do('index.hml')
 
 #hamill.process_file(r'input\informatique\json.hml', r'output\informatique\json.html', 'fr', includes)
 #hamill.process_file(jp('input', 'informatique', 'bnf.hml'), jp('output', 'informatique', 'bnf.html'), 'fr', includes)
@@ -36,7 +42,10 @@ hamill.process_file(jp('input', 'index.hml'), jp('output', 'index.html'), 'fr', 
 
 #hamill.process_file(r'input\passetemps\tech_dialogues.hml', r'output\passetemps\tech_dialogues.html', 'fr', includes)
 #hamill.process_file(r'input\passetemps\tech_transitions.hml', r'output\passetemps\tech_transitions.html', 'fr', includes)
-#hamill.process_file(r'input\passetemps\pres_jeux.hml', r'output\passetemps\pres_jeux.html', 'fr', includes)
+
+do('passetemps/pres_jeux.hml')
+do('passetemps/pres_favoris.hml')
+
 #hamill.process_file(jp('input', 'passetemps', 'pres_jeuxvideo.hml'), jp('output', 'passetemps', 'pres_jeuxvideo.html'), 'fr', includes)
 #hamill.process_file(r'input\passetemps\tech_raycasting_fr.hml', r'output\passetemps\tech_raycasting_fr.html', 'fr', includes)
 
