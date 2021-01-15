@@ -217,8 +217,8 @@ class Jyx:
             self.options['tongue'].var.set('en')
             self.update('tongue', init=True)
         # UI components
-        self.notebook = JyxNotebook(self)
         self.treeview = JyxTree(self)
+        self.notebook = JyxNotebook(self)
         # Prend tout Y (relheight = 1.0), se positionne à 0.2 pour le notebook
         self.treeview.place(relx=0.0, rely =0.0, relwidth =0.2, relheight =1.0)
         self.notebook.place(relx=0.2, rely =0.0, relwidth =0.8, relheight =1.0)
@@ -384,11 +384,18 @@ class Jyx:
             try:
                 content = f.read()
             except UnicodeDecodeError as ude:
-                log.error("[ERROR] Encoding error: unable to open file: " + filename)
+                self.log.error('Encoding error: unable to open file: ' + filename)
                 print(ude)
+                return
             finally:
                 f.close()
-            if content is not None:
+            if content is None:
+                self.log.error('Impossible to open ' + filename + ' nothing to read.')
+                return
+            already = False
+            # Todo: must check if already open
+            if True:
+                self.log.info('Opening: ' + filename)
                 self.notebook.open(filename, content)
                 self.treeview.rebuild()
 
@@ -608,6 +615,8 @@ class JyxTree(ttk.Treeview):
 
     def selection(self, event):
         current = self.identify('item', event.x, event.y)
+        if current not in self.links: # prevent when clicking on top bar of the tree
+            return
         at = self.links[current].at
         #print('Node :', self.links[current], '@', at)
         self.jyx.notebook.current().text.see("1.0+%d chars" % (at,))
@@ -659,7 +668,7 @@ class JyxNotebook(ttk.Notebook):
             if self.notes[i].filepath is None:
                 self.notes[i].update_title()
 
-    def new_tab(self, lang=None, init=False):
+    def new_tab(self, event=None, lang=None, init=False):
         if lang is None: lang = self.jyx.data['default_language']
         jn = JyxNote(self, lang)
         self.add(jn.frame, text=self.jyx.data['menu'][self.jyx.options['tongue'].get()]['new'])
@@ -714,7 +723,7 @@ class JyxNotebook(ttk.Notebook):
                 lang = key
                 break
         if self.current().dirty or self.current().filepath is not None or len(self) > 1:
-            self.new_tab(lang)
+            self.new_tab(lang=lang)
         else:
             self.current().change_lang(lang)
         self.jyx.options['language'].var.set(lang)
@@ -769,7 +778,18 @@ class JyxNote:
         self.text.bind('<KeyPress>', self.update_text_before)
         #self.text.bind('<KeyRelease>', self.update_text_after)
         self.text.bind('<ButtonRelease-1>', self.notebook.jyx.update_status)
-
+        if platform.system() == 'Windows':
+            self.text.bind('<Control-Key-a>', self.select_all)
+            self.text.bind('<Control-Key-n>', self.notebook.new_tab)
+            self.text.bind('<Control-Key-t>', self.notebook.new_tab)
+            self.text.bind('<Control-Key-z>', self.undo)
+            self.text.bind('<Control-Key-y>', self.redo)
+            self.text.bind('<Control-Key-c>', self.copy)
+            self.text.bind('<Control-Key-x>', self.cut)
+            self.text.bind('<Control-Key-v>', self.paste)
+            self.text.bind('<Control-Key-p>', self.notebook.jyx.treeview.rebuild)
+            self.text.bind('<Control-Key-s>', self.notebook.jyx.save)
+    
         self.filepath = None
         self.dirty = False
         self.lang = lang
@@ -949,7 +969,7 @@ class JyxNote:
             pass
             #print(f'caps lock')
         if self.control_pressed(event.state):
-            print('update_text_before:', event.keysym)
+            #print('update_text_before:', event.keysym)
             if event.keysym == 'a':
                 self.select_all()
             elif event.keysym in ['n', 't']:
