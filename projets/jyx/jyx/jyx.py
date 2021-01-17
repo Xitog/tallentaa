@@ -365,7 +365,8 @@ class Jyx:
         options['title'] = self.data['messages'][tongue]['save file']
         filename = filedialog.asksaveasfilename(**options) # mode='w',
         if type(filename) == str and len(filename) > 0:
-            self.notebook.save(filename)
+            print('save_as', filename)
+            self.notebook.current().save(filename)
 
     def open(self, event=None):
         tongue = self.options['tongue'].get()
@@ -393,11 +394,23 @@ class Jyx:
                 self.log.error('Impossible to open ' + filename + ' nothing to read.')
                 return
             already = False
-            # Todo: must check if already open
-            if True:
+            num = 0
+            cpt = 0
+            # Check if already open
+            for n in self.notebook:
+                msg = n.filepath if n.filepath is not None else 'buffer'
+                print('Opened file:', msg)
+                if n.filepath == filename:
+                    already = True
+                    num = cpt
+                cpt += 1
+            if not already:
                 self.log.info('Opening: ' + filename)
                 self.notebook.open(filename, content)
                 self.treeview.rebuild()
+            else:
+                self.log.info('Alreay opened, selecting: ' + str(num))
+                self.notebook.select(num)
 
     def run(self, event=None):
         lang = self.notebook.current().lang
@@ -647,6 +660,20 @@ class JyxTree(ttk.Treeview):
             print('Error on parsing:', e)
 
 
+class JyxNotebookIterator:
+
+    def __init__(self, parent):
+        self.cpt = -1
+        self.parent = parent
+
+    def __next__(self):
+        self.cpt += 1
+        if self.cpt < self.parent.index(tk.END):
+            return self.parent.notes[self.cpt]
+        else:
+            raise StopIteration
+
+
 class JyxNotebook(ttk.Notebook):
 
     def __init__(self, jyx):
@@ -662,6 +689,9 @@ class JyxNotebook(ttk.Notebook):
         self.pack(fill=tk.BOTH, expand=tk.YES)
         self.bind('<<NotebookTabChanged>>', self.on_tab_change)
         self.current().focus()
+
+    def __iter__(self):
+        return JyxNotebookIterator(self)
 
     def relabel(self, new):
         for i in range(self.index('end')):
@@ -682,6 +712,7 @@ class JyxNotebook(ttk.Notebook):
         return jn.index
 
     def close_tab(self):
+        del self.notes[self.index("current")]
         self.forget(self.index("current"))
         if self.index("end") == 1:
             self.jyx.menu.file_menu.entryconfig(Jyx.CLOSE_TAB, state=tk.DISABLED)
@@ -690,7 +721,7 @@ class JyxNotebook(ttk.Notebook):
     def on_tab_change(self, event):
         self.jyx.options['language'].var.set(self.current().lang)
         self.jyx.update()
-        
+
     def current(self):
         return self.notes[self.index("current")]
 
@@ -836,9 +867,8 @@ class JyxNote:
     # Handling of state and deleting, writing, loading and saving
     #
     def save(self, filename=None, raw=False):
-        if filename is None and self.filepath is not None:
-            filename = self.filepath
-        else:
+        filename = filename if filename is not None else self.filepath
+        if filename is None:
             raise Exception("Impossible to save, no file name specified.")
         f = open(filename, mode='w', encoding='utf8')
         content = self.text.get('1.0', tk.END)
