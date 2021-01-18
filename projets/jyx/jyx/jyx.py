@@ -685,10 +685,12 @@ class JyxNotebook(ttk.Notebook):
         self.grid_columnconfigure(0, weight=1)
 
         self.notes = []
-        self.new_tab(init=True)
+        self.is_loading_file = True # for the first time, to desactivate jyx#update
+        self.new_tab()
         self.pack(fill=tk.BOTH, expand=tk.YES)
         self.bind('<<NotebookTabChanged>>', self.on_tab_change)
         self.current().focus()
+        self.is_loading_file = False
 
     def __iter__(self):
         return JyxNotebookIterator(self)
@@ -698,7 +700,7 @@ class JyxNotebook(ttk.Notebook):
             if self.notes[i].filepath is None:
                 self.notes[i].update_title()
 
-    def new_tab(self, event=None, lang=None, init=False):
+    def new_tab(self, event=None, lang=None):
         if lang is None: lang = self.jyx.data['default_language']
         jn = JyxNote(self, lang)
         self.add(jn.frame, text=self.jyx.data['menu'][self.jyx.options['tongue'].get()]['new'])
@@ -708,7 +710,8 @@ class JyxNotebook(ttk.Notebook):
         jn.focus()
         if self.index("end") > 1:
             self.jyx.menu.file_menu.entryconfig(Jyx.CLOSE_TAB, state=tk.ACTIVE)
-        self.jyx.update(init=init)
+        if not self.is_loading_file:
+            self.jyx.update()
         return jn.index
 
     def close_tab(self):
@@ -719,6 +722,8 @@ class JyxNotebook(ttk.Notebook):
         self.jyx.update()
 
     def on_tab_change(self, event):
+        if self.is_loading_file:
+            return
         self.jyx.options['language'].var.set(self.current().lang)
         self.jyx.update()
 
@@ -747,6 +752,7 @@ class JyxNotebook(ttk.Notebook):
         return self.current().filepath
 
     def open(self, filename, content):
+        self.is_loading_file = True
         _, ext = os.path.splitext(filename)
         lang = self.jyx.data['default_language']
         for key, lg in self.jyx.data['languages'].items():
@@ -759,6 +765,7 @@ class JyxNotebook(ttk.Notebook):
             self.current().change_lang(lang)
         self.jyx.options['language'].var.set(lang)
         self.current().load(filename, content)
+        self.is_loading_file = False
 
     def send(self, order):
         if order == 'cut':
@@ -1121,6 +1128,9 @@ class ParserJSON:
 
     def read(self, tokens):
         #print('read', tokens[0], len(tokens))
+        if len(tokens) == 0:
+            print(tokens)
+            raise Exception("No token")
         token = tokens[0]
         if token.kind == 'separator' and token.value == '{':
             return self.read_object(tokens)
@@ -1312,7 +1322,6 @@ class LexerJSON:
         line = 0
         index = 0
         discard = discard if discard is not None else []
-        #print('|' + content + '|')
         while index < len(content):
             c = content[index]
             if c in ['{', '}', '[', ']', ',', ':']:
