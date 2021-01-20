@@ -951,6 +951,8 @@ class JyxNote:
     #
     def paste(self, event=None):
         content = self.notebook.jyx.root.clipboard_get()
+        if self.has_selection():
+            self.selection_delete()
         self.text.insert(tk.INSERT, content)
         self.text.see(tk.INSERT)
         return 'break'
@@ -1067,6 +1069,13 @@ class JyxNote:
             self.selection_clear()
             self.notebook.jyx.update_status()
             return 'break'
+        elif event.keysym == 'Return':
+            line = self.text.get('insert linestart', 'insert lineend')
+            decal = len(line) - len(line.lstrip())
+            if decal > 0:
+                content = '\n' + ' ' * decal
+            else:
+                content = '\n'
         elif event.char == '\r':
             content = '\n'
         elif event.char == '\t':
