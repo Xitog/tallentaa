@@ -45,8 +45,7 @@ do('index.hml')
 
 do('passetemps/pres_jeux.hml')
 do('passetemps/pres_favoris.hml')
-
-#hamill.process_file(jp('input', 'passetemps', 'pres_jeuxvideo.hml'), jp('output', 'passetemps', 'pres_jeuxvideo.html'), 'fr', includes)
+do('passetemps/pres_jeuxvideo.hml')
 #hamill.process_file(r'input\passetemps\tech_raycasting_fr.hml', r'output\passetemps\tech_raycasting_fr.html', 'fr', includes)
 
 #hamill.process_file(jp('input', 'passetemps', 'history_fps_tables_en.hml'), jp('output', 'passetemps', 'history_fps_tables_en.html'), 'fr', includes)
