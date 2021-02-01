@@ -1,10 +1,23 @@
-#!/usr/bin/env xdg-open
+# A mettre dans /usr/share
+
 [Desktop Entry]
-Version=0.0.1
-Type=Application
-Terminal=false
 Name=Jyx
-Comment=A simple text editor
-Exec=/home/damien/Documents/tallentaa/projet_editor/python/jyx.py
-Icon=/home/damien/Documents/tallentaa/projet_editor/python/icons/pole-star.png
-StartupWMClass=Jyx
+Comment=Simple text editor
+Exec=python3 /home/damien/Git/tallentaa/projets/jyx/run.py
+Icon=/home/damien/Git/tallentaa/projets/jyx/jyx/icons/polar-star.png
+Terminal=true
+Type=Application
+Categories=TextEditor;
+MimeType=x-scheme-handler/steam;
+Actions=Act1;Act2;
+
+[Desktop Action Act1]
+Name=Act1
+Name[fr]=Action 1
+Exec=python3
+
+[Desktop Action Act2]
+Name=Act2
+Name[fr]=Action 2
+Exec=python3
+

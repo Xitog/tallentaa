@@ -1,6 +1,6 @@
 # Jyx
 
-A simple text editor
+A simple text editor for developers in Python/Tkinter
 
 ## Summary
 
@@ -27,4 +27,13 @@ Although it can execute directly Python script, even unsaved.
 
 More to come...
 
-Damien Gouteux 2020
+## 3. Comparison with other editors
+
+This table presents some common features of text editors.
+
+|                     | Notepad | Gedit |  Jyx  |
+|---------------------|:-------:|:-----:|:-----:|
+| Syntax highlighting |    no   |  yes  |  yes  |
+| Statistics          |    no   |  yes  |  yes  |
+
+Damien Gouteux 2020-2021

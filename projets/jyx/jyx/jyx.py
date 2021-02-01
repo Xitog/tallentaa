@@ -156,7 +156,7 @@ class Jyx:
     CLOSE_TAB = 8
     DATA_FILE_NAME = 'jyx.json'
     LAST_VALUES = 'last_values.json'
-    VERSION = '0.0.1'
+    VERSION = '0.0.2'
     
     def __init__(self):
         self.log = Logger(exit_on_error=False, info=Output.CONSOLE, 
@@ -374,7 +374,10 @@ class Jyx:
         options = {}
         #options['defaultextension'] = '.txt'
         options['filetypes'] = [(self.data['messages'][tongue]['filter all'], '.*')]
-        options['initialdir'] = os.getcwd()
+        if self.notebook.get_filepath() is None:
+            options['initialdir'] = os.getcwd()
+        else:
+            options['initialdir'] = os.path.dirname(self.notebook.get_filepath())
         options['initialfile'] = self.data['messages'][tongue]['file name'] + self.data['languages'][lang]['extension'][0]
         options['parent'] = self.root
         options['title'] = self.data['messages'][tongue]['open file']
@@ -1063,6 +1066,8 @@ class JyxNote:
         elif event.keysym == 'Delete':
             if len(text.tag_ranges('sel')) > 0:
                 self.selection_delete()
+            elif text.index(tk.END) != text.index(tk.INSERT):
+                self.delete(tk.INSERT)
             self.notebook.jyx.update_status()
             return 'break'
         elif event.keysym == 'Escape':
