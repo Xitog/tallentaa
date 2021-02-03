@@ -1059,8 +1059,16 @@ class JyxNote:
             if len(text.tag_ranges('sel')) > 0:
                 self.selection_delete()
             else:
-                text.mark_set(tk.INSERT, 'insert-1c')
-                self.delete(tk.INSERT)
+                col = int(self.text.index("insert").split('.')[1]);
+                nb = col % 4
+                nb = 4 if nb == 0 else nb
+                print(nb, 'insert-%dc' % (nb,))
+                print(self.text.get('insert-%dc' % (nb,), tk.INSERT))
+                if self.text.get('insert-%dc' % (nb,), tk.INSERT).isspace():
+                    self.delete('insert-%dc' % (nb,), tk.INSERT)
+                else:
+                    self.delete('insert-1c', tk.INSERT)
+                #text.mark_set(tk.INSERT, 'insert-%dc' % (nb,))
             self.notebook.jyx.update_status()
             return 'break'
         elif event.keysym == 'Delete':
@@ -1084,7 +1092,8 @@ class JyxNote:
         elif event.char == '\r':
             content = '\n'
         elif event.char == '\t':
-            content = '    '
+            col = int(self.text.index("insert").split('.')[1]);
+            content = ' ' * (4 - (col % 4))
         elif event.keysym == 'space':
             content = ' '
         elif event.char.isprintable(): #isalnum()
