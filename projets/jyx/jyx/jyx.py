@@ -29,64 +29,66 @@ DEFAULT_CONFIG = """{
         "tongue": "en",
         "confirm": false,
         "basename": false,
-        "treeview": true
+        "treeview": true,
+        'tabasspaces' : true
     },
     "messages": {
         "en" : {
-            "started"    : "Started",
-            "about_msg"  : "Made with ❤",
-            "unsaved"    : "Unsaved changes",
-            "unsaved_msg": "There are unsaved changes.\\nDo you really want to quit Jyx?",
-            "open file"  : "Open file...",
-            "save file"  : "Save file...",
-            "filter all" : "all files",
-            "file name"  : "myfile"
+            "started"     : "Started",
+            "about_msg"   : "Made with ❤",
+            "unsaved"     : "Unsaved changes",
+            "unsaved_msg" : "There are unsaved changes.\\nDo you really want to quit Jyx?",
+            "open file"   : "Open file...",
+            "save file"   : "Save file...",
+            "filter all"  : "all files",
+            "file name"   : "myfile"
         }
     },
     "menu": {
         "en": {
-            "tongue"     : "English",
-            "file"       : "File",
-            "new"        : "New",
-            "open"       : "Open...",
-            "save"       : "Save",
-            "save as"    : "Save As...",
-            "save all"   : "Save All",
-            "run"        : "Run Script",
-            "close tab"  : "Close Tab",
-            "exit"       : "Exit",
-            "edit"       : "Edit",
-            "undo"       : "Undo",
-            "redo"       : "Redo",
-            "cut"        : "Cut",
-            "copy"       : "Copy",
-            "paste"      : "Paste",
-            "select all" : "Select all",
-            "clear"      : "Clear",
-            "options"    : "Options",
-            "tongues"    : "Tongues",
-            "confirm"    : "Confirm before exit",
-            "basename"   : "Display only the name",
-            "treeview"   : "Display tree",
-            "languages"  : "Languages",
-            "help"       : "Help",
-            "about"      : "About..."
+            "tongue"      : "English",
+            "file"        :  "File",
+            "new"         : "New",
+            "open"        : "Open...",
+            "save"        : "Save",
+            "save as"     : "Save As...",
+            "save all"    : "Save All",
+            "run"         : "Run Script",
+            "close tab"   : "Close Tab",
+            "exit"        : "Exit",
+            "edit"        : "Edit",
+            "undo"        : "Undo",
+            "redo"        : "Redo",
+            "cut"         : "Cut",
+            "copy"        : "Copy",
+            "paste"       : "Paste",
+            "select all"  : "Select all",
+            "clear"       : "Clear",
+            "options"     : "Options",
+            "tongues"     : "Tongues",
+            "confirm"     : "Confirm before exit",
+            "basename"    : "Display only the name",
+            "treeview"    : "Display tree",
+            "tabasspaces" : "Tab as spaces",
+            "languages"   : "Languages",
+            "help"        : "Help",
+            "about"       : "About..."
         }
     },
     "languages" : {
         "text" : {
-            "label": "Plain text",
-            "extension": [".txt"],
-            "family": "",
-            "support": "",
-            "token": [],
-            "style": {
-                "default": {
+            "label"       : "Plain text",
+            "extension"   : [".txt"],
+            "family"      : "",
+            "support"     : "",
+            "token"       : [],
+            "style"       : {
+                "default" : {
                 }
             }
         }
     },
-    "default_language" : "text"
+    "default_language"    : "text"
 }
 """
 
@@ -301,6 +303,8 @@ class Jyx:
             elif not val:
                 self.treeview.place_forget()
                 self.notebook.place(relx=0.0, rely =0.0, relwidth =1.0, relheight =1.0)
+        elif varname == 'tabasspace':
+            pass
         opt.prev = val
 
     def has(self, prop, value, content=None):
@@ -496,6 +500,8 @@ class JyxMenu(tk.Menu):
         self.options_menu.entryconfig(data['menu'][old]['tongues'], label=data['menu'][new]['tongues'])
         self.options_menu.entryconfig(data['menu'][old]['confirm'], label=data['menu'][new]['confirm'])
         self.options_menu.entryconfig(data['menu'][old]['basename'], label=data['menu'][new]['basename'])
+        self.options_menu.entryconfig(data['menu'][old]['treeview'], label=data['menu'][new]['treeview'])
+        self.options_menu.entryconfig(data['menu'][old]['tabasspaces'], label=data['menu'][new]['tabasspaces'])
         
         self.help_menu.entryconfig(data['menu'][old]['about'], label=data['menu'][new]['about'])
 
@@ -582,7 +588,11 @@ class JyxMenu(tk.Menu):
                                           onvalue=True, offvalue=False,
                                           variable=self.jyx.options['treeview'].var,
                                           command=lambda: self.jyx.update('treeview'))
-        
+        self.options_menu.add_checkbutton(label=data['menu'][tongue]['tabasspaces'],
+                                          onvalue=True, offvalue=False,
+                                          variable=self.jyx.options['tabasspaces'].var,
+                                          command=lambda: self.jyx.update('tabasspaces'))
+
         self.langmenu = tk.Menu(self, tearoff=0)
         self.add_cascade(label=data['menu'][tongue]['languages'], menu=self.langmenu)
 
@@ -1059,16 +1069,17 @@ class JyxNote:
             if len(text.tag_ranges('sel')) > 0:
                 self.selection_delete()
             else:
-                col = int(self.text.index("insert").split('.')[1]);
-                nb = col % 4
-                nb = 4 if nb == 0 else nb
-                print(nb, 'insert-%dc' % (nb,))
-                print(self.text.get('insert-%dc' % (nb,), tk.INSERT))
-                if self.text.get('insert-%dc' % (nb,), tk.INSERT).isspace():
-                    self.delete('insert-%dc' % (nb,), tk.INSERT)
+                if self.notebook.jyx.options['tabasspaces'].get():
+                    col = int(self.text.index("insert").split('.')[1]);
+                    nb = col % 4
+                    nb = 4 if nb == 0 else nb
+                    if self.text.get('insert-%dc' % (nb,), tk.INSERT).isspace():
+                        self.delete('insert-%dc' % (nb,), tk.INSERT)
+                    else:
+                        self.delete('insert-1c', tk.INSERT)
+                    #text.mark_set(tk.INSERT, 'insert-%dc' % (nb,))
                 else:
                     self.delete('insert-1c', tk.INSERT)
-                #text.mark_set(tk.INSERT, 'insert-%dc' % (nb,))
             self.notebook.jyx.update_status()
             return 'break'
         elif event.keysym == 'Delete':
@@ -1083,17 +1094,23 @@ class JyxNote:
             self.notebook.jyx.update_status()
             return 'break'
         elif event.keysym == 'Return':
-            line = self.text.get('insert linestart', 'insert lineend')
-            decal = len(line) - len(line.lstrip())
-            if decal > 0:
-                content = '\n' + ' ' * decal
+            if self.notebook.jyx.options['tabasspaces'].get():
+                line = self.text.get('insert linestart', 'insert lineend')
+                decal = len(line) - len(line.lstrip())
+                if decal > 0:
+                    content = '\n' + ' ' * decal
+                else:
+                    content = '\n'
             else:
                 content = '\n'
         elif event.char == '\r':
             content = '\n'
         elif event.char == '\t':
-            col = int(self.text.index("insert").split('.')[1]);
-            content = ' ' * (4 - (col % 4))
+            if self.notebook.jyx.options['tabasspaces'].get():
+                col = int(self.text.index("insert").split('.')[1]);
+                content = ' ' * (4 - (col % 4))
+            else:
+                content = '\t'
         elif event.keysym == 'space':
             content = ' '
         elif event.char.isprintable(): #isalnum()
