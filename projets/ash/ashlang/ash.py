@@ -1,7 +1,14 @@
 """
     Ash
     ---
-    A simple lexer / parser / interpreter / python transpiler for a small language inspired by Lua/Ruby
+    A simple lexer / parser / interpreter / transpiler for a small language
+    inspired by Lua/Ruby. The transpiler targets Python.
+
+    Tokenizer / Symbolizer / Lexer   string   -> [tokens]
+    Parser                           [tokens] -> abstract syntax tree (AST)
+    Interpreter                      AST      -> result
+    Compiler                         AST      -> low level code
+    Transpiler                       AST      -> high level code
 """
 
 #
@@ -81,11 +88,14 @@ def run(command, interpreter, mode='full', debug=False, output=None):
     res = None
     try:
         tokens = tokenizer.tokenize(command)
-        if mode == 'tokenize': return tokens
+        if mode == 'tokenize':
+            return (tokens, ast, res)
         ast = parser.parse(tokens)
+        if mode == 'parse':
+            return (tokens, ast, None)
         if mode == 'transpile':
             trans = transpiler.transpile(ast)
-            return trans
+            return (tokens, ast, trans)
         res = interpreter.do_ast(ast)
         console.puts('= ' + str(res))
     except Exception as e:
@@ -116,7 +126,23 @@ def run(command, interpreter, mode='full', debug=False, output=None):
         f.write('    <h1>' + str(res) + '</h1>\n')
         f.write('  </body>\n</html>')
         f.close()
-                
+
+class Mode:
+    FULL = 4
+    TRANS = 3
+    PARSE = 2
+    TOKENIZE = 1
+
+    @staticmethod
+    def str2mode(s):
+        dic = {'full' : Mode.FULL, 'trans' : Mode.TRANS, 'parse' : Mode.PARSE, 'tokenize' : Mode.TOKENIZE}
+        return dic[s]
+
+    @staticmethod
+    def mode2str(mode):
+        dic = {Mode.FULL : 'full', Mode.TRANS : 'trans',  Mode.PARSE : 'parse',  Mode.TOKENIZE : 'tokenize'}
+        return dic[mode]
+
 def main():
     debug = False
     mode = 'full'
@@ -135,17 +161,19 @@ def main():
                 break
             elif command == 'help':
                 print(f'Ash {__version__} on Python {__py_version__}. 2017-2020')
-                print('help      : this help')
-                print('tests     : run multiple tests')
-                print('reset     : reset interpreter')
-                print('debug     : set/unset debug. You can specify true or false')
-                print('locals    : get local variable')
-                print('exec <f>  : execute a file')
-                print('trans <f> : transpile a file')
-                print('full      : mode full: tokenize, parse, interpret')
-                print('tokenize  : mode only produce tokens')
-                print('transpile : mode only transpile to python')
-                print('exit      : exit this shell')
+                print('help           : this help')
+                print('tests          : run multiple tests')
+                print('reset          : reset interpreter')
+                print('debug          : set/unset debug. You can specify true or false')
+                print('dump           : get variables of root scope')
+                print('exec <f>       : execute a file')
+                print('trans <f>      : transpile a file')
+                print('mode           : print current mode')
+                print('mode full      : tokenize, parse and interpret')
+                print('mode tokenize  : mode only produce tokens (no parse, no execution)')
+                print('mode parse     : mode only produce an ast tree (no execution)')
+                print('mode transpile : mode only transpile to python')
+                print('exit           : exit this shell')
             elif command.startswith('debug'):
                 args = command.split(' ')
                 if len(args) < 2:
@@ -153,7 +181,7 @@ def main():
                 else:
                     debug = True if args[1] == 'true' else False
                 console.info(f'Debug set to {debug}.')
-            elif command == 'locals':
+            elif command == 'dump':
                 for k in sorted(interpreter.vars):
                     print(f"{k:10}", interpreter.vars[k])
             elif command.startswith('transXXX'):
@@ -210,13 +238,19 @@ def main():
                 interpreter = Interpreter()
             elif command == 'tests':
                 read_tests('./tests/tests.txt')
-            elif command in ['full', 'tokenize', 'transpile']:
-                mode = command
-                print(f'Mode set to {mode}')
+            elif command.startswith('mode'):
+                args = command.split(' ')
+                if len(args) == 1:
+                    print(f'Mode is {mode}')
+                elif args[1] in ['full', 'tokenize', 'transpile']:
+                    mode = Mode.str2mode(args[1])
+                    print(f'Mode set to {mode}')
+            elif not command: # empty string are false
+                continue
             else:
                 try:
-                    res = run(command, interpreter, mode, debug)
-                    if mode == 'tokenize':
+                    tokens, ast, result = run(command, interpreter, mode, debug)
+                    if mode in ['tokenize', 'parse']:
                         print(command)
                         start_line = ''
                         for i, r in enumerate(res):
@@ -227,7 +261,7 @@ def main():
                         print(start_line)
                         for i, r in enumerate(res):
                             print(i, r)
-                    elif mode == 'transpile':
+                    if mode == 'transpile':
                         print(res)
                 except Exception as e:
                     console.error(f'Exception: {e}')
