@@ -158,7 +158,7 @@ class Jyx:
     CLOSE_TAB = 8
     DATA_FILE_NAME = 'jyx.json'
     LAST_VALUES = 'last_values.json'
-    VERSION = '0.0.2'
+    VERSION = '0.0.3'
     
     def __init__(self):
         self.log = Logger(exit_on_error=False, info=Output.CONSOLE, 
@@ -263,7 +263,7 @@ class Jyx:
         self.root.wm_title(f"{Jyx.TITLE} {Jyx.VERSION} - {i}/{nb} {file}{dirty}")
 
     def update_status(self, event=None):
-        self.menu.status_bar.configure(text=self.notebook.current().lang + ' - ' + self.notebook.get_position())
+        self.notebook.current().status_bar.configure(text=self.notebook.current().lang + ' - ' + self.notebook.get_position())
 
     def update_all_options(self):
         for key in self.options:
@@ -505,7 +505,7 @@ class JyxMenu(tk.Menu):
         
         self.help_menu.entryconfig(data['menu'][old]['about'], label=data['menu'][new]['about'])
 
-        self.status_bar.config(text=data['messages'][new]['started'])
+        #self.jyx.notebook.current().status_bar.config(text=data['messages'][new]['started'])
 
     def build(self):
         data = self.jyx.data
@@ -625,11 +625,6 @@ class JyxMenu(tk.Menu):
         self.add_cascade(label=data['menu'][tongue]['help'], menu=self.help_menu)
         self.help_menu.add_command(label=data['menu'][tongue]['about'], command=self.jyx.about)
 
-        # Status bas
-        self.status_bar = tk.Label(self.jyx.get_root(), bd=1, relief=tk.SUNKEN)
-        self.status_bar.config(text=data['messages'][tongue]['started'], anchor=tk.E, padx=20)
-        self.status_bar.pack(side=tk.BOTTOM, fill=tk.X)
-
 
 class JyxTree(ttk.Treeview):
 
@@ -692,15 +687,9 @@ class JyxNotebook(ttk.Notebook):
     def __init__(self, jyx):
         ttk.Notebook.__init__(self, jyx.get_root())
         self.jyx = jyx
-
-        # To make the element at 0,0 grows with the window
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(0, weight=1)
-
         self.notes = []
         self.is_loading_file = True # for the first time, to desactivate jyx#update
         self.new_tab()
-        self.pack(fill=tk.BOTH, expand=tk.YES)
         self.bind('<<NotebookTabChanged>>', self.on_tab_change)
         self.current().focus()
         self.is_loading_file = False
@@ -814,18 +803,12 @@ class JyxNote:
         self.notebook = notebook
 
         self.frame = ttk.Frame(self.notebook) #, bd=2, relief=tk.SUNKEN)
-        self.frame.grid_rowconfigure(0, weight=1)
-        self.frame.grid_columnconfigure(0, weight=1)
-        
         self.scrollbar = ttk.Scrollbar(self.frame)
-        self.scrollbar.grid(row=0, column=1, sticky=tk.N+tk.S)
-
         self.text = tk.Text(self.frame, wrap=tk.NONE, bd=0, undo=True,
                             yscrollcommand=self.scrollbar.set)
         self.scrollbar.configure(command=self.text.yview)
         
         self.text.config(font=('consolas', 12), undo=True, wrap='word')
-        self.text.grid(row=0, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
         self.text.bind('<KeyPress>', self.update_text_before)
         #self.text.bind('<KeyRelease>', self.update_text_after)
         self.text.bind('<ButtonRelease-1>', self.notebook.jyx.update_status)
@@ -840,11 +823,27 @@ class JyxNote:
             self.text.bind('<Control-Key-v>', self.paste)
             self.text.bind('<Control-Key-p>', self.notebook.jyx.treeview.rebuild)
             self.text.bind('<Control-Key-s>', self.notebook.jyx.save)
-    
+
+        # Status bas
+        jyx = self.notebook.jyx
+        self.status_bar = tk.Label(self.frame, bd=1, relief=tk.SUNKEN)
+        #jyx.data['messages'][jyx.options['tongue'].get()]['started'] text will be updated ASAP
+        self.status_bar.config(text='', anchor=tk.E, padx=20)
+
+        # Attributes
         self.filepath = None
         self.dirty = False
         self.lang = lang
 
+        # Layout
+        self.frame.grid_rowconfigure(0, weight=100)
+        self.frame.grid_rowconfigure(1, weight=1)
+        self.frame.grid_columnconfigure(0, weight=1)
+
+        self.text.grid(row=0, column=0, sticky=tk.NS+tk.EW)
+        self.scrollbar.grid(row=0, column=1, sticky=tk.NS)
+        self.status_bar.grid(row=2, column=0, columnspan=2, sticky=tk.EW)
+        
         # Tags
         self.tokens = {}
         self.tags = {}

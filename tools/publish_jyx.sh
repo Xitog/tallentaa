@@ -1,7 +1,7 @@
 #!/bin/sh
-cd ../../
-
 clear
+#cd ../../
+echo Working in $PWD
 
 out="jyx"
 origin="tallentaa/projets/jyx"
