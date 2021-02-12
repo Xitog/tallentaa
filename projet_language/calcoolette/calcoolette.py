@@ -1,12 +1,3 @@
-#
-# Symbolizer  string   -> [tokens]
-# Parser      [tokens] -> abstract syntax tree (AST)
-# Interpreter AST      -> result
-#
-
-#-----------------------------------------------------------------------
-# Base
-#-----------------------------------------------------------------------
 
 class SymbolType:
     def __init__(self, name):
@@ -752,27 +743,6 @@ def exec_node(symbol, scope={}, debug=False):
 # Tests
 #-----------------------------------------------------------------------
 
-"""
-t = Symbolizer()
-#s = "2.0 * (-(2+1).abs + 2..abs) + a"
-s = "(2 + 3) * 4"
-s = "3.add(2)"
-print 'solve: %s' % (s,)
-o = t.parse(s)
-i = 0
-for e in o:
-    print '%d. %s' % (i, str(e))
-    i+=1
-del o[-1] # eof
-print o[first_op(o)], first_op(o)
-
-make_tree(o, True)
-r = exec_node(o[0], {}, True)
-print r
-
-exit()
-"""
-
 def print_tree(o):
     if o.terminal():
         print o.val
@@ -848,79 +818,3 @@ class Interpreter:
     
     def do_string(self, text):
         return test(text, False, 'exec')
-
-if __name__ == '__main__':
-    command = ''
-    loop = True
-    debug = False
-    mode = 'exec'
-    prod = True
-    print 'Welcome to Pypo 0.1'
-    print 'Type help for more information'
-    while loop:
-        command = raw_input('>>> ')
-        if command in ['exit', 'debug', '', 'symbols', 'exec', 'dump', 'prod', 'test', 'help', 'tree']:
-            if command == 'exit':
-                loop = False
-                continue
-            elif command == '':
-                continue
-            elif command == 'debug':
-                debug = not debug
-            elif command == 'symbols':
-                mode = 'symbols'
-                print 'mode changed to symbols only'
-            elif command == 'exec':
-                mode = 'exec'
-                print 'mode changed to full execution'
-            elif command == 'tree':
-                mode = 'tree'
-                print 'mode changed to tree only'
-            elif command == 'dump':
-                for e in root_scope:
-                    print e
-            elif command == 'prod':
-                prod = not prod
-                if prod: print 'production mode on'
-                else: print 'beware: dev mode on'
-            elif command == 'help':
-                print 'debug    debug mode on'
-                print 'symbols  retrieve only symbols (no exec)'
-                print 'exec     execution'
-                print 'tree     syntax tree only (no exec)'
-                print 'dump     dump root scope'
-                print 'prod     switch to prod mode on/off'
-                print 'test     run all tests'
-            elif command == 'test':
-                run_tests()
-        else:
-            if prod:
-                try:
-                    print test(command, debug, mode)
-                except Exception as e:
-                    print e
-            else:
-                print test(command, debug, mode)
-
-    a = Symbol(Id, "a")
-    b = Symbol(Operator, "=")
-    c = Symbol(Integer, "5")
-    l = [a, b, c]
-
-    a = Symbol(Integer, "3")
-    b = Symbol(Separator, ";")
-    c = Symbol(Integer, "5")
-
-#tl = TokenList([a,b,c])
-#print tl[0]
-
-#raw_input()
-
-#print exists_token([a,b,c], ';')
-#split_on([a,b,c], ';')
-
-#parse(l)
-#print exec_node(l[0])
-
-
-#exit()

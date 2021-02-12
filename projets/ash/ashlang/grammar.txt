@@ -1,5 +1,7 @@
 Ce document décrit le langage Ash, une syntaxe alternative pour Python.
 
+Dernière révision du 26 janvier 2021
+
 Ce document décrit un langage minimaliste de script.
 On décrit des EXTENSION (EXT) et des ALTERNATIVES (ALT) possibles.
 
@@ -131,21 +133,39 @@ instruction2
 
 instruction1 ; instruction2
 
-if COND then
-    ACT
-elif COND then
-    ACT
+if CONDITION [then]
+    ACTION
+elif CONDITION [then]
+    ACTION
 else
-    ACT
+    ACTION
 end
 
-[label] while COND do
-    ACT
+switch EXPRESSION
+    case EXPRESSION [do]
+        ACTION
+        [next]
+    case any [do]
+        ACTION
 end
 
-[label] for ID[: typ1][, ID2[: typ2]] in ID3 do
-    ACT
+[<LABEL>] while CONDITION [do]
+    ACTION
+    [break]
+    [next]
 end
+
+[<LABEL>] for ID[: typ1][, ID2[: typ2]] in ID3 [do]
+    ACTION
+    [break]
+    [next]
+end
+
+[<LABEL>] loop [do]
+    ACTION
+    [break]
+    [next]
+until CONDITION [end]
 
 On n'oblige pas dans le for à mettre var.
 
@@ -164,12 +184,17 @@ EXT : redo, retry dans les boucles
 EXT : one liner : ... if COND ou if COND => ... avec else possible et while COND =>
 EXT : case expr when expr [then] ... else ... end
 EXT : do ... next cond
+ALT : switch instead of case
+ALT : case instead of when
+ALT : case any instead of default
+ALT : le choix de until c'est SI VRAI on va direct à la suite, comme pour while.
+ALT : on break par défaut d'où le besoin de next
 
 4.B Modificateurs
 -----------------
 
-break [label]
-next [label]
+break [<LABEL>]
+next [<LABEL>]
 
 5. Opérateurs
 =============
@@ -181,6 +206,12 @@ Comparaison             == != < <= >= >
 Objet                   is in $ (conv en string/str) # (conv en int length/len/trunc) .
 Range                   ..
 Assignation             = += -= *= /= **= //= %= and= or= xor= not= <<= >>=
+
+nil
+any (tout type)
+
+a ?= b  <=> a = (a is nil) ? b : a
+a ??= b <=> a is not nil and a == b
 
 Les chaînes d'affilées se concatènent automatiquement, comme en Ruby.
 
@@ -197,11 +228,27 @@ ALT : Définir l'interrogation de définition : defined? (en méthode) non car o
 6.A Déclaration
 ---------------
 
-fun[ction] [id] (a : typ, b : typ -> typ[, typ]*)
-pro[cedure] [id] (a : typ, b : typ)
-sig[nature] [id] (a : typ, b : typ -> (typ[, typ]*) | nil)
+fun[ction] [CLASS.][NAME] ([VAR : TYP[, VAR : TYP]*] -> TYP[, TYP]*)
+    ACTION
+end
+
+pro[cedure] [CLASS.][NAME] ([VAR : TYP[, VAR : TYP]*])
+    ACTION
+end
+
+sig[nature] [NAME] (VAR : TYP, VAR : TYP -> (TYP[, TYP]*) | nil)
+
+get NAME [-> TYP]
+    ACTION
+end
+
+set NAME (VAR : TYP)
+    ACTION
+end
+
 call without parameter id
-return [expr]
+
+return [EXPRi [, EXPRi+1]*]
 
 Autoriser ? (pour -> bool) et ! (pour modif internes) dans les id de fun/pro.
 
@@ -230,15 +277,19 @@ ALT : is après ) si on a pas de paramètres et qu'on autorise de ne pas mettre 
 7. Classes
 ==========
 
-class ID [< SUPER]
+class NAME [< SUPER]
+    CODE
 end
+
 
 init : fonction de constructeur (au lieu de constructor, initialize, __init__)
 @attr doivent être déclaré uniquement dans init
+@@cls_attr
 
 self
 super
 
+ALT : instead of type, struct, record
 ALT : this
 EXT : enum < type is ... end
 ALT : +id -id #id respectivement une clé publique, privée, et protégée mais-@a c'est laid.
@@ -250,11 +301,13 @@ EXT : type/data ID is ... end
 raise EXPR
 
 try
-    ACT
-catch ID: typ
-    ACT
+    ACTION
+catch [VAR :] TYP [do]
+    ACTION
+catch any [do]
+    ACTION
 finally
-    ACT
+    ACTION
 end
 raise expr
 
@@ -262,6 +315,8 @@ No redo nor retry
 
 ALT : pas de gestion d'exceptions, on fait "à la C".
 Chaque type s'entend comme pouvant accueillir les valeurs nil et error.
+ALT rescure
+ALT except
 
 a = f()
 if a is not nil and a is not error then
@@ -275,6 +330,8 @@ ALT : else s'il n'y a pas eu d'exception
 
 9. Modules
 ==========
+
+import FICHIER [include * | ELEM1[, ELEMi]] (instead of require, from)
 
 Un fichier = un module
 
