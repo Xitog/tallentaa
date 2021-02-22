@@ -7,7 +7,7 @@
         "tabasspaces"     : true
     },
     "messages": {
-        "fr":  {
+        "fr" : {
             "started"     : "Démarré",
             "about_msg"   : "Fait avec ❤",
             "unsaved"     : "Modifications non sauvées",
