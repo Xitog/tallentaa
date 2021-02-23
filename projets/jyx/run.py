@@ -1,2 +1,0 @@
-import jyx
-jyx.Jyx()
