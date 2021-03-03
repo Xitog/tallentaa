@@ -145,7 +145,7 @@ switch EXPRESSION
     case EXPRESSION [do]
         ACTION
         [next]
-    case any [do]
+    case any [do] (ou else ?)
         ACTION
 end
 
@@ -199,19 +199,21 @@ next [<LABEL>]
 5. Opérateurs
 =============
 
-Mathématiques           + - * / ** // %
-Booléens et binaires    and or xor not
-Binaires                << >>
-Comparaison             == != < <= >= >
-Objet                   is in $ (conv en string/str) # (conv en int length/len/trunc) .
-Range                   ..
-Assignation             = += -= *= /= **= //= %= and= or= xor= not= <<= >>=
+Binaires
+    Mathématiques           + - * / ** // %
+    Booléens et binaires    and or xor
+    Autres                  << >> ??
+    Comparaison             == != < <= >= >
+    Objet                   is in .
+    Range                   ..
+    Assignation             = += -= *= /= **= //= %= and= or= xor= not= <<= >>= ??=
+Unaires
+    Mathématiques           -
+    Booléens et binaires    not
+    Objet                   $ (conv en string/str) # (conv en int length/len/trunc)
 
 nil
 any (tout type)
-
-a ?= b  <=> a = (a is nil) ? b : a
-a ??= b <=> a is not nil and a == b
 
 Les chaînes d'affilées se concatènent automatiquement, comme en Ruby.
 
@@ -221,6 +223,10 @@ ALT : [deb..fin] ou [deb..fin[
 EXT : &a permet de faire des alias a = &b a et b poitent sur la même valeur
 ALT : tester nil avec ==
 ALT : Définir l'interrogation de définition : defined? (en méthode) non car on veut savoir si une var existe, il faut un keyword ??? ou ?
+INF : On abandonne &, |, ^(xor), ~(not)
+ALT : un ou deux ?
+a ?= b  <=> a = (a is nil) ? b : a
+a ??= b <=> a is not nil and a == b
 
 6. Fonctions
 ============
@@ -304,7 +310,7 @@ try
     ACTION
 catch [VAR :] TYP [do]
     ACTION
-catch any [do]
+catch any [do] (ou else ?)
     ACTION
 finally
     ACTION
@@ -312,11 +318,6 @@ end
 raise expr
 
 No redo nor retry
-
-ALT : pas de gestion d'exceptions, on fait "à la C".
-Chaque type s'entend comme pouvant accueillir les valeurs nil et error.
-ALT rescure
-ALT except
 
 a = f()
 if a is not nil and a is not error then
@@ -327,6 +328,10 @@ end
 ALT : when au lieu de catch (pratique car on réutilise le when du switch)
 ALT : throw au lieu de raise
 ALT : else s'il n'y a pas eu d'exception
+ALT : pas de gestion d'exceptions, on fait "à la C".
+Chaque type s'entend comme pouvant accueillir les valeurs nil et error.
+ALT rescure
+ALT except
 
 9. Modules
 ==========
