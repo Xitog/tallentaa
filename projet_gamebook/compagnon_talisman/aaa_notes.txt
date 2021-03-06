@@ -1,0 +1,27 @@
+-------------------------------------------------------------------------------
+Les fichiers (13)
+-------------------------------------------------------------------------------
+
+Durant la phase de production, je travaillais seulement avec deux fichiers : le fichier Textile et le fichier VUE de tous les nœuds nommés (doc_)Talisman.
+Le troisième fichier important est le fichier résultat, la belle carte contenue dans Talisman_big.png.
+À la fin du projet, j'ai produit différentes variantes.
+
+aaa_notes                   (ce fichier) Notes de production publiques.
+doc_talisman.textile.txt    (***) Texte du compagnon au format Textile.
+Talisman.html               Fichier produit par VUE carte interactive des nœuds, mais les nœuds internes à un groupe ne sont pas sélectionnables.
+Talisman.png                Fichier produit par VUE carte nécessaire au fichier html dans un plus petit format que Talisman_big.
+Talisman.rdf                Fichier produit par VUE au format RDF.
+Talisman.svg                (archivé) Fichier produit par VUE au format SVG.
+Talisman.vue                (***) Le fichier des nœuds.
+Talisman_auto_arbre.png     (archivé) Fichier image d'une mise en ordre auto de VUE, pour le fun (très gros ! 10Mo).
+Talisman_auto_radial.png    (archivé) Fichier image d'une mise en ordre auto de VUE, pour le fun (très gros ! 10Mo).
+Talisman_big.png            (***) Fichier produit par VUE à partir de Talisman.vue, image en grand format (bizarrement, seulement 2Mo).
+Talisman_chapites.html      Fichier produit par VUE carte interactive des nœuds mais seulement des chapitres.
+Talisman_chapitres.png      Fichier produit par VUE carte nécessaire au fichier html.
+Talisman_chapitres.vue      Le fichier des nœuds chapitres seulement (pas de notes, pas de groupement).
+
+-------------------------------------------------------------------------------
+Historique
+-------------------------------------------------------------------------------
+
+Mise en ligne le 20 janvier 2015.
