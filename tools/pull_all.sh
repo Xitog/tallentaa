@@ -30,6 +30,7 @@ do
         echo -e "${RED}$output${NC}"
     fi
     git status
+    git remote -v
     cd ..
     printf "\n"
 done
