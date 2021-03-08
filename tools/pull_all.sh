@@ -9,16 +9,30 @@
 # raycasting            yes             https://github.com/Xitog/raycasting.git git@github.com:Xitog/raycasting.git
 # weyland       yes     yes             https://github.com/Xitog/weyland.git    git@github.com:Xitog/weyland.git
 
-for file in */ ; do
+GREEN='\033[1;32m'
+RED='\033[1;31m'
+NC='\033[0m' # No Color
+
+for file in */
+do
     name=${file%*/} 
     echo ---------------------------------------------------------------
     echo Updating "$name";
     echo ---------------------------------------------------------------
-    cd $file;
-    pull;
-    git status;
+    cd $file
+    output="$(pull)"
+    if [ "$output" = "Déjà à jour." ]
+    then
+        echo -e "${GREEN}$output${NC}"
+    fi
+    if [ "$output" != "Déjà à jour." ]
+    then
+        echo -e "${RED}$output${NC}"
+    fi
+    git status
     cd ..
     printf "\n"
 done
 
-echo Fin
+printf "** Fin **\n"
+
