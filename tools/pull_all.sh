@@ -13,11 +13,17 @@ GREEN='\033[1;32m'
 RED='\033[1;31m'
 NC='\033[0m' # No Color
 
+nb=$(find . -mindepth 1 -maxdepth 1 -type d | wc -l)
+echo Total of local repository: $nb
+printf "\n"
+
+count=1
+
 for file in */
 do
     name=${file%*/} 
     echo ---------------------------------------------------------------
-    echo Updating "$name";
+    echo Updating "$name" $count/$nb
     echo ---------------------------------------------------------------
     cd $file
     output="$(pull)"
@@ -33,6 +39,7 @@ do
     git remote -v
     cd ..
     printf "\n"
+    let "count+=1"
 done
 
 printf "** Fin **\n"
