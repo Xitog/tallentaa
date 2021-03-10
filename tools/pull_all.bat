@@ -1,26 +1,37 @@
 @echo off
+rem status:       lx      w8      w10     https                                   ssh
+rem ash           yes     yes             https://github.com/Xitog/ash.git        git@github.com:Xitog/ash.git
+rem dgx           yes     yes             https://github.com/Xitog/dgx.git        git@github.com:Xitog/dgx.git
+rem hamill        yes     yes             https://github.com/Xitog/hamill.git     git@github.com:Xitog/hamill.git
+rem jyx           yes     yes             https://github.com/Xitog/jyx.git        git@github.com:Xitog/jyx.git
+rem tal                   yes             https://github.com/Xitog/tal.git        git@github.com:Xitog/tal.git
+rem tallentaa     yes     yes             https://github.com/Xitog/tallentaa.git  git@github.com:Xitog/tallentaa.git
+rem teddy         yes     yes             https://github.com/Xitog/teddy.git      git@github.com:Xitog/teddy.git
+rem raycasting    yes     yes             https://github.com/Xitog/raycasting.git git@github.com:Xitog/raycasting.git
+rem weyland       yes     yes             https://github.com/Xitog/weyland.git    git@github.com:Xitog/weyland.git
 
-echo Updating Jyx https://github.com/Xitog/jyx.git
-cd jyx
-git pull
-cd ..
+rem GREEN='\033[1;32m'
+rem RED='\033[1;31m'
+rem NC='\033[0m' # No Color
 
-echo Updating Tallentaa https://github.com/Xitog/tallentaa.git
-cd tallentaa
-git pull
-cd ..
+rem nb=$(find . -mindepth 1 -maxdepth 1 -type d | wc -l)
+rem echo Total of local repository: $nb
+rem printf "\n"
 
-echo Updating Dgx https://github.com/Xitog/dgx.git
-cd dgx
-git pull
-cd ..
+rem count=1
+rem $count/$nb
 
-echo Updating Teddy https://github.com/Xitog/teddy
-cd teddy
-git pull
-cd ..
+for /d %%G in (*) do (
+    echo ---------------------------------------------------------------
+    echo Updating %%G
+    echo ---------------------------------------------------------------
+    cd %%G
+    git pull
+    git status
+    git remote -v
+    cd ..
+)
 
-echo Updating Old School Raycasting https://github.com/Xitog/old-school-raycasting
-echo skipped
+echo ** Fin **
+echo.
 
-echo Fin
