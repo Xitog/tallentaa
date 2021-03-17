@@ -18,6 +18,7 @@ echo Total of local repository: $nb
 printf "\n"
 
 count=1
+ok=0
 
 for file in */
 do
@@ -26,12 +27,18 @@ do
     echo Updating "$name" $count/$nb
     echo ---------------------------------------------------------------
     cd $file
-    output="$(pull)"
+    output="$(git pull)"
     if [ "$output" = "Déjà à jour." ]
     then
         echo -e "${GREEN}$output${NC}"
+        ok = 1
     fi
-    if [ "$output" != "Déjà à jour." ]
+    if [ "$output" = "Already up to date." ]
+    then
+        echo -e "${GREEN}$output${NC}"
+        ok = 1
+    fi
+    if [ ok = 0 ]
     then
         echo -e "${RED}$output${NC}"
     fi
