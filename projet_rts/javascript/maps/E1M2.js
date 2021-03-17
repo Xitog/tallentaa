@@ -34,16 +34,18 @@ const THE_RIVER = {
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // 30
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // 31
     ],
-    height : 32,
     width : 32,
-    triggers : {
-        'conditions' : [
-            ['ControlUnits', 4, 0, 0, 1, [1, 31, 7, 31]]
-        ],
-        'actions' : [
-            ['Victory', 'You Win']
-        ]
-    }
+    height : 32,
+    triggers : [
+        {
+            conditions : [
+                ['ControlUnits', 4, 0, 0, 1, [1, 31, 7, 31]]
+            ],
+            actions : [
+                ['Victory', 'You Win']
+            ]
+        }
+    ]
 };
 
 MAPS["E1M2"] = load_map(THE_RIVER);

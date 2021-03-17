@@ -38,10 +38,10 @@ const ARCHIPELAGO = {
     height : 32,
     triggers : [
         {
-            'conditions' : [
+            conditions : [
                 ['ControlUnits', 4, 0, 0, 1, [1, 31, 7, 31]]
             ],
-            'actions' : [
+            actions : [
                 ['Victory', 'You Win', 'E1M2']
             ]
         }

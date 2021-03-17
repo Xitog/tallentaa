@@ -160,23 +160,25 @@
         if ("triggers" in dic) {
           triggers = dic["triggers"];
           triggers_oo = []
-          let conditions = [];
-          let actions = [];
-          for (let c of triggers['conditions']) {
-            if (c[0] === 'ControlUnits') {
-              conditions.push(new ControlUnits(c[0], c[1], c[2], c[3], c[4], c[5]));
-            } else {
-              throw "Unknown condition : " + c[0];
+          for (let trig of triggers) {
+            let conditions = [];
+            let actions = [];
+            for (let c of trig.conditions) {
+              if (c[0] === 'ControlUnits') {
+                conditions.push(new ControlUnits(c[0], c[1], c[2], c[3], c[4], c[5]));
+              } else {
+                throw "Unknown condition : " + c[0];
+              }
             }
-          }
-          for (let a of triggers['actions']) {
-            if (a[0] === 'Victory') {
-              actions.push(new Victory(a[0], a[1], a[2]));
-            } else {
-              throw "Unknown action :" + a[0];
+            for (let a of trig.actions) {
+              if (a[0] === 'Victory') {
+                actions.push(new Victory(a[0], a[1], a[2]));
+              } else {
+                throw "Unknown action :" + a[0];
+              }
             }
+            triggers_oo.push(new Trigger(conditions, actions));
           }
-          triggers_oo.push(new Trigger(conditions, actions));
         } else {
           throw "Incorrect map format: no triggers provided";
         }
@@ -847,6 +849,7 @@
           this.selected = new Group(this.player);
           this.prev_selected = null;
           this.gui = true;
+          this.square = true; // display green border on each square
         }
         
         save_selection() {
@@ -1007,9 +1010,11 @@
             camera.menu.draw(ctx);
           }
           // Mouse
-          if (mouse_map_col != -1 || mouse_map_row != -1) {
-            ctx.strokeStyle = 'rgb(0, 255, 0)';
-            ctx.strokeRect(Math.floor(mouse_col / 32) * 32, Math.floor(mouse_row / 32) * 32, 32, 32);
+          if (camera.square) {
+            if (mouse_map_col != -1 || mouse_map_row != -1) {
+              ctx.strokeStyle = 'rgb(0, 255, 0)';
+              ctx.strokeRect(Math.floor(mouse_col / 32) * 32, Math.floor(mouse_row / 32) * 32, 32, 32);
+            }
           }
           // Info on player
           ctx.font = '10px arial';
@@ -1031,9 +1036,10 @@
       const KEY_DOWN = 40;
       const KEY_RIGHT = 39;
       const KEY_LEFT = 37;
-      const KEY_BACKSPACE = 8;
-      const KEY_M = 77;
-      const KEY_H = 72;
+      const KEY_BACKSPACE = 8;  // Previous selection
+      const KEY_M = 77;         // Show/hide minimap
+      const KEY_H = 72;         // Show/hide GUI
+      const KEY_I = 73;         // Show/hide square info
       
       // Functions
       
@@ -1132,6 +1138,8 @@
           camera.minimap.show = !camera.minimap.show;
         } else if (event.keyCode == KEY_H) {
           camera.gui = !camera.gui;
+        } else if (event.keyCode == KEY_I) {
+          camera.square = !camera.square;
         } else {
           console.log('Unbound up key:', event.keyCode);
         }
