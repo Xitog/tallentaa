@@ -31,12 +31,12 @@ do
     if [ "$output" = "Déjà à jour." ]
     then
         echo -e "${GREEN}$output${NC}"
-        ok = 1
+        ok=1
     fi
     if [ "$output" = "Already up to date." ]
     then
         echo -e "${GREEN}$output${NC}"
-        ok = 1
+        ok=1
     fi
     if [ ok = 0 ]
     then
