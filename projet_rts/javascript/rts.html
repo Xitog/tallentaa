@@ -693,6 +693,8 @@
       var mouse_map_row = -1;
       var mouse_col = -1;
       var mouse_row = -1;
+      var mouse_start_col = -1;
+      var mouse_start_row = -1;
       
       var scroll_left = false;
       var scroll_right = false;
@@ -712,6 +714,8 @@
       function start() {
         screen = document.getElementById('screen');
         screen.onmousemove = on_mouse_move;
+        screen.onmousedown = on_mouse_down;
+        screen.onmouseup = on_mouse_up;
         window.onclick = on_mouse_left_click;
         window.oncontextmenu = on_mouse_right_click;
         window.onkeydown = on_key_down;
@@ -1016,6 +1020,14 @@
               ctx.strokeRect(Math.floor(mouse_col / 32) * 32, Math.floor(mouse_row / 32) * 32, 32, 32);
             }
           }
+          if (clicked) {
+            ctx.strokeStyle = 'rgb(255, 255, 255)';
+            ctx.strokeRect(Math.min(mouse_start_col - camera.col * 32, mouse_col),
+                           Math.min(mouse_start_row - camera.row * 32, mouse_row - camera.row),
+                           Math.abs(mouse_start_col - camera.col * 32 - mouse_col), 
+                           Math.abs(mouse_start_row - camera.row * 32 - mouse_row));
+            //console.log(mouse_start_col, mouse_start_row, mouse_col, mouse_row);
+          }
           // Info on player
           ctx.font = '10px arial';
           ctx.fillStyle = 'rgb(255, 242, 0)';
@@ -1040,6 +1052,11 @@
       const KEY_M = 77;         // Show/hide minimap
       const KEY_H = 72;         // Show/hide GUI
       const KEY_I = 73;         // Show/hide square info
+      
+      // Global var
+      
+      var clicked = false;
+      var iTimer;
       
       // Functions
       
@@ -1068,8 +1085,19 @@
         }
       }
       
-      var clicked = false;
-      var iTimer;
+      function on_mouse_down(event) {
+        clicked = true;
+        let screenRect = screen.getBoundingClientRect();
+        mouse_start_col = event.pageX - screenRect.left + camera.col * 32;
+        mouse_start_row = event.pageY - screenRect.top + camera.row * 32;
+        console.log(clicked);
+      }
+      
+      function on_mouse_up(event)
+      {
+        clicked = false;
+        console.log(clicked);
+      }
       
       function on_mouse_left_click(event) {
         console.log('row:', mouse_map_row, 'col:', mouse_map_col);
