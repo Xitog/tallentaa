@@ -31,7 +31,7 @@ logging.getLogger().setLevel(logging.DEBUG)
 
 # Mono
 
-do('index.hml')
+#do('index.hml')
 
 #hamill.process_file(r'input\informatique\json.hml', r'output\informatique\json.html', 'fr', includes)
 #hamill.process_file(jp('input', 'informatique', 'bnf.hml'), jp('output', 'informatique', 'bnf.html'), 'fr', includes)
@@ -39,13 +39,13 @@ do('index.hml')
 #hamill.process_file(r'input\informatique\tools_langs.hml', r'output\informatique\tools_langs.html', 'fr', includes)
 #hamill.process_file(r'input\informatique\ash_guide.hml', r'output\informatique\ash_guide.html', 'fr', includes)
 #hamill.process_file(r'input\informatique\lua.hml', r'output\informatique\lua.html', 'fr', includes)
-do('informatique/python.hml')
+#do('informatique/python.hml')
 
 #hamill.process_file(r'input\passetemps\tech_dialogues.hml', r'output\passetemps\tech_dialogues.html', 'fr', includes)
 #hamill.process_file(r'input\passetemps\tech_transitions.hml', r'output\passetemps\tech_transitions.html', 'fr', includes)
 
-do('passetemps/pres_jeux.hml')
-do('passetemps/pres_favoris.hml')
+#do('passetemps/pres_jeux.hml')
+#do('passetemps/pres_favoris.hml')
 do('passetemps/pres_jeuxvideo.hml')
 #hamill.process_file(r'input\passetemps\tech_raycasting_fr.hml', r'output\passetemps\tech_raycasting_fr.html', 'fr', includes)
 
