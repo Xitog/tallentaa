@@ -16,8 +16,9 @@
 !css li a       { color: #6714cc; font-size: 16px; }
 !css li         { font-size: 16px; color: black; }
 
-!css .row       { display: flex; }
-!css .column    { flex: 50%; margin-left: 0.5em; margin-right: 0.5em; }
+!css @media screen and (min-width: 600px) { .row    { display: flex; } }
+!css @media screen and (min-width: 600px) { .column { flex: 50%; margin-left: 0.5em; margin-right: 0.5em; } }
+!css @media screen and (max-width: 599px) { .row    { padding-left: 15px; padding-right: 15px; } }
 
 !css p          { text-align: justify; margin-top: 12px; margin-bottom: 12px;}
 !css p.sign     { text-align: center; color: grey; font-size: 12px;}
