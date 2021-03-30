@@ -19,6 +19,7 @@ printf "\n"
 
 count=1
 ok=0
+nb_ok=0
 
 for file in */
 do
@@ -32,13 +33,15 @@ do
     then
         echo -e "${GREEN}$output${NC}"
         ok=1
+        ((nb_ok=nb_ok+1))
     fi
     if [ "$output" = "Already up to date." ]
     then
         echo -e "${GREEN}$output${NC}"
         ok=1
+        ((nb_ok=nb_ok+1))
     fi
-    if [ ok = 0 ]
+    if [ $ok == 0 ]
     then
         echo -e "${RED}$output${NC}"
     fi
@@ -48,6 +51,21 @@ do
     printf "\n"
     let "count+=1"
 done
+
+((sum=count-1))
+
+if [ $nb_ok == $sum ]
+then
+    echo -e "${GREEN}---------------------------------------------------------------${NC}"
+    echo -e "${GREEN}All repositories ( $count ) are up to date.${NC}"
+    echo -e "${GREEN}(but there could be some local changes)${NC}"
+    echo -e "${GREEN}---------------------------------------------------------------${NC}\n"
+else
+    ((updated=$count-$nb_ok))
+    echo -e "${RED}---------------------------------------------------------------${NC}"
+    echo -e "${RED}$updated / $count repository updated${NC}"
+    echo -e "${RED}---------------------------------------------------------------${NC}\n"
+fi
 
 printf "** Fin **\n"
 
