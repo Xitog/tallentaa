@@ -19,7 +19,8 @@ if [ -f "dist" ]; then
     rm -rf "dist"
 fi
 
-python setup.py sdist bdist_wheel
+# python3 for linux and disable proxy
+python3 setup.py sdist bdist_wheel
 
 twine upload dist/*
 
