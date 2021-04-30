@@ -57,13 +57,13 @@ done
 if [ $nb_ok == $sum ]
 then
     echo -e "${GREEN}---------------------------------------------------------------${NC}"
-    echo -e "${GREEN}All repositories ( $count ) are up to date.${NC}"
+    echo -e "${GREEN}All repositories ( $sum ) are up to date.${NC}"
     echo -e "${GREEN}(but there could be some local changes)${NC}"
     echo -e "${GREEN}---------------------------------------------------------------${NC}\n"
 else
     ((updated=$count-$nb_ok))
     echo -e "${RED}---------------------------------------------------------------${NC}"
-    echo -e "${RED}$updated / $count repository updated${NC}"
+    echo -e "${RED}$updated / $sum repository updated${NC}"
     echo -e "${RED}---------------------------------------------------------------${NC}\n"
 fi
 
