@@ -61,9 +61,10 @@ then
     echo -e "${GREEN}(but there could be some local changes)${NC}"
     echo -e "${GREEN}---------------------------------------------------------------${NC}\n"
 else
-    ((updated=$count-$nb_ok))
+    ((updated=$sum-$nb_ok))
     echo -e "${RED}---------------------------------------------------------------${NC}"
     echo -e "${RED}$updated / $sum repository updated${NC}"
+    echo -e "${GREEN}Already up to date ( $nb_ok )${NC}"
     echo -e "${RED}---------------------------------------------------------------${NC}\n"
 fi
 
