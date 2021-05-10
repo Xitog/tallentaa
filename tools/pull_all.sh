@@ -9,7 +9,7 @@
 # raycasting    yes     yes             https://github.com/Xitog/raycasting.git git@github.com:Xitog/raycasting.git
 # weyland       yes     yes             https://github.com/Xitog/weyland.git    git@github.com:Xitog/weyland.git
 
-GREEN='\033[1;32m'
+GRN='\033[1;32m'
 RED='\033[1;31m'
 NC='\033[0m' # No Color
 
@@ -31,13 +31,13 @@ do
     output="$(git pull)"
     if [ "$output" = "Déjà à jour." ]
     then
-        echo -e "${GREEN}$output${NC}"
+        echo -e "${GRN}$output${NC}"
         ok=1
         ((nb_ok=nb_ok+1))
     fi
     if [ "$output" = "Already up to date." ]
     then
-        echo -e "${GREEN}$output${NC}"
+        echo -e "${GRN}$output${NC}"
         ok=1
         ((nb_ok=nb_ok+1))
     fi
@@ -56,15 +56,15 @@ done
 
 if [ $nb_ok == $sum ]
 then
-    echo -e "${GREEN}---------------------------------------------------------------${NC}"
-    echo -e "${GREEN}All repositories ( $sum ) are up to date.${NC}"
-    echo -e "${GREEN}(but there could be some local changes)${NC}"
-    echo -e "${GREEN}---------------------------------------------------------------${NC}\n"
+    echo -e "${GRN}---------------------------------------------------------------${NC}"
+    echo -e "${GRN}All repositories ($sum) are up to date.${NC}"
+    echo -e "${GRN}(but there could be some local changes)${NC}"
+    echo -e "${GRN}---------------------------------------------------------------${NC}\n"
 else
     ((updated=$sum-$nb_ok))
     echo -e "${RED}---------------------------------------------------------------${NC}"
-    echo -e "${RED}$updated / $sum repository updated${NC}"
-    echo -e "${GREEN}Already up to date ( $nb_ok )${NC}"
+    echo -e "${RED}$updated / $sum repository(ies) updated${NC}"
+    echo -e "${GRN}$nb_ok / $sum repository(ies) already up to date )${NC}"
     echo -e "${RED}---------------------------------------------------------------${NC}\n"
 fi
 
