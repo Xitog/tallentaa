@@ -1,0 +1,233 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Guides Gouteux</title>
+
+    <!-- Bootstrap -->
+    <!-- <link href="css/bootstrap.min.css" rel="stylesheet"> -->
+    <!--<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>-->
+    <link href="zlib/simplex.bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+        div.container {
+            margin-top: 8px;
+        }
+        div.jumbotron p {
+            font-family: "Palatino Linotype";
+            font-size: 18px; /* de base 20px */
+        }
+        div.jumbotron p.n {
+            text-align: justify;
+        }    
+        div.jumbotron p.n:before {
+            content: "» ";
+        }
+        div.jumbotron p.sign {
+            text-align: right;
+        }
+        div.jumbotron h1 {
+            color: #CC6714;
+            font-family: "Palatino Linotype";
+        }
+        body {
+        }
+        // Sticky footer style
+        html {
+            position: relative;
+            min-height: 100%;
+        }
+        body {
+            /* Margin bottom by footer height */
+            margin-bottom: 30px;
+        }
+        .footer {
+            position: absolute;
+            bottom: 5px;
+            /* width: 100%; */
+            /* Set the fixed height of the footer here */
+            height: 30px;
+            background-color: #f5f5f5;
+        }
+        footer div p {
+            text-align: center;
+        }
+        /* Liens */
+        /* Les liens dans la barre de base */
+        .navbar-default .navbar-nav > li > a:hover,
+        .navbar-default .navbar-nav > li > a:focus {
+            color: #CC6714;
+        }
+        /* Dans le menu descendant, ouvert */
+        .dropdown-menu > li > a:hover,
+        .dropdown-menu > li > a:focus {
+          text-decoration: none;
+          color: #ffffff;
+          background-color: #CC6714;
+        }
+        /* Nom du projet "brand" */
+        .navbar-default .navbar-brand:hover,
+        .navbar-default .navbar-brand:focus {
+            color: #CC6714;
+        }
+        /* Menu descendant ouvert le menu en lui-même */
+        .navbar-default .navbar-nav > .open > a,
+        .navbar-default .navbar-nav > .open > a:hover,
+        .navbar-default .navbar-nav > .open > a:focus {
+            color: #CC6714;
+        }
+        /* spans */
+        span.blue {
+            border: 1px solid #9999CC;
+            color: #9999CC;
+        }
+        span.green {
+            border: 1px solid #55AA55;
+            color: #55AA55;
+        }
+        span.grey {
+            border: 1px solid #AAAAAA;
+            color: #111111;
+        }
+        span.grey , span.green , span.blue {
+            font-family: "Consolas";
+	    font-style: normal;
+	    font-size: 12px;
+	    background-color: #F9F9F9;
+	    padding-left: 2px;
+	    padding-right: 2px;
+        }
+        span.title {
+            border-bottom: 1px solid #EEEEEE; /* #AAAAAA; */
+        }
+        /* Div */
+        div.block {
+	    margin-left: 10px;
+	    border-left: 3px solid #EEEEEE;
+	    padding-left: 3px;
+	}
+        /* b */
+        b.green {
+            color: #55AA55;
+        }
+        b.blue {
+            color: #9999CC;
+        }
+        b.orange {
+            color: #FF6600;
+        }
+        /* pre */
+        div.code {
+            padding: 0 0 0 0;
+            margin: 0 0 0 0;
+            -moz-box-shadow: 10px 10px 5px 0px #c0c0c0;
+            -webkit-box-shadow: 10px 10px 5px 0px #c0c0c0;
+            -o-box-shadow: 10px 10px 5px 0px #c0c0c0;
+            box-shadow: 10px 10px 5px 0px #c0c0c0;    
+            filter:progid:DXImageTransform.Microsoft.Shadow(color=#c0c0c0, Direction=134, Strength=5);
+        }
+        pre.code {
+            background-color: #F9F9F9;
+            border: 1px solid #AAA;
+            padding: 2px;
+            font-family: "Consolas";
+        }
+    </style>
+    
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    
+    <div id="main" class="container">
+
+        <!-- Static navbar -->
+        <nav class="navbar navbar-default" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="index.html">Guides Gouteux</a>
+                </div>
+                <div id="navbar" class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                        <!--<li class="active"><a href="#">Accueil</a></li>-->
+                        <li><a href="xxx">Linguistique</a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Italien <span class="caret"></span></a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="http://ran.alwaysdata.net/beatrice/index.html">Tout-en-un</a></li>
+                                <li><a href="http://ran.alwaysdata.net/beatrice/beatrice3.html">Tout-en-un mobile</a></li>
+                                <li><a href="http://ran.alwaysdata.net/invoque/">Vocabulaire</a></li>
+                                <!--<li class="divider"></li>
+                                <li class="dropdown-header">Nav header</li>
+                                <li><a href="#">Separated link</a></li>
+                                <li><a href="#">One more separated link</a></li>-->
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Français <span class="caret"></span></a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="http://ran.alwaysdata.net/cristina/index.html">Tout-en-un</a></li>
+                                <li><a href="http://ran.alwaysdata.net/invoque/">Vocabulaire</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Histoire <span class="caret"></span></a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="http://ran.alwaysdata.net/histoire/methode.html">Méthode</a></li>
+                                <li><a href="http://ran.alwaysdata.net/histoire/bibliographie.html">Bibliographie</a></li>
+                                <li><a href="http://ran.alwaysdata.net/histoire/france19eme.html">France au XIXe</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Programmation <span class="caret"></span></a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="http://ran.alwaysdata.net/ruby/index.html">Ruby</a></li>
+                                <li><a href="xxx">Python</a></li>
+                                <li><a href="http://ran.alwaysdata.net/calcoolette/index.html">Calcoolette</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Jeux de rôles <span class="caret"></span></a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="#">Règles</a></li>
+                                <li><a href="#">Univers</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="xxx">Jeux vidéo</a></li>
+                        <li><a href="http://ran.alwaysdata.net/citations/dicocit.rb">Citations</a></li>
+                        <li><a href="http://ran.alwaysdata.net/liens.html">Liens</a></li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="active"><a href="a_propos.html">À propos</a></li>
+                    </ul>
+                </div><!--/.nav-collapse -->
+            </div><!--/.container-fluid -->
+       </nav>
+      
+      <iframe src='http://cdn.knightlab.com/libs/timeline/latest/embed/index.html?source=0As-nq3vZLtSgdDhqd2dKanRrU3dMMlVKMUpEUGRjMFE&font=Bevan-PotanoSans&maptype=toner&lang=fr&height=650' width='100%' height='650' frameborder='0'></iframe>
+
+      <footer class="footer">
+          <div class="container">
+              <p class="text-muted">2011-2014</p>
+          </div>
+      </footer>
+    
+    </div> <!-- /container -->
+    
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="zlib/bootstrap.min.js"></script>
+  </body>
+</html>

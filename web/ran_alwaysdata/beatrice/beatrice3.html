@@ -1,0 +1,331 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="http://ran.alwaysdata.net/beatrice/favicon.ico">
+    <title>Beatrice</title>
+    <style type="text/css">
+
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0 0 0 0;
+      font-family: "Palatino Linotype";
+    }
+ 
+    #main {
+      width: 100%;
+      height: 100%;
+      background-color: #EFEFEF;
+      color: #939393; /*DarkSlateGray;*/
+      text-align: center;
+      border-collapse: separate;
+      border-spacing: 2px 2px;
+      font-size: 18px;
+    }
+
+    /* ---- LIGNE simple (1/1 grisé, cursor par défaut, pas de réaction en survol : pour le contenu) ---- */
+
+    #main tr.simple:nth-child(odd) {
+      background-color: #e5e5e5;
+    }
+
+    #main tr.simple td {
+      cursor: default;
+    }
+
+    #main tr.simple td:hover {
+      cursor: default;
+    }
+
+    /* ---- LIGNE titre (or, cursor par défaut, par de réaction en survol : pour les titres de page) ---- */
+    
+    #main tr.titre td {
+      background-color: #e1b74c; /* or GoldenRod */
+      color: white;
+    }
+    #main tr.titre td:hover {
+      background-color: #e1b74c; /* or GoldenRod */
+      color: white;
+      cursor: default;
+    }
+
+    /* ---- LIGNE info (marron, cursor par défaut, par de réaction en survol : pour l'information en bas dans la page démarrage) ---- */
+
+    #main tr.info td {
+      background-color: #CFBCA6; /* gris */
+      color: white;
+    }
+    #main tr.info td:hover {
+      background-color: #CFBCA6; /* gris */
+      color: white;
+      cursor: default;
+    }
+
+    /* ---- CELLU side (vert, cursor par défaut, par de réaction en survol : pour les titres de colonnes) ---- */
+    
+    #main td.side {
+      background-color: #81b99a;
+      cursor: default;
+      color: #ffffff;
+    }
+    #main td.side:hover {
+      background-color: #81b99a;
+      cursor: default;
+      color: #ffffff;
+    }
+    
+    /* ---- LIGNE link (bleu, cursor lien, par de r"actione en survol : pour les liens) ---- */
+
+    #main tr.link {
+      background-color: #4c76e1;
+      cursor: pointer;
+      font-weight: bold;
+      color: white;
+    }
+    #main tr.link:nth-child(odd) {
+      background-color: #819fea;
+    }
+    #main tr.link:hover {
+      cursor: pointer;
+      font-weight: bold;
+      color: white;
+    }
+
+    /* forced blue */
+    #main tr.flink {
+      background-color: #4c76e1;
+      cursor: pointer;
+      font-weight: bold;
+      color: white;
+    }
+    #main tr.flink:hover {
+      cursor: pointer;
+      font-weight: bold;
+      color: white;
+    }   
+
+    /* dead link */
+    #main tr.dlink {
+      background-color: #b1b8c8;
+    }
+
+    /* ---- CELLU link (bleu, cursor lien, par de réactione en survol : pour les liens) ---- */
+
+    #main td.link {
+      background-color: #4c76e1;
+      cursor: pointer;
+      font-weight: bold;
+      color: white;
+    }
+    #main td.link:hover {
+      background-color: #4c76e1;
+      cursor: pointer;
+      font-weight: bold;
+      color: white;
+    }
+    
+    </style>
+  </head>
+  <body>
+    <table id="main">
+      <tbody id="core">
+      </tbody>
+    </table>
+    <script type="text/javascript">
+
+    function on_event(e) {
+      if (e == "#main") {
+        main();
+      } else if (e == "#presentation") {
+        presentation();
+      } else if (e == "#grammaire") {
+        grammaire();
+      } else if (e == "#phonetique") {
+        phonetique();
+      } else if (e == "#voyelles") {
+        voyelles();
+      } else if (e == "#cons_simples") {
+        cons_simples();
+      } else if (e == "#cons_variables") {
+        cons_variables();
+      } else if (e == "#cons_duos") {
+        cons_duos();
+      } else if (e == "#articles") {
+        articles();
+      } else if (e == "#articles_definis") {
+        articles_definis();
+      } else if (e == "#pronoms") {
+        pronoms();
+      } else if (e == "#pronoms_sujets") {
+        pronoms_sujets();
+      } else if (e == "#pronoms_reflechis") {
+        pronoms_reflechis();
+      } else if (e == "#verbes") {
+        verbes();
+      } else if (e == "#groupes") {
+        groupes();
+      } else if (e == "#present") {
+        present();
+      } else if (e == "#present_exemples") {
+        present_exemples();
+      } else if (e == "#imparfait") {
+        imparfait();
+      } else if (e == "#futur") {
+        futur();
+      } else if (e == "#conjugaison") {
+        conjugaison();
+      } else if (e == "#essere") {
+        essere();
+      } else if (e == "#avere") {
+        avere();
+      } else if (e == "#vocabulaire") {
+        vocabulaire();
+      } else if (e == "#couleurs") {
+        couleurs();
+      } else {
+        main();
+      }
+    }
+    
+    if ("onhashchange" in window) {
+      window.onhashchange = function () { on_event(window.location.hash); }
+      on_event(window.location.hash);
+    }
+
+    function main() {
+      var tbody = document.getElementById("core");
+      tbody.innerHTML = '<tr><tr class="titre"><td>Beatrice</td></tr> <tr class="link"><td onclick="window.location.href=\'#presentation\'">Présentation</td></tr> <tr class="link"><td onclick="window.location.href=\'#grammaire\'">Grammaire</td></tr> <tr class="link" onclick="window.location.href=\'#conjugaison\'"><td>Conjugaison</td></tr> <tr class="dlink"><td><i>Orthographe</i></td></tr> <tr class="link" onclick="window.location.href=\'#vocabulaire\'"><td>Vocabulaire</td></tr> <tr class="info"><td>D&G 2011-2014 α1</td></tr>';
+    }
+
+    function presentation() {
+      var tbody = document.getElementById("core");
+      tbody.innerHTML = '<tr class="titre"><td>Présentation</td></tr> <tr class="link"><td onclick="window.location.href=\'#phonetique\'">Phonétique</td></tr> <tr class="link" onclick="window.location.href=\'#main\'"><td>Retour</td><tr>';
+    }
+
+    function phonetique() {
+      var tbody = document.getElementById("core");
+      tbody.innerHTML = '<tr class="titre"><td>Phonétique</td></tr> <tr class="link"><td onclick="window.location.href=\'#voyelles\'">Voyelles</td></tr> <tr class="link"><td onclick="window.location.href=\'#cons_simples\'">Consonnes simples</td></tr> <tr class="link"><td onclick="window.location.href=\'#cons_variables\'">Consonnes et duo variables</td></tr> <tr class="link"><td onclick="window.location.href=\'#cons_duos\'">Duos</td></tr> <tr class="link" onclick="window.location.href=\'#presentation\'"><td>Retour</td><tr>';
+    }
+
+    function voyelles() {
+      var tbody = document.getElementById("core");
+      tbody.innerHTML = '<tr class="titre"><td colspan="3">Voyelles</td></tr> <tr class="simple"><td class="side" width="34%">Lettre</td><td class="side" width="33%">Son</td><td class="side" width="33%">Code API</td></tr> <tr class="simple"><td>a</td><td>"a"</td><td>[a]</td></tr> <tr class="simple"><td>e</td><td>"é" ou "è"</td><td>[e] ou [ɛ]</td></tr> <tr class="simple"><td>i</td><td>"i"</td><td>[i]</td></tr> <tr class="simple"><td>o</td><td>"o" ou "ô"</td><td>[o] ou [ɔ]</td></tr> <tr class="simple"><td>u</td><td>"ou"</td><td>[u]</td></tr> <tr class="flink" onclick="window.location.href=\'#phonetique\'"><td colspan="3">Retour</td><tr>';
+    }
+
+    function cons_simples() {
+      var tbody = document.getElementById("core");
+      tbody.innerHTML = '<tr class="titre"><td colspan="3">Consonnes simples</td></tr> <tr class="simple"><td class="side" width="34%">Lettre</td><td class="side" width="33%">Son</td><td class="side" width="33%">Code API</td></tr> <tr class="simple"><td>b</td><td>"b"</td><td>[b]</td></tr> <tr class="simple"><td>d</td><td>"d"</td><td>[d]</td></tr> <tr class="simple"><td>f</td><td>"f"</td><td>[f]</td></tr> <tr class="simple"><td>l</td><td>"l"</td><td>[l]</td></tr> <tr class="simple"><td>m</td><td>"m"</td><td>[m]</td></tr> <tr class="simple"><td>n</td><td>"n"</td><td>[n]</td></tr> <tr class="simple"><td>p</td><td>"p"</td><td>[p]</td></tr> <tr class="simple"><td>r</td><td>"r roulé"</td><td>[r]</td></tr> <tr class="simple"><td>t</td><td>"t"</td><td>[t]</td></tr> <tr class="simple"><td>v</td><td>"v"</td><td>[v]</td></tr> <tr class="flink" onclick="window.location.href=\'#phonetique\'"><td colspan="3">Retour</td><tr>';
+    }
+
+    function cons_variables() {
+      var tbody = document.getElementById("core");
+      tbody.innerHTML = '<tr class="titre"><td colspan="3">Consonnes et duo variables</td></tr> <tr class="simple"><td class="side" width="34%">Lettre</td><td class="side" width="33%">Son</td><td class="side" width="33%">Code API</td></tr> <tr class="simple"><td>c + a, o, u</td><td>"k"</td><td>[k]</td></tr> <tr class="simple"><td>c + e, i</td><td>"tch"</td><td>[tʃ]</td></tr> <tr class="simple"><td>g + a, o, u</td><td>"gu"</td><td>[g]</td></tr> <tr class="simple"><td>g + e, i</td><td>"dj"</td><td>[dʒ]</td></tr> <tr class="simple"><td>sc + a, o, u</td><td>"sk"</td><td>[sk]</td></tr> <tr class="simple"><td>sc + e, i</td><td>"ch"</td><td>[ʃ]</td></tr> <tr class="simple"><td>s</td><td>"ss" ou "z" (entre 2 voyelles)</td><td>[s] ou [z]</td></tr> <tr class="simple"><td>z</td><td>"z" ou "dz" ou "tz"</td><td>[z] ou [dz] ou [tz]</td></tr> <tr class="flink" onclick="window.location.href=\'#phonetique\'"><td colspan="3">Retour</td><tr>';
+    }
+
+    function cons_duos() {
+      var tbody = document.getElementById("core");
+      tbody.innerHTML = '<tr class="titre"><td colspan="3">Duos</td></tr> <tr class="simple"><td class="side" width="34%">Lettre</td><td class="side" width="33%">Son</td><td class="side" width="33%">Code API</td></tr> <tr class="simple"><td>gl</td><td>"ye" (l mouillé)</td><td>[ʎ]</td></tr> <tr class="simple"><td>gn</td><td>"gne"</td><td>[ɲ]</td></tr> <tr class="simple"><td>ng</td><td>"ng"</td><td>[ɳ]</td></tr> <tr class="link" onclick="window.location.href=\'#phonetique\'"><td colspan="3">Retour</td><tr>';
+    }
+
+    function grammaire() {
+      var tbody = document.getElementById("core");
+      tbody.innerHTML = '<tr class="titre"><td>Grammaire</td></tr> <tr class="dlink"><td><i>Noms</i></td></tr> <tr class="link"><td onclick="window.location.href=\'#articles\'">Articles</td></tr> <tr class="dlink"><td><i>Adjectifs qualificatifs</i></td></tr> <tr class="link"><td onclick="window.location.href=\'#pronoms\'">Pronoms</td></tr> <tr class="dlink"><td><i>Adverbes</i></td></tr> <tr class="link"><td onclick="window.location.href=\'#verbes\'">Verbes</td></tr> <tr class="dlink"><td><i>Adjectifs non qualificatifs</i></td></tr> <tr class="dlink"><td><i>Prépositions</i></td></tr> <tr class="dlink"><td><i>Conjonctions</i></td></tr> <tr class="dlink"><td><i>Interjections</i></td></tr> <tr class="link" onclick="window.location.href=\'#main\'"><td>Retour</td><tr>';
+    }
+    
+    function articles() {
+      var tbody = document.getElementById("core");
+      tbody.innerHTML = '<tr class="titre"><td>Articles</td></tr> <tr class="link"><td onclick="window.location.href=\'#articles_definis\'">Articles définis</td></tr> <tr class="dlink"><td><i>Articles indéfinis</i></td></tr> <tr class="link" onclick="window.location.href=\'#grammaire\'"><td>Retour</td><tr>';
+    }
+    
+    function articles_definis() {
+      var tbody = document.getElementById("core");
+      tbody.innerHTML = '<tr class="titre"><td colspan="3">Articles définis</td></tr> <tr class="simple"><td class="side" colspan="3">Masculin</td></tr> <tr class="simple"><td class="side" width="34%">précède</td><td class="side" width="33%">singulier</td><td class="side" width="33%">pluriel</td></tr> <tr class="simple"><td>consonne</td><td>il</td><td>i</td></tr> <tr class="simple"><td>voyelle</td><td>l\'</td><td>gli</td></tr> <tr class="simple"><td>s+consonne<br>x, z, ps, gn<br>/i/+voyelle</td><td>lo</td><td>gli</td></tr> <tr class="simple"><td class="side" colspan="3">Féminin</td></tr> <tr class="simple"><td class="side" width="40%">précède</td><td class="side" width="30%">singulier</td><td class="side" width="30%">pluriel</td></tr> <tr class="simple"><td>consonne</td><td>la</td><td>le</td></tr> <tr class="simple"><td>voyelle</td><td>l\'</td><td>le</td></tr> <tr class="flink" onclick="window.location.href=\'#articles\'"><td colspan="3">Retour</td><tr>';
+    }
+
+    function pronoms() {
+      var tbody = document.getElementById("core");
+      tbody.innerHTML = '<tr class="titre"><td>Pronoms</td></tr> <tr class="link"><td onclick="window.location.href=\'#pronoms_sujets\'">Pronoms sujets</td></tr> <tr class="link"><td onclick="window.location.href=\'#pronoms_reflechis\'">Pronoms réfléchis</td></tr> <tr class="dlink"><td><i>Pronoms compléments d\'objet</i></td></tr> <tr class="link" onclick="window.location.href=\'#grammaire\'"><td>Retour</td><tr>'
+    }
+
+    function pronoms_sujets() {
+      var tbody = document.getElementById("core");
+      tbody.innerHTML = '<tr class="titre"><td colspan="3">Pronoms sujets</td></tr> <tr class="simple"><td class="side" rowspan="3" width="10%">sg</td><td width="45%">io</td><td width="45%">je</td></tr> <tr class="simple"><td>tu</td><td>tu</td></tr> <tr class="simple"><td>lei, lui</td><td>elle, il</td></tr> <tr class="simple"><td class="side" rowspan="3" width="10%">pl</td><td>noi</td><td>nous</td></tr> <tr class="simple"><td>voi</td><td>vous</td></tr> <tr class="simple"><td>loro</td><td>elles, ils</td></tr> <tr class="link" onclick="window.location.href=\'#pronoms\'"><td colspan="3">Retour</td><tr>';
+    }
+
+    function pronoms_reflechis() {
+      var tbody = document.getElementById("core");
+      tbody.innerHTML = '<tr class="titre"><td colspan="3">Pronoms réfléchis</td></tr> <tr class="simple"><td class="side" rowspan="3" width="10%">sg</td><td width="45%">mi</td><td width="45%">me</td></tr> <tr class="simple"><td>ti</td><td>te</td></tr> <tr class="simple"><td>si</td><td>se</td></tr> <tr class="simple"><td class="side" rowspan="3" width="10%">pl</td><td>ci</td><td>nous</td></tr> <tr class="simple"><td>vi</td><td>vous</td></tr> <tr class="simple"><td>si</td><td>se</td></tr> <tr class="link" onclick="window.location.href=\'#pronoms\'"><td colspan="3">Retour</td><tr>';
+    }
+    
+    function verbes() {
+      var tbody = document.getElementById("core");
+      tbody.innerHTML = '<tr class="titre"><td>Conjugaison</td></tr> <tr class="link"><td onclick="window.location.href=\'#groupes\'">Groupes</td></tr> <tr class="link"><td onclick="window.location.href=\'#present\'">Présent de l\'indicatif</td></tr> <tr class="link"><td onclick="window.location.href=\'#imparfait\'">Imparfait de l\'indicatif</td></tr> <tr class="link"><td onclick="window.location.href=\'#futur\'">Futur de l\'indicatif</td></tr> <tr class="link" onclick="window.location.href=\'#grammaire\'"><td>Retour</td><tr>';
+    }
+
+    function groupes() {
+      var tbody = document.getElementById("core");
+      tbody.innerHTML = '<tr class="titre"><td colspan="3">Groupes</td></tr> <tr class="simple"><td class="side">Groupe</td><td class="side">Terminaison</td><td class="side">Exemple</td></tr> <tr class="simple"><td>1er groupe (A)</td><td>-are</td><td>parlare (parler)</td></tr> <tr class="simple"><td>2e groupe (E)</td><td>-ere</td><td>credere (croire)</td></tr> <tr class="simple"><td>3e groupe (I)</td><td>-ire</td><td>finire (finir)</td></tr> <tr class="link" onclick="window.location.href=\'#verbes\'"><td colspan="3">Retour</td><tr>';
+    }
+
+    function present() {
+      var tbody = document.getElementById("core");
+      tbody.innerHTML = '<tr class="titre"><td colspan="4">Présent de l\'indicatif</td></tr> <tr><td class="link" width="10%" onclick="window.location.href=\'#present_exemples\'">Exemples</td><td class="side" width="30%">1er (A)</td><td class="side" width="30%">2e (E)</td><td class="side" width="30%">3e (I)</td></tr> <tr class="simple"><td>io</td><td colspan="3">o</td></tr> <tr class="simple"><td>tu</td><td colspan="3">i</td></tr> <tr class="simple"><td>lei, lui</td><td>a</td><td colspan="2">e</td></tr> <tr class="simple"><td>noi</td><td colspan="3">iamo</td></tr> <tr class="simple"><td>voi</td><td>ate</td><td>ete</td><td>ite</td></tr> <tr class="simple"><td>loro</td><td>ano</td><td colspan="2">ono</td></tr> <tr class="flink" onclick="window.location.href=\'#verbes\'"><td colspan="4">Retour</td><tr>';
+    }
+
+    function present_exemples() {
+      var tbody = document.getElementById("core");
+      tbody.innerHTML = '<tr class="titre"><td colspan="4">Présent de l\'indicatif</td></tr> <tr><td class="link" width="10%" onclick="window.location.href=\'#present\'">Terminaisons</td><td class="side" width="30%">1er (A) parlare</td><td class="side" width="30%">2e (E) credere</td><td class="side" width="30%">3e (I) finire</td></tr> <tr class="simple"><td>io</td><td>parl<b>o</b></td><td>cred<b>o</b></td><td>fini<i>sc</i><b>o</b></td></tr> <tr class="simple"><td>tu</td><td>parl<b>i</b></td><td>cred<b>i</b></td><td>fini<i>sc</i><b>i</b></td></tr> <tr class="simple"><td>lei, lui</td><td>parl<b>a</b></td><td>cred<b>e</b></td><td>fini<i>sc</i><b>e</b></td></tr> <tr class="simple"><td>noi</td><td>parl<b>iamo</b></td><td>cred<b>iamo</b></td><td>fin<b>iamo</b></td></tr> <tr class="simple"><td>voi</td><td>parl<b>ate</b></td><td>cred<b>ete</b></td><td>fin<b>ite</b></td></tr> <tr class="simple"><td>loro</td><td>parl<b>ano</b></td><td>cred<b>ono</b></td><td>fini<i>sc</i><b>ono</b></tr> <tr class="flink" onclick="window.location.href=\'#verbes\'"><td colspan="4">Retour</td><tr>';
+    }
+    
+    function imparfait() {
+      var tbody = document.getElementById("core");
+      tbody.innerHTML = '<tr class="titre"><td colspan="4">Imparfait de l\'indicatif</td></tr> <tr class="simple"><td width="10%"></td><td class="side" width="30%">1er (A)</td><td class="side" width="30%">2e (E)</td><td class="side" width="30%">3e (I)</td></tr> <tr class="simple"><td>io</td><td>a<b>vo</b></td><td>e<b>vo</b></td><td>i<b>vo</b></td></tr> <tr class="simple"><td>tu</td><td>a<b>vi</b></td><td>e<b>vi</b></td><td>i<b>vi</b></td></tr> <tr class="simple"><td>lei, lui</td><td>a<b>va</b></td><td>e<b>va</b></td><td>i<b>va</b></td></tr> <tr class="simple"><td>noi</td><td>a<b>vamo</b></td><td>e<b>vamo</b></td><td>i<b>vamo</b></td></tr> <tr class="simple"><td>voi</td><td>a<b>vate</b></td><td>e<b>vate</b></td><td>i<b>vate</b></td></tr> <tr class="simple"><td>loro</td><td>a<b>vano</b></td><td>e<b>vano</b></td><td>i<b>vano</b></td></tr> <tr class="flink" onclick="window.location.href=\'#verbes\'"><td colspan="4">Retour</td><tr>';
+    }
+    
+    function futur() {
+      var tbody = document.getElementById("core");
+      tbody.innerHTML = '<tr class="titre"><td colspan="4">Futur de l\'indicatif</td></tr> <tr class="simple"><td width="10%"></td><td class="side" width="30%">1er (A)</td><td class="side" width="30%">2e (E)</td><td class="side" width="30%">3e (I)</td></tr> <tr class="simple"><td>io</td><td colspan="2">e<b>rò</b></td><td>i<b>rò</b></td></tr> <tr class="simple"><td>tu</td><td colspan="2">e<b>ri</b></td><td>i<b>ri</b></td></tr> <tr class="simple"><td>lei, lui</td><td colspan="2">e<b>rà</b></td><td>i<b>rà</b></td></tr> <tr class="simple"><td>noi</td><td colspan="2">e<b>remo</b></td><td>i<b>remo</b></td></tr> <tr class="simple"><td>voi</td><td colspan="2">e<b>rete</b></td><td>i<b>rete</b></td></tr> <tr class="simple"><td>loro</td><td colspan="2">e<b>ranno</b></td><td>i<b>ranno</b></td></tr> <tr class="flink" onclick="window.location.href=\'#verbes\'"><td colspan="4">Retour</td><tr>';
+    }
+
+    function conjugaison() {
+      var tbody = document.getElementById("core");
+      tbody.innerHTML = '<tr class="titre"><td>Conjugaison</td></tr> <tr class="link"><td onclick="window.location.href=\'#essere\'">essere</td></tr> <tr class="link"><td onclick="window.location.href=\'#avere\'">avere</td></tr> <tr class="flink" onclick="window.location.href=\'#main\'"><td>Retour</td><tr>';
+    }
+    
+    function essere() {
+      var tbody = document.getElementById("core");
+      tbody.innerHTML = '<tr class="titre"><td colspan="4">Essere</td></tr> <tr class="simple"><td class="side">Présent</td></tr> <tr class="simple"><td>sono</td></tr><tr class="simple"><td>sei</td></tr><tr class="simple"><td>è</td></tr><tr class="simple"><td>siamo</td></tr><tr class="simple"><td>siete</td></tr><tr class="simple"><td>sono</td></tr> <tr class="simple"><td class="side">Imparfait</td></tr> <tr class="simple"><td>ero</td></tr><tr class="simple"><td>eri</td></tr><tr class="simple"><td>era</td></tr><tr class="simple"><td>eravamo</td></tr><tr class="simple"><td>eravate</td></tr><tr class="simple"><td>erano</td></tr> <tr class="simple"><td class="side">Futur</td></tr> <tr class="simple"><td>sarò</td></tr><tr class="simple"><td>sarai</td></tr><tr class="simple"><td>sarà</td></tr><tr class="simple"><td>saremo</td></tr><tr class="simple"><td>sarete</td></tr><tr class="simple"><td>saranno</td></tr> <tr class="flink" onclick="window.location.href=\'#conjugaison\'"><td>Retour</td><tr>';
+    }
+        
+    function avere() {
+      var tbody = document.getElementById("core");
+      tbody.innerHTML = '<tr class="titre"><td colspan="4">Avere</td></tr> <tr class="simple"><td class="side">Présent</td></tr> <tr class="simple"><td>ho</td></tr><tr class="simple"><td>hai</td></tr><tr class="simple"><td>ha</td></tr><tr class="simple"><td>abbiamo</td></tr><tr class="simple"><td>avete</td></tr><tr class="simple"><td>hanno</td></tr> <tr class="simple"><td class="side">Imparfait</td></tr> <tr class="simple"><td>avevo</td></tr><tr class="simple"><td>avevi</td></tr><tr class="simple"><td>aveva</td></tr><tr class="simple"><td>avevamo</td></tr><tr class="simple"><td>avevate</td></tr><tr class="simple"><td>avevano</td></tr> <tr class="simple"><td class="side">Futur</td></tr> <tr class="simple"><td>avrò</td></tr><tr class="simple"><td>avrai</td></tr><tr class="simple"><td>avrà</td></tr><tr class="simple"><td>avremo</td></tr><tr class="simple"><td>avrete</td></tr><tr class="simple"><td>avranno</td></tr> <tr class="flink" onclick="window.location.href=\'#conjugaison\'"><td>Retour</td><tr>';
+    }
+
+    function vocabulaire() {
+      var tbody = document.getElementById("core");
+      tbody.innerHTML = '<tr class="titre"><td colspan="4">Vocabulaire</td></tr> <tr class="link" onclick="window.location.href=\'#couleurs\'"><td>Les couleurs</td></tr> <tr class="flink" onclick="window.location.href=\'#main\'"><td>Retour</td><tr>';
+    }
+    
+    function couleurs() {
+      var tbody = document.getElementById("core");
+      tbody.innerHTML = '<tr class="titre"><td colspan="2">Les couleurs</td></tr> <tr class="simple"><td width="50%">noir</td><td width="50%">nero</td></tr> <tr class="simple"><td>bleu (royal)</td><td>blu</td></tr> <tr class="simple"><td>bleu (ciel)</td><td>azzurro</td></tr> <tr class="simple"><td>brun</td><td>marrone</td></tr> <tr class="simple"><td>gris</td><td>grigio</td></tr> <tr class="simple"><td>vert</td><td>verde</td></tr> <tr class="simple"><td>blanc</td><td>bianco</td></tr> <tr class="simple"><td>jaune</td><td>giallo</td></tr> <tr class="simple"><td>orange</td><td>arancione</td></tr> <tr class="simple"><td>violet</td><td>viola</td></tr> <tr class="simple"><td>rouge</td><td>rosso</td></tr> <tr class="simple"><td>rose</td><td>rosa</td></tr> <tr class="flink" onclick="window.location.href=\'#vocabulaire\'"><td colspan="2">Retour</td><tr>';
+    }
+
+    function fun(elem, answer1, answer2) {
+      var s = document.getElementById(elem);
+      if (s != null) {
+        if (s.innerHTML === answer1) {
+          s.innerHTML = answer2;
+        } else {
+          s.innerHTML = answer1;
+        }
+      }
+    }
+    </script>
+  </body>
+</html>
