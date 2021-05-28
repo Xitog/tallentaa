@@ -64,7 +64,7 @@ else
     ((updated=$sum-$nb_ok))
     echo -e "${RED}---------------------------------------------------------------${NC}"
     echo -e "${RED}$updated / $sum repository(ies) updated${NC}"
-    echo -e "${GRN}$nb_ok / $sum repository(ies) already up to date )${NC}"
+    echo -e "${GRN}$nb_ok / $sum repository(ies) already up to date${NC}"
     echo -e "${RED}---------------------------------------------------------------${NC}\n"
 fi
 
