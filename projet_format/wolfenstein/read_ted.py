@@ -8,37 +8,53 @@
 # You rocks!
 
 #---------------------------------------------------------------------
+# Contants
+#---------------------------------------------------------------------
+
+WRITE_OUTPUT = False;
+HEADER_PATH = '.\\1.0\\MAPHEAD.WL1'
+CONTENT_PATH = '.\\1.0\\MAPTEMP.WL1'
+HEADER_SIZE = 38
+
+#---------------------------------------------------------------------
 # Header file
 #---------------------------------------------------------------------
 
 class Header:
 
     def __init__(self, filename):
-        f = open(filename, 'rb')
+        f = open(filename, 'rb') # BufferedReader
+        self.nb_bytes = 0
         try:
-            # 
+            #
             self.magic = int.from_bytes(f.read(2), byteorder='little', signed=False)
+            self.nb_bytes += 2
             self.ptr = []
             for i in range(0, 100):
                 # UINT32LE
                 self.ptr.append(int.from_bytes(f.read(4), byteorder='little', signed=False))
-            # Display
-            print('Magic:', hex(self.magic))
-            for i in range(0, 100):
-                if (self.ptr[i] == 0xffffffff): # ptr to headers
-                    break
-                print(f"    Ptr {i:5d} {hex(self.ptr[i])}")
+                self.nb_bytes += 4
         except Exception as e:
             print(e)
         f.close()
 
-h = Header("maphead.wl1")
+    def __str__(self):
+        s = f'Magic hex = {hex(self.magic)} dec = {self.magic}\n'
+        s += f'Number of bytes read = {self.nb_bytes}\n'
+        for i in range(0, 100):
+            if (self.ptr[i] == 0xffffffff): # ptr to headers
+                break
+            s += f"    - Ptr {i:5d} {hex(self.ptr[i])}\n"
+        return s
+
+h = Header(HEADER_PATH)
+print(h)
 
 #---------------------------------------------------------------------
 # Content file
 #---------------------------------------------------------------------
 
-f = open("maptemp.wl1", "rb")
+f = open(CONTENT_PATH, "rb")
 filetype = f.read(8).decode(encoding='ascii')
 print('Format:', filetype)
 
@@ -75,7 +91,6 @@ def read_level(h, f, num):
     print(f"Plane1 offset={lvl.offPlane1:5d} length={lvl.lenPlane1:5d}")
     print(f"Plane2 offset={lvl.offPlane2:5d} length={lvl.lenPlane2:5d}")
 
-    HEADER_SIZE = 38
     if f.tell() != HEADER_SIZE + h.ptr[num]:
         raise Exception(f"We are not at the beginning of a level data! : {f.tell()} vs {HEADER_SIZE + h.ptr[num]}")
 
@@ -123,7 +138,6 @@ def analyze(plane):
 
 def to_matrix(lvl, plane):
     matrix = []
-    row = 0
     line = 0
     for line in range(0, lvl.height):
         matrix.append(plane[line * lvl.width:(line + 1) * lvl.width])
@@ -140,13 +154,15 @@ lvl0 = read_level(h, f, 0)
 plane = rwle_expand(h, lvl0.data0)
 analyze(plane)
 matrix = to_matrix(lvl0, plane)
-to_csv('output0.csv', matrix)
+if WRITE_OUTPUT:
+    to_csv('output0.csv', matrix)
 
 lvl1 = read_level(h, f, 1)
 plane = rwle_expand(h, lvl1.data0)
 analyze(plane)
 matrix = to_matrix(lvl1, plane)
-to_csv('output1.csv', matrix)
+if WRITE_OUTPUT:
+    to_csv('output1.csv', matrix)
 
 f.close()
 

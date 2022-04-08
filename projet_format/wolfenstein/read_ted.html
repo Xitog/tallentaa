@@ -1,25 +1,100 @@
 <html>
     <head>
+        <meta charset="utf-8">
+        <title>TED5 viewer</title>
+        <style>
+            h1 {
+                width: 100%;
+                text-align: center;
+            }
+            pre {
+                border: 1px solid #ACAEB0;
+                background-color: #f5f5f5;
+                padding: 1rem;
+            }
+        </style>
         <script>
-            function handleFiles(files)
+            function hex(v)
+            {
+                return '0x' + v.toString(16);
+            }
+
+            class Header
+            {
+                constructor(data)
+                {
+                    this.nb_bytes = data.byteLength; // 402
+                    this.magic = new Uint16Array(data.slice(0, 2))[0]; // 43981 12h14
+                    //alert();
+                    this.ptr = [];
+                    for (let i = 0; i < 100; i++)
+                    {
+                        let p = new Uint32Array(data.slice(2 + i * 4, 2 + (i+1) * 4))[0];
+                        this.ptr.push(p);
+                    }
+                }
+
+                toString()
+                {
+                    let s = `Magix hex = ${hex(this.magic)} dec = ${this.magic}\n`;
+                    s += `Number of bytes read = ${this.nb_bytes}\n`;
+                    for (let i = 0; i < 100; i++)
+                    {
+                        if (this.ptr[i] == 0xffffffff)
+                        {
+                            break;
+                        }
+                        s += `    - Ptr ${i} ${hex(this.ptr[i])}\n`
+                    }
+                    return s;
+                }
+            }
+
+            class Level
+            {
+                constructor(data)
+                {
+                    let dec = new TextDecoder();
+                    let format = dec.decode(data.slice(0, 8));
+                    alert(format);
+                }
+            }
+
+            function handleFiles(files ,type)
             {
                 if (files.length > 0)
                 {
                     let file = files[0];
                     let reader = new FileReader();
-                    reader.onloadend = function(event) {
-                        alert(event.target.result);
-                    };
-                    reader.readAsBinaryString(file);
+                    reader.onloadend =
+                        function(event)
+                        {
+                            if (type === 'header')
+                            {
+                                let h = new Header(event.target.result);
+                                let console = document.getElementById("console");
+                                console.innerText = h.toString();
+                            } else {
+                                new Level(event.target.result);
+                            }
+                        }
+                    ;
+                    reader.readAsArrayBuffer(file);
+                    //reader.readAsBinaryString(file);
                 }
             }
         </script>
     </head>
     <body>
+        <h1>TED5 viewer</h1>
         <fieldset style="display: flex;">
             <legend>Fichiers</legend>
-            <label for="fileInput1">En-têtes :</label> <input type="file" id="fileInput1" onchange="handleFiles(this.files)">
-            <label for="fileInput2">Contenus :</label> <input type="file" id="fileInput2" onchange="handleFiles(this.files)">
+            <label for="fileInput1">En-têtes :</label> <input type="file" id="fileInput1" onchange="handleFiles(this.files, 'header')">
+            <label for="fileInput2">Contenus :</label> <input type="file" id="fileInput2" onchange="handleFiles(this.files, 'content')">
         </fieldset>
+        <pre id="console">
+        </pre>
+        <div id="result">
+        </div>
     </body>
 </html>
