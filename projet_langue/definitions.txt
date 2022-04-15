@@ -1,0 +1,7 @@
+famille,familles,nom,féminin
+ami,amis,nom,masculin
+amie,amies,nom,féminin
+parent,parents,nom,masculin
+parente,parentes,nom,féminin
+enfant,enfants,nom,masculin-féminin
+relation,relations,nom,féminin
