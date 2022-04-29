@@ -16,20 +16,26 @@
         <script>
             function hex(v)
             {
-                return '0x' + v.toString(16);
+                return '0x' + v.toString(16).padStart(8, '0') + ' (' + v + ')';
             }
 
             class Header
             {
                 constructor(data)
                 {
-                    this.nb_bytes = data.byteLength; // 402
+                    this.total_nb_bytes = data.byteLength; // 402
+                    this.nb_bytes = 0;
                     this.magic = new Uint16Array(data.slice(0, 2))[0]; // 43981 12h14
-                    //alert();
+                    this.nb_bytes += 2;
                     this.ptr = [];
                     for (let i = 0; i < 100; i++)
                     {
                         let p = new Uint32Array(data.slice(2 + i * 4, 2 + (i+1) * 4))[0];
+                        this.nb_bytes += 4;
+                        if (p == 0xffffffff) // Avant on continuait jusqu'au max, 100 !
+                        {
+                            break;
+                        }
                         this.ptr.push(p);
                     }
                 }
@@ -37,14 +43,11 @@
                 toString()
                 {
                     let s = `Magix hex = ${hex(this.magic)} dec = ${this.magic}\n`;
-                    s += `Number of bytes read = ${this.nb_bytes}\n`;
-                    for (let i = 0; i < 100; i++)
+                    s += `Number of bytes read = ${this.nb_bytes} / ${this.total_nb_bytes}\n`;
+                    s += `Number of levels = ${this.ptr.length}\n`;
+                    for (let i = 0; i < this.ptr.length; i++)
                     {
-                        if (this.ptr[i] == 0xffffffff)
-                        {
-                            break;
-                        }
-                        s += `    - Ptr/Lvl ${i} ${hex(this.ptr[i])}\n`
+                        s += `    - Lvl ${(i+1).toString().padStart(2, ' ')} start at ${hex(this.ptr[i])}\n`
                     }
                     return s;
                 }
@@ -75,10 +78,6 @@
                     this.levels = [];
                     for (let i of this.header.ptr)
                     {
-                        if (i == 0xffffffff)
-                        {
-                            break;
-                        }
                         console.log(`Reading ${i}`);
                         this.levels.push(this.read_level(data, i));
                     }
@@ -102,7 +101,7 @@
 
                 toString()
                 {
-                    let s = this.format;
+                    let s = this.format + "\n";
                     let nb = 0;
                     for (let i of Object.values(this.levels))
                     {
