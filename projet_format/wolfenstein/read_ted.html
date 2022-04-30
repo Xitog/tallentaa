@@ -12,8 +12,16 @@
                 background-color: #f5f5f5;
                 padding: 1rem;
             }
+            table {
+                border-collapse: collapse;
+            }
+            td {
+                border: 1px solid black;
+            }
         </style>
         <script>
+            // https://moddingwiki.shikadi.net/wiki/GameMaps_Format
+
             function hex(v)
             {
                 return '0x' + v.toString(16).padStart(8, '0') + ' (' + v + ')';
@@ -61,9 +69,11 @@
 
                 toString()
                 {
-                    let s = "\n[Starts]\n    - " + this.startPlane0 + "\n    - " + this.startPlane1 + "\n    - " + this.startPlane2 + "\n" +
-                                        "[Lengths]\n    - " + this.lengthPlane0 + "\n    - " + this.lengthPlane1 + "\n    - " + this.lengthPlane2 + "\n" +
-                                        "[Size]\n    " + this.width + "x" + this.length + "\n[Name]\n" + this.name;
+                    let s = "[Starts]            : " + this.startPlane0 + ", " + this.startPlane1 + ", " + this.startPlane2 + "\n" +
+                            "[CompressedLenghts] : " + this.lengthPlane0 + ", " + this.lengthPlane1 + ", " + this.lengthPlane2 + "\n" +
+                            "[ReadLengths]       : " + this.plane0.length + ", " + this.plane1.length + ", " + this.plane2.length + "\n" +
+                            "[Sizes]             : " + this.width + "x" + this.length + " (" + (64 * 64) + ")\n" +
+                            "[Name]              : " + this.name;
                     return s;
                 }
             }
@@ -79,35 +89,74 @@
                     for (let i of this.header.ptr)
                     {
                         console.log(`Reading ${i}`);
-                        this.levels.push(this.read_level(data, i));
+                        this.levels.push(this.read_level(data, i, this.header.magic));
+                    }
+                    if (this.levels.length > 0)
+                    {
+                        let lvl = this.levels[this.levels.length - 1];
+                        let end = lvl.startPlane2 + lvl.lengthPlane2;
+                        console.log(">>>>>>> " + end);
+                        console.log(">>>>>>> " + data.byteLength);
+                        if (end < data.byteLength)
+                        {
+                            this.ending = dec.decode(data.slice(end, data.byteLength));
+                        }
                     }
                 }
 
-                read_level(data, startLevel)
+                read_level(data, startLevel, magic)
                 {
-                    let lvl = new Level();
-                    lvl.startPlane0 = new Uint32Array(data.slice(startLevel, startLevel + 4))[0];
-                    lvl.startPlane1 = new Uint32Array(data.slice(startLevel + 4, startLevel + 8))[0];
-                    lvl.startPlane2 = new Uint32Array(data.slice(startLevel + 8, startLevel + 12))[0];
-                    lvl.lengthPlane0 = new Uint16Array(data.slice(startLevel + 12, startLevel + 14))[0];
-                    lvl.lengthPlane1 = new Uint16Array(data.slice(startLevel + 14, startLevel + 16))[0];
-                    lvl.lengthPlane2 = new Uint16Array(data.slice(startLevel + 16, startLevel + 18))[0];
-                    lvl.width = new Uint16Array(data.slice(startLevel + 18, startLevel + 20))[0];
-                    lvl.length = new Uint16Array(data.slice(startLevel + 20, startLevel + 22))[0];
+                    let level = new Level();
+                    level.startPlane0 = new Uint32Array(data.slice(startLevel, startLevel + 4))[0];
+                    level.startPlane1 = new Uint32Array(data.slice(startLevel + 4, startLevel + 8))[0];
+                    level.startPlane2 = new Uint32Array(data.slice(startLevel + 8, startLevel + 12))[0];
+                    level.lengthPlane0 = new Uint16Array(data.slice(startLevel + 12, startLevel + 14))[0];
+                    level.lengthPlane1 = new Uint16Array(data.slice(startLevel + 14, startLevel + 16))[0];
+                    level.lengthPlane2 = new Uint16Array(data.slice(startLevel + 16, startLevel + 18))[0];
+                    level.width = new Uint16Array(data.slice(startLevel + 18, startLevel + 20))[0];
+                    level.length = new Uint16Array(data.slice(startLevel + 20, startLevel + 22))[0];
                     let dec = new TextDecoder();
-                    lvl.name = dec.decode(data.slice(startLevel + 22, startLevel + 32));
-                    return lvl;
+                    level.name = dec.decode(data.slice(startLevel + 22, startLevel + 32));
+                    level.plane0 = this.rwle_expand(magic, data.slice(level.startPlane0, level.startPlane0 + level.lengthPlane0));
+                    level.plane1 = this.rwle_expand(magic, data.slice(level.startPlane1, level.startPlane1 + level.lengthPlane1));
+                    level.plane2 = this.rwle_expand(magic, data.slice(level.startPlane2, level.startPlane2 + level.lengthPlane2));
+                    return level;
+                }
+
+                rwle_expand(magic, data)
+                {
+                    let size = new Uint16Array(data.slice(0, 2))[0];
+                    console.log("RWLE EXPAND SIZE = " + size);
+                    let expanded = [];
+                    let i = 2;
+                    while (i < data.byteLength)
+                    {
+                        let v = new Uint16Array(data.slice(i, i+2));
+                        i += 2
+                        if (v == magic)
+                        {
+                            let count = new Uint16Array(data.slice(i, i+2))[0];
+                            i += 2
+                            let value = new Uint16Array(data.slice(i, i+2))[0];
+                            i += 2
+                            expanded = expanded.concat(Array(count).fill(value));
+                        } else {
+                            expanded.push(v);
+                        }
+                    }
+                    return expanded;
                 }
 
                 toString()
                 {
-                    let s = this.format + "\n";
+                    let s = "Format: " + this.format + "\n";
                     let nb = 0;
                     for (let i of Object.values(this.levels))
                     {
                         s += `[Level ${nb}]\n` + i.toString() + "\n";
                         nb += 1;
                     }
+                    s += "Ending: " + this.ending + "\n";
                     return s;
                 }
             }
@@ -123,20 +172,48 @@
                     reader.onloadend =
                         function(event)
                         {
-                            let console = document.getElementById("console");
+                            let console2 = document.getElementById("console");
                             if (type === 'header')
                             {
                                 handler = new Header(event.target.result);
-                                console.innerText = handler.toString();
+                                console2.innerText = handler.toString();
                             } else {
                                 if (handler == null)
                                 {
                                     alert("Set a map header file first!");
                                     return;
                                 }
-                                let lvl = new LevelSet(event.target.result, handler);
-                                let old = console.innerText;
-                                console.innerText = old + lvl.toString();
+                                let set = new LevelSet(event.target.result, handler);
+                                let old = console2.innerText;
+                                console2.innerText = old + set.toString();
+
+                                let table = document.createElement("table");
+                                let level = set.levels[0].plane0;
+                                let row_length = set.levels[0].width;
+                                let row = document.createElement("tr");
+                                let cell = document.createElement("td");
+                                let nb_lines = 0;
+                                cell.innerHTML = `<b>${nb_lines}</b>`;
+                                row.appendChild(cell);
+                                console.log("level.length = " + level.length);
+                                for (let nb = 0; nb < level.length; nb++)
+                                {
+                                    cell = document.createElement("td");
+                                    cell.innerText = level[nb];
+                                    row.appendChild(cell);
+                                    row_length -= 1;
+                                    if (row_length == 0)
+                                    {
+                                        nb_lines += 1;
+                                        table.appendChild(row);
+                                        row = document.createElement("tr");
+                                        row_length = set.levels[0].width;
+                                        cell = document.createElement("td");
+                                        cell.innerHTML = `<b>${nb_lines}</b>`;
+                                        row.appendChild(cell);
+                                    }
+                                }
+                                document.getElementById("result").appendChild(table);
                             }
                         }
                     ;
