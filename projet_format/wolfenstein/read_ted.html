@@ -74,8 +74,9 @@
 
             class Header
             {
-                constructor(data)
+                constructor(file, data)
                 {
+                    this.file = file;
                     this.total_nb_bytes = data.byteLength; // 402
                     this.nb_bytes = 0;
                     this.magic = new Uint16Array(data.slice(0, 2))[0]; // 43981 12h14
@@ -95,7 +96,15 @@
 
                 toString()
                 {
-                    let s = `Magix hex = ${hex(this.magic)} dec = ${this.magic}\n`;
+                    const name = this.file.name;
+                    const ext = name.split('.').pop();
+                    const date = new Date(this.file.lastModified);
+                    const size = this.file.size;
+                    let s = 'File name = ' + name + " (" + ext + ")\n" +
+                            'Created = ' + date.toLocaleString('us-US', { timeZone: 'America/Chicago' }) + "\n" +
+                            'FR Time = ' + date.toLocaleString('fr-FR', { timeZone: 'Europe/Brussels'}) + "\n"
+                            'File size = ' + size + "\n";
+                    s += `Magix hex = ${hex(this.magic)} dec = ${this.magic}\n`;
                     s += `Number of bytes read = ${this.nb_bytes} / ${this.total_nb_bytes}\n`;
                     s += `Number of levels = ${this.ptr.length}\n`;
                     for (let i = 0; i < this.ptr.length; i++)
@@ -393,7 +402,11 @@
                             let console2 = document.getElementById("console");
                             if (type === 'header')
                             {
-                                let header = new Header(event.target.result);
+                                //let filename = document.getElementById("fileInput1").value;
+                                //alert(filename + "\n" + filename.split('.').pop());
+                                let input = document.getElementById("fileInput1");
+                                let file = input.files[0];
+                                let header = new Header(file, event.target.result);
                                 console2.innerText = header.toString();
                                 set_header(header);
                             } else {
