@@ -22,6 +22,9 @@
             td {
                 border: 1px solid black;
             }
+            img.hidden {
+                display: none;
+            }
         </style>
         <script>
             // https://moddingwiki.shikadi.net/wiki/GameMaps_Format
@@ -282,7 +285,7 @@
                 return false;
             }
 
-            function createTable(set, ilevel, iplane)
+            function draw(set, ilevel)
             {
                 ilevel = document.getElementById("level").value;
                 console.log("ilevel = " + ilevel);
@@ -290,23 +293,15 @@
                 let grid = document.getElementById("grid").checked;
                 let small = document.getElementById("small").checked;
                 let info = document.createElement("h2");
-                info.innerText = set.levels[ilevel].name + " num " + ilevel + " plane " + iplane;
+                info.innerText = set.levels[ilevel].name + " num " + ilevel + " plane 0 & 1";
                 document.getElementById("result").appendChild(info);
-                let table = document.createElement("table");
-                let plane = set.levels[ilevel].planes[iplane];
+                let walls = set.levels[ilevel].planes[0];
+                let actors = set.levels[ilevel].planes[1];
                 let height = set.levels[ilevel].height;
                 let width = set.levels[ilevel].width;
-                let row = document.createElement("tr");
                 let x = 0;
                 let y = 0;
-                let cell = null;
-                if (!small)
-                {
-                    cell = document.createElement("td");
-                    cell.innerHTML = `<b>${y}</b>`;
-                    row.appendChild(cell);
-                }
-                console.log("level.length = " + plane.content.length);
+                //console.log("level.length = " + walls.content.length);
                 //   1 = pierre grise 1
                 //   2 = pierre grise 2
                 //   3 = pierre grise avec drapeau nazi
@@ -332,62 +327,56 @@
                 //  92 = porte à clé or
                 //  93 = porte à clé or
                 // 100 = porte d'entrée dans l'ascenceur avec un bouton rouge
-                let images = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 25, 90, 91, 92, 93, 100];
-                for (let nb = 0; nb < plane.content.length; nb++)
+                let images0 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 25, 90, 91, 92, 93, 100];
+                let images1 = {19: "19_player_N", 20: "20_player_E", 21: "21_player_W", 22: "22_player_N",
+                            34: "plant",
+                            37: "37_lamp",
+                            42: "bones",
+                            47: "food",
+                            49: "clip",
+                           124: "dead_guard"};
+                let canvas = document.createElement("canvas");
+                canvas.width = small ? 64 * 16 : 64 * 32;
+                canvas.height = small ? 64 * 16 : 64 * 32;
+                for (let nb = 0; nb < walls.content.length; nb++)
                 {
-                    cell = document.createElement("td");
-                    if (!grid)
+                    let wall = walls.content[nb];
+                    let actor = actors.content[nb];
+                    let wall_img = null;
+                    let actor_img = null;
+                    let text = null;
+                    // Drawing wall
+                    if (images0.includes(wall))
                     {
-                        cell.style.border = "none";
-                    }
-                    let val = plane.content[nb];
-                    //console.log(val, typeof(val));
-                    if (iplane === 0 && images.includes(val))
-                    {
-
-                        let img = document.createElement("img");
-                        if (is_wall(plane.content, x, y, width, height) || !unfill)
+                        if (is_wall(walls.content, x, y, width, height) || !unfill)
                         {
-                            img.src = "" + val + "b.png"; // 5 = #0000084 avec un carré de 56 au milieu, 8 = #000084, 9 = #00000056
+                            wall_img = wall + "b"; // 5 = #0000084 avec un carré de 56 au milieu, 8 = #000084, 9 = #00000056
                         } else if (unfill) {
-                            img.src = "void.png";
+                            wall_img = "void";
                         }
-                        if (!small)
-                        {
-                            img.style.width = "32px";
-                            img.style.height = "32px";
-                        } else {
-                            img.style.width = "16px";
-                            img.style.height = "16px";
-                        }
-                        cell.style.padding = "0px";
-                        cell.appendChild(img);
                     }
-                    else if (iplane === 0 && val > 100)
+                    else if (wall > 100)
                     {
-                        cell.style.backgroundColor = "#707070";
+                        wall_img = "floor"; // #707070
                     }
-                    else
+                    // Drawing actor
+                    if (actor in images1)
                     {
-                        cell.innerText = val;
+                        actor_img = images1[actor];
                     }
-                    row.appendChild(cell);
+                    else if (actor != 0)
+                    {
+                        text = actor;
+                    }
+                    merge_at(canvas, x, y, wall_img, actor_img, text, grid, small);
                     x += 1;
                     if (x == width)
                     {
                         x = 0;
                         y += 1;
-                        table.appendChild(row);
-                        row = document.createElement("tr");
-                        if (!small)
-                        {
-                            cell = document.createElement("td");
-                            cell.innerHTML = `<b>${y}</b>`;
-                            row.appendChild(cell);
-                        }
                     }
                 }
-                return table;
+                return canvas;
             }
 
             function handleFiles(files ,type)
@@ -463,10 +452,9 @@
             function display()
             {
                 let set = get_data();
-                let t1 = createTable(set, 0, 0);
-                let t2 = createTable(set, 0, 1);
+                let canvas = draw(set, 0);
                 let res = document.getElementById("result");
-                res.replaceChildren(t1, t2);
+                res.replaceChildren(canvas);
             }
 
             function options()
@@ -480,9 +468,59 @@
                 }
                 display();
             }
+
+            /*
+            function get(id)
+            {
+                let e = document.getElementById(id);
+                if (e == null)
+                {
+                    alert("No element for id = " + id);
+                }
+                return e;
+            }
+            */
+
+            function merge_at(canvas, x, y, filename1, filename2, text=null, grid, small)
+            {
+                const FACTOR = small ? 16 : 32;
+                let context = canvas.getContext("2d");
+                context.drawImage(textures[filename1], x * FACTOR, y * FACTOR, FACTOR, FACTOR);
+                if (filename2 != null)
+                {
+                    context.drawImage(textures[filename2], x * FACTOR, y * FACTOR, FACTOR, FACTOR);
+                }
+                if (text != null)
+                {
+                    context.fillStyle = 'pink';
+                    context.textBaseline = 'hanging';
+                    context.fillText("" + text, x * FACTOR, y * FACTOR, FACTOR);
+                }
+                if (grid)
+                {
+                    context.strokeStyle = "#000000";
+                    context.strokeRect(x * FACTOR, y * FACTOR, FACTOR, FACTOR);
+                }
+            }
+
+            var textures = {};
+
+            function load()
+            {
+                for (let o of document.images)
+                {
+                    textures[o.id] = o;
+                }
+            }
+
+            function start()
+            {
+                load();
+                reset();
+            }
         </script>
     </head>
-    <body onload="reset()">
+    <body onload="start()">
         <h1>TED5 viewer</h1>
         <fieldset id="controls" style="display: flex;">
             <legend>Fichiers</legend>
@@ -497,5 +535,46 @@
         </pre>
         <div id="result">
         </div>
+        <img id="void" class="hidden" src="plane0/void.png">
+        <img id="floor" class="hidden" src="plane0/floor.png">
+
+        <img id="1b" class="hidden" src="plane0/1b.png">
+        <img id="2b" class="hidden" src="plane0/2b.png">
+        <img id="3b" class="hidden" src="plane0/3b.png">
+        <img id="4b" class="hidden" src="plane0/4b.png">
+        <img id="5b" class="hidden" src="plane0/5b.png">
+        <img id="6b" class="hidden" src="plane0/6b.png">
+        <img id="7b" class="hidden" src="plane0/7b.png">
+        <img id="8b" class="hidden" src="plane0/8b.png">
+        <img id="9b" class="hidden" src="plane0/9b.png">
+        <img id="10b" class="hidden" src="plane0/10b.png">
+        <img id="11b" class="hidden" src="plane0/11b.png">
+        <img id="12b" class="hidden" src="plane0/12b.png">
+        <img id="13b" class="hidden" src="plane0/13b.png">
+        <img id="14b" class="hidden" src="plane0/14b.png">
+        <img id="15b" class="hidden" src="plane0/15b.png">
+        <img id="16b" class="hidden" src="plane0/16b.png">
+        <img id="17b" class="hidden" src="plane0/17b.png">
+        <img id="18b" class="hidden" src="plane0/18b.png">
+        <img id="19b" class="hidden" src="plane0/19b.png">
+        <img id="20b" class="hidden" src="plane0/20b.png">
+        <img id="21b" class="hidden" src="plane0/21b.png">
+        <img id="25b" class="hidden" src="plane0/25b.png">
+        <img id="90b" class="hidden" src="plane0/90b.png">
+        <img id="91b" class="hidden" src="plane0/91b.png">
+        <img id="92b" class="hidden" src="plane0/92b.png">
+        <img id="93b" class="hidden" src="plane0/93b.png">
+        <img id="100b" class="hidden" src="plane0/100b.png">
+
+        <img id="19_player_N" class="hidden" src="plane1/19_player_N.png">
+        <img id="20_player_E" class="hidden" src="plane1/20_player_E.png">
+        <img id="21_player_S" class="hidden" src="plane1/21_player_S.png">
+        <img id="22_player_W" class="hidden" src="plane1/22_player_W.png">
+        <img id="37_lamp" class="hidden" src="plane1/37_lamp.png">
+        <img id="plant" class="hidden" src="plane1/plant.png">
+        <img id="bones" class="hidden" src="plane1/bones.png">
+        <img id="food" class="hidden" src="plane1/food.png">
+        <img id="clip" class="hidden" src="plane1/clip.png">
+        <img id="dead_guard" class="hidden" src="plane1/dead_guard.png">
     </body>
 </html>
