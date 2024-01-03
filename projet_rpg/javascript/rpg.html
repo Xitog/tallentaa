@@ -35,6 +35,10 @@
       img.shadow {
         display: none;
       }
+      ol {
+        color: white;
+        background-color: pink;
+      }
     </style>
   </head>
   <body onload="start();">
@@ -55,41 +59,41 @@
     <img class="shadow" id="steelblue" src="graphics/steelblue.png">
     <img class="shadow" id="yellow" src="graphics/yellow.png">
     <img class="shadow" id="lobster" src="graphics/lobster.png">
-    
+
     <script type="text/javascript">
 
       // 20 => 640 25 => 800 30 => 960
       const SCREEN_WIDTH = 960;
       const SCREEN_HEIGHT = 800;
-      
+
       const CAM_MAX_COL = SCREEN_WIDTH / 32; // 30
       const CAM_MAX_ROW = SCREEN_HEIGHT / 32; // 25
-      
+
       var screen = null;
       var mouse_col = -1;
       var mouse_row = -1;
-      
+
       const KEY_UP = 38;
       const KEY_DOWN = 40;
       const KEY_RIGHT = 39;
       const KEY_LEFT = 37;
       const KEY_BACKSPACE = 8;
       const KEY_M = 77;
-      
+
       const NONE = 0;
       const VERTICAL = 1;
       const HORIZONTAL = 2;
       const MIN_SIZE = 5;
       const MAX_DIVISION = 4;
-      
+
       const EMPTY_TEXTURE = 0;
       const PLAIN_TEXTURE = 1;
       const MIN_TEXTURE = 2;
-      
+
       var map = [];
       var textures = [];
       var color_index = 1;
-      
+
       function get_color() {
         let res = color_index;
         color_index += 1;
@@ -99,11 +103,11 @@
         //console.log("color = " + res + " / " + textures.length);
         return res;
       }
-      
+
       const EMPTY = 0;
       var ROOM_ID = 1;
       var ROOMS = {};
-      
+
       // 2 essais : Lua (1er) Python (2e)
       class Room {
         constructor(map, parent, x, y, width, height) { //, div_type, div_pos, hole, parent) {
@@ -136,20 +140,15 @@
           this.finished = false;
           console.log("  ".repeat(this.level) + "Creating room @" + this.id + " x=" + x + " y=" + y + " width/colmax=" + width + " height/rowmax=" + height + " on map col=" + map[0].length + " row=" + map.length);
         }
-        
-        has_child() {
-          return (this.div != 0);
-          //return (!(this.top == null && this.bottom == null && this.left == null && this.right == null));
-        }
-        
+
         vertical() {
           return (this.parent.left != null);
         }
-        
+
         horizontal() {
           return (this.parent.top != null);
         }
-        
+
         first() {
           if (this.top != null) {
             return (this.top);
@@ -159,7 +158,7 @@
             throw "No first child.";
           }
         }
-        
+
         second() {
           if (this.bottom != null) {
             return (this.bottom);
@@ -169,50 +168,7 @@
             throw "No second child.";
           }
         }
-        
-        divide(times) {
-          if (this.has_child()) {
-            throw "Can divide this room, already divided";
-          }
-          let length = 0;
-          let intent = NONE;
-          if (this.w > this.h) {
-            length = this.w;
-            intent = VERTICAL;
-          } else {
-            length = this.h;
-            intent = HORIZONTAL;
-          }
-          if (length > MIN_SIZE * 2 + 1) {
-            if (length & 1) { // odd
-              // 0 1 2 3 4 5 6 7 8 => 9
-              // length / 2 = 4, possible = 3, 4, 5 soit -1, 0, 1
-              this.div = getRandomIntInclusive(1, 3) - 2 + Math.floor(length / 2);
-            } else { // even
-              // 0 1 2 3 4 5 6 7 8 9 => 10
-              // length / 2 = 5, possible = 3, 4, 5, 6 soit -2 -1 0 1
-              this.div = getRandomIntInclusive(1, 4) - 3 + length / 2;
-            }
-            // Create the two children
-            if (intent == VERTICAL) {
-              this.left = new Room(map, this, this.x, this.y, this.div, this.h);
-              this.right = new Room(map, this, this.x + this.div, this.y, this.w - this.div, this.h);
-              this.left.sibling = this.right;
-              this.right.sibling = this.left;
-            } else {
-              this.top = new Room(map, this, this.x, this.y, this.w, this.div);
-              this.bottom = new Room(map, this, this.x, this.y + this.div, this.w, this.h - this.div);
-              this.top.sibling = this.bottom;
-              this.bottom.sibling = this.top;
-            }
-            // Divide
-            if (times - 1 > 0) {
-              this.first().divide(times - 1);
-              this.second().divide(times - 1);
-            }
-          }
-        }
-        
+
         // make the room into the BSP leaves
         dig() {
           if (this.has_child()) {
@@ -237,33 +193,7 @@
             }
           }
         }
-        
-        // turn the tree into a matrix
-        to_matrix() {
-          if (this.has_child()) {
-            for (let row = this.y; row < this.y + this.h; row++) {
-              for (let col = this.x; col < this.x + this.w; col++) {
-                this.map[row][col] = this.id;
-              }
-            }
-            this.first().to_matrix();
-            this.second().to_matrix();
-          } else {
-            for (let row = this.ty; row < this.ty + this.th; row++) {
-              for (let col = this.tx; col < this.tx + this.tw; col++) {
-                if (row >= this.map.length || col >= this.map[0].length) {
-                  throw "Map is too small for this room: row=" + row + " col=" + col + "/" + this.w;
-                }
-                if (row == this.ty || row == this.ty + this.th - 1 || col == this.tx || col == this.tx + this.tw - 1) {
-                  this.map[row][col] = this.id; // wall of the leaf room
-                } else {
-                  this.map[row][col] = EMPTY; // emptyness of the leaf room
-                }
-              }
-            }
-          }
-        }
-        
+
         // make the hole to connect rooms
         spade() {
           if (this.has_child()) {
@@ -316,31 +246,141 @@
             }
           }
         }
-        
+
       }
-      
+
       function getRandomIntInclusive(min, max) {
         min = Math.ceil(min);
         max = Math.floor(max);
         return Math.floor(Math.random() * (max - min + 1)) + min;
       }
-      
-      function make_dungeon(map) {
-        for (let row = 0; row < CAM_MAX_ROW; row++) {
-          map.push([])
-          for (let col = 0; col < CAM_MAX_COL; col++) {
-            map[row].push(PLAIN_TEXTURE);
-          }
+
+        // New 2024
+        class Rect {
+            static nb = 0;
+
+            constructor(x, y, w, h) {
+                this.x = x;
+                this.y = y;
+                this.w = w;
+                this.h = h;
+                this.children = [];
+                this.cut_direction = null;
+                this.cut_value = null;
+                Rect.nb += 1;
+                this.id = Rect.nb;
+                ROOMS[this.id] = this;
+                this.color = get_color();
+            }
+
+            divide(times) {
+                if (times <= 0) {
+                    throw new Error("Cannot divide 0 or less times");
+                }
+                if (this.children.length > 0) {
+                    throw new Error("Can divide this room, already divided");
+                }
+                // Vertical or horizontal
+                this.cut_direction = HORIZONTAL;
+                if (this.w > this.h) {
+                    this.cut_direction = VERTICAL;
+                }
+                let modifier = Math.floor(Math.random() * 4) - 2; // from -2 to +2
+                let value = 0;
+                // Create the two children
+                if (this.cut_direction == VERTICAL) {
+                    // Exemple : this.w = 32. modifier = -2
+                    // value   = 16 - 2 = 14
+                    // counter = 32 - 14 = 18
+                    value = Math.floor(this.w / 2) + modifier;
+                    if (modifier >= Math.floor(this.w / 2)) {
+                        throw new Error(`Cannot divide vertically, Rect instance is to small: modifier is ${modifier} and h is ${this.w}`);
+                    }
+                    this.children.push(new Rect(this.x, this.y, value, this.h)); // left
+                    this.children.push(new Rect(this.x + value, this.y, this.w - value, this.h)); // right
+                } else { // HORIZONTAL
+                    value = Math.floor(this.h / 2) + modifier;
+                    if (modifier >= Math.floor(this.h / 2)) {
+                        throw new Error(`Cannot divide horizontally, Rect instance is to small: modifier is ${modifier} and h is ${this.h}`);
+                    }
+                    this.children.push(new Rect(this.x, this.y, this.w, value)); // top
+                    this.children.push(new Rect(this.x, this.y + value, this.w, this.h - value)); // bottom
+                }
+                this.cut_value = value;
+                // Divide again
+                if (times - 1 > 0) {
+                    this.children[0].divide(times - 1);
+                    this.children[1].divide(times - 1);
+                }
+            }
+
+            // turn the tree into a matrix
+            to_matrix(map) {
+                //if (this.children.length > 0) {
+                    for (let row = this.y; row < this.y + this.h; row++) {
+                        for (let col = this.x; col < this.x + this.w; col++) {
+                            map[row][col] = this.id;
+                        }
+                    }
+                    if (this.children.length > 0) {
+                        this.children[0].to_matrix(map);
+                        this.children[1].to_matrix(map);
+                    }
+                /*} else {
+                    for (let row = this.ty; row < this.ty + this.th; row++) {
+                        for (let col = this.tx; col < this.tx + this.tw; col++) {
+                            if (row >= map.length || col >= map[0].length) {
+                                throw "Map is too small for this room: row=" + row + " col=" + col + "/" + this.w;
+                            }
+                            if (row == this.ty || row == this.ty + this.th - 1 || col == this.tx || col == this.tx + this.tw - 1) {
+                                map[row][col] = this.id; // wall of the leaf room
+                            } else {
+                                map[row][col] = EMPTY; // emptyness of the leaf room
+                            }
+                        }
+                    }
+                }*/
+            }
+
+            to_html() {
+                let n = document.createElement('li');
+                if (this.cut_direction !== null) {
+                    let cut = this.cut_direction === VERTICAL ? 'VERTICAL' : 'HORIZONTAL';
+                    n.innerText = `Rect @${this.id} ${this.x}, ${this.y}, ${this.w}, ${this.h}, ${cut}, ${this.cut_value}`;
+                } else {
+                    n.innerText = `Rect @${this.id} ${this.x}, ${this.y}, ${this.w}, ${this.h}`;
+                }
+                if (this.children.length > 0) {
+                    let lst = document.createElement('ol');
+                    this.children.forEach(child => {
+                        lst.appendChild(child.to_html());
+                    });
+                    n.appendChild(lst);
+                }
+                return n;
+            }
         }
-        let room = new Room(map, null, 0, 0, CAM_MAX_COL, CAM_MAX_ROW); // x y width height
-        room.divide(MAX_DIVISION);
-        room.dig();
-        room.to_matrix();
-        room.spade();
-        console.log(map);
-        return room;
-      }
-      
+
+        // New 2024
+        function make_binary_tree_dungeon(deep) {
+            let tree = new Rect(0, 0, CAM_MAX_COL, CAM_MAX_ROW);
+            tree.divide(deep);
+            // Il faisait ensuite dig, to_matrix, spade
+            return tree;
+        }
+
+        // New 2024
+        function make_matrix_map() {
+            let map = [];
+            for (let row = 0; row < CAM_MAX_ROW; row++) {
+                map.push([])
+                for (let col = 0; col < CAM_MAX_COL; col++) {
+                    map[row].push(PLAIN_TEXTURE);
+                }
+            }
+            return map;
+        }
+
       function load() {
         for (let o of document.images) {
           textures.push(o);
@@ -348,7 +388,7 @@
         }
         console.log("End loading " + textures.length + " textures.");
       }
-      
+
       function get_leaves(list, node) {
         if (node.has_child()) {
           get_leaves(list, node.first())
@@ -357,12 +397,12 @@
           list.push(node)
         }
       }
-      
+
       function make_center(node) {
         node.cx = node.tx + node.tw / 2;
-        node.cy = node.ty + node.th / 2; 
+        node.cy = node.ty + node.th / 2;
       }
-      
+
       function get_nearest_unconnected(node, nodes) {
         let min = 99999999;
         let nearest = null;
@@ -377,11 +417,11 @@
         }
         node.nearest = nearest;
       }
-      
+
       function dist(n1, n2) {
         return Math.sqrt(math.pow(n1.cx - n2.cx, 2) + Math.pow(n1.cy - n2.cy, 2));
       }
-      
+
       function spade_to_nearest(node) {
         if (node.finished === true || node.nearest.finished === true) {
           return;
@@ -421,46 +461,58 @@
         node.finished = true;
         node.nearest.finished = true;
       }
-      
+
       var root;
       var leaves;
-      
-      function start() {
-        screen = document.getElementById('screen');
-        screen.onmousemove = on_mouse_move;
-        window.onclick = on_mouse_left_click;
-        window.oncontextmenu = on_mouse_right_click;
-        window.onkeydown = on_key_down;
-        window.onkeyup = on_key_up;
-        window.setInterval(run, 33);
-        load();
-        root = make_dungeon(map);
-        // Get all the leaves
-        leaves = [];
-        get_leaves(leaves, root);
-        // Make the center of all leaves
-        for (let n of leaves) {
-          make_center(n);
+
+        function start() {
+            screen = document.getElementById('screen');
+            screen.onmousemove = on_mouse_move;
+            window.onclick = on_mouse_left_click;
+            //window.oncontextmenu = on_mouse_right_click;
+            window.onkeydown = on_key_down;
+            window.onkeyup = on_key_up;
+            //window.setInterval(run, 33);
+            load();
+
+            let tree = make_binary_tree_dungeon(4);
+            let treeView = tree.to_html();
+            let lst = document.createElement('ol');
+            lst.appendChild(treeView);
+            let body = document.getElementsByTagName("body")[0];
+            body.appendChild(lst);
+
+            map = make_matrix_map();
+            tree.to_matrix(map);
+
+            run();
+            return;
+
+            // Get all the leaves
+            leaves = [];
+            get_leaves(leaves, root);
+            // Make the center of all leaves
+            for (let n of leaves) {
+            make_center(n);
+            }
+            // Get the nearest leaf unconnected for all leaves
+            for (let n of leaves) {
+            get_nearest_unconnected(n, leaves);
+            }
+            // Spade to the nearest
+            for (let n of leaves) {
+            spade_to_nearest(n);
+            }
         }
-        // Get the nearest leaf unconnected for all leaves
-        for (let n of leaves) {
-          get_nearest_unconnected(n, leaves);
+
+        function run() {
+            update();
+            draw();
         }
-        // Spade to the nearest
-        for (let n of leaves) {
-          spade_to_nearest(n);
+
+        function update() {
         }
-        run();
-      }
-      
-      function run() {
-        update();
-        draw();
-      }
-      
-      function update() {
-      }
-      
+
       function draw() {
         if (screen.getContext) {
           let ctx = screen.getContext('2d');
@@ -473,28 +525,28 @@
               if (index != EMPTY) {
                 let room = ROOMS[index];
                 ctx.drawImage(textures[room.color], col * 32, row * 32);
-                ctx.fillText(room.id, col * 32 + 10, row * 32 + 10); 
+                ctx.fillText(room.id, col * 32 + 10, row * 32 + 10);
               }
             }
           }
-          
+
           ctx.strokeStyle = 'rgb(0, 255, 0)';
           ctx.strokeRect(Math.floor(mouse_col / 32) * 32, Math.floor(mouse_row / 32) * 32, 32, 32);
-            
+
           //ctx.fillStyle = 'rgb(255, 0, 0)';
           //ctx.fillRect(x, y, this.size, this.size);
-          
+
           //ctx.strokeStyle = 'rgb(255, 242, 0)';
           //ctx.beginPath();
           //ctx.rect(this.x, this.y, this.size*32, this.size*32);
           //ctx.stroke();
-          
+
           //ctx.beginPath();
           //ctx.arc(posx, posy, 10, 0, 2 * Math.PI);
           //ctx.fill();
         }
       }
-      
+
       function on_mouse_move(event) {
         event = event || window.event;
         // Mouse coordinates
@@ -504,18 +556,18 @@
         //mouse_map_col = Math.floor(mouse_col / 32) + camera.col;
         //mouse_map_row = Math.floor(mouse_row / 32) + camera.row;
       }
-      
+
       function on_mouse_left_click(event) {
         event = event || window.event;
         console.log('Mouse col:', Math.floor(mouse_col / 32), 'Mouse row:', Math.floor(mouse_row / 32));
       }
-      
+
       function on_mouse_right_click(event) {
         event = event || window.event;
         console.log('Mouse col:', mouse_col, 'Mouse row:', mouse_row);
         return false;     // prevent default menu
       }
-      
+
       function on_key_up(event) {
         event = window.event || event;
         if (event.keyCode == KEY_UP) {
@@ -524,7 +576,7 @@
           console.log('Unbound up key:', event.keyCode);
         }
       }
-      
+
       function on_key_down(event){
         event = window.event || event;
         if (event.keyCode == KEY_LEFT) {
@@ -533,7 +585,7 @@
           console.log('Unbound down key:', event.keyCode);
         }
       }
-      
+
     </script>
   </body>
 </html>
