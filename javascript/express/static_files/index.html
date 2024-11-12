@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <title>Test Express + HTMX</title>
+    <script src="https://unpkg.com/htmx.org@2.0.3"></script>
+</head>
+
+<body>
+    <div id="main">
+        <button hx-post="/api/click" hx-swap="innerHTML" hx-target="#main">
+            Cliquer pour remplacer
+        </button>
+    </div>
+</body>
+
+</html>
