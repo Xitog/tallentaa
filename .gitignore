@@ -19,5 +19,5 @@ web/Thumbs.db
 .DS_Store
 projet_tile_grid_editor/build
 projet_tile_grid_editor/media/wip/wip-western-FPS
-*node_modules/*
+node_modules/
 *package-lock.json
