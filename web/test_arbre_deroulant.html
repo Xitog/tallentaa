@@ -1,0 +1,120 @@
+<html>
+<!--
+  LOL ! J'ai corrigé un truc, une balise ul non fermée, et il m'a supprimé la date de création du fichier !
+  Je ne sais donc plus quand je l'ai créé... Je pense entre avril et juin 2026, avant les vacances.
+-->
+<head>
+<style>
+ul > li > span {
+  cursor: pointer;
+}
+ul > li > span:hover {
+  text-decoration: underline;
+}
+.noselect {
+    -webkit-user-select: none;
+            user-select: none;
+    -moz-user-select: -moz-none;
+}
+
+li.plus::marker {
+  content: "⊕ ";
+}
+li.less::marker {
+  content: "⊖ ";
+}
+li::marker {
+  content: "• ";
+}
+
+/*
+li {
+   position:relative;
+}
+li.plus:before, li.less:before {
+    content: "";
+    position:absolute;
+    left:-16px;
+    top:2px;
+    /*background-color:red;*/
+    z-index:-1;
+    display:inline-block;
+    width:13px;
+    height:14px;
+    border: 1px solid black;
+    border-radius:5px;
+}
+*/
+</style>
+<script>
+function change(id)
+{
+    console.log("function change with id=", id);
+    let e = document.getElementById(id);
+    console.log(e.id);
+    e.style.display = (e.style.display == 'none') ? 'block' : 'none';
+    e.parentNode.className = (e.style.display == 'none') ? 'plus' : 'less';
+}
+
+function f()
+{
+    let lst = document.querySelectorAll("ul > li");
+    for (let e of lst)
+    {
+      if (e.id == '')
+      {
+        e.className = "dot";
+        continue;
+      }
+      console.log("element=", e.id);
+      let ul = e.querySelector("ul");
+      if (ul == null)
+      {
+        continue;
+      }
+      e.className = "plus";
+      console.log("list of element=", ul.id);
+      ul.style.display = 'none';
+      let sp = e.querySelector("span");
+      //sp.onclick = function() { change(ul.id); };
+      sp.onclick = function() { 
+        ul.style.display = (ul.style.display == 'none') ? 'block' : 'none';
+        ul.parentNode.className = (ul.style.display == 'none') ? 'plus' : 'less';
+      };
+    }
+}
+</script>
+</head>
+<body onload="f()">
+<ul>
+  <li id="gw"><span class="noselect">GW</span>
+    <ul id="gw-ul">
+      <li>Warhammer 40 000</li>
+      <li>Warhammer: The Old World</li>
+    </ul>
+  </li>
+  <li id="jv"><span class="noselect">JV</span>
+    <ul id="jv-ul">
+      <li id="turok" ><span class="noselect">Turok</span>
+        <ul id="turok-ul">
+          <li>Turok 1: Dinosaur Hunter</li>
+          <li>Turok 2: Seeds of Evil</li>
+          <li>Turok: Rage wars</li>
+          <li>Turok 3: Shadow of Oblivion</li>
+          <li><a href="https://en.wikipedia.org/wiki/Turok:_Evolution">Turok: Evolution</a></li>
+          <li>Turok</li>
+        </ul>
+      </li>
+      <li id="quake"><span class="noselect">Quake</span>
+        <ul id="quake-ul">
+          <li>Quake 1</li>
+          <li>Quake 2</li>
+          <li>Quake 3: Arena</li>
+          <li>Quake 4</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+</body>
+</html>
