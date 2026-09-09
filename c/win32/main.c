@@ -6,7 +6,15 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#define ID_EDIT_X 1001
+#define ID_EDIT_Y 1002
+#define ID_BUTTON 1003
+
 const char g_szClassName[] = "myWindowClass";
+static HWND g_edit_x;
+static HWND g_edit_y;
+static int g_rect_x = 100;
+static int g_rect_y = 100;
 
 static BOOL attachOutputToConsole(void) {
     HANDLE consoleHandleOut, consoleHandleError;
@@ -37,27 +45,99 @@ static BOOL attachOutputToConsole(void) {
 // Step 4: the Window Procedure
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    HDC hdc ;
-    PAINTSTRUCT ps;
-    RECT rect;
     switch(msg)
     {
         case WM_CREATE:
             printf("Program Started\n");
-            return 0;
-        case WM_CLOSE:
-            DestroyWindow(hwnd);
-        break;
+
+            // Label X
+            CreateWindow(
+                "STATIC",
+                "X :",
+                WS_VISIBLE | WS_CHILD,
+                10, 10, 20, 25,
+                hwnd,
+                NULL,
+                NULL,
+                NULL
+            );
+            // Champ X
+            g_edit_x = CreateWindow(
+                "EDIT",
+                "100",
+                WS_VISIBLE | WS_CHILD | WS_BORDER,
+                35, 10, 80, 25,
+                hwnd,
+                (HMENU)ID_EDIT_X,
+                NULL,
+                NULL
+            );
+            // Label Y
+            CreateWindow(
+                "STATIC",
+                "Y :",
+                WS_VISIBLE | WS_CHILD,
+                130, 10, 20, 25,
+                hwnd,
+                NULL,
+                NULL,
+                NULL
+            );
+            // Champ Y
+            g_edit_y = CreateWindow(
+                "EDIT",
+                "100",
+                WS_VISIBLE | WS_CHILD | WS_BORDER,
+                155, 10, 80, 25,
+                hwnd,
+                (HMENU)ID_EDIT_Y,
+                NULL,
+                NULL
+            );
+            // Button
+            CreateWindow(
+                "BUTTON",
+                "Dessiner",
+                WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON,
+                250, 10, 90, 25,
+                hwnd,
+                (HMENU)ID_BUTTON,
+                NULL,
+                NULL
+            );
+            break;
         case WM_PAINT:
+            HDC hdc ;
+            PAINTSTRUCT ps;
+            RECT rect;
             hdc = BeginPaint (hwnd, &ps) ;
             GetClientRect (hwnd, &rect) ;
             DrawText (hdc, TEXT ("Hello, Windows 98!"), -1, &rect,
                 DT_SINGLELINE | DT_CENTER | DT_VCENTER) ;
+            HBRUSH red_brush = CreateSolidBrush(RGB(255, 0, 0));
+            HBRUSH old_brush = SelectObject(hdc, red_brush);
+            Rectangle(hdc, g_rect_x, g_rect_y, g_rect_x + 100, g_rect_y + 50);
+            SelectObject(hdc, old_brush);
+            DeleteObject(red_brush);
             EndPaint (hwnd, &ps) ;
-            return 0 ;
+            break;
+        case WM_COMMAND:
+            if (LOWORD(wParam) == ID_BUTTON)
+            {
+                char buffer[32];
+                GetWindowText(g_edit_x, buffer, sizeof(buffer));
+                g_rect_x = atoi(buffer);
+                GetWindowText(g_edit_y, buffer, sizeof(buffer));
+                g_rect_y = atoi(buffer);
+                InvalidateRect(hwnd, NULL, TRUE);
+            }
+            break;
         case WM_DESTROY:
             PostQuitMessage(0);
-        break;
+            break;
+        case WM_CLOSE:
+            DestroyWindow(hwnd);
+            break;
         default:
             return DefWindowProc(hwnd, msg, wParam, lParam);
     }
@@ -83,7 +163,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
     WNDCLASSEX wc;
     HWND hwnd;
-    MSG msg;
 
     //Step 1: Registering the Window Class
     wc.cbSize        = sizeof(WNDCLASSEX);
@@ -114,8 +193,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         WS_OVERLAPPEDWINDOW,                    // dwStyle
         CW_USEDEFAULT,                          // X            initial x position
         CW_USEDEFAULT,                          // Y            initial y position
-        240,                                    // nWidth       initial width
-        120,                                    // nHeight      initial length
+        640,                                    // nWidth       initial width
+        480,                                    // nHeight      initial length
         NULL,                                   // hWndParent   parent window handle
         NULL,                                   // hMenu        window menu handle
         hInstance,                              // hInstance    program instance handle
@@ -132,6 +211,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     UpdateWindow(hwnd);
 
     // Step 3: The Message Loop
+    MSG msg;
     while(GetMessage(&msg, NULL, 0, 0) > 0)
     {
         TranslateMessage(&msg);
