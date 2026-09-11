@@ -2,14 +2,14 @@
 -- Dealing with the console
 -------------------------------------------------
 
-write = io.write
+local write = io.write
 
 print("hello 1")
 print("hello 2");
 write("hello 3 "); write("world") ; write("\n")
 write("hello 4\n")
 print("hello 5") print("hello 6")
-a = 5 b = 22 -- valid !!!
+local a = 5 local b = 22 -- valid !!!
 print(a) b = b + 1 -- valid !!!
 print(b)
 
@@ -20,9 +20,12 @@ print(b)
 -- ; is not a separator but an optional terminator
 -- Grammar : chunk ::= {stat [`;´]}
 
-a = 5 b = 6 -- New line doesn't mean anything
-c = { 10, 20, 30, 40, 50}
-d = { alpha = 55, beta = 66, zeta = null, ["zorba"] = "youpi" }
+local c = 5 local d = 6 -- New line doesn't mean anything
+print(c + d) -- display 11
+local e = { 10, 20, 30, 40, 50}
+print(#e) -- display 5
+local f = { alpha = 55, beta = 66, zeta = nil, ["zorba"] = "youpi" }
+print(#f) -- display 0. The operator # doesn't know how to count tables with non numeric keys.
 
 -------------------------------------------------
 -- Selection
@@ -100,7 +103,7 @@ repeat
     a = a - 1
 until a == 0
 
--- no a x= operator
+-- no a x= operator with assign
 -- no else after while
 
 -------------------------------------------------
@@ -112,11 +115,11 @@ for i=1, 5, 2 do
     print("i=", i)
 end
 -- no else
--- i is local to the for
+-- i is local to the for, must not be modified in the loop
 print(i) -- print nil
 
 for i=1, 5 do
-    print("for will break at 3, i=", i) 
+    print("for will break at 3, i=", i)
     if i == 3 then
         break
     end
@@ -125,29 +128,30 @@ end
 
 for i=1, 5 do
     if i % 2 == 0 then
+        print("hello")
     end
 end
 
-a = {1, 3, 7, 8, 22}
-for index, value in ipairs(a) do
+local tab = {1, 3, 7, 8, 22}
+for index, value in ipairs(tab) do
     print(index, " => ", value)
 end
-print(#a)
+print(#tab) -- display 5
 
-for key, value in pairs(d) do
+for key, value in pairs(f) do
     print(key, ' => ', value) -- zeta is not treated
 end
 
-if d.zeta then
+if f.zeta then
     print("never will be")
 else
-    print("zeta key value is null")
+    print("zeta key value is nil") -- goes here
 end
 
-if d.nokey then
+if f.nokey then
     print("never will be")
 else
-    print("nokey doesn't exist")
+    print("nokey doesn't exist") -- goes here
 end
 
 repeat
@@ -164,20 +168,22 @@ print(type("abc"))
 print(type({}))
 
 -- String
-a = "abc"
-a = 'abc'
-a = "ab" .. "c" -- concat
-print(a)
+local s = "abc" or 'abc'
+print(s)
+s = "ab" .. "c" -- concat
+print(s)
 
 -- Boolean
-a = true
-b = false
-c = not b
-print(c)
+local ba = true
+local bb = false
+print(tostring(ba) .. ' vs ' .. tostring(bb)) -- true vs false
+local bc = not bb
+print(bc) -- true
 
 -- Numbers
-a = 1.0
-b = 1
+local num1 = 1.0
+local num2 = 1
+print(num1 == num2) -- true
 
 -- Table (list)
 a = { 1, 2, 3, 4, 5}
@@ -206,7 +212,7 @@ else
 end
 
 -- Matrix
-matrix = {
+local matrix = {
     {0, 0, 0, 0, 0, 0},
     {0, 0, 0, 0, 1, 0},
     {0, 0, 0, 0, 1, 0},
@@ -225,15 +231,7 @@ print("Line 4 Column 3 =" .. matrix[4][3]) -- y puis x
 print(matrix.size)
 
 -- Table & metatable (10h38 : that's ok :-)
-people_class_methods = {
-    new = function(default_name)
-        i = {}
-        setmetatable(i, {__index = people_instance_methods})
-        i:init(default_name)
-        return i
-    end
-}
-people_instance_methods = {
+local people_instance_methods = {
     init = function(self, default_name)
         self.name = default_name
     end,
@@ -245,16 +243,25 @@ people_instance_methods = {
     end,
 }
 
-p1 = people_class_methods.new("Bob")
-p1:hello()
-p1:setname("Zorba")
+local people_class_methods = {
+    new = function(default_name)
+        local i = {}
+        setmetatable(i, {__index = people_instance_methods})
+        i:init(default_name)
+        return i
+    end
+}
+
+local p1 = people_class_methods.new("Bob")
+p1:hello() -- display Hello! I'm Bob
+p1:setname("Zorba") -- Hello! I'm Zorba
 p1:hello()
 
 -------------------------------------------------
 -- OO
 -------------------------------------------------
 
-Class = {}
+local Class = {}
 Class.to_s = "Class"
 Class.class = Class
 Class.methods = {}
@@ -262,7 +269,7 @@ setmetatable(Class, {
     __index = Class.methods
 })
 
-Person = {}
+local Person = {}
 Person.count = 0 -- static var
 Person.to_s = "Person prop"
 Person.class = Class
@@ -275,21 +282,21 @@ function Person.methods.birthday(obj) -- declaration of an instance method
 end
 function Person.new(name, age) -- declaration of a static method
     -- local a = {table.unpack(Person)} -- necessary?
-    local a = {}
-    a.name = name
-    a.age = age
-    a.class = Person
+    local aa = {}
+    aa.name = name
+    aa.age = age
+    aa.class = Person
     local mt = getmetatable(Person)
-    setmetatable(a, mt)
+    setmetatable(aa, mt)
     Person.count = Person.count + 1
-    return a
+    return aa
 end
 function Person.to_s()
     return "Person"
 end
 
 print(Person.count)
-Bob = Person.new("Bob", 32)
+local Bob = Person.new("Bob", 32)
 print(Person.count)
 Bob:birthday()
 Bob.birthday(Bob)
@@ -306,15 +313,16 @@ print(Bob.class.class.to_s)
 -------------------------------------------------
 
 -- Open / Write files
-f = io.open("pipo.txt", "w")
-if f == nil then
+local file = io.open("pipo.txt", "w")
+if file == nil then
     print("Pb to open in w mode")
+else
+    file:write("hello pipo!\n")
+    file:write("another line to the pipo!\n")
+    file:close()
 end
-f:write("hello pipo!\n")
-f:write("another line to the pipo!\n")
-f:close()
 
-f = io.open("pipo.txt", "r")
+file = io.open("pipo.txt", "r")
 s = f:read("*line") -- read only one line by default, () equivalent to ("*line")
 print("read one (text, line): " .. s)
 f:close()
@@ -347,7 +355,7 @@ print(s)
 -- ne pas savoir simplement la longueur d'une table "hash/dict" et non "array/list" (alors que les versions précédentes le permettait avec getn : non ct équivalent à #).
 
 -- A layer is a simple matrix of size*size full of base
-function create_layer(size, base)
+local function create_layer(size, base)
     local layer = {}
     for i = 1, size do
         layer[i] = {}
@@ -360,7 +368,7 @@ function create_layer(size, base)
     return layer
 end
 
-function print_layer(layer)
+local function print_layer(layer)
     print("++ Print layer ++")
     print("Size : " .. layer.size .. " x " .. layer.size)
     for i = 1, layer.size do
@@ -374,7 +382,7 @@ end
 
 -- A map consist of layers
 -- layers can be indexed by numbers or keys
-function create_map(size, base, layer)
+local function create_map(size, base, layer)
     local map = {}
     -- print(type(layer))
     if type(layer) == "number" then
@@ -382,7 +390,7 @@ function create_map(size, base, layer)
             map[i] = create_layer(size, base)
         end
     elseif type(layer) == "table" then
-        for i, v in ipairs(layer) do
+        for _, v in ipairs(layer) do
             map[v] = create_layer(size, base)
         end
     else
@@ -394,21 +402,21 @@ function create_map(size, base, layer)
 end
 
 -- Test layers & map
-world1 = create_map(10, 0, 3)
-print(world1[3][10][10])
-print_layer(world1[3])
+local world1 = create_map(10, 0, 3)
+if world1 ~= nil then
+    print(world1[3][10][10])
+    print_layer(world1[3])
+end
 
-world2 = create_map(10, 22, { "sol", "brou", "unit" })
-print(world2.sol[10][10])
-print_layer(world2.sol)
+local world2 = create_map(10, 22, { "sol", "brou", "unit" })
+if world2 ~= nil then
+    print(world2.sol[10][10])
+    print_layer(world2.sol)
+end
 
 -- 15h43 ça marche !
 
-function is_free(layer, x1, y1, x2, y2)
-    return #get_not_free(layer, x1, y1, x2, y2) == 0
-end
-
-function get_not_free(layer, x1, y1, x2, y2)
+local function get_not_free(layer, x1, y1, x2, y2)
     local x_max = math.max(x1, x2)
     local x_min = math.min(x1, x2)
     local y_max = math.max(y1, y2)
@@ -426,7 +434,11 @@ function get_not_free(layer, x1, y1, x2, y2)
     return not_free
 end
 
-function print_table(tbl)
+local function is_free(layer, x1, y1, x2, y2)
+    return #get_not_free(layer, x1, y1, x2, y2) == 0
+end
+
+local function print_table(tbl)
     print("++ Print table ++")
     if tbl ~= nil and #tbl > 0 then
         io.write('Table : ')
@@ -451,7 +463,7 @@ end
 print_table(ret_table())
 --]]
 
-layer1 = create_layer(10, 0)
+local layer1 = create_layer(10, 0)
 layer1[5][5] = 1
 print(layer1[5][5])
 print(type(is_free(layer1, 5, 5, 5, 5)))
@@ -468,13 +480,13 @@ print_table(get_not_free(layer1, 1, 1, 10, 10))
 print(is_free(layer1, 1, 1, 10, 10))
 
 math.randomseed(os.time())
-for i=1, 10 do
-    r = math.random(20)
+for _=1, 10 do
+    local r = math.random(20)
     io.write(r, '  ')
 end
 print()
 
-function create_room(world, layer, x, y, w, h, content)
+local function create_room(world, layer, x, y, w, h, content)
     for i = x, x+w do
         for j = y, y+h do
             world[layer][i][j] = content
@@ -483,7 +495,7 @@ function create_room(world, layer, x, y, w, h, content)
     return x, y, w, h
 end
 
-function create_random_room(world, layer, max_w, max_h, content)
+local function create_random_room(world, layer, max_w, max_h, content)
     local w = math.random(max_w)
     local h = math.random(max_h)
     local x = math.random(world.size - w - 1)
@@ -491,11 +503,13 @@ function create_random_room(world, layer, max_w, max_h, content)
     create_room(world, layer, x, y, w, h, content)
 end
 
-world3 = create_map(30, 0, { "sol", "brou", "unit" })
-for i=1, 3 do
-    create_random_room(world3, "sol", 5, 5, '_')
+local world3 = create_map(30, 0, { "sol", "brou", "unit" })
+if world3 ~= nil then
+    for _=1, 3 do
+        create_random_room(world3, "sol", 5, 5, '_')
+    end
+    print_layer(world3.sol)
 end
-print_layer(world3.sol)
 
 -- 15h23
 
@@ -503,15 +517,15 @@ print_layer(world3.sol)
 -- Brouillard calc (~04/01/2017)
 -------------------------------------------------
 
-x = 5
+local x = 5
 local y = 7
-function localize()
+local function localize()
     print("x=", x) -- 5
     print("y=", y) -- 7 recognize
 end
 localize()
 
-function brou(x, y, vision)
+local function brou(x, y, vision)
     local xstart = x - vision
     local xend = x + vision
     local ystart = y - vision
@@ -522,7 +536,7 @@ function brou(x, y, vision)
     for i = xstart, xend do
         for j = ystart, yend do
             local brou = vision - math.max(math.abs(x-i), math.abs(y-j)) -- 15h51 : working (vision -) !!!
-            if i == x or j == y then 
+            if i == x or j == y then
                 brou = brou + 1
             end
             io.write(brou .. ' ')
@@ -533,7 +547,7 @@ end
 
 x = 5
 y = 5
-vision = 3
+local vision = 3
 brou(x, y, vision)
 
 x = 10
@@ -870,7 +884,7 @@ for k, i in pairs(getmetatable(separators)) do
             print("pipo2")
         end
     end
-    
+
 end]]
 
 -- http://www.blitzbasic.com/Products/blitzmax.php
@@ -974,7 +988,7 @@ TABLE
 
 LITTERAL
     STRING | NUMBER | nil
-    
+
 CLE
 
 BLOCK
@@ -985,7 +999,7 @@ BLOCK
 
 KEYWORD
     return EXPRESSION, EXPR2...
-    
+
 OPERATOR
     ~= diff
     # last continuous integer key
@@ -993,7 +1007,7 @@ OPERATOR
     .CLE
     .. concaténation de chaîne
     !Pas d'opérateurs d'affectation combinés X=
-    
+
 MAGIC FUNCTIONS
     type(VAR) -> string
     setmetatable(TABLE, METATABLE)
